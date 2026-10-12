@@ -1,5 +1,4 @@
 <script lang="ts">
-  import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
     IconAwsColor,
@@ -44,8 +43,8 @@
       : deploymentName || translate('workers.name-placeholder'),
   );
 
-  /** Which Region the preview treats as active; failover moves it. */
-  let activeIndex = $state(0);
+  /** The preview shows the primary as the active Region. */
+  const activeIndex = 0;
 
   const multiRegion = $derived(regions.length > 1);
   const active = $derived(regions[activeIndex] ?? regions[0]);
@@ -72,10 +71,6 @@
     region.role === 'replica'
       ? translate('workers.region-role-replica')
       : translate('workers.region-role-primary');
-
-  const togglePreview = () => {
-    activeIndex = activeIndex === 0 ? 1 : 0;
-  };
 
   /**
    * The path lights up from the Namespace as each step is filled in. Version
@@ -437,18 +432,6 @@
         {/each}
       </div>
     </div>
-
-    {#if multiRegion}
-      <div
-        class="h-px bg-gradient-to-r from-transparent via-[var(--color-border-primary)] to-transparent"
-        aria-hidden="true"
-      ></div>
-      <Button variant="tertiary" size="sm" class="mt-4" onclick={togglePreview}>
-        {activeIndex === 0
-          ? translate('workers.preview-failover')
-          : translate('workers.preview-failback')}
-      </Button>
-    {/if}
   </div>
 </aside>
 

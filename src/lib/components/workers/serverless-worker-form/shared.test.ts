@@ -9,6 +9,7 @@ import {
   interpolateTerraformTemplate,
   msToScaleDownStabilization,
   scaleDownStabilizationToMs,
+  validateRegionValues,
 } from './shared';
 
 describe('scale-down stabilization conversion', () => {
@@ -339,6 +340,55 @@ describe('AgentCore provider validation', () => {
 
   it('does not require Lambda or Cloud Run fields', () => {
     expect(errorPaths(valid)).toEqual([]);
+  });
+});
+
+describe('validateRegionValues', () => {
+  const valid = {
+    provider: 'lambda' as const,
+    lambdaArn: 'arn:aws:lambda:us-east-1:123456789012:function:w',
+    iamRoleArn: 'arn:aws:iam::123456789012:role/w',
+    roleExternalId: 'demo',
+    agentCoreEndpointArn: '',
+    gcpProject: '',
+    gcpRegion: '',
+    gcpWorkerPool: '',
+    gcpServiceAccount: '',
+    minReplicas: 0,
+    maxReplicas: 30,
+    initialReplicas: 0,
+    utilizationTarget: 0.8,
+    scaleDownStabilization: '90s',
+  };
+
+  it('passes a region whose resource the schema accepts', () => {
+    expect(validateRegionValues([{ regionId: 'east', values: valid }])).toEqual(
+      {},
+    );
+  });
+
+  it('reports a resource error the schema cannot see', () => {
+    // A well-formed ARN in a region that is not offered as a replica.
+    expect(
+      validateRegionValues([
+        {
+          regionId: 'replica',
+          values: valid,
+          resourceError: { field: 'lambdaArn', message: 'not offered' },
+        },
+      ]),
+    ).toEqual({ replica: { lambdaArn: ['not offered'] } });
+  });
+
+  it("puts the schema's own error on the field first", () => {
+    const errors = validateRegionValues([
+      {
+        regionId: 'replica',
+        values: { ...valid, lambdaArn: 'nope' },
+        resourceError: { field: 'lambdaArn', message: 'not offered' },
+      },
+    ]);
+    expect(errors.replica?.lambdaArn).toEqual(['Invalid Lambda ARN format']);
   });
 });
 

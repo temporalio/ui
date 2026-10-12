@@ -4,6 +4,8 @@ import {
   computeRegionsFor,
   previewSlot,
   regionServerErrors,
+  replicaRegionFor,
+  resourceRegion,
   shortResourceName,
   suggestRegionalArn,
   truncateMiddle,
@@ -155,5 +157,74 @@ describe('regionServerErrors', () => {
 
   it('places nothing without regions', () => {
     expect(regionServerErrors('aws-us-east-1: denied', undefined)).toEqual({});
+  });
+});
+
+describe('resourceRegion', () => {
+  const fields = (over: Partial<Record<string, string>>) => ({
+    lambdaArn: '',
+    agentCoreEndpointArn: '',
+    gcpRegion: '',
+    ...over,
+  });
+
+  it('reads the region from a Lambda ARN', () => {
+    expect(
+      resourceRegion(
+        'lambda',
+        fields({
+          lambdaArn: 'arn:aws:lambda:us-west-2:123456789012:function:w',
+        }),
+      ),
+    ).toBe('us-west-2');
+  });
+
+  it('reads the region from an AgentCore endpoint ARN', () => {
+    expect(
+      resourceRegion(
+        'agentcore',
+        fields({
+          agentCoreEndpointArn:
+            'arn:aws:bedrock-agentcore:eu-west-1:123456789012:runtime/r/runtime-endpoint/e',
+        }),
+      ),
+    ).toBe('eu-west-1');
+  });
+
+  it('takes a Cloud Run worker pool region as it is', () => {
+    expect(
+      resourceRegion('cloud-run', fields({ gcpRegion: 'us-central1' })),
+    ).toBe('us-central1');
+  });
+
+  it.each([
+    ['an empty ARN', ''],
+    ['a partial ARN', 'arn:aws:lambda:'],
+    ['something else', 'orders-worker'],
+  ])('has no region for %s', (_name, lambdaArn) => {
+    expect(resourceRegion('lambda', fields({ lambdaArn }))).toBeUndefined();
+  });
+});
+
+describe('replicaRegionFor', () => {
+  const options = computeRegionsFor(
+    [
+      { regionId: 'aws-us-west-2', label: 'us-west-2', role: 'replica' },
+      { regionId: 'aws-us-west-1', label: 'us-west-1', role: 'replica' },
+    ],
+    'lambda',
+  );
+
+  it('finds the offered region by its label', () => {
+    expect(replicaRegionFor('us-west-1', options)?.id).toBe('aws-us-west-1');
+  });
+
+  it('finds nothing for a region that is not offered', () => {
+    // e.g. a replica pointed back at the primary's region
+    expect(replicaRegionFor('us-east-1', options)).toBeUndefined();
+  });
+
+  it('finds nothing before a resource names a region', () => {
+    expect(replicaRegionFor(undefined, options)).toBeUndefined();
   });
 });

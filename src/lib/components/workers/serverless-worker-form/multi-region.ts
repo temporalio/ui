@@ -178,3 +178,38 @@ export const regionServerErrors = (
   const match = keys.find(({ key }) => error.startsWith(`${key}: `));
   return match ? { [match.regionId]: error.slice(match.key.length + 2) } : {};
 };
+
+/** The region segment of an ARN: arn:partition:service:REGION:account:… */
+const ARN_REGION = /^arn:[^:]+:[^:]+:([a-z0-9-]+):/;
+
+/**
+ * The region a resource runs in, as its provider names it: the region in a
+ * Lambda or AgentCore ARN, or a Cloud Run worker pool's region. Undefined
+ * until the field holds one.
+ */
+export const resourceRegion = (
+  provider: ComputeProviderValue,
+  fields: {
+    lambdaArn: string;
+    agentCoreEndpointArn: string;
+    gcpRegion: string;
+  },
+): string | undefined => {
+  if (provider === 'cloud-run') return fields.gcpRegion || undefined;
+  const arn =
+    provider === 'agentcore' ? fields.agentCoreEndpointArn : fields.lambdaArn;
+  return arn.match(ARN_REGION)?.[1];
+};
+
+/**
+ * The offered replica region a resource runs in. Matched on the label, which
+ * is the provider's own name for the region, so this repo never builds a
+ * region id from a resource.
+ */
+export const replicaRegionFor = (
+  region: string | undefined,
+  options: readonly ComputeRegion[],
+): ComputeRegion | undefined =>
+  region
+    ? options.find(({ label, id }) => (label ?? id) === region)
+    : undefined;

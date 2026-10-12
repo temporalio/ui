@@ -284,8 +284,6 @@ export const Strings = {
   'preview-description': 'Where Temporal sends Tasks.',
   'preview-namespace': 'Namespace',
   'preview-worker-deployment': 'Worker Deployment',
-  'preview-failover': 'Preview Failover',
-  'preview-failback': 'Back to Primary',
   'preview-active': 'Active',
   'preview-resource-lambda': 'Function',
   'preview-resource-agentcore': 'Endpoint',
@@ -308,8 +306,9 @@ export const Strings = {
   'high-availability': 'High availability',
   'high-availability-off':
     'Turn on to run Serverless Workers in a replica region after a failover.',
-  'replica-region': 'Replica region',
   'region-the-primary': 'the primary',
+  'replica-region-not-offered':
+    '{{region}} is not a replica region for this Namespace. Use a resource in {{regions}}.',
   'region-arn-suggested-from-primary':
     "Based on the primary's ARN. Check the version number for",
   'region-inherits-primary':

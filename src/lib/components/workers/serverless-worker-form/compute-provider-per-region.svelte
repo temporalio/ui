@@ -3,9 +3,8 @@
 
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
-  import Option from '$lib/holocene/select/option.svelte';
-  import Select from '$lib/holocene/select/select.svelte';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
+  import { formatList } from '$lib/i18n/format-list';
   import { translate } from '$lib/i18n/translate';
 
   import {
@@ -14,6 +13,8 @@
     type PreviewRegion,
     previewSlot,
     regionPreview,
+    replicaRegionFor,
+    resourceRegion,
     resourceValue,
     suggestRegionalArn,
   } from './multi-region';
@@ -114,12 +115,10 @@
   });
 
   let highAvailability = $state(untrack(() => enabledRegionIds.length > 0));
-  let selectedReplicaId = $state<string | undefined>(
-    untrack(
-      () =>
-        enabledRegionIds[0] ??
-        regions.find(({ role }) => role === 'replica')?.id,
-    ),
+  /** The region the replica's resource is first suggested in. */
+  const preferredReplicaId = untrack(
+    () =>
+      enabledRegionIds[0] ?? regions.find(({ role }) => role === 'replica')?.id,
   );
 
   /** The regions the selected provider offers for a replica. */
@@ -137,12 +136,9 @@
       })),
   );
 
-  const replicaRegion = $derived(
-    replicaOptions.find(({ id }) => id === selectedReplicaId) ??
+  const suggestedRegion = $derived(
+    replicaOptions.find(({ id }) => id === preferredReplicaId) ??
       replicaOptions[0],
-  );
-  const replicaLabel = $derived(
-    replicaRegion ? (replicaRegion.label ?? replicaRegion.id) : '',
   );
 
   /**
@@ -151,17 +147,10 @@
    * "aws-us-east-1" is invalid. Without a label, nothing is suggested.
    */
   const suggestFor = (arn: string): string =>
-    replicaRegion?.label ? suggestRegionalArn(arn, replicaRegion.label) : '';
-  const replicated = $derived(highAvailability && !!replicaRegion);
-
-  /** A resource is regional, so a different region starts it over. */
-  const selectReplica = (regionId: string) => {
-    selectedReplicaId = regionId;
-    replica.lambdaArnOverride = undefined;
-    replica.agentCoreEndpointArnOverride = undefined;
-    replica.gcpRegion = '';
-    replica.gcpWorkerPool = '';
-  };
+    suggestedRegion?.label
+      ? suggestRegionalArn(arn, suggestedRegion.label)
+      : '';
+  const replicated = $derived(highAvailability && replicaOptions.length > 0);
 
   const inheritsPrimary = $derived(!replica.customized);
 
@@ -172,6 +161,56 @@
     replica.agentCoreEndpointArnOverride ??
       suggestFor(primary.agentCoreEndpointArn),
   );
+
+  /**
+   * The resource decides the region. The replica's group is scoped to the
+   * offered region its resource runs in, so the two can never disagree.
+   */
+  const replicaResourceRegion = $derived(
+    resourceRegion(provider, {
+      lambdaArn: replicaLambdaArn,
+      agentCoreEndpointArn: replicaAgentCoreArn,
+      gcpRegion: replica.gcpRegion,
+    }),
+  );
+  const replicaRegion = $derived(
+    replicaRegionFor(replicaResourceRegion, replicaOptions),
+  );
+  const replicaLabel = $derived(
+    replicaRegion?.label ?? replicaResourceRegion ?? '',
+  );
+  /** Errors key a region by id; an unmatched replica has none yet. */
+  const replicaKey = $derived(replicaRegion?.id ?? 'replica');
+
+  /** The field that names the resource, and so its region. */
+  const resourceField = $derived(
+    provider === 'cloud-run'
+      ? ('gcpRegion' as const)
+      : provider === 'agentcore'
+        ? ('agentCoreEndpointArn' as const)
+        : ('lambdaArn' as const),
+  );
+
+  /** A resource in a region the consumer does not offer as a replica. */
+  const replicaRegionError = $derived(
+    replicated && replicaResourceRegion && !replicaRegion
+      ? translate('workers.replica-region-not-offered', {
+          region: replicaResourceRegion,
+          regions: formatList(
+            replicaOptions.map(({ label, id }) => label ?? id),
+            { style: 'long', type: 'disjunction' },
+          ),
+        })
+      : undefined,
+  );
+
+  const replicaErrors = $derived<ComputeFieldErrors>({
+    ...(replicaRegionError ? { [resourceField]: [replicaRegionError] } : {}),
+    ...regionErrors[replicaKey],
+  });
+
+  /** Headers name a region only once a resource gives one. */
+  const primaryResourceRegion = $derived(resourceRegion(provider, primary));
 
   const isSuggested = $derived(
     provider === 'agentcore'
@@ -238,27 +277,30 @@
     agentCoreEndpointArn: replicaAgentCoreArn,
   });
 
+  /** The replica as the preview and heading show it: matched, else suggested. */
+  const shownReplica = $derived(replicaRegion ?? suggestedRegion);
+
   const previewRegions = $derived<PreviewRegion[]>([
     regionPreview(primaryRegion, provider, primary),
-    ...(replicated && replicaRegion
+    ...(replicated && shownReplica
       ? [
           {
-            ...regionPreview(replicaRegion, provider, replicaFields),
+            ...regionPreview(shownReplica, provider, replicaFields),
             resource: previewSlot(
               resourceValue(provider, replicaFields),
               replicaResourceState,
             ),
             access: inheritsPrimary
               ? { value: '', state: 'inherited' as const }
-              : regionPreview(replicaRegion, provider, replicaFields).access,
+              : regionPreview(shownReplica, provider, replicaFields).access,
           },
         ]
       : []),
   ]);
 
   const shownRegions = $derived(
-    replicated && replicaRegion
-      ? [primaryRegion, replicaRegion]
+    replicated && shownReplica
+      ? [primaryRegion, shownReplica]
       : [primaryRegion],
   );
 
@@ -299,10 +341,13 @@
       values: formValues(primary, primary),
       scoped: false,
     },
-    ...(replicated && replicaRegion
+    ...(replicated
       ? [
           {
-            regionId: replicaRegion.id,
+            regionId: replicaKey,
+            resourceError: replicaRegionError
+              ? { field: resourceField, message: replicaRegionError }
+              : undefined,
             values: formValues(inheritsPrimary ? primary : replica, {
               lambdaArn: replicaLambdaArn,
               agentCoreEndpointArn: replicaAgentCoreArn,
@@ -353,8 +398,19 @@
 
   <div class="flex flex-col gap-4">
     <!-- The primary saves as the unscoped default group, so its only region is
-    the one its resource names. The header names none, in either state. -->
-    <RegionBlock title={translate('workers.region-role-primary')}>
+    the one its resource names. The header shows it once there is one. -->
+    <RegionBlock
+      region={primaryResourceRegion
+        ? {
+            id: primaryRegion.id,
+            role: 'primary',
+            label: primaryResourceRegion,
+            provider,
+          }
+        : undefined}
+      title={translate('workers.region-role-primary')}
+      showRole
+    >
       {@render serverError(primaryRegion.id)}
       <ComputeFields
         {provider}
@@ -384,7 +440,9 @@
 
     {#if replicaOptions.length}
       <RegionBlock
-        region={replicated ? replicaRegion : undefined}
+        region={replicated && replicaResourceRegion
+          ? { id: replicaKey, role: 'replica', label: replicaLabel, provider }
+          : undefined}
         title={translate('workers.region-role-replica')}
         showRole
         roleTooltip={translate('workers.region-role-replica-tooltip', {
@@ -400,23 +458,16 @@
             bind:checked={highAvailability}
           />
         {/snippet}
-        {#if replicated && replicaRegion}
-          <Select
-            id="replica-region"
-            label={translate('workers.replica-region')}
-            value={replicaRegion.id}
-            onChange={selectReplica}
-          >
-            {#each replicaOptions as option (option.id)}
-              <Option value={option.id}>{option.label ?? option.id}</Option>
-            {/each}
-          </Select>
-          {@render serverError(replicaRegion.id)}
+        {#if replicated}
+          {@render serverError(replicaKey)}
           <ComputeFields
             {provider}
+            leadingDivider={false}
             sections={['resource']}
-            idPrefix={replicaRegion.id}
-            lambdaArnPlaceholder={lambdaArnPlaceholderFor(replicaRegion.label)}
+            idPrefix="replica"
+            lambdaArnPlaceholder={lambdaArnPlaceholderFor(
+              suggestedRegion?.label,
+            )}
             bind:lambdaArn={
               () => replicaLambdaArn,
               (value) => (replica.lambdaArnOverride = value)
@@ -440,7 +491,7 @@
             bind:scaleUpBacklogThreshold={replica.scaleUpBacklogThreshold}
             bind:maxWorkerLifetimeMs={replica.maxWorkerLifetimeMs}
             bind:metricsPollIntervalMs={replica.metricsPollIntervalMs}
-            errors={regionErrors[replicaRegion.id]}
+            errors={replicaErrors}
           />
           {#if isSuggested}
             <p class="mt-2 text-xs text-secondary">
@@ -463,7 +514,7 @@
             <ComputeFields
               {provider}
               sections={['access', 'scaling']}
-              idPrefix={replicaRegion.id}
+              idPrefix="replica"
               bind:lambdaArn={
                 () => replicaLambdaArn,
                 (value) => (replica.lambdaArnOverride = value)
@@ -487,7 +538,7 @@
               bind:scaleUpBacklogThreshold={replica.scaleUpBacklogThreshold}
               bind:maxWorkerLifetimeMs={replica.maxWorkerLifetimeMs}
               bind:metricsPollIntervalMs={replica.metricsPollIntervalMs}
-              errors={regionErrors[replicaRegion.id]}
+              errors={replicaErrors}
             />
           {/if}
         {:else}

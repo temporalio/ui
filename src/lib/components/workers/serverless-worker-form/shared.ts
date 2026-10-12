@@ -252,6 +252,8 @@ export type RegionComputeValues = {
    * wherever no scoped group matches, as every group did before regions.
    */
   scoped?: boolean;
+  /** A problem with the resource that the schema cannot see, such as its region. */
+  resourceError?: { field: keyof ComputeFormValues; message: string };
 };
 
 export type ComputeFieldErrors = Partial<
@@ -266,16 +268,16 @@ export const validateRegionValues = (
   entries: readonly RegionComputeValues[],
 ): Record<string, ComputeFieldErrors> =>
   Object.fromEntries(
-    entries.flatMap(({ regionId, values }) => {
+    entries.flatMap(({ regionId, values, resourceError }) => {
       const result = editVersionSchema.safeParse(values);
-      return result.success
-        ? []
-        : [
-            [
-              regionId,
-              result.error.flatten().fieldErrors as ComputeFieldErrors,
-            ],
-          ];
+      const errors: ComputeFieldErrors = result.success
+        ? {}
+        : (result.error.flatten().fieldErrors as ComputeFieldErrors);
+      // The schema's own error on the field comes first, e.g. a malformed ARN.
+      if (resourceError && !errors[resourceError.field]) {
+        errors[resourceError.field] = [resourceError.message];
+      }
+      return Object.keys(errors).length ? [[regionId, errors]] : [];
     }),
   );
 
