@@ -7,7 +7,7 @@
   import Drawer from '$lib/holocene/drawer.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Link from '$lib/holocene/link.svelte';
-  import { Badge, type BadgeColorScheme } from '$lib/io/badge';
+  import { Badge } from '$lib/io/badge';
   import { BadgeStatus, type BadgeStatusValue } from '$lib/io/badge-status';
   import {
     IconExternalLink,
@@ -82,11 +82,25 @@
     activeFilters.filter(({ key }) => key !== 'kind').length,
   );
 
-  const kindColors: Record<CatalogExecutionKind, BadgeColorScheme> = {
-    workflow: 'info',
-    'standalone-activity': 'accent',
-    'standalone-nexus-operation': 'success',
+  const kindStyles: Record<
+    CatalogExecutionKind,
+    { glyph: string; badge: string }
+  > = {
+    workflow: {
+      glyph: 'rounded-sm bg-action-workflow',
+      badge: 'bg-action-workflow-overlay',
+    },
+    'standalone-activity': {
+      glyph: 'rounded-full bg-action-activity',
+      badge: 'bg-action-activity-overlay',
+    },
+    'standalone-nexus-operation': {
+      glyph: 'rotate-45 scale-[0.82] rounded-[1px] bg-action-nexus',
+      badge: 'bg-action-nexus-overlay',
+    },
   };
+
+  const isKind = (id: string): id is CatalogExecutionKind => id in kindStyles;
 
   const toggleTag = (tag: string) => {
     filters.tag = filters.tag === tag ? null : tag;
@@ -179,11 +193,13 @@
   };
 </script>
 
-{#snippet sourceBadge(descriptor: BrowserCatalogDescriptor)}
-  <Badge
-    text={descriptor.source.label}
-    colorScheme={descriptor.source.id === 'local' ? 'warning' : 'neutral'}
-  />
+{#snippet kindGlyph(kind: 'all' | CatalogExecutionKind, size = 'size-2.5')}
+  {#if kind !== 'all'}
+    <span
+      class="inline-block shrink-0 {size} {kindStyles[kind].glyph}"
+      aria-hidden="true"
+    ></span>
+  {/if}
 {/snippet}
 
 {#snippet runBadge(
@@ -245,6 +261,7 @@
     aria-pressed={pressed}
     {onclick}
   >
+    {#if isKind(option.id)}{@render kindGlyph(option.id)}{/if}
     <span class="min-w-0 flex-1 truncate">{option.label}</span>
     {@render count(option.count)}
   </button>
@@ -262,6 +279,7 @@
     aria-pressed={pressed}
     {onclick}
   >
+    {#if isKind(option.id)}{@render kindGlyph(option.id)}{/if}
     {option.label}
     {@render count(option.count)}
   </button>
@@ -311,7 +329,7 @@
 <div class="flex items-start gap-6">
   <nav
     aria-label="Filter examples"
-    class="hidden w-60 shrink-0 flex-col gap-5 md:flex"
+    class="hidden w-64 shrink-0 flex-col gap-5 md:flex"
   >
     <fieldset class="catalog-facet">
       <legend class="catalog-facet-title">Execution kind</legend>
@@ -405,7 +423,7 @@
     {/if}
 
     <ul
-      class="divide-y divide-primary border border-primary bg-surface-primary"
+      class="divide-y divide-primary overflow-hidden rounded-lg border border-primary bg-surface-primary"
       aria-label="Catalog examples"
     >
       {#each facets.descriptors as descriptor (descriptor.id)}
@@ -425,17 +443,21 @@
             <div
               class="mt-1 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-secondary"
             >
-              <Badge
-                text={kind.label}
-                colorScheme={kindColors[descriptor.execution.kind]}
-              />
+              <span
+                class="inline-flex h-5 items-center gap-1.5 rounded px-1.5 font-medium text-primary {kindStyles[
+                  descriptor.execution.kind
+                ].badge}"
+              >
+                {@render kindGlyph(descriptor.execution.kind, 'size-2')}
+                {kind.label}
+              </span>
               <span
                 >{kind.locationHeader}
                 <span class="break-all font-mono"
                   >{kind.location(descriptor)}</span
                 ></span
               >
-              {@render sourceBadge(descriptor)}
+              <span>{descriptor.source.label}</span>
             </div>
             <p class="mt-1 max-w-[70ch] text-xs text-secondary">
               {descriptor.description}
@@ -548,7 +570,7 @@
   }
 
   .catalog-facet-option {
-    @apply flex min-h-8 w-full items-center gap-2 border-l-2 border-transparent px-2 text-left text-sm hover:bg-interactive-secondary-hover;
+    @apply flex min-h-8 w-full items-center gap-2 rounded-r border-l-2 border-transparent px-2 text-left text-sm hover:bg-interactive-secondary-hover;
 
     &[aria-pressed='true'] {
       @apply border-brand bg-interactive-secondary-press font-medium;
@@ -556,7 +578,7 @@
   }
 
   .catalog-facet-chip {
-    @apply inline-flex h-9 shrink-0 items-center gap-1.5 whitespace-nowrap border border-primary bg-surface-primary px-3 text-sm;
+    @apply inline-flex h-9 shrink-0 items-center gap-1.5 whitespace-nowrap rounded border border-primary bg-surface-primary px-3 text-sm;
 
     &[aria-pressed='true'] {
       @apply border-brand bg-interactive-secondary-press font-medium;
@@ -564,7 +586,7 @@
   }
 
   .catalog-tag {
-    @apply h-[22px] border border-primary px-1.5 text-xs text-secondary hover:border-brand hover:text-primary;
+    @apply h-[22px] rounded border border-primary px-1.5 text-xs text-secondary hover:border-brand hover:text-primary;
 
     &[aria-pressed='true'] {
       @apply border-brand bg-interactive-secondary-hover text-primary;

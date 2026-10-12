@@ -163,8 +163,8 @@ describe('catalogKind', () => {
         return [locationHeader, location(d)];
       }),
     ).toEqual([
-      ['Task queue', 'catalog-tasks'],
-      ['Task queue', 'catalog-tasks'],
+      ['Task Queue', 'catalog-tasks'],
+      ['Task Queue', 'catalog-tasks'],
       ['Endpoint', 'catalog-endpoint'],
     ]);
   });

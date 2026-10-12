@@ -38,13 +38,13 @@ export const catalogKinds: readonly CatalogKindDefinition[] = [
   {
     kind: 'workflow',
     label: 'Workflow',
-    locationHeader: 'Task queue',
+    locationHeader: 'Task Queue',
     location: taskQueue,
   },
   {
     kind: 'standalone-activity',
     label: 'Standalone Activity',
-    locationHeader: 'Task queue',
+    locationHeader: 'Task Queue',
     location: taskQueue,
   },
   {

@@ -114,11 +114,11 @@ describe('CatalogList', () => {
 
     expect(body).toContain('Order lifecycle');
     expect(body).toContain('Start and inspect an order workflow.');
-    expect(body).toContain('<span>Workflow</span>');
-    expect(body).toMatch(/Task queue\s*<span[^>]*font-mono[^>]*>catalog-tasks/);
     expect(body).toMatch(
-      /class="[^"]*border-tertiary[^"]*bg-surface-tertiary[^"]*text-secondary[^"]*"[\s\S]*?<span>OSS<\/span>/,
+      /bg-action-workflow-overlay[^"]*"[^>]*>(?:<!--[^>]*-->|\s)*<span[^>]*bg-action-workflow[^>]*><\/span>(?:<!--[^>]*-->|\s)*Workflow<\/span>/,
     );
+    expect(body).toMatch(/Task Queue\s*<span[^>]*font-mono[^>]*>catalog-tasks/);
+    expect(body).toContain('<span>OSS</span>');
     expect(body).toMatch(
       /<button[^>]*class="catalog-tag[^"]*"[^>]*aria-pressed="false"[^>]*>Child workflows<\/button>/,
     );
@@ -177,7 +177,9 @@ describe('CatalogList', () => {
     expect(list.indexOf('Slow Nexus operation')).toBeLessThan(
       list.indexOf('Order lifecycle'),
     );
-    expect(list).toContain('<span>Standalone Nexus Operation</span>');
+    expect(list).toMatch(
+      /bg-action-nexus-overlay[^"]*"[^>]*>(?:<!--[^>]*-->|\s)*<span[^>]*bg-action-nexus[^>]*><\/span>(?:<!--[^>]*-->|\s)*Standalone Nexus Operation<\/span>/,
+    );
     expect(list).toMatch(/Endpoint\s*<span[^>]*>catalog-endpoint/);
   });
 
@@ -301,7 +303,6 @@ describe('CatalogList', () => {
     );
 
     expect(source).toContain('catalog-search');
-    expect(source).toContain('descriptor.source.id');
     expect(source).toContain('descriptor.source.label');
     expect(source).not.toContain("['all', 'shared', 'local']");
     expect(source).toContain('exampleHref: (exampleId: string) => string;');
