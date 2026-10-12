@@ -3,6 +3,7 @@ import { describe, expect, it, test } from 'vitest';
 import {
   computeRegionsFor,
   previewSlot,
+  regionServerErrors,
   shortResourceName,
   suggestRegionalArn,
   truncateMiddle,
@@ -116,5 +117,36 @@ describe('computeRegionsFor', () => {
       'lambda',
     );
     expect(region.label).toBe('us-east-1');
+  });
+});
+
+describe('regionServerErrors', () => {
+  const regions = computeRegionsFor(
+    [
+      { regionId: 'aws-us-east-1', role: 'primary' },
+      { regionId: 'aws-us-west-2', role: 'replica' },
+    ],
+    'lambda',
+  );
+
+  it('places an error under the region its group key names', () => {
+    expect(
+      regionServerErrors(
+        'aws-us-west-2: cannot connect to the compute provider',
+        regions,
+      ),
+    ).toEqual({ 'aws-us-west-2': 'cannot connect to the compute provider' });
+  });
+
+  it.each([
+    ['no error', undefined],
+    ['an error that names no region', 'something went wrong'],
+    ['a region without the separator', 'aws-us-west-2 is unreachable'],
+  ])('places nothing for %s', (_name, error) => {
+    expect(regionServerErrors(error, regions)).toEqual({});
+  });
+
+  it('places nothing without regions', () => {
+    expect(regionServerErrors('aws-us-east-1: denied', undefined)).toEqual({});
   });
 });

@@ -292,7 +292,7 @@ export const Strings = {
   'preview-same-as': 'Same as',
   'preview-not-set': 'Not set',
   'preview-workers': 'Workers',
-  'preview-own-workers': 'Your Workers',
+  'preview-no-serverless-workers': 'No Serverless Workers',
   'regions-section-description':
     'is a multi-region Namespace. Temporal invokes the resource in the active Region.',
   'region-role-primary-tooltip':
@@ -304,6 +304,9 @@ export const Strings = {
     'If the Namespace fails over to this Region, Tasks for this version wait until other Workers poll.',
   'region-not-configured-in': 'No Serverless Workers in {{regions}}',
   'region-all': 'All Regions',
+  'region-serverless-workers': 'Serverless Workers',
+  'region-replica-off':
+    'Off. A failover to {{region}} finds no Serverless Workers.',
   'region-arn-suggested': 'Based on the',
   'region-arn-suggested-hint': 'ARN. Check the version number for',
   'region-inherits-primary':

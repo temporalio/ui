@@ -13,6 +13,7 @@
     type ComputeRegion,
     lambdaArnPlaceholderFor,
     regionPreview,
+    regionServerErrors,
   } from './multi-region';
   import {
     type ComputeFieldErrors,
@@ -105,6 +106,10 @@
   let regionValues = $state<RegionComputeValues[]>([]);
   let regionErrors = $state<Record<string, ComputeFieldErrors>>({});
 
+  /** A server error that names a region shows in that region's block. */
+  const errorsByRegion = $derived(regionServerErrors(error, regions));
+  const errorInRegion = $derived(Object.keys(errorsByRegion).length > 0);
+
   const superform = superForm(
     {
       provider: getInitialComputeProvider({
@@ -156,7 +161,7 @@
 </script>
 
 <div class="relative flex max-w-[45rem] flex-col gap-6">
-  {#if error}
+  {#if error && !errorInRegion}
     <Alert intent="error" title={translate('common.error-occurred')}
       >{error}</Alert
     >
@@ -178,6 +183,7 @@
           {buildId}
           bind:regionValues
           {regionErrors}
+          regionServerErrors={errorsByRegion}
         />
       {:else}
         <ComputeProviderPicker

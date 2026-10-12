@@ -85,8 +85,8 @@ export interface PreviewRegion {
   regionId: string;
   label: string;
   role?: ComputeRegionRole;
-  /** The customer's own Workers serve this Region. */
-  selfManaged: boolean;
+  /** False when this region runs no Serverless Workers. */
+  serverless: boolean;
   resource: PreviewSlot;
   access: PreviewSlot;
 }
@@ -144,7 +144,7 @@ export const regionPreview = (
   regionId: region.id,
   label: region.label ?? region.id,
   role: region.role,
-  selfManaged: false,
+  serverless: true,
   resource: previewSlot(resourceValue(provider, fields)),
   access: previewSlot(accessValue(provider, fields)),
 });
@@ -158,4 +158,19 @@ export const truncateMiddle = (value: string, maxLength = 16): string => {
   const keep = maxLength - 1;
   const head = Math.ceil(keep / 2);
   return `${value.slice(0, head)}…${value.slice(value.length - (keep - head))}`;
+};
+
+/**
+ * The region a server error names, with the rest of the message. The worker
+ * controller prefixes a scaling group's error with the group's key, and a
+ * multi-region Version keys each group by its region.
+ */
+export const regionServerErrors = (
+  error: string | undefined,
+  regions: readonly ComputeRegion[] | undefined,
+): Record<string, string> => {
+  const region = regions?.find(({ id }) => error?.startsWith(`${id}: `));
+  return region && error
+    ? { [region.id]: error.slice(region.id.length + 2) }
+    : {};
 };

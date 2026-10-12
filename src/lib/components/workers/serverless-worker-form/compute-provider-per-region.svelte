@@ -1,7 +1,9 @@
 <script lang="ts">
   import { untrack } from 'svelte';
 
+  import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
 
   import {
@@ -38,6 +40,14 @@
     regionValues?: RegionComputeValues[];
     /** Field errors per region, keyed by region id. */
     regionErrors?: Record<string, ComputeFieldErrors>;
+    /** A server error that names one region, keyed by region id. */
+    regionServerErrors?: Record<string, string>;
+    /**
+     * Replica regions that start with Serverless Workers on, for example
+     * because the Version being edited already has a group for them. Every
+     * other replica starts off.
+     */
+    enabledRegionIds?: readonly string[];
   }
 
   let {
@@ -48,13 +58,14 @@
     buildId,
     regionValues = $bindable([]),
     regionErrors = {},
+    regionServerErrors = {},
+    enabledRegionIds = [],
   }: Props = $props();
 
   let provider = $state<ComputeProviderValue>(
     untrack(() => regions[0]?.provider ?? 'lambda'),
   );
 
-  /** The customer runs their own Workers in the primary (replica-only). */
   const emptyEntry = (region: ComputeRegion) => ({
     regionId: region.id,
     label: region.label ?? region.id,
@@ -92,6 +103,7 @@
     untrack(() =>
       regions.slice(1).map((region) => ({
         ...emptyEntry(region),
+        enabled: enabledRegionIds.includes(region.id),
         customized: false,
         lambdaArnOverride: undefined as string | undefined,
         agentCoreEndpointArnOverride: undefined as string | undefined,
@@ -170,6 +182,7 @@
         agentCoreEndpointArn: replicaAgentCoreArn(replica),
       };
       const own = regionPreview(regions[index + 1], provider, fields);
+      if (!replica.enabled) return { ...own, serverless: false };
       const resource = resourceValue(provider, fields);
       return {
         ...own,
@@ -180,6 +193,7 @@
       };
     }),
   ]);
+
   /**
    * What a region saves. A replica that has not been customized takes the
    * primary's Access and Scaling. Its resource stays its own, because the
@@ -214,21 +228,47 @@
 
   const savedValues = $derived<RegionComputeValues[]>([
     { regionId: primary.regionId, values: formValues(primary, primary) },
-    ...replicas.map((replica) => ({
-      regionId: replica.regionId,
-      values: formValues(inheritsPrimary(replica) ? primary : replica, {
-        lambdaArn: replicaLambdaArn(replica),
-        agentCoreEndpointArn: replicaAgentCoreArn(replica),
-        gcpRegion: replica.gcpRegion,
-        gcpWorkerPool: replica.gcpWorkerPool,
-      }),
-    })),
+    ...replicas
+      .filter((replica) => replica.enabled)
+      .map((replica) => ({
+        regionId: replica.regionId,
+        values: formValues(inheritsPrimary(replica) ? primary : replica, {
+          lambdaArn: replicaLambdaArn(replica),
+          agentCoreEndpointArn: replicaAgentCoreArn(replica),
+          gcpRegion: replica.gcpRegion,
+          gcpWorkerPool: replica.gcpWorkerPool,
+        }),
+      })),
   ]);
+
+  /**
+   * The project is shared across regions, so an inheriting replica shows the
+   * primary's. Editing it there starts the replica's own settings.
+   */
+  const replicaProject = (replica: Replica): string =>
+    inheritsPrimary(replica) ? primary.gcpProject : replica.gcpProject;
+
+  const setReplicaProject = (replica: Replica, value: string) => {
+    customize(replica);
+    replica.gcpProject = value;
+  };
 
   $effect(() => {
     regionValues = savedValues;
   });
 </script>
+
+{#snippet serverError(regionId: string)}
+  {#if regionServerErrors[regionId]}
+    <Alert
+      intent="error"
+      title={translate('common.error-occurred')}
+      class="mb-4"
+    >
+      {regionServerErrors[regionId]}
+    </Alert>
+  {/if}
+{/snippet}
 
 {#snippet regionFields(entry: Entry)}
   <ComputeFields
@@ -283,6 +323,7 @@
         region: primaryRegion,
       })}
     >
+      {@render serverError(primary.regionId)}
       {@render regionFields(primary)}
     </RegionBlock>
 
@@ -293,66 +334,28 @@
         roleTooltip={translate('workers.region-role-replica-tooltip', {
           region: replica.label,
         })}
+        bodyClass={replica.enabled ? '' : 'py-3'}
       >
-        <ComputeFields
-          {provider}
-          leadingDivider={false}
-          sections={['resource']}
-          idPrefix={replica.regionId}
-          lambdaArnPlaceholder={lambdaArnPlaceholderFor(replica.label)}
-          bind:lambdaArn={
-            () => replicaLambdaArn(replica),
-            (value) => (replica.lambdaArnOverride = value)
-          }
-          bind:agentCoreEndpointArn={
-            () => replicaAgentCoreArn(replica),
-            (value) => (replica.agentCoreEndpointArnOverride = value)
-          }
-          bind:iamRoleArn={replica.iamRoleArn}
-          bind:roleExternalId={replica.roleExternalId}
-          bind:gcpProject={replica.gcpProject}
-          bind:gcpRegion={replica.gcpRegion}
-          bind:gcpWorkerPool={replica.gcpWorkerPool}
-          bind:gcpServiceAccount={replica.gcpServiceAccount}
-          bind:minReplicas={replica.minReplicas}
-          bind:maxReplicas={replica.maxReplicas}
-          bind:initialReplicas={replica.initialReplicas}
-          bind:utilizationTarget={replica.utilizationTarget}
-          bind:scaleDownStabilization={replica.scaleDownStabilization}
-          bind:scaleUpCooloffMs={replica.scaleUpCooloffMs}
-          bind:scaleUpBacklogThreshold={replica.scaleUpBacklogThreshold}
-          bind:maxWorkerLifetimeMs={replica.maxWorkerLifetimeMs}
-          bind:metricsPollIntervalMs={replica.metricsPollIntervalMs}
-          errors={regionErrors[replica.regionId]}
-        />
-        {#if isSuggested(replica)}
-          <p class="mt-2 text-xs text-secondary">
-            {translate('workers.region-arn-suggested')}
-            <span class="font-medium text-primary">{primaryRegion}</span>
-            {translate('workers.region-arn-suggested-hint')}
-            <span class="font-medium text-primary">{replica.label}</span>.
+        {#snippet action()}
+          <ToggleSwitch
+            id="{replica.regionId}-serverless"
+            label={translate('workers.region-serverless-workers')}
+            labelPosition="left"
+            bind:checked={replica.enabled}
+          />
+        {/snippet}
+        {#if !replica.enabled}
+          <p class="text-sm text-secondary">
+            {translate('workers.region-replica-off', { region: replica.label })}
           </p>
-        {/if}
-        {#if inheritsPrimary(replica)}
-          <hr class="my-5 border-primary" />
-          <div class="flex flex-col items-start gap-3">
-            <p class="text-sm text-secondary">
-              {translate('workers.region-inherits-primary')}
-              <span class="font-medium text-primary">{primaryRegion}</span>
-            </p>
-            <Button
-              variant="tertiary"
-              size="sm"
-              onclick={() => customize(replica)}
-            >
-              {translate('workers.region-customize')}
-            </Button>
-          </div>
         {:else}
+          {@render serverError(replica.regionId)}
           <ComputeFields
             {provider}
-            sections={['access', 'scaling']}
+            leadingDivider={false}
+            sections={['resource']}
             idPrefix={replica.regionId}
+            lambdaArnPlaceholder={lambdaArnPlaceholderFor(replica.label)}
             bind:lambdaArn={
               () => replicaLambdaArn(replica),
               (value) => (replica.lambdaArnOverride = value)
@@ -363,7 +366,10 @@
             }
             bind:iamRoleArn={replica.iamRoleArn}
             bind:roleExternalId={replica.roleExternalId}
-            bind:gcpProject={replica.gcpProject}
+            bind:gcpProject={
+              () => replicaProject(replica),
+              (value) => setReplicaProject(replica, value)
+            }
             bind:gcpRegion={replica.gcpRegion}
             bind:gcpWorkerPool={replica.gcpWorkerPool}
             bind:gcpServiceAccount={replica.gcpServiceAccount}
@@ -378,6 +384,60 @@
             bind:metricsPollIntervalMs={replica.metricsPollIntervalMs}
             errors={regionErrors[replica.regionId]}
           />
+          {#if isSuggested(replica)}
+            <p class="mt-2 text-xs text-secondary">
+              {translate('workers.region-arn-suggested')}
+              <span class="font-medium text-primary">{primaryRegion}</span>
+              {translate('workers.region-arn-suggested-hint')}
+              <span class="font-medium text-primary">{replica.label}</span>.
+            </p>
+          {/if}
+          {#if inheritsPrimary(replica)}
+            <hr class="my-5 border-primary" />
+            <div class="flex flex-col items-start gap-3">
+              <p class="text-sm text-secondary">
+                {translate('workers.region-inherits-primary')}
+                <span class="font-medium text-primary">{primaryRegion}</span>
+              </p>
+              <Button
+                variant="tertiary"
+                size="sm"
+                onclick={() => customize(replica)}
+              >
+                {translate('workers.region-customize')}
+              </Button>
+            </div>
+          {:else}
+            <ComputeFields
+              {provider}
+              sections={['access', 'scaling']}
+              idPrefix={replica.regionId}
+              bind:lambdaArn={
+                () => replicaLambdaArn(replica),
+                (value) => (replica.lambdaArnOverride = value)
+              }
+              bind:agentCoreEndpointArn={
+                () => replicaAgentCoreArn(replica),
+                (value) => (replica.agentCoreEndpointArnOverride = value)
+              }
+              bind:iamRoleArn={replica.iamRoleArn}
+              bind:roleExternalId={replica.roleExternalId}
+              bind:gcpProject={replica.gcpProject}
+              bind:gcpRegion={replica.gcpRegion}
+              bind:gcpWorkerPool={replica.gcpWorkerPool}
+              bind:gcpServiceAccount={replica.gcpServiceAccount}
+              bind:minReplicas={replica.minReplicas}
+              bind:maxReplicas={replica.maxReplicas}
+              bind:initialReplicas={replica.initialReplicas}
+              bind:utilizationTarget={replica.utilizationTarget}
+              bind:scaleDownStabilization={replica.scaleDownStabilization}
+              bind:scaleUpCooloffMs={replica.scaleUpCooloffMs}
+              bind:scaleUpBacklogThreshold={replica.scaleUpBacklogThreshold}
+              bind:maxWorkerLifetimeMs={replica.maxWorkerLifetimeMs}
+              bind:metricsPollIntervalMs={replica.metricsPollIntervalMs}
+              errors={regionErrors[replica.regionId]}
+            />
+          {/if}
         {/if}
       </RegionBlock>
     {/each}

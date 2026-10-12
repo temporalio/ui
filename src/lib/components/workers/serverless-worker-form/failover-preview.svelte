@@ -66,7 +66,7 @@
   );
 
   const isReady = (region: PreviewRegion): boolean =>
-    region.selfManaged || region.resource.state !== 'missing';
+    region.serverless && region.resource.state !== 'missing';
 
   const roleLabel = (region: PreviewRegion): string =>
     region.role === 'replica'
@@ -225,9 +225,9 @@
       <span class="inline-flex items-center gap-1.5">
         {@render mark(isReady(region) ? 'set' : 'missing')}
         <span class="font-medium text-primary">{region.label}</span>
-        {#if region.selfManaged}
+        {#if !region.serverless}
           <span class="text-secondary">
-            {translate('workers.preview-own-workers')}
+            {translate('workers.preview-no-serverless-workers')}
           </span>
         {:else if region.resource.state !== 'missing'}
           <span class="text-secondary">{region.resource.value}</span>
@@ -422,10 +422,10 @@
               class:min-h-[107px]={multiRegion}
               class:py-[9px]={multiRegion}
             >
-              {#if region.selfManaged}
+              {#if !region.serverless}
                 {@render field(translate('workers.preview-workers'), {
-                  value: translate('workers.preview-own-workers'),
-                  state: 'set',
+                  value: translate('workers.preview-no-serverless-workers'),
+                  state: 'missing',
                 })}
               {:else}
                 {@render field(resourceLabel, region.resource)}
