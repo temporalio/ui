@@ -182,6 +182,7 @@
   onClick={close}
   id="version-details-drawer"
   labelledby="version-details-heading"
+  backdrop
   closeButtonLabel={translate('deployments.details-close')}
   closePadding={false}
   class="w-screen sm:w-[560px] sm:max-w-[560px]"
