@@ -12,10 +12,43 @@
     formatDurationMs,
     getScalingGroups,
     hasRegionScopedGroups,
+    type NamespaceRegion,
   } from '$lib/utilities/compute-regions';
 
-  let { computeConfig }: { computeConfig: ComputeConfig | undefined } =
-    $props();
+  let {
+    computeConfig,
+    namespaceRegions = [],
+  }: {
+    computeConfig: ComputeConfig | undefined;
+    namespaceRegions?: readonly NamespaceRegion[];
+  } = $props();
+
+  /**
+   * A group's column, named as the form names it. The unscoped group is the
+   * primary; a scoped group takes the role of the Namespace region it names.
+   * Without the Namespace's regions, the group's own regions are shown.
+   */
+  const groupHeading = (
+    regionIds: string[],
+  ): { region: string; role?: string } => {
+    const region = regionIds.length
+      ? namespaceRegions.find(({ regionId }) => regionIds.includes(regionId))
+      : namespaceRegions.find(({ role }) => role === 'primary');
+    if (!region) {
+      return {
+        region: regionIds.length
+          ? regionIds.join(', ')
+          : translate('workers.region-all'),
+      };
+    }
+    return {
+      region: region.label ?? region.regionId,
+      role:
+        region.role === 'replica'
+          ? translate('workers.region-role-replica')
+          : translate('workers.region-role-primary'),
+    };
+  };
 
   /** Header cell of the parent table's Region column, when there is one. */
   const REGION_HEADER = 'thead th:nth-child(3)';
@@ -36,9 +69,14 @@
     if (!header) return;
     const measure = () => {
       const padding = parseFloat(getComputedStyle(header).paddingLeft) || 0;
+      const cell = own.querySelector('td');
+      const cellPadding = cell
+        ? parseFloat(getComputedStyle(cell).paddingLeft) || 0
+        : 0;
       labelWidth =
         header.getBoundingClientRect().left +
         padding -
+        cellPadding -
         own.getBoundingClientRect().left;
     };
     measure();
@@ -165,26 +203,29 @@
 
 {#if isCompute}
   <div class="bg-surface-secondary py-3 text-xs">
-    <div class="pl-6 pr-4">
+    <div class="px-4">
       <table bind:this={table} class="w-full table-fixed">
         {#if isMultiRegion}
           <thead>
             <tr>
               <th
-                class="pb-2"
+                class="pb-2 pl-2"
                 class:w-48={labelWidth === undefined}
                 style:width={labelWidth === undefined
                   ? undefined
                   : `${labelWidth}px`}
               ></th>
               {#each perGroup as group (group.name)}
-                <th class="pb-2 text-left font-normal">
+                {@const heading = groupHeading(group.regionIds)}
+                <th class="pb-2 pl-2 text-left font-normal">
                   <span class="flex items-center gap-1.5">
                     <span class="font-medium text-primary">
-                      {group.regionIds.length
-                        ? group.regionIds.join(', ')
-                        : translate('workers.region-all')}
+                      {heading.region}
                     </span>
+                    {#if heading.role}
+                      <span class="text-secondary" aria-hidden="true">·</span>
+                      <span class="text-secondary">{heading.role}</span>
+                    {/if}
                   </span>
                 </th>
               {/each}
@@ -196,7 +237,7 @@
             <tr>
               <th
                 scope="row"
-                class="py-1.5 pr-4 text-left font-normal text-secondary"
+                class="py-1.5 pl-2 pr-4 text-left font-normal text-secondary"
                 class:w-48={labelWidth === undefined}
                 style:width={labelWidth === undefined
                   ? undefined
@@ -205,7 +246,7 @@
                 {row.label}
               </th>
               {#each row.cells as cell, index (index)}
-                <td class="py-1.5 pr-4 text-primary">
+                <td class="py-1.5 pl-2 pr-4 text-primary">
                   {@render value(cell)}
                 </td>
               {/each}

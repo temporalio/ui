@@ -401,6 +401,7 @@
         {namespace}
         {deploymentName}
         buildId={versionBuildId}
+        {namespaceRegions}
       />
     </td>
   </tr>
