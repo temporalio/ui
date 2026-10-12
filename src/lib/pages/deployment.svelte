@@ -5,6 +5,7 @@
   import DeleteDeploymentModal from '$lib/components/deployments/delete-deployment-modal.svelte';
   import DeploymentHeader from '$lib/components/deployments/deployment-header.svelte';
   import RampUnversionedModal from '$lib/components/deployments/ramp-unversioned-modal.svelte';
+  import VersionDetailsDrawer from '$lib/components/deployments/version-details/version-details-drawer.svelte';
   import VersionTableRow from '$lib/components/deployments/version-table-row.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Error from '$lib/holocene/error.svelte';
@@ -221,6 +222,16 @@
       {/snippet}
     </PaginatedTable>
   </div>
+
+  <VersionDetailsDrawer
+    {namespace}
+    {deploymentName}
+    {info}
+    conflictToken={deployment.conflictToken}
+    {namespaceRegions}
+    onChange={reload}
+    onValidationComplete={reload}
+  />
 
   {#if deleteError}
     <Error error={deleteError} />
