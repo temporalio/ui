@@ -199,7 +199,16 @@ const toScalingGroupsPayload = (
   Object.fromEntries(
     Object.entries(computeConfig.scalingGroups ?? {}).map(([name, group]) => [
       name,
-      { scalingGroup: group, updateMask: 'provider,scaler' },
+      {
+        scalingGroup: group,
+        // An existing group changes only in the masked fields, so a group's
+        // regions must be masked to change. Only when it sets them: a server
+        // older than region_ids rejects the path, and single-region edits must
+        // keep working there.
+        updateMask: group.regionIds?.length
+          ? 'provider,scaler,region_ids'
+          : 'provider,scaler',
+      },
     ]),
   );
 
