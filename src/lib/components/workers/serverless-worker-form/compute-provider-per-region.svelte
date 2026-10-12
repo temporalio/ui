@@ -158,7 +158,7 @@
     regionErrors[replicaKey] ?? {},
   );
 
-  /** The primary's header names a region once its resource gives one. */
+  /** Where the primary's resource runs, for the same-region warning. */
   const primaryResourceRegion = $derived(resourceRegion(provider, primary));
 
   /**
@@ -355,18 +355,11 @@
   />
 
   <div class="flex flex-col gap-4">
-    <!-- Both headers name where a resource runs, once it gives a region. The
-    replica's group is scoped to the Namespace's replica either way; the
-    Regions line and the Replica tooltip say which. -->
+    <!-- With high availability on, the headers name the Namespace regions the
+    worker controller runs in, which is what region_ids means and what the
+    config saves. A resource's own region does not change them. -->
     <RegionBlock
-      region={primaryResourceRegion
-        ? {
-            id: primaryRegion.id,
-            role: 'primary',
-            label: primaryResourceRegion,
-            provider,
-          }
-        : undefined}
+      region={replicated ? primaryRegion : undefined}
       title={translate('workers.region-role-primary')}
       showRole
     >
@@ -399,14 +392,7 @@
 
     {#if replicaRegion}
       <RegionBlock
-        region={replicated && replicaResourceRegion
-          ? {
-              id: replicaKey,
-              role: 'replica',
-              label: replicaResourceRegion,
-              provider,
-            }
-          : undefined}
+        region={replicated ? replicaRegion : undefined}
         title={translate('workers.region-role-replica')}
         showRole
         roleTooltip={translate('workers.region-role-replica-tooltip', {
