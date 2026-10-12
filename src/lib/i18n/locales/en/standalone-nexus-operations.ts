@@ -71,7 +71,6 @@ export const Strings = {
   'operation-event-history': 'Operation Event History',
   'run-details-section': 'Run Details',
   'operation-details-section': 'Operation Details',
-  'attempt-section': 'Start Attempts',
   'start-attempts': 'Start Attempts',
   'timeout-configuration': 'Timeout Configuration',
   'endpoint-name': 'Endpoint Name',

@@ -163,11 +163,11 @@
 
     <div class="space-y-4">
       <h5 class="text-secondary">
-        {translate('standalone-nexus-operations.attempt-section')}
+        {translate('standalone-nexus-operations.start-attempts')}
       </h5>
       <DetailList
         rowCount={3}
-        aria-label={translate('standalone-nexus-operations.attempt-section')}
+        aria-label={translate('standalone-nexus-operations.start-attempts')}
         class="gap-y-4"
       >
         <DetailListLabel
