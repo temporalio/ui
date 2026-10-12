@@ -1,3 +1,5 @@
+import { limitAsync } from 'es-toolkit';
+
 import { allLifecycleGroupFilterDefinitions } from './lifecycle-group-filter-indexes/filter-definitions';
 import { getWorkflowExecutionKeyFromIdentity } from './workflow-execution/get-key-from-identity';
 import type {
@@ -175,6 +177,67 @@ export class Workflows {
     }
 
     return Array.from(executions.values());
+  }
+
+  /** Discovers currently known children with bounded concurrency, in reference order.
+   * Does not load child histories or traverse grandchildren. */
+  async discoverChildExecutions(
+    parentExecution: WorkflowExecution,
+    maxConcurrentDiscoveries: number = 4,
+    signal?: AbortSignal,
+  ): Promise<readonly WorkflowExecution[]> {
+    signal?.throwIfAborted();
+
+    if (
+      !Number.isInteger(maxConcurrentDiscoveries) ||
+      maxConcurrentDiscoveries < 1
+    ) {
+      throw new RangeError(
+        'maxConcurrentDiscoveries must be a positive integer',
+      );
+    }
+
+    const references = Array.from(
+      parentExecution.childExecutionReferences.values(),
+    );
+
+    if (!references.length) {
+      return [];
+    }
+
+    const controller = new AbortController();
+    const abortDiscovery = () => controller.abort(signal?.reason);
+    signal?.addEventListener('abort', abortDiscovery, { once: true });
+
+    const discoverChild = limitAsync(
+      async (identity: WorkflowExecutionIdentity) => {
+        controller.signal.throwIfAborted();
+
+        const execution = await this.getOrCreateExecution(
+          identity,
+          controller.signal,
+        );
+
+        controller.signal.throwIfAborted();
+
+        return execution;
+      },
+      maxConcurrentDiscoveries,
+    );
+
+    const discoveries = references.map((reference) =>
+      discoverChild(reference.identity),
+    );
+
+    try {
+      return await Promise.all(discoveries);
+    } catch (error) {
+      controller.abort(error);
+      await Promise.allSettled(discoveries);
+      throw error;
+    } finally {
+      signal?.removeEventListener('abort', abortDiscovery);
+    }
   }
 
   /** Returns known executions grouped into chains and ordered by start time. */

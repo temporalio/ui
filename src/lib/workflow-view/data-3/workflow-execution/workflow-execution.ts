@@ -6,6 +6,7 @@ import {
 } from './api';
 import { getWorkflowExecutionKeyFromIdentity } from './get-key-from-identity';
 import type {
+  ChildWorkflowExecutionReference,
   NotificationByTopic,
   Subscriber,
   SubscriptionArgs,
@@ -25,6 +26,7 @@ import type {
 } from '../event-group-markers/types';
 import { assertDiscoveredStartEvent } from '../history-events/assert-discovered-start-event';
 import { compareEventIds } from '../history-events/compare-event-ids';
+import { getChildWorkflowExecutionReference } from '../history-events/get-child-workflow-execution-reference';
 import { getNextExecutionIdentity } from '../history-events/get-next-execution-identity';
 import { isTerminalExecutionEvent } from '../history-events/is-terminal-execution-event';
 import type {
@@ -57,6 +59,7 @@ export class WorkflowExecution {
   private _subscribersByTopic: {
     [T in SubscriptionTopic]: Set<Subscriber<T>>;
   } = {
+    CHILD_EXECUTION_REFERENCES_ADDED: new Set(),
     EXECUTION_DETAILS_CHANGED: new Set(),
     LIFECYCLE_GROUP_FILTER_INDEXES_CHANGED: new Set(),
     EVENTS_ADDED: new Set(),
@@ -74,6 +77,10 @@ export class WorkflowExecution {
   private _lifecycleGroupFilterIndexesProjection: LifecycleGroupsFilterIndexesProjection;
 
   private _events = new Map<HistoryEventId, NormalizedHistoryEvent>();
+  private _childExecutionReferences = new Map<
+    HistoryEventId,
+    ChildWorkflowExecutionReference
+  >();
 
   /** Fetches the start event and constructs a discovered execution. */
   static async discover(
@@ -131,12 +138,17 @@ export class WorkflowExecution {
   ): void {
     const eventIds = new Set<HistoryEventId>();
     const headEventIds = new Set<HistoryEventId>();
+    const childExecutionHeadEventIds = new Set<HistoryEventId>();
     const eventGroupMarkerKeys = new Set<EventGroupMarkerKey>();
 
     const lifecycleGroupFilterKeys = new Set<LifecycleGroupFilterKey>();
 
     for (const change of changes) {
       switch (change.type) {
+        case 'CHILD_EXECUTION_REFERENCE_ADDED': {
+          childExecutionHeadEventIds.add(change.headEventId);
+          break;
+        }
         case 'LIFECYCLE_GROUP_FILTER_INDEX_CHANGED': {
           lifecycleGroupFilterKeys.add(change.lifecycleGroupFilterKey);
           break;
@@ -155,6 +167,18 @@ export class WorkflowExecution {
           eventGroupMarkerKeys.add(change.eventGroupMarkerKey);
           break;
         }
+      }
+    }
+
+    if (childExecutionHeadEventIds.size) {
+      const notification: NotificationByTopic['CHILD_EXECUTION_REFERENCES_ADDED'] =
+        {
+          headEventIds: Array.from(childExecutionHeadEventIds),
+        };
+
+      for (const subscriber of this._subscribersByTopic
+        .CHILD_EXECUTION_REFERENCES_ADDED) {
+        subscriber(notification);
       }
     }
 
@@ -213,6 +237,11 @@ export class WorkflowExecution {
         continue;
       }
 
+      const childReference = getChildWorkflowExecutionReference(
+        this.identity.namespace,
+        event,
+      );
+
       this._events.set(event.eventId, event);
       batchChanges.push({ type: 'EVENT_ADDED', eventId: event.eventId });
 
@@ -234,6 +263,19 @@ export class WorkflowExecution {
 
       if (lifecycleGroupChange) {
         batchChanges.push(lifecycleGroupChange);
+      }
+      if (
+        childReference &&
+        !this._childExecutionReferences.has(childReference.headEventId)
+      ) {
+        this._childExecutionReferences.set(
+          childReference.headEventId,
+          childReference,
+        );
+        batchChanges.push({
+          type: 'CHILD_EXECUTION_REFERENCE_ADDED',
+          headEventId: childReference.headEventId,
+        });
       }
 
       const eventGroupMarkerGroupChanges =
@@ -350,6 +392,14 @@ export class WorkflowExecution {
     return this._nextExecutionIdentity;
   }
 
+  /** Returns known started children keyed by their parent lifecycle head event ID. */
+  get childExecutionReferences(): ReadonlyMap<
+    HistoryEventId,
+    ChildWorkflowExecutionReference
+  > {
+    return this._childExecutionReferences;
+  }
+
   /** Returns map of the lifecycle groups by headEventId */
   get lifecycleGroups(): ReadonlyMap<HistoryEventId, LifecycleGroup> {
     return this._lifecycleGroupsProjection.lifecycleGroups;
@@ -402,6 +452,12 @@ export class WorkflowExecution {
     }
 
     switch (topic) {
+      case 'CHILD_EXECUTION_REFERENCES_ADDED': {
+        return subscribeTo(
+          this._subscribersByTopic.CHILD_EXECUTION_REFERENCES_ADDED,
+          handler,
+        );
+      }
       case 'EXECUTION_DETAILS_CHANGED': {
         return subscribeTo(
           this._subscribersByTopic.EXECUTION_DETAILS_CHANGED,

@@ -22,6 +22,12 @@ export type WorkflowExecutionIdentity = Readonly<{
 
 export type WorkflowExecutionKey = `workflow-execution:(${string})`;
 
+/** Associates a started child execution with its lifecycle in the parent's history. */
+export type ChildWorkflowExecutionReference = Readonly<{
+  headEventId: HistoryEventId;
+  identity: WorkflowExecutionIdentity;
+}>;
+
 /** A replaceable DescribeWorkflowExecution snapshot, separate from history. */
 export type WorkflowExecutionDetails = Readonly<
   Omit<
@@ -42,12 +48,19 @@ export type WorkflowExecutionChange =
       type: 'EVENT_ADDED';
       eventId: HistoryEventId;
     }>
+  | Readonly<{
+      type: 'CHILD_EXECUTION_REFERENCE_ADDED';
+      headEventId: HistoryEventId;
+    }>
   | LifecycleGroupsProjectionChange
   | EventGroupMarkerGroupsProjectionChange
   | LifecycleGroupFilterIndexProjectionChange;
 
 /** Consolidated batch payloads for each execution subscription topic. */
 export type NotificationByTopic = {
+  CHILD_EXECUTION_REFERENCES_ADDED: Readonly<{
+    headEventIds: readonly HistoryEventId[];
+  }>;
   EXECUTION_DETAILS_CHANGED: Readonly<{
     details: WorkflowExecutionDetails;
   }>;
