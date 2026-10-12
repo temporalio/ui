@@ -247,6 +247,11 @@ export type ComputeFormValues = z.infer<z.ZodObject<typeof providerFields>> &
 export type RegionComputeValues = {
   regionId: string;
   values: ComputeFormValues;
+  /**
+   * False for the primary, which saves as the unscoped default group: it runs
+   * wherever no scoped group matches, as every group did before regions.
+   */
+  scoped?: boolean;
 };
 
 export type ComputeFieldErrors = Partial<
@@ -335,16 +340,21 @@ export const buildComputeConfigFromForm = (
  * decides where a group runs, but a map keyed by something meaningful is
  * easier to read in a diff and in an error message than `group-1`.
  */
+/** The group a single-region Version saves, and an HA Version's primary. */
+export const DEFAULT_SCALING_GROUP = 'default';
+
 export const buildComputeConfigForRegions = (
   entries: readonly RegionComputeValues[],
 ): ComputeConfig => ({
   scalingGroups: Object.fromEntries(
-    entries.map(({ regionId, values }) => {
+    entries.map(({ regionId, values, scoped = true }) => {
       // Each provider builder emits exactly one group, which is the group this
       // region needs; only its name and its regions are added here.
       const built = buildComputeConfigFromForm(values);
       const [group] = Object.values(built.scalingGroups ?? {});
-      return [regionId, { ...group, regionIds: [regionId] }];
+      return scoped
+        ? [regionId, { ...group, regionIds: [regionId] }]
+        : [DEFAULT_SCALING_GROUP, group];
     }),
   ),
 });

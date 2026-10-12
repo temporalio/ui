@@ -276,9 +276,10 @@ export const Strings = {
   'compute-description': 'Choose where your Workers run.',
   'region-section': 'Region',
   'regions-section': 'Regions',
-  'region-runs-in': 'Serverless Workers run in {{region}}.',
+  'region-runs-anywhere':
+    'Serverless Workers use these resources wherever the Namespace is active.',
   'regions-run-in':
-    'Serverless Workers run in {{primary}}, and in {{replica}} after a failover.',
+    "Serverless Workers use these resources, and the replica's after a failover to {{replica}}.",
   'preview-title': 'Preview',
   'preview-description': 'Where Temporal sends Tasks.',
   'preview-namespace': 'Namespace',
@@ -306,10 +307,11 @@ export const Strings = {
   'region-all': 'All Regions',
   'high-availability': 'High availability',
   'high-availability-off':
-    'Off. Serverless Workers use the resources above wherever the Namespace is active.',
+    'Turn on to run Serverless Workers in a replica region after a failover.',
   'replica-region': 'Replica region',
-  'region-arn-suggested': 'Based on the',
-  'region-arn-suggested-hint': 'ARN. Check the version number for',
+  'region-the-primary': 'the primary',
+  'region-arn-suggested-from-primary':
+    "Based on the primary's ARN. Check the version number for",
   'region-inherits-primary':
     'Uses the same Access and Scaling and Lifecycle settings as',
   'region-customize': 'Customize',

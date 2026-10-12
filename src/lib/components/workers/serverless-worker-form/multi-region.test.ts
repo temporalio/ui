@@ -146,6 +146,13 @@ describe('regionServerErrors', () => {
     expect(regionServerErrors(error, regions)).toEqual({});
   });
 
+  it('places an error on the default group under the primary', () => {
+    // The primary saves as the default group, so the server names it so.
+    expect(regionServerErrors('default: access denied', regions)).toEqual({
+      'aws-us-east-1': 'access denied',
+    });
+  });
+
   it('places nothing without regions', () => {
     expect(regionServerErrors('aws-us-east-1: denied', undefined)).toEqual({});
   });

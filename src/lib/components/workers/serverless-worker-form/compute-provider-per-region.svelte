@@ -99,7 +99,6 @@
   type Entry = ReturnType<typeof emptyEntry>;
 
   const primaryRegion = $derived(regions[0]);
-  const primaryLabel = $derived(primaryRegion.label ?? primaryRegion.id);
 
   let primary = $state(emptyEntry());
 
@@ -295,7 +294,11 @@
   });
 
   const savedValues = $derived<RegionComputeValues[]>([
-    { regionId: primaryRegion.id, values: formValues(primary, primary) },
+    {
+      regionId: primaryRegion.id,
+      values: formValues(primary, primary),
+      scoped: false,
+    },
     ...(replicated && replicaRegion
       ? [
           {
@@ -337,9 +340,9 @@
 
   <hr class="my-5 border-primary" />
 
-  {#if replicated}
-    <RegionsHeading regions={shownRegions} />
-  {/if}
+  <!-- Always present, so turning high availability on adds a region to the
+  line rather than a heading to the page. -->
+  <RegionsHeading regions={shownRegions} />
   <FailoverPreview
     {namespace}
     {provider}
@@ -349,15 +352,9 @@
   />
 
   <div class="flex flex-col gap-4">
-    <!-- Without high availability the group is not scoped to a region, so the
-    card names none. -->
-    <RegionBlock
-      region={replicated ? primaryRegion : undefined}
-      showRole={replicated}
-      roleTooltip={translate('workers.region-role-primary-tooltip', {
-        region: primaryLabel,
-      })}
-    >
+    <!-- The primary saves as the unscoped default group, so its only region is
+    the one its resource names. The header names none, in either state. -->
+    <RegionBlock title={translate('workers.region-role-primary')}>
       {@render serverError(primaryRegion.id)}
       <ComputeFields
         {provider}
@@ -447,9 +444,7 @@
           />
           {#if isSuggested}
             <p class="mt-2 text-xs text-secondary">
-              {translate('workers.region-arn-suggested')}
-              <span class="font-medium text-primary">{primaryLabel}</span>
-              {translate('workers.region-arn-suggested-hint')}
+              {translate('workers.region-arn-suggested-from-primary')}
               <span class="font-medium text-primary">{replicaLabel}</span>.
             </p>
           {/if}
@@ -458,7 +453,7 @@
             <div class="flex flex-col items-start gap-3">
               <p class="text-sm text-secondary">
                 {translate('workers.region-inherits-primary')}
-                <span class="font-medium text-primary">{primaryLabel}</span>
+                {translate('workers.region-the-primary')}
               </p>
               <Button variant="tertiary" size="sm" onclick={customize}>
                 {translate('workers.region-customize')}

@@ -21,11 +21,10 @@
 </h2>
 <p class="mb-4 text-sm text-secondary">
   {#if primary && replica}
-    {translate('workers.regions-run-in', {
-      primary: label(primary),
-      replica: label(replica),
-    })}
-  {:else if primary}
-    {translate('workers.region-runs-in', { region: label(primary) })}
+    {translate('workers.regions-run-in', { replica: label(replica) })}
+  {:else}
+    <!-- One region is an unscoped group: it runs wherever the Namespace is
+    active, so the line names no region. -->
+    {translate('workers.region-runs-anywhere')}
   {/if}
 </p>

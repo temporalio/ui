@@ -418,6 +418,27 @@ describe('buildComputeConfigForRegions', () => {
     expect(Object.keys(config.scalingGroups ?? {})).not.toContain('default');
   });
 
+  it('saves the primary as the unscoped default group, beside a scoped replica', () => {
+    // The PRD's upgrade path: the existing default group stays as it was and
+    // a group scoped to the replica is added beside it.
+    const config = buildComputeConfigForRegions([
+      {
+        regionId: EAST,
+        values: lambda('arn:aws:lambda:us-east-1:1:function:w'),
+        scoped: false,
+      },
+      {
+        regionId: WEST,
+        values: lambda('arn:aws:lambda:us-west-2:1:function:w'),
+      },
+    ]);
+
+    const groups = config.scalingGroups ?? {};
+    expect(Object.keys(groups)).toEqual(['default', WEST]);
+    expect(groups.default.regionIds).toBeUndefined();
+    expect(groups[WEST].regionIds).toEqual([WEST]);
+  });
+
   it('writes nothing for no regions, rather than an empty default', () => {
     expect(buildComputeConfigForRegions([]).scalingGroups).toEqual({});
   });

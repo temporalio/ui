@@ -169,8 +169,12 @@ export const regionServerErrors = (
   error: string | undefined,
   regions: readonly ComputeRegion[] | undefined,
 ): Record<string, string> => {
-  const region = regions?.find(({ id }) => error?.startsWith(`${id}: `));
-  return region && error
-    ? { [region.id]: error.slice(region.id.length + 2) }
-    : {};
+  if (!error || !regions?.length) return {};
+  // The primary saves as the default group, so its errors carry that key.
+  const keys = [
+    ...regions.map(({ id }) => ({ key: id, regionId: id })),
+    { key: 'default', regionId: regions[0].id },
+  ];
+  const match = keys.find(({ key }) => error.startsWith(`${key}: `));
+  return match ? { [match.regionId]: error.slice(match.key.length + 2) } : {};
 };
