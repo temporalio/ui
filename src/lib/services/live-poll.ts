@@ -72,7 +72,7 @@ export async function runLivePoll({
         if (onEvent(ev)) added++;
       }
       if (added > 0) onNewEvents?.();
-      if (events.some(isWorkflowCloseEvent)) break;
+      if (isWorkflowCloseEvent(events.at(-1))) break;
 
       if (response?.nextPageToken) {
         token = response.nextPageToken as unknown as string;
