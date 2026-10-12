@@ -304,10 +304,6 @@ export const Strings = {
     'If the Namespace fails over to this Region, Tasks for this version wait until other Workers poll.',
   'region-not-configured-in': 'No Serverless Workers in {{regions}}',
   'region-all': 'All Regions',
-  'region-runner-serverless-workers': 'Serverless',
-  'region-self-managed-primary': 'Your Workers serve',
-  'region-self-managed-replica':
-    'Serverless Workers run only after failover to',
   'region-arn-suggested': 'Based on the',
   'region-arn-suggested-hint': 'ARN. Check the version number for',
   'region-inherits-primary':

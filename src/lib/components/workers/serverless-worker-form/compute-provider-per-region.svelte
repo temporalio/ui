@@ -2,7 +2,6 @@
   import { untrack } from 'svelte';
 
   import Button from '$lib/holocene/button.svelte';
-  import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
 
   import {
@@ -10,15 +9,17 @@
     lambdaArnPlaceholderFor,
     type PreviewRegion,
     previewSlot,
-    type RegionCoverageMode,
     regionPreview,
     resourceValue,
     suggestRegionalArn,
   } from './multi-region';
   import {
+    type ComputeFieldErrors,
+    type ComputeFormValues,
     type ComputeProviderOption,
     type ComputeProviderValue,
     defaultScaleDownStabilization,
+    type RegionComputeValues,
   } from './shared';
 
   import ComputeFields from './compute-fields.svelte';
@@ -31,18 +32,22 @@
     namespace: string;
     regions: readonly ComputeRegion[];
     computeProviders?: readonly ComputeProviderOption[];
-    initialMode?: RegionCoverageMode;
     deploymentName?: string;
     buildId?: string;
+    /** Out: the compute each region saves, kept current as the form changes. */
+    regionValues?: RegionComputeValues[];
+    /** Field errors per region, keyed by region id. */
+    regionErrors?: Record<string, ComputeFieldErrors>;
   }
 
   let {
     namespace,
     regions,
     computeProviders,
-    initialMode = 'per-region',
     deploymentName,
     buildId,
+    regionValues = $bindable([]),
+    regionErrors = {},
   }: Props = $props();
 
   let provider = $state<ComputeProviderValue>(
@@ -50,10 +55,6 @@
   );
 
   /** The customer runs their own Workers in the primary (replica-only). */
-  let selfManagedPrimary = $state(
-    untrack(() => initialMode === 'replica-only'),
-  );
-
   const emptyEntry = (region: ComputeRegion) => ({
     regionId: region.id,
     label: region.label ?? region.id,
@@ -100,11 +101,10 @@
 
   type Replica = (typeof replicas)[number];
 
-  const inheritsPrimary = (replica: Replica): boolean =>
-    !selfManagedPrimary && !replica.customized;
+  const inheritsPrimary = (replica: Replica): boolean => !replica.customized;
 
   const suggestedFor = (arn: string, replica: Replica): string =>
-    selfManagedPrimary ? '' : suggestRegionalArn(arn, replica.label);
+    suggestRegionalArn(arn, replica.label);
 
   const replicaLambdaArn = (replica: Replica): string =>
     replica.lambdaArnOverride ?? suggestedFor(primary.lambdaArn, replica);
@@ -142,19 +142,6 @@
     replica.customized = true;
   };
 
-  /** Keep the suggested ARNs, which stop being suggested without a primary. */
-  const setSelfManagedPrimary = (checked: boolean) => {
-    if (checked === selfManagedPrimary) return;
-    if (checked) {
-      replicas.forEach((replica) => {
-        replica.lambdaArnOverride = replicaLambdaArn(replica);
-        replica.agentCoreEndpointArnOverride = replicaAgentCoreArn(replica);
-        customize(replica);
-      });
-    }
-    selfManagedPrimary = checked;
-  };
-
   const copyField = <K extends (typeof INHERITED_FIELDS)[number]>(
     from: Entry,
     to: Entry,
@@ -175,12 +162,7 @@
   };
 
   const previewRegions = $derived<PreviewRegion[]>([
-    selfManagedPrimary
-      ? {
-          ...regionPreview(regions[0], provider, primary),
-          selfManaged: true,
-        }
-      : regionPreview(regions[0], provider, primary),
+    regionPreview(regions[0], provider, primary),
     ...replicas.map((replica, index) => {
       const fields = {
         ...replica,
@@ -198,9 +180,54 @@
       };
     }),
   ]);
-  const replicaRegions = $derived(
-    replicas.map((replica) => replica.label).join(', '),
-  );
+  /**
+   * What a region saves. A replica that has not been customized takes the
+   * primary's Access and Scaling. Its resource stays its own, because the
+   * resource is regional.
+   */
+  const formValues = (
+    settings: Entry,
+    resource: Pick<
+      Entry,
+      'lambdaArn' | 'agentCoreEndpointArn' | 'gcpRegion' | 'gcpWorkerPool'
+    >,
+  ): ComputeFormValues => ({
+    provider,
+    lambdaArn: resource.lambdaArn,
+    agentCoreEndpointArn: resource.agentCoreEndpointArn,
+    gcpRegion: resource.gcpRegion,
+    gcpWorkerPool: resource.gcpWorkerPool,
+    iamRoleArn: settings.iamRoleArn,
+    roleExternalId: settings.roleExternalId,
+    gcpProject: settings.gcpProject,
+    gcpServiceAccount: settings.gcpServiceAccount,
+    minReplicas: settings.minReplicas,
+    maxReplicas: settings.maxReplicas,
+    initialReplicas: settings.initialReplicas,
+    utilizationTarget: settings.utilizationTarget,
+    scaleDownStabilization: settings.scaleDownStabilization,
+    scaleUpCooloffMs: settings.scaleUpCooloffMs,
+    scaleUpBacklogThreshold: settings.scaleUpBacklogThreshold,
+    maxWorkerLifetimeMs: settings.maxWorkerLifetimeMs,
+    metricsPollIntervalMs: settings.metricsPollIntervalMs,
+  });
+
+  const savedValues = $derived<RegionComputeValues[]>([
+    { regionId: primary.regionId, values: formValues(primary, primary) },
+    ...replicas.map((replica) => ({
+      regionId: replica.regionId,
+      values: formValues(inheritsPrimary(replica) ? primary : replica, {
+        lambdaArn: replicaLambdaArn(replica),
+        agentCoreEndpointArn: replicaAgentCoreArn(replica),
+        gcpRegion: replica.gcpRegion,
+        gcpWorkerPool: replica.gcpWorkerPool,
+      }),
+    })),
+  ]);
+
+  $effect(() => {
+    regionValues = savedValues;
+  });
 </script>
 
 {#snippet regionFields(entry: Entry)}
@@ -226,6 +253,7 @@
     bind:scaleUpBacklogThreshold={entry.scaleUpBacklogThreshold}
     bind:maxWorkerLifetimeMs={entry.maxWorkerLifetimeMs}
     bind:metricsPollIntervalMs={entry.metricsPollIntervalMs}
+    errors={regionErrors[entry.regionId]}
   />
 {/snippet}
 
@@ -251,35 +279,11 @@
     <RegionBlock
       region={regions[0]}
       showRole
-      roleTooltip={selfManagedPrimary
-        ? undefined
-        : translate('workers.region-role-primary-tooltip', {
-            region: primaryRegion,
-          })}
-      bodyClass={selfManagedPrimary ? 'py-3' : ''}
+      roleTooltip={translate('workers.region-role-primary-tooltip', {
+        region: primaryRegion,
+      })}
     >
-      {#snippet action()}
-        <ToggleSwitch
-          id="{primary.regionId}-serverless"
-          label={translate('workers.region-runner-serverless-workers')}
-          labelPosition="left"
-          checked={!selfManagedPrimary}
-          onchange={(event) => {
-            if (event.currentTarget instanceof HTMLInputElement)
-              setSelfManagedPrimary(!event.currentTarget.checked);
-          }}
-        />
-      {/snippet}
-      {#if selfManagedPrimary}
-        <p class="text-sm text-secondary">
-          {translate('workers.region-self-managed-primary')}
-          <span class="font-medium text-primary">{primaryRegion}</span>.
-          {translate('workers.region-self-managed-replica')}
-          <span class="font-medium text-primary">{replicaRegions}</span>.
-        </p>
-      {:else}
-        {@render regionFields(primary)}
-      {/if}
+      {@render regionFields(primary)}
     </RegionBlock>
 
     {#each replicas as replica, index (replica.regionId)}
@@ -319,6 +323,7 @@
           bind:scaleUpBacklogThreshold={replica.scaleUpBacklogThreshold}
           bind:maxWorkerLifetimeMs={replica.maxWorkerLifetimeMs}
           bind:metricsPollIntervalMs={replica.metricsPollIntervalMs}
+          errors={regionErrors[replica.regionId]}
         />
         {#if isSuggested(replica)}
           <p class="mt-2 text-xs text-secondary">
@@ -371,6 +376,7 @@
             bind:scaleUpBacklogThreshold={replica.scaleUpBacklogThreshold}
             bind:maxWorkerLifetimeMs={replica.maxWorkerLifetimeMs}
             bind:metricsPollIntervalMs={replica.metricsPollIntervalMs}
+            errors={regionErrors[replica.regionId]}
           />
         {/if}
       </RegionBlock>

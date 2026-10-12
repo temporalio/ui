@@ -1,7 +1,7 @@
 <script lang="ts" module>
   import { defineMeta } from '@storybook/addon-svelte-csf';
 
-  import type { ComputeRegion, RegionCoverageMode } from './multi-region';
+  import type { ComputeRegion } from './multi-region';
   import type { ComputeProviderOption } from './shared';
 
   import CreateVersionForm from './create-version-form.svelte';
@@ -9,10 +9,8 @@
   import ServerlessWorkerCreateForm from './serverless-worker-create-form.svelte';
 
   type Topology = 'single' | 'multi';
-  type ExistingConfig = RegionCoverageMode;
   type StoryArgs = {
     namespace: Topology;
-    existing?: ExistingConfig;
   };
 
   const { Story } = defineMeta({
@@ -91,25 +89,9 @@
   {/snippet}
 </Story>
 
-<Story
-  name="Edit Version"
-  args={{ existing: 'per-region' }}
-  argTypes={{
-    existing: {
-      name: 'Existing config',
-      control: {
-        type: 'inline-radio',
-        labels: {
-          'per-region': 'Resource per Region',
-          'replica-only': 'Own Workers in Primary',
-        },
-      },
-      options: ['per-region', 'replica-only'],
-    },
-  }}
->
+<Story name="Edit Version">
   {#snippet template(args: StoryArgs)}
-    {#key `${args.namespace}-${args.existing}`}
+    {#key args.namespace}
       <div class="p-4">
         <EditVersionForm
           deploymentName="orders-worker"
@@ -121,7 +103,6 @@
           {namespace}
           computeProviders={providersFor(args.namespace)}
           regions={regionsFor(args.namespace)}
-          initialRegionMode={args.existing}
         />
       </div>
     {/key}

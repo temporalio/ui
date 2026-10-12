@@ -4,8 +4,13 @@
     type ComputeProviderValue,
   } from '$lib/components/workers/serverless-worker-form/compute-providers';
   import CreateVersionForm from '$lib/components/workers/serverless-worker-form/create-version-form.svelte';
-  import type { ComputeProviderOption } from '$lib/components/workers/serverless-worker-form/shared';
-  import { buildComputeConfigFromForm } from '$lib/components/workers/serverless-worker-form/shared';
+  import { computeRegionsFor } from '$lib/components/workers/serverless-worker-form/multi-region';
+  import {
+    buildComputeConfigForRegions,
+    buildComputeConfigFromForm,
+    type ComputeProviderOption,
+    getInitialComputeProvider,
+  } from '$lib/components/workers/serverless-worker-form/shared';
   import Alert from '$lib/holocene/alert.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -17,6 +22,7 @@
     validateWorkerDeploymentVersionComputeConfig,
   } from '$lib/services/deployments-service';
   import type { VersionSummary } from '$lib/types/deployments';
+  import type { NamespaceRegion } from '$lib/utilities/compute-regions';
   import { lockComputeProvider } from '$lib/utilities/lock-compute-provider';
   import { routeForWorkerDeployment } from '$lib/utilities/route-for';
 
@@ -27,6 +33,12 @@
     computeProviders?: readonly ComputeProviderOption[];
     gcpRegions?: string[];
     templates?: Record<ComputeProviderValue, ComputeProviderTemplates>;
+    /**
+     * The Namespace's regions. A consumer passes these when its own entitlement
+     * says the Namespace is highly available; with two or more, the form
+     * collects compute per region.
+     */
+    namespaceRegions?: readonly NamespaceRegion[];
   }
 
   let {
@@ -36,6 +48,7 @@
     computeProviders,
     gcpRegions,
     templates,
+    namespaceRegions = [],
   }: Props = $props();
 
   let error = $state<string | undefined>();
@@ -43,6 +56,16 @@
   let lockedProvider = $state<ReturnType<typeof lockComputeProvider>>();
   let loading = $state(true);
   let loadError = $state(false);
+
+  const regions = $derived(
+    computeRegionsFor(
+      namespaceRegions,
+      getInitialComputeProvider({
+        provider: lockedProvider?.provider,
+        providers: lockedProvider?.providers ?? computeProviders,
+      }),
+    ),
+  );
 
   const backHref = $derived(
     routeForWorkerDeployment({ namespace, deployment }),
@@ -103,10 +126,15 @@
       initialProvider={lockedProvider?.provider}
       {gcpRegions}
       {templates}
+      {regions}
+      {namespace}
+      deploymentName={deployment}
       cancelHref={backHref}
-      onSubmit={async (data) => {
+      onSubmit={async (data, regionValues) => {
         error = undefined;
-        const computeConfig = buildComputeConfigFromForm(data);
+        const computeConfig = regionValues
+          ? buildComputeConfigForRegions(regionValues)
+          : buildComputeConfigFromForm(data);
         await createWorkerDeploymentVersion(
           {
             namespace,

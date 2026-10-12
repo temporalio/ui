@@ -1,6 +1,7 @@
-import { describe, expect, test } from 'vitest';
+import { describe, expect, it, test } from 'vitest';
 
 import {
+  computeRegionsFor,
   previewSlot,
   shortResourceName,
   suggestRegionalArn,
@@ -80,5 +81,40 @@ describe('truncateMiddle', () => {
     const value = truncateMiddle('7706e295-b501-4d44-9fec-1ce52ccbe92b');
     expect(value).toBe('7706e295…ccbe92b');
     expect(value).toHaveLength(16);
+  });
+});
+
+describe('computeRegionsFor', () => {
+  it('puts the primary first whatever order the regions arrive in', () => {
+    expect(
+      computeRegionsFor(
+        [
+          { regionId: 'aws-us-west-2', role: 'replica' },
+          { regionId: 'aws-us-east-1', role: 'primary' },
+        ],
+        'lambda',
+      ),
+    ).toEqual([
+      {
+        id: 'aws-us-east-1',
+        role: 'primary',
+        label: undefined,
+        provider: 'lambda',
+      },
+      {
+        id: 'aws-us-west-2',
+        role: 'replica',
+        label: undefined,
+        provider: 'lambda',
+      },
+    ]);
+  });
+
+  it('keeps the label a consumer supplied', () => {
+    const [region] = computeRegionsFor(
+      [{ regionId: 'aws-us-east-1', role: 'primary', label: 'us-east-1' }],
+      'lambda',
+    );
+    expect(region.label).toBe('us-east-1');
   });
 });

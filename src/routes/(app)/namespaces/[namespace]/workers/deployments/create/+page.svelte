@@ -7,6 +7,7 @@
   import { translate } from '$lib/i18n/translate';
   import { IconChevronLeft } from '$lib/io/icon';
   import ServerlessWorkerCreate from '$lib/pages/serverless-worker-create.svelte';
+  import { demoNamespaceRegions } from '$lib/utilities/demo-namespace-regions';
   import { routeForWorkerDeployments } from '$lib/utilities/route-for';
 
   const namespace = $derived(page.params.namespace);
@@ -24,5 +25,9 @@
   <h1>
     {translate('workers.create-serverless-title')}
   </h1>
-  <ServerlessWorkerCreate {namespace} onSuccess={() => goto(deploymentsHref)} />
+  <ServerlessWorkerCreate
+    {namespace}
+    namespaceRegions={demoNamespaceRegions()}
+    onSuccess={() => goto(deploymentsHref)}
+  />
 </div>

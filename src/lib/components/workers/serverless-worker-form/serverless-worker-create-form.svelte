@@ -19,11 +19,15 @@
     regionPreview,
   } from './multi-region';
   import {
+    type ComputeFieldErrors,
     type ComputeProviderOption,
     type CreateDeploymentFormData,
     createDeploymentSchema,
     defaultScaleDownStabilization,
     getInitialComputeProvider,
+    multiRegionCreateDeploymentSchema,
+    type RegionComputeValues,
+    validateRegionValues,
   } from './shared';
 
   import CloudRunLatencyNotice from './cloud-run-latency-notice.svelte';
@@ -43,6 +47,7 @@
   interface Props {
     onSubmit: (
       data: CreateDeploymentFormData,
+      regions?: RegionComputeValues[],
     ) => Promise<SubmitFieldErrors | void>;
     onSuccess: () => void;
     cancelHref: string;
@@ -73,6 +78,9 @@
 
   const isMultiRegion = $derived(!!regions && regions.length > 1);
 
+  let regionValues = $state<RegionComputeValues[]>([]);
+  let regionErrors = $state<Record<string, ComputeFieldErrors>>({});
+
   const superform = superForm(
     {
       name: '',
@@ -100,14 +108,25 @@
     },
     {
       SPA: true,
-      validators: zodClient(createDeploymentSchema),
+      validators: zodClient(
+        untrack(() => isMultiRegion)
+          ? multiRegionCreateDeploymentSchema
+          : createDeploymentSchema,
+      ),
       resetForm: false,
       dataType: 'json',
       onUpdate: async ({ form }) => {
         if (!form.valid) return;
         error = undefined;
+        if (isMultiRegion) {
+          regionErrors = validateRegionValues(regionValues);
+          if (Object.keys(regionErrors).length) return;
+        }
         try {
-          const fieldErrors = await onSubmit(form.data);
+          const fieldErrors = await onSubmit(
+            form.data,
+            isMultiRegion ? regionValues : undefined,
+          );
           if (fieldErrors) {
             if (fieldErrors.lambdaArn)
               form.errors.lambdaArn = fieldErrors.lambdaArn;
@@ -180,6 +199,8 @@
           {computeProviders}
           deploymentName={$form.name}
           buildId={$form.buildId}
+          bind:regionValues
+          {regionErrors}
         />
       {:else}
         <ComputeProviderPicker

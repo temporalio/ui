@@ -1,3 +1,5 @@
+import type { NamespaceRegion } from '$lib/utilities/compute-regions';
+
 import type { ComputeProviderValue } from './shared';
 
 /**
@@ -15,13 +17,6 @@ import type { ComputeProviderValue } from './shared';
 
 export type ComputeRegionRole = 'primary' | 'replica';
 
-/**
- * `per-region`: Serverless Workers in every Region. `replica-only`: the
- * customer runs their own Workers in the primary, so only the replica gets a
- * scaling group and Serverless Workers run only after failover.
- */
-export type RegionCoverageMode = 'per-region' | 'replica-only';
-
 export interface ComputeRegion {
   /**
    * Temporal Cloud: the full region id, e.g. "aws-us-east-1".
@@ -38,6 +33,24 @@ export interface ComputeRegion {
   /** The compute provider for this region, derived from the region's cloud. */
   provider: ComputeProviderValue;
 }
+
+/**
+ * The form's regions for a Namespace's regions, primary first. The form reads
+ * its first region as the primary, while a Namespace region states its own
+ * role and can arrive in any order.
+ */
+export const computeRegionsFor = (
+  namespaceRegions: readonly NamespaceRegion[],
+  provider: ComputeProviderValue,
+): ComputeRegion[] =>
+  [...namespaceRegions]
+    .sort((a, b) => Number(b.role === 'primary') - Number(a.role === 'primary'))
+    .map(({ regionId, role = 'replica', label }) => ({
+      id: regionId,
+      role,
+      label,
+      provider,
+    }));
 
 /**
  * Suggest the same resource in another Region by swapping the Region segment

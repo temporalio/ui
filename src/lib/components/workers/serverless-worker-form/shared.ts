@@ -192,17 +192,18 @@ const validateProviderFields = (
   }
 };
 
+const deploymentNameField = z
+  .string()
+  .min(3, 'Name must be at least 3 characters')
+  .max(100)
+  .regex(/^[a-z][a-z0-9-]*$/, 'Must be lowercase, alphanumeric with hyphens');
+
+const buildIdField = z.string().min(1, 'Build ID is required');
+
 export const createDeploymentSchema = z
   .object({
-    name: z
-      .string()
-      .min(3, 'Name must be at least 3 characters')
-      .max(100)
-      .regex(
-        /^[a-z][a-z0-9-]*$/,
-        'Must be lowercase, alphanumeric with hyphens',
-      ),
-    buildId: z.string().min(1, 'Build ID is required'),
+    name: deploymentNameField,
+    buildId: buildIdField,
     ...providerFields,
     ...scalingFields,
   })
@@ -210,11 +211,23 @@ export const createDeploymentSchema = z
 
 export const createVersionSchema = z
   .object({
-    buildId: z.string().min(1, 'Build ID is required'),
+    buildId: buildIdField,
     ...providerFields,
     ...scalingFields,
   })
   .superRefine(validateProviderFields);
+
+// When each region holds its own compute, the form checks only the fields it
+// owns. validateRegionValues checks each region's compute.
+export const multiRegionCreateDeploymentSchema = z
+  .object({ name: deploymentNameField, buildId: buildIdField })
+  .passthrough();
+
+export const multiRegionCreateVersionSchema = z
+  .object({ buildId: buildIdField })
+  .passthrough();
+
+export const multiRegionEditVersionSchema = z.object({}).passthrough();
 
 export const editVersionSchema = z
   .object({
@@ -227,8 +240,39 @@ export type CreateDeploymentFormData = z.infer<typeof createDeploymentSchema>;
 export type CreateVersionFormData = z.infer<typeof createVersionSchema>;
 export type EditVersionFormData = z.infer<typeof editVersionSchema>;
 
-type ComputeFormValues = z.infer<z.ZodObject<typeof providerFields>> &
+export type ComputeFormValues = z.infer<z.ZodObject<typeof providerFields>> &
   Partial<z.infer<z.ZodObject<typeof scalingFields>>>;
+
+/** The compute a highly available Namespace runs in one of its regions. */
+export type RegionComputeValues = {
+  regionId: string;
+  values: ComputeFormValues;
+};
+
+export type ComputeFieldErrors = Partial<
+  Record<keyof ComputeFormValues, string[]>
+>;
+
+/**
+ * Validates each region with the same rules as a single-region Version.
+ * Returns the field errors of each region that fails, keyed by region.
+ */
+export const validateRegionValues = (
+  entries: readonly RegionComputeValues[],
+): Record<string, ComputeFieldErrors> =>
+  Object.fromEntries(
+    entries.flatMap(({ regionId, values }) => {
+      const result = editVersionSchema.safeParse(values);
+      return result.success
+        ? []
+        : [
+            [
+              regionId,
+              result.error.flatten().fieldErrors as ComputeFieldErrors,
+            ],
+          ];
+    }),
+  );
 
 // The single place that maps a provider choice onto a ComputeConfig. Every
 // create/edit page routes through here so a new provider is one branch, not a
@@ -292,7 +336,7 @@ export const buildComputeConfigFromForm = (
  * easier to read in a diff and in an error message than `group-1`.
  */
 export const buildComputeConfigForRegions = (
-  entries: readonly { regionId: string; values: ComputeFormValues }[],
+  entries: readonly RegionComputeValues[],
 ): ComputeConfig => ({
   scalingGroups: Object.fromEntries(
     entries.map(({ regionId, values }) => {

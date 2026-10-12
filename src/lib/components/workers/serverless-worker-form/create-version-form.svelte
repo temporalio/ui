@@ -20,11 +20,15 @@
     regionPreview,
   } from './multi-region';
   import {
+    type ComputeFieldErrors,
     type ComputeProviderOption,
     type CreateVersionFormData,
     createVersionSchema,
     defaultScaleDownStabilization,
     getInitialComputeProvider,
+    multiRegionCreateVersionSchema,
+    type RegionComputeValues,
+    validateRegionValues,
   } from './shared';
 
   import CloudRunLatencyNotice from './cloud-run-latency-notice.svelte';
@@ -37,7 +41,10 @@
   import RegionsHeading from './regions-heading.svelte';
 
   interface Props {
-    onSubmit: (data: CreateVersionFormData) => Promise<void>;
+    onSubmit: (
+      data: CreateVersionFormData,
+      regions?: RegionComputeValues[],
+    ) => Promise<void>;
     cancelHref: string;
     error?: string;
     versions?: VersionSummary[];
@@ -79,6 +86,9 @@
 
   const isMultiRegion = $derived(!!regions && regions.length > 1);
 
+  let regionValues = $state<RegionComputeValues[]>([]);
+  let regionErrors = $state<Record<string, ComputeFieldErrors>>({});
+
   const superform = superForm(
     {
       buildId: '',
@@ -106,11 +116,21 @@
     },
     {
       SPA: true,
-      validators: zodClient(createVersionSchema),
+      validators: zodClient(
+        untrack(() => isMultiRegion)
+          ? multiRegionCreateVersionSchema
+          : createVersionSchema,
+      ),
       resetForm: false,
       dataType: 'json',
       onUpdate: async ({ form }) => {
         if (!form.valid) return;
+        if (isMultiRegion) {
+          regionErrors = validateRegionValues(regionValues);
+          if (Object.keys(regionErrors).length) return;
+          await onSubmit(form.data, regionValues);
+          return;
+        }
         await onSubmit(form.data);
       },
     },
@@ -161,6 +181,8 @@
           {computeProviders}
           {deploymentName}
           buildId={$form.buildId}
+          bind:regionValues
+          {regionErrors}
         />
       {:else}
         <ComputeProviderPicker

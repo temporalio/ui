@@ -3,12 +3,16 @@
     type ComputeProviderTemplates,
     type ComputeProviderValue,
   } from '$lib/components/workers/serverless-worker-form/compute-providers';
+  import { computeRegionsFor } from '$lib/components/workers/serverless-worker-form/multi-region';
   import ServerlessWorkerCreateForm from '$lib/components/workers/serverless-worker-form/serverless-worker-create-form.svelte';
-  import type {
-    ComputeProviderOption,
-    CreateDeploymentFormData,
+  import {
+    buildComputeConfigForRegions,
+    buildComputeConfigFromForm,
+    type ComputeProviderOption,
+    type CreateDeploymentFormData,
+    getInitialComputeProvider,
+    type RegionComputeValues,
   } from '$lib/components/workers/serverless-worker-form/shared';
-  import { buildComputeConfigFromForm } from '$lib/components/workers/serverless-worker-form/shared';
   import { translate } from '$lib/i18n/translate';
   import {
     createWorkerDeployment,
@@ -19,6 +23,7 @@
     validateWorkerDeploymentVersionComputeConfig,
   } from '$lib/services/deployments-service';
   import type { ComputeConfig } from '$lib/types/deployments';
+  import type { NamespaceRegion } from '$lib/utilities/compute-regions';
   import { routeForWorkers } from '$lib/utilities/route-for';
 
   interface Props {
@@ -27,6 +32,12 @@
     templates?: Record<ComputeProviderValue, ComputeProviderTemplates>;
     computeProviders?: readonly ComputeProviderOption[];
     gcpRegions?: string[];
+    /**
+     * The Namespace's regions. A consumer passes these when its own entitlement
+     * says the Namespace is highly available; with two or more, the form
+     * collects compute per region.
+     */
+    namespaceRegions?: readonly NamespaceRegion[];
   }
 
   interface SubmitFieldErrors {
@@ -34,8 +45,21 @@
     iamRoleArn?: string[];
   }
 
-  let { namespace, onSuccess, templates, computeProviders, gcpRegions }: Props =
-    $props();
+  let {
+    namespace,
+    onSuccess,
+    templates,
+    computeProviders,
+    gcpRegions,
+    namespaceRegions = [],
+  }: Props = $props();
+
+  const regions = $derived(
+    computeRegionsFor(
+      namespaceRegions,
+      getInitialComputeProvider({ providers: computeProviders }),
+    ),
+  );
 
   async function rollbackDeployment(
     deploymentName: string,
@@ -69,6 +93,7 @@
 
   async function handleCreate(
     data: CreateDeploymentFormData,
+    regionValues?: RegionComputeValues[],
   ): Promise<SubmitFieldErrors | void> {
     let deploymentError: string | undefined;
     const deployment = await createWorkerDeployment(
@@ -82,7 +107,9 @@
     );
     if (deploymentError) throw new Error(deploymentError);
 
-    const computeConfig = buildComputeConfigFromForm(data);
+    const computeConfig = regionValues
+      ? buildComputeConfigForRegions(regionValues)
+      : buildComputeConfigFromForm(data);
 
     let versionError: string | undefined;
     await createWorkerDeploymentVersion(
@@ -186,4 +213,6 @@
   {templates}
   {computeProviders}
   {gcpRegions}
+  {regions}
+  {namespace}
 />

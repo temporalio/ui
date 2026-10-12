@@ -12,16 +12,19 @@
   import {
     type ComputeRegion,
     lambdaArnPlaceholderFor,
-    type RegionCoverageMode,
     regionPreview,
   } from './multi-region';
   import {
+    type ComputeFieldErrors,
     type ComputeProviderOption,
     type ComputeProviderValue,
     defaultScaleDownStabilization,
     type EditVersionFormData,
     editVersionSchema,
     getInitialComputeProvider,
+    multiRegionEditVersionSchema,
+    type RegionComputeValues,
+    validateRegionValues,
   } from './shared';
 
   import ComputeFields from './compute-fields.svelte';
@@ -52,7 +55,10 @@
       maxWorkerLifetimeMs?: number;
       metricsPollIntervalMs?: number;
     };
-    onSubmit: (data: EditVersionFormData) => Promise<void>;
+    onSubmit: (
+      data: EditVersionFormData,
+      regions?: RegionComputeValues[],
+    ) => Promise<void>;
     onDelete: () => void;
     cancelHref: string;
     error?: string;
@@ -77,8 +83,6 @@
     deploymentName?: string;
     /** The version being edited, shown in the preview. */
     buildId?: string;
-    /** How the existing version covers the namespace's regions. */
-    initialRegionMode?: RegionCoverageMode;
   }
 
   let {
@@ -94,10 +98,12 @@
     namespace = '',
     deploymentName,
     buildId,
-    initialRegionMode,
   }: Props = $props();
 
   const isMultiRegion = $derived(!!regions && regions.length > 1);
+
+  let regionValues = $state<RegionComputeValues[]>([]);
+  let regionErrors = $state<Record<string, ComputeFieldErrors>>({});
 
   const superform = superForm(
     {
@@ -126,11 +132,21 @@
     },
     {
       SPA: true,
-      validators: zodClient(editVersionSchema),
+      validators: zodClient(
+        untrack(() => isMultiRegion)
+          ? multiRegionEditVersionSchema
+          : editVersionSchema,
+      ),
       resetForm: false,
       dataType: 'json',
       onUpdate: async ({ form }) => {
         if (!form.valid) return;
+        if (isMultiRegion) {
+          regionErrors = validateRegionValues(regionValues);
+          if (Object.keys(regionErrors).length) return;
+          await onSubmit(form.data, regionValues);
+          return;
+        }
         await onSubmit(form.data);
       },
     },
@@ -158,9 +174,10 @@
           {namespace}
           {regions}
           {computeProviders}
-          initialMode={initialRegionMode}
           {deploymentName}
           {buildId}
+          bind:regionValues
+          {regionErrors}
         />
       {:else}
         <ComputeProviderPicker
