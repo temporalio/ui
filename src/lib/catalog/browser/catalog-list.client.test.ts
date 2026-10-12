@@ -39,31 +39,49 @@ describe('CatalogList client interactions', () => {
     ).toBe(true);
   });
 
+  const buttons = (target: HTMLElement, selector = 'button') =>
+    Array.from(target.querySelectorAll<HTMLButtonElement>(selector));
+  const facet = (target: HTMLElement, label: string, group = '') =>
+    buttons(target, `nav[aria-label="Filter examples"] ${group} button`).find(
+      (candidate) =>
+        candidate.querySelector('.truncate')?.textContent?.trim() === label,
+    );
+  const facetCount = (target: HTMLElement, label: string) =>
+    facet(target, label)?.lastElementChild?.textContent?.trim();
+  const summary = (target: HTMLElement) =>
+    target
+      .querySelector('[data-testid="catalog-summary"]')
+      ?.textContent?.replace(/\s+/g, ' ')
+      .trim();
+
   it('filters examples and dispatches Quick Run through the shared session host', async () => {
     const target = await client.renderList();
     await client.flush();
     const button = (label: string) =>
-      Array.from(target.querySelectorAll('button')).find(
+      buttons(target).find(
         (candidate) => candidate.textContent?.trim() === label,
       );
 
-    button('OSS')?.click();
+    expect(facetCount(target, 'All sources')).toBe('3');
+    expect(facetCount(target, 'OSS')).toBe('1');
+
+    facet(target, 'OSS')?.click();
     client.flushSync();
     expect(target.textContent).toContain('Order lifecycle');
     expect(target.textContent).not.toContain('Payment reminder');
     expect(target.textContent).not.toContain('Cloud example');
 
-    button('Cloud')?.click();
+    facet(target, 'Cloud')?.click();
     client.flushSync();
     expect(target.textContent).toContain('Cloud example');
     expect(target.textContent).not.toContain('Order lifecycle');
 
-    button('Local')?.click();
+    facet(target, 'Local')?.click();
     client.flushSync();
     expect(target.textContent).toContain('Payment reminder');
     expect(target.textContent).not.toContain('Cloud example');
 
-    button('OSS')?.click();
+    facet(target, 'OSS')?.click();
     client.flushSync();
 
     const search = target.querySelector<HTMLInputElement>('#catalog-search');
@@ -77,6 +95,7 @@ describe('CatalogList client interactions', () => {
       'No examples match the current filters.',
     );
     expect(target.textContent).not.toContain('Order lifecycle');
+    expect(facetCount(target, 'Local')).toBe('1');
 
     if (search) {
       search.value = 'order';
@@ -94,6 +113,52 @@ describe('CatalogList client interactions', () => {
     });
     await client.flush();
     expect(target.textContent).toContain('Completed');
+  });
+
+  it('filters by execution kind and feature, and clears each filter', async () => {
+    const target = await client.renderList();
+    await client.flush();
+
+    facet(target, 'Standalone Activity')?.click();
+    client.flushSync();
+    expect(summary(target)).toMatch(/^0 of 3 examples Standalone Activity/);
+    expect(target.textContent).toContain(
+      'No examples match the current filters.',
+    );
+
+    buttons(
+      target,
+      '[aria-label="Remove filter Standalone Activity"]',
+    )[0]?.click();
+    client.flushSync();
+    expect(summary(target)).toBe('3 of 3 examples');
+
+    const tag = buttons(target, '.catalog-tag').find(
+      (candidate) => candidate.textContent?.trim() === 'Workflow',
+    );
+    tag?.click();
+    client.flushSync();
+    expect(tag?.getAttribute('aria-pressed')).toBe('true');
+    expect(
+      facet(target, 'Workflow', 'fieldset:nth-of-type(2)')?.getAttribute(
+        'aria-pressed',
+      ),
+    ).toBe('true');
+    expect(
+      facet(target, 'Workflow', 'fieldset:nth-of-type(1)')?.getAttribute(
+        'aria-pressed',
+      ),
+    ).toBe('false');
+
+    facet(target, 'Local')?.click();
+    client.flushSync();
+    expect(summary(target)).toMatch(/^1 of 3 examples Workflow Local/);
+
+    buttons(target)
+      .find((candidate) => candidate.textContent?.trim() === 'Clear filters')
+      ?.click();
+    client.flushSync();
+    expect(summary(target)).toBe('3 of 3 examples');
   });
 
   it('uses the host-provided href for the Configure action', async () => {

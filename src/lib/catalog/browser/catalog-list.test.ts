@@ -90,50 +90,63 @@ const host: WorkbenchHost = {
 const exampleHref = (exampleId: string) => `/examples/${exampleId}`;
 
 describe('CatalogList', () => {
-  it('keeps an empty filtered result inside the bounded workflow table', () => {
+  it('shows an empty state inside the example list when nothing matches', () => {
     const sessionStore = createCatalogSessionStore(host);
     const { body } = renderComponent(catalogList, {
       props: { descriptors: [], host, sessionStore, exampleHref },
     });
 
-    expect(body).toContain('<table');
-    expect(body).toContain('aria-label="Workflow examples"');
-    expect(body).toContain('colspan="5"');
+    expect(body).toContain('aria-label="Catalog examples"');
     expect(body).toContain('No examples match the current filters.');
+    expect(body).toMatch(/<strong[^>]*>0<\/strong> of 0\s+examples/);
   });
 
-  it('renders catalog examples in a compact native table with fixed actions', () => {
+  it('renders each example with its kind, location, source, features, run, and actions', () => {
+    const sessionStore = createCatalogSessionStore(host);
+    const { body } = renderComponent(catalogList, {
+      props: {
+        descriptors: [{ ...descriptor, capabilityTags: ['child-workflows'] }],
+        host,
+        sessionStore,
+        exampleHref,
+      },
+    });
+
+    expect(body).toContain('Order lifecycle');
+    expect(body).toContain('Start and inspect an order workflow.');
+    expect(body).toContain('<span>Workflow</span>');
+    expect(body).toMatch(/Task queue\s*<span[^>]*font-mono[^>]*>catalog-tasks/);
+    expect(body).toMatch(
+      /class="[^"]*border-tertiary[^"]*bg-surface-tertiary[^"]*text-secondary[^"]*"[\s\S]*?<span>OSS<\/span>/,
+    );
+    expect(body).toMatch(
+      /<button[^>]*class="catalog-tag[^"]*"[^>]*aria-pressed="false"[^>]*>Child workflows<\/button>/,
+    );
+    expect(body.match(/Not run/g)).toHaveLength(1);
+    expect(body).toContain('>Start<');
+    expect(body).toContain('Configure');
+  });
+
+  it('shows kind, feature, and source facets with counts', () => {
     const sessionStore = createCatalogSessionStore(host);
     const { body } = renderComponent(catalogList, {
       props: { descriptors: [descriptor], host, sessionStore, exampleHref },
     });
+    const nav = body
+      .split('aria-label="Filter examples"')[1]
+      ?.split('</nav>')[0];
 
-    expect(body).toContain('<table');
-    expect(body).toContain('aria-label="Workflow examples"');
-    expect(body).toMatch(/<th[^>]*scope="col"[^>]*>Workflow<\/th>/);
-    expect(body).toMatch(/<th[^>]*scope="col"[^>]*>Source<\/th>/);
-    expect(body).toMatch(/<th[^>]*scope="col"[^>]*>Task queue<\/th>/);
-    expect(body).toMatch(/<th[^>]*scope="col"[^>]*>Latest run<\/th>/);
-    expect(body).toMatch(
-      /<th[^>]*scope="col"[^>]*class="[^"]*!text-right[^"]*"[^>]*>Actions<\/th>/,
+    expect(nav).toContain('Execution kind');
+    expect(nav).toContain('Feature');
+    expect(nav).toContain('Source');
+    expect(nav).toMatch(/All kinds<\/span>\s*<span[^>]*>1<\/span>/);
+    expect(nav).toMatch(
+      /Standalone Nexus Operation<\/span>\s*<span[^>]*>0<\/span>/,
     );
-    expect(body).toContain('Order lifecycle');
-    expect(body).toContain('Start and inspect an order workflow.');
-    expect(body).toMatch(
-      /class="[^"]*border-tertiary[^"]*bg-surface-tertiary[^"]*text-secondary[^"]*"[\s\S]*?<span>OSS<\/span>/,
-    );
-    expect(body).toContain('catalog-tasks');
-    expect(body).toContain('Not run');
-    expect(body).toContain('>Start<');
-    expect(body).toContain('Configure');
-    expect(body).toContain('sticky right-0');
-    expect(body).toMatch(
-      /<th[^>]*class="(?=[^"]*w-36)(?=[^"]*!text-right)(?=[^"]*sm:w-60)[^"]*"/,
-    );
-    expect(body).toContain('hidden sm:inline');
+    expect(nav).toMatch(/OSS<\/span>\s*<span[^>]*>1<\/span>/);
   });
 
-  it('renders standalone Nexus operation examples in a separate table beneath the workflow examples', () => {
+  it('lists standalone Nexus operation examples with workflows and labels them by endpoint', () => {
     const nexusDescriptor: BrowserCatalogDescriptor = {
       ...descriptor,
       id: 'slow-nexus-operation',
@@ -158,58 +171,26 @@ describe('CatalogList', () => {
         exampleHref,
       },
     });
-    const [workflowTable, nexusTable] = body
-      .split('<table')
-      .slice(1)
-      .map((table) => table.split('</table>')[0] ?? '');
+    const list = body.split('aria-label="Catalog examples"')[1] ?? '';
 
-    expect(workflowTable).toContain('aria-label="Workflow examples"');
-    expect(workflowTable).toContain('Order lifecycle');
-    expect(workflowTable).not.toContain('Slow Nexus operation');
-    expect(nexusTable).toContain(
-      'aria-label="Standalone Nexus Operation examples"',
+    expect(body.match(/<ul/g)).toHaveLength(1);
+    expect(list.indexOf('Slow Nexus operation')).toBeLessThan(
+      list.indexOf('Order lifecycle'),
     );
-    expect(nexusTable).toMatch(
-      /<th[^>]*scope="col"[^>]*>Nexus Operation<\/th>/,
-    );
-    expect(nexusTable).toMatch(/<th[^>]*scope="col"[^>]*>Endpoint<\/th>/);
-    expect(nexusTable).toContain('Slow Nexus operation');
-    expect(nexusTable).toContain('catalog-endpoint');
-    expect(body).toMatch(/<h2[^>]*>Workflows<\/h2>/);
-    expect(body).toMatch(/<h2[^>]*>Standalone Nexus Operations<\/h2>/);
+    expect(list).toContain('<span>Standalone Nexus Operation</span>');
+    expect(list).toMatch(/Endpoint\s*<span[^>]*>catalog-endpoint/);
   });
 
-  it('keeps the workflow name readable on small screens', () => {
+  it('keeps the example name readable on small screens', () => {
     const sessionStore = createCatalogSessionStore(host);
     const { body } = renderComponent(catalogList, {
       props: { descriptors: [descriptor], host, sessionStore, exampleHref },
     });
-    const source = readFileSync(
-      resolve('src/lib/catalog/browser/catalog-list.svelte'),
-      'utf8',
-    );
 
     expect(body).toMatch(
       /<a[^>]*class="[^"]*break-words[^"]*"[^>]*>[\s\S]*?Order lifecycle[\s\S]*?<\/a>/,
     );
     expect(body).not.toMatch(/<a[^>]*class="[^"]*table-link[^"]*truncate/);
-    expect(source).toContain(
-      '<th scope="col" class="hidden w-20 sm:table-cell"',
-    );
-    expect(source).toContain(
-      '<th scope="col" class="hidden w-36 sm:table-cell">Latest run</th>',
-    );
-    expect(source).toContain('sm:hidden');
-  });
-
-  it('repeats the source and latest run beside the name only on small screens', () => {
-    const sessionStore = createCatalogSessionStore(host);
-    const { body } = renderComponent(catalogList, {
-      props: { descriptors: [descriptor], host, sessionStore, exampleHref },
-    });
-
-    expect(body.match(/OSS/g)?.length).toBeGreaterThan(1);
-    expect(body.match(/Not run/g)).toHaveLength(2);
   });
 
   it('uses the host-provided href for the workflow title link', () => {
@@ -334,18 +315,6 @@ describe('CatalogList', () => {
     expect(source).not.toContain('JSON.stringify(');
   });
 
-  it('uses the toolbar border to group the borderless search and source filters', () => {
-    const source = readFileSync(
-      resolve('src/lib/catalog/browser/catalog-list.svelte'),
-      'utf8',
-    );
-
-    expect(source).toContain(
-      'class="flex w-full flex-wrap items-center gap-2 border border-primary bg-surface-primary p-1.5"',
-    );
-    expect(source).toMatch(/<Input[\s\S]*id="catalog-search"[\s\S]*noBorder/);
-  });
-
   it('uses client navigation when opening a workflow from its title', () => {
     const source = readFileSync(
       resolve('src/lib/catalog/browser/catalog-list.svelte'),
@@ -383,25 +352,5 @@ describe('CatalogList', () => {
     expect(source).toContain('pointer-events-none absolute');
     expect(source).toContain('Start (${pending} pending)');
     expect(source).not.toContain('disabled={runningExampleId');
-  });
-
-  it('keeps the sticky actions cell opaque and aligned with row backgrounds', () => {
-    const source = readFileSync(
-      resolve('src/lib/catalog/browser/catalog-list.svelte'),
-      'utf8',
-    );
-
-    expect(source).toMatch(
-      /class="[^"]*catalog-table-region[^"]*"[\s\S]*class="(?=[^"]*catalog-actions-cell)(?=[^"]*sticky)(?=[^"]*right-0)(?=[^"]*bg-surface-primary)(?=[^"]*text-primary)[^"]*"/,
-    );
-    expect(source).toContain(
-      ':global(.holocene-table-body tr:nth-of-type(even) > .catalog-actions-cell)',
-    );
-    expect(source).toContain('background-color: var(--color-surface-primary);');
-    expect(source).toContain('var(--color-surface-overlay-primary)');
-    expect(source).toContain(
-      ':global(.holocene-table-body tr:hover > .catalog-actions-cell)',
-    );
-    expect(source).toContain('background-image: none;');
   });
 });
