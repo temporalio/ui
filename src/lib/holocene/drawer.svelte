@@ -21,7 +21,7 @@
     id?: string;
     /** Id of the element that names the drawer, usually its heading. */
     labelledby?: string;
-    /** Blur and dim the page behind the drawer, as a modal does. */
+    /** Dim the page behind the drawer. */
     backdrop?: boolean;
     closeButtonLabel: string;
     closePadding?: boolean;
@@ -76,7 +76,7 @@
   <!-- Skipped by the focus trap's inert pass, so a click on it reaches the
   drawer's outside-click handler and closes the drawer. -->
   <div
-    class="fixed inset-0 z-[54] bg-surface-overlay-neutral backdrop-blur-[8px]"
+    class="fixed inset-0 z-[54] bg-surface-overlay-neutral"
     aria-hidden="true"
     data-inert-skip
     transition:fade={{ duration: 200 }}
