@@ -71,20 +71,31 @@
   };
 
   /**
-   * Arrow keys move through a radio group and select as they go, so they
-   * must not close the cards: a keyboard user browsing the options would
-   * switch providers and lose the list at once. Enter and Space choose.
+   * Arrow keys move through a radio group and select as they go, so a change
+   * they make keeps the cards open: a keyboard user browsing the options
+   * would otherwise switch providers and lose the list at once. Enter and
+   * Space choose.
    */
+  let browsingWithKeys = false;
   const handleCardKeydown = (event: KeyboardEvent) => {
+    if (event.key.startsWith('Arrow')) {
+      browsingWithKeys = true;
+      return;
+    }
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
       closeCards();
     }
   };
 
-  /** A pointer click chooses. A click a key press makes has no detail. */
-  const handleCardClick = (event: MouseEvent, disabled?: boolean) => {
-    if (event.detail > 0 && !disabled) closeCards();
+  /** A click on the card already chosen changes nothing, so it closes here. */
+  const handleCardClick = (
+    event: MouseEvent,
+    option: ComputeProviderOption,
+  ) => {
+    if (event.detail > 0 && !option.disabled && option.value === provider) {
+      closeCards();
+    }
   };
 
   // Label, description and brand mark all come from the registry, so a
@@ -145,6 +156,12 @@
 
   $effect(() => {
     return providerStore.subscribe((value) => {
+      // Close after the radio has taken the new value. Closing inside the
+      // click handler removes the radio before the click can select it.
+      if (value !== untrack(() => provider)) {
+        if (browsingWithKeys) browsingWithKeys = false;
+        else closeCards();
+      }
       provider = value;
     });
   });
@@ -245,7 +262,7 @@
             class="flex cursor-pointer items-center gap-3 rounded-lg border border-primary p-4"
             class:cursor-not-allowed={option.disabled}
             class:opacity-50={option.disabled}
-            onclick={(event) => handleCardClick(event, option.disabled)}
+            onclick={(event) => handleCardClick(event, option)}
           >
             <RadioControl
               group={providerStore}
