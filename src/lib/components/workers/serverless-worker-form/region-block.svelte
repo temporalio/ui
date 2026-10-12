@@ -10,6 +10,8 @@
   interface Props {
     /** Omitted when the Namespace's region is unknown, e.g. self-hosted. */
     region?: ComputeRegion;
+    /** The header's text when there is no region to name. */
+    title?: string;
     /** Primary/Replica only mean something once there is more than one. */
     showRole?: boolean;
     /** Explains when Temporal invokes this Region's resource. */
@@ -21,6 +23,7 @@
 
   let {
     region,
+    title,
     showRole = false,
     roleTooltip,
     bodyClass = '',
@@ -30,13 +33,15 @@
 </script>
 
 <div class="rounded-lg border border-primary">
-  {#if region}
+  {#if region || title}
     <div
       class="flex min-h-12 items-center gap-2 rounded-t-lg border-b border-primary bg-surface-secondary px-4 py-2"
     >
       <span class="inline-flex items-center gap-1">
-        <span class="text-sm font-medium">{region.label ?? region.id}</span>
-        {#if showRole}
+        <span class="text-sm font-medium"
+          >{region ? (region.label ?? region.id) : title}</span
+        >
+        {#if region && showRole}
           {@const roleLabel =
             region.role === 'replica'
               ? translate('workers.region-role-replica')

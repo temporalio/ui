@@ -386,14 +386,24 @@
     </RegionBlock>
 
     {#if replicaOptions.length}
-      <div class="flex flex-col gap-3 rounded-lg border border-primary p-4">
-        <ToggleSwitch
-          id="high-availability"
-          label={translate('workers.high-availability')}
-          labelPosition="left"
-          bind:checked={highAvailability}
-        />
-        {#if highAvailability && replicaRegion}
+      <RegionBlock
+        region={replicated ? replicaRegion : undefined}
+        title={translate('workers.region-role-replica')}
+        showRole
+        roleTooltip={translate('workers.region-role-replica-tooltip', {
+          region: replicaLabel,
+        })}
+        bodyClass={highAvailability ? '' : 'py-3'}
+      >
+        {#snippet action()}
+          <ToggleSwitch
+            id="high-availability"
+            label={translate('workers.high-availability')}
+            labelPosition="left"
+            bind:checked={highAvailability}
+          />
+        {/snippet}
+        {#if replicated && replicaRegion}
           <Select
             id="replica-region"
             label={translate('workers.replica-region')}
@@ -404,80 +414,12 @@
               <Option value={option.id}>{option.label ?? option.id}</Option>
             {/each}
           </Select>
-        {:else}
-          <p class="text-sm text-secondary">
-            {translate('workers.high-availability-off', {
-              region: primaryLabel,
-            })}
-          </p>
-        {/if}
-      </div>
-    {/if}
-
-    {#if replicated && replicaRegion}
-      <RegionBlock
-        region={replicaRegion}
-        showRole
-        roleTooltip={translate('workers.region-role-replica-tooltip', {
-          region: replicaLabel,
-        })}
-      >
-        {@render serverError(replicaRegion.id)}
-        <ComputeFields
-          {provider}
-          leadingDivider={false}
-          sections={['resource']}
-          idPrefix={replicaRegion.id}
-          lambdaArnPlaceholder={lambdaArnPlaceholderFor(replicaRegion.label)}
-          bind:lambdaArn={
-            () => replicaLambdaArn,
-            (value) => (replica.lambdaArnOverride = value)
-          }
-          bind:agentCoreEndpointArn={
-            () => replicaAgentCoreArn,
-            (value) => (replica.agentCoreEndpointArnOverride = value)
-          }
-          bind:iamRoleArn={replica.iamRoleArn}
-          bind:roleExternalId={replica.roleExternalId}
-          bind:gcpProject={() => replicaProject, setReplicaProject}
-          bind:gcpRegion={replica.gcpRegion}
-          bind:gcpWorkerPool={replica.gcpWorkerPool}
-          bind:gcpServiceAccount={replica.gcpServiceAccount}
-          bind:minReplicas={replica.minReplicas}
-          bind:maxReplicas={replica.maxReplicas}
-          bind:initialReplicas={replica.initialReplicas}
-          bind:utilizationTarget={replica.utilizationTarget}
-          bind:scaleDownStabilization={replica.scaleDownStabilization}
-          bind:scaleUpCooloffMs={replica.scaleUpCooloffMs}
-          bind:scaleUpBacklogThreshold={replica.scaleUpBacklogThreshold}
-          bind:maxWorkerLifetimeMs={replica.maxWorkerLifetimeMs}
-          bind:metricsPollIntervalMs={replica.metricsPollIntervalMs}
-          errors={regionErrors[replicaRegion.id]}
-        />
-        {#if isSuggested}
-          <p class="mt-2 text-xs text-secondary">
-            {translate('workers.region-arn-suggested')}
-            <span class="font-medium text-primary">{primaryLabel}</span>
-            {translate('workers.region-arn-suggested-hint')}
-            <span class="font-medium text-primary">{replicaLabel}</span>.
-          </p>
-        {/if}
-        {#if inheritsPrimary}
-          <hr class="my-5 border-primary" />
-          <div class="flex flex-col items-start gap-3">
-            <p class="text-sm text-secondary">
-              {translate('workers.region-inherits-primary')}
-              <span class="font-medium text-primary">{primaryLabel}</span>
-            </p>
-            <Button variant="tertiary" size="sm" onclick={customize}>
-              {translate('workers.region-customize')}
-            </Button>
-          </div>
-        {:else}
+          {@render serverError(replicaRegion.id)}
           <ComputeFields
             {provider}
-            sections={['access', 'scaling']}
+            sections={['resource']}
             idPrefix={replicaRegion.id}
+            lambdaArnPlaceholder={lambdaArnPlaceholderFor(replicaRegion.label)}
             bind:lambdaArn={
               () => replicaLambdaArn,
               (value) => (replica.lambdaArnOverride = value)
@@ -488,7 +430,7 @@
             }
             bind:iamRoleArn={replica.iamRoleArn}
             bind:roleExternalId={replica.roleExternalId}
-            bind:gcpProject={replica.gcpProject}
+            bind:gcpProject={() => replicaProject, setReplicaProject}
             bind:gcpRegion={replica.gcpRegion}
             bind:gcpWorkerPool={replica.gcpWorkerPool}
             bind:gcpServiceAccount={replica.gcpServiceAccount}
@@ -503,6 +445,60 @@
             bind:metricsPollIntervalMs={replica.metricsPollIntervalMs}
             errors={regionErrors[replicaRegion.id]}
           />
+          {#if isSuggested}
+            <p class="mt-2 text-xs text-secondary">
+              {translate('workers.region-arn-suggested')}
+              <span class="font-medium text-primary">{primaryLabel}</span>
+              {translate('workers.region-arn-suggested-hint')}
+              <span class="font-medium text-primary">{replicaLabel}</span>.
+            </p>
+          {/if}
+          {#if inheritsPrimary}
+            <hr class="my-5 border-primary" />
+            <div class="flex flex-col items-start gap-3">
+              <p class="text-sm text-secondary">
+                {translate('workers.region-inherits-primary')}
+                <span class="font-medium text-primary">{primaryLabel}</span>
+              </p>
+              <Button variant="tertiary" size="sm" onclick={customize}>
+                {translate('workers.region-customize')}
+              </Button>
+            </div>
+          {:else}
+            <ComputeFields
+              {provider}
+              sections={['access', 'scaling']}
+              idPrefix={replicaRegion.id}
+              bind:lambdaArn={
+                () => replicaLambdaArn,
+                (value) => (replica.lambdaArnOverride = value)
+              }
+              bind:agentCoreEndpointArn={
+                () => replicaAgentCoreArn,
+                (value) => (replica.agentCoreEndpointArnOverride = value)
+              }
+              bind:iamRoleArn={replica.iamRoleArn}
+              bind:roleExternalId={replica.roleExternalId}
+              bind:gcpProject={replica.gcpProject}
+              bind:gcpRegion={replica.gcpRegion}
+              bind:gcpWorkerPool={replica.gcpWorkerPool}
+              bind:gcpServiceAccount={replica.gcpServiceAccount}
+              bind:minReplicas={replica.minReplicas}
+              bind:maxReplicas={replica.maxReplicas}
+              bind:initialReplicas={replica.initialReplicas}
+              bind:utilizationTarget={replica.utilizationTarget}
+              bind:scaleDownStabilization={replica.scaleDownStabilization}
+              bind:scaleUpCooloffMs={replica.scaleUpCooloffMs}
+              bind:scaleUpBacklogThreshold={replica.scaleUpBacklogThreshold}
+              bind:maxWorkerLifetimeMs={replica.maxWorkerLifetimeMs}
+              bind:metricsPollIntervalMs={replica.metricsPollIntervalMs}
+              errors={regionErrors[replicaRegion.id]}
+            />
+          {/if}
+        {:else}
+          <p class="text-sm text-secondary">
+            {translate('workers.high-availability-off')}
+          </p>
         {/if}
       </RegionBlock>
     {/if}

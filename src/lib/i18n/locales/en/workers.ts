@@ -306,7 +306,7 @@ export const Strings = {
   'region-all': 'All Regions',
   'high-availability': 'High availability',
   'high-availability-off':
-    'Off. Serverless Workers use the resources in {{region}} wherever the Namespace is active.',
+    'Off. Serverless Workers use the resources above wherever the Namespace is active.',
   'replica-region': 'Replica region',
   'region-arn-suggested': 'Based on the',
   'region-arn-suggested-hint': 'ARN. Check the version number for',
