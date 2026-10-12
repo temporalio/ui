@@ -307,8 +307,8 @@ export const Strings = {
   'high-availability-off':
     'Turn on to run Serverless Workers in a replica region after a failover.',
   'region-the-primary': 'the primary',
-  'replica-region-not-offered':
-    '{{region}} is not a replica region for this Namespace. Use a resource in {{regions}}.',
+  'replica-same-region':
+    'The primary and the replica both run in {{region}}, so an outage there stops both.',
   'region-arn-suggested-from-primary':
     "Based on the primary's ARN. Check the version number for",
   'region-inherits-primary':

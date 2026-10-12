@@ -1,8 +1,3 @@
-import {
-  COMPUTE_PROVIDER_VALUES,
-  type ComputeProviderValue,
-} from '$lib/components/workers/serverless-worker-form/compute-providers';
-import type { ComputeProviderOption } from '$lib/components/workers/serverless-worker-form/shared';
 import type {
   ComputeRegionRole,
   NamespaceRegion,
@@ -40,51 +35,13 @@ export const parseNamespaceRegions = (
     }));
 
 /**
- * Namespace regions from the environment, standing in for the ones a consumer
- * passes. The open-source server has no region of its own, so this is how a
- * development build or a feature demo sees the multi-region UI. A production
- * build never reads it.
+ * Namespace regions from the environment, for a development build or a
+ * feature demo whose server cannot provide them, such as a single-cluster dev
+ * server. Undefined when unset, so the Namespace's own regions are used. A
+ * production build never reads it.
  */
-export const namespaceRegionsFromEnv = (): NamespaceRegion[] =>
-  import.meta.env.DEV
-    ? parseNamespaceRegions(import.meta.env.VITE_NAMESPACE_REGIONS)
-    : [];
-
-const PROVIDERS: ReadonlySet<string> = new Set(COMPUTE_PROVIDER_VALUES);
-
-/**
- * Reads `provider:region` pairs separated by commas, where a region is
- * `regionId` or `regionId=label`, for example
- * `lambda:aws-us-west-2=us-west-2,lambda:aws-us-west-1`, into every provider,
- * each with the replica regions it was given. Returns undefined when no pair is valid, which
- * leaves the form's default providers in place.
- */
-export const parseReplicaRegions = (
-  value: string | undefined,
-): ComputeProviderOption[] | undefined => {
-  const pairs = (value ?? '')
-    .split(',')
-    .map((entry) => entry.trim().split(':'))
-    .filter(
-      ([provider, value]) =>
-        PROVIDERS.has(provider) && !!region(value ?? '').regionId,
-    );
-  if (!pairs.length) return undefined;
-  return COMPUTE_PROVIDER_VALUES.map((value: ComputeProviderValue) => ({
-    value,
-    replicaRegions: pairs
-      .filter(([provider]) => provider === value)
-      .map(([, value]) => region(value)),
-  }));
+export const namespaceRegionsFromEnv = (): NamespaceRegion[] | undefined => {
+  if (!import.meta.env.DEV) return undefined;
+  const regions = parseNamespaceRegions(import.meta.env.VITE_NAMESPACE_REGIONS);
+  return regions.length ? regions : undefined;
 };
-
-/**
- * Providers with replica regions from the environment, standing in for the
- * ones a consumer passes. A production build never reads it.
- */
-export const computeProvidersFromEnv = ():
-  | ComputeProviderOption[]
-  | undefined =>
-  import.meta.env.DEV
-    ? parseReplicaRegions(import.meta.env.VITE_REPLICA_REGIONS)
-    : undefined;

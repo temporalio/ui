@@ -46,23 +46,10 @@
   const regionsFor = (namespace: Topology): ComputeRegion[] =>
     namespace === 'multi' ? multiRegions : multiRegions.slice(0, 1);
 
-  /** Regions Temporal Cloud would offer an AWS provider for a replica. */
-  const awsReplicaRegions = [
-    { regionId: 'aws-us-west-2', label: 'us-west-2' },
-    { regionId: 'aws-us-west-1', label: 'us-west-1' },
-    { regionId: 'aws-eu-west-1', label: 'eu-west-1' },
-  ];
-
-  /**
-   * Temporal Cloud offers only the providers matching the Namespace's cloud,
-   * each with the regions it can run a replica in.
-   */
+  /** Temporal Cloud offers only the providers matching the Namespace's cloud. */
   const providersFor = (namespace: Topology): ComputeProviderOption[] =>
     namespace === 'multi'
-      ? [
-          { value: 'lambda', replicaRegions: awsReplicaRegions },
-          { value: 'agentcore', replicaRegions: awsReplicaRegions },
-        ]
+      ? [{ value: 'lambda' }, { value: 'agentcore' }]
       : [{ value: 'lambda' }, { value: 'cloud-run' }];
 
   const namespace = 'orders.a1b2c';

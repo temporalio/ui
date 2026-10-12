@@ -6,11 +6,17 @@
   import { translate } from '$lib/i18n/translate';
   import WorkersLayout from '$lib/layouts/workers-layout.svelte';
   import WorkerDeployments from '$lib/pages/deployments.svelte';
+  import { namespaceRegionsFromReplication } from '$lib/utilities/compute-regions';
   import { namespaceRegionsFromEnv } from '$lib/utilities/env-regions';
   import { routeForWorkerDeploymentCreate } from '$lib/utilities/route-for';
 
   const namespace = $derived(page.params.namespace);
-  const namespaceRegions = namespaceRegionsFromEnv();
+  // Self-hosted: the Namespace's clusters, unless a development setting
+  // stands in for them. A consumer such as Temporal Cloud passes its own.
+  const namespaceRegions = $derived(
+    namespaceRegionsFromEnv() ??
+      namespaceRegionsFromReplication(page.data.namespace),
+  );
   const createHref = $derived(routeForWorkerDeploymentCreate({ namespace }));
 </script>
 

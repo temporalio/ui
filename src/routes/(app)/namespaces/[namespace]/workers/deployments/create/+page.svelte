@@ -7,14 +7,18 @@
   import { translate } from '$lib/i18n/translate';
   import { IconChevronLeft } from '$lib/io/icon';
   import ServerlessWorkerCreate from '$lib/pages/serverless-worker-create.svelte';
-  import {
-    computeProvidersFromEnv,
-    namespaceRegionsFromEnv,
-  } from '$lib/utilities/env-regions';
+  import { namespaceRegionsFromReplication } from '$lib/utilities/compute-regions';
+  import { namespaceRegionsFromEnv } from '$lib/utilities/env-regions';
   import { routeForWorkerDeployments } from '$lib/utilities/route-for';
 
   const namespace = $derived(page.params.namespace);
   const deploymentsHref = $derived(routeForWorkerDeployments({ namespace }));
+  // Self-hosted: the Namespace's clusters, unless a development setting
+  // stands in for them. A consumer such as Temporal Cloud passes its own.
+  const namespaceRegions = $derived(
+    namespaceRegionsFromEnv() ??
+      namespaceRegionsFromReplication(page.data.namespace),
+  );
 </script>
 
 <PageTitle
@@ -30,8 +34,7 @@
   </h1>
   <ServerlessWorkerCreate
     {namespace}
-    namespaceRegions={namespaceRegionsFromEnv()}
-    computeProviders={computeProvidersFromEnv()}
+    {namespaceRegions}
     onSuccess={() => goto(deploymentsHref)}
   />
 </div>

@@ -24,7 +24,6 @@
     editVersionSchema,
     getInitialComputeProvider,
     multiRegionEditVersionSchema,
-    offersReplicaRegions,
     type RegionComputeValues,
     validateRegionValues,
   } from './shared';
@@ -102,9 +101,9 @@
     buildId,
   }: Props = $props();
 
-  /** A consumer offers high availability through each provider's replicaRegions. */
+  /** High availability is offered when the Namespace has a replica. */
   const offersHighAvailability = $derived(
-    !!regions?.length && offersReplicaRegions(computeProviders),
+    !!regions?.some(({ role }) => role === 'replica'),
   );
 
   let regionValues = $state<RegionComputeValues[]>([]);
