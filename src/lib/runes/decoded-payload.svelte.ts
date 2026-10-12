@@ -16,8 +16,13 @@ export type DecodedPayloadState =
   | { status: 'success'; results: DecodedPayloadResult }
   | { status: 'error'; error: unknown; retry: () => void };
 
+type DecodedPayloadOptions = {
+  onDecode?: (results: DecodedPayloadResult) => void;
+};
+
 export function createDecodedPayload(
   getValue: () => DecodableValue | null | undefined,
+  { onDecode }: DecodedPayloadOptions = {},
 ) {
   let state = $state<DecodedPayloadState>({ status: 'idle' });
   let stateValueJson = $state<string>();
@@ -46,7 +51,10 @@ export function createDecodedPayload(
     state = { status: 'loading' };
     try {
       const results = await decodePayloadResult(value);
-      if (id === request) state = { status: 'success', results };
+      if (id === request) {
+        state = { status: 'success', results };
+        onDecode?.(results);
+      }
     } catch (error) {
       if (id === request) {
         state = {

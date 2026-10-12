@@ -238,4 +238,24 @@ describe('createDecodedPayload', () => {
     expect(mockDecode).toHaveBeenCalledTimes(1);
     cleanup();
   });
+
+  it('calls onDecode with the results of the current decode', async () => {
+    const stale = deferred<ReturnType<typeof results>>();
+    mockDecode
+      .mockReturnValueOnce(stale.promise)
+      .mockResolvedValueOnce(results('b'));
+    const onDecode = vi.fn();
+    let value = $state<Payloads>(payloads('a'));
+    cleanup = $effect.root(() => {
+      createDecodedPayload(() => value, { onDecode });
+    });
+    flushSync();
+    value = payloads('b');
+    flushSync();
+    await vi.waitFor(() => expect(onDecode).toHaveBeenCalledTimes(1));
+    stale.resolve(results('a'));
+    await stale.promise;
+    expect(onDecode).toHaveBeenCalledTimes(1);
+    expect(onDecode).toHaveBeenCalledWith(results('b'));
+  });
 });
