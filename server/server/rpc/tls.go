@@ -34,10 +34,10 @@ import (
 	"net/http"
 	"os"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/temporalio/ui-server/v2/server/config"
+	"github.com/temporalio/ui-server/v2/server/tlsutil"
 )
 
 const (
@@ -50,57 +50,6 @@ var netClient HttpGetter = &http.Client{
 
 type HttpGetter interface {
 	Get(url string) (resp *http.Response, err error)
-}
-
-type certLoader struct {
-	CertFile    string
-	KeyFile     string
-	cachedCert  *tls.Certificate
-	lastModTime time.Time
-	lock        sync.RWMutex
-}
-
-func (l *certLoader) GetClientCertificate(_ *tls.CertificateRequestInfo) (*tls.Certificate, error) {
-	stat, err := os.Stat(l.CertFile)
-	if err != nil {
-		l.lock.RLock()
-		existingCert := l.cachedCert
-		l.lock.RUnlock()
-
-		if existingCert == nil {
-			return nil, fmt.Errorf("statting tls cert file: %w", err)
-		}
-
-		log.Printf("unable to stat tls cert file, returning cached cert which may expire: %s", err)
-		return existingCert, nil
-	}
-
-	l.lock.RLock()
-	if existingCert := l.cachedCert; existingCert != nil && stat.ModTime().Equal(l.lastModTime) {
-		l.lock.RUnlock()
-		log.Printf("tls cert unchanged on disk; returning cached cert")
-		return existingCert, nil
-	}
-	l.lock.RUnlock()
-
-	// If the cert file and key file don't match, tls.LoadX509KeyPair will
-	// return an error. This will protect us from a race condition where the key
-	// file has been written but the cert file has not yet. We'll log the error
-	// but keep returning the previous cert until loading the new cert succeeds.
-	cert, err := tls.LoadX509KeyPair(l.CertFile, l.KeyFile)
-
-	l.lock.Lock()
-	defer l.lock.Unlock()
-	if err != nil {
-		log.Printf("unable to load tls key pair, returning cached cert which may expire: %s", err)
-		return l.cachedCert, nil
-	}
-	log.Printf("loaded new tls key pair")
-
-	l.cachedCert = &cert
-	l.lastModTime = stat.ModTime()
-
-	return l.cachedCert, nil
 }
 
 func CreateTLSConfig(address string, cfg *config.TLS) (*tls.Config, error) {
@@ -150,12 +99,8 @@ func CreateTLSConfig(address string, cfg *config.TLS) (*tls.Config, error) {
 	if configureKeyPairFromFile {
 		// Configure server to reload client cert from file if it changes on
 		// disk.
-		certLoader := &certLoader{
-			CertFile: cfg.CertFile,
-			KeyFile:  cfg.KeyFile,
-			lock:     sync.RWMutex{},
-		}
-		tlsConfig.GetClientCertificate = certLoader.GetClientCertificate
+		loader := tlsutil.NewCertLoader(cfg.CertFile, cfg.KeyFile)
+		tlsConfig.GetClientCertificate = loader.GetClientCertificate
 	}
 
 	if configureKeyPairFromBytes {

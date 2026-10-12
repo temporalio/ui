@@ -23,6 +23,9 @@
 package server
 
 import (
+	"crypto/tls"
+	"crypto/x509"
+	"errors"
 	"fmt"
 	"io/fs"
 	"net/http"
@@ -39,6 +42,7 @@ import (
 	"github.com/temporalio/ui-server/v2/server/headers"
 	"github.com/temporalio/ui-server/v2/server/route"
 	"github.com/temporalio/ui-server/v2/server/server_options"
+	"github.com/temporalio/ui-server/v2/server/tlsutil"
 
 	"github.com/temporalio/ui-server/v2/ui"
 )
@@ -144,17 +148,67 @@ func (s *Server) Start() error {
 	}
 
 	address := fmt.Sprintf("%s:%d", cfg.Host, cfg.Port)
-	if cfg.UIServerTLS.CertFile != "" && cfg.UIServerTLS.KeyFile != "" {
+	tlsMode, err := cfg.UIServerTLS.Mode()
+	if err != nil {
+		return err
+	}
+	switch tlsMode {
+	case config.ModeMutual:
+		s.httpServer.Logger.Info("Starting UI server with mTLS...")
+		tlsConfig, buildErr := buildMTLSConfig(cfg.UIServerTLS.CertFile, cfg.UIServerTLS.KeyFile, *cfg.UIServerTLS.MTLS)
+		if buildErr != nil {
+			return buildErr
+		}
+		// StartTLS doesn't allow us to specify the CA, or get the cert reload behavior, set addr and TLS config manually.
+		s.httpServer.TLSServer.Addr = address
+		s.httpServer.TLSServer.TLSConfig = tlsConfig
+		err = s.httpServer.StartServer(s.httpServer.TLSServer)
+	case config.ModeStandard:
 		s.httpServer.Logger.Info("Starting UI server with TLS...")
 		err = s.httpServer.StartTLS(address, cfg.UIServerTLS.CertFile, cfg.UIServerTLS.KeyFile)
-	} else {
+	case config.ModeNone:
 		err = s.httpServer.Start(address)
+	case config.ModeUnknown:
+		err = errors.New("could not determine valid TLS mode from config")
+	default:
+		err = fmt.Errorf("unsupported TLS mode: %s", tlsMode)
 	}
 
 	if err != http.ErrServerClosed {
 		s.httpServer.Logger.Fatal(err)
 	}
 	return nil
+}
+
+// buildMTLSConfig provides an mTLS configuration based on the provided configuration. The server cert
+// is hot-reloaded from disk, allowing for cert rotation without restarting the server.
+func buildMTLSConfig(certFile, keyFile string, mtls config.UIServerMTLS) (*tls.Config, error) {
+	loader := tlsutil.NewCertLoader(certFile, keyFile)
+	if _, err := loader.GetCertificate(nil); err != nil {
+		return nil, fmt.Errorf("error load initial ui-server key pair: %w", err)
+	}
+
+	caBytes, err := os.ReadFile(mtls.CaFile)
+	if err != nil {
+		return nil, fmt.Errorf("error reading client CA %q: %w", mtls.CaFile, err)
+	}
+	pool := x509.NewCertPool()
+	if !pool.AppendCertsFromPEM(caBytes) {
+		return nil, fmt.Errorf("no valid PEM certificates in %q", mtls.CaFile)
+	}
+
+	clientAuth, err := mtls.ClientAuthType()
+	if err != nil {
+		return nil, err
+	}
+
+	return &tls.Config{
+		MinVersion:     tls.VersionTLS12,
+		NextProtos:     []string{"h2", "http/1.1"},
+		GetCertificate: loader.GetCertificate,
+		ClientAuth:     clientAuth,
+		ClientCAs:      pool,
+	}, nil
 }
 
 // Stop UI server.
