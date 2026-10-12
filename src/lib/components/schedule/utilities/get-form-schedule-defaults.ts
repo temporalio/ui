@@ -137,7 +137,7 @@ export function getFormScheduleDefaults(
     workflowId: startWorkflow?.workflowId ?? '',
     taskQueue: startWorkflow?.taskQueue?.name ?? '',
 
-    input: '',
+    inputs: [''],
     // Re-encoding the input only happens when this is set; default it on for
     // new schedules and off for existing ones, whose payloads aren't decoded
     // back into the form.

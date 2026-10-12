@@ -16,6 +16,8 @@
     editing?: boolean;
     placeholder?: string;
     copyable?: boolean;
+    clearOnDestroy?: boolean;
+    labelHidden?: boolean;
   }
 
   let {
@@ -28,6 +30,8 @@
     editing = true,
     placeholder,
     copyable = false,
+    clearOnDestroy = true,
+    labelHidden = false,
   }: Props = $props();
 
   const isValidInput = (value: string) => {
@@ -61,11 +65,13 @@
     input = uploadInput;
   };
 
-  onDestroy(clearValues);
+  onDestroy(() => {
+    if (clearOnDestroy) clearValues();
+  });
 </script>
 
 <div class="flex flex-col gap-2">
-  <span class="text-sm font-medium">{label}</span>
+  <span class="text-sm font-medium" class:sr-only={labelHidden}>{label}</span>
   <div class="flex gap-2">
     {#key `${loading}-${editing}`}
       <CodeBlock
