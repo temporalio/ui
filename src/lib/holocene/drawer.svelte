@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { fly } from 'svelte/transition';
+  import { fade, fly } from 'svelte/transition';
 
   import type { Snippet } from 'svelte';
   import { setContext } from 'svelte';
@@ -21,6 +21,8 @@
     id?: string;
     /** Id of the element that names the drawer, usually its heading. */
     labelledby?: string;
+    /** Blur and dim the page behind the drawer, as a modal does. */
+    backdrop?: boolean;
     closeButtonLabel: string;
     closePadding?: boolean;
     class?: string;
@@ -34,6 +36,7 @@
     onClick,
     id = 'navigation-drawer',
     labelledby,
+    backdrop = false,
     closeButtonLabel,
     closePadding = true,
     class: className = '',
@@ -68,6 +71,18 @@
     onClick(event);
   };
 </script>
+
+{#if open && backdrop}
+  <!-- Skipped by the focus trap's inert pass, so a click on it reaches the
+  drawer's outside-click handler and closes the drawer. -->
+  <div
+    class="fixed inset-0 z-[54] bg-surface-overlay-neutral backdrop-blur-[8px]"
+    aria-hidden="true"
+    data-inert-skip
+    transition:fade={{ duration: 200 }}
+    use:portal
+  ></div>
+{/if}
 
 {#if open}
   <!-- Order matters: use:portal must run before use:focusTrap. Actions set up
