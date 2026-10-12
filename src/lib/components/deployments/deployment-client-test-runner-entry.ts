@@ -75,17 +75,6 @@ export async function renderDeployment({
   return target;
 }
 
-export function expandDetails(target: HTMLElement) {
-  const expand = target.querySelector<HTMLButtonElement>(
-    'button[aria-label="Expand"]',
-  );
-  expand?.click();
-  flushSync();
-  return target.querySelector<HTMLTableCellElement>(
-    'tr.bg-surface-primary > td[colspan]',
-  );
-}
-
 export function openMenu(controls: string) {
   const trigger = document.querySelector<HTMLButtonElement>(
     `[aria-controls="${controls}"]`,

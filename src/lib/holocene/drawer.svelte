@@ -16,8 +16,11 @@
     open?: boolean;
     position?: 'bottom' | 'right';
     dark?: boolean;
-    onClick: (e: MouseEvent) => void;
+    /** Closes the drawer: the close button, a click outside, or Escape. */
+    onClick: (e: MouseEvent | KeyboardEvent) => void;
     id?: string;
+    /** Id of the element that names the drawer, usually its heading. */
+    labelledby?: string;
     closeButtonLabel: string;
     closePadding?: boolean;
     class?: string;
@@ -30,6 +33,7 @@
     dark = true,
     onClick,
     id = 'navigation-drawer',
+    labelledby,
     closeButtonLabel,
     closePadding = true,
     class: className = '',
@@ -48,6 +52,21 @@
 
   // svelte-ignore state_referenced_locally
   setContext('drawer-pos', position);
+
+  // Escape belongs to whatever inside the drawer is open first: a modal
+  // dialog, or a menu whose trigger reports itself expanded.
+  const closeOnEscape = (event: KeyboardEvent) => {
+    if (event.key !== 'Escape' || event.defaultPrevented) return;
+    const target = event.target;
+    if (
+      target instanceof Element &&
+      (target.closest('dialog[open]') ||
+        target.closest('[aria-expanded="true"]'))
+    ) {
+      return;
+    }
+    onClick(event);
+  };
 </script>
 
 {#if open}
@@ -67,8 +86,11 @@
     )}
     in:fly={flyParamsIn}
     out:fly={flyParamsOut}
-    role="region"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby={labelledby}
     tabindex="-1"
+    onkeydown={closeOnEscape}
     use:portal
     use:focusTrap={true}
     use:clickoutside={onClick}
@@ -80,8 +102,6 @@
           label={closeButtonLabel}
           class="text-primary"
           Icon={IconClose}
-          aria-expanded={open}
-          aria-controls="navigation-drawer"
           onclick={onClick}
         />
       </div>
