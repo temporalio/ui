@@ -49,12 +49,9 @@ export function createDecodedPayload(
     }
 
     state = { status: 'loading' };
+    let results: DecodedPayloadResult;
     try {
-      const results = await decodePayloadResult(value);
-      if (id === request) {
-        state = { status: 'success', results };
-        onDecode?.(results);
-      }
+      results = await decodePayloadResult(value);
     } catch (error) {
       if (id === request) {
         state = {
@@ -65,6 +62,15 @@ export function createDecodedPayload(
           },
         };
       }
+      return;
+    }
+
+    if (id !== request) return;
+    state = { status: 'success', results };
+    try {
+      onDecode?.(results);
+    } catch (error) {
+      console.error(error);
     }
   };
 
