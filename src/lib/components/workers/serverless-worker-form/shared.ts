@@ -11,8 +11,15 @@ import {
   buildAgentCoreComputeConfig,
   buildGcpCloudRunComputeConfig,
   buildLambdaComputeConfig,
+  decodeAgentCoreProviderDetails,
+  decodeGcpCloudRunProviderDetails,
+  decodeLambdaProviderDetails,
+  decodeScalerDetails,
 } from '$lib/services/deployments-service';
-import type { ComputeConfig } from '$lib/types/deployments';
+import type {
+  ComputeConfig,
+  ComputeConfigScalingGroup,
+} from '$lib/types/deployments';
 
 import {
   COMPUTE_PROVIDERS,
@@ -252,6 +259,8 @@ export type RegionComputeValues = {
    * wherever no scoped group matches, as every group did before regions.
    */
   scoped?: boolean;
+  /** The group's name when it already exists, so an edit keeps it. */
+  name?: string;
   /** A problem with the resource that the schema cannot see, such as its region. */
   resourceError?: { field: keyof ComputeFormValues; message: string };
 };
@@ -349,14 +358,14 @@ export const buildComputeConfigForRegions = (
   entries: readonly RegionComputeValues[],
 ): ComputeConfig => ({
   scalingGroups: Object.fromEntries(
-    entries.map(({ regionId, values, scoped = true }) => {
+    entries.map(({ regionId, values, scoped = true, name }) => {
       // Each provider builder emits exactly one group, which is the group this
       // region needs; only its name and its regions are added here.
       const built = buildComputeConfigFromForm(values);
       const [group] = Object.values(built.scalingGroups ?? {});
       return scoped
-        ? [regionId, { ...group, regionIds: [regionId] }]
-        : [DEFAULT_SCALING_GROUP, group];
+        ? [name ?? regionId, { ...group, regionIds: [regionId] }]
+        : [name ?? DEFAULT_SCALING_GROUP, group];
     }),
   ),
 });
@@ -458,4 +467,65 @@ export const interpolateTerraformTemplate = (
   result = replaceArnList(result, 'agent_runtime_arns', agentCoreEndpointArn);
 
   return result;
+};
+
+/** A form's starting values, as read from a saved scaling group. */
+export type ComputeInitialValues = {
+  provider?: ComputeProviderValue;
+  lambdaArn: string;
+  agentCoreEndpointArn?: string;
+  iamRoleArn: string;
+  roleExternalId: string;
+  gcpProject?: string;
+  gcpRegion?: string;
+  gcpWorkerPool?: string;
+  gcpServiceAccount?: string;
+  minReplicas?: number;
+  maxReplicas?: number;
+  initialReplicas?: number;
+  utilizationTarget?: number;
+  scaleDownStabilization?: string;
+  scaleUpCooloffMs?: number;
+  scaleUpBacklogThreshold?: number;
+  maxWorkerLifetimeMs?: number;
+  metricsPollIntervalMs?: number;
+};
+
+/** Reads one saved scaling group back into a form's values. */
+export const formValuesFromGroup = (
+  group: ComputeConfigScalingGroup | undefined,
+): ComputeInitialValues => {
+  const config: ComputeConfig = { scalingGroups: group ? { group } : {} };
+  const lambda = decodeLambdaProviderDetails(config);
+  const agentCore = decodeAgentCoreProviderDetails(config);
+  const gcp = decodeGcpCloudRunProviderDetails(config);
+  const scaler = decodeScalerDetails(config);
+  return {
+    // A saved provider decides which fields it filled.
+    provider: agentCore.agentCoreEndpointArn
+      ? 'agentcore'
+      : gcp.gcpWorkerPool
+        ? 'cloud-run'
+        : 'lambda',
+    lambdaArn: lambda.lambdaArn ?? '',
+    agentCoreEndpointArn: agentCore.agentCoreEndpointArn ?? '',
+    iamRoleArn: lambda.iamRoleArn ?? agentCore.iamRoleArn ?? '',
+    roleExternalId: lambda.roleExternalId ?? agentCore.roleExternalId ?? '',
+    gcpProject: gcp.gcpProject,
+    gcpRegion: gcp.gcpRegion,
+    gcpWorkerPool: gcp.gcpWorkerPool,
+    gcpServiceAccount: gcp.gcpServiceAccount,
+    scaleUpCooloffMs: scaler.scaleUpCooloffMs,
+    scaleUpBacklogThreshold: scaler.scaleUpBacklogThreshold,
+    maxWorkerLifetimeMs: scaler.maxWorkerLifetimeMs,
+    metricsPollIntervalMs: scaler.metricsPollIntervalMs,
+    minReplicas: scaler.minReplicas,
+    maxReplicas: scaler.maxReplicas,
+    initialReplicas: scaler.initialReplicas,
+    utilizationTarget: scaler.utilizationTarget,
+    scaleDownStabilization:
+      scaler.scaleDownStabilizationMs === undefined
+        ? undefined
+        : msToScaleDownStabilization(scaler.scaleDownStabilizationMs),
+  };
 };

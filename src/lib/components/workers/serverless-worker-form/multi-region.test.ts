@@ -7,6 +7,7 @@ import {
   replicaRegionFor,
   resourceRegion,
   shortResourceName,
+  splitHighAvailabilityGroups,
   suggestRegionalArn,
   truncateMiddle,
 } from './multi-region';
@@ -226,5 +227,51 @@ describe('replicaRegionFor', () => {
 
   it('finds nothing before a resource names a region', () => {
     expect(replicaRegionFor(undefined, options)).toBeUndefined();
+  });
+});
+
+describe('splitHighAvailabilityGroups', () => {
+  const WEST = 'aws-us-west-2';
+  const config = (groups: Record<string, { regionIds?: string[] }>) => ({
+    scalingGroups: groups,
+  });
+
+  it('reads the unscoped group as the primary and the scoped one as the replica', () => {
+    const { primary, replica } = splitHighAvailabilityGroups(
+      config({ default: {}, secondary: { regionIds: [WEST] } }),
+      WEST,
+    );
+    expect(primary?.name).toBe('default');
+    expect(replica?.name).toBe('secondary');
+  });
+
+  it('has no replica when no group names the Namespace replica', () => {
+    const { primary, replica } = splitHighAvailabilityGroups(
+      config({ default: {} }),
+      WEST,
+    );
+    expect(primary?.name).toBe('default');
+    expect(replica).toBeUndefined();
+  });
+
+  it('takes a group scoped elsewhere as the primary when none is unscoped', () => {
+    const { primary, replica } = splitHighAvailabilityGroups(
+      config({
+        east: { regionIds: ['aws-us-east-1'] },
+        west: { regionIds: [WEST] },
+      }),
+      WEST,
+    );
+    expect(primary?.name).toBe('east');
+    expect(replica?.name).toBe('west');
+  });
+
+  it('reads a single-region Namespace as a primary only', () => {
+    const { primary, replica } = splitHighAvailabilityGroups(
+      config({ default: {} }),
+      undefined,
+    );
+    expect(primary?.name).toBe('default');
+    expect(replica).toBeUndefined();
   });
 });

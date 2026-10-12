@@ -7,10 +7,15 @@
     type ComputeProviderValue,
   } from '$lib/components/workers/serverless-worker-form/compute-providers';
   import EditVersionForm from '$lib/components/workers/serverless-worker-form/edit-version-form.svelte';
-  import type { ComputeProviderOption } from '$lib/components/workers/serverless-worker-form/shared';
   import {
+    computeRegionsFor,
+    splitHighAvailabilityGroups,
+  } from '$lib/components/workers/serverless-worker-form/multi-region';
+  import {
+    buildComputeConfigForRegions,
     buildComputeConfigFromForm,
-    msToScaleDownStabilization,
+    type ComputeProviderOption,
+    formValuesFromGroup,
   } from '$lib/components/workers/serverless-worker-form/shared';
   import Alert from '$lib/holocene/alert.svelte';
   import Link from '$lib/holocene/link.svelte';
@@ -18,15 +23,12 @@
   import { translate } from '$lib/i18n/translate';
   import { IconChevronLeft } from '$lib/io/icon';
   import {
-    decodeAgentCoreProviderDetails,
-    decodeGcpCloudRunProviderDetails,
-    decodeLambdaProviderDetails,
-    decodeScalerDetails,
     deleteWorkerDeploymentVersion,
     fetchDeploymentVersion,
     updateWorkerDeploymentVersionComputeConfig,
     validateWorkerDeploymentVersionComputeConfig,
   } from '$lib/services/deployments-service';
+  import type { NamespaceRegion } from '$lib/utilities/compute-regions';
   import { lockProvidersTo } from '$lib/utilities/lock-compute-provider';
   import { routeForWorkerDeployment } from '$lib/utilities/route-for';
 
@@ -37,6 +39,11 @@
     computeProviders?: readonly ComputeProviderOption[];
     gcpRegions?: string[];
     templates?: Record<ComputeProviderValue, ComputeProviderTemplates>;
+    /**
+     * The Namespace's regions. With a replica, the form edits the Version's
+     * high availability.
+     */
+    namespaceRegions?: readonly NamespaceRegion[];
   }
 
   let {
@@ -46,7 +53,12 @@
     computeProviders,
     gcpRegions,
     templates,
+    namespaceRegions = [],
   }: Props = $props();
+
+  const replicaRegionId = $derived(
+    namespaceRegions.find(({ role }) => role === 'replica')?.regionId,
+  );
 
   let error = $state<string | undefined>();
   let showDeleteModal = $state(false);
@@ -63,17 +75,16 @@
   <SkeletonTable rows={6} />
 {:then versionResponse}
   {@const info = versionResponse.workerDeploymentVersionInfo}
-  {@const providerDetails = decodeLambdaProviderDetails(info.computeConfig)}
-  {@const agentCoreDetails = decodeAgentCoreProviderDetails(info.computeConfig)}
-  {@const gcpDetails = decodeGcpCloudRunProviderDetails(info.computeConfig)}
-  {@const scalerDetails = decodeScalerDetails(info.computeConfig)}
+  <!-- The unscoped group is the primary, and the group scoped to the
+       Namespace's replica is the replica. -->
+  {@const groups = splitHighAvailabilityGroups(
+    info.computeConfig,
+    replicaRegionId,
+  )}
+  {@const primaryValues = formValuesFromGroup(groups.primary?.group)}
   <!-- A Version's provider cannot be changed, so the picker shows only the one
        in use rather than offering alternatives that cannot be applied. -->
-  {@const configuredProvider = agentCoreDetails.agentCoreEndpointArn
-    ? 'agentcore'
-    : gcpDetails.gcpWorkerPool
-      ? 'cloud-run'
-      : 'lambda'}
+  {@const configuredProvider = primaryValues.provider ?? 'lambda'}
   <div class="flex max-w-[45rem] flex-col gap-4">
     <Link href={backHref} LeadingIcon={IconChevronLeft}>
       {translate('workers.back-to-deployment', { deployment })}
@@ -86,41 +97,48 @@
       computeProviders={lockProvidersTo(configuredProvider, computeProviders)}
       {gcpRegions}
       {templates}
-      initialData={{
-        provider: configuredProvider,
-        lambdaArn: providerDetails.lambdaArn ?? '',
-        agentCoreEndpointArn: agentCoreDetails.agentCoreEndpointArn ?? '',
-        iamRoleArn:
-          providerDetails.iamRoleArn ?? agentCoreDetails.iamRoleArn ?? '',
-        roleExternalId:
-          providerDetails.roleExternalId ??
-          agentCoreDetails.roleExternalId ??
-          '',
-        gcpProject: gcpDetails.gcpProject,
-        gcpRegion: gcpDetails.gcpRegion,
-        gcpWorkerPool: gcpDetails.gcpWorkerPool,
-        gcpServiceAccount: gcpDetails.gcpServiceAccount,
-        scaleUpCooloffMs: scalerDetails.scaleUpCooloffMs,
-        scaleUpBacklogThreshold: scalerDetails.scaleUpBacklogThreshold,
-        maxWorkerLifetimeMs: scalerDetails.maxWorkerLifetimeMs,
-        metricsPollIntervalMs: scalerDetails.metricsPollIntervalMs,
-        minReplicas: scalerDetails.minReplicas,
-        maxReplicas: scalerDetails.maxReplicas,
-        initialReplicas: scalerDetails.initialReplicas,
-        utilizationTarget: scalerDetails.utilizationTarget,
-        scaleDownStabilization:
-          scalerDetails.scaleDownStabilizationMs === undefined
-            ? undefined
-            : msToScaleDownStabilization(
-                scalerDetails.scaleDownStabilizationMs,
-              ),
-      }}
+      initialData={primaryValues}
+      initialReplicaData={groups.replica
+        ? formValuesFromGroup(groups.replica.group)
+        : undefined}
+      enabledRegionIds={groups.replica && replicaRegionId
+        ? [replicaRegionId]
+        : []}
+      regions={computeRegionsFor(namespaceRegions, configuredProvider)}
+      {namespace}
+      deploymentName={deployment}
+      {buildId}
       cancelHref={backHref}
-      onSubmit={async (data) => {
+      onSubmit={async (data, regionValues) => {
         error = undefined;
-        const computeConfig = buildComputeConfigFromForm(data);
+        // Each group keeps its saved name, so an edit updates it in place.
+        const computeConfig = regionValues
+          ? buildComputeConfigForRegions(
+              regionValues.map((entry) => ({
+                ...entry,
+                name:
+                  entry.scoped === false
+                    ? groups.primary?.name
+                    : groups.replica?.name,
+              })),
+            )
+          : buildComputeConfigFromForm(data);
+        // Only the groups this form edits are removed: the replica's, when
+        // high availability is turned off. Any other group is left alone.
+        const removeScalingGroups = regionValues
+          ? [groups.primary?.name, groups.replica?.name].filter(
+              (name): name is string =>
+                !!name && !(name in (computeConfig.scalingGroups ?? {})),
+            )
+          : [];
         await updateWorkerDeploymentVersionComputeConfig(
-          { namespace, deploymentName: deployment, buildId, computeConfig },
+          {
+            namespace,
+            deploymentName: deployment,
+            buildId,
+            computeConfig,
+            removeScalingGroups,
+          },
           (err) => {
             error =
               err.body?.message ||
@@ -132,7 +150,12 @@
 
         let validateError: string | undefined;
         const validation = await validateWorkerDeploymentVersionComputeConfig(
-          { namespace, deploymentName: deployment, buildId, computeConfig },
+          {
+            namespace,
+            deploymentName: deployment,
+            buildId,
+            computeConfig,
+          },
           (err) => {
             if (err.status === 501) return;
             validateError =

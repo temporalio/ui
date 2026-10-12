@@ -19,6 +19,7 @@
   import {
     type ComputeFieldErrors,
     type ComputeFormValues,
+    type ComputeInitialValues,
     type ComputeProviderOption,
     type ComputeProviderValue,
     defaultScaleDownStabilization,
@@ -56,6 +57,10 @@
      * one, high availability starts off.
      */
     enabledRegionIds?: readonly string[];
+    /** The primary's saved values, when editing. */
+    initialPrimary?: ComputeInitialValues;
+    /** The replica's saved values, when editing a Version that has one. */
+    initialReplica?: ComputeInitialValues;
   }
 
   let {
@@ -68,10 +73,12 @@
     regionErrors = {},
     regionServerErrors = {},
     enabledRegionIds = [],
+    initialPrimary,
+    initialReplica,
   }: Props = $props();
 
   let provider = $state<ComputeProviderValue>(
-    untrack(() => regions[0]?.provider ?? 'lambda'),
+    untrack(() => initialPrimary?.provider ?? regions[0]?.provider ?? 'lambda'),
   );
 
   const emptyEntry = () => ({
@@ -96,20 +103,57 @@
 
   type Entry = ReturnType<typeof emptyEntry>;
 
+  /** An empty entry with whatever saved values there are. */
+  const withInitial = (initial: ComputeInitialValues | undefined): Entry => {
+    const entry = emptyEntry();
+    if (!initial) return entry;
+    for (const key of Object.keys(entry) as (keyof Entry)[]) {
+      const value = initial[key as keyof ComputeInitialValues];
+      if (value !== undefined) (entry as Record<string, unknown>)[key] = value;
+    }
+    return entry;
+  };
+
   const primaryRegion = $derived(regions[0]);
 
-  let primary = $state(emptyEntry());
+  const INHERITED_FIELDS = [
+    'iamRoleArn',
+    'roleExternalId',
+    'gcpProject',
+    'gcpServiceAccount',
+    'minReplicas',
+    'maxReplicas',
+    'initialReplicas',
+    'utilizationTarget',
+    'scaleDownStabilization',
+    'scaleUpCooloffMs',
+    'scaleUpBacklogThreshold',
+    'maxWorkerLifetimeMs',
+    'metricsPollIntervalMs',
+  ] as const;
+
+  let primary = $state(untrack(() => withInitial(initialPrimary)));
 
   /**
    * The replica inherits the primary's Access and Scaling until customized.
    * Its resource ARN is suggested from the primary's until the user edits it.
    */
-  let replica = $state({
-    ...emptyEntry(),
-    customized: false,
-    lambdaArnOverride: undefined as string | undefined,
-    agentCoreEndpointArnOverride: undefined as string | undefined,
-  });
+  let replica = $state(
+    untrack(() => {
+      const saved = withInitial(initialReplica);
+      return {
+        ...saved,
+        // A saved replica whose settings differ from the primary's has its
+        // own, so editing it must not quietly take the primary's.
+        customized:
+          !!initialReplica &&
+          INHERITED_FIELDS.some((field) => saved[field] !== primary[field]),
+        lambdaArnOverride: initialReplica?.lambdaArn || undefined,
+        agentCoreEndpointArnOverride:
+          initialReplica?.agentCoreEndpointArn || undefined,
+      };
+    }),
+  );
 
   let highAvailability = $state(untrack(() => enabledRegionIds.length > 0));
 
@@ -182,22 +226,6 @@
           !!replicaAgentCoreArn
       : replica.lambdaArnOverride === undefined && !!replicaLambdaArn,
   );
-
-  const INHERITED_FIELDS = [
-    'iamRoleArn',
-    'roleExternalId',
-    'gcpProject',
-    'gcpServiceAccount',
-    'minReplicas',
-    'maxReplicas',
-    'initialReplicas',
-    'utilizationTarget',
-    'scaleDownStabilization',
-    'scaleUpCooloffMs',
-    'scaleUpBacklogThreshold',
-    'maxWorkerLifetimeMs',
-    'metricsPollIntervalMs',
-  ] as const;
 
   const copyField = <K extends (typeof INHERITED_FIELDS)[number]>(
     from: Entry,

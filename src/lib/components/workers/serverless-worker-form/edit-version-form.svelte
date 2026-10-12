@@ -17,6 +17,7 @@
   } from './multi-region';
   import {
     type ComputeFieldErrors,
+    type ComputeInitialValues,
     type ComputeProviderOption,
     type ComputeProviderValue,
     defaultScaleDownStabilization,
@@ -36,26 +37,11 @@
   import RegionsHeading from './regions-heading.svelte';
 
   interface Props {
-    initialData: {
-      provider?: ComputeProviderValue;
-      lambdaArn: string;
-      agentCoreEndpointArn?: string;
-      iamRoleArn: string;
-      roleExternalId: string;
-      gcpProject?: string;
-      gcpRegion?: string;
-      gcpWorkerPool?: string;
-      gcpServiceAccount?: string;
-      minReplicas?: number;
-      maxReplicas?: number;
-      initialReplicas?: number;
-      utilizationTarget?: number;
-      scaleDownStabilization?: string;
-      scaleUpCooloffMs?: number;
-      scaleUpBacklogThreshold?: number;
-      maxWorkerLifetimeMs?: number;
-      metricsPollIntervalMs?: number;
-    };
+    initialData: ComputeInitialValues;
+    /** The replica's saved values, when the Version has a replica group. */
+    initialReplicaData?: ComputeInitialValues;
+    /** Replica regions that already have a group, so high availability starts on. */
+    enabledRegionIds?: readonly string[];
     onSubmit: (
       data: EditVersionFormData,
       regions?: RegionComputeValues[],
@@ -88,6 +74,8 @@
 
   let {
     initialData,
+    initialReplicaData,
+    enabledRegionIds = [],
     onSubmit,
     onDelete,
     cancelHref,
@@ -152,13 +140,9 @@
         if (offersHighAvailability) {
           regionErrors = validateRegionValues(regionValues);
           if (Object.keys(regionErrors).length) return;
-          // Without high availability the one region saves what a
-          // single-region Version saves.
-          if (regionValues.length > 1) {
-            await onSubmit(form.data, regionValues);
-          } else {
-            await onSubmit({ ...form.data, ...regionValues[0]?.values });
-          }
+          // Always the regions: with high availability off the page still has
+          // to remove a replica group the Version had.
+          await onSubmit(form.data, regionValues);
           return;
         }
         await onSubmit(form.data);
@@ -192,6 +176,9 @@
           {buildId}
           bind:regionValues
           {regionErrors}
+          {enabledRegionIds}
+          initialPrimary={initialData}
+          initialReplica={initialReplicaData}
           regionServerErrors={errorsByRegion}
         />
       {:else}

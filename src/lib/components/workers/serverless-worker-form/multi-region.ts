@@ -1,4 +1,9 @@
-import type { NamespaceRegion } from '$lib/utilities/compute-regions';
+import type { ComputeConfig } from '$lib/types/deployments';
+import {
+  getScalingGroups,
+  type NamespaceRegion,
+  type ScalingGroupEntry,
+} from '$lib/utilities/compute-regions';
 
 import type { ComputeProviderValue } from './shared';
 
@@ -213,3 +218,23 @@ export const replicaRegionFor = (
   region
     ? options.find(({ label, id }) => (label ?? id) === region)
     : undefined;
+
+/**
+ * A saved config as the high availability form sees it: the primary is the
+ * unscoped group, and the replica is the group scoped to the Namespace's
+ * replica. A config saved another way still reads: a group scoped to some
+ * other region stands in for the primary.
+ */
+export const splitHighAvailabilityGroups = (
+  computeConfig: ComputeConfig | undefined,
+  replicaRegionId: string | undefined,
+): { primary?: ScalingGroupEntry; replica?: ScalingGroupEntry } => {
+  const groups = getScalingGroups(computeConfig);
+  const replica = replicaRegionId
+    ? groups.find(({ regionIds }) => regionIds.includes(replicaRegionId))
+    : undefined;
+  const others = groups.filter((group) => group !== replica);
+  const primary =
+    others.find(({ regionIds }) => regionIds.length === 0) ?? others[0];
+  return { primary, replica };
+};

@@ -5,6 +5,7 @@ import {
   createDeploymentSchema,
   createVersionSchema,
   editVersionSchema,
+  formValuesFromGroup,
   getInitialComputeProvider,
   interpolateTerraformTemplate,
   msToScaleDownStabilization,
@@ -491,5 +492,77 @@ describe('buildComputeConfigForRegions', () => {
 
   it('writes nothing for no regions, rather than an empty default', () => {
     expect(buildComputeConfigForRegions([]).scalingGroups).toEqual({});
+  });
+});
+
+describe('formValuesFromGroup', () => {
+  it('reads a saved Lambda group back into the values that built it', () => {
+    const config = buildComputeConfigForRegions([
+      {
+        regionId: 'aws-us-west-2',
+        values: {
+          provider: 'lambda',
+          lambdaArn: 'arn:aws:lambda:us-west-2:123456789012:function:w',
+          iamRoleArn: 'arn:aws:iam::123456789012:role/w',
+          roleExternalId: 'demo',
+          agentCoreEndpointArn: '',
+          gcpProject: '',
+          gcpRegion: '',
+          gcpWorkerPool: '',
+          gcpServiceAccount: '',
+          minReplicas: 0,
+          maxReplicas: 30,
+          initialReplicas: 0,
+          utilizationTarget: 0.8,
+          scaleDownStabilization: '90s',
+          scaleUpCooloffMs: 5000,
+        },
+      },
+    ]);
+
+    expect(
+      formValuesFromGroup(config.scalingGroups?.['aws-us-west-2']),
+    ).toMatchObject({
+      provider: 'lambda',
+      lambdaArn: 'arn:aws:lambda:us-west-2:123456789012:function:w',
+      iamRoleArn: 'arn:aws:iam::123456789012:role/w',
+      roleExternalId: 'demo',
+      scaleUpCooloffMs: 5000,
+    });
+  });
+
+  it('reads no group as empty Lambda values', () => {
+    expect(formValuesFromGroup(undefined)).toMatchObject({
+      provider: 'lambda',
+      lambdaArn: '',
+      iamRoleArn: '',
+    });
+  });
+
+  it('keeps a saved group name, so an edit updates it in place', () => {
+    const group = { provider: { type: 'aws-lambda' } };
+    expect(
+      Object.keys(
+        buildComputeConfigForRegions([
+          {
+            regionId: 'aws-us-east-1',
+            values: {
+              ...formValuesFromGroup(group),
+              provider: 'lambda',
+            } as never,
+            scoped: false,
+            name: 'primary-workers',
+          },
+          {
+            regionId: 'aws-us-west-2',
+            values: {
+              ...formValuesFromGroup(group),
+              provider: 'lambda',
+            } as never,
+            name: 'secondary',
+          },
+        ]).scalingGroups ?? {},
+      ),
+    ).toEqual(['primary-workers', 'secondary']);
   });
 });
