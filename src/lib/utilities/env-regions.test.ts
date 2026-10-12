@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { parseNamespaceRegions } from './demo-namespace-regions';
+import { parseNamespaceRegions, parseReplicaRegions } from './env-regions';
 
 describe('parseNamespaceRegions', () => {
   it('reads each region with the role it states', () => {
@@ -35,5 +35,36 @@ describe('parseNamespaceRegions', () => {
     ['no region', ':primary'],
   ])('returns no regions when %s', (_name, value) => {
     expect(parseNamespaceRegions(value)).toEqual([]);
+  });
+});
+
+describe('parseReplicaRegions', () => {
+  it('gives each provider the replica regions named for it', () => {
+    const providers = parseReplicaRegions(
+      'lambda:aws-us-west-2,lambda:aws-us-west-1,cloud-run:gcp-us-east1',
+    );
+
+    expect(providers?.find(({ value }) => value === 'lambda')).toEqual({
+      value: 'lambda',
+      replicaRegions: [
+        { regionId: 'aws-us-west-2' },
+        { regionId: 'aws-us-west-1' },
+      ],
+    });
+    expect(
+      providers?.find(({ value }) => value === 'cloud-run')?.replicaRegions,
+    ).toEqual([{ regionId: 'gcp-us-east1' }]);
+    expect(
+      providers?.find(({ value }) => value === 'agentcore')?.replicaRegions,
+    ).toEqual([]);
+  });
+
+  it.each([
+    ['unset', undefined],
+    ['empty', ''],
+    ['an unknown provider', 'azure:eastus'],
+    ['no region', 'lambda:'],
+  ])('leaves the default providers when %s', (_name, value) => {
+    expect(parseReplicaRegions(value)).toBeUndefined();
   });
 });

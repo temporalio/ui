@@ -24,6 +24,7 @@
     editVersionSchema,
     getInitialComputeProvider,
     multiRegionEditVersionSchema,
+    offersReplicaRegions,
     type RegionComputeValues,
     validateRegionValues,
   } from './shared';
@@ -101,7 +102,10 @@
     buildId,
   }: Props = $props();
 
-  const isMultiRegion = $derived(!!regions && regions.length > 1);
+  /** A consumer offers high availability through each provider's replicaRegions. */
+  const offersHighAvailability = $derived(
+    !!regions?.length && offersReplicaRegions(computeProviders),
+  );
 
   let regionValues = $state<RegionComputeValues[]>([]);
   let regionErrors = $state<Record<string, ComputeFieldErrors>>({});
@@ -138,7 +142,7 @@
     {
       SPA: true,
       validators: zodClient(
-        untrack(() => isMultiRegion)
+        untrack(() => offersHighAvailability)
           ? multiRegionEditVersionSchema
           : editVersionSchema,
       ),
@@ -146,10 +150,16 @@
       dataType: 'json',
       onUpdate: async ({ form }) => {
         if (!form.valid) return;
-        if (isMultiRegion) {
+        if (offersHighAvailability) {
           regionErrors = validateRegionValues(regionValues);
           if (Object.keys(regionErrors).length) return;
-          await onSubmit(form.data, regionValues);
+          // Without high availability the one region saves what a
+          // single-region Version saves.
+          if (regionValues.length > 1) {
+            await onSubmit(form.data, regionValues);
+          } else {
+            await onSubmit({ ...form.data, ...regionValues[0]?.values });
+          }
           return;
         }
         await onSubmit(form.data);
@@ -174,7 +184,7 @@
       <p class="mb-4 text-sm text-secondary">
         {translate('workers.compute-description')}
       </p>
-      {#if isMultiRegion && regions}
+      {#if offersHighAvailability && regions}
         <ComputeProviderPerRegion
           {namespace}
           {regions}

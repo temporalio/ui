@@ -27,6 +27,7 @@
     defaultScaleDownStabilization,
     getInitialComputeProvider,
     multiRegionCreateDeploymentSchema,
+    offersReplicaRegions,
     type RegionComputeValues,
     validateRegionValues,
   } from './shared';
@@ -77,7 +78,10 @@
 
   let error = $state<string | undefined>();
 
-  const isMultiRegion = $derived(!!regions && regions.length > 1);
+  /** A consumer offers high availability through each provider's replicaRegions. */
+  const offersHighAvailability = $derived(
+    !!regions?.length && offersReplicaRegions(computeProviders),
+  );
 
   let regionValues = $state<RegionComputeValues[]>([]);
   let regionErrors = $state<Record<string, ComputeFieldErrors>>({});
@@ -114,7 +118,7 @@
     {
       SPA: true,
       validators: zodClient(
-        untrack(() => isMultiRegion)
+        untrack(() => offersHighAvailability)
           ? multiRegionCreateDeploymentSchema
           : createDeploymentSchema,
       ),
@@ -123,14 +127,19 @@
       onUpdate: async ({ form }) => {
         if (!form.valid) return;
         error = undefined;
-        if (isMultiRegion) {
+        if (offersHighAvailability) {
           regionErrors = validateRegionValues(regionValues);
           if (Object.keys(regionErrors).length) return;
         }
         try {
+          // Without high availability the one region saves what a
+          // single-region Version saves.
+          const replicated = offersHighAvailability && regionValues.length > 1;
           const fieldErrors = await onSubmit(
-            form.data,
-            isMultiRegion ? regionValues : undefined,
+            offersHighAvailability && !replicated
+              ? { ...form.data, ...regionValues[0]?.values }
+              : form.data,
+            replicated ? regionValues : undefined,
           );
           if (fieldErrors) {
             if (fieldErrors.lambdaArn)
@@ -197,7 +206,7 @@
       <p class="mb-4 text-sm text-secondary">
         {translate('workers.compute-description')}
       </p>
-      {#if isMultiRegion && regions}
+      {#if offersHighAvailability && regions}
         <ComputeProviderPerRegion
           {namespace}
           {regions}

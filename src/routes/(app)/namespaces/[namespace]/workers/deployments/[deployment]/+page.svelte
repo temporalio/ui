@@ -4,10 +4,10 @@
   import PageTitle from '$lib/components/page-title.svelte';
   import { translate } from '$lib/i18n/translate';
   import Deployment from '$lib/pages/deployment.svelte';
-  import { demoNamespaceRegions } from '$lib/utilities/demo-namespace-regions';
+  import { namespaceRegionsFromEnv } from '$lib/utilities/env-regions';
 
   const deployment = $derived(page.params.deployment);
-  const namespaceRegions = demoNamespaceRegions();
+  const namespaceRegions = namespaceRegionsFromEnv();
 </script>
 
 <PageTitle

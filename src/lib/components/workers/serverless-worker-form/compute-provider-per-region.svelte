@@ -3,6 +3,8 @@
 
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import Option from '$lib/holocene/select/option.svelte';
+  import Select from '$lib/holocene/select/select.svelte';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
 
@@ -32,20 +34,28 @@
 
   interface Props {
     namespace: string;
+    /**
+     * The Namespace's regions, primary first. Without high availability the
+     * compute runs in the primary.
+     */
     regions: readonly ComputeRegion[];
+    /** Each provider's replicaRegions are the regions high availability offers. */
     computeProviders?: readonly ComputeProviderOption[];
     deploymentName?: string;
     buildId?: string;
-    /** Out: the compute each region saves, kept current as the form changes. */
+    /**
+     * Out: the compute each region saves. One entry without high availability,
+     * two with it.
+     */
     regionValues?: RegionComputeValues[];
     /** Field errors per region, keyed by region id. */
     regionErrors?: Record<string, ComputeFieldErrors>;
     /** A server error that names one region, keyed by region id. */
     regionServerErrors?: Record<string, string>;
     /**
-     * Replica regions that start with Serverless Workers on, for example
-     * because the Version being edited already has a group for them. Every
-     * other replica starts off.
+     * A replica region that starts with high availability on, for example
+     * because the Version being edited already has a group there. Without
+     * one, high availability starts off.
      */
     enabledRegionIds?: readonly string[];
   }
@@ -66,11 +76,7 @@
     untrack(() => regions[0]?.provider ?? 'lambda'),
   );
 
-  const emptyEntry = (region: ComputeRegion) => ({
-    regionId: region.id,
-    label: region.label ?? region.id,
-    role: region.role,
-    cloud: region.provider,
+  const emptyEntry = () => ({
     lambdaArn: '',
     agentCoreEndpointArn: '',
     iamRoleArn: '',
@@ -92,44 +98,81 @@
 
   type Entry = ReturnType<typeof emptyEntry>;
 
-  let primary = $state(untrack(() => emptyEntry(regions[0])));
+  const primaryRegion = $derived(regions[0]);
+  const primaryLabel = $derived(primaryRegion.label ?? primaryRegion.id);
+
+  let primary = $state(emptyEntry());
 
   /**
-   * Replicas inherit the primary's Access and Scaling until customized. Their
-   * resource ARN is suggested from the primary's until the user edits it.
-   * Every Region still saves a complete scaling group of its own.
+   * The replica inherits the primary's Access and Scaling until customized.
+   * Its resource ARN is suggested from the primary's until the user edits it.
    */
-  let replicas = $state(
-    untrack(() =>
-      regions.slice(1).map((region) => ({
-        ...emptyEntry(region),
-        enabled: enabledRegionIds.includes(region.id),
-        customized: false,
-        lambdaArnOverride: undefined as string | undefined,
-        agentCoreEndpointArnOverride: undefined as string | undefined,
-      })),
+  let replica = $state({
+    ...emptyEntry(),
+    customized: false,
+    lambdaArnOverride: undefined as string | undefined,
+    agentCoreEndpointArnOverride: undefined as string | undefined,
+  });
+
+  let highAvailability = $state(untrack(() => enabledRegionIds.length > 0));
+  let selectedReplicaId = $state<string | undefined>(
+    untrack(
+      () =>
+        enabledRegionIds[0] ??
+        regions.find(({ role }) => role === 'replica')?.id,
     ),
   );
 
-  type Replica = (typeof replicas)[number];
+  /** The regions the selected provider offers for a replica. */
+  const replicaOptions = $derived<ComputeRegion[]>(
+    (
+      computeProviders?.find(({ value }) => value === provider)
+        ?.replicaRegions ?? []
+    )
+      .filter(({ regionId }) => regionId !== primaryRegion.id)
+      .map(({ regionId, label }) => ({
+        id: regionId,
+        role: 'replica',
+        label,
+        provider,
+      })),
+  );
 
-  const inheritsPrimary = (replica: Replica): boolean => !replica.customized;
+  const replicaRegion = $derived(
+    replicaOptions.find(({ id }) => id === selectedReplicaId) ??
+      replicaOptions[0],
+  );
+  const replicaLabel = $derived(
+    replicaRegion ? (replicaRegion.label ?? replicaRegion.id) : '',
+  );
+  const replicated = $derived(highAvailability && !!replicaRegion);
 
-  const suggestedFor = (arn: string, replica: Replica): string =>
-    suggestRegionalArn(arn, replica.label);
+  /** A resource is regional, so a different region starts it over. */
+  const selectReplica = (regionId: string) => {
+    selectedReplicaId = regionId;
+    replica.lambdaArnOverride = undefined;
+    replica.agentCoreEndpointArnOverride = undefined;
+    replica.gcpRegion = '';
+    replica.gcpWorkerPool = '';
+  };
 
-  const replicaLambdaArn = (replica: Replica): string =>
-    replica.lambdaArnOverride ?? suggestedFor(primary.lambdaArn, replica);
+  const inheritsPrimary = $derived(!replica.customized);
 
-  const replicaAgentCoreArn = (replica: Replica): string =>
+  const replicaLambdaArn = $derived(
+    replica.lambdaArnOverride ??
+      suggestRegionalArn(primary.lambdaArn, replicaLabel),
+  );
+  const replicaAgentCoreArn = $derived(
     replica.agentCoreEndpointArnOverride ??
-    suggestedFor(primary.agentCoreEndpointArn, replica);
+      suggestRegionalArn(primary.agentCoreEndpointArn, replicaLabel),
+  );
 
-  const isSuggested = (replica: Replica): boolean =>
+  const isSuggested = $derived(
     provider === 'agentcore'
       ? replica.agentCoreEndpointArnOverride === undefined &&
-        !!replicaAgentCoreArn(replica)
-      : replica.lambdaArnOverride === undefined && !!replicaLambdaArn(replica);
+          !!replicaAgentCoreArn
+      : replica.lambdaArnOverride === undefined && !!replicaLambdaArn,
+  );
 
   const INHERITED_FIELDS = [
     'iamRoleArn',
@@ -147,13 +190,6 @@
     'metricsPollIntervalMs',
   ] as const;
 
-  /** Start the replica's own Access and Scaling from the primary's values. */
-  const customize = (replica: Replica) => {
-    if (!inheritsPrimary(replica)) return;
-    INHERITED_FIELDS.forEach((field) => copyField(primary, replica, field));
-    replica.customized = true;
-  };
-
   const copyField = <K extends (typeof INHERITED_FIELDS)[number]>(
     from: Entry,
     to: Entry,
@@ -162,42 +198,67 @@
     to[field] = from[field];
   };
 
-  const primaryRegion = $derived(primary.label);
+  /** Start the replica's own Access and Scaling from the primary's values. */
+  const customize = () => {
+    if (!inheritsPrimary) return;
+    INHERITED_FIELDS.forEach((field) => copyField(primary, replica, field));
+    replica.customized = true;
+  };
+
+  /**
+   * The project is shared across regions, so an inheriting replica shows the
+   * primary's. Editing it there starts the replica's own settings.
+   */
+  const replicaProject = $derived(
+    inheritsPrimary ? primary.gcpProject : replica.gcpProject,
+  );
+  const setReplicaProject = (value: string) => {
+    customize();
+    replica.gcpProject = value;
+  };
 
   /** Suggested until the user edits it; previewSlot handles an empty value. */
-  const replicaResourceState = (replica: Replica): 'set' | 'suggested' => {
+  const replicaResourceState = $derived.by((): 'set' | 'suggested' => {
     const edited =
       provider === 'agentcore'
         ? replica.agentCoreEndpointArnOverride !== undefined
         : replica.lambdaArnOverride !== undefined;
     return edited || provider === 'cloud-run' ? 'set' : 'suggested';
-  };
+  });
+
+  const replicaFields = $derived({
+    ...replica,
+    lambdaArn: replicaLambdaArn,
+    agentCoreEndpointArn: replicaAgentCoreArn,
+  });
 
   const previewRegions = $derived<PreviewRegion[]>([
-    regionPreview(regions[0], provider, primary),
-    ...replicas.map((replica, index) => {
-      const fields = {
-        ...replica,
-        lambdaArn: replicaLambdaArn(replica),
-        agentCoreEndpointArn: replicaAgentCoreArn(replica),
-      };
-      const own = regionPreview(regions[index + 1], provider, fields);
-      if (!replica.enabled) return { ...own, serverless: false };
-      const resource = resourceValue(provider, fields);
-      return {
-        ...own,
-        resource: previewSlot(resource, replicaResourceState(replica)),
-        access: inheritsPrimary(replica)
-          ? { value: '', state: 'inherited' as const }
-          : own.access,
-      };
-    }),
+    regionPreview(primaryRegion, provider, primary),
+    ...(replicated && replicaRegion
+      ? [
+          {
+            ...regionPreview(replicaRegion, provider, replicaFields),
+            resource: previewSlot(
+              resourceValue(provider, replicaFields),
+              replicaResourceState,
+            ),
+            access: inheritsPrimary
+              ? { value: '', state: 'inherited' as const }
+              : regionPreview(replicaRegion, provider, replicaFields).access,
+          },
+        ]
+      : []),
   ]);
 
+  const shownRegions = $derived(
+    replicated && replicaRegion
+      ? [primaryRegion, replicaRegion]
+      : [primaryRegion],
+  );
+
   /**
-   * What a region saves. A replica that has not been customized takes the
-   * primary's Access and Scaling. Its resource stays its own, because the
-   * resource is regional.
+   * What a region saves. An inheriting replica takes the primary's Access and
+   * Scaling. Its resource stays its own, because the resource is regional.
    */
   const formValues = (
     settings: Entry,
@@ -227,31 +288,21 @@
   });
 
   const savedValues = $derived<RegionComputeValues[]>([
-    { regionId: primary.regionId, values: formValues(primary, primary) },
-    ...replicas
-      .filter((replica) => replica.enabled)
-      .map((replica) => ({
-        regionId: replica.regionId,
-        values: formValues(inheritsPrimary(replica) ? primary : replica, {
-          lambdaArn: replicaLambdaArn(replica),
-          agentCoreEndpointArn: replicaAgentCoreArn(replica),
-          gcpRegion: replica.gcpRegion,
-          gcpWorkerPool: replica.gcpWorkerPool,
-        }),
-      })),
+    { regionId: primaryRegion.id, values: formValues(primary, primary) },
+    ...(replicated && replicaRegion
+      ? [
+          {
+            regionId: replicaRegion.id,
+            values: formValues(inheritsPrimary ? primary : replica, {
+              lambdaArn: replicaLambdaArn,
+              agentCoreEndpointArn: replicaAgentCoreArn,
+              gcpRegion: replica.gcpRegion,
+              gcpWorkerPool: replica.gcpWorkerPool,
+            }),
+          },
+        ]
+      : []),
   ]);
-
-  /**
-   * The project is shared across regions, so an inheriting replica shows the
-   * primary's. Editing it there starts the replica's own settings.
-   */
-  const replicaProject = (replica: Replica): string =>
-    inheritsPrimary(replica) ? primary.gcpProject : replica.gcpProject;
-
-  const setReplicaProject = (replica: Replica, value: string) => {
-    customize(replica);
-    replica.gcpProject = value;
-  };
 
   $effect(() => {
     regionValues = savedValues;
@@ -270,33 +321,6 @@
   {/if}
 {/snippet}
 
-{#snippet regionFields(entry: Entry)}
-  <ComputeFields
-    {provider}
-    leadingDivider={false}
-    idPrefix={entry.regionId}
-    lambdaArnPlaceholder={lambdaArnPlaceholderFor(entry.label)}
-    bind:lambdaArn={entry.lambdaArn}
-    bind:agentCoreEndpointArn={entry.agentCoreEndpointArn}
-    bind:iamRoleArn={entry.iamRoleArn}
-    bind:roleExternalId={entry.roleExternalId}
-    bind:gcpProject={entry.gcpProject}
-    bind:gcpRegion={entry.gcpRegion}
-    bind:gcpWorkerPool={entry.gcpWorkerPool}
-    bind:gcpServiceAccount={entry.gcpServiceAccount}
-    bind:minReplicas={entry.minReplicas}
-    bind:maxReplicas={entry.maxReplicas}
-    bind:initialReplicas={entry.initialReplicas}
-    bind:utilizationTarget={entry.utilizationTarget}
-    bind:scaleDownStabilization={entry.scaleDownStabilization}
-    bind:scaleUpCooloffMs={entry.scaleUpCooloffMs}
-    bind:scaleUpBacklogThreshold={entry.scaleUpBacklogThreshold}
-    bind:maxWorkerLifetimeMs={entry.maxWorkerLifetimeMs}
-    bind:metricsPollIntervalMs={entry.metricsPollIntervalMs}
-    errors={regionErrors[entry.regionId]}
-  />
-{/snippet}
-
 <div>
   <ComputeProviderPicker
     layout="summary"
@@ -306,7 +330,7 @@
 
   <hr class="my-5 border-primary" />
 
-  <RegionsHeading {namespace} {regions} />
+  <RegionsHeading {namespace} regions={shownRegions} />
   <FailoverPreview
     {namespace}
     {provider}
@@ -317,59 +341,143 @@
 
   <div class="flex flex-col gap-4">
     <RegionBlock
-      region={regions[0]}
-      showRole
+      region={primaryRegion}
+      showRole={replicated}
       roleTooltip={translate('workers.region-role-primary-tooltip', {
-        region: primaryRegion,
+        region: primaryLabel,
       })}
     >
-      {@render serverError(primary.regionId)}
-      {@render regionFields(primary)}
+      {@render serverError(primaryRegion.id)}
+      <ComputeFields
+        {provider}
+        leadingDivider={false}
+        idPrefix={primaryRegion.id}
+        lambdaArnPlaceholder={lambdaArnPlaceholderFor(primaryLabel)}
+        bind:lambdaArn={primary.lambdaArn}
+        bind:agentCoreEndpointArn={primary.agentCoreEndpointArn}
+        bind:iamRoleArn={primary.iamRoleArn}
+        bind:roleExternalId={primary.roleExternalId}
+        bind:gcpProject={primary.gcpProject}
+        bind:gcpRegion={primary.gcpRegion}
+        bind:gcpWorkerPool={primary.gcpWorkerPool}
+        bind:gcpServiceAccount={primary.gcpServiceAccount}
+        bind:minReplicas={primary.minReplicas}
+        bind:maxReplicas={primary.maxReplicas}
+        bind:initialReplicas={primary.initialReplicas}
+        bind:utilizationTarget={primary.utilizationTarget}
+        bind:scaleDownStabilization={primary.scaleDownStabilization}
+        bind:scaleUpCooloffMs={primary.scaleUpCooloffMs}
+        bind:scaleUpBacklogThreshold={primary.scaleUpBacklogThreshold}
+        bind:maxWorkerLifetimeMs={primary.maxWorkerLifetimeMs}
+        bind:metricsPollIntervalMs={primary.metricsPollIntervalMs}
+        errors={regionErrors[primaryRegion.id]}
+      />
     </RegionBlock>
 
-    {#each replicas as replica, index (replica.regionId)}
+    {#if replicaOptions.length}
+      <div class="flex flex-col gap-3 rounded-lg border border-primary p-4">
+        <ToggleSwitch
+          id="high-availability"
+          label={translate('workers.high-availability')}
+          labelPosition="left"
+          bind:checked={highAvailability}
+        />
+        {#if highAvailability && replicaRegion}
+          <Select
+            id="replica-region"
+            label={translate('workers.replica-region')}
+            value={replicaRegion.id}
+            onChange={selectReplica}
+          >
+            {#each replicaOptions as option (option.id)}
+              <Option value={option.id}>{option.label ?? option.id}</Option>
+            {/each}
+          </Select>
+        {:else}
+          <p class="text-sm text-secondary">
+            {translate('workers.high-availability-off', {
+              region: primaryLabel,
+            })}
+          </p>
+        {/if}
+      </div>
+    {/if}
+
+    {#if replicated && replicaRegion}
       <RegionBlock
-        region={regions[index + 1]}
+        region={replicaRegion}
         showRole
         roleTooltip={translate('workers.region-role-replica-tooltip', {
-          region: replica.label,
+          region: replicaLabel,
         })}
-        bodyClass={replica.enabled ? '' : 'py-3'}
       >
-        {#snippet action()}
-          <ToggleSwitch
-            id="{replica.regionId}-serverless"
-            label={translate('workers.region-serverless-workers')}
-            labelPosition="left"
-            bind:checked={replica.enabled}
-          />
-        {/snippet}
-        {#if !replica.enabled}
-          <p class="text-sm text-secondary">
-            {translate('workers.region-replica-off', { region: replica.label })}
+        {@render serverError(replicaRegion.id)}
+        <ComputeFields
+          {provider}
+          leadingDivider={false}
+          sections={['resource']}
+          idPrefix={replicaRegion.id}
+          lambdaArnPlaceholder={lambdaArnPlaceholderFor(replicaLabel)}
+          bind:lambdaArn={
+            () => replicaLambdaArn,
+            (value) => (replica.lambdaArnOverride = value)
+          }
+          bind:agentCoreEndpointArn={
+            () => replicaAgentCoreArn,
+            (value) => (replica.agentCoreEndpointArnOverride = value)
+          }
+          bind:iamRoleArn={replica.iamRoleArn}
+          bind:roleExternalId={replica.roleExternalId}
+          bind:gcpProject={() => replicaProject, setReplicaProject}
+          bind:gcpRegion={replica.gcpRegion}
+          bind:gcpWorkerPool={replica.gcpWorkerPool}
+          bind:gcpServiceAccount={replica.gcpServiceAccount}
+          bind:minReplicas={replica.minReplicas}
+          bind:maxReplicas={replica.maxReplicas}
+          bind:initialReplicas={replica.initialReplicas}
+          bind:utilizationTarget={replica.utilizationTarget}
+          bind:scaleDownStabilization={replica.scaleDownStabilization}
+          bind:scaleUpCooloffMs={replica.scaleUpCooloffMs}
+          bind:scaleUpBacklogThreshold={replica.scaleUpBacklogThreshold}
+          bind:maxWorkerLifetimeMs={replica.maxWorkerLifetimeMs}
+          bind:metricsPollIntervalMs={replica.metricsPollIntervalMs}
+          errors={regionErrors[replicaRegion.id]}
+        />
+        {#if isSuggested}
+          <p class="mt-2 text-xs text-secondary">
+            {translate('workers.region-arn-suggested')}
+            <span class="font-medium text-primary">{primaryLabel}</span>
+            {translate('workers.region-arn-suggested-hint')}
+            <span class="font-medium text-primary">{replicaLabel}</span>.
           </p>
+        {/if}
+        {#if inheritsPrimary}
+          <hr class="my-5 border-primary" />
+          <div class="flex flex-col items-start gap-3">
+            <p class="text-sm text-secondary">
+              {translate('workers.region-inherits-primary')}
+              <span class="font-medium text-primary">{primaryLabel}</span>
+            </p>
+            <Button variant="tertiary" size="sm" onclick={customize}>
+              {translate('workers.region-customize')}
+            </Button>
+          </div>
         {:else}
-          {@render serverError(replica.regionId)}
           <ComputeFields
             {provider}
-            leadingDivider={false}
-            sections={['resource']}
-            idPrefix={replica.regionId}
-            lambdaArnPlaceholder={lambdaArnPlaceholderFor(replica.label)}
+            sections={['access', 'scaling']}
+            idPrefix={replicaRegion.id}
             bind:lambdaArn={
-              () => replicaLambdaArn(replica),
+              () => replicaLambdaArn,
               (value) => (replica.lambdaArnOverride = value)
             }
             bind:agentCoreEndpointArn={
-              () => replicaAgentCoreArn(replica),
+              () => replicaAgentCoreArn,
               (value) => (replica.agentCoreEndpointArnOverride = value)
             }
             bind:iamRoleArn={replica.iamRoleArn}
             bind:roleExternalId={replica.roleExternalId}
-            bind:gcpProject={
-              () => replicaProject(replica),
-              (value) => setReplicaProject(replica, value)
-            }
+            bind:gcpProject={replica.gcpProject}
             bind:gcpRegion={replica.gcpRegion}
             bind:gcpWorkerPool={replica.gcpWorkerPool}
             bind:gcpServiceAccount={replica.gcpServiceAccount}
@@ -382,64 +490,10 @@
             bind:scaleUpBacklogThreshold={replica.scaleUpBacklogThreshold}
             bind:maxWorkerLifetimeMs={replica.maxWorkerLifetimeMs}
             bind:metricsPollIntervalMs={replica.metricsPollIntervalMs}
-            errors={regionErrors[replica.regionId]}
+            errors={regionErrors[replicaRegion.id]}
           />
-          {#if isSuggested(replica)}
-            <p class="mt-2 text-xs text-secondary">
-              {translate('workers.region-arn-suggested')}
-              <span class="font-medium text-primary">{primaryRegion}</span>
-              {translate('workers.region-arn-suggested-hint')}
-              <span class="font-medium text-primary">{replica.label}</span>.
-            </p>
-          {/if}
-          {#if inheritsPrimary(replica)}
-            <hr class="my-5 border-primary" />
-            <div class="flex flex-col items-start gap-3">
-              <p class="text-sm text-secondary">
-                {translate('workers.region-inherits-primary')}
-                <span class="font-medium text-primary">{primaryRegion}</span>
-              </p>
-              <Button
-                variant="tertiary"
-                size="sm"
-                onclick={() => customize(replica)}
-              >
-                {translate('workers.region-customize')}
-              </Button>
-            </div>
-          {:else}
-            <ComputeFields
-              {provider}
-              sections={['access', 'scaling']}
-              idPrefix={replica.regionId}
-              bind:lambdaArn={
-                () => replicaLambdaArn(replica),
-                (value) => (replica.lambdaArnOverride = value)
-              }
-              bind:agentCoreEndpointArn={
-                () => replicaAgentCoreArn(replica),
-                (value) => (replica.agentCoreEndpointArnOverride = value)
-              }
-              bind:iamRoleArn={replica.iamRoleArn}
-              bind:roleExternalId={replica.roleExternalId}
-              bind:gcpProject={replica.gcpProject}
-              bind:gcpRegion={replica.gcpRegion}
-              bind:gcpWorkerPool={replica.gcpWorkerPool}
-              bind:gcpServiceAccount={replica.gcpServiceAccount}
-              bind:minReplicas={replica.minReplicas}
-              bind:maxReplicas={replica.maxReplicas}
-              bind:initialReplicas={replica.initialReplicas}
-              bind:utilizationTarget={replica.utilizationTarget}
-              bind:scaleDownStabilization={replica.scaleDownStabilization}
-              bind:scaleUpCooloffMs={replica.scaleUpCooloffMs}
-              bind:scaleUpBacklogThreshold={replica.scaleUpBacklogThreshold}
-              bind:maxWorkerLifetimeMs={replica.maxWorkerLifetimeMs}
-              bind:metricsPollIntervalMs={replica.metricsPollIntervalMs}
-              errors={regionErrors[replica.regionId]}
-            />
-          {/if}
         {/if}
       </RegionBlock>
-    {/each}
+    {/if}
   </div>
 </div>

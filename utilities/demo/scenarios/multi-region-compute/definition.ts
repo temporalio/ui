@@ -7,7 +7,7 @@ export const definition = defineScenario({
   name: 'multi-region-compute',
   title: 'Compute per Namespace region for serverless Workers',
   summary:
-    'Saves a Worker Deployment Version with one scaling group per Namespace region and shows which regions it covers. The server comes from the branch that maps region_ids into the worker controller, with a demo-only patch that gives the server a host region. The UI takes its Namespace regions from VITE_DEMO_NAMESPACE_REGIONS, because only a consumer can supply real ones.',
+    'Saves a Worker Deployment Version with one scaling group per region when high availability is on, and shows which regions it covers. The server comes from the branch that maps region_ids into the worker controller, with a demo-only patch that gives the server a host region. The UI takes its Namespace regions and the replica regions a consumer would offer from VITE_ settings, because only a consumer can supply real ones.',
   server: {
     // region_ids reaches the server through two unreleased changes: the server
     // branch that maps the field, and the worker controller that honours it.
@@ -54,7 +54,10 @@ export const definition = defineScenario({
     // The reused ui-server must carry an api build that knows region_ids.
     rebuildUiServer: true,
     env: {
-      VITE_DEMO_NAMESPACE_REGIONS: `${PRIMARY}:primary,${REPLICA}:replica`,
+      VITE_NAMESPACE_REGIONS: `${PRIMARY}:primary,${REPLICA}:replica`,
+      // The regions a consumer would offer Lambda for a replica. The second is
+      // not one of the Namespace's, which is the case the list flags.
+      VITE_REPLICA_REGIONS: `lambda:${REPLICA},lambda:aws-us-west-1`,
     },
   },
   // The catalog cannot exercise this feature. Its worker is unversioned, so it
@@ -65,10 +68,11 @@ export const definition = defineScenario({
   preview: {
     notes: [
       `Prerequisite: a Lambda function in each region (${PRIMARY} and ${REPLICA}), an IAM role this shell's AWS credentials can assume, and those credentials in this shell. Creating a Version validates every group against AWS, and nothing is saved if one fails, so a made-up ARN or role stops the save at the provider. The serverless-worker-aws skill sets these up.`,
-      "Open Workers, then Create Serverless Worker. The Compute section shows one block per region: the primary first, then the replica. The replica suggests its Lambda ARN from the primary's by swapping the region, and takes the primary's Access and Scaling until Customize is pressed.",
-      "Leave a required field empty in one region and submit. The error shows in that region's block, and nothing is saved.",
+      `Open Workers, then Create Serverless Worker. The Compute section shows the ${PRIMARY} block and a High availability switch, off. Off saves one group that no region scopes, exactly as a single-region Version does.`,
+      `Turn High availability on and pick ${REPLICA}. A replica block appears. It suggests its Lambda ARN from the primary's by swapping the region, and takes the primary's Access and Scaling until Customize is pressed.`,
+      "Leave a required field empty in one region and submit. The error shows in that region's block, and nothing is saved. A Lambda that AWS cannot reach shows in the block of the region it belongs to.",
       'Fill both regions and submit. The deployments list shows the Version with both regions covered. Open it: each region names the group that serves it.',
-      `To see an uncovered region, create a Version through the API with one group whose region_ids names only ${PRIMARY}; that needs a Lambda in ${PRIMARY} alone. The deployments list and the Version table then mark ${REPLICA} as the region a failover would find no workers in.`,
+      `To see an uncovered region, pick aws-us-west-1 as the replica instead. It is offered but is not one of the Namespace's regions, so the list marks ${REPLICA} as the region a failover would find no workers in. That needs a Lambda in aws-us-west-1.`,
       `This server is hosted in ${PRIMARY}, so its worker controller scales only the groups that list ${PRIMARY}. Showing a failover needs a second server hosted in ${REPLICA}, which this scenario does not start.`,
     ],
   },

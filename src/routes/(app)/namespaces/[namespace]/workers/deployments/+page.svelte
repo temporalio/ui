@@ -6,11 +6,11 @@
   import { translate } from '$lib/i18n/translate';
   import WorkersLayout from '$lib/layouts/workers-layout.svelte';
   import WorkerDeployments from '$lib/pages/deployments.svelte';
-  import { demoNamespaceRegions } from '$lib/utilities/demo-namespace-regions';
+  import { namespaceRegionsFromEnv } from '$lib/utilities/env-regions';
   import { routeForWorkerDeploymentCreate } from '$lib/utilities/route-for';
 
   const namespace = $derived(page.params.namespace);
-  const namespaceRegions = demoNamespaceRegions();
+  const namespaceRegions = namespaceRegionsFromEnv();
   const createHref = $derived(routeForWorkerDeploymentCreate({ namespace }));
 </script>
 

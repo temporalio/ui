@@ -349,13 +349,33 @@ export const buildComputeConfigForRegions = (
   ),
 });
 
+/** A region a provider can run a replica's compute in. */
+export type ReplicaRegionOption = {
+  regionId: string;
+  /** What to show. Defaults to regionId; this repo does not parse it. */
+  label?: string;
+};
+
 export type ComputeProviderOption = {
   value: ComputeProviderValue;
   disabled?: boolean;
   disabledReason?: string;
   hidden?: boolean;
   releaseStage?: ComputeProviderReleaseStage;
+  /**
+   * Regions this provider offers for a replica. A consumer that supports high
+   * availability passes them; with none, the form saves one group as before.
+   */
+  replicaRegions?: readonly ReplicaRegionOption[];
 };
+
+/** Whether any offered provider can run a replica, so the form offers HA. */
+export const offersReplicaRegions = (
+  providers: readonly ComputeProviderOption[] | undefined,
+): boolean =>
+  !!providers?.some(
+    ({ hidden, replicaRegions }) => !hidden && !!replicaRegions?.length,
+  );
 
 /**
  * Re-exported so the many modules already importing these from here keep

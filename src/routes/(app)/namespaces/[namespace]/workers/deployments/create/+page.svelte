@@ -7,7 +7,10 @@
   import { translate } from '$lib/i18n/translate';
   import { IconChevronLeft } from '$lib/io/icon';
   import ServerlessWorkerCreate from '$lib/pages/serverless-worker-create.svelte';
-  import { demoNamespaceRegions } from '$lib/utilities/demo-namespace-regions';
+  import {
+    computeProvidersFromEnv,
+    namespaceRegionsFromEnv,
+  } from '$lib/utilities/env-regions';
   import { routeForWorkerDeployments } from '$lib/utilities/route-for';
 
   const namespace = $derived(page.params.namespace);
@@ -27,7 +30,8 @@
   </h1>
   <ServerlessWorkerCreate
     {namespace}
-    namespaceRegions={demoNamespaceRegions()}
+    namespaceRegions={namespaceRegionsFromEnv()}
+    computeProviders={computeProvidersFromEnv()}
     onSuccess={() => goto(deploymentsHref)}
   />
 </div>

@@ -5,7 +5,10 @@
   import PageTitle from '$lib/components/page-title.svelte';
   import { translate } from '$lib/i18n/translate';
   import WorkerDeploymentVersionCreatePage from '$lib/pages/worker-deployment-version-create.svelte';
-  import { demoNamespaceRegions } from '$lib/utilities/demo-namespace-regions';
+  import {
+    computeProvidersFromEnv,
+    namespaceRegionsFromEnv,
+  } from '$lib/utilities/env-regions';
   import { routeForWorkerDeployment } from '$lib/utilities/route-for';
 
   const namespace = $derived(page.params.namespace);
@@ -22,6 +25,7 @@
 <WorkerDeploymentVersionCreatePage
   {namespace}
   {deployment}
-  namespaceRegions={demoNamespaceRegions()}
+  namespaceRegions={namespaceRegionsFromEnv()}
+  computeProviders={computeProvidersFromEnv()}
   onSuccess={() => goto(backHref)}
 />
