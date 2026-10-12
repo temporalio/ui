@@ -16,9 +16,12 @@ import type {
   WorkflowExecutionKey,
 } from './types';
 import { EventGroupMarkerGroupsProjection } from '../event-group-markers/event-group-marker-groups-projection';
+import { getEventGroupMarkerSource } from '../event-group-markers/get-event-group-marker-source';
 import type {
+  EventGroupMarkerDescriptor,
   EventGroupMarkerGroup,
   EventGroupMarkerKey,
+  EventGroupMarkerSource,
 } from '../event-group-markers/types';
 import { assertDiscoveredStartEvent } from '../history-events/assert-discovered-start-event';
 import { compareEventIds } from '../history-events/compare-event-ids';
@@ -129,6 +132,7 @@ export class WorkflowExecution {
     const eventIds = new Set<HistoryEventId>();
     const headEventIds = new Set<HistoryEventId>();
     const eventGroupMarkerKeys = new Set<EventGroupMarkerKey>();
+
     const lifecycleGroupFilterKeys = new Set<LifecycleGroupFilterKey>();
 
     for (const change of changes) {
@@ -365,6 +369,21 @@ export class WorkflowExecution {
     ReadonlySet<HistoryEventId>
   > {
     return this._lifecycleGroupFilterIndexesProjection.filterIndex;
+  }
+
+  /** Resolves marker source metadata from currently known history, without caching a copy. */
+  getEventGroupMarkerSource(
+    marker: EventGroupMarkerDescriptor,
+  ): EventGroupMarkerSource | null {
+    return getEventGroupMarkerSource(
+      marker,
+      (eventId) => this.getEvent(eventId),
+      marker.type === 'inbound-update'
+        ? this._eventGroupMarkerGroupsProjection.updateSourceEventIds.get(
+            marker.updateId,
+          )
+        : undefined,
+    );
   }
 
   /** Returns a stored event by its ID within this execution. */

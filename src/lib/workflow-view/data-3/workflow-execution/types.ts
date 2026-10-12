@@ -60,6 +60,7 @@ export type NotificationByTopic = {
   LIFECYCLE_GROUPS_CHANGED: Readonly<{
     headEventIds: readonly HistoryEventId[];
   }>;
+
   EVENT_GROUP_MARKER_GROUPS_CHANGED: Readonly<{
     eventGroupMarkerKeys: readonly EventGroupMarkerKey[];
   }>;

@@ -1,5 +1,5 @@
-import { getEventGroupMarkerIdentity } from './get-identity';
-import { getEventGroupMarkerKeyFromIdentity } from './get-key-from-identity';
+import { getEventGroupMarkerKey } from './get-key-from-marker';
+import { normalizeEventGroupMarker } from './normalize-event-group-marker';
 import type { EventGroupMarkerReference } from './types';
 import type { NormalizedHistoryEvent } from '../history-events/types';
 
@@ -9,16 +9,15 @@ export function getEventGroupMarkerReferences(
 ): readonly EventGroupMarkerReference[] {
   const references: EventGroupMarkerReference[] = [];
 
-  for (const marker of event.eventGroupMarkers ?? []) {
-    const identity = getEventGroupMarkerIdentity(marker);
+  for (const rawMarker of event.eventGroupMarkers ?? []) {
+    const marker = normalizeEventGroupMarker(rawMarker);
 
-    if (!identity) {
+    if (!marker) {
       continue;
     }
 
     references.push({
-      key: getEventGroupMarkerKeyFromIdentity(identity),
-      identity,
+      key: getEventGroupMarkerKey(marker),
       marker,
     });
   }
