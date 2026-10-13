@@ -121,9 +121,12 @@
           content={value}
           copyIconTitle={`${translate('common.copy-icon-title')}: ${groupFieldLabel(key)}, ${regionLabel}`}
           copySuccessIconTitle={translate('common.copy-success-icon-title')}
-          container-class="items-start"
+          container-class="min-w-0"
         >
-          <span class="min-w-0 break-all font-mono text-xs leading-5">
+          <span
+            class="min-w-0 truncate font-mono text-xs leading-5"
+            title={value}
+          >
             {value}
           </span>
         </Copyable>
