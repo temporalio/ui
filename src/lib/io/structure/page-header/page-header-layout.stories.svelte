@@ -121,6 +121,14 @@
   <p class="text-sm text-secondary">This is a super cool description</p>
 {/snippet}
 
+{#snippet wrappingDescription()}
+  <p>
+    Processes customer orders for the production payments service, including
+    payment authorization, inventory updates, and fulfillment notifications
+    across all supported regions.
+  </p>
+{/snippet}
+
 {#snippet actions()}
   <Button
     colorScheme="secondary"
@@ -201,6 +209,19 @@
 <Story name="Many actions" args={{ actions: manyActions }} />
 
 <Story name="Long heading" args={{ heading: longHeading }}>
+  {#snippet template(args: ComponentProps<typeof PageHeaderLayout>)}
+    {@render example(args, 600)}
+  {/snippet}
+</Story>
+
+<Story
+  name="Content flows around actions"
+  args={{
+    heading: longHeading,
+    tags: existingTags,
+    description: wrappingDescription,
+  }}
+>
   {#snippet template(args: ComponentProps<typeof PageHeaderLayout>)}
     {@render example(args, 600)}
   {/snippet}

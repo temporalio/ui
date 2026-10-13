@@ -41,66 +41,57 @@
   )}
   {...rest}
 >
-  <div class={twMerge('layout-grid', 'min-w-0 gap-x-page-gutter gap-y-lg')}>
-    <div class="heading-content flex flex-col gap-y-sm">
+  <div class="heading-layout min-w-0 gap-y-lg">
+    {#if actions}
       <div
-        class={twMerge(
-          'inline-flex min-w-0 flex-wrap items-center gap-x-lg gap-y-sm leading-6',
-        )}
+        class="actions flex min-h-10 min-w-0 flex-wrap items-center gap-x-lg gap-y-sm leading-10"
       >
+        {@render actions()}
+      </div>
+    {/if}
+    <div class="heading-content min-w-0">
+      <div class="heading-line min-w-0 leading-10">
         {#if leading}
-          <div class="flex min-h-6 shrink-0 items-center gap-lg">
+          <div class="inline-flex min-h-6 items-center gap-lg align-middle">
             {@render leading()}
           </div>
         {/if}
         <h1
-          class="min-w-0 text-base font-medium text-primary [overflow-wrap:anywhere]"
+          class="inline text-base font-medium text-primary [overflow-wrap:anywhere]"
         >
           {@render heading()}
         </h1>
         {#if headingActions}
-          <div class="flex shrink-0 gap-lg">
+          <div class="inline-flex min-h-6 items-center gap-lg align-middle">
             {@render headingActions()}
           </div>
         {/if}
         {#if tags}
-          <div class="flex min-w-0 flex-wrap items-center gap-lg">
-            {@render tags()}
-          </div>
+          {@render tags()}
         {/if}
       </div>
       {#if description}
         <div
           class={twMerge(
             'description',
-            'flex min-w-0 flex-wrap items-center gap-lg text-xs text-secondary',
+            'mt-sm min-w-0 text-xs leading-6 text-secondary',
           )}
         >
           {@render description()}
         </div>
       {/if}
     </div>
-    {#if actions}
-      <div
-        class={twMerge(
-          'actions',
-          'flex min-w-0 flex-wrap gap-x-lg gap-y-sm self-start',
-        )}
-      >
-        {@render actions()}
-      </div>
-    {/if}
-    {#if filters}
-      <div class="col-span-full flex min-w-0 flex-wrap gap-lg">
-        {@render filters()}
-      </div>
-    {/if}
-    {#if metadata}
-      <div class="col-span-full flex min-w-0 flex-wrap gap-lg">
-        {@render metadata()}
-      </div>
-    {/if}
   </div>
+  {#if filters}
+    <div class="flex min-w-0 flex-wrap gap-lg">
+      {@render filters()}
+    </div>
+  {/if}
+  {#if metadata}
+    <div class="flex min-w-0 flex-wrap gap-lg">
+      {@render metadata()}
+    </div>
+  {/if}
 </header>
 
 <style>
@@ -109,24 +100,30 @@
     container-type: inline-size;
   }
 
-  .layout-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
+  .heading-layout {
+    display: flex;
+    flex-direction: column;
   }
 
-  .heading-content {
-    grid-column: 1;
-    grid-row: 1;
+  .actions {
+    order: 1;
+  }
+
+  .heading-line > :global(*),
+  .description > :global(*) {
+    margin-inline-end: var(--spacing-lg);
+    vertical-align: middle;
   }
 
   @container page-header (min-width: 518px) {
-    .layout-grid:has(> .actions) {
-      grid-template-columns: minmax(0, 1fr) fit-content(35%);
+    .heading-layout {
+      display: flow-root;
     }
 
     .actions {
-      grid-column: 2;
-      grid-row: 1;
+      float: right;
+      max-width: 35%;
+      margin-inline-start: var(--spacing-page-gutter);
       justify-content: end;
     }
   }
