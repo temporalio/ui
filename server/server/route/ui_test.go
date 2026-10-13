@@ -10,10 +10,12 @@ import (
 	"testing/fstest"
 
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/temporalio/ui-server/v2/server/config"
+	"github.com/temporalio/ui-server/v2/server/csrf"
 )
 
 var testIndexHTML = `<!DOCTYPE html>
@@ -348,6 +350,7 @@ func TestBuildUIAssetsHandler_CacheControl(t *testing.T) {
 	tests := []struct {
 		name         string
 		path         string
+		rangeHeader  string
 		status       int
 		cacheControl string
 		location     string
@@ -356,6 +359,13 @@ func TestBuildUIAssetsHandler_CacheControl(t *testing.T) {
 			name:         "immutable asset is cached",
 			path:         "/_app/immutable/chunk.js",
 			status:       http.StatusOK,
+			cacheControl: "public, max-age=31536000, immutable",
+		},
+		{
+			name:         "immutable range response is cached",
+			path:         "/_app/immutable/chunk.js",
+			rangeHeader:  "bytes=0-1",
+			status:       http.StatusPartialContent,
 			cacheControl: "public, max-age=31536000, immutable",
 		},
 		{
@@ -380,6 +390,9 @@ func TestBuildUIAssetsHandler_CacheControl(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			e := echo.New()
 			req := httptest.NewRequest(http.MethodGet, tt.path, nil)
+			if tt.rangeHeader != "" {
+				req.Header.Set("Range", tt.rangeHeader)
+			}
 			rec := httptest.NewRecorder()
 
 			err := handler(e.NewContext(req, rec))
@@ -387,6 +400,49 @@ func TestBuildUIAssetsHandler_CacheControl(t *testing.T) {
 			assert.Equal(t, tt.status, rec.Code)
 			assert.Equal(t, tt.cacheControl, rec.Header().Get("Cache-Control"))
 			assert.Equal(t, tt.location, rec.Header().Get("Location"))
+		})
+	}
+}
+
+func TestBuildUIAssetsHandler_CacheControlWithCSRFMiddleware(t *testing.T) {
+	assets := fstest.MapFS{
+		"_app":                    &fstest.MapFile{Mode: os.ModeDir},
+		"_app/immutable":          &fstest.MapFile{Mode: os.ModeDir},
+		"_app/immutable/chunk.js": &fstest.MapFile{Data: []byte("chunk")},
+	}
+	provider := &routeTestConfigProvider{cfg: &config.Config{}}
+	e := echo.New()
+	e.Use(csrf.EnsureTokenCookie(false))
+	e.Use(middleware.CSRFWithConfig(csrf.MiddlewareConfig(provider, false)))
+	e.GET("/_app/*", buildUIAssetsHandler(assets))
+
+	tests := []struct {
+		name         string
+		path         string
+		cacheControl string
+		setCookie    bool
+	}{
+		{
+			name:         "immutable file is cacheable without a csrf cookie",
+			path:         "/_app/immutable/chunk.js",
+			cacheControl: "public, max-age=31536000, immutable",
+		},
+		{
+			name:      "immutable directory is not cacheable",
+			path:      "/_app/immutable/",
+			setCookie: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req := httptest.NewRequest(http.MethodGet, tt.path, nil)
+			rec := httptest.NewRecorder()
+			e.ServeHTTP(rec, req)
+
+			assert.Equal(t, http.StatusOK, rec.Code)
+			assert.Equal(t, tt.cacheControl, rec.Header().Get("Cache-Control"))
+			assert.Equal(t, tt.setCookie, len(rec.Result().Cookies()) > 0)
 		})
 	}
 }

@@ -141,7 +141,7 @@ func splitRequestURI(uri string) (reqPath, rawQuery string) {
 func buildUIAssetsHandler(assets fs.FS) echo.HandlerFunc {
 	handler := http.FileServer(http.FS(assets))
 	return echo.WrapHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if strings.HasPrefix(r.URL.Path, "/_app/immutable/") {
+		if strings.HasPrefix(r.URL.Path, "/_app/immutable/") && !strings.HasSuffix(r.URL.Path, "/") {
 			handler.ServeHTTP(&immutableAssetResponseWriter{ResponseWriter: w}, r)
 			return
 		}
@@ -157,6 +157,7 @@ type immutableAssetResponseWriter struct {
 func (w *immutableAssetResponseWriter) WriteHeader(status int) {
 	if !w.wroteHeader {
 		if status >= http.StatusOK && status < http.StatusMultipleChoices {
+			w.Header().Del("Set-Cookie")
 			w.Header().Set("Cache-Control", "public, max-age=31536000, immutable")
 		}
 		w.wroteHeader = true
