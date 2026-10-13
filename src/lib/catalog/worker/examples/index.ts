@@ -23,9 +23,10 @@ import { catalogExample as example15 } from './sequential-no-summary-activities/
 import { catalogExample as example16 } from './sequential-plain-text-activities/example.js';
 import { catalogExample as example17 } from './signal-collector/example.js';
 import { catalogExample as example18 } from './signal-handlers/example.js';
-import { catalogExample as example19 } from './standalone-activity/example.js';
-import { catalogExample as example20 } from './timer-driven-repetition/example.js';
-import { catalogExample as example21 } from './workflow-patching/example.js';
+import { catalogExample as example19 } from './slow-nexus-operation/example.js';
+import { catalogExample as example20 } from './standalone-activity/example.js';
+import { catalogExample as example21 } from './timer-driven-repetition/example.js';
+import { catalogExample as example22 } from './workflow-patching/example.js';
 
 const sharedWorkflowDefinitions = [
   example0,
@@ -50,6 +51,7 @@ const sharedWorkflowDefinitions = [
   example19,
   example20,
   example21,
+  example22,
 ] satisfies readonly CatalogExampleDefinition[];
 
 export const sharedWorkflowExamples: readonly CatalogExampleRegistration[] =
@@ -142,6 +144,9 @@ export const sharedWorkflowSourceFiles = [
   'src/lib/catalog/worker/examples/signal-handlers/activity.ts',
   'src/lib/catalog/worker/examples/signal-handlers/example.ts',
   'src/lib/catalog/worker/examples/signal-handlers/workflow.ts',
+  'src/lib/catalog/worker/examples/slow-nexus-operation/example.ts',
+  'src/lib/catalog/worker/examples/slow-nexus-operation/handler.ts',
+  'src/lib/catalog/worker/examples/slow-nexus-operation/service.ts',
   'src/lib/catalog/worker/examples/standalone-activity/activity.ts',
   'src/lib/catalog/worker/examples/standalone-activity/example.ts',
   'src/lib/catalog/worker/examples/timer-driven-repetition/example.ts',

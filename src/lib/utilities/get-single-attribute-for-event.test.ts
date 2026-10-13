@@ -5,6 +5,7 @@ import {
   getCodeBlockValue,
   getPrimaryAttributeForEvent,
   getSummaryAttribute,
+  getTimerFireTime,
   shouldDisplayAsExecutionLink,
   shouldDisplayAsTime,
   shouldDisplayAttribute,
@@ -334,5 +335,37 @@ describe('getSummaryEvent', () => {
       key: 'operation',
       value: 'custom-op',
     });
+  });
+});
+
+describe('getTimerFireTime', () => {
+  const timerStarted = {
+    eventId: '5',
+    eventTime: '2026-10-08T16:28:59.180Z',
+    eventType: 'TimerStarted',
+    timerStartedEventAttributes: {
+      timerId: '1',
+      startToFireTimeout: '79104s',
+      workflowTaskCompletedEventId: '4',
+    },
+  };
+
+  it('adds startToFireTimeout to eventTime', () => {
+    expect(getTimerFireTime(toEvent(timerStarted))).toBe(
+      '2026-10-09T14:27:23.180Z',
+    );
+  });
+
+  it('returns undefined for non-timer events', () => {
+    expect(
+      getTimerFireTime(
+        toEvent({
+          eventId: '1',
+          eventTime: '2026-10-08T16:28:59.180Z',
+          eventType: 'TimerFired',
+          timerFiredEventAttributes: { timerId: '1', startedEventId: '5' },
+        }),
+      ),
+    ).toBeUndefined();
   });
 });

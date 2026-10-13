@@ -33,6 +33,7 @@ import {
   routeForScheduleCreate,
   routeForScheduleEdit,
   routeForSchedules,
+  routeForSchedulesWithQuery,
   routeForStandaloneActivities,
   routeForStandaloneActivitiesWithQuery,
   routeForStandaloneActivityDetails,
@@ -239,6 +240,15 @@ describe('routeFor functions should resolve the base path exactly once', () => {
     [
       'routeForWorkflowsWithQuery',
       () => routeForWorkflowsWithQuery({ namespace: 'default', query: 'test' }),
+    ],
+    [
+      'routeForSchedulesWithQuery',
+      () =>
+        routeForSchedulesWithQuery({
+          namespace: 'default',
+          query: 'ScheduleTag="s1"',
+          page: '2',
+        }),
     ],
     [
       'routeForAuthentication',
@@ -493,6 +503,15 @@ describe('routeFor functions with prefix should resolve base + prefix correctly'
     [
       'routeForWorkflowsWithQuery',
       () => routeForWorkflowsWithQuery({ namespace: 'default', query: 'test' }),
+    ],
+    [
+      'routeForSchedulesWithQuery',
+      () =>
+        routeForSchedulesWithQuery({
+          namespace: 'default',
+          query: 'ScheduleTag="s1"',
+          page: '2',
+        }),
     ],
   ];
 

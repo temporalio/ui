@@ -3,12 +3,14 @@
 
   import PayloadCodeBlock from '$lib/components/payload/payload-code-block.svelte';
   import PayloadSummary from '$lib/components/payload/payload-summary.svelte';
-  import Timestamp from '$lib/components/timestamp.svelte';
+  import Timestamp, { timestamp } from '$lib/components/timestamp.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Preview from '$lib/holocene/markdown-editor/preview.svelte';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconInfo } from '$lib/io/icon';
   import {
     decodeEventGroupNames,
     type EventGroupLabel,
@@ -37,6 +39,7 @@
     displayLinkType,
     getCodeBlockValue,
     getStackTrace,
+    getTimerFireTime,
     shouldDisplayAsTime,
   } from '$lib/utilities/get-single-attribute-for-event';
   import {
@@ -78,6 +81,8 @@
     }
     return attrs;
   });
+
+  const fireTime = $derived(getTimerFireTime(event));
 
   const displayName = $derived(
     systemNexus?.displayName ??
@@ -394,15 +399,35 @@
 
 {#snippet details(key: string, value: string | number)}
   <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm text-secondary">
+    <div class="flex min-w-56 items-center gap-1 text-sm text-secondary">
       {format(key)}
-    </p>
-    <p class="whitespace-pre-line break-all">
+      {#if key === 'startToFireTimeout' && fireTime}
+        <Tooltip
+          top
+          width={250}
+          text={translate('events.timer-fire-time-tooltip')}
+        >
+          <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+          <span tabindex="0" class="flex"><IconInfo class="h-3 w-3" /></span>
+        </Tooltip>
+      {/if}
+    </div>
+    <div class="whitespace-pre-line break-all">
       {#if shouldDisplayAsTime(key)}
         <Timestamp dateTime={value} />
+      {:else if key === 'startToFireTimeout' && fireTime}
+        <Tooltip
+          top
+          text={translate('events.timer-fire-time-estimated', {
+            time: $timestamp(fireTime),
+          })}
+        >
+          <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+          <span tabindex="0">{value}</span>
+        </Tooltip>
       {:else}
         {value}
       {/if}
-    </p>
+    </div>
   </div>
 {/snippet}

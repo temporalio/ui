@@ -65,4 +65,34 @@ test.describe('Start a Standalone Nexus Operation', () => {
     await expect(startNexusOperationPage.serviceInputError).toBeVisible();
     await expect(startNexusOperationPage.operationNameInputError).toBeVisible();
   });
+
+  test('Displays an error alert when starting the operation fails', async ({
+    page,
+  }) => {
+    await page.route(
+      '**/api/v1/namespaces/default/nexus-operations/op-abc-123*',
+      (route) => {
+        if (route.request().method() !== 'POST') return route.fallback();
+        return route.fulfill({
+          status: 400,
+          json: { code: 3, message: 'endpoint not found: my-endpoint' },
+        });
+      },
+    );
+
+    const startNexusOperationPage = new StartStandaloneNexusOperationPage(page);
+    await startNexusOperationPage.goto({
+      operationId: 'op-abc-123',
+      endpoint: 'my-endpoint',
+      service: 'my-service',
+      operation: 'my-operation',
+    });
+
+    await startNexusOperationPage.submitButton.click();
+
+    await expect(page.getByText('An Error Occurred')).toBeVisible();
+    await expect(
+      page.getByText('endpoint not found: my-endpoint'),
+    ).toBeVisible();
+  });
 });

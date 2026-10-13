@@ -4,20 +4,17 @@ import { pathToFileURL } from 'url';
 import { chalk } from 'zx';
 
 import {
+  type Definition,
   hasOwnScenario,
   loadDefinition,
   ownScenarioPath,
   type Stage,
 } from './definition';
-import { startCatalogExamples } from './examples';
 import { WORK_DIR } from './paths';
 import { runPreflight } from './preflight';
 import { listenersOn, stopPid, type Supervised } from './process';
 import type { Scenario, StartedWorkflow } from './scenario';
-import { startServer } from './stages/server';
-import { startTunnel } from './stages/tunnel';
-import { startUi } from './stages/ui';
-import { startCatalogWorker } from './stages/worker';
+import { type DemoStage, SCENARIOS_STAGE, type StageContext } from './stage';
 import { clearState, isRunning, readState, writeState } from './state';
 import {
   printSummary,
@@ -56,6 +53,19 @@ export type DemoIo = {
   writeError: (message: string) => void;
 };
 
+/**
+ * What a repository contributes to a run: the stages it can start, and a way
+ * to start the catalog examples a definition names, when it has a catalog.
+ * The core knows neither, so both arrive here.
+ */
+export type DemoRunner = {
+  stages: readonly DemoStage[];
+  runExamples?: (
+    context: Parameters<Scenario['run']>[0],
+    entries: Definition['examples'],
+  ) => Promise<Awaited<ReturnType<Scenario['run']>>>;
+};
+
 export type StartOptions = {
   skip: Stage[];
   only: Stage[];
@@ -85,6 +95,7 @@ export const startFeatureDemo = async (
   target: string,
   options: StartOptions,
   io: DemoIo,
+  runner: DemoRunner,
 ) => {
   const { path: definitionPath, definition } = await loadDefinition(target);
   const log = (message: string) =>
@@ -116,6 +127,16 @@ export const startFeatureDemo = async (
 
   // A worker with a long activity in flight can take minutes to drain, so a
   // scenario gets a moment and then the run continues regardless.
+  const stageContext = (): StageContext => ({
+    definition,
+    runName: definition.name,
+    log,
+    address,
+    publicAddress,
+    bundledUiUrl,
+    webUrl,
+  });
+
   const stopScenarios = async () => {
     await Promise.race([
       Promise.all(teardown.map((shutdown) => shutdown().catch(() => {}))),
@@ -198,160 +219,48 @@ export const startFeatureDemo = async (
       if (own.preflight) await own.preflight(definition.scenario);
     }
 
-    const server = stageState('server', definition.server.enabled, options);
+    for (const stage of runner.stages) {
+      const context = stageContext();
+      const state = stageState(stage.name, stage.enabled(definition), options);
 
-    if (server.run) {
-      const provisioned = await startServer(
-        definition.server,
-        log,
-        definition.name,
-      );
-
-      address = provisioned.address;
-      bundledUiUrl = provisioned.bundledUiUrl;
-
-      if (provisioned.process) {
-        processes.push(provisioned.process);
-        ownedPorts.push(
-          definition.server.port,
-          definition.server.uiPort,
-          definition.server.httpPort ?? definition.server.port + 1,
-        );
+      if (!state.run) {
+        outcomes.push({
+          stage: stage.name,
+          ran: false,
+          reason: state.reason,
+          details: stage.idle?.(context) ?? [],
+        });
+        continue;
       }
 
+      const output = await stage.run(context);
+
+      // A stage reports what it leaves behind rather than assigning to these,
+      // so a stage from another repository cannot reach into the run.
+      address = output.address ?? address;
+      publicAddress = output.publicAddress ?? publicAddress;
+      bundledUiUrl = output.bundledUiUrl ?? bundledUiUrl;
+      webUrl = output.webUrl ?? webUrl;
+
+      if (output.processes) processes.push(...output.processes);
+      if (output.ownedPorts) ownedPorts.push(...output.ownedPorts);
+
       outcomes.push({
-        stage: 'server',
+        stage: stage.name,
         ran: true,
-        details: [
-          `Listening on ${provisioned.address}, namespace "${provisioned.namespace}"`,
-          ...(provisioned.reusedExisting
-            ? []
-            : [
-                `Temporal CLI ${provisioned.cliVersion}, Server ${provisioned.serverVersion}`,
-                ...provisioned.provenance,
-                ...Object.entries(definition.server.dynamicConfig).map(
-                  ([key, value]) =>
-                    `Dynamic config: ${key}=${JSON.stringify(value)}`,
-                ),
-              ]),
-          `Bundled Web UI: ${provisioned.bundledUiUrl}`,
-        ],
-      });
-    } else {
-      outcomes.push({
-        stage: 'server',
-        ran: false,
-        reason: server.reason,
-        details: [`Expecting a server on ${address}`],
-      });
-    }
-
-    const worker = stageState('worker', definition.worker.enabled, options);
-
-    if (worker.run) {
-      const running = await startCatalogWorker(
-        definition.worker,
-        address,
-        definition.server.namespace,
-        log,
-        definition.name,
-      );
-
-      if (running.process) processes.push(running.process);
-
-      outcomes.push({
-        stage: 'worker',
-        ran: true,
-        details: [
-          `The catalog worker is polling for: ${running.targets.join(', ')}`,
-          'Started with "pnpm catalog worker", so the demo runs the same code the catalog page runs.',
-        ],
-      });
-    } else {
-      outcomes.push({
-        stage: 'worker',
-        ran: false,
-        reason: worker.reason,
-        details: [],
-      });
-    }
-
-    const tunnel = stageState('tunnel', definition.tunnel.enabled, options);
-
-    if (tunnel.run) {
-      const running = await startTunnel(
-        definition.tunnel,
-        definition.server.port,
-        log,
-        definition.name,
-      );
-
-      publicAddress = running.publicAddress;
-
-      if (running.process) processes.push(running.process);
-
-      outcomes.push({
-        stage: 'tunnel',
-        ran: true,
-        details: [
-          `Frontend reachable from outside this machine at ${running.publicAddress}`,
-          'A server-scaled Worker dials the frontend back, which localhost cannot offer.',
-          'The hostname changes per run, so anything holding it must be updated each time.',
-        ],
-      });
-    } else {
-      outcomes.push({
-        stage: 'tunnel',
-        ran: false,
-        reason: tunnel.reason,
-        details: [],
-      });
-    }
-
-    const ui = stageState('ui', definition.ui.enabled, options);
-
-    if (ui.run) {
-      const running = await startUi(
-        definition.ui,
-        address,
-        log,
-        definition.name,
-      );
-
-      webUrl = running.webUrl;
-      processes.push(...running.processes);
-
-      for (const child of running.processes) {
-        if (child.label === 'ui-server') ownedPorts.push(definition.ui.apiPort);
-        if (child.label === 'ui') ownedPorts.push(definition.ui.webPort);
-      }
-
-      outcomes.push({
-        stage: 'ui',
-        ran: true,
-        details: [
-          ...(running.apiUrl ? [`ui-server API: ${running.apiUrl}`] : []),
-          ...(running.webUrl ? [`UI: ${running.webUrl}`] : []),
-        ],
-      });
-    } else {
-      outcomes.push({
-        stage: 'ui',
-        ran: false,
-        reason: ui.reason,
-        details: [],
+        details: output.details,
       });
     }
 
     const scenarios = stageState(
-      'scenarios',
+      SCENARIOS_STAGE,
       definition.examples.length > 0 || hasOwnScenario(definition.name),
       options,
     );
 
     if (!scenarios.run) {
       outcomes.push({
-        stage: 'scenarios',
+        stage: SCENARIOS_STAGE,
         ran: false,
         reason: scenarios.reason,
         details: [],
@@ -380,10 +289,10 @@ export const startFeatureDemo = async (
       log,
     };
 
-    if (definition.examples.length) {
+    if (definition.examples.length && runner.runExamples) {
       log(`Starting ${definition.examples.length} catalog example(s)`);
 
-      const result = await startCatalogExamples(context, definition.examples);
+      const result = await runner.runExamples(context, definition.examples);
 
       record(result);
       details.push(`Catalog examples: started ${result.workflows.length}`);
@@ -402,7 +311,7 @@ export const startFeatureDemo = async (
       );
     }
 
-    outcomes.push({ stage: 'scenarios', ran: true, details });
+    outcomes.push({ stage: SCENARIOS_STAGE, ran: true, details });
   }
 };
 

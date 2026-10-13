@@ -11,9 +11,13 @@ import {
   runtimeExists,
 } from './provision';
 import { createVersionInUi } from './ui-create-version';
-import { runDirFor } from '../../paths';
-import { failure } from '../../remedy';
-import type { Scenario, ScenarioContext, ScenarioResult } from '../../scenario';
+import { runDirFor } from '../../../../src/lib/demo/paths';
+import { failure } from '../../../../src/lib/demo/remedy';
+import type {
+  Scenario,
+  ScenarioContext,
+  ScenarioResult,
+} from '../../../../src/lib/demo/scenario';
 
 /** The options this scenario accepts, checked by the compiler in definition.ts. */
 export type Options = z.input<typeof optionsSchema>;

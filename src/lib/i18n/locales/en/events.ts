@@ -11,6 +11,8 @@ export const Strings = {
   'show-elapsed-time': 'Show Elapsed Time & Duration',
   'event-type': 'Event Type',
   'workflow-events': 'Workflow Events',
+  'timer-fire-time-tooltip': 'Fire time estimated due to latency',
+  'timer-fire-time-estimated': '{{time}} (estimated)',
   category: {
     all: 'All',
     activity: 'Activity',
