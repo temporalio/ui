@@ -27,6 +27,7 @@
   );
 
   const sharedClasses = twJoin(
+    'relative',
     'inline-flex',
     'shrink-0',
     'font-sans',
