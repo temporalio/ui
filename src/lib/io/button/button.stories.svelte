@@ -8,6 +8,7 @@
     type ButtonColorScheme,
     type ButtonSize,
   } from './button.svelte';
+  import ButtonLink from './link.svelte';
 
   const colorSchemes: ButtonColorScheme[] = [
     'primary',
@@ -26,11 +27,13 @@
       colorScheme: 'primary',
       size: 'md',
       disabled: false,
+      isLoading: false,
     },
     argTypes: {
       colorScheme: { control: 'select', options: colorSchemes },
       size: { control: 'select', options: sizes },
       disabled: { control: 'boolean' },
+      isLoading: { control: 'boolean' },
       LeadingIcon: {
         control: 'select',
         options: ['None', 'Add'],
@@ -45,7 +48,26 @@
       class: { table: { disable: true } },
     },
     parameters: { layout: 'padded' },
-    render: template,
+  });
+</script>
+
+<script lang="ts">
+  import { onDestroy } from 'svelte';
+
+  let isLoading = $state(false);
+  let loadingTimeout: ReturnType<typeof setTimeout> | undefined;
+
+  function startLoading() {
+    if (isLoading) return;
+    isLoading = true;
+    loadingTimeout = setTimeout(() => {
+      isLoading = false;
+      loadingTimeout = undefined;
+    }, 2000);
+  }
+
+  onDestroy(() => {
+    if (loadingTimeout !== undefined) clearTimeout(loadingTimeout);
   });
 </script>
 
@@ -55,7 +77,39 @@
   </div>
 {/snippet}
 
-<Story name="Playground" />
+<Story name="Playground" {template} />
+
+<Story
+  name="Link"
+  parameters={{
+    controls: {
+      include: ['colorScheme', 'size', 'LeadingIcon', 'TrailingIcon'],
+    },
+  }}
+>
+  {#snippet template(args)}
+    <div
+      class="flex flex-wrap items-center gap-4 bg-background-primary p-6 text-primary"
+    >
+      <ButtonLink
+        href="https://docs.temporal.io"
+        colorScheme={args.colorScheme}
+        size={args.size}
+        LeadingIcon={args.LeadingIcon}
+        TrailingIcon={args.TrailingIcon}>Documentation</ButtonLink
+      >
+      <ButtonLink
+        href="https://docs.temporal.io"
+        target="_blank"
+        rel="noopener noreferrer"
+        colorScheme={args.colorScheme}
+        size={args.size}
+        LeadingIcon={args.LeadingIcon}
+        TrailingIcon={args.TrailingIcon}>Documentation (new tab)</ButtonLink
+      >
+    </div>
+  {/snippet}
+</Story>
 
 <Story name="Color schemes and sizes">
   {#snippet template()}
@@ -160,6 +214,48 @@
         </tbody>
       </table>
     </div>
+  {/snippet}
+</Story>
+
+<Story
+  name="Loading"
+  args={{ isLoading: true, 'aria-busy': true }}
+  {template}
+/>
+
+{#snippet loadingTemplate(args: ComponentProps<typeof Button>)}
+  <div class="bg-background-primary p-6 text-primary">
+    <Button
+      {...args}
+      isLoading={args.isLoading || isLoading}
+      disabled={args.disabled || isLoading}
+      aria-busy={args.isLoading || isLoading}
+      onclick={startLoading}>Click to load</Button
+    >
+  </div>
+{/snippet}
+
+<Story name="Loading with leading icon" args={{ LeadingIcon: IconAdd }}>
+  {#snippet template(args)}
+    {@render loadingTemplate(args)}
+  {/snippet}
+</Story>
+
+<Story
+  name="Loading with trailing icon"
+  args={{ TrailingIcon: IconChevronDown }}
+>
+  {#snippet template(args)}
+    {@render loadingTemplate(args)}
+  {/snippet}
+</Story>
+
+<Story
+  name="Loading with both icons"
+  args={{ LeadingIcon: IconAdd, TrailingIcon: IconChevronDown }}
+>
+  {#snippet template(args)}
+    {@render loadingTemplate(args)}
   {/snippet}
 </Story>
 

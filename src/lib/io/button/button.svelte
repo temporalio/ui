@@ -3,7 +3,7 @@
 
   import { twJoin, twMerge } from 'tailwind-merge';
 
-  import type { IconComponent } from '$lib/io/icon';
+  import { type IconComponent, IconSpinner } from '$lib/io/icon';
   import type { ConditionalValue } from '$lib/io/types';
 
   export type ButtonColorScheme =
@@ -16,7 +16,7 @@
 
   const disabledClasses = twJoin(
     'disabled:cursor-not-allowed',
-    'disabled:opacity-disabled',
+    'disabled:[&:not([aria-busy=true])]:opacity-disabled',
   );
 
   const iconOnlyClasses = twJoin(
@@ -46,33 +46,33 @@
   const colorSchemeClasses: Record<ButtonColorScheme, string> = {
     primary: twJoin(
       'text-white bg-interactive-primary',
-      'enabled:hover:bg-interactive-primary-hover',
-      'enabled:active:bg-interactive-primary-press',
-      'enabled:focus-visible:bg-interactive-primary-hover',
+      '[&:not(:disabled)]:hover:bg-interactive-primary-hover',
+      '[&:not(:disabled)]:active:bg-interactive-primary-press',
+      '[&:not(:disabled)]:focus-visible:bg-interactive-primary-hover',
     ),
     secondary: twJoin(
       'border-brand bg-interactive-secondary text-brand',
-      'enabled:hover:bg-interactive-secondary-hover',
-      'enabled:active:bg-interactive-secondary-press',
-      'enabled:focus-visible:bg-interactive-secondary-hover',
+      '[&:not(:disabled)]:hover:bg-interactive-secondary-hover',
+      '[&:not(:disabled)]:active:bg-interactive-secondary-press',
+      '[&:not(:disabled)]:focus-visible:bg-interactive-secondary-hover',
     ),
     tertiary: twJoin(
       'border-secondary bg-interactive-tertiary text-primary',
-      'enabled:hover:bg-interactive-tertiary-hover',
-      'enabled:active:bg-interactive-tertiary-press',
-      'enabled:focus-visible:bg-interactive-tertiary-hover',
+      '[&:not(:disabled)]:hover:bg-interactive-tertiary-hover',
+      '[&:not(:disabled)]:active:bg-interactive-tertiary-press',
+      '[&:not(:disabled)]:focus-visible:bg-interactive-tertiary-hover',
     ),
     ghost: twJoin(
       'bg-interactive-tertiary text-primary',
-      'enabled:hover:bg-interactive-tertiary-hover',
-      'enabled:active:bg-interactive-tertiary-press',
-      'enabled:focus-visible:bg-interactive-tertiary-hover',
+      '[&:not(:disabled)]:hover:bg-interactive-tertiary-hover',
+      '[&:not(:disabled)]:active:bg-interactive-tertiary-press',
+      '[&:not(:disabled)]:focus-visible:bg-interactive-tertiary-hover',
     ),
     danger: twJoin(
-      'bg-interactive-danger text-primary',
-      'enabled:hover:bg-interactive-danger-hover',
-      'enabled:active:bg-interactive-danger-press',
-      'enabled:focus-visible:bg-interactive-danger-hover',
+      'bg-interactive-danger text-white',
+      '[&:not(:disabled)]:hover:bg-interactive-danger-hover',
+      '[&:not(:disabled)]:active:bg-interactive-danger-press',
+      '[&:not(:disabled)]:focus-visible:bg-interactive-danger-hover',
     ),
   };
 
@@ -106,6 +106,7 @@
     size?: ButtonSize;
     LeadingIcon?: ConditionalValue<IconComponent>;
     TrailingIcon?: ConditionalValue<IconComponent>;
+    isLoading?: boolean;
     class?: string;
   }
 </script>
@@ -117,6 +118,7 @@
     size = 'md',
     type = 'button',
     children,
+    isLoading,
     LeadingIcon,
     TrailingIcon,
     ...rest
@@ -125,14 +127,37 @@
   const iconSize = $derived(size === 'md' ? 16 : 12);
 </script>
 
-<button {...rest} {type} class={buttonRecipe({ colorScheme, size, className })}>
+{#snippet loadingIcon()}
+  <IconSpinner class="animate-spin" width={iconSize} height={iconSize} />
+{/snippet}
+
+{#snippet leadingIcon()}
   {#if LeadingIcon}
-    <LeadingIcon width={iconSize} height={iconSize} />
+    {#if isLoading}
+      {@render loadingIcon()}
+    {:else}
+      <LeadingIcon width={iconSize} height={iconSize} />
+    {/if}
   {/if}
+{/snippet}
+
+{#snippet trailingIcon()}
+  {#if TrailingIcon && (LeadingIcon || !isLoading)}
+    <TrailingIcon width={iconSize} height={iconSize} />
+  {:else if !LeadingIcon && isLoading}
+    {@render loadingIcon()}
+  {/if}
+{/snippet}
+
+<button
+  aria-busy={isLoading}
+  {...rest}
+  {type}
+  class={buttonRecipe({ colorScheme, size, className })}
+>
+  {@render leadingIcon()}
   {#if children}
     <span class="contents">{@render children()}</span>
   {/if}
-  {#if TrailingIcon}
-    <TrailingIcon width={iconSize} height={iconSize} />
-  {/if}
+  {@render trailingIcon()}
 </button>
