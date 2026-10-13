@@ -122,7 +122,7 @@
         content={value}
         copyIconTitle={`${translate('common.copy-icon-title')}: ${groupFieldLabel(key)}, ${regionLabel}`}
         copySuccessIconTitle={translate('common.copy-success-icon-title')}
-        container-class="min-w-0"
+        container-class="h-5 min-w-0"
       >
         <!-- A narrow column cuts the middle, so the resource name stays. -->
         <span
