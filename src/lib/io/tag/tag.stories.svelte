@@ -3,9 +3,7 @@
   import type { ComponentProps } from 'svelte';
 
   import { IconTag } from '$lib/io/icon';
-
-  import type { TagColorScheme } from './tag.svelte';
-  import Tag from './tag.svelte';
+  import { Tag, type TagColorScheme } from '$lib/io/tag';
 
   const colorSchemes: TagColorScheme[] = [
     'neutral',
