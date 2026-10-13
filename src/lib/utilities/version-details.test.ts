@@ -12,6 +12,7 @@ import {
   lifecycleRows,
   metadataValue,
   regionBlocks,
+  splitIdentifier,
   versionDetailsHref,
 } from './version-details';
 
@@ -226,5 +227,34 @@ describe('durationToMs', () => {
 
   it('returns undefined for no value', () => {
     expect(durationToMs(undefined)).toBeUndefined();
+  });
+});
+
+describe('splitIdentifier', () => {
+  it('splits an ARN before the resource name', () => {
+    expect(
+      splitIdentifier('arn:aws:lambda:us-east-1:123:function:orders-worker'),
+    ).toEqual({
+      head: 'arn:aws:lambda:us-east-1:123:function:',
+      tail: 'orders-worker',
+    });
+    expect(splitIdentifier('arn:aws:iam::123:role/Worker')).toEqual({
+      head: 'arn:aws:iam::123:role/',
+      tail: 'Worker',
+    });
+  });
+
+  it('keeps a value with no separator whole', () => {
+    expect(splitIdentifier('tmprl-a1b2')).toEqual({
+      head: '',
+      tail: 'tmprl-a1b2',
+    });
+  });
+
+  it('keeps a value that ends in a separator whole', () => {
+    expect(splitIdentifier('projects/demo/')).toEqual({
+      head: '',
+      tail: 'projects/demo/',
+    });
   });
 });
