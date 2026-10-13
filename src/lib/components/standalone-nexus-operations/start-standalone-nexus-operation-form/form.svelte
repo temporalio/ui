@@ -37,6 +37,7 @@
     type NexusOperationIdReusePolicy,
   } from '$lib/types';
   import { getIdentity } from '$lib/utilities/core-context';
+  import { has } from '$lib/utilities/has';
   import { isNetworkError } from '$lib/utilities/is-network-error';
   import { routeForStandaloneNexusOperationDetails } from '$lib/utilities/route-for';
   import { fromScreamingEnum } from '$lib/utilities/screaming-enums';
@@ -195,10 +196,11 @@
     resetForm: false,
     invalidateAll: false,
     validators: zodClient(schema),
-    onUpdate: async ({ form }) => {
+    onUpdate: async ({ form, cancel }) => {
       if (!form.valid) return;
 
       const { idReusePolicy, idConflictPolicy } = form.data;
+      message.set(undefined);
 
       try {
         const operationId = form.data.operationId || crypto.randomUUID();
@@ -242,7 +244,15 @@
         return { type: 'success' };
       } catch (error) {
         if (!isNetworkError(error) || error.statusCode !== 409) {
-          return { type: 'error' };
+          message.set({
+            intent: 'error',
+            title: translate('common.error-occurred'),
+            text: has(error, 'message')
+              ? String(error.message)
+              : translate('common.unknown-error'),
+          });
+          cancel();
+          return;
         }
 
         const { operationId } = form.data;
@@ -331,8 +341,6 @@
 </script>
 
 <form class="space-y-4" use:enhance novalidate>
-  <Message value={$message} />
-
   <div class="flex items-start gap-6">
     <div class="min-w-0 flex-1 space-y-4">
       <Card class="space-y-4">
@@ -646,6 +654,8 @@
           <MarkdownEditor bind:content={$form.details} />
         </div>
       </Card>
+
+      <Message value={$message} />
 
       <div class="flex justify-end">
         <Button
