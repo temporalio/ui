@@ -1,3 +1,4 @@
+import { flushSync } from 'svelte';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import type { PaletteToolSet } from './types';
@@ -40,5 +41,21 @@ describe('registerToolSet', () => {
 
     removeOld();
     expect(registeredToolSets().map(({ label }) => label)).toEqual(['New']);
+  });
+
+  it('registers from an effect without rerunning it', () => {
+    let runs = 0;
+    const stop = $effect.root(() => {
+      $effect(() => {
+        runs += 1;
+        return registerToolSet(set('alpha'));
+      });
+    });
+    flushSync();
+    expect(runs).toBe(1);
+    expect(registeredToolSets().map(({ id }) => id)).toEqual(['alpha']);
+
+    stop();
+    expect(registeredToolSets()).toEqual([]);
   });
 });
