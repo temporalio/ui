@@ -26,7 +26,7 @@
     '[&:has(>svg:only-child)]:p-0',
   );
 
-  const sharedClasses = twJoin(
+  const wrapperClasses = twJoin(
     'relative',
     'inline-flex',
     'shrink-0',
@@ -95,7 +95,7 @@
     className?: string;
   }) => {
     return twMerge(
-      sharedClasses,
+      wrapperClasses,
       colorSchemeClasses[colorScheme],
       sizeClasses[size],
       iconOnlyClasses,
