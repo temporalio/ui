@@ -8,6 +8,7 @@ import * as Deployments from './deployments';
 import * as Events from './events';
 import * as Namespaces from './namespaces';
 import * as Nexus from './nexus';
+import * as Palette from './palette';
 import * as Schedules from './schedules';
 import * as SearchAttributes from './search-attributes';
 import * as StandaloneActivities from './standalone-activities';
@@ -32,6 +33,7 @@ export const English = {
   [DataEncoder.Namespace]: DataEncoder.Strings,
   [Namespaces.Namespace]: Namespaces.Strings,
   [Nexus.Namespace]: Nexus.Strings,
+  [Palette.Namespace]: Palette.Strings,
   [SearchAttributes.Namespace]: SearchAttributes.Strings,
   [StandaloneActivities.Namespace]: StandaloneActivities.Strings,
   [StandaloneNexusOperations.Namespace]: StandaloneNexusOperations.Strings,
