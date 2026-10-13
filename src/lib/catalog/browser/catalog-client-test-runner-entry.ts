@@ -1,4 +1,8 @@
+import i18next from 'i18next';
 import { flushSync as flushSvelte, mount, tick, unmount } from 'svelte';
+
+import { i18nNamespaces } from '$lib/i18n/index';
+import resources from '$lib/i18n/locales/index';
 
 import type { CatalogFilters } from './catalog-list-state';
 import { createCatalogSessionStore } from './session-store';
@@ -11,6 +15,13 @@ import type {
 
 import CatalogDetail from './catalog-detail.svelte';
 import CatalogList from './catalog-list.svelte';
+
+i18next.init({
+  fallbackLng: 'en',
+  ns: i18nNamespaces,
+  defaultNS: 'common',
+  resources,
+});
 
 const descriptor: BrowserCatalogDescriptor = {
   id: 'order-lifecycle',

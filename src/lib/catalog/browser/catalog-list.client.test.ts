@@ -196,13 +196,13 @@ describe('CatalogList client interactions', () => {
     ]);
     expect(rows.map((row) => text(row, 'catalog-location'))).toEqual([
       'Task Queue catalog-tasks',
-      'Endpoint catalog-endpoint',
+      'Nexus Endpoint catalog-endpoint',
     ]);
     expect(rows.map((row) => text(row, 'catalog-source'))).toEqual([
       'OSS',
       'OSS',
     ]);
-    expect(rows[1]?.textContent).toContain('Child workflows');
+    expect(rows[1]?.textContent).toContain('Child Workflows');
     expect(facetCount(target, 'Standalone Nexus Operation')).toBe('1');
     expect(facetCount(target, 'Standalone Activity')).toBe('0');
   });

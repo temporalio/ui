@@ -1,4 +1,5 @@
 <script module lang="ts">
+  import { type CatalogExecutionKind, catalogKinds } from './catalog-kinds';
   import type { ReadinessCheck as HostReadinessCheck } from './workbench-host';
 
   export type WorkerReadinessDisplayState =
@@ -32,19 +33,21 @@
 
   export const readinessPresentation = ({
     kind,
+    executionKind,
     state,
     taskQueue,
   }: {
     kind: HostReadinessCheck['kind'];
+    executionKind: CatalogExecutionKind;
     state: WorkerReadinessDisplayState | 'loading';
     taskQueue: string;
   }): ReadinessPresentation => {
     const label =
       kind === 'worker'
-        ? 'Handler worker is polling'
-        : 'Endpoint matches the declared target and policy';
+        ? catalogKinds[executionKind].pollingWorkerLabel
+        : 'Nexus Endpoint matches the declared target and policy';
     const iconSubject =
-      kind === 'worker' ? 'Worker readiness' : 'Nexus endpoint readiness';
+      kind === 'worker' ? 'Worker readiness' : 'Nexus Endpoint readiness';
 
     if (state === 'loading') {
       return {
@@ -54,8 +57,8 @@
         label,
         tooltip:
           kind === 'worker'
-            ? 'Checking for workers…'
-            : 'Checking Nexus endpoint readiness…',
+            ? 'Checking for Workers…'
+            : 'Checking Nexus Endpoint readiness…',
       };
     }
 
@@ -68,7 +71,7 @@
         tooltip:
           kind === 'worker'
             ? 'A Worker is polling.'
-            : 'Nexus endpoint is ready.',
+            : 'Nexus Endpoint is ready.',
       };
     }
 
@@ -81,7 +84,7 @@
         tooltip:
           kind === 'worker'
             ? `This run will wait for a Worker to poll the ${taskQueue} Task Queue. Run "pnpm catalog worker" to start one.`
-            : 'Nexus endpoint is unavailable.',
+            : 'Nexus Endpoint is unavailable.',
       };
     }
 
@@ -93,7 +96,7 @@
       tooltip:
         kind === 'worker'
           ? 'Worker status couldn’t be checked.'
-          : 'Nexus endpoint status couldn’t be checked.',
+          : 'Nexus Endpoint status couldn’t be checked.',
     };
   };
 
@@ -144,8 +147,7 @@
   import type { SearchAttributesSchema } from '$lib/stores/search-attributes';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
 
-  import { catalogKinds } from './catalog-kinds';
-  import { featureLabel } from './catalog-list-state';
+  import { featureLabel } from './catalog-features';
   import { launchOutcomeExplanation } from './launch-outcome-presentation';
   import { createReadinessLoader } from './readiness-loader';
   import { sessionStatusPresentation } from './session-presentation';
@@ -278,7 +280,7 @@
       taskQueue,
       {
         id: 'catalog-endpoint',
-        label: 'Endpoint',
+        label: 'Nexus Endpoint',
         value: execution.endpoint,
       },
       {
@@ -310,6 +312,7 @@
   let workerPresentation = $derived(
     readinessPresentation({
       kind: 'worker',
+      executionKind: descriptor.execution.kind,
       state: readinessLoading ? 'loading' : workerReadinessState,
       taskQueue: descriptor.execution.taskQueue,
     }),
@@ -326,6 +329,7 @@
             (check) =>
               readinessPresentation({
                 kind: check.kind,
+                executionKind: descriptor.execution.kind,
                 state: check.state,
                 taskQueue: descriptor.execution.taskQueue,
               }).iconLabel,
@@ -662,8 +666,8 @@
                     {relativeSessionTime(session.createdAt)}
                   </td>
                   <td>
-                    {#if status.status}
-                      <BadgeStatus status={status.status} text={status.label} />
+                    {#if 'status' in status}
+                      <BadgeStatus status={status.status} />
                     {:else}
                       {@const explanation =
                         launchOutcomeExplanation(session.outcome) ??
@@ -745,7 +749,7 @@
         {/if}
         <dl class="divide-y divide-primary text-sm">
           <div class="py-2 first:pt-0">
-            <dt class="body-small text-secondary">Type</dt>
+            <dt class="body-small text-secondary">Execution</dt>
             <dd class="mt-0.5">{executionKindLabel}</dd>
           </div>
           <div class="py-2 first:pt-0">
@@ -811,6 +815,7 @@
             {#each prerequisiteReadiness as check, index (`${check.kind}-${index}`)}
               {@const presentation = readinessPresentation({
                 kind: check.kind,
+                executionKind: descriptor.execution.kind,
                 state: check.state,
                 taskQueue: descriptor.execution.taskQueue,
               })}

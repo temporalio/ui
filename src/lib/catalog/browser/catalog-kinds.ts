@@ -10,6 +10,7 @@ export interface CatalogKindDefinition {
   label: string;
   locationLabel: string;
   location: (descriptor: BrowserCatalogDescriptor) => string;
+  pollingWorkerLabel: string;
   glyphClass: string;
   badgeClass: string;
 }
@@ -33,6 +34,7 @@ export const catalogKinds: Readonly<
     label: 'Workflow',
     locationLabel: 'Task Queue',
     location: taskQueue,
+    pollingWorkerLabel: 'A Worker is polling for Workflow Tasks',
     glyphClass: 'rounded-sm bg-action-workflow',
     badgeClass: 'bg-action-workflow-overlay',
   },
@@ -41,14 +43,16 @@ export const catalogKinds: Readonly<
     label: 'Standalone Activity',
     locationLabel: 'Task Queue',
     location: taskQueue,
+    pollingWorkerLabel: 'A Worker is polling for Activity Tasks',
     glyphClass: 'rounded-full bg-action-activity',
     badgeClass: 'bg-action-activity-overlay',
   },
   'standalone-nexus-operation': {
     kind: 'standalone-nexus-operation',
     label: 'Standalone Nexus Operation',
-    locationLabel: 'Endpoint',
+    locationLabel: 'Nexus Endpoint',
     location: nexusEndpoint,
+    pollingWorkerLabel: 'A handler Worker is polling for Nexus Tasks',
     glyphClass: 'rotate-45 scale-[0.82] rounded-[1px] bg-action-nexus',
     badgeClass: 'bg-action-nexus-overlay',
   },

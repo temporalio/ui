@@ -1,3 +1,4 @@
+import { featureLabel } from './catalog-features';
 import {
   type CatalogExecutionKind,
   catalogKinds,
@@ -19,11 +20,6 @@ export const changePendingRunCount = (
 
   const { [exampleId]: _removed, ...remaining } = counts;
   return remaining;
-};
-
-export const featureLabel = (feature: string): string => {
-  const words = feature.replaceAll('-', ' ').trim();
-  return words.charAt(0).toLocaleUpperCase() + words.slice(1);
 };
 
 export type CatalogFilterKey = 'kind' | 'feature' | 'source';
@@ -120,7 +116,7 @@ const byCountThenLabel = (a: CatalogFacetOption, b: CatalogFacetOption) =>
 
 const facetDefinitions: Readonly<Record<CatalogFilterKey, FacetDefinition>> = {
   kind: {
-    title: 'Execution kind',
+    title: 'Execution',
     values: ({ execution }) => [execution.kind],
     options: ({ candidates, counts }) => [
       allOption('All kinds', candidates.length),

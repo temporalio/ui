@@ -7,11 +7,11 @@ import {
   type CatalogFilters,
   catalogFiltersFromSearchParams,
   catalogFiltersUrl,
+  catalogFilterTitle,
   changePendingRunCount,
   clearCatalogFilters,
   drawerFilterKeys,
   emptyCatalogFilters,
-  featureLabel,
   toggleCatalogFilter,
 } from './catalog-list-state';
 import {
@@ -235,20 +235,13 @@ describe('activeCatalogFilters', () => {
 
     expect(activeCatalogFilters(facets(filters), filters)).toEqual([
       { key: 'kind', label: 'Standalone Nexus Operation' },
-      { key: 'feature', label: 'Child workflows' },
+      { key: 'feature', label: 'Child Workflows' },
       { key: 'source', label: 'Local' },
     ]);
   });
 
   it('returns nothing without filters', () => {
     expect(activeCatalogFilters(facets({}), emptyCatalogFilters)).toEqual([]);
-  });
-});
-
-describe('featureLabel', () => {
-  it('turns a feature slug into a sentence-case label', () => {
-    expect(featureLabel('child-workflows')).toBe('Child workflows');
-    expect(featureLabel('Workflow')).toBe('Workflow');
   });
 });
 
@@ -267,5 +260,13 @@ describe('changePendingRunCount', () => {
     });
     expect(changePendingRunCount(first, 'shared-order', -1)).toEqual({});
     expect(changePendingRunCount({}, 'missing', -1)).toEqual({});
+  });
+});
+
+describe('catalogFilterTitle', () => {
+  it('names each facet with Temporal terms', () => {
+    expect(catalogFilterTitle('kind')).toBe('Execution');
+    expect(catalogFilterTitle('feature')).toBe('Feature');
+    expect(catalogFilterTitle('source')).toBe('Source');
   });
 });

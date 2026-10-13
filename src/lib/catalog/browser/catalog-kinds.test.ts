@@ -35,7 +35,7 @@ describe('catalogKinds', () => {
     expect(locations).toEqual([
       ['Task Queue', 'catalog-tasks'],
       ['Task Queue', 'catalog-tasks'],
-      ['Endpoint', 'catalog-endpoint'],
+      ['Nexus Endpoint', 'catalog-endpoint'],
     ]);
   });
 });

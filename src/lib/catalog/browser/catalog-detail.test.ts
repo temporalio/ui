@@ -20,6 +20,7 @@ import {
 import { startIsolatedViteServer } from '$lib/test-utilities/isolated-vite-server';
 
 import { catalogHarnessSetupTimeoutMs } from './catalog-harness-timeout';
+import type { CatalogExecutionKind } from './catalog-kinds';
 import { createCatalogSessionStore } from './session-store';
 import type { BrowserCatalogDescriptor } from './types';
 import type { WorkbenchHost } from './workbench-host';
@@ -45,6 +46,7 @@ let isCurrentCatalogDetailRequest: (request: {
 }) => boolean;
 let readinessPresentation: (config: {
   kind: 'nexus-endpoint' | 'worker';
+  executionKind: CatalogExecutionKind;
   state:
     | 'error'
     | 'indeterminate'
@@ -236,14 +238,15 @@ describe('CatalogDetail', () => {
     expect(body).toMatch(
       /aria-label="Readiness"[\s\S]*>Readiness<[\s\S]*>Refresh<[\s\S]*aria-live="polite"[\s\S]*tabindex="0"[\s\S]*aria-label="Worker readiness is checking"/,
     );
-    expect(body).toContain('>Handler worker is polling<');
-    expect(body).toContain('Checking for workers…');
+    expect(body).toContain('>A Worker is polling for Workflow Tasks<');
+    expect(body).toContain('Checking for Workers…');
   });
 
   it('keeps the worker label stable while its readiness icon and tooltip change', () => {
     expect(
       readinessPresentation({
         kind: 'worker',
+        executionKind: 'workflow',
         state: 'ready',
         taskQueue: 'catalog-tasks',
       }),
@@ -251,7 +254,7 @@ describe('CatalogDetail', () => {
       Icon: iconNamed(IconCheckCircle),
       iconClass: 'text-success',
       iconLabel: 'Worker readiness is ready',
-      label: 'Handler worker is polling',
+      label: 'A Worker is polling for Workflow Tasks',
       tooltip: 'A Worker is polling.',
     });
   });
@@ -324,6 +327,7 @@ describe('CatalogDetail', () => {
     expect(
       readinessPresentation({
         kind: 'worker',
+        executionKind: 'workflow',
         state: 'unavailable',
         taskQueue: 'catalog-tasks',
       }),
@@ -331,7 +335,7 @@ describe('CatalogDetail', () => {
       Icon: iconNamed(IconWarning),
       iconClass: 'text-warning',
       iconLabel: 'Worker readiness is unavailable',
-      label: 'Handler worker is polling',
+      label: 'A Worker is polling for Workflow Tasks',
       tooltip:
         'This run will wait for a Worker to poll the catalog-tasks Task Queue. Run "pnpm catalog worker" to start one.',
     });
@@ -350,6 +354,7 @@ describe('CatalogDetail', () => {
       expect(
         readinessPresentation({
           kind: 'worker',
+          executionKind: 'standalone-activity',
           state,
           taskQueue: 'catalog-tasks',
         }),
@@ -357,10 +362,28 @@ describe('CatalogDetail', () => {
         Icon: iconNamed(IconQuestionCircle),
         iconClass: 'text-secondary',
         iconLabel: 'Worker readiness status is unknown',
-        label: 'Handler worker is polling',
+        label: 'A Worker is polling for Activity Tasks',
         tooltip: 'Worker status couldn’t be checked.',
       });
     }
+  });
+
+  it('names the handler Worker only for Nexus Operations', () => {
+    const label = (executionKind: CatalogExecutionKind) =>
+      readinessPresentation({
+        kind: 'worker',
+        executionKind,
+        state: 'ready',
+        taskQueue: 'catalog-tasks',
+      }).label;
+
+    expect(label('workflow')).toBe('A Worker is polling for Workflow Tasks');
+    expect(label('standalone-activity')).toBe(
+      'A Worker is polling for Activity Tasks',
+    );
+    expect(label('standalone-nexus-operation')).toBe(
+      'A handler Worker is polling for Nexus Tasks',
+    );
   });
 
   it('uses the same static-label presentation for Nexus readiness rows', () => {
@@ -369,27 +392,28 @@ describe('CatalogDetail', () => {
         'ready',
         {
           Icon: iconNamed(IconCheckCircle),
-          iconLabel: 'Nexus endpoint readiness is ready',
-          tooltip: 'Nexus endpoint is ready.',
+          iconLabel: 'Nexus Endpoint readiness is ready',
+          tooltip: 'Nexus Endpoint is ready.',
         },
       ],
       [
         'unavailable',
         {
           Icon: iconNamed(IconWarning),
-          iconLabel: 'Nexus endpoint readiness is unavailable',
-          tooltip: 'Nexus endpoint is unavailable.',
+          iconLabel: 'Nexus Endpoint readiness is unavailable',
+          tooltip: 'Nexus Endpoint is unavailable.',
         },
       ],
     ] as const) {
       expect(
         readinessPresentation({
           kind: 'nexus-endpoint',
+          executionKind: 'standalone-nexus-operation',
           state,
           taskQueue: 'catalog-tasks',
         }),
       ).toMatchObject({
-        label: 'Endpoint matches the declared target and policy',
+        label: 'Nexus Endpoint matches the declared target and policy',
         ...expected,
       });
     }
@@ -493,7 +517,7 @@ describe('CatalogDetail', () => {
     });
 
     expect(body).toMatch(
-      /aria-label="Execution details"[\s\S]*aria-label="Readiness"[\s\S]*Checking for workers…[\s\S]*aria-label="What to verify"/,
+      /aria-label="Execution details"[\s\S]*aria-label="Readiness"[\s\S]*Checking for Workers…[\s\S]*aria-label="What to verify"/,
     );
     expect(body).toContain('role="tooltip"');
     expect(body).toContain('aria-label="Worker readiness is checking"');
@@ -537,7 +561,9 @@ describe('CatalogDetail', () => {
       },
     });
 
-    expect(body).toMatch(/<dt[^>]*>Type<\/dt>[\s\S]*<dd[^>]*>Workflow<\/dd>/);
+    expect(body).toMatch(
+      /<dt[^>]*>Execution<\/dt>[\s\S]*<dd[^>]*>Workflow<\/dd>/,
+    );
     expect(body.match(/>Workflow(?:<!---->)?<\//g)).toHaveLength(1);
     expect(body).toContain('Links');
   });

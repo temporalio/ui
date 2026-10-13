@@ -4,37 +4,30 @@ import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
 import type { CatalogSession, CatalogSessionState } from './session-store';
 import type { ExecutionTerminalStatus } from './workbench-host';
 
-type TerminalStatusPresentation = {
-  label: string;
+const terminalBadgeStatuses: Record<ExecutionTerminalStatus, BadgeStatusValue> =
+  {
+    canceled: 'Canceled',
+    completed: 'Completed',
+    'continued-as-new': 'ContinuedAsNew',
+    failed: 'Failed',
+    terminated: 'Terminated',
+    'timed-out': 'TimedOut',
+  };
+
+export interface TerminalSessionStatus {
   status: BadgeStatusValue;
-};
-
-const terminalStatusPresentations: Record<
-  ExecutionTerminalStatus,
-  TerminalStatusPresentation
-> = {
-  canceled: { label: 'Canceled', status: 'Canceled' },
-  completed: { label: 'Completed', status: 'Completed' },
-  'continued-as-new': {
-    label: 'Continued as new',
-    status: 'ContinuedAsNew',
-  },
-  failed: { label: 'Failed', status: 'Failed' },
-  terminated: { label: 'Terminated', status: 'Terminated' },
-  'timed-out': { label: 'Timed out', status: 'TimedOut' },
-};
-
-export const terminalStatusPresentation = (
-  status: ExecutionTerminalStatus,
-): TerminalStatusPresentation => terminalStatusPresentations[status];
-
-export interface SessionStatusPresentation {
-  label: string;
-  status?: BadgeStatusValue;
 }
 
+export interface ActiveSessionStatus {
+  label: string;
+}
+
+export type SessionStatusPresentation =
+  | TerminalSessionStatus
+  | ActiveSessionStatus;
+
 const sessionStateLabels: Record<CatalogSessionState, string> = {
-  'execution-terminal': 'Finished',
+  'execution-terminal': 'Closed',
   'launch-rejected': 'Start failed',
   'launch-uncertain': 'Start not confirmed',
   'observation-paused': 'Status checks paused',
@@ -51,7 +44,7 @@ export const sessionStatusPresentation = ({
   'state' | 'terminalStatus'
 >): SessionStatusPresentation => {
   if (state === 'execution-terminal' && terminalStatus) {
-    return terminalStatusPresentation(terminalStatus);
+    return { status: terminalBadgeStatuses[terminalStatus] };
   }
 
   return { label: sessionStateLabels[state] };

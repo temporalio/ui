@@ -28,8 +28,8 @@
 
 {#if latest && run}
   <span class="inline-flex items-center gap-1">
-    {#if run.status}
-      <BadgeStatus status={run.status} text={run.label} />
+    {#if 'status' in run}
+      <BadgeStatus status={run.status} />
     {:else}
       <Badge text={run.label} />
     {/if}

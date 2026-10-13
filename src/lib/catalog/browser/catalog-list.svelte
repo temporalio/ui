@@ -181,7 +181,7 @@
       <div
         class="-mx-4 flex gap-1.5 overflow-x-auto px-4 py-0.5"
         role="group"
-        aria-label="Execution kind"
+        aria-label="Execution"
       >
         {#each facets.options.kind as option (option.id)}
           <CatalogFacetOption

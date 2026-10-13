@@ -114,7 +114,7 @@ describe('CatalogList', () => {
     expect(body).toContain('Task Queue');
     expect(body).toContain('catalog-tasks');
     expect(body).toContain('OSS');
-    expect(body).toContain('Child workflows');
+    expect(body).toContain('Child Workflows');
     expect(body.match(/Not run/g)).toHaveLength(1);
     expect(body).toContain('>Start<');
     expect(body).toContain('Configure');

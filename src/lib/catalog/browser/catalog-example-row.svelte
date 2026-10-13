@@ -4,8 +4,8 @@
   import IconPlaySolid from '$lib/io/icon/icons/play-solid.svelte';
   import IconTemporalSettings from '$lib/io/icon/icons/temporal-settings.svelte';
 
+  import { featureLabel } from './catalog-features';
   import { catalogKinds } from './catalog-kinds';
-  import { featureLabel } from './catalog-list-state';
   import type { CatalogSession } from './session-store';
   import type { BrowserCatalogDescriptor } from './types';
   import type { WorkbenchHost } from './workbench-host';
