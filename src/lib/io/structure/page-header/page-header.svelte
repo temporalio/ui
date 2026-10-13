@@ -4,7 +4,7 @@
   import type { Snippet } from 'svelte';
   import { twMerge } from 'tailwind-merge';
 
-  interface PageHeaderLayoutProps extends Omit<
+  export interface PageHeaderProps extends Omit<
     HTMLAttributes<HTMLElement>,
     'children' | 'class'
   > {
@@ -30,7 +30,7 @@
     filters,
     metadata,
     ...rest
-  }: PageHeaderLayoutProps = $props();
+  }: PageHeaderProps = $props();
 </script>
 
 <header
