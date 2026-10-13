@@ -201,14 +201,27 @@ export const REGIONAL_FIELDS: readonly GroupField[] = [
   'gcpRegion',
 ];
 
-/** Fields shown as long, copyable values on a line of their own. */
+/** Identifiers shown in monospace with a copy button. */
 export const LONG_FIELDS: readonly GroupField[] = [
   'lambdaArn',
   'agentCoreEndpointArn',
   'gcpWorkerPool',
   'iamRoleArn',
   'gcpServiceAccount',
+  'roleExternalId',
 ];
+
+/**
+ * Split an identifier before its last segment, so a narrow column can cut
+ * the middle and keep the resource name: "arn:aws:iam::1:role/" + "Worker".
+ */
+export const splitIdentifier = (
+  value: string,
+): { head: string; tail: string } => {
+  const cut = Math.max(value.lastIndexOf(':'), value.lastIndexOf('/')) + 1;
+  if (cut <= 0 || cut >= value.length) return { head: '', tail: value };
+  return { head: value.slice(0, cut), tail: value.slice(cut) };
+};
 
 const FIELD_LABELS: Record<GroupField, Parameters<typeof translate>[0]> = {
   lambdaArn: 'workers.preview-resource-lambda',

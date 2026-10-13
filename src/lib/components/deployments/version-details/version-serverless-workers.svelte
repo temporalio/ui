@@ -22,6 +22,7 @@
     type RegionBlock,
     regionBlocks,
     type RegionHeading,
+    splitIdentifier,
   } from '$lib/utilities/version-details';
 
   interface Props {
@@ -113,26 +114,27 @@
       {translate('deployments.details-same-as-primary')}
     </dd>
   {:else if LONG_FIELDS.includes(key)}
-    <div class="col-span-2 flex flex-col gap-0.5">
-      <dt class="text-secondary">{groupFieldLabel(key)}</dt>
-      <dd class="flex flex-col gap-1">
-        <Copyable
-          visible
-          content={value}
-          copyIconTitle={`${translate('common.copy-icon-title')}: ${groupFieldLabel(key)}, ${regionLabel}`}
-          copySuccessIconTitle={translate('common.copy-success-icon-title')}
-          container-class="min-w-0"
+    {@const { head, tail } = splitIdentifier(value)}
+    <dt class="text-secondary">{groupFieldLabel(key)}</dt>
+    <dd class="flex min-w-0 flex-col gap-1">
+      <Copyable
+        visible
+        content={value}
+        copyIconTitle={`${translate('common.copy-icon-title')}: ${groupFieldLabel(key)}, ${regionLabel}`}
+        copySuccessIconTitle={translate('common.copy-success-icon-title')}
+        container-class="min-w-0"
+      >
+        <!-- A narrow column cuts the middle, so the resource name stays. -->
+        <span
+          class="flex min-w-0 whitespace-nowrap font-mono text-xs leading-5"
+          title={value}
         >
-          <span
-            class="min-w-0 truncate font-mono text-xs leading-5"
-            title={value}
-          >
-            {value}
-          </span>
-        </Copyable>
-        {#if tagged}{@render differs()}{/if}
-      </dd>
-    </div>
+          {#if head}<span class="min-w-[4ch] truncate">{head}</span>{/if}
+          <span class="max-w-full shrink-0 truncate">{tail}</span>
+        </span>
+      </Copyable>
+      {#if tagged}{@render differs()}{/if}
+    </dd>
   {:else}
     <dt class="text-secondary">{groupFieldLabel(key)}</dt>
     <dd class="flex flex-wrap items-center gap-2 tabular-nums">
