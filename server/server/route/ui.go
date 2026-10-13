@@ -158,6 +158,20 @@ func (w *immutableAssetResponseWriter) WriteHeader(status int) {
 	if !w.wroteHeader {
 		if status >= http.StatusOK && status < http.StatusMultipleChoices {
 			w.Header().Del("Set-Cookie")
+			vary := w.Header().Values("Vary")
+			w.Header().Del("Vary")
+			for _, value := range vary {
+				var tokens []string
+				for _, token := range strings.Split(value, ",") {
+					token = strings.TrimSpace(token)
+					if !strings.EqualFold(token, "Cookie") {
+						tokens = append(tokens, token)
+					}
+				}
+				if len(tokens) > 0 {
+					w.Header().Add("Vary", strings.Join(tokens, ", "))
+				}
+			}
 			w.Header().Set("Cache-Control", "public, max-age=31536000, immutable")
 		}
 		w.wroteHeader = true

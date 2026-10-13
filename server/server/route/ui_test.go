@@ -412,6 +412,7 @@ func TestBuildUIAssetsHandler_CacheControlWithCSRFMiddleware(t *testing.T) {
 	}
 	provider := &routeTestConfigProvider{cfg: &config.Config{}}
 	e := echo.New()
+	e.Use(middleware.Gzip())
 	e.Use(csrf.EnsureTokenCookie(false))
 	e.Use(middleware.CSRFWithConfig(csrf.MiddlewareConfig(provider, false)))
 	e.GET("/_app/*", buildUIAssetsHandler(assets))
@@ -437,12 +438,17 @@ func TestBuildUIAssetsHandler_CacheControlWithCSRFMiddleware(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			req := httptest.NewRequest(http.MethodGet, tt.path, nil)
+			req.Header.Set("Accept-Encoding", "gzip")
 			rec := httptest.NewRecorder()
 			e.ServeHTTP(rec, req)
 
 			assert.Equal(t, http.StatusOK, rec.Code)
 			assert.Equal(t, tt.cacheControl, rec.Header().Get("Cache-Control"))
 			assert.Equal(t, tt.setCookie, len(rec.Result().Cookies()) > 0)
+			if tt.cacheControl != "" {
+				assert.Contains(t, rec.Header().Values("Vary"), "Accept-Encoding")
+				assert.NotContains(t, strings.Join(rec.Header().Values("Vary"), ","), "Cookie")
+			}
 		})
 	}
 }
