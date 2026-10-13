@@ -6,6 +6,8 @@
   import { type IconComponent, IconSpinner } from '$lib/io/icon';
   import type { ConditionalValue } from '$lib/io/types';
 
+  import type { TrackingOptions } from './tracking';
+
   export type ButtonColorScheme =
     | 'primary'
     | 'secondary'
@@ -107,11 +109,14 @@
     LeadingIcon?: ConditionalValue<IconComponent>;
     TrailingIcon?: ConditionalValue<IconComponent>;
     isLoading?: boolean;
+    tracking?: TrackingOptions;
     class?: string;
   }
 </script>
 
 <script lang="ts">
+  import { getTrackingAttributes } from './tracking';
+
   let {
     class: className,
     colorScheme = 'primary',
@@ -119,6 +124,7 @@
     type = 'button',
     children,
     isLoading,
+    tracking,
     LeadingIcon,
     TrailingIcon,
     ...rest
@@ -151,6 +157,7 @@
 
 <button
   aria-busy={isLoading}
+  {...getTrackingAttributes(tracking, colorScheme)}
   {...rest}
   {type}
   class={buttonRecipe({ colorScheme, size, className })}

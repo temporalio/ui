@@ -34,6 +34,11 @@
       size: { control: 'select', options: sizes },
       disabled: { control: 'boolean' },
       isLoading: { control: 'boolean' },
+      tracking: {
+        control: 'object',
+        description:
+          'Omit for defaults, use false to opt out, or override name, intent, and text.',
+      },
       LeadingIcon: {
         control: 'select',
         options: ['None', 'Add'],
@@ -83,7 +88,13 @@
   name="Link"
   parameters={{
     controls: {
-      include: ['colorScheme', 'size', 'LeadingIcon', 'TrailingIcon'],
+      include: [
+        'colorScheme',
+        'size',
+        'LeadingIcon',
+        'TrailingIcon',
+        'tracking',
+      ],
     },
   }}
 >
@@ -96,7 +107,8 @@
         colorScheme={args.colorScheme}
         size={args.size}
         LeadingIcon={args.LeadingIcon}
-        TrailingIcon={args.TrailingIcon}>Documentation</ButtonLink
+        TrailingIcon={args.TrailingIcon}
+        tracking={args.tracking}>Documentation</ButtonLink
       >
       <ButtonLink
         href="https://docs.temporal.io"
@@ -105,7 +117,8 @@
         colorScheme={args.colorScheme}
         size={args.size}
         LeadingIcon={args.LeadingIcon}
-        TrailingIcon={args.TrailingIcon}>Documentation (new tab)</ButtonLink
+        TrailingIcon={args.TrailingIcon}
+        tracking={args.tracking}>Documentation (new tab)</ButtonLink
       >
     </div>
   {/snippet}
