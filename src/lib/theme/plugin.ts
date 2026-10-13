@@ -54,10 +54,8 @@ const textStyles = plugin(({ addBase, theme }) => {
 });
 
 const temporal = plugin(
-  ({ addBase, addVariant }) => {
+  ({ addBase }) => {
     addBase(themesBaseStyles);
-    addVariant('hover', ['&:hover', '&[data-state="hover"]']);
-    addVariant('active', ['&:active', '&[data-state="active"]']);
   },
   {
     future: {
