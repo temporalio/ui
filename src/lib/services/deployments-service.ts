@@ -118,10 +118,15 @@ export const fetchDeployment = async (
 export const fetchDeploymentVersion = async (
   parameters: DeploymentVersionParameters,
   request = fetch,
+  { reportTaskQueueStats = false }: { reportTaskQueueStats?: boolean } = {},
 ): Promise<WorkerDeploymentVersionResponse> => {
   const route = routeForApi('worker-deployment-version', parameters);
   return requestFromAPI<WorkerDeploymentVersionResponse>(route, {
     request,
+    // Stats make the server read every task queue, so only ask when shown.
+    ...(reportTaskQueueStats
+      ? { params: { reportTaskQueueStats: 'true' } }
+      : {}),
   }).then((response) => response ?? emptyWorkerDeploymentVersionResponse);
 };
 

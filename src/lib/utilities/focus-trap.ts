@@ -62,8 +62,14 @@ export const focusTrap = (node: HTMLElement, enabled: boolean) => {
 
     releaseBackground = inertBackground(node);
 
+    // A trap can name where focus starts, such as its heading, so a screen
+    // reader announces what opened before the first control.
     const [firstFocusable] = getFocusableElements(node);
-    (firstFocusable ?? node).focus();
+    (
+      node.querySelector<HTMLElement>('[data-autofocus]') ??
+      firstFocusable ??
+      node
+    ).focus();
   };
 
   const deactivate = () => {

@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { fly } from 'svelte/transition';
+  import { prefersReducedMotion } from 'svelte/motion';
+  import { fade, fly } from 'svelte/transition';
 
   import type { Snippet } from 'svelte';
   import { setContext } from 'svelte';
@@ -16,8 +17,13 @@
     open?: boolean;
     position?: 'bottom' | 'right';
     dark?: boolean;
-    onClick: (e: MouseEvent) => void;
+    /** Closes the drawer: the close button, a click outside, or Escape. */
+    onClick: (e: MouseEvent | KeyboardEvent) => void;
     id?: string;
+    /** Id of the element that names the drawer, usually its heading. */
+    labelledby?: string;
+    /** Dim the page behind the drawer. */
+    backdrop?: boolean;
     closeButtonLabel: string;
     closePadding?: boolean;
     class?: string;
@@ -30,6 +36,8 @@
     dark = true,
     onClick,
     id = 'navigation-drawer',
+    labelledby,
+    backdrop = false,
     closeButtonLabel,
     closePadding = true,
     class: className = '',
@@ -37,18 +45,45 @@
   }: Props = $props();
 
   const flyParamsIn = $derived({
-    duration: 250,
+    duration: prefersReducedMotion.current ? 0 : 250,
     ...(position === 'bottom' ? { y: 200 } : { x: 100 }),
   });
 
   const flyParamsOut = $derived({
-    duration: 150,
+    duration: prefersReducedMotion.current ? 0 : 150,
     ...(position === 'bottom' ? { y: 200 } : { x: 100 }),
   });
 
   // svelte-ignore state_referenced_locally
   setContext('drawer-pos', position);
+
+  // Escape belongs to whatever inside the drawer is open first: a modal
+  // dialog, or a menu whose trigger reports itself expanded.
+  const closeOnEscape = (event: KeyboardEvent) => {
+    if (event.key !== 'Escape' || event.defaultPrevented) return;
+    const target = event.target;
+    if (
+      target instanceof Element &&
+      (target.closest('dialog[open]') ||
+        target.closest('[aria-expanded="true"]'))
+    ) {
+      return;
+    }
+    onClick(event);
+  };
 </script>
+
+{#if open && backdrop}
+  <!-- Skipped by the focus trap's inert pass, so a click on it reaches the
+  drawer's outside-click handler and closes the drawer. -->
+  <div
+    class="fixed inset-0 z-[54] bg-surface-overlay-neutral"
+    aria-hidden="true"
+    data-inert-skip
+    transition:fade={{ duration: prefersReducedMotion.current ? 0 : 200 }}
+    use:portal
+  ></div>
+{/if}
 
 {#if open}
   <!-- Order matters: use:portal must run before use:focusTrap. Actions set up
@@ -67,8 +102,11 @@
     )}
     in:fly={flyParamsIn}
     out:fly={flyParamsOut}
-    role="region"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby={labelledby}
     tabindex="-1"
+    onkeydown={closeOnEscape}
     use:portal
     use:focusTrap={true}
     use:clickoutside={onClick}
@@ -80,8 +118,6 @@
           label={closeButtonLabel}
           class="text-primary"
           Icon={IconClose}
-          aria-expanded={open}
-          aria-controls="navigation-drawer"
           onclick={onClick}
         />
       </div>

@@ -12,7 +12,7 @@
   import type { NamespaceRegion } from '$lib/utilities/compute-regions';
 
   import DeploymentStatus from './deployment-status.svelte';
-  import VersionComputeDetails from './version-compute-details.svelte';
+  import VersionServerlessWorkers from './version-details/version-serverless-workers.svelte';
   import VersionRegions from './version-regions.svelte';
 
   type Topology = 'single' | 'multi';
@@ -288,7 +288,13 @@
               {#if v.expanded}
                 <tr class="border-b border-primary">
                   <td colspan="4" class="p-0">
-                    <VersionComputeDetails computeConfig={v.config} />
+                    <div class="p-6">
+                      <VersionServerlessWorkers
+                        computeConfig={v.config}
+                        namespaceRegions={namespaceRegionsFor(args.namespace)}
+                        editHref="#"
+                      />
+                    </div>
                   </td>
                 </tr>
               {/if}
