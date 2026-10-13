@@ -3,19 +3,17 @@
   import { action } from 'storybook/actions';
   import type { ComponentProps } from 'svelte';
 
-  import Button from '$lib/holocene/button.svelte';
-  import BadgeStatus from '$lib/io/badge-status/badge-status.svelte';
-  import Chip from '$lib/io/chip/chip.svelte';
-  import ChipStatus, {
-    type ChipStatusValue,
-  } from '$lib/io/chip-status/chip-status.svelte';
+  import { BadgeStatus } from '$lib/io/badge-status';
+  import { Button } from '$lib/io/button';
+  import { Chip } from '$lib/io/chip';
+  import { ChipStatus, type ChipStatusValue } from '$lib/io/chip-status';
   import {
     IconAdd,
     IconAwsColor,
     IconHeartbeat,
     IconRetry,
   } from '$lib/io/icon';
-  import Tag from '$lib/io/tag/tag.svelte';
+  import { Tag } from '$lib/io/tag';
 
   import PageHeaderLayout from './page-header-layout.svelte';
 
@@ -31,7 +29,7 @@
   ];
 
   const { Story } = defineMeta({
-    title: 'IO/Design System/Structure/Page Header Layout',
+    title: 'IO/Structure/Page Header Layout',
     component: PageHeaderLayout,
     args: {
       heading,
@@ -81,9 +79,8 @@
 
 {#snippet headingActions()}
   <Button
-    variant="ghost"
-    size="xs"
-    class="h-6"
+    colorScheme="ghost"
+    size="sm"
     LeadingIcon={IconRetry}
     aria-label="Refresh"
     onclick={action('Refresh')}
@@ -92,10 +89,10 @@
 
 {#snippet addTags()}
   <Button
-    variant="ghost"
-    size="xs"
+    colorScheme="ghost"
+    size="sm"
     LeadingIcon={IconAdd}
-    class="h-6 text-primary underline underline-offset-2"
+    class="underline underline-offset-2"
     onclick={action('Add tags')}
   >
     Add Tags
@@ -110,10 +107,10 @@
 
 {#snippet addDescription()}
   <Button
-    variant="ghost"
-    size="xs"
+    colorScheme="ghost"
+    size="sm"
     LeadingIcon={IconAdd}
-    class="h-6 text-primary underline underline-offset-2"
+    class="underline underline-offset-2"
     onclick={action('Add description')}
   >
     Add Description
@@ -126,39 +123,27 @@
 
 {#snippet actions()}
   <Button
-    variant="secondary"
-    size="xs"
-    class="h-6"
+    colorScheme="secondary"
+    size="sm"
     onclick={action('Secondary action')}
   >
     Secondary
   </Button>
-  <Button
-    variant="primary"
-    size="xs"
-    class="h-6"
-    onclick={action('Primary action')}
-  >
+  <Button colorScheme="primary" size="sm" onclick={action('Primary action')}>
     Primary
   </Button>
 {/snippet}
 
 {#snippet manyActions()}
-  <Button
-    variant="tertiary"
-    size="sm"
-    class="h-6"
-    onclick={action('View history')}
-  >
+  <Button colorScheme="tertiary" size="sm" onclick={action('View history')}>
     View history
   </Button>
-  <Button variant="tertiary" size="sm" class="h-6" onclick={action('Export')}>
+  <Button colorScheme="tertiary" size="sm" onclick={action('Export')}>
     Export
   </Button>
   <Button
-    variant="secondary"
+    colorScheme="secondary"
     size="sm"
-    class="h-6"
     onclick={action('Edit configuration')}
   >
     Edit configuration

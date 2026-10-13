@@ -49,7 +49,7 @@
         )}
       >
         {#if leading}
-          <div class="flex shrink-0 gap-lg">
+          <div class="flex min-h-6 shrink-0 items-center gap-lg">
             {@render leading()}
           </div>
         {/if}
@@ -119,7 +119,7 @@
     grid-row: 1;
   }
 
-  @container page-header (min-width: 580px) {
+  @container page-header (min-width: 518px) {
     .layout-grid:has(> .actions) {
       grid-template-columns: minmax(0, 1fr) fit-content(35%);
     }
