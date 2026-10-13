@@ -146,6 +146,19 @@
     },
   ];
 
+  /** A drained Version: its queues are empty and nothing new arrives. */
+  const drainedTaskQueues: VersionTaskQueue[] = taskQueuesWithStats.map(
+    (queue) => ({
+      ...queue,
+      stats: {
+        approximateBacklogCount: '0',
+        approximateBacklogAge: '0s',
+        tasksAddRate: 0,
+        tasksDispatchRate: 0,
+      },
+    }),
+  );
+
   /** The Deployment the page already loaded. The drawer finds its Version here. */
   const deploymentFor = (
     info: WorkerDeploymentVersionInfo | undefined,
@@ -366,7 +379,7 @@
         metadata: undefined,
         lastModifierIdentity: undefined,
       }),
-      taskQueues: [],
+      taskQueues: drainedTaskQueues,
     },
   }}
   {template}
