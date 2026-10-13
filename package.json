@@ -319,6 +319,10 @@
       "types": "./dist/io/badge-status/index.d.ts",
       "import": "./dist/io/badge-status/index.js"
     },
+    "./io/button": {
+      "types": "./dist/io/button/index.d.ts",
+      "import": "./dist/io/button/index.js"
+    },
     "./io/chip": {
       "types": "./dist/io/chip/index.d.ts",
       "import": "./dist/io/chip/index.js"
