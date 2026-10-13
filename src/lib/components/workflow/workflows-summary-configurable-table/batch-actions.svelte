@@ -45,9 +45,13 @@
     workflowCancelEnabled(page.params.namespace, page.data.settings),
   );
 
+  const resetSupported = $derived(
+    $isCloud || minimumVersionRequired('1.23.0', $temporalVersion),
+  );
+
   const resetEnabled = $derived(
     workflowResetEnabled(page.params.namespace, page.data.settings) &&
-      ($isCloud || minimumVersionRequired('1.23.0', $temporalVersion)),
+      resetSupported,
   );
 </script>
 
