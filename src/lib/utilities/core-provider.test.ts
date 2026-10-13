@@ -183,27 +183,15 @@ describe('core-provider', () => {
         getAccessToken: async () => '',
       });
 
+      expect(corePermissions.namespaces.canTerminateWorkflow('namespace')).toBe(
+        true,
+      );
+      expect(corePermissions.namespaces.canStartWorkflow('namespace')).toBe(
+        true,
+      );
       expect(
-        corePermissions.namespaces.canTerminateWorkflow('namespace', {
-          disableWriteActions: false,
-          workflowTerminateDisabled: false,
-        }),
+        corePermissions.namespaces.canChangeWorkflowPauseState('namespace'),
       ).toBe(true);
-      expect(
-        corePermissions.namespaces.canTerminateWorkflow('namespace', {
-          workflowTerminateDisabled: true,
-        }),
-      ).toBe(false);
-      expect(
-        corePermissions.namespaces.canStartWorkflow('namespace', {
-          startWorkflowDisabled: true,
-        }),
-      ).toBe(false);
-      expect(
-        corePermissions.namespaces.canChangeWorkflowPauseState('namespace', {
-          workflowPauseDisabled: true,
-        }),
-      ).toBe(false);
     });
 
     it('should delegate every workflow permission to the injected provider', () => {
@@ -224,9 +212,6 @@ describe('core-provider', () => {
         },
       });
 
-      const settings = {
-        disableWriteActions: false,
-      };
       const checks = [
         [
           corePermissions.namespaces.canStartWorkflow,
@@ -259,11 +244,8 @@ describe('core-provider', () => {
       ];
 
       for (const [check, injectedCheck] of checks) {
-        expect(check('restricted-namespace', settings)).toBe(false);
-        expect(injectedCheck).toHaveBeenCalledWith(
-          'restricted-namespace',
-          settings,
-        );
+        expect(check('restricted-namespace')).toBe(false);
+        expect(injectedCheck).toHaveBeenCalledWith('restricted-namespace');
       }
     });
   });

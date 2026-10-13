@@ -1,13 +1,10 @@
-import {
-  corePermissions,
-  type WorkflowPermissionSettings,
-} from '$lib/utilities/core-provider';
+import type { Settings } from '$lib/types/global';
+import { corePermissions } from '$lib/utilities/core-provider';
 
 export const workflowCancelEnabled = (
   namespace: string,
-  settings?: WorkflowPermissionSettings,
+  settings: Partial<Settings> = {},
 ): boolean =>
-  corePermissions.namespaces.canRequestWorkflowCancellation(
-    namespace,
-    settings,
-  );
+  !settings.disableWriteActions &&
+  !settings.workflowCancelDisabled &&
+  corePermissions.namespaces.canRequestWorkflowCancellation(namespace);

@@ -1,7 +1,5 @@
 import { BROWSER } from 'esm-env';
 
-import type { Settings } from '$lib/types/global';
-
 export type RequestContext = {
   url: string;
   options: RequestInit;
@@ -16,24 +14,7 @@ export type PostResponseHook = (
   context: RequestContext & { retry: () => Promise<Response> },
 ) => Promise<Response>;
 
-export type WorkflowPermissionSettings = Partial<
-  Pick<
-    Settings,
-    | 'disableWriteActions'
-    | 'startWorkflowDisabled'
-    | 'workflowCancelDisabled'
-    | 'workflowSignalDisabled'
-    | 'workflowUpdateDisabled'
-    | 'workflowTerminateDisabled'
-    | 'workflowResetDisabled'
-    | 'workflowPauseDisabled'
-  >
->;
-
-export type NamespacePermissionCheck = (
-  namespace: string,
-  settings?: WorkflowPermissionSettings,
-) => boolean;
+export type NamespacePermissionCheck = (namespace: string) => boolean;
 
 export type CorePermissions = {
   namespaces: {
@@ -80,20 +61,13 @@ const passthroughResponse: PostResponseHook = async (res) => res;
 
 const defaultPermissions: CorePermissions = {
   namespaces: {
-    canStartWorkflow: (_namespace, settings) =>
-      !settings?.disableWriteActions && !settings?.startWorkflowDisabled,
-    canRequestWorkflowCancellation: (_namespace, settings) =>
-      !settings?.disableWriteActions && !settings?.workflowCancelDisabled,
-    canSignalWorkflow: (_namespace, settings) =>
-      !settings?.disableWriteActions && !settings?.workflowSignalDisabled,
-    canUpdateWorkflow: (_namespace, settings) =>
-      !settings?.disableWriteActions && !settings?.workflowUpdateDisabled,
-    canTerminateWorkflow: (_namespace, settings) =>
-      !settings?.disableWriteActions && !settings?.workflowTerminateDisabled,
-    canResetWorkflow: (_namespace, settings) =>
-      !settings?.disableWriteActions && !settings?.workflowResetDisabled,
-    canChangeWorkflowPauseState: (_namespace, settings) =>
-      !settings?.disableWriteActions && !settings?.workflowPauseDisabled,
+    canStartWorkflow: () => true,
+    canRequestWorkflowCancellation: () => true,
+    canSignalWorkflow: () => true,
+    canUpdateWorkflow: () => true,
+    canTerminateWorkflow: () => true,
+    canResetWorkflow: () => true,
+    canChangeWorkflowPauseState: () => true,
   },
 };
 
@@ -121,40 +95,23 @@ function getCoreProvider(): CoreProvider {
 
 export const corePermissions: CorePermissions = {
   namespaces: {
-    canStartWorkflow: (namespace, settings) =>
-      getCoreProvider().permissions.namespaces.canStartWorkflow(
-        namespace,
-        settings,
-      ),
-    canRequestWorkflowCancellation: (namespace, settings) =>
+    canStartWorkflow: (namespace) =>
+      getCoreProvider().permissions.namespaces.canStartWorkflow(namespace),
+    canRequestWorkflowCancellation: (namespace) =>
       getCoreProvider().permissions.namespaces.canRequestWorkflowCancellation(
         namespace,
-        settings,
       ),
-    canSignalWorkflow: (namespace, settings) =>
-      getCoreProvider().permissions.namespaces.canSignalWorkflow(
-        namespace,
-        settings,
-      ),
-    canUpdateWorkflow: (namespace, settings) =>
-      getCoreProvider().permissions.namespaces.canUpdateWorkflow(
-        namespace,
-        settings,
-      ),
-    canTerminateWorkflow: (namespace, settings) =>
-      getCoreProvider().permissions.namespaces.canTerminateWorkflow(
-        namespace,
-        settings,
-      ),
-    canResetWorkflow: (namespace, settings) =>
-      getCoreProvider().permissions.namespaces.canResetWorkflow(
-        namespace,
-        settings,
-      ),
-    canChangeWorkflowPauseState: (namespace, settings) =>
+    canSignalWorkflow: (namespace) =>
+      getCoreProvider().permissions.namespaces.canSignalWorkflow(namespace),
+    canUpdateWorkflow: (namespace) =>
+      getCoreProvider().permissions.namespaces.canUpdateWorkflow(namespace),
+    canTerminateWorkflow: (namespace) =>
+      getCoreProvider().permissions.namespaces.canTerminateWorkflow(namespace),
+    canResetWorkflow: (namespace) =>
+      getCoreProvider().permissions.namespaces.canResetWorkflow(namespace),
+    canChangeWorkflowPauseState: (namespace) =>
       getCoreProvider().permissions.namespaces.canChangeWorkflowPauseState(
         namespace,
-        settings,
       ),
   },
 };
