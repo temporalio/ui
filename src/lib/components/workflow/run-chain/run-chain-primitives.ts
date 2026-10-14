@@ -1,5 +1,8 @@
 import type { HistoryEvent } from '$lib/types/events';
-import { findAttributesAndKey } from '$lib/utilities/is-event-type';
+import {
+  findAttributesAndKey,
+  localActivityMarkerNames,
+} from '$lib/utilities/is-event-type';
 
 import type { ChainStep } from './run-chain';
 
@@ -61,7 +64,9 @@ export function updateOtherChainStep(
   const marker = event.markerRecordedEventAttributes;
   if (marker)
     return create(
-      marker.markerName === 'LocalActivity' ? 'local-activity' : 'other',
+      localActivityMarkerNames.includes(marker.markerName ?? '')
+        ? 'local-activity'
+        : 'other',
       marker.markerName || 'Marker',
       marker.failure ? 'Failed' : 'Completed',
     );

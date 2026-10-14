@@ -468,7 +468,10 @@ export const isResetEvent = (event: WorkflowEvent): boolean => {
   return validResetEventTypes.includes(event.eventType);
 };
 
-const localActivityMarkerNames = ['LocalActivity', 'core_local_activity'];
+export const localActivityMarkerNames = [
+  'LocalActivity',
+  'core_local_activity',
+];
 
 export const isLocalActivityMarkerEvent = (
   event: IterableEvent | CommonHistoryEvent | HistoryEvent,

@@ -25,6 +25,25 @@ const event = (eventId: number, attributes: object) =>
   }) as unknown as HistoryEvent;
 
 describe('run comparison', () => {
+  it.each(['LocalActivity', 'core_local_activity'])(
+    'counts %s markers as local activities',
+    (markerName) => {
+      const scan = new RunSummaryAccumulator();
+      scan.append([
+        event(1, { markerRecordedEventAttributes: { markerName } }),
+        event(2, {
+          markerRecordedEventAttributes: { markerName: 'core_patch' },
+        }),
+      ]);
+      const result = summarizeRunWork(scan.snapshot(run(), true));
+      expect(
+        Object.fromEntries(
+          result.primitives.map((p) => [p.kind, p.counts.total]),
+        ),
+      ).toEqual({ 'local-activity': 1, other: 1 });
+    },
+  );
+
   it('counts logical primitives once across pages and preserves their outcomes', () => {
     const scan = new RunSummaryAccumulator();
     const events = [
