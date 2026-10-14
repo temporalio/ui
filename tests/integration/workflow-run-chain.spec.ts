@@ -171,7 +171,7 @@ test('chain shows ten runs, navigates to the first, and follows rollover without
       (element) => element.scrollHeight === element.clientHeight,
     ),
   ).toBe(true);
-  await expect(runRows.last().locator('.primitive')).toHaveCount(8);
+  await expect(runRows.last().locator('.flow-layer')).toHaveCount(8);
   expect(fullPageRequests[0]).toBe(25);
   expect(fullPageRequests.filter((index) => index < 25)).toEqual([
     24, 23, 22, 21, 20, 19, 18, 17, 16,

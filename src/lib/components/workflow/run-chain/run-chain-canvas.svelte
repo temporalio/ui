@@ -2,13 +2,11 @@
   import { tick, untrack } from 'svelte';
 
   import { getCategoryStrokeColor } from '$lib/components/lines-and-dots/colors';
-  import { CategoryIcon } from '$lib/components/lines-and-dots/constants';
   import { timestamp } from '$lib/components/timestamp.svelte';
   import WorkflowStatusBadge from '$lib/components/workflow/workflow-status-badge.svelte';
-  import { IconArrowRight, IconRetry, IconWarning } from '$lib/io/icon';
-  import { timeFormat } from '$lib/stores/time-format';
+  import { IconClock, IconRetry, IconWarning } from '$lib/io/icon';
+  import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import { routeForWorkflow } from '$lib/utilities/route-for';
-  import { getTimezone } from '$lib/utilities/timezone';
 
   import {
     type ChainRun,
@@ -20,7 +18,11 @@
   import { compareRuns, runAttention } from './run-chain-comparison';
   import type { RunHistory } from './run-chain-reader';
   import type { RunSummary } from './run-chain-summary';
-  import { summarySegments } from './run-chain-visual';
+  import {
+    flowConnectors,
+    flowLayers,
+    flowThickness,
+  } from './run-chain-visual';
 
   import RunChainTimeline from './run-chain-timeline.svelte';
 
@@ -159,29 +161,23 @@
   }
   const duration = (run: ChainRun) =>
     Math.max(1, (run.closeTime ?? now) - run.startTime);
-  const startDateFormatter = $derived(
-    new Intl.DateTimeFormat(undefined, {
-      month: 'short',
-      day: 'numeric',
-      timeZone: getTimezone($timeFormat),
-    }),
-  );
-  const startTimeFormatter = $derived(
-    new Intl.DateTimeFormat(undefined, {
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hourCycle: 'h23',
-      timeZone: getTimezone($timeFormat),
-    }),
-  );
+  const runDuration = (run: ChainRun) =>
+    formatDistanceAbbreviated({
+      start: run.startTime,
+      end: run.closeTime ?? now,
+      includeMilliseconds: true,
+    }) || formatChainDuration(duration(run));
   function runLabel(run: ChainRun) {
-    return `Started ${$timestamp(run.startTime, { relative: false })} · ${run.closeTime ? 'Duration' : 'Elapsed'} ${formatChainDuration(duration(run))} · ${run.status} · ${run.runId}`;
+    return `Started ${$timestamp(run.startTime, { relative: false })} · ${run.closeTime ? 'Duration' : 'Elapsed'} ${runDuration(run)} · ${run.status} · ${run.runId}`;
   }
-  const count = new Intl.NumberFormat(undefined, {
-    notation: 'compact',
-    maximumFractionDigits: 1,
-  });
+  const flows = $derived(
+    comparison.rows.map((row) =>
+      flowLayers(
+        row.primitives,
+        flowThickness(row.totals.total, comparison.maxWork),
+      ),
+    ),
+  );
   const time = (value: number) =>
     new Date(value).toLocaleTimeString([], {
       hour: '2-digit',
@@ -235,95 +231,70 @@
           {#each comparison.rows as row, index (row.run.runId)}
             {@const attention = runAttention(row, row.run.status)}
             {#if index > 0}<span class="run-connector" aria-hidden="true"
-                ><IconArrowRight class="h-4 w-4" /></span
+                ><svg
+                  class="flow-bridge"
+                  viewBox="0 0 1 1"
+                  preserveAspectRatio="none"
+                  ><line x1="0" y1="0.5" x2="1" y2="0.5"
+                  ></line>{#each flowConnectors(flows[index - 1], flows[index]) as connector (connector.kind)}<path
+                      d={connector.path}
+                      fill={getCategoryStrokeColor(connector.kind)}
+                    ></path>{/each}</svg
+                ></span
               >{/if}
             <button
               class="run-row"
               class:selected={row.run.runId === focused.runId}
-              class:troubled={attention.trouble}
               onclick={() => select(row.run)}
               aria-pressed={row.run.runId === focused.runId}
               aria-label={`${runLabel(row.run)}. ${row.summary ? workLabel(row) || 'No recorded work' : 'Loading summary'}. ${attention.title}. ${row.totals.retried ? `${row.totals.retried} activities retried.` : ''}${!row.summary?.complete ? ' Partial history.' : ''}`}
               data-run-id={row.run.runId}
               data-testid="chain-comparison-row"
             >
-              <span class="run-start" title={runLabel(row.run)}>
-                <span class="run-time"
-                  >{startTimeFormatter.format(row.run.startTime)}</span
+              <span class="run-heading">
+                <span class="run-start" title={runLabel(row.run)}
+                  >{$timestamp(row.run.startTime)}</span
                 >
-                <span class="run-date"
-                  >{startDateFormatter.format(
-                    row.run.startTime,
-                  )}{#if row.run.runId === latest?.runId}<span
-                      class="latest-label"
-                      >{hasLater ? 'Newest loaded' : 'Latest'}</span
-                    >{/if}</span
+                <span
+                  class="run-duration"
+                  title={`${row.run.closeTime === undefined ? 'Elapsed so far' : 'Duration'}: ${runDuration(row.run)}${comparison.durationMedian !== undefined ? ` · Median of displayed closed runs: ${formatChainDuration(comparison.durationMedian)}` : ''}${row.longer ? ' · At least 1.5× the median duration' : ''}`}
                 >
-              </span>
-              <span
-                class="duration-metric"
-                title={`${row.run.closeTime === undefined ? 'Elapsed so far' : 'Duration'}: ${formatChainDuration(row.duration)}${comparison.durationMedian !== undefined ? ` · Median of displayed closed runs: ${formatChainDuration(comparison.durationMedian)}` : ''}`}
-              >
-                <span class="metric-caption"
-                  >Duration{#if row.longer}<span
-                      class="outlier"
-                      title="At least 1.5× the median duration of the displayed closed runs"
-                      >Longer</span
-                    >{/if}</span
-                >
-                <span class="metric-value"
-                  ><span
-                    >{formatChainDuration(
-                      row.duration,
-                    )}{#if row.run.closeTime === undefined}<span
-                        class="live-label"
-                      >
-                        live</span
+                  <span class="duration-value" class:longer={row.longer}
+                    ><IconClock class="h-3 w-3 shrink-0" /><span
+                      >{runDuration(row.run)}</span
+                    >{#if row.run.closeTime === undefined}<span
+                        class="live-label">live</span
                       >{/if}</span
-                  ></span
-                >
-                <span class="metric-track"
-                  ><span
-                    class="duration-fill"
-                    style:width={`${(row.duration / comparison.maxDuration) * 100}%`}
-                  ></span></span
-                >
+                  >
+                  <span class="tags"
+                    >{#if row.run.runId === latest?.runId}<span
+                        class="latest-label"
+                        >{hasLater ? 'Newest loaded' : 'Latest'}</span
+                      >{/if}</span
+                  >
+                </span>
               </span>
               <span
-                class="work-metric"
-                title={`${workLabel(row)}${comparison.workMedian !== undefined ? ` · Median of displayed complete, closed runs: ${comparison.workMedian} operations` : ''}. Counts represent recorded operations, not CPU or cost.`}
+                class="flow"
+                class:partial={!row.summary?.complete}
+                class:open={row.run.closeTime === undefined}
+                class:origin={row.run.runId === runs[0]?.runId && !hasEarlier}
+                class:ended={index === comparison.rows.length - 1 &&
+                  row.run.closeTime !== undefined &&
+                  row.run.status !== 'Continued as new'}
+                title={`${row.summary ? `${!row.summary.complete ? 'At least ' : ''}${row.totals.total} recorded operations${workLabel(row) ? ` · ${workLabel(row)}` : ''}` : 'Loading summary'}${row.heavier ? ' · At least 1.5× the median recorded operations of the displayed complete, closed runs' : ''}. Band thickness is relative to the busiest displayed run.`}
+                aria-hidden="true"
+                ><span class="flow-spine"
+                ></span>{#each flows[index] as layer (layer.kind)}<span
+                    class="flow-layer"
+                    style:top={`${layer.top * 100}%`}
+                    style:height={`${layer.height * 100}%`}
+                    style:background={getCategoryStrokeColor(layer.kind)}
+                  ></span>{/each}</span
               >
-                <span class="metric-caption"
-                  >Work{#if row.heavier}<span
-                      class="outlier"
-                      title="At least 1.5× the median recorded operations of the displayed complete, closed runs"
-                      >Heavier</span
-                    >{/if}</span
-                >
-                <span class="metric-value"
-                  ><span
-                    >{row.summary
-                      ? `${!row.summary.complete ? '≥' : ''}${row.totals.total} ops`
-                      : '—'}</span
-                  ></span
-                >
-                <span class="metric-track"
-                  ><span
-                    class="work-fill"
-                    style:width={`${(row.totals.total / comparison.maxWork) * 100}%`}
-                    >{#each row.primitives as primitive (primitive.kind)}<span
-                        style:width={`${(primitive.counts.total / row.totals.total) * 100}%`}
-                        style:background={getCategoryStrokeColor(
-                          primitive.kind,
-                        )}
-                      ></span>{/each}</span
-                  ></span
-                >
-              </span>
               <span class="attention">
-                {#if attention.label}<span
-                    class:trouble={attention.trouble}
-                    class="attention-item"
+                {#if attention.trouble}<span
+                    class="attention-item trouble"
                     title={attention.title}
                     ><IconWarning class="h-3 w-3 shrink-0" /><span
                       >{attention.label}</span
@@ -333,54 +304,9 @@
                     class="attention-item"
                     style:color={getCategoryStrokeColor('retry')}
                     title={`${row.totals.retried} activities with observed retries · ${row.totals.recovered} completed after retrying. Counts activities, not retry attempts; history does not expose every internal retry.`}
-                    ><IconRetry class="h-3 w-3 shrink-0" />{row.totals.retried} retried</span
-                  >{/if}
-                {#if !attention.label && !row.totals.retried}<span class="quiet"
-                    >{row.run.status === 'Running'
-                      ? 'Running'
-                      : row.summary?.complete
-                        ? row.run.status
-                        : ''}</span
-                  >{/if}
-              </span>
-              <span class="primitives" title={workLabel(row)}>
-                {#each row.primitives as primitive (primitive.kind)}
-                  {@const Icon = CategoryIcon[primitive.kind].Icon}
-                  <span
-                    class="primitive"
-                    title={`${primitive.label}: ${primitive.counts.total} · ${summarySegments(
-                      primitive.kind,
-                      primitive.counts,
-                    )
-                      .map(
-                        (segment) =>
-                          `${segment.count} ${segment.label.toLowerCase()}`,
-                      )
-                      .join(', ')}`}
-                  >
-                    <span class="mark" aria-hidden="true"
-                      ><span class="segments"
-                        >{#each summarySegments(primitive.kind, primitive.counts) as segment (segment.label)}<span
-                            style:width={`${(segment.count / primitive.counts.total) * 100}%`}
-                            style:background={segment.color}
-                          ></span>{/each}</span
-                      ><Icon class="relative h-3 w-3 text-black" /></span
-                    >
-                    <span>{count.format(primitive.counts.total)}</span><span
-                      class="sr-only"
-                    >
-                      {primitive.label}</span
-                    >
-                  </span>
-                {/each}
-                {#if !row.summary}<span class="coverage-label"
-                    >Loading summary…</span
-                  >{:else if !row.summary.complete}<span
-                    class="coverage-label"
-                    title="History is still loading; operation counts are lower bounds."
-                    >Partial</span
-                  >{:else if !row.totals.total}<span class="coverage-label"
-                    >No recorded operations</span
+                    ><IconRetry class="h-3 w-3 shrink-0" /><span
+                      >{row.totals.retried} retried</span
+                    ></span
                   >{/if}
               </span>
             </button>
@@ -508,19 +434,47 @@
 
     overscroll-behavior-x: contain;
     scrollbar-width: thin;
+
+    --card-h: 130px;
+    --flow-top: 50px;
+    --flow-h: 40px;
   }
 
   .run-connector {
-    @apply flex w-7 shrink-0 items-center justify-center text-tertiary;
+    @apply relative w-7 shrink-0 text-tertiary;
+
+    height: var(--card-h);
+  }
+
+  .flow-bridge {
+    @apply absolute inset-x-0 w-full overflow-visible;
+
+    top: calc(var(--flow-top) + 1px);
+    height: var(--flow-h);
+  }
+
+  .flow-bridge line {
+    stroke: currentColor;
+    stroke-width: 1px;
+    opacity: 0.4;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .flow-bridge path {
+    opacity: 0.55;
   }
 
   .run-row {
-    @apply relative grid shrink-0 gap-x-3 gap-y-1 rounded border border-primary bg-surface-primary p-2 text-left text-xs;
+    @apply relative grid shrink-0 gap-y-1.5 rounded border border-transparent bg-transparent p-2 text-left text-xs;
 
-    width: 200px;
-    height: 176px;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-template-rows: 32px 40px 44px 30px;
+    width: 232px;
+    height: var(--card-h);
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: 36px var(--flow-h) 24px;
+  }
+
+  .run-row:hover {
+    @apply border-primary bg-transparent;
   }
 
   .run-row.selected,
@@ -529,131 +483,92 @@
   }
 
   .run-row.selected::after {
-    @apply pointer-events-none absolute inset-0 rounded border border-tertiary;
+    @apply pointer-events-none absolute inset-0 z-10 rounded border border-tertiary;
 
     content: '';
   }
 
-  .run-row.troubled {
-    @apply border-l-2 border-l-danger;
+  .run-heading {
+    @apply flex min-w-0 flex-col gap-0.5;
   }
 
   .run-start {
-    @apply flex min-w-0 flex-col gap-0.5;
-
-    grid-column: 1 / -1;
+    @apply self-center truncate font-medium tabular-nums;
   }
 
-  .run-time {
-    @apply truncate text-sm font-semibold tabular-nums;
-
-    line-height: 18px;
+  .run-duration {
+    @apply flex min-w-0 items-center justify-between gap-2 tabular-nums;
   }
 
-  .selected .run-time {
-    @apply font-semibold;
+  .duration-value {
+    @apply flex min-w-0 items-center gap-1;
   }
 
-  .run-date {
-    @apply flex items-center justify-between text-secondary;
+  .duration-value > span:first-of-type {
+    @apply truncate;
+  }
 
-    font-size: 10px;
-    line-height: 12px;
+  .duration-value.longer {
+    @apply text-danger;
+  }
+
+  .tags {
+    @apply flex shrink-0 items-center gap-1.5;
   }
 
   .latest-label {
     @apply font-semibold text-primary;
-  }
-
-  .duration-metric,
-  .work-metric {
-    @apply flex min-w-0 flex-col gap-0.5;
-  }
-
-  .metric-caption {
-    @apply flex items-center justify-between gap-1 text-secondary;
 
     font-size: 10px;
-    line-height: 12px;
-  }
-
-  .metric-value {
-    @apply flex min-w-0 items-baseline justify-between gap-0.5 tabular-nums;
-
-    font-size: 13px;
-    line-height: 18px;
-    font-weight: 500;
-  }
-
-  .metric-value > span {
-    @apply truncate;
-  }
-
-  .outlier {
-    @apply font-semibold text-primary;
-
-    font-size: 9px;
   }
 
   .live-label {
-    @apply ml-1 text-secondary;
+    @apply text-secondary;
 
     font-size: 9px;
   }
 
-  .metric-track {
-    @apply block w-full overflow-hidden rounded-sm bg-surface-secondary;
+  .flow {
+    @apply absolute text-tertiary;
 
-    height: 4px;
+    top: var(--flow-top);
+    left: -1px;
+    right: -1px;
+    height: var(--flow-h);
   }
 
-  .duration-fill {
-    @apply block h-full bg-content-secondary;
-
-    min-width: 2px;
+  .flow.origin {
+    @apply left-2 overflow-hidden rounded-l-sm;
   }
 
-  .work-fill {
-    @apply flex h-full;
+  .flow.ended {
+    @apply right-2 overflow-hidden rounded-r-sm;
   }
 
-  .work-fill > span {
-    @apply h-full;
+  .flow.open {
+    mask-image: linear-gradient(to right, black 65%, transparent);
   }
 
-  .primitives {
-    @apply grid min-w-0 grid-cols-4 content-center items-center gap-1 overflow-hidden;
-
-    grid-column: 1 / -1;
-    grid-row: 3;
+  .flow.partial .flow-layer {
+    opacity: 0.6;
   }
 
-  .primitive {
-    @apply flex shrink-0 items-center gap-0.5 font-medium tabular-nums;
+  .flow-spine {
+    @apply absolute inset-x-0 block bg-current opacity-40;
 
-    font-size: 11px;
+    top: 50%;
+    height: 1px;
   }
 
-  .mark {
-    @apply relative flex h-5 w-5 shrink-0 items-center justify-center overflow-hidden rounded-sm border border-primary;
-  }
-
-  .segments {
-    @apply absolute inset-0 flex;
-  }
-
-  .coverage-label {
-    @apply truncate text-secondary;
-
-    font-size: 10px;
+  .flow-layer {
+    @apply absolute inset-x-0 block;
   }
 
   .attention {
-    @apply flex min-w-0 flex-col justify-center border-t border-primary pt-1;
+    @apply flex min-w-0 items-center gap-3;
 
     line-height: 12px;
-    grid-column: 1 / -1;
-    grid-row: 4;
+    grid-row: 3;
     font-size: 10px;
   }
 
@@ -669,10 +584,6 @@
 
   .attention-item.trouble {
     @apply text-danger;
-  }
-
-  .quiet {
-    @apply text-secondary;
   }
 
   .focus-title {
