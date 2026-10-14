@@ -1,5 +1,7 @@
 import { BROWSER } from 'esm-env';
 
+import type { CreateUserPreference } from '$lib/stores/user-preference';
+
 export type RequestContext = {
   url: string;
   options: RequestInit;
@@ -18,6 +20,7 @@ export type CoreProvider = {
   getAccessToken: () => Promise<string>;
   getIdToken: () => Promise<string | undefined>;
   getRoutePrefix: () => string;
+  createUserPreference?: CreateUserPreference;
   api: {
     preRequest: PreRequestHook;
     postResponse: PostResponseHook;
@@ -30,6 +33,7 @@ export type InitOptions = {
   getAccessToken: () => Promise<string>;
   getIdToken?: () => Promise<string | undefined>;
   getRoutePrefix?: () => string;
+  createUserPreference?: CreateUserPreference;
   api?: {
     preRequest?: PreRequestHook;
     postResponse?: PostResponseHook;
@@ -48,6 +52,7 @@ export function initCoreProvider(options: InitOptions): void {
     getAccessToken: options.getAccessToken,
     getIdToken: options.getIdToken ?? (async () => undefined),
     getRoutePrefix: options.getRoutePrefix ?? (() => ''),
+    createUserPreference: options.createUserPreference,
     api: {
       preRequest: options.api?.preRequest ?? passthrough,
       postResponse: options.api?.postResponse ?? passthroughResponse,
@@ -70,6 +75,11 @@ export async function getIdToken(): Promise<string | undefined> {
 export function getRoutePrefix(): string {
   if (!BROWSER || !provider) return '';
   return provider.getRoutePrefix();
+}
+
+export function getUserPreferenceFactory(): CreateUserPreference | undefined {
+  if (!BROWSER) return undefined;
+  return provider?.createUserPreference;
 }
 
 export async function getDataEncoderEndpoint(
