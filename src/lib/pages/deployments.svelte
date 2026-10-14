@@ -8,6 +8,7 @@
   import Button from '$lib/holocene/button.svelte';
   import ColumnResizeHandle from '$lib/holocene/table/column-resize-handle.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
+  import SortableTableHeader from '$lib/holocene/table/sortable-table-header.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { IconTemporalSettings } from '$lib/io/icon';
@@ -21,9 +22,11 @@
     TABLE_TYPE,
   } from '$lib/stores/configurable-table-columns';
   import { refresh } from '$lib/stores/workers';
+  import type { ListWorkerDeployment } from '$lib/types/deployments';
   import { columnWidthStyle } from '$lib/utilities/column-width';
   import { has } from '$lib/utilities/has';
   import { routeForWorkerDeploymentCreate } from '$lib/utilities/route-for';
+  import type { TableSortColumn } from '$lib/utilities/table-sort';
 
   interface Props {
     canCreateServerlessDeployment?: boolean;
@@ -65,6 +68,32 @@
   );
   const availableColumns = $derived(availableDeploymentColumns(namespace));
 
+  const sortableColumns: Record<
+    string,
+    TableSortColumn<ListWorkerDeployment>
+  > = {
+    Deployment: { getValue: (deployment) => deployment.name, type: 'string' },
+    'Current Version': {
+      getValue: (deployment) =>
+        deployment.currentVersionSummary?.deploymentVersion?.buildId,
+      type: 'string',
+    },
+    'Latest Version': {
+      getValue: (deployment) =>
+        deployment.latestVersionSummary?.deploymentVersion?.buildId,
+      type: 'string',
+    },
+    'Created At': {
+      getValue: (deployment) => deployment.createTime,
+      type: 'datetime',
+    },
+  };
+  const sortColumns = $derived(
+    Object.fromEntries(
+      columns.map(({ label }) => [label, sortableColumns[label]]),
+    ),
+  );
+
   let customizationDrawerOpen = $state(false);
   const openCustomizationDrawer = () => {
     customizationDrawerOpen = true;
@@ -89,6 +118,7 @@
 {#key [namespace, $refresh]}
   <div class="flex min-h-0 grow flex-col gap-4">
     <PaginatedTable
+      {sortColumns}
       {onFetch}
       {onError}
       aria-label={translate('deployments.deployments')}
@@ -105,8 +135,11 @@
       {#snippet headers()}
         <tr class="text-left">
           {#each columns as { label, width } (label)}
-            <th class="relative" style={columnWidthStyle(width)}>
-              <span class="block truncate">{columnLabel(label)}</span>
+            <SortableTableHeader
+              column={label}
+              label={columnLabel(label)}
+              style={columnWidthStyle(width)}
+            >
               <ColumnResizeHandle
                 label={columnLabel(label)}
                 {width}
@@ -119,13 +152,13 @@
                     TABLE_TYPE.DEPLOYMENTS,
                   )}
               />
-            </th>
+            </SortableTableHeader>
           {/each}
           <th>{translate('deployments.actions')}</th>
         </tr>
       {/snippet}
       {#snippet rows({ visibleItems })}
-        {#each visibleItems as deployment}
+        {#each visibleItems as deployment (deployment.name)}
           <DeploymentTableRow
             {deployment}
             {columns}

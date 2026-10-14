@@ -11,7 +11,7 @@
 
   import { debounce } from 'es-toolkit';
   import type { Snippet } from 'svelte';
-  import { getContext, onMount } from 'svelte';
+  import { getContext, onMount, setContext } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import Alert from '$lib/holocene/alert.svelte';
@@ -25,6 +25,16 @@
   } from '$lib/stores/api-pagination';
   import { options } from '$lib/stores/pagination';
   import { isError } from '$lib/utilities/is';
+  import {
+    sortTableItems,
+    type TableSort,
+    type TableSortColumn,
+  } from '$lib/utilities/table-sort';
+
+  import {
+    TABLE_SORT_CONTEXT,
+    type TableSortContext,
+  } from '../table-sort-context';
 
   import PaginatedTable from './index.svelte';
   import {
@@ -41,6 +51,7 @@
     onError?: ((error: Error | unknown) => void) | undefined;
     onFetch: () => Promise<PaginatedRequest<T>>;
     onItemsChange?: (items: T[]) => void;
+    sortColumns?: Record<string, TableSortColumn<T>>;
     onLoadingChange?: ((loading: boolean) => void) | undefined;
     onShiftUp?: KeyboardHandler;
     onShiftDown?: KeyboardHandler;
@@ -70,6 +81,7 @@
     onError,
     onFetch,
     onItemsChange,
+    sortColumns = {},
     onLoadingChange,
     onShiftUp,
     onShiftDown,
@@ -100,6 +112,38 @@
   );
   let fetchError = $state<Error | undefined>();
   let paginatedTable = $state<PaginatedTable<T>>();
+  let sort = $state<TableSort>();
+  const pageItems = $derived($store.visibleItems);
+  const visibleItems = $derived(
+    sortTableItems(
+      pageItems,
+      sort ? sortColumns[sort.column] : undefined,
+      sort?.direction,
+    ),
+  );
+
+  setContext<TableSortContext>(TABLE_SORT_CONTEXT, {
+    isSortable: (column) =>
+      Object.prototype.hasOwnProperty.call(sortColumns, column) &&
+      Boolean(sortColumns[column]),
+    direction: (column) =>
+      sort?.column === column ? sort.direction : undefined,
+    toggle: (column) => {
+      if (
+        !Object.prototype.hasOwnProperty.call(sortColumns, column) ||
+        !sortColumns[column]
+      )
+        return;
+      sort = {
+        column,
+        direction:
+          sort?.column === column && sort.direction === 'ascending'
+            ? 'descending'
+            : 'ascending',
+      };
+      store.setActiveIndex(0);
+    },
+  });
 
   function clearError() {
     if (fetchError) fetchError = undefined;
@@ -222,9 +266,9 @@
 
   let previousItems: T[] | undefined;
   $effect(() => {
-    if (onItemsChange && $store.visibleItems !== previousItems) {
-      previousItems = $store.visibleItems;
-      onItemsChange($store.visibleItems);
+    if (onItemsChange && visibleItems !== previousItems) {
+      previousItems = visibleItems;
+      onItemsChange(visibleItems);
     }
   });
 
@@ -261,7 +305,7 @@
   bind:this={paginatedTable}
   loading={$store.loading}
   updating={$store.updating}
-  visibleItems={$store.visibleItems}
+  {visibleItems}
   {maxHeight}
   verticalScroll={maximizable && $maximized ? 'table' : 'responsive'}
   class={merge(maximizable && 'rounded-none border-0 border-t')}
@@ -271,7 +315,7 @@
   {headers}
   empty={indexEmpty}
 >
-  {@render rows?.({ visibleItems: $store.visibleItems })}
+  {@render rows?.({ visibleItems })}
 
   {#snippet actionsStart()}
     <FilterSelect
@@ -285,7 +329,7 @@
   {#snippet actionsEnd()}
     <div class="ml-auto flex shrink-0 items-center gap-2">
       {@render actionsEndAdditional?.({
-        visibleItems: $store.visibleItems,
+        visibleItems,
         page: $store.index + 1,
       })}
       {#if maximizable}

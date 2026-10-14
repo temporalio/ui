@@ -49,6 +49,8 @@ export const Strings = {
   'post-meridiem': 'PM',
   ascending: 'Ascending',
   descending: 'Descending',
+  'sort-page-ascending': 'Sort this page by {{column}}, ascending',
+  'sort-page-descending': 'Sort this page by {{column}}, descending',
   start: 'Start',
   end: 'End',
   true: 'True',

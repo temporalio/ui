@@ -47,4 +47,48 @@ The `<Paginated />` component wraps `<PaginatedTable />`, adding pagination cont
 
 The `<ApiPaginated />` component wraps `<PaginatedTable />`, adding pagination controls, props, and state management logic for data sets that are paginated on the server side.
 
+### Sorting the current page
+
+Pass `sortColumns` to `ApiPaginated` and render `SortableTableHeader` for each sortable header. The column key connects the header to a raw-value accessor and an optional type (`string`, `integer`, `number`, `datetime`, or `boolean`). Use `integer` for API int64 strings so large values retain their precision. Without a type, native numbers, booleans, dates, and strings are compared according to their runtime type.
+
+```svelte
+<script lang="ts">
+  import ApiPaginated from './paginated-table/api-paginated.svelte';
+  import SortableTableHeader from './sortable-table-header.svelte';
+  import type { TableSortColumn } from '$lib/utilities/table-sort';
+
+  type Row = { name: string; count: string };
+  const sortColumns: Record<string, TableSortColumn<Row>> = {
+    Name: { getValue: (row) => row.name, type: 'string' },
+    Count: { getValue: (row) => row.count, type: 'integer' },
+  };
+  // onFetch supplies the paginated request for these rows.
+</script>
+
+<ApiPaginated
+  {onFetch}
+  {sortColumns}
+  pageSizeSelectLabel="Per page"
+  previousButtonLabel="Previous"
+  nextButtonLabel="Next"
+>
+  {#snippet headers()}
+    <tr>
+      <SortableTableHeader column="Name" />
+      <SortableTableHeader column="Count" />
+      <th>Actions</th>
+    </tr>
+  {/snippet}
+  {#snippet rows({ visibleItems })}
+    {#each visibleItems as row}
+      <tr><td>{row.name}</td><td>{row.count}</td><td></td></tr>
+    {/each}
+  {/snippet}
+</ApiPaginated>
+```
+
+The first click sorts ascending; subsequent clicks toggle descending and ascending. Only the current API page is sorted, with the same choice applied when navigating pages. Sorting does not fetch data or mutate cached API results. Missing and invalid values stay last in both directions, and ties retain their original order. Rows, header snippets, action snippets, and `onItemsChange` all receive the same sorted items.
+
+Headers expose `aria-sort` and support Enter/Space. Put resize handles or other controls in the header's children snippet, outside its sort button. A header without a configured sort column renders as a plain header.
+
 <!-- For more Table examples, see the Table story -->

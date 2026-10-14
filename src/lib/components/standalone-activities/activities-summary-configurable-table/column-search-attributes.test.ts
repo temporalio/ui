@@ -1,8 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
 import type { ActivityExecutionListInfo } from '$lib/types/activity-execution';
+import { sortTableItems } from '$lib/utilities/table-sort';
 
-import { getActivityColumnValue } from './column-search-attributes';
+import {
+  getActivityColumnValue,
+  getActivitySortColumns,
+} from './column-search-attributes';
 
 const activity = {
   activityId: 'my-activity',
@@ -23,6 +27,20 @@ const activity = {
 } as unknown as ActivityExecutionListInfo;
 
 describe('getActivityColumnValue', () => {
+  it('sorts raw durations numerically rather than comparing query strings', () => {
+    const columns = getActivitySortColumns(['Execution Duration'], {
+      ExecutionDuration: 'Int',
+    });
+    const items = ['100s', '20s', '0s'].map((executionDuration) => ({
+      ...activity,
+      executionDuration,
+    }));
+    expect(sortTableItems(items, columns['Execution Duration'])).toEqual([
+      items[2],
+      items[1],
+      items[0],
+    ]);
+  });
   it('reads the activity fields a mapped column filters on', () => {
     expect(getActivityColumnValue('Activity ID', activity)).toBe('my-activity');
     expect(getActivityColumnValue('Type', activity)).toBe('MyActivityType');

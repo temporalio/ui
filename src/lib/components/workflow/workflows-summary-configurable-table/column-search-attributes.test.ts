@@ -2,9 +2,11 @@ import { describe, expect, it } from 'vitest';
 
 import type { WorkflowExecution } from '$lib/types/workflows';
 import { getColumnAttribute } from '$lib/utilities/query/quick-filter-table';
+import { sortTableItems } from '$lib/utilities/table-sort';
 
 import {
   getWorkflowColumnValue,
+  getWorkflowSortColumns,
   UNFILTERABLE_WORKFLOW_COLUMNS,
   WORKFLOW_COLUMN_ATTRIBUTE,
 } from './column-search-attributes';
@@ -43,6 +45,62 @@ describe('the workflow column attribute map', () => {
 
   it('treats an unmapped label as a custom search attribute name', () => {
     expect(attributeFor('CustomIntField')).toBe('CustomIntField');
+  });
+});
+
+describe('workflow sorting columns', () => {
+  it('uses numeric counts and chronological timestamps without loaded metadata', () => {
+    const columns = getWorkflowSortColumns(['History Size', 'Start'], {});
+    const items = [
+      workflow,
+      {
+        ...workflow,
+        historySizeBytes: '10',
+        startTime: '2024-01-02T03:04:05+02:00',
+      },
+    ];
+    expect(sortTableItems(items, columns['History Size'])).toEqual([
+      items[1],
+      items[0],
+    ]);
+    expect(sortTableItems(items, columns.Start)).toEqual([items[1], items[0]]);
+  });
+
+  it('uses search attribute metadata for encoded numeric strings', () => {
+    const columns = getWorkflowSortColumns(['CustomIntField'], {
+      CustomIntField: 'Int',
+    });
+    const items = ['10', '2'].map(
+      (value) =>
+        ({
+          ...workflow,
+          searchAttributes: { indexedFields: { CustomIntField: value } },
+        }) as unknown as WorkflowExecution,
+    );
+    expect(sortTableItems(items, columns.CustomIntField)).toEqual([
+      items[1],
+      items[0],
+    ]);
+  });
+
+  it('sorts duration by elapsed time, including zero, and uses the displayed parent namespace', () => {
+    const columns = getWorkflowSortColumns(
+      ['Execution Duration', 'Parent Namespace'],
+      {},
+    );
+    const items = [
+      workflow,
+      { ...workflow, endTime: workflow.startTime },
+      { ...workflow, endTime: '' },
+    ];
+    expect(sortTableItems(items, columns['Execution Duration'])).toEqual([
+      items[1],
+      items[0],
+      items[2],
+    ]);
+    expect(columns['Parent Namespace'].getValue(workflow)).toBe(
+      'parent-namespace',
+    );
   });
 });
 

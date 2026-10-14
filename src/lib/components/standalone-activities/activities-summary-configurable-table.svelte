@@ -23,6 +23,7 @@
     resizeColumn,
     TABLE_TYPE,
   } from '$lib/stores/configurable-table-columns';
+  import { activitySearchAttributes } from '$lib/stores/search-attributes';
   import type { ActivityExecutionListInfo } from '$lib/types/activity-execution';
   import {
     getBatchSelectionTargets,
@@ -30,6 +31,8 @@
     type PageSelectionStatus,
   } from '$lib/utilities/batch-selection';
   import { standaloneActivityBulkActionsEnabled } from '$lib/utilities/standalone-activities-commands-disabled';
+
+  import { getActivitySortColumns } from './activities-summary-configurable-table/column-search-attributes';
 
   import TableBodyCell from './activities-summary-configurable-table/table-body-cell.svelte';
   import TableEmptyState from './activities-summary-configurable-table/table-empty-state.svelte';
@@ -100,11 +103,18 @@
     void $allSelected;
     prevClickedIndex = null;
   });
+  const sortColumns = $derived(
+    getActivitySortColumns(
+      columns.map((column) => column.label),
+      $activitySearchAttributes,
+    ),
+  );
 </script>
 
 {#key [namespace, query, $activityRefresh]}
   <PaginatedTable
     total={$activityCount.count}
+    {sortColumns}
     {onFetch}
     onItemsChange={(items) => {
       visiblePaginatedItems = items;
