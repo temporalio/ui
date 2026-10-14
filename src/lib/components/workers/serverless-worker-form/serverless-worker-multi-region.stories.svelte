@@ -1,8 +1,13 @@
 <script lang="ts" module>
   import { defineMeta } from '@storybook/addon-svelte-csf';
 
-  import type { ComputeRegion } from './multi-region';
-  import type { ComputeProviderOption } from './shared';
+  import {
+    type ComputeProviderConfig,
+    configuredRegions,
+    deployRegionsFor,
+  } from '$lib/utilities/compute-provider-config';
+
+  import { computeRegionsFor } from './multi-region';
 
   import CreateVersionForm from './create-version-form.svelte';
   import EditVersionForm from './edit-version-form.svelte';
@@ -28,29 +33,40 @@
     },
   });
 
-  const multiRegions: ComputeRegion[] = [
-    {
-      id: 'aws-us-east-1',
-      role: 'primary',
-      label: 'us-east-1',
-      provider: 'lambda',
-    },
-    {
-      id: 'aws-us-west-2',
-      role: 'replica',
-      label: 'us-west-2',
-      provider: 'lambda',
-    },
-  ];
+  const EAST = { regionId: 'aws-us-east-1', label: 'us-east-1' };
+  const WEST = { regionId: 'aws-us-west-2', label: 'us-west-2' };
 
-  const regionsFor = (namespace: Topology): ComputeRegion[] =>
-    namespace === 'multi' ? multiRegions : multiRegions.slice(0, 1);
-
-  /** Temporal Cloud offers only the providers matching the Namespace's cloud. */
-  const providersFor = (namespace: Topology): ComputeProviderOption[] =>
+  /**
+   * The one prop a host passes to the worker deployment pages. Temporal Cloud
+   * builds it per Namespace: the Namespace's cloud decides the providers, and
+   * its regions and replicas decide the regions.
+   */
+  const providerConfigFor = (namespace: Topology): ComputeProviderConfig =>
     namespace === 'multi'
-      ? [{ value: 'lambda' }, { value: 'agentcore' }]
-      : [{ value: 'lambda' }, { value: 'cloud-run' }];
+      ? {
+          providers: [{ value: 'lambda' }, { value: 'agentcore' }],
+          regions: [
+            { ...EAST, role: 'primary' },
+            { ...WEST, role: 'replica' },
+          ],
+        }
+      : {
+          providers: [
+            { value: 'lambda' },
+            { value: 'cloud-run', deployRegions: ['us-central1', 'us-east1'] },
+          ],
+          regions: [{ ...EAST, role: 'primary' }],
+        };
+
+  /** What each page derives from the config before it renders a form. */
+  const formPropsFor = (namespace: Topology) => {
+    const config = providerConfigFor(namespace);
+    return {
+      computeProviders: config.providers,
+      gcpRegions: deployRegionsFor(config, 'cloud-run'),
+      regions: computeRegionsFor(configuredRegions(config), 'lambda'),
+    };
+  };
 
   const namespace = 'orders.a1b2c';
 
@@ -74,8 +90,7 @@
           onSuccess={() => {}}
           cancelHref="#"
           {namespace}
-          computeProviders={providersFor(args.namespace)}
-          regions={regionsFor(args.namespace)}
+          {...formPropsFor(args.namespace)}
         />
       </div>
     {/key}
@@ -91,8 +106,7 @@
           onSubmit={noop}
           cancelHref="#"
           {namespace}
-          computeProviders={providersFor(args.namespace)}
-          regions={regionsFor(args.namespace)}
+          {...formPropsFor(args.namespace)}
         />
       </div>
     {/key}
@@ -111,8 +125,7 @@
           onDelete={() => {}}
           cancelHref="#"
           {namespace}
-          computeProviders={providersFor(args.namespace)}
-          regions={regionsFor(args.namespace)}
+          {...formPropsFor(args.namespace)}
         />
       </div>
     {/key}

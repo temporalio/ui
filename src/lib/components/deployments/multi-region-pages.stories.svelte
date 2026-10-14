@@ -9,7 +9,10 @@
     ComputeStatus,
     DeploymentStatus as VersionStatus,
   } from '$lib/types/deployments';
-  import type { NamespaceRegion } from '$lib/utilities/compute-regions';
+  import {
+    type ComputeProviderConfig,
+    configuredRegions,
+  } from '$lib/utilities/compute-provider-config';
 
   import DeploymentStatus from './deployment-status.svelte';
   import VersionComputeDetails from './version-compute-details.svelte';
@@ -103,14 +106,24 @@
   };
   const pending: ComputeStatus = { providerValidation: {} };
 
-  // The active region states its role rather than relying on being first.
-  const namespaceRegionsFor = (namespace: Topology): NamespaceRegion[] =>
-    namespace === 'multi'
-      ? [
-          { regionId: EAST, role: 'primary' },
-          { regionId: WEST, role: 'replica' },
-        ]
-      : [{ regionId: EAST, role: 'primary' }];
+  /**
+   * The one prop a host passes to the worker deployment pages. The active
+   * region states its role rather than relying on being first.
+   */
+  const providerConfigFor = (namespace: Topology): ComputeProviderConfig => ({
+    providers: [{ value: 'lambda' }, { value: 'agentcore' }],
+    regions:
+      namespace === 'multi'
+        ? [
+            { regionId: EAST, role: 'primary', label: 'us-east-1' },
+            { regionId: WEST, role: 'replica', label: 'us-west-2' },
+          ]
+        : [{ regionId: EAST, role: 'primary', label: 'us-east-1' }],
+  });
+
+  /** What the deployment pages derive from the config. */
+  const namespaceRegionsFor = (namespace: Topology) =>
+    configuredRegions(providerConfigFor(namespace));
 
   const deploymentsFor = (namespace: Topology) =>
     [
