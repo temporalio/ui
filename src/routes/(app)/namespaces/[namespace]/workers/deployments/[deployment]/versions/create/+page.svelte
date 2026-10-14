@@ -5,7 +5,6 @@
   import PageTitle from '$lib/components/page-title.svelte';
   import { translate } from '$lib/i18n/translate';
   import WorkerDeploymentVersionCreatePage from '$lib/pages/worker-deployment-version-create.svelte';
-  import { namespaceRegionsFromReplication } from '$lib/utilities/compute-regions';
   import { namespaceRegionsFromEnv } from '$lib/utilities/env-regions';
   import { routeForWorkerDeployment } from '$lib/utilities/route-for';
 
@@ -14,12 +13,10 @@
   const backHref = $derived(
     routeForWorkerDeployment({ namespace, deployment }),
   );
-  // Self-hosted: the Namespace's clusters, unless a development setting
-  // stands in for them. A consumer such as Temporal Cloud passes its own.
-  const namespaceRegions = $derived(
-    namespaceRegionsFromEnv() ??
-      namespaceRegionsFromReplication(page.data.namespace),
-  );
+  // A self-hosted server has no host region for region_ids to match, so it
+  // offers no high availability. A development setting can stand in for a
+  // consumer such as Temporal Cloud, which passes its own config.
+  const providerConfig = $derived({ regions: namespaceRegionsFromEnv() });
 </script>
 
 <PageTitle
@@ -29,6 +26,6 @@
 <WorkerDeploymentVersionCreatePage
   {namespace}
   {deployment}
-  {namespaceRegions}
+  {providerConfig}
   onSuccess={() => goto(backHref)}
 />

@@ -22,7 +22,10 @@
   } from '$lib/stores/configurable-table-columns';
   import { refresh } from '$lib/stores/workers';
   import { columnWidthStyle } from '$lib/utilities/column-width';
-  import type { NamespaceRegion } from '$lib/utilities/compute-regions';
+  import {
+    type ComputeProviderConfig,
+    configuredRegions,
+  } from '$lib/utilities/compute-provider-config';
   import { has } from '$lib/utilities/has';
   import { routeForWorkerDeploymentCreate } from '$lib/utilities/route-for';
 
@@ -30,19 +33,19 @@
     canCreateServerlessDeployment?: boolean;
     showConnectionStatus?: boolean;
     /**
-     * The Namespace's regions. A consumer passes these when its own
-     * entitlement says the Namespace is highly available; fewer than two
-     * shows no regions. Each region states its own role rather than relying
-     * on list order.
+     * The providers this Namespace may use and the regions it lives in. With
+     * two or more regions, each Version shows the regions it covers.
      */
-    namespaceRegions?: readonly NamespaceRegion[];
+    providerConfig?: ComputeProviderConfig;
   }
 
   let {
     canCreateServerlessDeployment = true,
     showConnectionStatus = true,
-    namespaceRegions,
+    providerConfig,
   }: Props = $props();
+
+  const namespaceRegions = $derived(configuredRegions(providerConfig));
 
   let error = $state('');
 

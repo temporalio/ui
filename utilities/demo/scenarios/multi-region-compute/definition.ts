@@ -7,7 +7,7 @@ export const definition = defineScenario({
   name: 'multi-region-compute',
   title: 'Compute per Namespace region for serverless Workers',
   summary:
-    'Saves a Worker Deployment Version with one scaling group per region when high availability is on, and shows which regions it covers. The server comes from the branch that maps region_ids into the worker controller, with a demo-only patch that gives the server a host region. The dev server has one cluster, so the UI takes the Namespace regions from VITE_NAMESPACE_REGIONS instead of the replication config.',
+    'Saves a Worker Deployment Version with one scaling group per region when high availability is on, and shows which regions it covers. The server comes from the branch that maps region_ids into the worker controller, with a demo-only patch that gives the server a host region. A self-hosted server offers no high availability, so VITE_NAMESPACE_REGIONS stands in for the regions a consumer such as Temporal Cloud passes in its provider config.',
   server: {
     // region_ids reaches the server through two unreleased changes: the server
     // branch that maps the field, and the worker controller that honours it.

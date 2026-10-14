@@ -8,7 +8,6 @@
   import {
     buildComputeConfigForRegions,
     buildComputeConfigFromForm,
-    type ComputeProviderOption,
     type CreateDeploymentFormData,
     getInitialComputeProvider,
     type RegionComputeValues,
@@ -23,21 +22,22 @@
     validateWorkerDeploymentVersionComputeConfig,
   } from '$lib/services/deployments-service';
   import type { ComputeConfig } from '$lib/types/deployments';
-  import type { NamespaceRegion } from '$lib/utilities/compute-regions';
+  import {
+    type ComputeProviderConfig,
+    configuredRegions,
+    deployRegionsFor,
+  } from '$lib/utilities/compute-provider-config';
   import { routeForWorkers } from '$lib/utilities/route-for';
 
   interface Props {
     namespace: string;
     onSuccess: () => void;
     templates?: Record<ComputeProviderValue, ComputeProviderTemplates>;
-    computeProviders?: readonly ComputeProviderOption[];
-    gcpRegions?: string[];
     /**
-     * The Namespace's regions. A consumer passes these when its own entitlement
-     * says the Namespace is highly available; with two or more, the form
-     * collects compute per region.
+     * The providers this Namespace may use and the regions it lives in. Two
+     * or more regions turn on high availability.
      */
-    namespaceRegions?: readonly NamespaceRegion[];
+    providerConfig?: ComputeProviderConfig;
   }
 
   interface SubmitFieldErrors {
@@ -45,14 +45,11 @@
     iamRoleArn?: string[];
   }
 
-  let {
-    namespace,
-    onSuccess,
-    templates,
-    computeProviders,
-    gcpRegions,
-    namespaceRegions = [],
-  }: Props = $props();
+  let { namespace, onSuccess, templates, providerConfig }: Props = $props();
+
+  const computeProviders = $derived(providerConfig?.providers);
+  const gcpRegions = $derived(deployRegionsFor(providerConfig, 'cloud-run'));
+  const namespaceRegions = $derived(configuredRegions(providerConfig));
 
   const regions = $derived(
     computeRegionsFor(

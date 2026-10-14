@@ -18,7 +18,10 @@
     setRampingUnversionedWorkers,
   } from '$lib/services/deployments-service';
   import type { DescribeWorkerDeploymentResponse } from '$lib/types/deployments';
-  import type { NamespaceRegion } from '$lib/utilities/compute-regions';
+  import {
+    type ComputeProviderConfig,
+    configuredRegions,
+  } from '$lib/utilities/compute-provider-config';
   import { deploymentShowsConnectionStatus } from '$lib/utilities/connection-status';
   import { deploymentHasComputeConfig } from '$lib/utilities/deployment-has-compute-config';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
@@ -27,15 +30,20 @@
   interface Props {
     showInstancesLink?: boolean;
     showConnectionStatus?: boolean;
-    /** Regions the namespace runs in (highly available namespaces have more than one). */
-    namespaceRegions?: readonly NamespaceRegion[];
+    /**
+     * The providers this Namespace may use and the regions it lives in. With
+     * two or more regions, each Version shows the regions it covers.
+     */
+    providerConfig?: ComputeProviderConfig;
   }
 
   let {
     showInstancesLink = true,
     showConnectionStatus = true,
-    namespaceRegions,
+    providerConfig,
   }: Props = $props();
+
+  const namespaceRegions = $derived(configuredRegions(providerConfig));
 
   const { namespace } = $derived(page.params);
   const deploymentName = $derived(decodeURIForSvelte(page.params.deployment));

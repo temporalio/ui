@@ -8,7 +8,6 @@
   import {
     buildComputeConfigForRegions,
     buildComputeConfigFromForm,
-    type ComputeProviderOption,
     getInitialComputeProvider,
   } from '$lib/components/workers/serverless-worker-form/shared';
   import Alert from '$lib/holocene/alert.svelte';
@@ -22,7 +21,11 @@
     validateWorkerDeploymentVersionComputeConfig,
   } from '$lib/services/deployments-service';
   import type { VersionSummary } from '$lib/types/deployments';
-  import type { NamespaceRegion } from '$lib/utilities/compute-regions';
+  import {
+    type ComputeProviderConfig,
+    configuredRegions,
+    deployRegionsFor,
+  } from '$lib/utilities/compute-provider-config';
   import { lockComputeProvider } from '$lib/utilities/lock-compute-provider';
   import { routeForWorkerDeployment } from '$lib/utilities/route-for';
 
@@ -30,26 +33,20 @@
     namespace: string;
     deployment: string;
     onSuccess: () => void;
-    computeProviders?: readonly ComputeProviderOption[];
-    gcpRegions?: string[];
     templates?: Record<ComputeProviderValue, ComputeProviderTemplates>;
     /**
-     * The Namespace's regions. A consumer passes these when its own entitlement
-     * says the Namespace is highly available; with two or more, the form
-     * collects compute per region.
+     * The providers this Namespace may use and the regions it lives in. Two
+     * or more regions turn on high availability.
      */
-    namespaceRegions?: readonly NamespaceRegion[];
+    providerConfig?: ComputeProviderConfig;
   }
 
-  let {
-    namespace,
-    deployment,
-    onSuccess,
-    computeProviders,
-    gcpRegions,
-    templates,
-    namespaceRegions = [],
-  }: Props = $props();
+  let { namespace, deployment, onSuccess, templates, providerConfig }: Props =
+    $props();
+
+  const computeProviders = $derived(providerConfig?.providers);
+  const gcpRegions = $derived(deployRegionsFor(providerConfig, 'cloud-run'));
+  const namespaceRegions = $derived(configuredRegions(providerConfig));
 
   let error = $state<string | undefined>();
   let versions = $state<VersionSummary[]>();

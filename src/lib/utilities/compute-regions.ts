@@ -3,7 +3,6 @@ import {
   computeProviderFromType,
 } from '$lib/components/workers/serverless-worker-form/compute-providers';
 import { translate } from '$lib/i18n/translate';
-import type { DescribeNamespaceResponse } from '$lib/types';
 import type {
   ComputeConfig,
   ComputeConfigScalingGroup,
@@ -15,11 +14,12 @@ import type {
  *
  * ## What decides whether any of this is shown
  *
- * `namespaceRegions`, and nothing else. This repo does not decide whether an
- * install has highly available Namespaces: a consumer passes the regions when
- * its own entitlement says so, the same way it passes the compute providers a
- * Namespace may use. An empty or single-entry list means single region, which
- * is every self-hosted install and every Namespace without HA.
+ * `ComputeProviderConfig.regions`, and nothing else. This repo does not decide
+ * whether an install has highly available Namespaces: a consumer passes the
+ * regions in the same config as the compute providers a Namespace may use.
+ * An empty or single-entry list means single region, which is every
+ * self-hosted install, because its server has no host region for `region_ids`
+ * to match, and every Namespace without HA.
  *
  * That is deliberately the only switch. A scaling group naming a region does
  * not by itself make a deployment multi-region — a single-region Namespace
@@ -214,28 +214,4 @@ export const formatDurationMs = (ms: number): string => {
   ];
   const unit = units.find(([size]) => ms >= size && ms % size === 0);
   return unit ? `${ms / unit[0]}${unit[1]}` : `${ms}ms`;
-};
-
-/**
- * The regions of a self-hosted Namespace, read from its replication config.
- * The server knows clusters, so a cluster name is the region identifier: the
- * active cluster is the primary and the others are replicas, as the Namespace
- * page reads them. A Namespace on one cluster reads as single region.
- *
- * Temporal Cloud passes its Namespace's regions itself.
- */
-export const namespaceRegionsFromReplication = (
-  namespace: DescribeNamespaceResponse | undefined,
-): NamespaceRegion[] => {
-  const replication = namespace?.replicationConfig;
-  const active = replication?.activeClusterName;
-
-  return (replication?.clusters ?? [])
-    .map(({ clusterName }) => clusterName)
-    .filter((clusterName): clusterName is string => !!clusterName)
-    .map((clusterName) => ({
-      regionId: clusterName,
-      role:
-        clusterName === active ? ('primary' as const) : ('replica' as const),
-    }));
 };

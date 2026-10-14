@@ -14,7 +14,6 @@
   import {
     buildComputeConfigForRegions,
     buildComputeConfigFromForm,
-    type ComputeProviderOption,
     formValuesFromGroup,
   } from '$lib/components/workers/serverless-worker-form/shared';
   import Alert from '$lib/holocene/alert.svelte';
@@ -28,7 +27,11 @@
     updateWorkerDeploymentVersionComputeConfig,
     validateWorkerDeploymentVersionComputeConfig,
   } from '$lib/services/deployments-service';
-  import type { NamespaceRegion } from '$lib/utilities/compute-regions';
+  import {
+    type ComputeProviderConfig,
+    configuredRegions,
+    deployRegionsFor,
+  } from '$lib/utilities/compute-provider-config';
   import { lockProvidersTo } from '$lib/utilities/lock-compute-provider';
   import { routeForWorkerDeployment } from '$lib/utilities/route-for';
 
@@ -36,25 +39,20 @@
     namespace: string;
     deployment: string;
     buildId: string;
-    computeProviders?: readonly ComputeProviderOption[];
-    gcpRegions?: string[];
     templates?: Record<ComputeProviderValue, ComputeProviderTemplates>;
     /**
-     * The Namespace's regions. With a replica, the form edits the Version's
-     * high availability.
+     * The providers this Namespace may use and the regions it lives in. Two
+     * or more regions turn on high availability.
      */
-    namespaceRegions?: readonly NamespaceRegion[];
+    providerConfig?: ComputeProviderConfig;
   }
 
-  let {
-    namespace,
-    deployment,
-    buildId,
-    computeProviders,
-    gcpRegions,
-    templates,
-    namespaceRegions = [],
-  }: Props = $props();
+  let { namespace, deployment, buildId, templates, providerConfig }: Props =
+    $props();
+
+  const computeProviders = $derived(providerConfig?.providers);
+  const gcpRegions = $derived(deployRegionsFor(providerConfig, 'cloud-run'));
+  const namespaceRegions = $derived(configuredRegions(providerConfig));
 
   const replicaRegionId = $derived(
     namespaceRegions.find(({ role }) => role === 'replica')?.regionId,

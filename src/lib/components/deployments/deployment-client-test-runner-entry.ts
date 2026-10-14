@@ -65,7 +65,9 @@ export async function renderDeployment({
       target,
       props: {
         ...(showConnectionStatus === undefined ? {} : { showConnectionStatus }),
-        ...(namespaceRegions === undefined ? {} : { namespaceRegions }),
+        ...(namespaceRegions === undefined
+          ? {}
+          : { providerConfig: { regions: namespaceRegions } }),
       },
     }),
   );
