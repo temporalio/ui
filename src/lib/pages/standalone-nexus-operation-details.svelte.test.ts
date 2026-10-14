@@ -53,9 +53,10 @@ describe('StandaloneNexusOperationDetails start attempts', () => {
   it.each(['', 'PENDING_NEXUS_OPERATION_STATE_UNSPECIFIED'])(
     'hides the state badge when the state is %j',
     (state) => {
-      const section = startAttempts(renderDetails({ state }));
-      expect(section?.textContent).not.toContain('Unspecified');
-      expect(section?.querySelectorAll('dd span.rounded-full')).toHaveLength(1);
+      const section = startAttempts(renderDetails({ attempt: 1, state }));
+      const attempts = section?.querySelector('dd');
+      expect(attempts?.textContent?.trim()).toBe('1');
+      expect(attempts?.children).toHaveLength(1);
     },
   );
 

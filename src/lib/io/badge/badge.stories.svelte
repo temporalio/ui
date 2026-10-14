@@ -2,14 +2,12 @@
   import { defineMeta } from '@storybook/addon-svelte-csf';
   import type { ComponentProps } from 'svelte';
 
+  import { Badge, type BadgeColorScheme, type BadgeSize } from '$lib/io/badge';
   import {
     IconAwsColor,
     IconExclamationOctagon,
     IconHeartbeat,
   } from '$lib/io/icon';
-
-  import type { BadgeColorScheme, BadgeSize } from './badge.svelte';
-  import Badge from './badge.svelte';
 
   const sizes: BadgeSize[] = ['sm', 'md'];
 
@@ -35,8 +33,10 @@
       text: { control: 'text' },
       colorScheme: { control: 'select', options: colorSchemes },
       size: { control: 'select', options: sizes },
+      truncate: { control: 'boolean' },
       Icon: { control: false },
       extension: { control: 'object' },
+      extensions: { control: 'object' },
       class: { table: { disable: true } },
     },
     parameters: {
@@ -67,6 +67,58 @@
     },
   }}
 />
+
+<Story
+  name="With multiple extensions"
+  args={{
+    Icon: IconHeartbeat,
+    extensions: [
+      { text: '987', LeadIcon: IconAwsColor },
+      {
+        text: 'warning',
+        colorScheme: 'warning',
+        TrailIcon: IconExclamationOctagon,
+      },
+      false,
+    ],
+  }}
+/>
+
+<Story name="Primary truncation">
+  {#snippet template()}
+    <div class="w-64 border border-primary bg-surface-primary p-6">
+      <Badge
+        text="A long badge label that should truncate"
+        truncate
+        Icon={IconHeartbeat}
+        extensions={[
+          { text: '987' },
+          { colorScheme: 'warning', TrailIcon: IconExclamationOctagon },
+        ]}
+      />
+    </div>
+  {/snippet}
+</Story>
+
+<Story name="Extension truncation">
+  {#snippet template()}
+    <div class="w-64 border border-primary bg-surface-primary p-6">
+      <Badge
+        text="A long badge label that should truncate"
+        truncate
+        Icon={IconHeartbeat}
+        extensions={[
+          { text: '987' },
+          {
+            text: 'A long extension that should also truncate',
+            colorScheme: 'warning',
+            truncate: true,
+          },
+        ]}
+      />
+    </div>
+  {/snippet}
+</Story>
 
 <Story name="Sizes">
   {#snippet template()}
