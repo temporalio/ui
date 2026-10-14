@@ -148,6 +148,14 @@ describe('RunChainReader', () => {
     expect(chain.runs.map((run) => run.runId)).toEqual(['a', 'b', 'c']);
   });
 
+  it('starts from the current run when no run is given', async () => {
+    current = 'b';
+    const chain = reader();
+    await chain.initialize();
+    expect(chain.runs.map((run) => run.runId)).toEqual(['b']);
+    expect(chain.hasEarlier).toBe(true);
+  });
+
   it('walks forward when the latest run belongs to a different chain', async () => {
     fixtures.b = { previous: 'a', next: 'c' };
     fixtures.c = { previous: 'b', running: true };

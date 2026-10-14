@@ -31,6 +31,7 @@ import {
   routeForNamespaces,
   routeForNexus,
   routeForPendingActivities,
+  routeForRunChain,
   routeForSchedule,
   routeForScheduleCreate,
   routeForSchedules,
@@ -48,6 +49,15 @@ describe('routeFor', () => {
   it('should route to "namespaces"', () => {
     const path = routeForNamespaces();
     expect(path).toBe(`${base}/namespaces`);
+  });
+
+  it('should route to a run chain, optionally anchored at a run', () => {
+    expect(routeForRunChain({ namespace: 'default', workflow: 'a/b' })).toBe(
+      `${base}/namespaces/default/workflows/a%2Fb/chain`,
+    );
+    expect(
+      routeForRunChain({ namespace: 'default', workflow: 'abc', run: 'def' }),
+    ).toBe(`${base}/namespaces/default/workflows/abc/chain?run=def`);
   });
 
   it('should route to a "namespace"', () => {

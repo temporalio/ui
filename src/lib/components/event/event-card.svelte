@@ -1,14 +1,12 @@
 <script lang="ts">
-  import { getContext } from 'svelte';
-
   import { page } from '$app/state';
 
   import PayloadCodeBlock from '$lib/components/payload/payload-code-block.svelte';
   import PayloadSummary from '$lib/components/payload/payload-summary.svelte';
   import Timestamp, { timestamp } from '$lib/components/timestamp.svelte';
   import {
-    WORKFLOW_VIEW_CONTEXT,
-    type WorkflowViewContext,
+    getWorkflowViewContext,
+    workflowIdentity,
   } from '$lib/contexts/workflow-view-context';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
@@ -66,17 +64,9 @@
     /** The operation's NexusOperationScheduled event, when this is part of a group. */
     initiatingEvent?: WorkflowEvent;
   } = $props();
-  const scope = getContext<WorkflowViewContext | undefined>(
-    WORKFLOW_VIEW_CONTEXT,
-  );
+  const scope = getWorkflowViewContext();
   const { namespace, workflow, run } = $derived(
-    scope
-      ? {
-          namespace: scope.namespace,
-          workflow: scope.workflow.id,
-          run: scope.workflow.runId,
-        }
-      : page.params,
+    workflowIdentity(scope, page.params),
   );
 
   const systemNexus = $derived(

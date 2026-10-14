@@ -101,20 +101,24 @@ export class RunChainReader {
     };
   }
 
+  private async readCurrentRunId(): Promise<string | undefined> {
+    const response = await requestFromAPI<WorkflowExecutionAPIResponse>(
+      routeForApi('workflow', {
+        namespace: this.namespace,
+        workflowId: this.workflowId,
+      }),
+      {
+        options: { signal: this.signal },
+        request: this.request,
+        notifyOnError: false,
+      },
+    );
+    return response?.workflowExecutionInfo?.execution?.runId || undefined;
+  }
+
   private async readLatest(anchor: ChainRun): Promise<ChainRun | undefined> {
     try {
-      const response = await requestFromAPI<WorkflowExecutionAPIResponse>(
-        routeForApi('workflow', {
-          namespace: this.namespace,
-          workflowId: this.workflowId,
-        }),
-        {
-          options: { signal: this.signal },
-          request: this.request,
-          notifyOnError: false,
-        },
-      );
-      const runId = response?.workflowExecutionInfo?.execution?.runId;
+      const runId = await this.readCurrentRunId();
       if (!runId || runId === anchor.runId) return;
       const latest = await this.readRun(runId);
       return latest.firstRunId && latest.firstRunId === anchor.firstRunId
@@ -126,8 +130,10 @@ export class RunChainReader {
     }
   }
 
-  async initialize(runId: string) {
-    const anchor = await this.readRun(runId);
+  async initialize(runId?: string) {
+    const anchorId = runId || (await this.readCurrentRunId());
+    if (!anchorId) throw new Error('This workflow has no runs to show.');
+    const anchor = await this.readRun(anchorId);
     const latest = anchor.nextRunId ? await this.readLatest(anchor) : undefined;
     this.runs = [latest ?? anchor];
     this.hasEarlier = !!this.runs[0].previousRunId;

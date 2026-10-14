@@ -4,7 +4,6 @@
 
   import { page } from '$app/state';
 
-  import RunChain from '$lib/components/workflow/run-chain/run-chain.svelte';
   import WorkflowError from '$lib/components/workflow/workflow-error.svelte';
   import {
     HISTORY_CTX,
@@ -61,7 +60,6 @@
   let workflowId = $derived(page.params.workflow);
   let runId = $derived(page.params.run);
   let showJson = $derived(page.url.searchParams.has('json'));
-  const showRunChain = $derived(page.url.searchParams.get('view') === 'chain');
   let workerHeartbeatsEnabled = $derived(
     !!page.data?.namespace?.namespaceInfo?.capabilities?.workerHeartbeats,
   );
@@ -181,7 +179,6 @@
     ns: string,
     wfId: string,
     rId: string,
-    chainView: boolean,
   ) => {
     const { workflow, error } = await fetchWorkflow({
       namespace: ns,
@@ -204,14 +201,6 @@
     $workflowRun = { ...$workflowRun, workflow, workers, workersLoaded: true };
 
     workflowRunController = new AbortController();
-
-    // The chain owns its selected-run history. Do not also start the hidden
-    // single-run history loader and live poll behind it.
-    if (chainView) {
-      resetBuffer(0);
-      fetchComplete = true;
-      return;
-    }
 
     const onWorkersRoute = page.url.pathname.endsWith('/workers');
 
@@ -370,10 +359,9 @@
     const ns = namespace;
     const wfId = workflowId;
     const rId = runId;
-    const chainView = showRunChain;
     untrack(() => {
       clearWorkflowData();
-      getWorkflowAndEventHistory(ns, wfId, rId, chainView);
+      getWorkflowAndEventHistory(ns, wfId, rId);
     });
   });
 
@@ -395,12 +383,7 @@
         _pollPaused = true;
         livePollingController.abort();
         livePollingController = null;
-      } else if (
-        !showRunChain &&
-        !paused &&
-        _pollPaused &&
-        $workflowRun.workflow?.isRunning
-      ) {
+      } else if (!paused && _pollPaused && $workflowRun.workflow?.isRunning) {
         _pollPaused = false;
         startLivePoll(namespace, workflowId, runId, _lastPollToken);
       }
@@ -439,11 +422,5 @@
   <SkeletonWorkflow />
 {:else}
   <WorkflowHeader {headerSnippet} />
-  {#if showRunChain}
-    {#key `${namespace}/${workflowId}/${runId}`}
-      <RunChain {namespace} {workflowId} {runId} />
-    {/key}
-  {:else}
-    {@render children()}
-  {/if}
+  {@render children()}
 {/if}

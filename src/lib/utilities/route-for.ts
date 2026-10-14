@@ -330,6 +330,19 @@ export const baseRouteForWorkflow = ({
   return `${routeForWorkflows(parameters)}/${id}/${run}`;
 };
 
+export const routeForRunChain = ({
+  workflow,
+  run,
+  ...parameters
+}: NamespaceParameter & {
+  workflow: string;
+  run?: string;
+}): ResolvedPathname =>
+  toURL(
+    `${routeForWorkflows(parameters)}/${encodeURIForSvelte(workflow)}/chain`,
+    run ? { run } : undefined,
+  );
+
 export const routeForSchedules = (
   parameters: NamespaceParameter,
 ): ResolvedPathname => {

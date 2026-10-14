@@ -159,7 +159,7 @@ test('chain shows ten runs, navigates to the first, and follows rollover without
       });
     });
   await page.goto(
-    `/namespaces/default/workflows/${workflowId}/${runId(25)}/timeline?view=chain`,
+    `/namespaces/default/workflows/${workflowId}/chain?run=${runId(25)}`,
   );
   const header = page.getByTestId('chain-focused-run');
   const runRows = page.getByTestId('chain-overview').getByRole('button');
@@ -219,7 +219,7 @@ test('chain shows ten runs, navigates to the first, and follows rollover without
   expect(
     await rows.evaluateAll((elements) =>
       elements.every(
-        (element) => element.getBoundingClientRect().height === 176,
+        (element) => element.getBoundingClientRect().height === 102,
       ),
     ),
   ).toBe(true);
@@ -264,7 +264,7 @@ test('chain shows ten runs, navigates to the first, and follows rollover without
   await expect(
     graph.getByText('Transient failure', { exact: false }).first(),
   ).toBeVisible();
-  await expect(page).toHaveURL(/view=chain/);
+  await expect(page).toHaveURL(/\/chain\?run=chain-run-25/);
   await graph.getByRole('button', { name: 'Close', exact: true }).click();
   await expect(
     graph.getByRole('button', { name: 'Close', exact: true }),
@@ -283,6 +283,6 @@ test('chain shows ten runs, navigates to the first, and follows rollover without
   await expect(
     graph.getByRole('link', { name: '2', exact: true }),
   ).toHaveAttribute('href', /chain-run-26/);
-  await expect(page).toHaveURL(/chain-run-25\/timeline\?view=chain/);
+  await expect(page).toHaveURL(/\/chain\?run=chain-run-25/);
   expect(errors).toEqual([]);
 });

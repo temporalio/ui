@@ -13,7 +13,13 @@
     namespace,
     workflowId,
     runId,
-  }: { namespace: string; workflowId: string; runId: string } = $props();
+    focusedRunId = $bindable(''),
+  }: {
+    namespace: string;
+    workflowId: string;
+    runId?: string;
+    focusedRunId?: string;
+  } = $props();
   let runs = $state<ChainRun[]>([]);
   let histories = $state<Record<string, RunHistory>>({});
   let summaries = $state<Record<string, RunSummary>>({});
@@ -40,6 +46,9 @@
   const focused = $derived(
     runs.find((run) => run.runId === selectedRunId) ?? latest,
   );
+  $effect(() => {
+    focusedRunId = focused?.runId ?? '';
+  });
   const message = (error: unknown) =>
     error && typeof error === 'object' && 'message' in error
       ? String(error.message)

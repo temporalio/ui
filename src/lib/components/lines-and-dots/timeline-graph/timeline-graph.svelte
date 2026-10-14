@@ -306,8 +306,12 @@
       : undefined,
   );
 
+  const panelOpen = $derived(
+    activeGroupId !== undefined ? activeIdx >= 0 : $activeGroups.length > 0,
+  );
+
   $effect(() => {
-    if (activeIdx < 0) panelHeight = 0;
+    if (!panelOpen) panelHeight = 0;
   });
 
   // Open detail panel pushes rows below the active one down by panelHeight.
@@ -516,7 +520,7 @@
     {#snippet children({ endTime })}
       <div
         class="pointer-events-none sticky top-[120px]"
-        class:invisible={activeIdx >= 0}
+        class:invisible={panelOpen}
       >
         <div class="flex w-full justify-between text-xs">
           <p class="w-60 -translate-x-24 rotate-90">

@@ -37,7 +37,6 @@
     flowThickness,
   } from './run-chain-visual';
 
-  import { runChainFocus } from './run-chain-focus.svelte';
   import RunChainTimeline from './run-chain-timeline.svelte';
 
   let {
@@ -86,12 +85,6 @@
   const focused = $derived(
     runs.find((run) => run.runId === selectedRunId) ?? latest,
   );
-  $effect(() => {
-    runChainFocus.runId = focused?.runId ?? '';
-    return () => {
-      runChainFocus.runId = '';
-    };
-  });
   const visibleRuns = $derived(chainRunWindow(runs, windowEndRunId));
   const comparison = $derived(compareRuns(visibleRuns, summaries, now));
   const visibleKey = $derived(visibleRuns.map((run) => run.runId).join('|'));
