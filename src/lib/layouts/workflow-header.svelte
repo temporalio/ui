@@ -3,6 +3,7 @@
 
   import type { Snippet } from 'svelte';
 
+  import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
   import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
@@ -21,6 +22,7 @@
   import TabList from '$lib/holocene/tab/tab-list.svelte';
   import Tab from '$lib/holocene/tab/tab.svelte';
   import Tabs from '$lib/holocene/tab/tabs.svelte';
+  import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
   import { Badge } from '$lib/io/badge';
   import { BadgeCount } from '$lib/io/badge-count';
@@ -114,6 +116,13 @@
   const linkCount = $derived(outboundLinks + inboundLinks);
   const sharedFilterParams = $derived(getSharedFilterParams(page.url));
   const taskQueue = $derived(workflow?.taskQueue ?? '');
+  const chainView = $derived(page.url.searchParams.get('view') === 'chain');
+  const toggleChainView = () => {
+    const url = new URL(page.url);
+    if (chainView) url.searchParams.delete('view');
+    else url.searchParams.set('view', 'chain');
+    void goto(url, { noScroll: true, keepFocus: true });
+  };
 </script>
 
 <div class="flex items-center justify-between">
@@ -139,6 +148,13 @@
       </Link>
     {/if}
   </div>
+  <ToggleSwitch
+    id="workflow-run-chain"
+    label="Run chain"
+    checked={chainView}
+    onchange={toggleChainView}
+    data-testid="run-chain-toggle"
+  />
 </div>
 <header class="flex flex-col gap-4">
   <div class="flex flex-col items-start justify-between gap-4 xl:flex-row">
@@ -194,7 +210,9 @@
     </div>
   </div>
   <CodecServerErrorBanner />
-  <WorkflowDetails workflow={workflow!} next={workflowRelationships.next} />
+  {#if !chainView}
+    <WorkflowDetails workflow={workflow!} next={workflowRelationships.next} />
+  {/if}
   <ExtensionSlot
     name="workflow.header.after-details"
     class="flex w-full flex-col gap-2"
@@ -288,139 +306,141 @@
     {runningWithNoWorkers}
     deployment={workerDeployment}
   />
-  <Tabs>
-    <TabList label="workflow detail">
-      <Tab
-        label={translate('workflows.timeline-tab')}
-        id="timeline-tab"
-        href={routeForTimeline({
-          ...routeParameters,
-          queryParams: sharedFilterParams,
-        })}
-        active={pathMatches(
-          page.url.pathname,
-          routeForTimeline(routeParameters),
-        )}
-        onClick={() => ($workflowViewPreference = 'timeline')}
-      />
-      <Tab
-        label={translate('workflows.history-tab')}
-        id="history-tab"
-        href={routeForEventHistory({
-          ...routeParameters,
-          queryParams: sharedFilterParams,
-        })}
-        onClick={() => ($workflowViewPreference = 'history')}
-        active={pathMatches(
-          page.url.pathname,
-          routeForEventHistory({
-            ...routeParameters,
-          }),
-        )}
-      >
-        <BadgeCount value={workflow?.historyEvents ?? 0} />
-      </Tab>
-      <Tab
-        label={translate('workflows.relationships')}
-        id="relationships-tab"
-        href={routeForRelationships(routeParameters)}
-        active={pathMatches(
-          page.url.pathname,
-          routeForRelationships(routeParameters),
-        )}
-      >
-        <BadgeCount value={workflowRelationships.relationshipCount} />
-      </Tab>
-      {#if linkCount > 0}
+  {#if !chainView}
+    <Tabs>
+      <TabList label="workflow detail">
         <Tab
-          label={translate('workflows.nexus-links-tab')}
-          id="nexus-links-tab"
-          href={routeForNexusLinks(routeParameters)}
+          label={translate('workflows.timeline-tab')}
+          id="timeline-tab"
+          href={routeForTimeline({
+            ...routeParameters,
+            queryParams: sharedFilterParams,
+          })}
           active={pathMatches(
             page.url.pathname,
-            routeForNexusLinks(routeParameters),
+            routeForTimeline(routeParameters),
+          )}
+          onClick={() => ($workflowViewPreference = 'timeline')}
+        />
+        <Tab
+          label={translate('workflows.history-tab')}
+          id="history-tab"
+          href={routeForEventHistory({
+            ...routeParameters,
+            queryParams: sharedFilterParams,
+          })}
+          onClick={() => ($workflowViewPreference = 'history')}
+          active={pathMatches(
+            page.url.pathname,
+            routeForEventHistory({
+              ...routeParameters,
+            }),
           )}
         >
-          <BadgeCount value={linkCount} />
+          <BadgeCount value={workflow?.historyEvents ?? 0} />
         </Tab>
-      {/if}
-      <Tab
-        label={translate('workflows.workers-tab')}
-        id="workers-tab"
-        href={routeForWorkflowWorkers(routeParameters)}
-        active={pathMatches(
-          page.url.pathname,
-          routeForWorkflowWorkers(routeParameters),
-        )}
-      >
-        {#if workerCount !== undefined}
-          <BadgeCount value={workerCount} />
+        <Tab
+          label={translate('workflows.relationships')}
+          id="relationships-tab"
+          href={routeForRelationships(routeParameters)}
+          active={pathMatches(
+            page.url.pathname,
+            routeForRelationships(routeParameters),
+          )}
+        >
+          <BadgeCount value={workflowRelationships.relationshipCount} />
+        </Tab>
+        {#if linkCount > 0}
+          <Tab
+            label={translate('workflows.nexus-links-tab')}
+            id="nexus-links-tab"
+            href={routeForNexusLinks(routeParameters)}
+            active={pathMatches(
+              page.url.pathname,
+              routeForNexusLinks(routeParameters),
+            )}
+          >
+            <BadgeCount value={linkCount} />
+          </Tab>
         {/if}
-      </Tab>
-      <Tab
-        label={translate('workflows.pending-activities-tab')}
-        id="pending-activities-tab"
-        href={routeForPendingActivities(routeParameters)}
-        active={pathMatches(
-          page.url.pathname,
-          routeForPendingActivities(routeParameters),
-        )}
-      >
-        {#if activitiesCanceled}
-          <Badge
-            colorScheme="warning"
-            Icon={IconCanceled}
-            text={String(workflow?.pendingActivities?.length ?? 0)}
-          />
-        {:else}
-          <BadgeCount value={workflow?.pendingActivities?.length ?? 0} />
-        {/if}
-      </Tab>
-      <Tab
-        label={translate('workflows.call-stack-tab')}
-        id="call-stack-tab"
-        href={routeForCallStack(routeParameters)}
-        active={pathMatches(
-          page.url.pathname,
-          routeForCallStack(routeParameters),
-        )}
-      />
-      <Tab
-        label={translate('workflows.queries-tab')}
-        id="queries-tab"
-        href={routeForWorkflowQuery(routeParameters)}
-        active={pathMatches(
-          page.url.pathname,
-          routeForWorkflowQuery(routeParameters),
-        )}
-      />
-      <Tab
-        label={translate('workflows.user-metadata-tab')}
-        id="user-metadata-tab"
-        href={routeForUserMetadata(routeParameters)}
-        active={pathMatches(
-          page.url.pathname,
-          routeForUserMetadata(routeParameters),
-        )}
-      />
-      <Tab
-        label={translate('workflows.search-attributes-tab')}
-        id="search-attributes-tab"
-        href={routeForWorkflowSearchAttributes(routeParameters)}
-        active={pathMatches(
-          page.url.pathname,
-          routeForWorkflowSearchAttributes(routeParameters),
-        )}
-      />
-      <Tab
-        label={translate('workflows.memo-tab')}
-        id="memo-tab"
-        href={routeForWorkflowMemo(routeParameters)}
-        active={pathMatches(
-          page.url.pathname,
-          routeForWorkflowMemo(routeParameters),
-        )}
-      />
-    </TabList>
-  </Tabs>
+        <Tab
+          label={translate('workflows.workers-tab')}
+          id="workers-tab"
+          href={routeForWorkflowWorkers(routeParameters)}
+          active={pathMatches(
+            page.url.pathname,
+            routeForWorkflowWorkers(routeParameters),
+          )}
+        >
+          {#if workerCount !== undefined}
+            <BadgeCount value={workerCount} />
+          {/if}
+        </Tab>
+        <Tab
+          label={translate('workflows.pending-activities-tab')}
+          id="pending-activities-tab"
+          href={routeForPendingActivities(routeParameters)}
+          active={pathMatches(
+            page.url.pathname,
+            routeForPendingActivities(routeParameters),
+          )}
+        >
+          {#if activitiesCanceled}
+            <Badge
+              colorScheme="warning"
+              Icon={IconCanceled}
+              text={String(workflow?.pendingActivities?.length ?? 0)}
+            />
+          {:else}
+            <BadgeCount value={workflow?.pendingActivities?.length ?? 0} />
+          {/if}
+        </Tab>
+        <Tab
+          label={translate('workflows.call-stack-tab')}
+          id="call-stack-tab"
+          href={routeForCallStack(routeParameters)}
+          active={pathMatches(
+            page.url.pathname,
+            routeForCallStack(routeParameters),
+          )}
+        />
+        <Tab
+          label={translate('workflows.queries-tab')}
+          id="queries-tab"
+          href={routeForWorkflowQuery(routeParameters)}
+          active={pathMatches(
+            page.url.pathname,
+            routeForWorkflowQuery(routeParameters),
+          )}
+        />
+        <Tab
+          label={translate('workflows.user-metadata-tab')}
+          id="user-metadata-tab"
+          href={routeForUserMetadata(routeParameters)}
+          active={pathMatches(
+            page.url.pathname,
+            routeForUserMetadata(routeParameters),
+          )}
+        />
+        <Tab
+          label={translate('workflows.search-attributes-tab')}
+          id="search-attributes-tab"
+          href={routeForWorkflowSearchAttributes(routeParameters)}
+          active={pathMatches(
+            page.url.pathname,
+            routeForWorkflowSearchAttributes(routeParameters),
+          )}
+        />
+        <Tab
+          label={translate('workflows.memo-tab')}
+          id="memo-tab"
+          href={routeForWorkflowMemo(routeParameters)}
+          active={pathMatches(
+            page.url.pathname,
+            routeForWorkflowMemo(routeParameters),
+          )}
+        />
+      </TabList>
+    </Tabs>
+  {/if}
 </header>

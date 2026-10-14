@@ -6,6 +6,7 @@
     getStatusStrokeColor,
   } from '$lib/components/lines-and-dots/colors';
   import { timestamp } from '$lib/components/timestamp.svelte';
+  import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import {
     type LazyGroup,
     materializeGroup,
@@ -15,6 +16,7 @@
   import { collapseIdleTime } from '$lib/stores/event-view';
   import { fullEventHistory } from '$lib/stores/events';
   import { eventStatusFilter } from '$lib/stores/filters';
+  import type { WorkflowEvent } from '$lib/types/events';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { isWorkflowDelayed } from '$lib/utilities/delayed-workflows';
   import { type ValidTime, validTimeToDate } from '$lib/utilities/format-time';
@@ -46,6 +48,9 @@
 
   interface Props {
     workflow: WorkflowExecution;
+    eventHistory?: WorkflowEvent[];
+    onSelectGroup?: (group: EventGroup) => void;
+    activeGroupId?: string;
     // Filtering, sorting and segment layout need no EventGroup, so only the
     // pooled rows below materialize one.
     lazyGroups: LazyGroup[];
@@ -61,6 +66,9 @@
 
   let {
     workflow,
+    eventHistory,
+    onSelectGroup,
+    activeGroupId,
     lazyGroups,
     readOnly = false,
     error = false,
@@ -119,7 +127,7 @@
   let nowMs = $state(Date.now());
 
   const timeline = new Timeline({
-    getFullEventHistory: () => $fullEventHistory,
+    getFullEventHistory: () => eventHistory ?? $fullEventHistory,
     getWorkflow: () => workflow,
     getLazyGroups: () => lazyGroups,
     getCurrentTimeMs: () => nowMs,
@@ -257,7 +265,7 @@
   }
 
   const firstStartTime = $derived.by(() => {
-    const firstEventTime = $fullEventHistory[0]?.eventTime;
+    const firstEventTime = (eventHistory ?? $fullEventHistory)[0]?.eventTime;
 
     if (!firstEventTime) {
       return workflow.executionTime;
@@ -279,7 +287,11 @@
   // Active group's index in filteredLazyGroups (-1 = none). Derived here so the row
   // pool doesn't subscribe to $activeGroups directly.
   const activeIdx = $derived(
-    $activeGroups.length > 0 ? (groupIndexMap.get($activeGroups[0]) ?? -1) : -1,
+    activeGroupId !== undefined
+      ? (groupIndexMap.get(activeGroupId) ?? -1)
+      : $activeGroups.length > 0
+        ? (groupIndexMap.get($activeGroups[0]) ?? -1)
+        : -1,
   );
 
   // Materialized here rather than inline in the template: a GroupRecord keeps
@@ -288,12 +300,14 @@
   // built with, missing later pending-metadata changes.
   const activeGroup = $derived(
     activeIdx >= 0 && filteredLazyGroups[activeIdx]
-      ? eventBuffer.materializeGroup(filteredLazyGroups[activeIdx])
+      ? eventHistory
+        ? materializeGroup(filteredLazyGroups[activeIdx])
+        : eventBuffer.materializeGroup(filteredLazyGroups[activeIdx])
       : undefined,
   );
 
   $effect(() => {
-    if ($activeGroups.length === 0) panelHeight = 0;
+    if (activeIdx < 0) panelHeight = 0;
   });
 
   // Open detail panel pushes rows below the active one down by panelHeight.
@@ -502,7 +516,7 @@
     {#snippet children({ endTime })}
       <div
         class="pointer-events-none sticky top-[120px]"
-        class:invisible={!!$activeGroups.length}
+        class:invisible={activeIdx >= 0}
       >
         <div class="flex w-full justify-between text-xs">
           <p class="w-60 -translate-x-24 rotate-90">
@@ -588,6 +602,7 @@
                   {canvasWidth}
                   project={projectX}
                   {readOnly}
+                  {onSelectGroup}
                 />
               {/if}
             </li>
@@ -616,6 +631,9 @@
           <GroupDetailsRow
             y={panelY}
             group={activeGroup}
+            onClose={onSelectGroup
+              ? () => onSelectGroup?.(activeGroup!)
+              : undefined}
             {canvasWidth}
             endTime={workflow?.endTime ? endTime : nowMs}
             onHeight={(height) => {

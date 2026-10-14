@@ -1,6 +1,7 @@
 <script lang="ts">
   import { omit } from 'es-toolkit';
   import type { Snippet } from 'svelte';
+  import { getContext } from 'svelte';
 
   import { page } from '$app/state';
 
@@ -8,6 +9,10 @@
   import EventStatusBadge from '$lib/components/event/event-status-badge.svelte';
   import PayloadCodeBlock from '$lib/components/payload/payload-code-block.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
+  import {
+    WORKFLOW_VIEW_CONTEXT,
+    type WorkflowViewContext,
+  } from '$lib/contexts/workflow-view-context';
   import Accordion from '$lib/holocene/accordion/accordion.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -36,11 +41,24 @@
   const failed = $derived(
     (activity.attempt ?? 0) > 1 && !!activity.lastFailure,
   );
-  const isRunning = $derived($workflowRun?.workflow?.isRunning);
-  const isPaused = $derived($workflowRun?.workflow?.isPaused);
+  const scope = getContext<WorkflowViewContext | undefined>(
+    WORKFLOW_VIEW_CONTEXT,
+  );
+  const isRunning = $derived(
+    (scope?.workflow ?? $workflowRun?.workflow)?.isRunning,
+  );
+  const isPaused = $derived(
+    (scope?.workflow ?? $workflowRun?.workflow)?.isPaused,
+  );
 
   const scheduledEvent = $derived(
-    eventBuffer.pendingActivityScheduledEvent(activity.activityId),
+    scope
+      ? scope.events.find(
+          (event) =>
+            event.activityTaskScheduledEventAttributes?.activityId ===
+            activity.activityId,
+        )
+      : eventBuffer.pendingActivityScheduledEvent(activity.activityId),
   );
   const updatedOptions = $derived(
     getUpdatedActivityOptions(

@@ -25,6 +25,7 @@
     y: number;
     // Reports panel height so timeline-graph can shift the rows below it.
     onHeight?: (h: number) => void;
+    onClose?: () => void;
   };
 
   let {
@@ -34,6 +35,7 @@
     x = 0,
     y,
     onHeight,
+    onClose,
   }: Props = $props();
 
   // ResizeObserver so the height re-measures when CodeMirror lazily swaps in.
@@ -85,9 +87,9 @@
     <div
       class="relative flex h-full items-center justify-between bg-surface-secondary text-sm"
     >
-      <div class="flex h-full items-center gap-4 px-2">
+      <div class="flex h-full min-w-0 items-center gap-4 px-2">
         <EventStatusBadge {status} />
-        {title}
+        <span class="truncate" {title}>{title}</span>
         {#if duration}
           <div class="flex items-center gap-1">
             <IconClock />
@@ -96,7 +98,10 @@
         {/if}
       </div>
       <div class="flex items-center gap-4">
-        <Button variant="ghost" size="xs" onclick={() => setActiveGroup(group)}
+        <Button
+          variant="ghost"
+          size="xs"
+          onclick={onClose ?? (() => setActiveGroup(group))}
           >{translate('common.close')} <IconClose /></Button
         >
       </div>

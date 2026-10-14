@@ -46,6 +46,7 @@
     canvasWidth: number;
     project: (time: ValidTime | undefined | null) => number;
     readOnly: boolean;
+    onSelectGroup?: (group: EventGroup) => void;
     // Reactive event count so the row recomputes on streamed appends (eventList
     // is mutated in place) and on pooled re-point.
     eventCount?: number;
@@ -56,6 +57,7 @@
     canvasWidth,
     project,
     readOnly = false,
+    onSelectGroup,
     eventCount = 0,
   }: Props = $props();
 
@@ -133,7 +135,8 @@
 
   const onClick = () => {
     if (readOnly) return;
-    setActiveGroup(group);
+    if (onSelectGroup) onSelectGroup(group);
+    else setActiveGroup(group);
   };
 
   // Only activity groups carry an ActivityTaskStarted event; guard so other

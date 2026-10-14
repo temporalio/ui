@@ -1,8 +1,13 @@
 <script lang="ts">
   import type { WorkflowExecution } from '@temporalio/client';
+  import { getContext } from 'svelte';
 
   import { page } from '$app/state';
 
+  import {
+    WORKFLOW_VIEW_CONTEXT,
+    type WorkflowViewContext,
+  } from '$lib/contexts/workflow-view-context';
   import Button from '$lib/holocene/button.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -34,7 +39,18 @@
   };
 
   let { activity, class: className = '' }: Props = $props();
-  const { namespace, workflow, run } = $derived(page.params);
+  const scope = getContext<WorkflowViewContext | undefined>(
+    WORKFLOW_VIEW_CONTEXT,
+  );
+  const { namespace, workflow, run } = $derived(
+    scope
+      ? {
+          namespace: scope.namespace,
+          workflow: scope.workflow.id,
+          run: scope.workflow.runId,
+        }
+      : page.params,
+  );
   const execution: WorkflowExecution = $derived({
     workflowId: workflow,
     runId: run,
