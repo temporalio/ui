@@ -15,6 +15,8 @@ export type ChainRun = {
   closeTime?: number;
   status: string;
   eventCount: string;
+  inputBytes?: number;
+  firstRunId?: string;
 };
 
 export type ChainStep = {
@@ -51,6 +53,36 @@ export function eventTime(value: unknown): number {
   return 0;
 }
 
+const encodedBytes = (value: unknown) => {
+  if (value instanceof Uint8Array) return value.byteLength;
+  if (typeof value !== 'string') return 0;
+  const padding = value.endsWith('==') ? 2 : value.endsWith('=') ? 1 : 0;
+  return Math.max(0, Math.floor((value.length * 3) / 4) - padding);
+};
+
+/** Wire size of encoded payloads, which is what history size limits count. */
+export function payloadBytes(payloads: unknown): number | undefined {
+  const list =
+    payloads && typeof payloads === 'object' && 'payloads' in payloads
+      ? payloads.payloads
+      : undefined;
+  if (!Array.isArray(list)) return undefined;
+  return list.reduce<number>((sum, payload) => {
+    const { data, metadata } = (payload ?? {}) as {
+      data?: unknown;
+      metadata?: Record<string, unknown>;
+    };
+    return (
+      sum +
+      encodedBytes(data) +
+      Object.values(metadata ?? {}).reduce<number>(
+        (total, value) => total + encodedBytes(value),
+        0,
+      )
+    );
+  }, 0);
+}
+
 export function summarizeRun(
   runId: string,
   first: HistoryEvent,
@@ -81,6 +113,8 @@ export function summarizeRun(
     closeTime: status === 'Running' ? undefined : eventTime(last.eventTime),
     status,
     eventCount: last.eventId,
+    inputBytes: payloadBytes(started.input),
+    firstRunId: started.firstExecutionRunId || undefined,
   };
 }
 

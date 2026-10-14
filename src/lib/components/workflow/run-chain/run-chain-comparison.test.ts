@@ -6,6 +6,7 @@ import type { ChainRun } from './run-chain';
 import {
   compareRuns,
   runAttention,
+  stateGrowth,
   summarizeRunWork,
 } from './run-chain-comparison';
 import { RunSummaryAccumulator, summarizeSteps } from './run-chain-summary';
@@ -25,6 +26,30 @@ const event = (eventId: number, attributes: object) =>
   }) as unknown as HistoryEvent;
 
 describe('run comparison', () => {
+  it('flags carried state that keeps growing between runs', () => {
+    const sized = (...sizes: (number | undefined)[]) =>
+      sizes.map((inputBytes, index) => ({
+        ...run(`run-${index}`),
+        inputBytes,
+      }));
+    expect(stateGrowth(sized(10, 20, 30), 2)).toEqual({
+      bytes: 30,
+      change: 10,
+      growing: true,
+    });
+    expect(stateGrowth(sized(10, 20, 30), 1).growing).toBe(false);
+    expect(stateGrowth(sized(10, 30, 20), 2)).toMatchObject({
+      change: -10,
+      growing: false,
+    });
+    expect(stateGrowth(sized(10, 10, 30), 2).growing).toBe(false);
+    expect(stateGrowth(sized(10, undefined, 30), 2)).toEqual({
+      bytes: 30,
+      change: undefined,
+      growing: false,
+    });
+  });
+
   it.each(['LocalActivity', 'core_local_activity'])(
     'counts %s markers as local activities',
     (markerName) => {
@@ -243,5 +268,13 @@ describe('run comparison', () => {
     expect(
       compareRuns(runs.slice(0, 2), summaries, 120_000).durationMedian,
     ).toBeUndefined();
+    expect(
+      compareRuns(runs, { ...summaries, e: summary('e', 100, false) }, 120_000)
+        .maxWork,
+    ).toBe(40);
+    expect(
+      compareRuns(runs.slice(4), { e: summary('e', 5, false) }, 120_000)
+        .maxWork,
+    ).toBe(5);
   });
 });

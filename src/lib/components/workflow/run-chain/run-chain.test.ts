@@ -6,6 +6,7 @@ import {
   buildChainSteps,
   type ChainRun,
   chainRunWindow,
+  payloadBytes,
   summarizeRun,
 } from './run-chain';
 
@@ -87,6 +88,25 @@ describe('run chain model', () => {
       status: 'Continued as new',
       nextRunId: 'next',
     });
+  });
+
+  it('measures the encoded size of the state a run received', () => {
+    expect(payloadBytes(undefined)).toBeUndefined();
+    expect(payloadBytes({ payloads: [] })).toBe(0);
+    expect(
+      payloadBytes({
+        payloads: [
+          { metadata: { encoding: 'anNvbi9wbGFpbg==' }, data: 'eyJhIjoxfQ==' },
+          { data: new Uint8Array(5) },
+        ],
+      }),
+    ).toBe(10 + 7 + 5);
+    const started = event('1', 0, {
+      workflowExecutionStartedEventAttributes: {
+        input: { payloads: [{ data: 'eyJhIjoxfQ==' }] },
+      },
+    });
+    expect(summarizeRun('run', started, started).inputBytes).toBe(7);
   });
 
   it('matches out-of-order activity completions and assigns overlap lanes', () => {

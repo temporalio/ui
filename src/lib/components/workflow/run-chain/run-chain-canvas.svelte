@@ -1,29 +1,43 @@
 <script lang="ts">
-  import { tick, untrack } from 'svelte';
+  import { type Snippet, tick, untrack } from 'svelte';
 
-  import { getCategoryStrokeColor } from '$lib/components/lines-and-dots/colors';
+  import { eventCategoryColor } from '$lib/components/event/event-styles';
+  import {
+    getCategoryStrokeColor,
+    getStatusStrokeColor,
+  } from '$lib/components/lines-and-dots/colors';
   import { timestamp } from '$lib/components/timestamp.svelte';
   import WorkflowStatusBadge from '$lib/components/workflow/workflow-status-badge.svelte';
-  import { IconClock, IconRetry, IconWarning } from '$lib/io/icon';
+  import { IconClock, IconLink } from '$lib/io/icon';
+  import { formatBytes } from '$lib/utilities/format-bytes';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import { routeForWorkflow } from '$lib/utilities/route-for';
 
   import {
     type ChainRun,
     chainRunWindow,
+    type ChainStep,
     chainWorkflowStatus,
     formatChainDuration,
     type LiveRunState,
   } from './run-chain';
-  import { compareRuns, runAttention } from './run-chain-comparison';
+  import {
+    compareRuns,
+    primitiveLabels,
+    runAttention,
+    stateGrowth,
+  } from './run-chain-comparison';
   import type { RunHistory } from './run-chain-reader';
   import type { RunSummary } from './run-chain-summary';
   import {
     flowConnectors,
     flowLayers,
+    flowOrder,
+    flowRetryPattern,
     flowThickness,
   } from './run-chain-visual';
 
+  import { runChainFocus } from './run-chain-focus.svelte';
   import RunChainTimeline from './run-chain-timeline.svelte';
 
   let {
@@ -43,6 +57,8 @@
     hasEarlier = false,
     onloadearlier,
     onwindowchange,
+    actions,
+    notices,
   }: {
     runs: ChainRun[];
     histories: Record<string, RunHistory>;
@@ -60,6 +76,8 @@
     hasEarlier?: boolean;
     onloadearlier: () => void;
     onwindowchange: (ids: string[]) => void;
+    actions?: Snippet;
+    notices?: Snippet;
   } = $props();
   let windowEndRunId = $state('');
   let pendingPreviousRunId = $state('');
@@ -68,6 +86,12 @@
   const focused = $derived(
     runs.find((run) => run.runId === selectedRunId) ?? latest,
   );
+  $effect(() => {
+    runChainFocus.runId = focused?.runId ?? '';
+    return () => {
+      runChainFocus.runId = '';
+    };
+  });
   const visibleRuns = $derived(chainRunWindow(runs, windowEndRunId));
   const comparison = $derived(compareRuns(visibleRuns, summaries, now));
   const visibleKey = $derived(visibleRuns.map((run) => run.runId).join('|'));
@@ -138,6 +162,10 @@
     } else if (!hasEarlier) pendingPreviousRunId = '';
   });
   function keydown(event: KeyboardEvent) {
+    if (event.key === 'Escape' && pinnedKind) {
+      pinnedKind = '';
+      return;
+    }
     if (
       event.defaultPrevented ||
       event.altKey ||
@@ -184,6 +212,53 @@
       minute: '2-digit',
       second: '2-digit',
     });
+  const legendLabels: Record<ChainStep['kind'], string> = {
+    activity: 'Activities',
+    'local-activity': 'Local activities',
+    'child-workflow': 'Child workflows',
+    timer: 'Timers',
+    signal: 'Signals',
+    update: 'Updates',
+    nexus: 'Nexus',
+    other: 'Markers',
+  };
+  const legend = $derived(
+    flowOrder.filter((kind) =>
+      comparison.rows.some((row) =>
+        row.primitives.some(
+          (primitive) => primitive.kind === kind && primitive.counts.total > 0,
+        ),
+      ),
+    ),
+  );
+  const legendRetried = $derived(
+    comparison.rows.some((row) => row.totals.recovered > 0),
+  );
+  let hoveredKind = $state<ChainStep['kind'] | ''>('');
+  let pinnedKind = $state<ChainStep['kind'] | ''>('');
+  const highlightKind = $derived.by(() => {
+    const kind = hoveredKind || pinnedKind;
+    return kind && legend.includes(kind) ? kind : '';
+  });
+  const dimmed = (kind: ChainStep['kind']) =>
+    !!highlightKind && kind !== highlightKind;
+  function hoverFlow(event: PointerEvent) {
+    const kind =
+      event.target instanceof Element
+        ? event.target.closest('[data-kind]')?.getAttribute('data-kind')
+        : undefined;
+    hoveredKind = (kind as ChainStep['kind'] | undefined) ?? '';
+  }
+  const sizeLabel = (bytes: number) =>
+    bytes < 1024 ? `${bytes} B` : formatBytes(bytes, 1);
+  function carriedLabel(growth: ReturnType<typeof stateGrowth>) {
+    if (growth.bytes === undefined) return '';
+    const change =
+      growth.change === undefined
+        ? ''
+        : ` (${growth.change >= 0 ? '+' : '−'}${sizeLabel(Math.abs(growth.change))} vs the previous run)`;
+    return `Carried ${sizeLabel(growth.bytes)} of state into this run${change}${growth.growing ? '. Carried state grew across each of the last three runs; state that keeps growing will eventually hit payload and history size limits.' : '.'}`;
+  }
   function workLabel(row: (typeof comparison.rows)[number]) {
     return row.primitives
       .map(({ label, counts }) => `${counts.total} ${label.toLowerCase()}`)
@@ -194,43 +269,87 @@
 <svelte:window onkeydown={keydown} />
 
 <div class="canvas" data-testid="chain-canvas">
+  <div class="chain-heading">
+    <div class="chain-title">
+      <IconLink class="h-4 w-4" />
+      <h2>Run chain</h2>
+      <span
+        class="hint"
+        title="Runs are ordered oldest to latest. Use the left and right arrow keys to inspect runs."
+        >← / → to select</span
+      >
+    </div>
+    {#if legend.length}<div
+        class="legend"
+        role="group"
+        aria-label="Flow legend"
+      >
+        {#each legend as kind (kind)}<button
+            type="button"
+            class="legend-item {eventCategoryColor({ category: kind })}"
+            class:active={highlightKind === kind}
+            aria-pressed={pinnedKind === kind}
+            title={`${primitiveLabels[kind]}. Hover to follow across runs; click to keep it highlighted.`}
+            onpointerenter={() => (hoveredKind = kind)}
+            onpointerleave={() => (hoveredKind = '')}
+            onfocus={() => (hoveredKind = kind)}
+            onblur={() => (hoveredKind = '')}
+            onclick={() => (pinnedKind = pinnedKind === kind ? '' : kind)}
+            ><span class="legend-swatch bg-current"></span>{legendLabels[
+              kind
+            ]}</button
+          >{/each}
+        {#if legendRetried}<span
+            class="legend-item static"
+            title="Striped ends: work that completed after retrying"
+            ><span
+              class="legend-swatch"
+              style:background={flowRetryPattern(
+                getCategoryStrokeColor('retry'),
+              )}
+            ></span>Retried</span
+          >{/if}
+      </div>{/if}
+    <div class="run-navigation">
+      {#if selectedRunId}<button
+          class="follow-latest"
+          onclick={() => {
+            if (latest) select(latest);
+          }}>Follow latest</button
+        >{/if}
+      <button
+        onclick={() => move(-1)}
+        disabled={!focused || (focusedIndex <= 0 && !hasEarlier)}
+        aria-label="Previous run"
+        title="Previous run (←)">←</button
+      ><button
+        onclick={() => move(1)}
+        disabled={!focused || focusedIndex >= runs.length - 1}
+        aria-label="Next run"
+        title="Next run (→)">→</button
+      >{@render actions?.()}
+    </div>
+  </div>
+  {@render notices?.()}
   {#if focused}
     <div class="workspace">
       <div class="overview">
-        <div class="panel-heading">
-          <div class="overview-heading">
-            <strong
-              >{!windowEndRunId ? 'Latest' : ''}
-              {visibleRuns.length} runs</strong
-            >
-            <div class="run-navigation">
-              {#if selectedRunId}<button
-                  class="follow-latest"
-                  onclick={() => {
-                    if (latest) select(latest);
-                  }}>Follow latest</button
-                >{/if}
-              <button
-                onclick={() => move(-1)}
-                disabled={focusedIndex <= 0 && !hasEarlier}
-                aria-label="Previous run"
-                title="Previous run (←)">←</button
-              ><button
-                onclick={() => move(1)}
-                disabled={focusedIndex >= runs.length - 1}
-                aria-label="Next run"
-                title="Next run (→)">→</button
-              >
-            </div>
-          </div>
-          <small title="Use the left and right arrow keys to inspect runs"
-            >Oldest → latest · ← / → to select</small
-          >
-        </div>
-        <div class="run-list" data-testid="chain-overview" bind:this={runList}>
+        <div
+          class="run-list"
+          data-testid="chain-overview"
+          bind:this={runList}
+          style:--flow-failed={getStatusStrokeColor('Failed')}
+          role="presentation"
+          onpointerover={hoverFlow}
+          onpointerleave={() => (hoveredKind = '')}
+        >
           {#each comparison.rows as row, index (row.run.runId)}
             {@const attention = runAttention(row, row.run.status)}
-            {#if index > 0}<span class="run-connector" aria-hidden="true"
+            {@const growth = stateGrowth(runs, number(row.run) - 1)}
+            {#if index > 0}<span
+                class="run-connector"
+                aria-hidden="true"
+                title={carriedLabel(growth)}
                 ><svg
                   class="flow-bridge"
                   viewBox="0 0 1 1"
@@ -238,42 +357,27 @@
                   ><line x1="0" y1="0.5" x2="1" y2="0.5"
                   ></line>{#each flowConnectors(flows[index - 1], flows[index]) as connector (connector.kind)}<path
                       d={connector.path}
-                      fill={getCategoryStrokeColor(connector.kind)}
+                      data-kind={connector.kind}
+                      class:dimmed={dimmed(connector.kind)}
+                      class:highlighted={highlightKind === connector.kind}
+                      class={eventCategoryColor({ category: connector.kind })}
+                      fill="currentColor"
                     ></path>{/each}</svg
-                ></span
+                >{#if growth.bytes !== undefined}<span
+                    class="carried"
+                    class:growing={growth.growing}
+                    >{growth.growing ? '↑ ' : ''}{sizeLabel(growth.bytes)}</span
+                  >{/if}</span
               >{/if}
             <button
               class="run-row"
               class:selected={row.run.runId === focused.runId}
               onclick={() => select(row.run)}
               aria-pressed={row.run.runId === focused.runId}
-              aria-label={`${runLabel(row.run)}. ${row.summary ? workLabel(row) || 'No recorded work' : 'Loading summary'}. ${attention.title}. ${row.totals.retried ? `${row.totals.retried} activities retried.` : ''}${!row.summary?.complete ? ' Partial history.' : ''}`}
+              aria-label={`${runLabel(row.run)}. ${row.summary ? workLabel(row) || 'No recorded work' : 'Loading summary'}. ${attention.title}. ${row.totals.retried ? `${row.totals.retried} activities retried.` : ''}${!row.summary?.complete ? ' Partial history.' : ''} ${carriedLabel(growth)}`}
               data-run-id={row.run.runId}
               data-testid="chain-comparison-row"
             >
-              <span class="run-heading">
-                <span class="run-start" title={runLabel(row.run)}
-                  >{$timestamp(row.run.startTime)}</span
-                >
-                <span
-                  class="run-duration"
-                  title={`${row.run.closeTime === undefined ? 'Elapsed so far' : 'Duration'}: ${runDuration(row.run)}${comparison.durationMedian !== undefined ? ` · Median of displayed closed runs: ${formatChainDuration(comparison.durationMedian)}` : ''}${row.longer ? ' · At least 1.5× the median duration' : ''}`}
-                >
-                  <span class="duration-value" class:longer={row.longer}
-                    ><IconClock class="h-3 w-3 shrink-0" /><span
-                      >{runDuration(row.run)}</span
-                    >{#if row.run.closeTime === undefined}<span
-                        class="live-label">live</span
-                      >{/if}</span
-                  >
-                  <span class="tags"
-                    >{#if row.run.runId === latest?.runId}<span
-                        class="latest-label"
-                        >{hasLater ? 'Newest loaded' : 'Latest'}</span
-                      >{/if}</span
-                  >
-                </span>
-              </span>
               <span
                 class="flow"
                 class:partial={!row.summary?.complete}
@@ -282,32 +386,70 @@
                 class:ended={index === comparison.rows.length - 1 &&
                   row.run.closeTime !== undefined &&
                   row.run.status !== 'Continued as new'}
-                title={`${row.summary ? `${!row.summary.complete ? 'At least ' : ''}${row.totals.total} recorded operations${workLabel(row) ? ` · ${workLabel(row)}` : ''}` : 'Loading summary'}${row.heavier ? ' · At least 1.5× the median recorded operations of the displayed complete, closed runs' : ''}. Band thickness is relative to the busiest displayed run.`}
+                class:failed-end={[
+                  'Failed',
+                  'Timed out',
+                  'Terminated',
+                ].includes(row.run.status)}
+                title={`${row.summary ? `${!row.summary.complete ? 'At least ' : ''}${row.totals.total} recorded operations${workLabel(row) ? ` · ${workLabel(row)}` : ''}` : 'Loading summary'}${row.heavier ? ' · At least 1.5× the median recorded operations of the displayed complete, closed runs' : ''}. Band thickness is relative to the busiest displayed closed run; striped and red ends mark work that was retried or failed.`}
                 aria-hidden="true"
                 ><span class="flow-spine"
                 ></span>{#each flows[index] as layer (layer.kind)}<span
-                    class="flow-layer"
+                    class="flow-layer bg-current {eventCategoryColor({
+                      category: layer.kind,
+                    })}"
+                    class:dimmed={dimmed(layer.kind)}
+                    data-kind={layer.kind}
                     style:top={`${layer.top * 100}%`}
                     style:height={`${layer.height * 100}%`}
-                    style:background={getCategoryStrokeColor(layer.kind)}
-                  ></span>{/each}</span
+                    >{#each layer.marks as mark (mark.label)}<span
+                        class="flow-mark"
+                        style:width={`${mark.width * 100}%`}
+                        style:background={mark.background}
+                      ></span>{/each}</span
+                  >{/each}</span
               >
-              <span class="attention">
-                {#if attention.trouble}<span
-                    class="attention-item trouble"
-                    title={attention.title}
-                    ><IconWarning class="h-3 w-3 shrink-0" /><span
-                      >{attention.label}</span
-                    ></span
-                  >{/if}
-                {#if row.totals.retried}<span
-                    class="attention-item"
-                    style:color={getCategoryStrokeColor('retry')}
-                    title={`${row.totals.retried} activities with observed retries · ${row.totals.recovered} completed after retrying. Counts activities, not retry attempts; history does not expose every internal retry.`}
-                    ><IconRetry class="h-3 w-3 shrink-0" /><span
-                      >{row.totals.retried} retried</span
-                    ></span
-                  >{/if}
+              <span class="run-heading">
+                <span class="heading-line">
+                  <span class="run-start" title={runLabel(row.run)}
+                    >{$timestamp(row.run.startTime)}</span
+                  >{#if row.run.runId === latest?.runId}<span
+                      class="latest-label"
+                      >{hasLater ? 'Newest loaded' : 'Latest'}</span
+                    >{/if}
+                </span>
+                <span class="heading-line">
+                  <span
+                    class="duration-value"
+                    class:longer={row.longer}
+                    title={`${row.run.closeTime === undefined ? 'Elapsed so far' : 'Duration'}: ${runDuration(row.run)}${comparison.durationMedian !== undefined ? ` · Median of displayed closed runs: ${formatChainDuration(comparison.durationMedian)}` : ''}${row.longer ? ' · At least 1.5× the median duration' : ''}`}
+                    ><IconClock class="h-3 w-3 shrink-0" /><span
+                      >{runDuration(row.run)}</span
+                    >{#if row.run.closeTime === undefined}<span
+                        class="live-label">live</span
+                      >{/if}</span
+                  >
+                  <span class="attention">
+                    {#if row.totals.retried}<span
+                        class="attention-item"
+                        style:color={getCategoryStrokeColor('retry')}
+                        title={`${row.totals.retried} activities with observed retries · ${row.totals.recovered} completed after retrying. Counts activities, not retry attempts; history does not expose every internal retry. Shown as striped ends on the flow.`}
+                        ><span
+                          class="swatch"
+                          style:background={flowRetryPattern(
+                            getCategoryStrokeColor('retry'),
+                          )}
+                        ></span><span>{row.totals.retried} retried</span></span
+                      >{/if}
+                    {#if attention.trouble}<span
+                        class="attention-item trouble"
+                        title={`${attention.title}. Shown as red ends on the flow.`}
+                        ><span class="swatch failed"></span><span
+                          >{attention.label}</span
+                        ></span
+                      >{/if}
+                  </span>
+                </span>
               </span>
             </button>
           {/each}
@@ -405,24 +547,65 @@
     overflow: hidden;
   }
 
-  .panel-heading strong {
-    @apply truncate text-sm font-semibold;
+  .chain-heading {
+    @apply flex min-w-0 shrink-0 items-center justify-between gap-4 border-b border-primary px-4 py-2;
   }
 
-  .panel-heading small {
+  .chain-title {
+    @apply flex min-w-0 items-center gap-3;
+  }
+
+  .chain-title > :global(svg) {
+    @apply shrink-0 text-brand;
+  }
+
+  h2 {
+    @apply shrink-0 text-sm font-semibold;
+  }
+
+  .hint {
     @apply truncate text-xs text-secondary;
   }
 
-  .overview-heading {
-    @apply flex min-w-0 items-center justify-between gap-2;
+  .legend {
+    @apply flex min-w-0 flex-1 items-center justify-end gap-1 overflow-hidden;
+  }
+
+  .legend-item {
+    @apply flex h-7 shrink-0 items-center gap-1.5 rounded border border-transparent px-1.5 text-xs;
+
+    white-space: nowrap;
+  }
+
+  button.legend-item:hover,
+  .legend-item.active {
+    @apply bg-surface-secondary;
+  }
+
+  .legend-item[aria-pressed='true'] {
+    @apply border-primary;
+  }
+
+  .legend-item.static {
+    @apply cursor-default text-secondary;
+  }
+
+  .legend-swatch {
+    @apply block h-2.5 w-2.5 shrink-0 rounded-sm;
+  }
+
+  @container (max-width: 720px) {
+    .legend {
+      @apply hidden;
+    }
   }
 
   .run-navigation {
-    @apply flex shrink-0 gap-1;
+    @apply flex shrink-0 items-center gap-1;
   }
 
   .run-navigation button {
-    @apply h-7 w-8 rounded border border-primary text-sm;
+    @apply h-8 w-8 rounded border border-primary text-sm;
   }
 
   .run-navigation .follow-latest {
@@ -435,13 +618,13 @@
     overscroll-behavior-x: contain;
     scrollbar-width: thin;
 
-    --card-h: 130px;
-    --flow-top: 50px;
+    --card-h: 102px;
+    --flow-top: 8px;
     --flow-h: 40px;
   }
 
   .run-connector {
-    @apply relative w-7 shrink-0 text-tertiary;
+    @apply relative w-10 shrink-0 text-tertiary;
 
     height: var(--card-h);
   }
@@ -462,15 +645,38 @@
 
   .flow-bridge path {
     opacity: 0.55;
+    transition: opacity 120ms ease-out;
+  }
+
+  .flow-bridge path.highlighted {
+    opacity: 0.9;
+  }
+
+  .flow-bridge path.dimmed {
+    opacity: 0.08;
+  }
+
+  .carried {
+    @apply absolute inset-x-0 text-center tabular-nums text-secondary;
+
+    top: calc(var(--flow-top) + var(--flow-h) + 5px);
+    font-size: 9px;
+    line-height: 12px;
+    white-space: nowrap;
+  }
+
+  .carried.growing {
+    @apply font-semibold text-warning;
   }
 
   .run-row {
-    @apply relative grid shrink-0 gap-y-1.5 rounded border border-transparent bg-transparent p-2 text-left text-xs;
+    @apply relative grid shrink-0 rounded border border-transparent bg-transparent p-2 text-left text-xs;
 
     width: 232px;
     height: var(--card-h);
     grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: 36px var(--flow-h) 24px;
+    grid-template-rows: var(--flow-h) 36px;
+    row-gap: 8px;
   }
 
   .run-row:hover {
@@ -490,18 +696,22 @@
 
   .run-heading {
     @apply flex min-w-0 flex-col gap-0.5;
+
+    grid-row: 2;
+  }
+
+  .heading-line {
+    @apply flex min-w-0 items-center justify-between gap-2;
+
+    height: 17px;
   }
 
   .run-start {
-    @apply self-center truncate font-medium tabular-nums;
-  }
-
-  .run-duration {
-    @apply flex min-w-0 items-center justify-between gap-2 tabular-nums;
+    @apply truncate font-medium tabular-nums;
   }
 
   .duration-value {
-    @apply flex min-w-0 items-center gap-1;
+    @apply flex min-w-0 items-center gap-1 tabular-nums;
   }
 
   .duration-value > span:first-of-type {
@@ -512,12 +722,8 @@
     @apply text-danger;
   }
 
-  .tags {
-    @apply flex shrink-0 items-center gap-1.5;
-  }
-
   .latest-label {
-    @apply font-semibold text-primary;
+    @apply shrink-0 font-semibold text-primary;
 
     font-size: 10px;
   }
@@ -561,15 +767,46 @@
   }
 
   .flow-layer {
-    @apply absolute inset-x-0 block;
+    @apply absolute inset-x-0 flex justify-end overflow-hidden;
+
+    transition: opacity 120ms ease-out;
+  }
+
+  .flow-layer.dimmed {
+    opacity: 0.15;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .flow-layer,
+    .flow-bridge path {
+      transition: none;
+    }
+  }
+
+  .flow-mark {
+    @apply block h-full shrink-0;
+  }
+
+  .flow.failed-end::after {
+    @apply absolute inset-y-0 right-0 w-0.5;
+
+    background: var(--flow-failed);
+    content: '';
   }
 
   .attention {
-    @apply flex min-w-0 items-center gap-3;
+    @apply flex min-w-0 shrink items-center gap-2;
 
     line-height: 12px;
-    grid-row: 3;
     font-size: 10px;
+  }
+
+  .swatch {
+    @apply block h-2.5 w-2.5 shrink-0 rounded-sm;
+  }
+
+  .swatch.failed {
+    background: var(--flow-failed);
   }
 
   .attention-item {
@@ -597,7 +834,7 @@
   }
 
   .run-id {
-    @apply min-w-0 truncate text-xs text-primary;
+    @apply min-w-0 truncate text-lg font-medium text-primary;
   }
 
   .timeline-heading {

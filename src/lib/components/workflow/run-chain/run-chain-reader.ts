@@ -101,8 +101,35 @@ export class RunChainReader {
     };
   }
 
+  private async readLatest(anchor: ChainRun): Promise<ChainRun | undefined> {
+    try {
+      const response = await requestFromAPI<WorkflowExecutionAPIResponse>(
+        routeForApi('workflow', {
+          namespace: this.namespace,
+          workflowId: this.workflowId,
+        }),
+        {
+          options: { signal: this.signal },
+          request: this.request,
+          notifyOnError: false,
+        },
+      );
+      const runId = response?.workflowExecutionInfo?.execution?.runId;
+      if (!runId || runId === anchor.runId) return;
+      const latest = await this.readRun(runId);
+      return latest.firstRunId && latest.firstRunId === anchor.firstRunId
+        ? latest
+        : undefined;
+    } catch (error) {
+      if (this.signal.aborted) throw error;
+      return;
+    }
+  }
+
   async initialize(runId: string) {
-    this.runs = [await this.readRun(runId)];
+    const anchor = await this.readRun(runId);
+    const latest = anchor.nextRunId ? await this.readLatest(anchor) : undefined;
+    this.runs = [latest ?? anchor];
     this.hasEarlier = !!this.runs[0].previousRunId;
     if (this.runs[0].nextRunId) await this.refresh();
   }

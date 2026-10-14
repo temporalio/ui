@@ -11,9 +11,11 @@ type Fixture = {
   next?: string;
   retry?: string;
   running?: boolean;
+  first?: string;
 };
 let fixtures: Record<string, Fixture>;
 let unavailable: string;
+let current: string;
 
 function reader() {
   return new RunChainReader('default', 'orders', new AbortController().signal);
@@ -22,11 +24,12 @@ function reader() {
 beforeEach(() => {
   fixtures = { a: { next: 'b' }, b: { previous: 'a', running: true } };
   unavailable = '';
+  current = '';
   vi.mocked(requestFromAPI).mockReset();
   vi.mocked(requestFromAPI).mockImplementation(async (url, options) => {
-    const runId = (options?.params as Record<string, string>)[
-      'execution.runId'
-    ];
+    if (!options?.params)
+      return { workflowExecutionInfo: { execution: { runId: current } } };
+    const runId = (options.params as Record<string, string>)['execution.runId'];
     if (runId === unavailable) throw new Error('History expired');
     const fixture = fixtures[runId];
     if (!fixture) throw new Error(`Unknown run ${runId}`);
@@ -35,6 +38,7 @@ beforeEach(() => {
       eventTime: '2026-10-13T12:00:00Z',
       workflowExecutionStartedEventAttributes: {
         continuedExecutionRunId: fixture.previous,
+        firstExecutionRunId: fixture.first ?? 'a',
       },
     };
     const last = {
@@ -121,6 +125,37 @@ describe('RunChainReader', () => {
     await chain.initialize('a');
     expect(chain.runs.map((run) => run.runId)).toEqual(['a', 'b']);
     expect(chain.runs.at(-1)?.status).toBe('Running');
+  });
+
+  it('jumps to the latest run of the same chain instead of walking forward', async () => {
+    fixtures.b = { previous: 'a', next: 'c' };
+    fixtures.c = { previous: 'b', running: true };
+    current = 'c';
+    const chain = reader();
+    await chain.initialize('a');
+    expect(chain.runs.map((run) => run.runId)).toEqual(['c']);
+    expect(chain.hasEarlier).toBe(true);
+    const opened = vi
+      .mocked(requestFromAPI)
+      .mock.calls.map(
+        ([, options]) =>
+          (options?.params as Record<string, string> | undefined)?.[
+            'execution.runId'
+          ],
+      );
+    expect(opened).not.toContain('b');
+    await chain.loadEarlier();
+    expect(chain.runs.map((run) => run.runId)).toEqual(['a', 'b', 'c']);
+  });
+
+  it('walks forward when the latest run belongs to a different chain', async () => {
+    fixtures.b = { previous: 'a', next: 'c' };
+    fixtures.c = { previous: 'b', running: true };
+    fixtures.other = { running: true, first: 'other' };
+    current = 'other';
+    const chain = reader();
+    await chain.initialize('a');
+    expect(chain.runs.map((run) => run.runId)).toEqual(['a', 'b', 'c']);
   });
 
   it('follows rollover without duplicating closed runs', async () => {

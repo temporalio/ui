@@ -12,6 +12,8 @@ import {
   chainStepVisual,
   flowConnectors,
   flowLayers,
+  flowMarks,
+  flowRetryPattern,
   flowThickness,
 } from './run-chain-visual';
 
@@ -102,6 +104,30 @@ describe('chain flow ribbon', () => {
     expect(layers[0].height).toBeCloseTo(0.276);
     expect(layers[1].top).toBeCloseTo(0.576);
     expect(layers[1].top + layers[1].height).toBeCloseTo(0.7);
+  });
+
+  it('marks retried and failed work at the trailing end of a layer', () => {
+    expect(flowMarks({ total: 10 })).toEqual([]);
+    const marks = flowMarks({
+      total: 100,
+      recovered: 2,
+      failed: 20,
+      timedOut: 5,
+    });
+    expect(
+      marks.map(({ label, count, width }) => [label, count, width]),
+    ).toEqual([
+      ['Completed after retries', 2, 0.08],
+      ['Failed', 25, 0.25],
+    ]);
+    expect(marks[0].background).toBe(
+      flowRetryPattern(getCategoryStrokeColor('retry')),
+    );
+    expect(marks[1].background).toBe(getStatusStrokeColor('Failed'));
+    expect(
+      flowLayers([{ kind: 'activity', counts: { total: 4, failed: 1 } }], 1)[0]
+        .marks,
+    ).toHaveLength(1);
   });
 
   it('tapers layers that only exist on one side of a connector', () => {

@@ -3,7 +3,6 @@
 
   import type { Snippet } from 'svelte';
 
-  import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
   import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
@@ -14,19 +13,26 @@
   import ExtensionSlot from '$lib/components/extensions/extension-slot.svelte';
   import WorkflowDetails from '$lib/components/lines-and-dots/workflow-details.svelte';
   import NoWorkersPollingAlert from '$lib/components/workers/no-workers-polling-alert.svelte';
+  import { runChainFocus } from '$lib/components/workflow/run-chain/run-chain-focus.svelte';
   import WorkflowStatusBadge from '$lib/components/workflow/workflow-status-badge.svelte';
   import WorkflowActions from '$lib/components/workflow-actions.svelte';
   import Alert from '$lib/holocene/alert.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Link from '$lib/holocene/link.svelte';
   import TabList from '$lib/holocene/tab/tab-list.svelte';
   import Tab from '$lib/holocene/tab/tab.svelte';
   import Tabs from '$lib/holocene/tab/tabs.svelte';
-  import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
   import { Badge } from '$lib/io/badge';
   import { BadgeCount } from '$lib/io/badge-count';
-  import { IconCanceled, IconChevronLeft, IconInfo } from '$lib/io/icon';
+  import {
+    IconArrowUpRight,
+    IconCanceled,
+    IconChevronLeft,
+    IconInfo,
+    IconLink,
+  } from '$lib/io/icon';
   import { getVisibleInboundNexusLinkEvents } from '$lib/runes/inbound-nexus-links.svelte';
   import { workflowViewPreference } from '$lib/stores/event-view';
   import { fullEventHistory } from '$lib/stores/events';
@@ -41,6 +47,7 @@
     getWorkflowNexusLinksFromHistory,
     getWorkflowRelationships,
   } from '$lib/utilities/get-workflow-relationships';
+  import { isWorkflowExecutionStartedEvent } from '$lib/utilities/is-event-type';
   import { isRunningWithNoWorkers } from '$lib/utilities/is-running-with-no-workers';
   import { pathMatches } from '$lib/utilities/path-matches';
   import {
@@ -117,12 +124,19 @@
   const sharedFilterParams = $derived(getSharedFilterParams(page.url));
   const taskQueue = $derived(workflow?.taskQueue ?? '');
   const chainView = $derived(page.url.searchParams.get('view') === 'chain');
-  const toggleChainView = () => {
+  const startEvent = $derived(
+    $fullEventHistory.find(isWorkflowExecutionStartedEvent),
+  );
+  const inRunChain = $derived(
+    !!startEvent &&
+      (!!startEvent.attributes?.continuedExecutionRunId ||
+        workflow?.status === 'ContinuedAsNew'),
+  );
+  const chainHref = $derived.by(() => {
     const url = new URL(page.url);
-    if (chainView) url.searchParams.delete('view');
-    else url.searchParams.set('view', 'chain');
-    void goto(url, { noScroll: true, keepFocus: true });
-  };
+    url.searchParams.set('view', 'chain');
+    return `${url.pathname}${url.search}`;
+  });
 </script>
 
 <div class="flex items-center justify-between">
@@ -148,67 +162,92 @@
       </Link>
     {/if}
   </div>
-  <ToggleSwitch
-    id="workflow-run-chain"
-    label="Run chain"
-    checked={chainView}
-    onchange={toggleChainView}
-    data-testid="run-chain-toggle"
-  />
+  {#if chainView}
+    <Button
+      variant="secondary"
+      size="sm"
+      LeadingIcon={IconArrowUpRight}
+      href={routeForWorkflow({
+        namespace,
+        workflow: workflowId,
+        run: runChainFocus.runId || runId,
+      })}
+      data-testid="view-focused-run"
+    >
+      View run
+    </Button>
+  {/if}
 </div>
+{#snippet viewRunChain()}
+  {#if inRunChain}
+    <Button
+      variant="secondary"
+      size="sm"
+      LeadingIcon={IconLink}
+      href={chainHref}
+      data-testid="view-run-chain"
+    >
+      View run chain
+    </Button>
+  {/if}
+{/snippet}
 <header class="flex flex-col gap-4">
-  <div class="flex flex-col items-start justify-between gap-4 xl:flex-row">
-    <div
-      class="flex w-full flex-col items-start gap-4 xl:flex-row xl:items-center"
+  {#if !chainView}<div
+      class="flex flex-col items-start justify-between gap-4 xl:flex-row"
     >
       <div
-        class="flex flex-wrap items-center justify-between gap-4 max-xl:w-full"
+        class="flex w-full flex-col items-start gap-4 xl:flex-row xl:items-center"
       >
-        {#if workflow}
-          <WorkflowStatusBadge
-            role="status"
-            aria-atomic="true"
-            status={workflow.status}
-            delayed={isWorkflowDelayed(workflow)}
-            taskFailure={isWorkflowTaskFailure(workflow)}
-          />
-        {/if}
-        <div class="xl:hidden">
-          <WorkflowActions
-            {cancelInProgress}
-            workflow={workflow!}
-            {namespace}
-            first={workflowRelationships.first}
-            next={workflowRelationships.next}
-          />
+        <div
+          class="flex flex-wrap items-center justify-between gap-4 max-xl:w-full"
+        >
+          {#if workflow}
+            <WorkflowStatusBadge
+              role="status"
+              aria-atomic="true"
+              status={workflow.status}
+              delayed={isWorkflowDelayed(workflow)}
+              taskFailure={isWorkflowTaskFailure(workflow)}
+            />
+          {/if}
+          <div class="flex items-center gap-2 xl:hidden">
+            {@render viewRunChain()}
+            <WorkflowActions
+              {cancelInProgress}
+              workflow={workflow!}
+              {namespace}
+              first={workflowRelationships.first}
+              next={workflowRelationships.next}
+            />
+          </div>
+        </div>
+        <div class="flex flex-col flex-wrap gap-0">
+          <h1
+            data-testid="workflow-id-heading"
+            class="gap-0 overflow-hidden max-sm:text-xl sm:max-md:text-2xl"
+          >
+            <Copyable
+              copyIconTitle={translate('common.copy-icon-title')}
+              copySuccessIconTitle={translate('common.copy-success-icon-title')}
+              content={workflowId}
+              clickAllToCopy
+              container-class="w-full"
+              class="overflow-hidden text-ellipsis text-left"
+            />
+          </h1>
         </div>
       </div>
-      <div class="flex flex-col flex-wrap gap-0">
-        <h1
-          data-testid="workflow-id-heading"
-          class="gap-0 overflow-hidden max-sm:text-xl sm:max-md:text-2xl"
-        >
-          <Copyable
-            copyIconTitle={translate('common.copy-icon-title')}
-            copySuccessIconTitle={translate('common.copy-success-icon-title')}
-            content={workflowId}
-            clickAllToCopy
-            container-class="w-full"
-            class="overflow-hidden text-ellipsis text-left"
-          />
-        </h1>
+      <div class="flex items-center gap-2 max-xl:hidden">
+        {@render viewRunChain()}
+        <WorkflowActions
+          {cancelInProgress}
+          workflow={workflow!}
+          {namespace}
+          first={workflowRelationships.first}
+          next={workflowRelationships.next}
+        />
       </div>
-    </div>
-    <div class="max-xl:hidden">
-      <WorkflowActions
-        {cancelInProgress}
-        workflow={workflow!}
-        {namespace}
-        first={workflowRelationships.first}
-        next={workflowRelationships.next}
-      />
-    </div>
-  </div>
+    </div>{/if}
   <CodecServerErrorBanner />
   {#if !chainView}
     <WorkflowDetails workflow={workflow!} next={workflowRelationships.next} />

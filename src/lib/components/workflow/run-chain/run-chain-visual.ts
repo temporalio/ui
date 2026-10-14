@@ -113,7 +113,7 @@ export function summarySegments(kind: ChainStep['kind'], counts: StepCounts) {
   ].filter((segment) => segment.count > 0);
 }
 
-const flowOrder: ChainStep['kind'][] = [
+export const flowOrder: ChainStep['kind'][] = [
   'activity',
   'local-activity',
   'child-workflow',
@@ -124,17 +124,53 @@ const flowOrder: ChainStep['kind'][] = [
   'other',
 ];
 
+export type FlowMark = {
+  label: 'Completed after retries' | 'Failed';
+  count: number;
+  width: number;
+  background: string;
+};
+
 export type FlowLayer = {
   kind: ChainStep['kind'];
   top: number;
   height: number;
+  marks: FlowMark[];
 };
+
+type FlowCounts = Pick<StepCounts, 'total'> &
+  Partial<Pick<StepCounts, 'failed' | 'timedOut' | 'recovered'>>;
+
+export const flowRetryPattern = (color: string) =>
+  `repeating-linear-gradient(135deg, ${color} 0 2px, transparent 2px 5px)`;
+
+/** Retried and failed work sits at the trailing end of each layer, failures last. */
+export function flowMarks(counts: FlowCounts): FlowMark[] {
+  const width = (count: number) =>
+    count > 0 ? Math.min(1, Math.max(0.08, count / counts.total)) : 0;
+  const failed = (counts.failed ?? 0) + (counts.timedOut ?? 0);
+  const recovered = counts.recovered ?? 0;
+  return [
+    {
+      label: 'Completed after retries' as const,
+      count: recovered,
+      width: width(recovered),
+      background: flowRetryPattern(getCategoryStrokeColor('retry')),
+    },
+    {
+      label: 'Failed' as const,
+      count: failed,
+      width: width(failed),
+      background: getStatusStrokeColor('Failed'),
+    },
+  ].filter((mark) => mark.count > 0);
+}
 
 export const flowThickness = (total: number, max: number) =>
   total > 0 ? 0.35 + (0.65 * Math.min(total, max)) / Math.max(1, max) : 0;
 
 export function flowLayers(
-  primitives: { kind: ChainStep['kind']; counts: Pick<StepCounts, 'total'> }[],
+  primitives: { kind: ChainStep['kind']; counts: FlowCounts }[],
   thickness: number,
 ): FlowLayer[] {
   const present = primitives
@@ -147,7 +183,7 @@ export function flowLayers(
   return present.map(({ kind, counts }) => {
     const height =
       thickness * (minimumShare + (sharedShare * counts.total) / total);
-    const layer = { kind, top, height };
+    const layer = { kind, top, height, marks: flowMarks(counts) };
     top += height;
     return layer;
   });
@@ -159,7 +195,7 @@ function collapsedLayer(layers: FlowLayer[], kind: ChainStep['kind']) {
   );
   const last = layers.at(-1);
   const top = next ? next.top : last ? last.top + last.height : 0.5;
-  return { kind, top, height: 0 };
+  return { kind, top, height: 0, marks: [] };
 }
 
 export function flowConnectors(from: FlowLayer[], to: FlowLayer[]) {

@@ -6,7 +6,6 @@
   import { type ChainRun, type LiveRunState } from './run-chain';
   import { RunChainReader, type RunHistory } from './run-chain-reader';
   import type { RunSummary } from './run-chain-summary';
-  import { chainRunColor } from './run-chain-visual';
 
   import RunChainCanvas from './run-chain-canvas.svelte';
 
@@ -41,7 +40,6 @@
   const focused = $derived(
     runs.find((run) => run.runId === selectedRunId) ?? latest,
   );
-  const live = $derived(latest?.status === 'Running');
   const message = (error: unknown) =>
     error && typeof error === 'object' && 'message' in error
       ? String(error.message)
@@ -219,69 +217,6 @@
   aria-label="Continue-As-New run chain"
   data-testid="run-chain-view"
 >
-  <div class="chain-toolbar">
-    <div class="chain-title">
-      <IconLink class="h-4 w-4" />
-      <h2>Run chain</h2>
-      <span class="facts">10-run view</span>
-    </div>
-    <div class="controls">
-      <span class="update-status"
-        ><span
-          class="live-dot"
-          style:background={paused
-            ? undefined
-            : chainRunColor(latest?.status ?? 'Unspecified')}
-        ></span>{paused
-          ? 'Updates paused'
-          : hasLater
-            ? 'Finding latest run…'
-            : live
-              ? 'Live · updates every 3s'
-              : 'Chain ended'}</span
-      >
-      <button
-        class="control"
-        onclick={() => {
-          paused = !paused;
-          if (!paused) void refresh();
-        }}
-        aria-label={paused ? 'Resume updates' : 'Pause updates'}
-        title={paused ? 'Resume updates' : 'Pause updates'}
-        >{#if paused}<IconPlay class="h-3.5 w-3.5" />{:else}<IconPause
-            class="h-3.5 w-3.5"
-          />{/if}</button
-      >
-    </div>
-  </div>
-  {#if error}<div class="notice" role="alert">
-      <span
-        >{runs.length
-          ? 'Updates interrupted. Showing the last loaded runs.'
-          : 'Unable to load the run chain.'}
-        {error}</span
-      ><button onclick={refresh} disabled={busy}>Retry</button>
-    </div>{/if}
-  {#if !ready && busy}<div class="empty" role="status">
-      <IconLink /><span>Connecting the runs…</span>
-    </div>{/if}
-  {#if earlierError}<div class="notice" role="alert">
-      <span>Earlier history is unavailable. {earlierError}</span><button
-        onclick={loadEarlier}
-        disabled={busy}>Retry earlier runs</button
-      >
-    </div>
-  {/if}
-  {#if Object.values(summaryErrors).some(Boolean)}
-    <div class="notice" role="status">
-      <span>Some overview summaries are incomplete.</span><button
-        onclick={() => {
-          summaryErrors = {};
-          void backfill();
-        }}>Retry summaries</button
-      >
-    </div>
-  {/if}
   <RunChainCanvas
     {liveState}
     {liveError}
@@ -299,7 +234,52 @@
     {now}
     onloadmore={loadHistory}
     bind:selectedRunId
-  />
+  >
+    {#snippet actions()}
+      <button
+        class="control"
+        onclick={() => {
+          paused = !paused;
+          if (!paused) void refresh();
+        }}
+        aria-label={paused ? 'Resume updates' : 'Pause updates'}
+        title={paused ? 'Resume updates' : 'Pause updates'}
+        >{#if paused}<IconPlay class="h-3.5 w-3.5" />{:else}<IconPause
+            class="h-3.5 w-3.5"
+          />{/if}</button
+      >
+    {/snippet}
+    {#snippet notices()}
+      {#if error}<div class="notice" role="alert">
+          <span
+            >{runs.length
+              ? 'Updates interrupted. Showing the last loaded runs.'
+              : 'Unable to load the run chain.'}
+            {error}</span
+          ><button onclick={refresh} disabled={busy}>Retry</button>
+        </div>{/if}
+      {#if !ready && busy}<div class="empty" role="status">
+          <IconLink /><span>Connecting the runs…</span>
+        </div>{/if}
+      {#if earlierError}<div class="notice" role="alert">
+          <span>Earlier history is unavailable. {earlierError}</span><button
+            onclick={loadEarlier}
+            disabled={busy}>Retry earlier runs</button
+          >
+        </div>
+      {/if}
+      {#if Object.values(summaryErrors).some(Boolean)}
+        <div class="notice" role="status">
+          <span>Some overview summaries are incomplete.</span><button
+            onclick={() => {
+              summaryErrors = {};
+              void backfill();
+            }}>Retry summaries</button
+          >
+        </div>
+      {/if}
+    {/snippet}
+  </RunChainCanvas>
   {#if hasLater}<div class="boundary">
       <button disabled={busy} onclick={refresh}>Load more recent runs →</button>
     </div>{/if}
@@ -310,41 +290,12 @@
     @apply flex shrink-0 flex-col overflow-hidden rounded-lg border border-primary bg-surface-primary text-primary;
   }
 
-  .chain-toolbar {
-    @apply flex shrink-0 flex-wrap items-center justify-between gap-x-4 gap-y-1 border-b border-primary px-4 py-2;
-  }
-
-  .chain-title,
-  .controls {
-    @apply flex items-center gap-3;
-  }
-
-  .chain-title > :global(svg) {
-    @apply text-brand;
-  }
-
-  h2 {
-    @apply text-sm font-semibold;
-  }
-
-  .facts {
-    @apply text-xs text-secondary;
-  }
-
   .control {
-    @apply flex h-8 w-8 items-center justify-center rounded border border-primary;
+    @apply ml-2 flex h-8 w-8 items-center justify-center rounded border border-primary;
   }
 
   .control:hover {
     @apply bg-surface-secondary;
-  }
-
-  .update-status {
-    @apply flex items-center gap-2 text-xs text-secondary;
-  }
-
-  .live-dot {
-    @apply h-1.5 w-1.5 rounded-full bg-border-secondary;
   }
 
   .boundary,

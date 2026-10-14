@@ -78,9 +78,15 @@ export function compareRuns(
       .filter((row) => row.run.closeTime !== undefined && row.summary?.complete)
       .map((row) => row.totals.total),
   );
+  const settled = rows.filter(
+    (row) => row.run.closeTime !== undefined && row.summary?.complete,
+  );
   return {
     maxDuration: Math.max(1, ...rows.map((row) => row.duration)),
-    maxWork: Math.max(1, ...rows.map((row) => row.totals.total)),
+    maxWork: Math.max(
+      1,
+      ...(settled.length ? settled : rows).map((row) => row.totals.total),
+    ),
     durationMedian,
     workMedian,
     rows: rows.map((row) => ({
@@ -95,6 +101,26 @@ export function compareRuns(
         row.totals.total > workMedian &&
         row.totals.total >= workMedian * 1.5,
     })),
+  };
+}
+
+/** Carried state that grew across each of the last three visible runs. */
+export function stateGrowth(runs: ChainRun[], index: number) {
+  const bytes = runs[index]?.inputBytes;
+  const previous = runs[index - 1]?.inputBytes;
+  const before = runs[index - 2]?.inputBytes;
+  return {
+    bytes,
+    change:
+      bytes !== undefined && previous !== undefined
+        ? bytes - previous
+        : undefined,
+    growing:
+      bytes !== undefined &&
+      previous !== undefined &&
+      before !== undefined &&
+      before < previous &&
+      previous < bytes,
   };
 }
 
