@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  consoleMessagesForParity,
   normalizeEvidenceText,
   normalizeEvidenceUrl,
   normalizeSemanticText,
@@ -50,5 +51,32 @@ describe('migration evidence normalization', () => {
     expect(normalizeSemanticText('  Start\t Workflow \r\n\r\n Details  ')).toBe(
       'Start Workflow\nDetails',
     );
+  });
+
+  it('compares classified console errors without minified stack details', () => {
+    expect(
+      consoleMessagesForParity(
+        [
+          {
+            type: 'error',
+            text: 'Expected 404 at minified stack A',
+            location: { lineNumber: 12 },
+          },
+          {
+            type: 'warning',
+            text: 'Keep this warning',
+            location: { lineNumber: 4 },
+          },
+        ],
+        (text) => (text.startsWith('Expected 404') ? 'expected-404' : null),
+      ),
+    ).toEqual([
+      { type: 'error', classification: 'expected-404' },
+      {
+        type: 'warning',
+        text: 'Keep this warning',
+        location: { lineNumber: 4 },
+      },
+    ]);
   });
 });

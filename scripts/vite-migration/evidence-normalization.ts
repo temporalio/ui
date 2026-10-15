@@ -40,3 +40,18 @@ export const normalizeSemanticText = (value: string): string => {
     .filter(Boolean)
     .join('\n');
 };
+
+export const consoleMessagesForParity = <
+  Message extends { type: string; text: string },
+  Classification extends string,
+>(
+  messages: readonly Message[],
+  classify: (text: string) => Classification | null,
+) => {
+  return messages.map((message) => {
+    const classification =
+      message.type === 'error' ? classify(message.text) : null;
+
+    return classification ? { type: message.type, classification } : message;
+  });
+};

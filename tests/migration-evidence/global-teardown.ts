@@ -17,6 +17,7 @@ type Evidence = {
   appApiRequestsForParity: unknown;
   catchAllMocks: unknown;
   consoleMessages: unknown;
+  consoleMessagesForParity: unknown;
   pageErrors: unknown;
   unexpectedPageErrors: unknown;
   semantic: unknown;
@@ -34,7 +35,7 @@ const comparableFields = [
   'navigation',
   'appApiRequestsForParity',
   'catchAllMocks',
-  'consoleMessages',
+  'consoleMessagesForParity',
   'unexpectedPageErrors',
   'semantic',
   'accessibility',

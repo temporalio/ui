@@ -21,6 +21,7 @@ import {
   scenarioForParity,
 } from '../../scripts/vite-migration/api-evidence';
 import {
+  consoleMessagesForParity,
   normalizeEvidenceText,
   normalizeEvidenceUrl,
   normalizeSemanticText,
@@ -535,6 +536,10 @@ const runFamilyScenario = async (
       unapproved: unapprovedCatchAllApis,
     },
     consoleMessages: tracked.consoleMessages,
+    consoleMessagesForParity: consoleMessagesForParity(
+      tracked.consoleMessages,
+      classifyKnownConsoleError,
+    ),
     consoleErrorAssessment: {
       observed: assessedConsoleErrors,
       unexpected: unexpectedConsoleErrors,
