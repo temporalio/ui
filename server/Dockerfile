@@ -15,9 +15,9 @@ COPY . ./
 
 RUN make build-server
 
-FROM golang:1.26.9-alpine3.23 AS dockerize-builder
+FROM golang:1.27.2-alpine3.23 AS dockerize-builder
 
-ARG DOCKERIZE_VERSION=v0.10.1
+ARG DOCKERIZE_VERSION=v0.15.2
 RUN go install github.com/jwilder/dockerize@${DOCKERIZE_VERSION} && \
     cp $(which dockerize) /usr/local/bin/dockerize
 
