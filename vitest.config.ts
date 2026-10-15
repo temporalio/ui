@@ -88,8 +88,10 @@ export default defineConfig({
     globalSetup: ['./vitest-global-setup.ts'],
     environment: 'jsdom',
     setupFiles: ['./vitest-setup.ts', 'vitest-localstorage-mock'],
-    deps: {
-      inline: ['date-fns'],
+    server: {
+      deps: {
+        inline: ['date-fns'],
+      },
     },
   },
 });
