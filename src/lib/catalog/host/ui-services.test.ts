@@ -295,28 +295,21 @@ describe('createApiWorkbenchHost', () => {
     );
   });
 
-  it('only counts pollers seen in the last two minutes as ready', async () => {
-    vi.useFakeTimers();
-    vi.setSystemTime(new Date('2026-10-01T12:00:00Z'));
-    const stopped = {
-      identity: 'stopped',
-      lastAccessTime: '2026-10-01T11:57:59Z',
-    };
-    const running = {
-      identity: 'running',
-      lastAccessTime: '2026-10-01T11:59:10Z',
+  it('counts any poller the server lists as ready, however long since it polled', async () => {
+    const busy = {
+      identity: 'busy',
+      lastAccessTime: '2020-01-01T00:00:00Z',
     };
     const request = vi
       .fn()
-      .mockResolvedValueOnce(jsonResponse({ pollers: [stopped] }))
-      .mockResolvedValueOnce(jsonResponse({ pollers: [stopped, running] }));
+      .mockResolvedValueOnce(jsonResponse({ pollers: [busy] }))
+      .mockResolvedValueOnce(jsonResponse({ pollers: [] }));
     const host = createApiWorkbenchHost({ descriptors: [descriptor], request });
 
+    expect((await host.checkReadiness(descriptor.id))[0].state).toBe('ready');
     expect((await host.checkReadiness(descriptor.id))[0].state).toBe(
       'unavailable',
     );
-    expect((await host.checkReadiness(descriptor.id))[0].state).toBe('ready');
-    vi.useRealTimers();
   });
 
   it('checks activity readiness with task queue type 2', async () => {
@@ -329,6 +322,74 @@ describe('createApiWorkbenchHost', () => {
     await host.checkReadiness(activityDescriptor.id);
 
     expect(request.mock.calls[0][0]).toMatch(/\?taskQueueType=2$/);
+  });
+
+  it('treats an idle serverless deployment as ready', async () => {
+    const version = { deploymentName: 'catalog-serverless', buildId: 'v1' };
+    const request = vi.fn().mockImplementation(async (url: string) => {
+      if (url.includes('/task-queues/')) {
+        return jsonResponse({
+          pollers: [],
+          versioningInfo: { currentDeploymentVersion: version },
+        });
+      }
+      return jsonResponse({
+        workerDeploymentInfo: {
+          name: 'catalog-serverless',
+          routingConfig: { currentDeploymentVersion: version },
+          versionSummaries: [
+            {
+              deploymentVersion: version,
+              computeConfig: {
+                scalingGroups: { default: { providerType: 'aws-lambda' } },
+              },
+            },
+          ],
+        },
+      });
+    });
+    const host = createApiWorkbenchHost({ descriptors: [descriptor], request });
+
+    await expect(host.checkReadiness(descriptor.id)).resolves.toEqual([
+      {
+        kind: 'worker',
+        required: false,
+        state: 'ready',
+        taskQueueType: 1,
+        serverlessDeployment: 'catalog-serverless',
+      },
+    ]);
+    expect(request.mock.calls[1][0]).toContain(
+      '/worker-deployments/catalog-serverless',
+    );
+  });
+
+  it('reports a self-managed deployment with no pollers as unavailable', async () => {
+    const request = vi.fn().mockImplementation(async (url: string) => {
+      if (url.includes('/task-queues/')) {
+        return jsonResponse({
+          pollers: [],
+          versioningInfo: {
+            currentDeploymentVersion: {
+              deploymentName: 'catalog-self-managed',
+              buildId: 'v1',
+            },
+          },
+        });
+      }
+      return jsonResponse({
+        workerDeploymentInfo: {
+          name: 'catalog-self-managed',
+          routingConfig: {},
+          versionSummaries: [],
+        },
+      });
+    });
+    const host = createApiWorkbenchHost({ descriptors: [descriptor], request });
+
+    expect((await host.checkReadiness(descriptor.id))[0].state).toBe(
+      'unavailable',
+    );
   });
 
   it('checks Nexus readiness with task queue type 3 and the exact endpoint', async () => {

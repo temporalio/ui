@@ -382,4 +382,10 @@ export const Strings = {
   'gcp-service-account-placeholder':
     'temporal-worker@my-project.iam.gserviceaccount.com',
   'heartbeat-config': 'Heartbeat Configuration',
+  'task-queue-active': 'Task Queue is Active',
+  'task-queue-inactive': 'Task Queue is Inactive',
+  'task-queue-serverless-title': 'Workers start on demand',
+  'task-queue-serverless-description':
+    'The {{taskQueue}} Task Queue is served by the serverless Worker Deployment {{deployment}}. No Workers are running right now; Temporal starts them automatically when there is work to process.',
+  'view-task-queue': 'View Task Queue',
 } as const;

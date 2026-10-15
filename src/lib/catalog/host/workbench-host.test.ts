@@ -465,7 +465,7 @@ describe('OSS WorkbenchHost', () => {
   });
 
   it('reports a missing workflow poller as advisory readiness', async () => {
-    const checkWorker = vi.fn().mockResolvedValue(false);
+    const checkWorker = vi.fn().mockResolvedValue({ state: 'no-workers' });
     const host = assembleWorkbenchHost({
       descriptors: [workflowDescriptor],
       launch: vi.fn(),
@@ -497,7 +497,7 @@ describe('OSS WorkbenchHost', () => {
     const host = assembleWorkbenchHost({
       descriptors: [nexusDescriptor],
       launch: vi.fn(),
-      checkWorker: vi.fn().mockResolvedValue(true),
+      checkWorker: vi.fn().mockResolvedValue({ state: 'polling' }),
       checkNexusEndpoint,
       createEvidenceHref: vi.fn(),
     });

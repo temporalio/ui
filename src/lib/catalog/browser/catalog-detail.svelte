@@ -36,11 +36,13 @@
     executionKind,
     state,
     taskQueue,
+    serverlessDeployment,
   }: {
     kind: HostReadinessCheck['kind'];
     executionKind: CatalogExecutionKind;
     state: WorkerReadinessDisplayState | 'loading';
     taskQueue: string;
+    serverlessDeployment?: string;
   }): ReadinessPresentation => {
     const label =
       kind === 'worker'
@@ -59,6 +61,16 @@
           kind === 'worker'
             ? 'Checking for Workers…'
             : 'Checking Nexus Endpoint readiness…',
+      };
+    }
+
+    if (state === 'ready' && kind === 'worker' && serverlessDeployment) {
+      return {
+        Icon: IconCheckCircle,
+        iconClass: 'text-success',
+        iconLabel: `${iconSubject} is ready`,
+        label: 'Handler workers start on demand',
+        tooltip: `The ${taskQueue} Task Queue is served by the serverless Worker Deployment ${serverlessDeployment}. Temporal starts a Worker when this example runs.`,
       };
     }
 
@@ -315,6 +327,8 @@
       executionKind: descriptor.execution.kind,
       state: readinessLoading ? 'loading' : workerReadinessState,
       taskQueue: descriptor.execution.taskQueue,
+      serverlessDeployment: readiness.find((check) => check.kind === 'worker')
+        ?.serverlessDeployment,
     }),
   );
   let prerequisiteReadiness = $derived(
