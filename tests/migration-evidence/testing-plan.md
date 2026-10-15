@@ -71,8 +71,8 @@ BASELINE_ARCHIVE="$PWD/migration-evidence/previews/vite6-baseline"
 BASELINE_DESCRIPTOR="$BASELINE_ARCHIVE.descriptor.json"
 BASELINE_DEPLOY="$PWD/migration-evidence/deploy/vite6-baseline"
 COMMIT_SHA="$(git rev-parse HEAD)"
-LOCKFILE_SHA256="$(node --input-type=module -e "import { createHash } from 'node:crypto'; import { readFileSync } from 'node:fs'; process.stdout.write(createHash('sha256').update(readFileSync('pnpm-lock.yaml')).digest('hex'))")"
-PROVENANCE_ID="$COMMIT_SHA:$LOCKFILE_SHA256"
+LOCKFILE_BLOB_ID="$(git hash-object pnpm-lock.yaml)"
+PROVENANCE_ID="$COMMIT_SHA:$LOCKFILE_BLOB_ID"
 pnpm build:local
 pnpm --filter . deploy --legacy "$BASELINE_DEPLOY"
 test -d "$BASELINE_DEPLOY/node_modules/@sveltejs/kit"
@@ -99,8 +99,8 @@ CANDIDATE_ARCHIVE="$PWD/migration-evidence/previews/vite8-candidate"
 CANDIDATE_DESCRIPTOR="$CANDIDATE_ARCHIVE.descriptor.json"
 CANDIDATE_DEPLOY="$PWD/migration-evidence/deploy/vite8-candidate"
 COMMIT_SHA="$(git rev-parse HEAD)"
-LOCKFILE_SHA256="$(node --input-type=module -e "import { createHash } from 'node:crypto'; import { readFileSync } from 'node:fs'; process.stdout.write(createHash('sha256').update(readFileSync('pnpm-lock.yaml')).digest('hex'))")"
-PROVENANCE_ID="$COMMIT_SHA:$LOCKFILE_SHA256"
+LOCKFILE_BLOB_ID="$(git hash-object pnpm-lock.yaml)"
+PROVENANCE_ID="$COMMIT_SHA:$LOCKFILE_BLOB_ID"
 pnpm build:local
 pnpm --filter . deploy --legacy "$CANDIDATE_DEPLOY"
 test -d "$CANDIDATE_DEPLOY/node_modules/@sveltejs/kit"
@@ -244,19 +244,19 @@ Catalog pages are development-only and are expected to return accessible 404 pag
 
 ## Final validation record
 
-| Surface                     | Result                                                                                                                                                                                                                                                                    |
-| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Frozen strict install       | Passed with Vite 8.3.4, plugin-Svelte 7.3.1, Vitest family 4.1.11, Node types 22.18.0, and esbuild 0.28.2.                                                                                                                                                                |
-| Lint and types              | `pnpm lint`, `pnpm check`, and `pnpm check:migration-evidence` passed. Existing lint/Svelte warnings are unchanged.                                                                                                                                                       |
-| Unit and coverage           | 295 files passed; 3,810 tests passed and 2 skipped. Coverage passed over 754 files at 74.49% statements, 71.16% branches, 60.9% functions, and 76.71% lines. The Vite 6 baseline coverage command cannot start because it already pairs Vitest 3.2.6 with coverage 4.1.9. |
-| Vite 6 versus Vite 8 routes | 150 browser executions collected 75/75 entries per side with 75 matches, zero differences, zero missing entries, and zero failed expectations.                                                                                                                            |
-| Integration and E2E         | 401 integration tests passed with 1 skip; 37 E2E tests passed with 5 skips.                                                                                                                                                                                               |
-| Production outputs          | Static, Docker, embedded server, Vercel, package, Storybook, and catalog outputs built and received provenance-bound inventories.                                                                                                                                         |
-| Catalog                     | Generate/verify, clean packed consumer, list/detail development routes, readiness, and a completed `hello` workflow passed.                                                                                                                                               |
-| Development                 | Full `ui-server` mode rendered; cross-family client navigation preserved state; markup and CSS HMR preserved browser state; current-page console was clean.                                                                                                               |
-| Authentication              | `with-auth` mode reached the local OIDC provider sign-in page.                                                                                                                                                                                                            |
-| Server and automation       | Go server build/race tests, 77-entry accessibility manifest, and 102 GitHub automation tests passed.                                                                                                                                                                      |
-| External/baseline gates     | See the risk register; baseline-identical failures are not reported as Vite regressions.                                                                                                                                                                                  |
+| Surface                     | Result                                                                                                                                                                                                                                                            |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Frozen strict install       | Passed with Vite 8.3.4, plugin-Svelte 7.3.1, Vitest family 4.1.11, Node types 22.18.0, and esbuild 0.28.2.                                                                                                                                                        |
+| Lint and types              | `pnpm lint`, `pnpm check`, and `pnpm check:migration-evidence` passed. Existing lint/Svelte warnings are unchanged.                                                                                                                                               |
+| Unit and coverage           | 295 files passed; 3,810 tests passed and 2 skipped. Final coverage passed at 74.27% statements, 71.14% branches, 60.92% functions, and 76.46% lines. The Vite 6 baseline coverage command cannot start because it already pairs Vitest 3.2.6 with coverage 4.1.9. |
+| Vite 6 versus Vite 8 routes | 150 browser executions collected 75/75 entries and 74/74 applicable client navigations per side with zero differences, missing entries, or failed expectations. Only the `/render` server response is client-navigation exempt.                                   |
+| Integration and E2E         | 401 integration tests passed with 1 skip; 37 E2E tests passed with 5 skips.                                                                                                                                                                                       |
+| Production outputs          | Static, Docker, embedded server, Vercel, package, Storybook, and catalog outputs built and received provenance-bound inventories.                                                                                                                                 |
+| Catalog                     | Generate/verify, clean packed consumer, list/detail development routes, readiness, and a completed `hello` workflow passed.                                                                                                                                       |
+| Development                 | Full `ui-server` mode rendered; cross-family client navigation preserved state; markup and CSS HMR preserved browser state; current-page console was clean.                                                                                                       |
+| Authentication              | `with-auth` mode reached the local OIDC provider sign-in page.                                                                                                                                                                                                    |
+| Server and automation       | Go server build/race tests, 77-entry accessibility manifest, and 102 GitHub automation tests passed.                                                                                                                                                              |
+| External/baseline gates     | See the risk register; baseline-identical failures are not reported as Vite regressions.                                                                                                                                                                          |
 
 ### Artifact comparison
 
@@ -280,6 +280,7 @@ No compressed-size increase exceeds the 5% investigation threshold.
 | Resolved           | Global esbuild 0.25 override violated Vite 8’s optional peer range.                                                                               | Override now resolves 0.28.2; Storybook and builds passed.                                                                                                                   |
 | Resolved           | Rolldown could change route behavior, CJS interop, CSS, or output structure.                                                                      | Intermediate Rolldown checkpoint, 75-route A/B, integration/E2E, and seven output inventories passed.                                                                        |
 | Accepted           | Vite warns that extensionless imports and `__dirname` in the config dependency graph are incompatible with a future native config-loader default. | Current Vite 8 bundle config loader works. This is a future-major migration item, not a Vite 8 failure.                                                                      |
+| Accepted           | Rolldown reports `TOLERATED_TRANSFORM` for top-level `await` in SvelteKit server utilities against the preserved browser target.                  | The warnings affect SvelteKit’s SSR `node:path` and `node:process` imports; Node 22 supports them, and server builds plus E2E pass.                                          |
 | Untested           | Actual Chrome 87, Edge 88, Firefox 78, and Safari 14 runtimes.                                                                                    | Build targets are explicitly preserved, but those historical browser binaries were unavailable locally.                                                                      |
 | Baseline           | Standalone accessibility HAR suites time out on all 32 cases with a 500 page.                                                                     | Reproduced identically at baseline commit `2a6871759`; route A/B still compares axe output for every manifest entry.                                                         |
 | Baseline           | Storybook browser tests report 36 accessibility failures in 13 suites.                                                                            | Vite 6 and Vite 8 both report exactly 36 failures, 286 passes, and 49 passing suites. Storybook production build passes.                                                     |
