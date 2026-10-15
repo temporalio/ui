@@ -109,7 +109,14 @@ export type CustomUISettings = {
   iframeExtensions: IframeExtension[];
 };
 
-export type BannerColor = 'info' | 'warning' | 'success' | 'error';
+export type BannerColor =
+  | 'neutral'
+  | 'info'
+  | 'warning'
+  | 'success'
+  | 'danger'
+  | 'error'
+  | 'accent';
 
 export type BannerSettings = {
   text: string;

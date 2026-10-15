@@ -21,7 +21,7 @@ The development server uses [Air](https://github.com/air-verse/air) for automati
 Set `TEMPORAL_UI_BANNER_TEXT=PRODUCTION` and `TEMPORAL_UI_BANNER_COLOR=info`
 when running the Docker image to show a persistent banner and prefix browser page titles
 with `PRODUCTION | `. The banner also appears on the login screen and cannot
-be dismissed.
+be dismissed. Fullscreen tables and payloads cover the banner until they are closed.
 
 Set `TEMPORAL_UI_BANNER_COLOR` to choose a color preset:
 
@@ -38,11 +38,12 @@ banner:
   color: "Warning"
 ```
 
-Supported colors are `info` (blue), `warning` (amber), `success` (green), and
-`error` (red). Values are case-insensitive and surrounding whitespace is ignored.
+Supported colors are `neutral` (greyscale), `info` (blue), `warning` (amber),
+`success` (green), `danger` (red), `error` (orange), and `accent` (purple).
+Values are case-insensitive and surrounding whitespace is ignored.
 Both text and color are required. Missing, empty, or invalid values disable
 the banner and page-title prefix without causing an error. Presets use the UI's existing
-background and border colors, adapting to light and dark themes. Custom colors
+background, border, and text colors, adapting to light and dark themes. Custom colors
 are not supported.
 
 The development configuration uses literal strings. To read environment

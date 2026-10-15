@@ -7,7 +7,7 @@ port: {{ env "TEMPORAL_UI_PORT" | default "8080" }}
 publicPath: {{ env "TEMPORAL_UI_PUBLIC_PATH" | default "" }}
 enableUi: {{ env "TEMPORAL_UI_ENABLED" | default "true" }}
 banner:
-  # Both fields are required. Color: info, warning, success, or error (case-insensitive).
+  # Both fields are required. Color: neutral, info, warning, success, danger, error, or accent (case-insensitive).
   text: {{ env "TEMPORAL_UI_BANNER_TEXT" | yamlString }}
   color: {{ env "TEMPORAL_UI_BANNER_COLOR" | yamlString }}
 cloudUi: {{ env "TEMPORAL_CLOUD_UI" | default "false" }}

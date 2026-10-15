@@ -2,7 +2,12 @@ import { expect, test } from '@playwright/test';
 
 import type { SettingsResponse } from '$lib/types';
 
-import { mockSettingsApi, mockWorkflowsApis } from '~/test-utilities/mock-apis';
+import {
+  mockSettingsApi,
+  mockWorkflowApis,
+  mockWorkflowsApis,
+} from '~/test-utilities/mock-apis';
+import { mockWorkflow } from '~/test-utilities/mocks/workflow';
 
 test.beforeEach(async ({ page }) => {
   await mockWorkflowsApis(page);
@@ -96,9 +101,9 @@ test('keeps the mobile navigation menu below the banner', async ({
   );
 });
 
-test('reserves space for a wrapping banner when the table is maximized', async ({
+test('fullscreen tables cover the banner until restored', async ({
   page,
-}) => {
+}, testInfo) => {
   const text = 'PRODUCTION us-east-1 customer workflows require extra care';
   await mockSettingsApi(page, { Banner: { Text: text, Color: 'error' } });
   await page.goto('/namespaces/default/workflows');
@@ -109,17 +114,99 @@ test('reserves space for a wrapping banner when the table is maximized', async (
 
   const table = page.getByTestId('maximizable-table-view');
   await expect(table).toHaveCSS('position', 'fixed');
-  const bannerBox = await banner.boundingBox();
   const tableBox = await table.boundingBox();
-  expect(bannerBox.y).toBe(0);
-  expect(tableBox.y).toBe(bannerBox.height);
-  expect(tableBox.height + bannerBox.height).toBe(page.viewportSize().height);
+  expect(tableBox.y).toBe(0);
+  expect(tableBox.height).toBe(page.viewportSize().height);
+  expect(
+    await table.evaluate((element) =>
+      element.contains(document.elementFromPoint(1, 1)),
+    ),
+  ).toBe(true);
+  await page.screenshot({ path: testInfo.outputPath('fullscreen-table.png') });
 
   await page.keyboard.press('Escape');
   await expect(page.getByTestId('table-maximize-button')).toHaveAccessibleName(
     'Maximize',
   );
   await expect(banner).toBeVisible();
+  expect(
+    await banner.evaluate((element) =>
+      element.contains(document.elementFromPoint(1, 1)),
+    ),
+  ).toBe(true);
+});
+
+test('fullscreen payloads cover the banner until closed', async ({
+  page,
+}, testInfo) => {
+  await mockWorkflowApis(page);
+  await mockSettingsApi(page, {
+    Banner: { Text: 'PRODUCTION', Color: 'danger' },
+  });
+  const { workflowId, runId } = mockWorkflow.workflowExecutionInfo.execution;
+  await page.goto(
+    `/namespaces/default/workflows/${workflowId}/${runId}/history`,
+  );
+
+  const maximize = page
+    .getByTestId('input-and-result')
+    .getByRole('button', { name: 'Maximize Input', exact: true });
+  await maximize.click();
+  const payload = page.getByRole('dialog', { name: 'Input', exact: true });
+  await expect(payload).toBeVisible();
+  const payloadBox = await payload.boundingBox();
+  expect(payloadBox.y).toBe(0);
+  expect(payloadBox.height).toBe(page.viewportSize().height);
+  expect(
+    await payload.evaluate((element) =>
+      element.contains(document.elementFromPoint(1, 1)),
+    ),
+  ).toBe(true);
+  await page.screenshot({
+    path: testInfo.outputPath('fullscreen-payload.png'),
+  });
+
+  await page.keyboard.press('Escape');
+  await expect(payload).toBeHidden();
+  await expect(maximize).toBeFocused();
+  expect(
+    await page
+      .getByTestId('environment-banner')
+      .evaluate((element) => element.contains(document.elementFromPoint(1, 1))),
+  ).toBe(true);
+});
+
+test('shares the banner height with portals and updates it when the banner wraps', async ({
+  page,
+}) => {
+  await mockSettingsApi(page, {
+    Banner: {
+      Text: 'PRODUCTION us-east-1 customer workflows require extra care',
+      Color: 'warning',
+    },
+  });
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/namespaces/default/workflows');
+  const banner = page.getByTestId('environment-banner');
+  await expect(banner).toBeVisible();
+  const wideHeight = (await banner.boundingBox()).height;
+
+  await expect(page.locator('html')).toHaveCSS(
+    '--environment-banner-height',
+    `${wideHeight}px`,
+  );
+  await page.setViewportSize({ width: 375, height: 800 });
+  await expect
+    .poll(async () => (await banner.boundingBox()).height)
+    .toBeGreaterThan(wideHeight);
+  const wrappedHeight = (await banner.boundingBox()).height;
+  await expect(page.locator('body')).toHaveCSS(
+    '--environment-banner-height',
+    `${wrappedHeight}px`,
+  );
+  expect((await page.locator('#content-wrapper').boundingBox()).y).toBe(
+    wrappedHeight,
+  );
 });
 
 test('shows the banner and prefixed title on the login screen', async ({
@@ -138,11 +225,14 @@ test('shows the banner and prefixed title on the login screen', async ({
   await expect(page).toHaveTitle('STAGING | Login');
 });
 
-for (const { color, token } of [
+for (const { color, token, textToken = token } of [
+  { color: 'Neutral', token: 'tertiary', textToken: 'secondary' },
   { color: 'Info', token: 'information' },
   { color: 'Warning', token: 'warning' },
   { color: 'Success', token: 'success' },
-  { color: 'Error', token: 'danger' },
+  { color: 'Danger', token: 'danger' },
+  { color: 'Error', token: 'error' },
+  { color: 'Accent', token: 'accent' },
 ]) {
   test(`renders the ${color ?? 'default'} color using theme presets`, async ({
     page,
@@ -154,6 +244,7 @@ for (const { color, token } of [
     await expect(banner).toHaveText('Test');
     await expect(banner).toHaveClass(new RegExp(`bg-surface-${token}`));
     await expect(banner).toHaveClass(new RegExp(`border-${token}`));
+    await expect(banner).toHaveClass(new RegExp(`text-${textToken}`));
     await expect(page).toHaveTitle('Test | Workflows | default');
   });
 }

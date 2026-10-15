@@ -143,10 +143,13 @@ const normalizeBanner = (banner: unknown): BannerSettings => {
   if (!text || /[\p{Cc}"'&:]/u.test(banner.Text)) return hidden;
 
   switch (color) {
+    case 'neutral':
     case 'info':
     case 'warning':
     case 'success':
+    case 'danger':
     case 'error':
+    case 'accent':
       return { text, color };
     default:
       return hidden;

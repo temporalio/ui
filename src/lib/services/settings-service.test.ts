@@ -131,11 +131,14 @@ describe('fetchSettings', () => {
   });
 
   it.each([
+    [' Neutral ', 'neutral'],
     ['info', 'info'],
     ['INFO', 'info'],
     ['Warning', 'warning'],
     [' success ', 'success'],
+    ['DANGER', 'danger'],
     ['ERROR', 'error'],
+    ['Accent', 'accent'],
   ])('normalizes banner color %j to %j', async (Color, expected) => {
     vi.mocked(requestFromAPI).mockResolvedValue(
       settingsResponse({ Banner: { Text: 'Test', Color } }),

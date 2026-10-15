@@ -244,7 +244,7 @@ func (b *Banner) UnmarshalYAML(node *yaml.Node) error {
 		return nil
 	}
 	switch color {
-	case "info", "warning", "success", "error":
+	case "neutral", "info", "warning", "success", "danger", "error", "accent":
 		*b = Banner{Text: text, Color: color}
 	}
 	return nil
