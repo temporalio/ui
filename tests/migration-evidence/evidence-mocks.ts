@@ -326,14 +326,16 @@ export const installNavigationEvidenceMocks = async (
   await installDeterministicWorkflows(page);
 };
 
-export const installEvidenceMocks = async (
-  page: Page,
-  setup: MigrationRouteSetup,
-): Promise<void> => {
+const installBaseEvidenceMocks = async (page: Page): Promise<void> => {
   await installCatchAllApi(page);
   await installNewsFeed(page);
   await installRenderFrame(page);
+};
 
+const installSetupEvidenceMocks = async (
+  page: Page,
+  setup: MigrationRouteSetup,
+): Promise<void> => {
   if (setup === 'none') return;
   if (setup === 'global') {
     await mockGlobalApis(page);
@@ -452,5 +454,24 @@ export const installEvidenceMocks = async (
       mockWorkersApi(page),
     ]);
     await installDeterministicWorkflows(page);
+  }
+};
+
+export const installEvidenceMocks = async (
+  page: Page,
+  setup: MigrationRouteSetup,
+): Promise<void> => {
+  await installBaseEvidenceMocks(page);
+  await installSetupEvidenceMocks(page, setup);
+};
+
+export const installClientNavigationEvidenceMocks = async (
+  page: Page,
+  targetSetup: MigrationRouteSetup,
+): Promise<void> => {
+  await installBaseEvidenceMocks(page);
+  await installSetupEvidenceMocks(page, 'global');
+  if (targetSetup !== 'global') {
+    await installSetupEvidenceMocks(page, targetSetup);
   }
 };

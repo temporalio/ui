@@ -12,6 +12,7 @@ import {
 } from '@playwright/test';
 
 import {
+  installClientNavigationEvidenceMocks,
   installEvidenceMocks,
   installNavigationEvidenceMocks,
 } from './evidence-mocks';
@@ -20,6 +21,7 @@ import {
   apiRequestsForParity,
   scenarioForParity,
 } from '../../scripts/vite-migration/api-evidence';
+import { clientNavigationForParity } from '../../scripts/vite-migration/client-navigation-evidence';
 import {
   consoleMessagesForParity,
   normalizeEvidenceText,
@@ -385,6 +387,297 @@ const collectScreenshotSample = async (
   );
 };
 
+const configureEvidencePage = async (page: Page): Promise<void> => {
+  await page.emulateMedia({ colorScheme: 'light', reducedMotion: 'reduce' });
+  await page.addInitScript(() => {
+    let uuidCounter = 0;
+    Object.defineProperty(globalThis.crypto, 'randomUUID', {
+      configurable: true,
+      value: () => {
+        uuidCounter += 1;
+        return `00000000-0000-4000-8000-${uuidCounter
+          .toString(16)
+          .padStart(12, '0')}`;
+      },
+    });
+  });
+  await page.clock.setFixedTime(new Date('2025-01-15T12:00:00.000Z'));
+};
+
+const settleDocument = async (page: Page): Promise<void> => {
+  await page.waitForLoadState('load', { timeout: 5000 });
+  await page.evaluate(async () => {
+    await document.fonts.ready;
+    await new Promise<void>((resolve) => {
+      requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+    });
+  });
+};
+
+const runClientNavigation = async (
+  page: Page,
+  route: MigrationRoute,
+  baseUrl: string,
+  normalize: (value: string) => string,
+) => {
+  if (route.clientNavigation.kind === 'exempt') {
+    return {
+      kind: 'exempt' as const,
+      reason: route.clientNavigation.reason,
+    };
+  }
+
+  const navigationPage = await page.context().newPage();
+
+  try {
+    await configureEvidencePage(navigationPage);
+    await installClientNavigationEvidenceMocks(navigationPage, route.setup);
+
+    const sourceUrl = new URL(route.clientNavigation.sourceUrl, baseUrl);
+    const targetUrl = new URL(route.url, baseUrl);
+    const expectedFinalUrl = new URL(route.expected.finalPath, baseUrl);
+    const sentinel = `migration-evidence-window:${route.id}`;
+    const errors: string[] = [];
+
+    const sourceTracker = new EvidenceTracker(navigationPage, normalize);
+    sourceTracker.start();
+    await navigationPage.goto(sourceUrl.href, {
+      waitUntil: 'domcontentloaded',
+    });
+    await settleDocument(navigationPage);
+    await sourceTracker.waitForQuiet();
+    sourceTracker.stop();
+
+    const observedSourceUrl = new URL(navigationPage.url());
+    if (
+      observedSourceUrl.pathname !== sourceUrl.pathname ||
+      observedSourceUrl.search !== sourceUrl.search
+    ) {
+      errors.push(
+        `Client navigation source ended at ${observedSourceUrl.pathname}${observedSourceUrl.search}`,
+      );
+    }
+
+    await navigationPage.evaluate(
+      ({ sentinelValue, targetHref }) => {
+        type NavigationState = {
+          sentinel: string;
+          events: { type: string; url: string | null }[];
+        };
+        const state: NavigationState = {
+          sentinel: sentinelValue,
+          events: [],
+        };
+        const navigationWindow = window as typeof window & {
+          __migrationEvidenceClientNavigation?: NavigationState;
+        };
+        navigationWindow.__migrationEvidenceClientNavigation = state;
+
+        const record = (type: string, url: string | null = location.href) => {
+          state.events.push({ type, url });
+        };
+        window.addEventListener('popstate', () => record('popstate'));
+        window.addEventListener('hashchange', () => record('hashchange'));
+        window.addEventListener('beforeunload', () => record('beforeunload'));
+        window.addEventListener('pagehide', () => record('pagehide'));
+
+        const anchor = document.createElement('a');
+        anchor.dataset.migrationEvidenceTarget = 'true';
+        anchor.href = targetHref;
+        anchor.textContent = 'Migration evidence target';
+        document.body.append(anchor);
+      },
+      { sentinelValue: sentinel, targetHref: targetUrl.href },
+    );
+
+    const tracker = new EvidenceTracker(navigationPage, normalize);
+    tracker.start();
+    let navigationError: string | null = null;
+    let settleError: string | null = null;
+    const interactionEvents: { type: string; url: string | null }[] = [];
+
+    try {
+      await navigationPage
+        .locator('a[data-migration-evidence-target="true"]')
+        .click();
+      interactionEvents.push({
+        type: 'anchor-click',
+        url: normalizeEvidenceUrl(targetUrl.href, origins),
+      });
+      await navigationPage.waitForURL(
+        (url) =>
+          url.pathname === expectedFinalUrl.pathname &&
+          url.search === expectedFinalUrl.search,
+        { timeout: 5000 },
+      );
+    } catch (error) {
+      navigationError = normalize(messageFor(error));
+      errors.push(`Client navigation failed: ${navigationError}`);
+    }
+
+    try {
+      await settleDocument(navigationPage);
+      await tracker.waitForQuiet();
+    } catch (error) {
+      settleError = normalize(messageFor(error));
+      errors.push(`Client navigation settlement failed: ${settleError}`);
+    }
+
+    const tracked = tracker.stop();
+    const browserState = await navigationPage
+      .evaluate(() => {
+        const navigationWindow = window as typeof window & {
+          __migrationEvidenceClientNavigation?: {
+            sentinel: string;
+            events: { type: string; url: string | null }[];
+          };
+        };
+        return navigationWindow.__migrationEvidenceClientNavigation ?? null;
+      })
+      .catch(() => null);
+    const navigationEvents = [
+      ...interactionEvents,
+      ...(browserState?.events ?? []).map((event) => ({
+        ...event,
+        url: event.url ? normalizeEvidenceUrl(event.url, origins) : null,
+      })),
+      ...tracked.mainFrameNavigations.map((url) => ({
+        type: 'main-frame-navigated',
+        url,
+      })),
+    ];
+    const observedSentinel = browserState?.sentinel ?? null;
+    const windowSentinel = {
+      expected: sentinel,
+      observed: observedSentinel,
+      preserved: observedSentinel === sentinel,
+    };
+    const finalUrl = new URL(navigationPage.url());
+    const has404Heading = await navigationPage
+      .getByRole('heading', { level: 1, name: '404', exact: true })
+      .isVisible()
+      .catch(() => false);
+    const observedAppStatus = has404Heading ? 404 : 200;
+    const expectedAppStatus =
+      route.expected.kind === 'not-found' ? route.expected.appStatus : 200;
+    const usedCatchAllApis = [
+      ...new Set(
+        tracked.appApiRequests
+          .map(({ mock }) => mock)
+          .filter((mock): mock is string => mock !== null),
+      ),
+    ].sort();
+    const unapprovedCatchAllApis = usedCatchAllApis.filter(
+      (mock) =>
+        !route.approvedCatchAllApis.includes(mock as EvidenceCatchAllApi),
+    );
+    const apiFailures = tracked.appApiRequests.filter(
+      ({ failure, status }) =>
+        (failure !== null && status === null) ||
+        (status !== null && status >= 400),
+    );
+    const assessedConsoleErrors = tracked.consoleMessages
+      .filter(({ type }) => type === 'error')
+      .map((message) => ({
+        ...message,
+        classification: classifyKnownConsoleError(message.text),
+      }));
+    const unexpectedConsoleErrors = assessedConsoleErrors.filter(
+      ({ classification }) =>
+        classification === null ||
+        !route.approvedConsoleErrors.includes(classification),
+    );
+    const pageErrorAssessment = assessPageErrors(tracked.pageErrors, route);
+
+    if (finalUrl.pathname !== route.expected.finalPath) {
+      errors.push(
+        `Expected client navigation final path ${route.expected.finalPath}, received ${finalUrl.pathname}`,
+      );
+    }
+    if (observedAppStatus !== expectedAppStatus) {
+      errors.push(
+        `Expected client navigation app status ${expectedAppStatus}, received ${observedAppStatus}`,
+      );
+    }
+    if (
+      windowSentinel.preserved !==
+      route.clientNavigation.expectedWindowPreserved
+    ) {
+      errors.push(
+        `Expected client navigation window preservation to be ${route.clientNavigation.expectedWindowPreserved}, received ${windowSentinel.preserved}`,
+      );
+    }
+    if (!navigationEvents.some(({ type }) => type === 'anchor-click')) {
+      errors.push('Client navigation did not record the injected anchor click');
+    }
+    if (pageErrorAssessment.unexpected.length) {
+      errors.push(
+        `Client navigation page errors: ${pageErrorAssessment.unexpected
+          .map(({ text }) => text)
+          .join(' | ')}`,
+      );
+    }
+    if (unexpectedConsoleErrors.length) {
+      errors.push(
+        `Client navigation console errors: ${unexpectedConsoleErrors
+          .map(({ text }) => text)
+          .join(' | ')}`,
+      );
+    }
+    if (apiFailures.length) {
+      errors.push(
+        `Client navigation API failures: ${apiFailures
+          .map(
+            ({ method, path: requestPath, status, failure }) =>
+              `${method} ${requestPath} ${status ?? failure}`,
+          )
+          .join(' | ')}`,
+      );
+    }
+    if (unapprovedCatchAllApis.length) {
+      errors.push(
+        `Client navigation unapproved catch-all APIs: ${unapprovedCatchAllApis.join(', ')}`,
+      );
+    }
+
+    return {
+      kind: 'collected' as const,
+      sourceUrl: normalizeEvidenceUrl(observedSourceUrl.href, origins),
+      targetUrl: normalizeEvidenceUrl(targetUrl.href, origins),
+      finalUrl: normalizeEvidenceUrl(finalUrl.href, origins),
+      expected: {
+        finalPath: route.expected.finalPath,
+        appStatus: expectedAppStatus,
+        windowPreserved: route.clientNavigation.expectedWindowPreserved,
+      },
+      observed: {
+        finalPath: finalUrl.pathname,
+        appStatus: observedAppStatus,
+      },
+      navigationEvents,
+      windowSentinel,
+      navigationError,
+      settleError,
+      appApiRequests: tracked.appApiRequests,
+      catchAllMocks: {
+        used: usedCatchAllApis,
+        unapproved: unapprovedCatchAllApis,
+      },
+      consoleMessages: tracked.consoleMessages,
+      consoleMessagesForParity: consoleMessagesForParity(
+        tracked.consoleMessages,
+        classifyKnownConsoleError,
+      ),
+      unexpectedConsoleErrors,
+      pageErrors: tracked.pageErrors,
+      unexpectedPageErrors: pageErrorAssessment.unexpected,
+      errors,
+    };
+  } finally {
+    await navigationPage.close();
+  }
+};
+
 const runFamilyScenario = async (
   page: Page,
   route: MigrationRoute,
@@ -560,20 +853,7 @@ const collectRoute = async (
   const appOrigin = new URL(baseUrl).origin;
   const normalize = (value: string) => normalizeEvidenceText(value, origins);
 
-  await page.emulateMedia({ colorScheme: 'light', reducedMotion: 'reduce' });
-  await page.addInitScript(() => {
-    let uuidCounter = 0;
-    Object.defineProperty(globalThis.crypto, 'randomUUID', {
-      configurable: true,
-      value: () => {
-        uuidCounter += 1;
-        return `00000000-0000-4000-8000-${uuidCounter
-          .toString(16)
-          .padStart(12, '0')}`;
-      },
-    });
-  });
-  await page.clock.setFixedTime(new Date('2025-01-15T12:00:00.000Z'));
+  await configureEvidencePage(page);
   await installEvidenceMocks(page, route.setup);
 
   const initialUrl = new URL(route.url, baseUrl).href;
@@ -596,13 +876,7 @@ const collectRoute = async (
   }
 
   try {
-    await page.waitForLoadState('load', { timeout: 5000 });
-    await page.evaluate(async () => {
-      await document.fonts.ready;
-      await new Promise<void>((resolve) => {
-        requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
-      });
-    });
+    await settleDocument(page);
     await tracker.waitForQuiet();
   } catch (error) {
     settleError = normalize(messageFor(error));
@@ -644,6 +918,12 @@ const collectRoute = async (
   }
 
   const scenario = await runFamilyScenario(page, route, appOrigin, normalize);
+  const clientNavigation = await runClientNavigation(
+    page,
+    route,
+    baseUrl,
+    normalize,
+  );
   const usedCatchAllApis = [
     ...new Set(
       tracked.appApiRequests
@@ -766,6 +1046,9 @@ const collectRoute = async (
   if (scenario?.errors.length) {
     expectationFailures.push(...scenario.errors);
   }
+  if (clientNavigation.kind === 'collected' && clientNavigation.errors.length) {
+    expectationFailures.push(...clientNavigation.errors);
+  }
 
   const evidence = {
     route: {
@@ -779,6 +1062,7 @@ const collectRoute = async (
       approvedCatchAllApis: route.approvedCatchAllApis,
       approvedConsoleErrors: route.approvedConsoleErrors,
       approvedPageErrors: route.approvedPageErrors,
+      clientNavigation: route.clientNavigation,
     },
     variant,
     initialUrl: normalizeEvidenceUrl(initialUrl, origins),
@@ -810,6 +1094,8 @@ const collectRoute = async (
     accessibility,
     scenario,
     scenarioForParity: scenarioForParity(scenario),
+    clientNavigation,
+    clientNavigationForParity: clientNavigationForParity(clientNavigation),
     screenshot: {
       path: 'page.jpg',
       sha256: createHash('sha256').update(screenshot).digest('hex'),

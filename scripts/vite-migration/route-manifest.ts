@@ -69,6 +69,18 @@ export const evidenceKnownPageErrors = [
   'detached-resize-observer-element',
 ] as const;
 export type EvidenceKnownPageError = (typeof evidenceKnownPageErrors)[number];
+export const migrationClientNavigationSourceUrl =
+  '/select-namespace?migration-evidence-source=true';
+export type MigrationClientNavigation =
+  | {
+      kind: 'required';
+      sourceUrl: typeof migrationClientNavigationSourceUrl;
+      expectedWindowPreserved: boolean;
+    }
+  | {
+      kind: 'exempt';
+      reason: string;
+    };
 export type MigrationRouteBehavior =
   | {
       kind: 'render';
@@ -105,6 +117,7 @@ export type MigrationRoute = {
   approvedCatchAllApis: readonly EvidenceCatchAllApi[];
   approvedConsoleErrors: readonly EvidenceKnownConsoleError[];
   approvedPageErrors: readonly EvidenceKnownPageError[];
+  clientNavigation: MigrationClientNavigation;
 };
 
 type MigrationRouteInput = Omit<
@@ -113,6 +126,7 @@ type MigrationRouteInput = Omit<
   | 'approvedCatchAllApis'
   | 'approvedConsoleErrors'
   | 'approvedPageErrors'
+  | 'clientNavigation'
 > & {
   availability?: MigrationRoute['availability'];
   approvedCatchAllApis?: readonly EvidenceCatchAllApi[];
@@ -960,6 +974,11 @@ const pageErrorApprovalsByRoute: Partial<
   'workflow-user-metadata': ['detached-resize-observer-element'],
 };
 
+const clientNavigationDocumentReplacements = new Set([
+  'workflow-history-raw-redirect',
+  'error-boundary',
+]);
+
 export const migrationRouteManifest: readonly MigrationRoute[] =
   migrationRouteInputs.map((route) => ({
     ...route,
@@ -979,6 +998,19 @@ export const migrationRouteManifest: readonly MigrationRoute[] =
     ],
     approvedPageErrors:
       route.approvedPageErrors ?? pageErrorApprovalsByRoute[route.id] ?? [],
+    clientNavigation:
+      route.expected.kind === 'server-response'
+        ? {
+            kind: 'exempt' as const,
+            reason: 'Server-response routes are not SvelteKit page navigations',
+          }
+        : {
+            kind: 'required' as const,
+            sourceUrl: migrationClientNavigationSourceUrl,
+            expectedWindowPreserved: !clientNavigationDocumentReplacements.has(
+              route.id,
+            ),
+          },
   }));
 
 type FamilyNavigationScenario = {

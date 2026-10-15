@@ -1,6 +1,10 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
+import {
+  type ClientNavigationResult,
+  clientNavigationStatus,
+} from '../../scripts/vite-migration/client-navigation-evidence';
 import { writeJsonExclusive } from '../../scripts/vite-migration/evidence-run';
 import { migrationRouteManifest } from '../../scripts/vite-migration/route-manifest';
 import {
@@ -24,6 +28,8 @@ type Evidence = {
   accessibility: unknown;
   scenario: unknown;
   scenarioForParity: unknown;
+  clientNavigation?: ClientNavigationResult;
+  clientNavigationForParity?: unknown;
   screenshot: ScreenshotEvidence;
   expectationFailures: string[];
 };
@@ -40,6 +46,7 @@ const comparableFields = [
   'semantic',
   'accessibility',
   'scenarioForParity',
+  'clientNavigationForParity',
   'expectationFailures',
 ] as const;
 
@@ -72,6 +79,14 @@ const globalTeardown = async (): Promise<void> => {
     const candidate = await readEvidence(outputRoot, 'candidate', route.id);
     if (baseline) evidenceByRoute.set(`baseline:${route.id}`, baseline);
     if (candidate) evidenceByRoute.set(`candidate:${route.id}`, candidate);
+    const baselineClientNavigation = clientNavigationStatus(
+      route.clientNavigation.kind,
+      baseline?.clientNavigation,
+    );
+    const candidateClientNavigation = clientNavigationStatus(
+      route.clientNavigation.kind,
+      candidate?.clientNavigation,
+    );
     const differences: string[] = comparableFields.filter(
       (field) =>
         JSON.stringify(baseline?.[field]) !==
@@ -97,6 +112,15 @@ const globalTeardown = async (): Promise<void> => {
         baseline !== null && candidate !== null && differences.length === 0,
       differences,
       screenshotComparison,
+      clientNavigation: {
+        baseline: baselineClientNavigation,
+        candidate: candidateClientNavigation,
+        matches:
+          baselineClientNavigation !== 'missing' &&
+          candidateClientNavigation !== 'missing' &&
+          JSON.stringify(baseline?.clientNavigationForParity) ===
+            JSON.stringify(candidate?.clientNavigationForParity),
+      },
     });
   }
 
@@ -130,6 +154,41 @@ const globalTeardown = async (): Promise<void> => {
         screenshotComparison?.normalizedMatches &&
         !screenshotComparison.rawSha256Matches,
     ).length,
+    clientNavigation: {
+      requiredRoutes: migrationRouteManifest.filter(
+        ({ clientNavigation }) => clientNavigation.kind === 'required',
+      ).length,
+      exemptRoutes: migrationRouteManifest.filter(
+        ({ clientNavigation }) => clientNavigation.kind === 'exempt',
+      ).length,
+      collected: {
+        baseline: routes.filter(
+          ({ clientNavigation }) => clientNavigation.baseline === 'collected',
+        ).length,
+        candidate: routes.filter(
+          ({ clientNavigation }) => clientNavigation.candidate === 'collected',
+        ).length,
+      },
+      exempt: {
+        baseline: routes.filter(
+          ({ clientNavigation }) => clientNavigation.baseline === 'exempt',
+        ).length,
+        candidate: routes.filter(
+          ({ clientNavigation }) => clientNavigation.candidate === 'exempt',
+        ).length,
+      },
+      missingRoutes: routes.filter(
+        ({ clientNavigation }) =>
+          clientNavigation.baseline === 'missing' ||
+          clientNavigation.candidate === 'missing',
+      ).length,
+      differingRoutes: routes.filter(
+        ({ clientNavigation }) =>
+          clientNavigation.baseline !== 'missing' &&
+          clientNavigation.candidate !== 'missing' &&
+          !clientNavigation.matches,
+      ).length,
+    },
     routes,
   };
 
@@ -139,10 +198,12 @@ const globalTeardown = async (): Promise<void> => {
     process.env.MIGRATION_EVIDENCE_REQUIRE_EQUAL === '1' &&
     (summary.differingRoutes > 0 ||
       summary.missingRoutes > 0 ||
-      summary.failedEvidenceRoutes > 0)
+      summary.failedEvidenceRoutes > 0 ||
+      summary.clientNavigation.missingRoutes > 0 ||
+      summary.clientNavigation.differingRoutes > 0)
   ) {
     throw new Error(
-      `Migration evidence differs for ${summary.differingRoutes} routes, is missing for ${summary.missingRoutes} routes, and failed expectations for ${summary.failedEvidenceRoutes} routes`,
+      `Migration evidence differs for ${summary.differingRoutes} routes, is missing for ${summary.missingRoutes} routes, failed expectations for ${summary.failedEvidenceRoutes} routes, has missing client-navigation evidence for ${summary.clientNavigation.missingRoutes} routes, and differing client-navigation evidence for ${summary.clientNavigation.differingRoutes} routes`,
     );
   }
 };

@@ -6,6 +6,7 @@ import { globSync } from 'fast-glob';
 import { describe, expect, it } from 'vitest';
 
 import {
+  migrationClientNavigationSourceUrl,
   migrationRouteFamilies,
   migrationRouteFamilyScenarios,
   migrationRouteManifest,
@@ -171,6 +172,46 @@ describe('migration route manifest', () => {
       httpStatus: 404,
       appStatus: 404,
     });
+  });
+
+  it('requires generic client-navigation evidence for every route except render', () => {
+    const exemptRoutes = migrationRouteManifest.filter(
+      ({ clientNavigation }) => clientNavigation.kind === 'exempt',
+    );
+    const requiredRoutes = migrationRouteManifest.filter(
+      ({ clientNavigation }) => clientNavigation.kind === 'required',
+    );
+
+    expect(exemptRoutes.map(({ id }) => id)).toEqual(['render-markdown']);
+    expect(requiredRoutes).toHaveLength(74);
+    expect(exemptRoutes[0]?.clientNavigation).toEqual({
+      kind: 'exempt',
+      reason: 'Server-response routes are not SvelteKit page navigations',
+    });
+
+    for (const route of migrationRouteManifest) {
+      if (route.clientNavigation.kind === 'exempt') continue;
+
+      expect(route.clientNavigation.kind, route.id).toBe('required');
+      expect(route.clientNavigation.sourceUrl, route.id).toBe(
+        migrationClientNavigationSourceUrl,
+      );
+      expect(
+        typeof route.clientNavigation.expectedWindowPreserved,
+        route.id,
+      ).toBe('boolean');
+      expect(route.expected.kind, route.id).not.toBe('server-response');
+    }
+
+    expect(
+      migrationRouteManifest
+        .filter(
+          ({ clientNavigation }) =>
+            clientNavigation.kind === 'required' &&
+            !clientNavigation.expectedWindowPreserved,
+        )
+        .map(({ id }) => id),
+    ).toEqual(['workflow-history-raw-redirect', 'error-boundary']);
   });
 
   it('declares catch-all approvals for every route', () => {
