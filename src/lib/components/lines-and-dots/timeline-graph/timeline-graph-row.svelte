@@ -335,7 +335,7 @@
             ? 'retry'
             : undefined}
         <div
-          class="pointer-events-auto absolute flex w-max select-none items-center gap-1 whitespace-nowrap text-[13px] leading-none {textAnchor ===
+          class="pointer-events-auto absolute flex w-max select-none items-center gap-1 whitespace-nowrap text-sm leading-none {textAnchor ===
           'end'
             ? '-translate-x-full -translate-y-1/2 flex-row-reverse'
             : '-translate-y-1/2'}"
