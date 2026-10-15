@@ -77,7 +77,7 @@
   let { children }: Props = $props();
 
   let bannerHeight = $state(0);
-  const bannerText = $derived(page.data?.settings?.bannerText ?? '');
+  const banner = $derived(page.data?.settings?.banner);
 
   initializeNavDefaults(page.data?.settings?.navCollapsedByDefault);
 
@@ -415,9 +415,13 @@
 
 <div
   class="flex h-[calc(100dvh-var(--layout-pt))] w-screen flex-row pt-[var(--environment-banner-height)]"
-  style:--environment-banner-height={`${bannerText ? bannerHeight : 0}px`}
+  style:--environment-banner-height={`${banner?.text ? bannerHeight : 0}px`}
 >
-  <EnvironmentBanner text={bannerText} bind:height={bannerHeight} />
+  <EnvironmentBanner
+    text={banner?.text ?? ''}
+    color={banner?.color}
+    bind:height={bannerHeight}
+  />
   <Toaster
     closeButtonLabel={translate('common.close')}
     pop={toaster.pop}

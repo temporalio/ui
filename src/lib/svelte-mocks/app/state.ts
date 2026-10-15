@@ -1,7 +1,7 @@
 import type { Settings } from '$lib/types/global';
 
 const settings: Settings = {
-  bannerText: '',
+  banner: { text: '', color: 'info' },
   auth: {
     enabled: false,
     options: null,

@@ -13,14 +13,18 @@
   let { children }: Props = $props();
 
   let bannerHeight = $state(0);
-  const bannerText = $derived(page.data?.settings?.bannerText ?? '');
+  const banner = $derived(page.data?.settings?.banner);
 </script>
 
 <DarkMode />
 <div
   class="min-h-screen bg-background-primary pt-[var(--environment-banner-height)] text-primary"
-  style:--environment-banner-height={`${bannerText ? bannerHeight : 0}px`}
+  style:--environment-banner-height={`${banner?.text ? bannerHeight : 0}px`}
 >
-  <EnvironmentBanner text={bannerText} bind:height={bannerHeight} />
+  <EnvironmentBanner
+    text={banner?.text ?? ''}
+    color={banner?.color}
+    bind:height={bannerHeight}
+  />
   {@render children()}
 </div>

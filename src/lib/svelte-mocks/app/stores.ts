@@ -12,7 +12,7 @@ interface Page<Params extends Record<string, string> = Record<string, string>> {
 }
 
 const settings: Settings = {
-  bannerText: '',
+  banner: { text: '', color: 'info' },
   auth: {
     enabled: false,
     options: null,

@@ -111,17 +111,78 @@ describe('isLocalRuntimeEnvironment', () => {
 });
 
 describe('fetchSettings', () => {
+  it('defaults to an empty info banner when omitted', async () => {
+    vi.mocked(requestFromAPI).mockResolvedValue(settingsResponse());
+
+    expect((await fetchSettings()).banner).toEqual({ text: '', color: 'info' });
+  });
+
   it.each([
     [undefined, ''],
     ['', ''],
     ['   ', ''],
     [' PRODUCTION us-east-1 ', 'PRODUCTION us-east-1'],
-  ])('normalizes banner text %j to %j', async (BannerText, expected) => {
+  ])('normalizes banner text %j to %j', async (Text, expected) => {
     vi.mocked(requestFromAPI).mockResolvedValue(
-      settingsResponse({ BannerText }),
+      settingsResponse({ Banner: { Text, Color: 'info' } }),
     );
 
-    expect((await fetchSettings()).bannerText).toBe(expected);
+    expect((await fetchSettings()).banner.text).toBe(expected);
+  });
+
+  it.each([
+    ['info', 'info'],
+    ['INFO', 'info'],
+    ['Warning', 'warning'],
+    [' success ', 'success'],
+    ['ERROR', 'error'],
+  ])('normalizes banner color %j to %j', async (Color, expected) => {
+    vi.mocked(requestFromAPI).mockResolvedValue(
+      settingsResponse({ Banner: { Text: 'Test', Color } }),
+    );
+
+    expect((await fetchSettings()).banner).toEqual({
+      text: 'Test',
+      color: expected,
+    });
+  });
+
+  it.each([
+    null,
+    'invalid',
+    42,
+    true,
+    [],
+    {},
+    { Text: 'Test' },
+    { Color: 'warning' },
+    { Text: null, Color: 'info' },
+    { Text: 42, Color: 'info' },
+    { Text: true, Color: 'info' },
+    { Text: ['Test'], Color: 'info' },
+    { Text: { label: 'Test' }, Color: 'info' },
+    { Text: 'Test', Color: null },
+    { Text: 'Test', Color: 42 },
+    { Text: 'Test', Color: ['info'] },
+    { Text: 'Test', Color: { name: 'info' } },
+    { Text: 'Test', Color: '' },
+    { Text: 'Test', Color: '   ' },
+    { Text: 'Test', Color: 'purple' },
+    { Text: 'Test', Color: '#ff0000' },
+    { Text: 'Test', Color: 'toString' },
+    { Text: '"Test"', Color: 'info' },
+    { Text: "'Test'", Color: 'info' },
+    { Text: 'Test & staging', Color: 'info' },
+    { Text: 'Test: staging', Color: 'info' },
+    { Text: 'Test\nregion', Color: 'info' },
+    { Text: 'Test\u0001region', Color: 'info' },
+  ])('hides invalid banner settings %j without throwing', async (Banner) => {
+    vi.mocked(requestFromAPI).mockResolvedValue({
+      ...settingsResponse(),
+      Banner,
+    });
+
+    expect((await fetchSettings()).banner).toEqual({ text: '', color: 'info' });
   });
 
   it('maps navCollapsedByDefault from settings response', async () => {

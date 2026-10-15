@@ -99,11 +99,15 @@ func TestTemporalAccessCheckUsesTemporalAPIAuthority(t *testing.T) {
 	}
 }
 
-func TestGetSettingsIncludesBannerText(t *testing.T) {
-	for _, bannerText := range []string{"", "PRODUCTION us-east-1"} {
-		t.Run(bannerText, func(t *testing.T) {
+func TestGetSettingsIncludesBanner(t *testing.T) {
+	for _, banner := range []config.Banner{
+		{},
+		{Text: "PRODUCTION us-east-1"},
+		{Text: "Test", Color: "Warning"},
+	} {
+		t.Run(banner.Text, func(t *testing.T) {
 			cfgProvider, err := config.NewConfigProviderWithRefresh(&mockConfigProvider{
-				cfg: &config.Config{BannerText: bannerText},
+				cfg: &config.Config{Banner: banner},
 			})
 			require.NoError(t, err)
 			defer cfgProvider.Close()
@@ -117,7 +121,7 @@ func TestGetSettingsIncludesBannerText(t *testing.T) {
 
 			var payload map[string]any
 			require.NoError(t, json.Unmarshal(rec.Body.Bytes(), &payload))
-			assert.Equal(t, bannerText, payload["BannerText"])
+			assert.Equal(t, map[string]any{"Text": banner.Text, "Color": banner.Color}, payload["Banner"])
 		})
 	}
 }

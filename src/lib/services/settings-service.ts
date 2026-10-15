@@ -5,7 +5,11 @@ import {
   isTemporalExtensionSlot,
 } from '$lib/extensions/iframe-extensions';
 import type { CustomUIResponse, SettingsResponse } from '$lib/types';
-import type { IframeExtension, Settings } from '$lib/types/global';
+import type {
+  BannerSettings,
+  IframeExtension,
+  Settings,
+} from '$lib/types/global';
 import { getApiOrigin } from '$lib/utilities/get-api-origin';
 import { getEnvironment } from '$lib/utilities/get-environment';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
@@ -122,6 +126,33 @@ export const fetchUiExtensions = async (
   }
 };
 
+const normalizeBanner = (banner: unknown): BannerSettings => {
+  const hidden: BannerSettings = { text: '', color: 'info' };
+  if (
+    !banner ||
+    typeof banner !== 'object' ||
+    !('Text' in banner) ||
+    !('Color' in banner) ||
+    typeof banner.Text !== 'string' ||
+    typeof banner.Color !== 'string'
+  )
+    return hidden;
+
+  const text = banner.Text.trim();
+  const color = banner.Color.trim().toLowerCase();
+  if (!text || /[\p{Cc}"'&:]/u.test(banner.Text)) return hidden;
+
+  switch (color) {
+    case 'info':
+    case 'warning':
+    case 'success':
+    case 'error':
+      return { text, color };
+    default:
+      return hidden;
+  }
+};
+
 export const fetchSettings = async (request = fetch): Promise<Settings> => {
   const route = routeForApi('settings');
   const settingsResponse: SettingsResponse =
@@ -132,7 +163,7 @@ export const fetchSettings = async (request = fetch): Promise<Settings> => {
   const EnvironmentOverride = getEnvironment();
 
   const settingsInformation = {
-    bannerText: settingsResponse?.BannerText?.trim() ?? '',
+    banner: normalizeBanner(settingsResponse?.Banner),
     auth: {
       enabled: !!settingsResponse?.Auth?.Enabled,
       options: settingsResponse?.Auth?.Options,

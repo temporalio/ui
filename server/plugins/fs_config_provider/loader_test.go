@@ -32,6 +32,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
+	"github.com/temporalio/ui-server/v2/server/config"
 )
 
 const fileMode = os.FileMode(0644)
@@ -56,33 +57,89 @@ func TestLoaderSuite(t *testing.T) {
 	suite.Run(t, new(LoaderSuite))
 }
 
-func TestBannerTextFromEnv(t *testing.T) {
+func TestBannerFromEnv(t *testing.T) {
 	// The old environment variable must not configure the banner.
 	t.Setenv("TEMPORAL_BANNER_TEXT", "STAGING")
 
-	for _, environment := range []string{"docker", "development"} {
-		t.Run(environment, func(t *testing.T) {
-			for _, test := range []struct {
-				name  string
-				value string
-				set   bool
-			}{
-				{name: "unset"},
-				{name: "empty", set: true},
-				{name: "configured", value: "PRODUCTION us-east-1", set: true},
-			} {
-				t.Run(test.name, func(t *testing.T) {
-					t.Setenv("TEMPORAL_UI_BANNER_TEXT", test.value)
-					if !test.set {
-						require.NoError(t, os.Unsetenv("TEMPORAL_UI_BANNER_TEXT"))
-					}
-
-					cfg, err := LoadConfig("../../config", environment)
-
-					require.NoError(t, err)
-					require.Equal(t, test.value, cfg.BannerText)
-				})
+	for _, test := range []struct {
+		name  string
+		text  string
+		color string
+		set   bool
+		want  config.Banner
+	}{
+		{name: "unset"},
+		{name: "empty", set: true},
+		{name: "text only", text: "PRODUCTION us-east-1", set: true},
+		{name: "text and color", text: "Test", color: "Warning", set: true, want: config.Banner{Text: "Test", Color: "warning"}},
+		{name: "trimmed values", text: " Test ", color: " INFO ", set: true, want: config.Banner{Text: "Test", Color: "info"}},
+		{name: "success", text: "Test", color: "SUCCESS", set: true, want: config.Banner{Text: "Test", Color: "success"}},
+		{name: "error", text: "Test", color: "error", set: true, want: config.Banner{Text: "Test", Color: "error"}},
+		{name: "backslash", text: `Test\region`, color: "info", set: true, want: config.Banner{Text: `Test\region`, Color: "info"}},
+		{name: "color only", color: "success", set: true},
+		{name: "unknown color", text: "Test", color: "purple", set: true},
+		{name: "custom color", text: "Test", color: "#ff0000", set: true},
+		{name: "blank color", text: "Test", color: "   ", set: true},
+		{name: "blank text", text: "   ", color: "info", set: true},
+		{name: "double quotes", text: `"Test"`, color: "info", set: true},
+		{name: "single quotes", text: "'Test'", color: "info", set: true},
+		{name: "ampersand", text: "Test & staging", color: "info", set: true},
+		{name: "colon", text: "Test: staging", color: "info", set: true},
+		{name: "newlines", text: " Test\nregion", color: "info", set: true},
+		{name: "control characters", text: "Test\x01region", color: "info", set: true},
+		{name: "malformed color", text: "Test", color: "\"warning\"\nother: [", set: true},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			t.Setenv("TEMPORAL_UI_BANNER_TEXT", test.text)
+			t.Setenv("TEMPORAL_UI_BANNER_COLOR", test.color)
+			if !test.set {
+				require.NoError(t, os.Unsetenv("TEMPORAL_UI_BANNER_TEXT"))
+				require.NoError(t, os.Unsetenv("TEMPORAL_UI_BANNER_COLOR"))
 			}
+
+			cfg, err := LoadConfig("../../config", "docker")
+
+			require.NoError(t, err)
+			require.Equal(t, test.want, cfg.Banner)
+		})
+	}
+}
+
+func TestBannerFromYAML(t *testing.T) {
+	for _, test := range []struct {
+		name string
+		yaml string
+		want config.Banner
+	}{
+		{name: "omitted", yaml: "enableUi: true\n"},
+		{name: "text only", yaml: "banner:\n  text: Test\n"},
+		{name: "color only", yaml: "banner:\n  color: Warning\n"},
+		{name: "text and color", yaml: "banner:\n  text: \"Test\"\n  color: \"Warning\"\n", want: config.Banner{Text: "Test", Color: "warning"}},
+		{name: "null banner", yaml: "banner: null\n"},
+		{name: "empty banner", yaml: "banner: {}\n"},
+		{name: "string banner", yaml: "banner: invalid\n"},
+		{name: "number banner", yaml: "banner: 42\n"},
+		{name: "boolean banner", yaml: "banner: true\n"},
+		{name: "array banner", yaml: "banner: [Test, Warning]\n"},
+		{name: "number text", yaml: "banner:\n  text: 42\n  color: info\n"},
+		{name: "boolean text", yaml: "banner:\n  text: true\n  color: info\n"},
+		{name: "array text", yaml: "banner:\n  text: [Test]\n  color: info\n"},
+		{name: "object text", yaml: "banner:\n  text: {label: Test}\n  color: info\n"},
+		{name: "null text", yaml: "banner:\n  text: null\n  color: info\n"},
+		{name: "number color", yaml: "banner:\n  text: Test\n  color: 42\n"},
+		{name: "object color", yaml: "banner:\n  text: Test\n  color: {name: info}\n"},
+		{name: "null color", yaml: "banner:\n  text: Test\n  color: null\n"},
+		{name: "unknown color", yaml: "banner:\n  text: Test\n  color: purple\n"},
+		{name: "misspelled field", yaml: "banner:\n  text: Test\n  colour: warning\n"},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			dir := t.TempDir()
+			require.NoError(t, os.WriteFile(path(dir, "development.yaml"), []byte(test.yaml), fileMode))
+
+			cfg, err := LoadConfig(dir, "development")
+
+			require.NoError(t, err)
+			require.Equal(t, test.want, cfg.Banner)
 		})
 	}
 }

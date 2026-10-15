@@ -5,7 +5,10 @@
 publicPath:
 port: 8081
 enableUi: true
-bannerText: "{{ env "TEMPORAL_UI_BANNER_TEXT" }}"
+banner:
+  # Both fields are required to show banner. Color: info, warning, success, or error (case-insensitive).
+  text: ""
+  color: ""
 cors:
   cookieInsecure: false
   allowOrigins:

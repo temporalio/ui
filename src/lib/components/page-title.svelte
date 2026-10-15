@@ -19,7 +19,7 @@
     image = banner,
   }: Props = $props();
 
-  const bannerText = $derived(page.data?.settings?.bannerText);
+  const bannerText = $derived(page.data?.settings?.banner?.text);
   const pageTitle = $derived(bannerText ? `${bannerText} | ${title}` : title);
 </script>
 

@@ -18,20 +18,47 @@ The development server uses [Air](https://github.com/air-verse/air) for automati
 
 ### Environment banner
 
-Set `TEMPORAL_UI_BANNER_TEXT=PRODUCTION` when running the Docker image or the
-local UI server to show a persistent banner and prefix browser page titles
+Set `TEMPORAL_UI_BANNER_TEXT=PRODUCTION` and `TEMPORAL_UI_BANNER_COLOR=info`
+when running the Docker image to show a persistent banner and prefix browser page titles
 with `PRODUCTION | `. The banner also appears on the login screen and cannot
 be dismissed.
 
-For a custom YAML configuration, set:
+Set `TEMPORAL_UI_BANNER_COLOR` to choose a color preset:
 
-```yaml
-bannerText: PRODUCTION
+```bash
+export TEMPORAL_UI_BANNER_TEXT="Test"
+export TEMPORAL_UI_BANNER_COLOR="Warning"
 ```
 
-Use a single-line plain-text label. Quotes, ampersands, colons, and newlines
-are not supported in the environment variable. Empty or whitespace-only text
-shows no banner and leaves page titles unchanged.
+For a custom YAML configuration or `server/config/development.yaml`, set:
+
+```yaml
+banner:
+  text: "Test"
+  color: "Warning"
+```
+
+Supported colors are `info` (blue), `warning` (amber), `success` (green), and
+`error` (red). Values are case-insensitive and surrounding whitespace is ignored.
+Both text and color are required. Missing, empty, or invalid values disable
+the banner and page-title prefix without causing an error. Presets use the UI's existing
+background and border colors, adapting to light and dark themes. Custom colors
+are not supported.
+
+The development configuration uses literal strings. To read environment
+variables instead, use the following in a configuration with `# enable-template`
+at the top, as in the Docker configuration:
+
+```yaml
+banner:
+  text: {{ env "TEMPORAL_UI_BANNER_TEXT" | yamlString }}
+  color: {{ env "TEMPORAL_UI_BANNER_COLOR" | yamlString }}
+```
+
+Use a single-line plain-text label. Quotes, ampersands, colons, newlines, and
+control characters are not supported; labels containing them disable the banner.
+The `yamlString` template helper safely quotes environment values so invalid
+banner values cannot break YAML parsing.
 
 Restart the UI server after changing the environment variable and reload
 open browser tabs.
