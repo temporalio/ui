@@ -251,7 +251,8 @@
         </tr>
       {/snippet}
       {#snippet rows({ visibleItems })}
-        {#each visibleItems as schedule (schedule.scheduleId)}
+        <!-- IDs can repeat in visibility results; entry identity stays unique when sorting. -->
+        {#each visibleItems as schedule (schedule)}
           <SchedulesTableRow {schedule} {columns} />
         {/each}
       {/snippet}
