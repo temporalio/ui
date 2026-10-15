@@ -5,7 +5,7 @@
   import { twMerge } from 'tailwind-merge';
 
   import { translate } from '$lib/i18n/translate';
-  import { IconChevronDown, IconChevronUp } from '$lib/io/icon';
+  import { IconArrowAscending, IconArrowDescending } from '$lib/io/icon';
 
   import {
     TABLE_SORT_CONTEXT,
@@ -58,9 +58,9 @@
         )}
       >
         {#if direction === 'descending'}
-          <IconChevronDown />
+          <IconArrowDescending />
         {:else}
-          <IconChevronUp />
+          <IconArrowAscending />
         {/if}
       </span>
     </button>
