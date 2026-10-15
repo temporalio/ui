@@ -1581,9 +1581,9 @@ registry.registerExample({
           type: 'module',
           dependencies: { '@temporalio/ui': `file:${tarballPath}` },
           devDependencies: {
-            '@sveltejs/vite-plugin-svelte': '^6.2.4',
+            '@sveltejs/vite-plugin-svelte': '7.3.1',
             svelte: '^5.55.7',
-            vite: '^6.4.3',
+            vite: '8.3.4',
           },
         }),
       );
@@ -1660,7 +1660,7 @@ registry.registerExample({
           "import { svelte } from '@sveltejs/vite-plugin-svelte';",
           "import { defineConfig } from 'vite';",
           '',
-          "export default defineConfig({ plugins: [svelte({ hot: false })], resolve: { alias: { $app: '@temporalio/ui/svelte-mocks/app' } } });",
+          "export default defineConfig({ plugins: [svelte({ compilerOptions: { hmr: false } })], resolve: { alias: { $app: '@temporalio/ui/svelte-mocks/app' } } });",
         ].join('\n'),
       );
       await writeFile(
