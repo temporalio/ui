@@ -260,7 +260,7 @@
       "@tootallnate/once": ">=2.0.1 <3",
       "cookie": "0.7.0",
       "micromatch": "^4.0.8",
-      "esbuild": "^0.25.0",
+      "esbuild": "^0.28.0",
       "serialize-javascript": "^7.0.5",
       "picomatch@>=2 <3": "^2.3.2",
       "picomatch@>=4": "^4.0.4",
