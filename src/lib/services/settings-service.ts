@@ -132,6 +132,7 @@ export const fetchSettings = async (request = fetch): Promise<Settings> => {
   const EnvironmentOverride = getEnvironment();
 
   const settingsInformation = {
+    bannerText: settingsResponse?.BannerText?.trim() ?? '',
     auth: {
       enabled: !!settingsResponse?.Auth?.Enabled,
       options: settingsResponse?.Auth?.Options,

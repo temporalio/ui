@@ -110,6 +110,7 @@ export type CustomUISettings = {
 };
 
 export type Settings = {
+  bannerText: string;
   auth: {
     enabled: boolean;
     options: string[] | null;

@@ -61,6 +61,7 @@ type CodecResponse struct {
 
 type SettingsResponse struct {
 	Auth                          *Auth
+	BannerText                    string
 	DefaultNamespace              string
 	ShowTemporalSystemNamespace   bool
 	NavCollapsedByDefault         bool
@@ -285,6 +286,7 @@ func GetSettings(cfgProvider *config.ConfigProviderWithRefresh) func(echo.Contex
 				Options:            options,
 				RedirectToProvider: cfg.Auth.RedirectToProvider,
 			},
+			BannerText:                  cfg.BannerText,
 			DefaultNamespace:            cfg.DefaultNamespace,
 			ShowTemporalSystemNamespace: cfg.ShowTemporalSystemNamespace,
 			NavCollapsedByDefault:       cfg.NavCollapsedByDefault,

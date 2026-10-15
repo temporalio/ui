@@ -111,6 +111,19 @@ describe('isLocalRuntimeEnvironment', () => {
 });
 
 describe('fetchSettings', () => {
+  it.each([
+    [undefined, ''],
+    ['', ''],
+    ['   ', ''],
+    [' PRODUCTION us-east-1 ', 'PRODUCTION us-east-1'],
+  ])('normalizes banner text %j to %j', async (BannerText, expected) => {
+    vi.mocked(requestFromAPI).mockResolvedValue(
+      settingsResponse({ BannerText }),
+    );
+
+    expect((await fetchSettings()).bannerText).toBe(expected);
+  });
+
   it('maps navCollapsedByDefault from settings response', async () => {
     vi.mocked(requestFromAPI).mockResolvedValue(
       settingsResponse({ NavCollapsedByDefault: true }),

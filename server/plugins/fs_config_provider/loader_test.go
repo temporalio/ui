@@ -56,6 +56,37 @@ func TestLoaderSuite(t *testing.T) {
 	suite.Run(t, new(LoaderSuite))
 }
 
+func TestBannerTextFromEnv(t *testing.T) {
+	// The old environment variable must not configure the banner.
+	t.Setenv("TEMPORAL_BANNER_TEXT", "STAGING")
+
+	for _, environment := range []string{"docker", "development"} {
+		t.Run(environment, func(t *testing.T) {
+			for _, test := range []struct {
+				name  string
+				value string
+				set   bool
+			}{
+				{name: "unset"},
+				{name: "empty", set: true},
+				{name: "configured", value: "PRODUCTION us-east-1", set: true},
+			} {
+				t.Run(test.name, func(t *testing.T) {
+					t.Setenv("TEMPORAL_UI_BANNER_TEXT", test.value)
+					if !test.set {
+						require.NoError(t, os.Unsetenv("TEMPORAL_UI_BANNER_TEXT"))
+					}
+
+					cfg, err := LoadConfig("../../config", environment)
+
+					require.NoError(t, err)
+					require.Equal(t, test.value, cfg.BannerText)
+				})
+			}
+		})
+	}
+}
+
 func TestDevelopmentExtensionExampleIsOptIn(t *testing.T) {
 	t.Setenv("TEMPORAL_UI_EXTENSION_EXAMPLE_ENABLED", "")
 	t.Setenv("TEMPORAL_UI_EXTENSION_AUTH_EXAMPLE_ENABLED", "")

@@ -99,6 +99,29 @@ func TestTemporalAccessCheckUsesTemporalAPIAuthority(t *testing.T) {
 	}
 }
 
+func TestGetSettingsIncludesBannerText(t *testing.T) {
+	for _, bannerText := range []string{"", "PRODUCTION us-east-1"} {
+		t.Run(bannerText, func(t *testing.T) {
+			cfgProvider, err := config.NewConfigProviderWithRefresh(&mockConfigProvider{
+				cfg: &config.Config{BannerText: bannerText},
+			})
+			require.NoError(t, err)
+			defer cfgProvider.Close()
+
+			e := echo.New()
+			req := httptest.NewRequest(http.MethodGet, "/api/v1/settings", nil)
+			rec := httptest.NewRecorder()
+
+			require.NoError(t, GetSettings(cfgProvider)(e.NewContext(req, rec)))
+			require.Equal(t, http.StatusOK, rec.Code)
+
+			var payload map[string]any
+			require.NoError(t, json.Unmarshal(rec.Body.Bytes(), &payload))
+			assert.Equal(t, bannerText, payload["BannerText"])
+		})
+	}
+}
+
 func TestGetSettingsIncludesAuthRedirectToProvider(t *testing.T) {
 	cfg := &config.Config{}
 	cfg.Auth.Enabled = true

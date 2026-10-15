@@ -16,6 +16,26 @@ The development server uses [Air](https://github.com/air-verse/air) for automati
 
 ## Configuration
 
+### Environment banner
+
+Set `TEMPORAL_UI_BANNER_TEXT=PRODUCTION` when running the Docker image or the
+local UI server to show a persistent banner and prefix browser page titles
+with `PRODUCTION | `. The banner also appears on the login screen and cannot
+be dismissed.
+
+For a custom YAML configuration, set:
+
+```yaml
+bannerText: PRODUCTION
+```
+
+Use a single-line plain-text label. Quotes, ampersands, colons, and newlines
+are not supported in the environment variable. Empty or whitespace-only text
+shows no banner and leaves page titles unchanged.
+
+Restart the UI server after changing the environment variable and reload
+open browser tabs.
+
 ### CORS Settings
 
 The server supports flexible CORS configuration through YAML config files:
