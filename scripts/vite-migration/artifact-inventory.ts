@@ -209,6 +209,7 @@ export const archiveBuild = async (
     throw new Error(`Build path is not a directory: ${source}`);
   }
 
+  await mkdir(path.dirname(archive), { recursive: true });
   try {
     await mkdir(archive);
   } catch (error) {

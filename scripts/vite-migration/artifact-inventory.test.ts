@@ -193,9 +193,9 @@ describe('build artifact inventory', () => {
     ).toBe(true);
   });
 
-  it('archives a build without overwriting an existing archive', async () => {
+  it('creates archive parents without overwriting an existing archive', async () => {
     const { buildDirectory, temporaryDirectory } = await createBuild();
-    const archiveDirectory = path.join(temporaryDirectory, 'archive');
+    const archiveDirectory = path.join(temporaryDirectory, 'nested', 'archive');
 
     await archiveBuild(buildDirectory, archiveDirectory);
 
