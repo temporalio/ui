@@ -56,10 +56,14 @@ export type ArtifactMatrixEntry = ArtifactInventory['totals'] & {
 
 export type ArtifactMatrix = {
   version: 1;
+  provenanceId: string;
   artifacts: Partial<Record<RequiredArtifactOutput, ArtifactMatrixEntry>>;
 };
 
 const assertCompleteArtifactMatrix = (matrix: ArtifactMatrix): void => {
+  if (!matrix.provenanceId) {
+    throw new Error('Artifact matrix provenance ID is required');
+  }
   const missing = requiredArtifactOutputs.filter((output) => {
     const artifact = matrix.artifacts[output];
     return !artifact || artifact.files < 1 || !artifact.sha256;
@@ -71,8 +75,9 @@ const assertCompleteArtifactMatrix = (matrix: ArtifactMatrix): void => {
 
 export const createArtifactMatrix = (
   artifacts: Partial<Record<RequiredArtifactOutput, ArtifactMatrixEntry>>,
+  provenanceId: string,
 ): ArtifactMatrix => {
-  const matrix: ArtifactMatrix = { version: 1, artifacts };
+  const matrix: ArtifactMatrix = { version: 1, provenanceId, artifacts };
   assertCompleteArtifactMatrix(matrix);
   return matrix;
 };
@@ -86,6 +91,8 @@ export const compareArtifactMatrices = (
 
   return {
     version: 1 as const,
+    baselineProvenanceId: baseline.provenanceId,
+    candidateProvenanceId: candidate.provenanceId,
     artifacts: Object.fromEntries(
       requiredArtifactOutputs.map((output) => {
         const baselineEntry = baseline.artifacts[output] as ArtifactMatrixEntry;
@@ -329,6 +336,10 @@ const argumentValue = (name: string): string | undefined => {
 const run = async (): Promise<void> => {
   const matrixOutputPath = argumentValue('--matrix-output');
   if (matrixOutputPath) {
+    const provenanceId = argumentValue('--provenance-id');
+    if (!provenanceId) {
+      throw new Error('--provenance-id is required with --matrix-output');
+    }
     const artifacts: Partial<
       Record<RequiredArtifactOutput, ArtifactMatrixEntry>
     > = {};
@@ -342,7 +353,7 @@ const run = async (): Promise<void> => {
       artifacts[output] = artifactMatrixEntry(inventory);
     }
 
-    const matrix = createArtifactMatrix(artifacts);
+    const matrix = createArtifactMatrix(artifacts, provenanceId);
     await mkdir(path.dirname(path.resolve(matrixOutputPath)), {
       recursive: true,
     });

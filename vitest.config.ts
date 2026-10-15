@@ -84,6 +84,7 @@ export default defineConfig({
       'tests',
       '.svelte-kit',
       '.catalog-tmp/**',
+      'migration-evidence/**',
     ],
     globalSetup: ['./vitest-global-setup.ts'],
     environment: 'jsdom',

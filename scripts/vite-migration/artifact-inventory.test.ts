@@ -127,23 +127,26 @@ describe('build artifact inventory', () => {
     ]);
 
     expect(() =>
-      createArtifactMatrix({
-        static: {
-          files: 1,
-          sha256: 'static',
-          bytes: 1,
-          gzipBytes: 1,
-          brotliBytes: 1,
+      createArtifactMatrix(
+        {
+          static: {
+            files: 1,
+            sha256: 'static',
+            bytes: 1,
+            gzipBytes: 1,
+            brotliBytes: 1,
+          },
         },
-      }),
+        'test-provenance',
+      ),
     ).toThrow('Missing required artifact outputs');
   });
 
   it('fails comparison when a required artifact is missing', () => {
     expect(() =>
       compareArtifactMatrices(
-        { version: 1, artifacts: {} },
-        { version: 1, artifacts: {} },
+        { version: 1, provenanceId: 'baseline', artifacts: {} },
+        { version: 1, provenanceId: 'candidate', artifacts: {} },
       ),
     ).toThrow('Missing required artifact outputs');
   });
@@ -162,7 +165,7 @@ describe('build artifact inventory', () => {
       ]),
     ) as Parameters<typeof createArtifactMatrix>[0];
 
-    expect(() => createArtifactMatrix(artifacts)).toThrow(
+    expect(() => createArtifactMatrix(artifacts, 'test-provenance')).toThrow(
       'Missing required artifact outputs: catalog',
     );
   });
@@ -181,10 +184,14 @@ describe('build artifact inventory', () => {
       ]),
     ) as Parameters<typeof createArtifactMatrix>[0];
     const comparison = compareArtifactMatrices(
-      createArtifactMatrix(artifacts),
-      createArtifactMatrix(artifacts),
+      createArtifactMatrix(artifacts, 'baseline'),
+      createArtifactMatrix(artifacts, 'candidate'),
     );
 
+    expect(comparison).toMatchObject({
+      baselineProvenanceId: 'baseline',
+      candidateProvenanceId: 'candidate',
+    });
     expect(Object.keys(comparison.artifacts).sort()).toEqual(
       [...requiredArtifactOutputs].sort(),
     );
