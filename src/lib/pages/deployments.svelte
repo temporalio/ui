@@ -26,7 +26,7 @@
   import { columnWidthStyle } from '$lib/utilities/column-width';
   import { has } from '$lib/utilities/has';
   import { routeForWorkerDeploymentCreate } from '$lib/utilities/route-for';
-  import type { TableSortColumn } from '$lib/utilities/table-sort';
+  import type { TableSort, TableSortColumn } from '$lib/utilities/table-sort';
 
   interface Props {
     canCreateServerlessDeployment?: boolean;
@@ -41,6 +41,12 @@
   let error = $state('');
 
   const namespace = $derived(page.params.namespace);
+  let sort = $state<TableSort>();
+  $effect(() => {
+    void namespace;
+    sort = undefined;
+  });
+
   const createHref = $derived(routeForWorkerDeploymentCreate({ namespace }));
 
   const onFetch = $derived.by(() => {
@@ -118,6 +124,7 @@
 {#key [namespace, $refresh]}
   <div class="flex min-h-0 grow flex-col gap-4">
     <PaginatedTable
+      bind:sort
       {sortColumns}
       {onFetch}
       {onError}

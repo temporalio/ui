@@ -50,13 +50,20 @@
   import type { APIErrorResponse } from '$lib/utilities/request-from-api';
   import { routeForScheduleCreate } from '$lib/utilities/route-for';
   import { searchAttributeSortType } from '$lib/utilities/search-attribute-table-sort';
-  import type { TableSortColumn } from '$lib/utilities/table-sort';
+  import type { TableSort, TableSortColumn } from '$lib/utilities/table-sort';
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
   import type { ScheduleListEntry } from '$types';
 
   const { namespace } = $derived(page.params);
   const query = $derived(page.url.searchParams.get('query') ?? '');
+
+  let sort = $state<TableSort>();
+  $effect(() => {
+    void namespace;
+    void query;
+    sort = undefined;
+  });
 
   const countPoller = createCountPoller({
     getStore: () => schedulesCount,
@@ -216,6 +223,7 @@
   />
   {#key [namespace, query, $schedulesRefresh]}
     <PaginatedTable
+      bind:sort
       {sortColumns}
       {onFetch}
       {onError}

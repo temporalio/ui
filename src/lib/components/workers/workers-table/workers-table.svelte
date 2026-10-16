@@ -12,7 +12,7 @@
   import { formatSDKName } from '$lib/utilities/get-sdk-version';
   import { isRunningWithNoWorkers } from '$lib/utilities/is-running-with-no-workers';
   import { toWorkerStatusReadable } from '$lib/utilities/screaming-enums';
-  import type { TableSortColumn } from '$lib/utilities/table-sort';
+  import type { TableSort, TableSortColumn } from '$lib/utilities/table-sort';
 
   import WorkerHeartbeatsSDKAlert from './worker-heartbeats-sdk-warning.svelte';
   import WorkersQueryEmptyState from './workers-query-empty-state.svelte';
@@ -24,6 +24,7 @@
     onFetch: () => Promise<PaginatedRequest<WorkerListInfo | WorkerHeartbeat>>;
     onError?: (err: unknown) => void;
     total?: number;
+    sort?: TableSort;
   }
 
   let {
@@ -32,6 +33,7 @@
     onFetch,
     onError,
     total,
+    sort = $bindable(),
   }: Props = $props();
 
   const sortColumns: Record<
@@ -87,6 +89,7 @@
 </script>
 
 <PaginatedTable
+  bind:sort
   {sortColumns}
   {onFetch}
   {onError}

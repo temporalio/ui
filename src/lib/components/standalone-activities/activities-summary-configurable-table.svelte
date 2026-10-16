@@ -31,6 +31,7 @@
     type PageSelectionStatus,
   } from '$lib/utilities/batch-selection';
   import { standaloneActivityBulkActionsEnabled } from '$lib/utilities/standalone-activities-commands-disabled';
+  import type { TableSort } from '$lib/utilities/table-sort';
 
   import { getActivitySortColumns } from './activities-summary-configurable-table/column-search-attributes';
 
@@ -54,6 +55,13 @@
     $configurableTableColumns?.[namespace]?.activities ?? [],
   );
   const query = $derived(page.url.searchParams.get('query') ?? '');
+
+  let sort = $state<TableSort>();
+  $effect(() => {
+    void namespace;
+    void query;
+    sort = undefined;
+  });
 
   const onFetch = $derived(() => fetchPaginatedActivities(namespace, query));
 
@@ -114,6 +122,7 @@
 {#key [namespace, query, $activityRefresh]}
   <PaginatedTable
     total={$activityCount.count}
+    bind:sort
     {sortColumns}
     {onFetch}
     onItemsChange={(items) => {

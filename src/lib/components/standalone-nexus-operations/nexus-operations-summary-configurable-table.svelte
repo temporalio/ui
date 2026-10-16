@@ -19,6 +19,7 @@
     nexusOperationRefresh,
   } from '$lib/stores/nexus-operations';
   import { nexusOperationSearchAttributes } from '$lib/stores/search-attributes';
+  import type { TableSort } from '$lib/utilities/table-sort';
 
   import { getNexusOperationSortColumns } from './nexus-operations-summary-configurable-table/column-search-attributes';
 
@@ -40,6 +41,13 @@
   );
   const query = $derived(page.url.searchParams.get('query') ?? '');
 
+  let sort = $state<TableSort>();
+  $effect(() => {
+    void namespace;
+    void query;
+    sort = undefined;
+  });
+
   const onFetch = $derived(() =>
     fetchPaginatedNexusOperations(namespace, query),
   );
@@ -54,6 +62,7 @@
 {#key [namespace, query, $nexusOperationRefresh]}
   <PaginatedTable
     total={$nexusOperationCount.count}
+    bind:sort
     {sortColumns}
     {onFetch}
     aria-label={translate(
