@@ -96,27 +96,40 @@ describe('FairnessKey', () => {
     expect(dialog?.querySelector('a')).toBeNull();
   });
 
-  it('keeps the explanation open after a touch-like pointer exit and click', () => {
+  it('pins the visible key through a real pointer sequence and closes outside', () => {
     client.setNamespaceFairness({ enabled: false });
     const target = client.render();
     const trigger = target.querySelector<HTMLButtonElement>(
       'button[aria-haspopup="dialog"]',
     );
+    const key = trigger?.querySelector<HTMLElement>(':scope > span');
 
-    trigger?.dispatchEvent(new MouseEvent('pointerover', { bubbles: true }));
+    key?.dispatchEvent(new MouseEvent('pointerover', { bubbles: true }));
     client.flush();
     expect(target.querySelector('[role="dialog"]')).not.toBeNull();
 
-    trigger?.dispatchEvent(
+    key?.dispatchEvent(
+      new MouseEvent('pointerdown', { bubbles: true, button: 0 }),
+    );
+    trigger?.focus();
+    key?.dispatchEvent(new MouseEvent('pointerup', { bubbles: true }));
+    key?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    key?.dispatchEvent(
       new MouseEvent('pointerout', { bubbles: true, relatedTarget: null }),
+    );
+    trigger?.dispatchEvent(
+      new FocusEvent('focusout', { bubbles: true, relatedTarget: null }),
+    );
+    client.flush();
+    expect(target.querySelector('[role="dialog"]')).not.toBeNull();
+    expect(trigger?.getAttribute('aria-expanded')).toBe('true');
+
+    document.body.dispatchEvent(
+      new MouseEvent('pointerdown', { bubbles: true }),
     );
     client.flush();
     expect(target.querySelector('[role="dialog"]')).toBeNull();
-
-    trigger?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-    client.flush();
-    expect(document.activeElement).toBe(trigger);
-    expect(target.querySelector('[role="dialog"]')).not.toBeNull();
+    expect(trigger?.getAttribute('aria-expanded')).toBe('false');
   });
 
   it('keeps the popover open while the pointer moves to the CTA', () => {
@@ -159,7 +172,7 @@ describe('FairnessKey', () => {
     expect(target.querySelector('[role="dialog"]')).toBeNull();
   });
 
-  it('announces the fairness key and warning and supports focus, CTA, and Escape', async () => {
+  it('announces the fairness key and warning and supports focus, CTA, outside focus, and Escape', async () => {
     client.setNamespaceFairness({
       enabled: false,
       enableHref: '/namespaces/default?edit=fairness',
@@ -175,6 +188,7 @@ describe('FairnessKey', () => {
       'Fairness is disabled for this Namespace',
     );
     trigger?.focus();
+    trigger?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     client.flush();
 
     const dialog = target.querySelector<HTMLElement>('[role="dialog"]');
@@ -202,6 +216,17 @@ describe('FairnessKey', () => {
     cta?.dispatchEvent(
       new FocusEvent('focusin', { bubbles: true, relatedTarget: trigger }),
     );
+    client.flush();
+    expect(target.querySelector('[role="dialog"]')).not.toBeNull();
+
+    const outside = document.body.appendChild(document.createElement('button'));
+    outside.focus();
+    client.flush();
+    expect(target.querySelector('[role="dialog"]')).toBeNull();
+    expect(trigger?.getAttribute('aria-expanded')).toBe('false');
+
+    trigger?.focus();
+    trigger?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     client.flush();
     expect(target.querySelector('[role="dialog"]')).not.toBeNull();
 

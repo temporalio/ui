@@ -13,15 +13,18 @@
   let container = $state<HTMLDivElement>();
   let isHovered = $state(false);
   let isFocused = $state(false);
+  let isPinned = $state(false);
   let dismissed = $state(false);
   const uid = $props.id();
   const popoverId = `fairness-key-popover-${uid}`;
   const isDisabled = $derived($namespaceFairness.enabled === false);
-  const isOpen = $derived(isDisabled && !dismissed && (isHovered || isFocused));
+  const isOpen = $derived(
+    isDisabled && !dismissed && (isHovered || isFocused || isPinned),
+  );
   const hasNumber = $derived(/\d/.test(fairnessKey));
 
   $effect(() => {
-    if (!isHovered && !isFocused) dismissed = false;
+    if (!isHovered && !isFocused && !isPinned) dismissed = false;
   });
 
   function handleFocusOut(event: FocusEvent) {
@@ -42,8 +45,34 @@
     isHovered = false;
   }
 
+  function handlePointerDown(event: PointerEvent) {
+    if (event.button === 0) isPinned = true;
+  }
+
+  function handleClick() {
+    isPinned = true;
+  }
+
+  function closeIfOutside(target: EventTarget | null) {
+    if (target instanceof Node && container?.contains(target)) return;
+    isHovered = false;
+    isFocused = false;
+    isPinned = false;
+  }
+
+  function handleWindowPointerDown(event: PointerEvent) {
+    closeIfOutside(event.target);
+  }
+
+  function handleWindowFocusIn(event: FocusEvent) {
+    closeIfOutside(event.target);
+  }
+
   function handleKeydown(event: KeyboardEvent) {
-    if (event.key === 'Escape' && isOpen) dismissed = true;
+    if (event.key === 'Escape' && isOpen) {
+      isPinned = false;
+      dismissed = true;
+    }
   }
 </script>
 
@@ -63,7 +92,8 @@
       aria-controls={isOpen ? popoverId : undefined}
       aria-expanded={isOpen}
       aria-haspopup="dialog"
-      onclick={(event) => event.currentTarget.focus()}
+      onpointerdown={handlePointerDown}
+      onclick={handleClick}
       class="inline-flex min-w-0 items-center gap-1 rounded-sm text-left leading-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary"
     >
       <span
@@ -108,4 +138,8 @@
   </div>
 {/if}
 
-<svelte:window onkeydowncapture={handleKeydown} />
+<svelte:window
+  onkeydowncapture={handleKeydown}
+  onpointerdowncapture={handleWindowPointerDown}
+  onfocusincapture={handleWindowFocusIn}
+/>
