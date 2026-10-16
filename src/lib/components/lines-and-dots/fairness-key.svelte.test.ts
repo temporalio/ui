@@ -40,15 +40,42 @@ describe('FairnessKey', () => {
   afterEach(async () => client.cleanup());
   afterAll(closeFairnessKeyClientTestRunner);
 
-  it.each([{ enabled: true }, { enabled: undefined }])(
-    'keeps the value unchanged when fairness is $enabled',
-    ({ enabled }) => {
+  it.each([
+    { enabled: true, fairnessKey: 'payments', hasNumber: false },
+    { enabled: undefined, fairnessKey: 'payments-123', hasNumber: true },
+  ])(
+    'keeps $fairnessKey unchanged when fairness is $enabled',
+    ({ enabled, fairnessKey, hasNumber }) => {
       client.setNamespaceFairness({ enabled });
-      const target = client.render();
+      const target = client.render(fairnessKey);
+      const key = target.querySelector<HTMLElement>('div > span');
 
-      expect(target.textContent).toContain('payments');
+      expect(target.textContent).toContain(fairnessKey);
+      expect(key?.classList.contains('font-mono')).toBe(hasNumber);
       expect(target.querySelector('button')).toBeNull();
       expect(target.querySelector('[role="dialog"]')).toBeNull();
+    },
+  );
+
+  it.each([
+    { fairnessKey: 'payments', hasNumber: false },
+    { fairnessKey: 'payments-123', hasNumber: true },
+  ])(
+    'uses monospace only for the disabled numeric key $fairnessKey',
+    ({ fairnessKey, hasNumber }) => {
+      client.setNamespaceFairness({ enabled: false });
+      const target = client.render(fairnessKey);
+      const trigger = target.querySelector<HTMLButtonElement>(
+        'button[aria-haspopup="dialog"]',
+      );
+      const key = trigger?.querySelector<HTMLElement>(':scope > span');
+      const icon = trigger?.querySelector<HTMLElement>('[aria-hidden="true"]');
+      const srText = trigger?.querySelector<HTMLElement>('.sr-only');
+
+      expect(key?.classList.contains('font-mono')).toBe(hasNumber);
+      expect(trigger?.classList).not.toContain('font-mono');
+      expect(icon?.classList).not.toContain('font-mono');
+      expect(srText?.classList).not.toContain('font-mono');
     },
   );
 
