@@ -33,6 +33,15 @@
     isFocused = false;
   }
 
+  function handlePointerOut(event: PointerEvent) {
+    if (
+      event.relatedTarget instanceof Node &&
+      container?.contains(event.relatedTarget)
+    )
+      return;
+    isHovered = false;
+  }
+
   function handleKeydown(event: KeyboardEvent) {
     if (event.key === 'Escape' && isOpen) dismissed = true;
   }
@@ -44,8 +53,8 @@
     data-testid="fairness-key-alert"
     role="presentation"
     class="relative inline-flex min-w-0"
-    onmouseenter={() => (isHovered = true)}
-    onmouseleave={() => (isHovered = false)}
+    onpointerover={() => (isHovered = true)}
+    onpointerout={handlePointerOut}
     onfocusin={() => (isFocused = true)}
     onfocusout={handleFocusOut}
   >

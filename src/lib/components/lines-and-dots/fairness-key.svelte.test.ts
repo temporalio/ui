@@ -30,11 +30,11 @@ describe('FairnessKey', () => {
   it('opens the no-CTA explanation on hover when fairness is disabled', () => {
     client.setNamespaceFairness({ enabled: false });
     const target = client.render();
-    const alert = target.querySelector<HTMLElement>(
-      '[data-testid="fairness-key-alert"]',
+    const trigger = target.querySelector<HTMLButtonElement>(
+      'button[aria-haspopup="dialog"]',
     );
 
-    alert?.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+    trigger?.dispatchEvent(new MouseEvent('pointerover', { bubbles: true }));
     client.flush();
 
     const dialog = target.querySelector('[role="dialog"]');
@@ -50,11 +50,11 @@ describe('FairnessKey', () => {
       enableHref: '/namespaces/default?edit=fairness',
     });
     const target = client.render();
-    const alert = target.querySelector<HTMLElement>(
-      '[data-testid="fairness-key-alert"]',
+    const trigger = target.querySelector<HTMLButtonElement>(
+      'button[aria-haspopup="dialog"]',
     );
 
-    alert?.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+    trigger?.dispatchEvent(new MouseEvent('pointerover', { bubbles: true }));
     client.flush();
 
     const dialog = target.querySelector<HTMLElement>('[role="dialog"]');
@@ -65,12 +65,21 @@ describe('FairnessKey', () => {
     expect(bridge?.classList).toContain('pt-2');
     expect(dialog?.classList).not.toContain('mt-2');
 
-    alert?.dispatchEvent(new MouseEvent('mouseleave', { bubbles: true }));
-    bridge?.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+    trigger?.dispatchEvent(
+      new MouseEvent('pointerout', { bubbles: true, relatedTarget: bridge }),
+    );
+    bridge?.dispatchEvent(
+      new MouseEvent('pointerover', { bubbles: true, relatedTarget: trigger }),
+    );
     client.flush();
     expect(target.querySelector('[role="dialog"]')).not.toBeNull();
 
-    alert?.dispatchEvent(new MouseEvent('mouseleave', { bubbles: true }));
+    bridge?.dispatchEvent(
+      new MouseEvent('pointerout', {
+        bubbles: true,
+        relatedTarget: document.body,
+      }),
+    );
     client.flush();
     expect(target.querySelector('[role="dialog"]')).toBeNull();
   });
