@@ -1,9 +1,8 @@
 <script lang="ts">
   import { page } from '$app/state';
 
-  import Link from '$lib/holocene/link.svelte';
+  import Error from '$lib/holocene/error.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { IconChevronLeft } from '$lib/io/icon';
   import { workflowsSearchParams } from '$lib/stores/workflows';
   import type { NetworkError } from '$lib/types/global';
   import { routeForWorkflows } from '$lib/utilities/route-for';
@@ -15,33 +14,13 @@
   let { error }: Props = $props();
 
   const namespace = $derived(page.params.namespace);
-
-  const title = $derived(
-    error.statusCode === 404
-      ? translate('workflows.workflow-404-title')
-      : translate('workflows.workflow-error-title'),
-  );
 </script>
 
-<header class="mb-4 flex flex-col gap-1">
-  <div class="mb-4 block">
-    <Link
-      href={`${routeForWorkflows({
-        namespace,
-      })}?${$workflowsSearchParams}`}
-      data-testid="back-to-workflows"
-      LeadingIcon={IconChevronLeft}
-    >
-      {translate('workflows.back-to-workflows')}
-    </Link>
-  </div>
-</header>
-<div class="text-center align-middle">
-  <h1 class="leading-0 text-[12rem] font-semibold">
-    {error?.statusCode ?? '500'}
-  </h1>
-  <p class="-mt-12 text-lg">{title}</p>
-  <p class="text-2xl font-bold text-danger">
-    {error?.statusText ?? ''}
-  </p>
-</div>
+<Error
+  {error}
+  resource={translate('common.workflows-plural', { count: 1 })}
+  back={{
+    href: `${routeForWorkflows({ namespace })}?${$workflowsSearchParams}`,
+    label: translate('workflows.back-to-workflows'),
+  }}
+/>
