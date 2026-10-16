@@ -54,12 +54,12 @@
           {@render heading()}
         </h1>
         {#if headingActions}
-          <div class="flex shrink-0 items-center gap-lg">
+          <div class="flex shrink-0 items-center gap-x-lg gap-y-sm">
             {@render headingActions()}
           </div>
         {/if}
         {#if tags}
-          <div class="flex min-w-0 flex-wrap items-center gap-lg">
+          <div class="flex min-w-0 flex-wrap items-center gap-x-lg gap-y-sm">
             {@render tags()}
           </div>
         {/if}
@@ -81,12 +81,12 @@
     {/if}
   </div>
   {#if filters}
-    <div class="flex min-w-0 flex-wrap items-center gap-lg">
+    <div class="flex min-w-0 flex-wrap items-center gap-x-lg gap-y-sm">
       {@render filters()}
     </div>
   {/if}
   {#if metadata}
-    <div class="flex min-w-0 flex-wrap items-center gap-lg">
+    <div class="flex min-w-0 flex-wrap items-center gap-x-lg gap-y-sm">
       {@render metadata()}
     </div>
   {/if}
