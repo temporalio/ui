@@ -1,0 +1,28 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "allowJs": false,
+    "checkJs": false,
+    "incremental": false,
+    "module": "esnext",
+    "noEmit": true,
+    "paths": {
+      "$components/*": ["./src/components/*"],
+      "$fixtures/*": ["./src/fixtures/*"],
+      "$lib": ["./src/lib"],
+      "$lib/*": ["./src/lib/*"],
+      "$src/*": ["./src/*"],
+      "$types": ["./src/lib/types"],
+      "$types/*": ["./src/lib/types/*"]
+    },
+    "strict": true,
+    "target": "es2022",
+    "types": ["node", "vitest/globals"],
+    "verbatimModuleSyntax": false
+  },
+  "include": [
+    "scripts/vite-migration/**/*.ts",
+    "tests/migration-evidence/**/*.ts"
+  ],
+  "exclude": []
+}

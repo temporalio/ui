@@ -19,6 +19,9 @@ export default defineConfig({
   optimizeDeps: {
     include: ['date-fns', 'date-fns-tz'],
   },
+  build: {
+    target: ['chrome87', 'edge88', 'firefox78', 'safari14'],
+  },
   resolve: {
     alias: {
       $types: path.resolve('./src/types'),

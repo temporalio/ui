@@ -157,6 +157,7 @@ export default [
       'test-results/**',
       'coverage/**',
       'storybook-static/**',
+      'migration-evidence/**',
     ],
   },
 ];
