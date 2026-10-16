@@ -228,6 +228,7 @@ export async function deleteSchedule(
   const route = routeForApi('schedule', { namespace, scheduleId });
   return requestFromAPI(route, {
     request,
+    notifyOnError: false,
     options: { method: 'DELETE' },
     params: identity ? { identity } : {},
   });
@@ -256,9 +257,8 @@ export async function createSchedule({
     namespace,
     scheduleId,
   });
-  const { conflictToken } = (await requestFromAPI<{ conflictToken: string }>(
-    route,
-    {
+  const { conflictToken = '' } =
+    (await requestFromAPI<{ conflictToken: string }>(route, {
       options: {
         method: 'POST',
         body: stringifyWithBigInt({
@@ -267,9 +267,9 @@ export async function createSchedule({
           ...(identity && { identity }),
         }),
       },
+      notifyOnError: false,
       onError,
-    },
-  )) ?? { conflictToken: '' };
+    })) ?? {};
 
   return { conflictToken, error };
 }
@@ -308,6 +308,7 @@ export async function editSchedule({
         ...(identity && { identity }),
       }),
     },
+    notifyOnError: false,
     onError,
   });
 
@@ -347,7 +348,7 @@ export async function pauseSchedule({
           ...(identity && { identity }),
         }),
       },
-      onError: (error) => console.error(error),
+      notifyOnError: false,
     })) ?? null
   );
 }
@@ -385,6 +386,7 @@ export async function unpauseSchedule({
           ...(identity && { identity }),
         }),
       },
+      notifyOnError: false,
     })) ?? null
   );
 }
@@ -424,6 +426,7 @@ export async function triggerImmediately({
           ...(identity && { identity }),
         }),
       },
+      notifyOnError: false,
     })) ?? null
   );
 }
@@ -467,6 +470,7 @@ export async function backfillRequest({
           ...(identity && { identity }),
         }),
       },
+      notifyOnError: false,
     })) ?? null
   );
 }

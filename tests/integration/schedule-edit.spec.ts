@@ -234,4 +234,35 @@ test.describe('Schedules List with schedules', () => {
     await expect(payloadInput).toContainText('"hello"');
     await expect(page.getByText('Input must be valid JSON')).toBeHidden();
   });
+
+  test('preserves form edits and surfaces error alert and toast when edit fails with 403', async ({
+    page,
+  }) => {
+    await mockScheduleApi(page);
+    await page.route('**/schedules/test-schedule/update*', (route) =>
+      route.fulfill({
+        status: 403,
+        contentType: 'application/json',
+        body: JSON.stringify({ message: 'Request unauthorized.' }),
+      }),
+    );
+
+    await page.goto(scheduleEditUrl);
+    await expect(page.locator('h1')).toHaveText('Edit Schedule');
+
+    const workflowInput = page.getByTestId('schedule-workflow-id-input');
+    await expect(workflowInput).toHaveValue('test123');
+    await workflowInput.fill('new-workflow-id');
+
+    await page.getByTestId('create-schedule-button').click();
+
+    await expect(workflowInput).toHaveValue('new-workflow-id');
+    await expect(
+      page.getByRole('alert').filter({ hasText: 'Request unauthorized.' }),
+    ).toBeVisible();
+    await expect(page.getByTestId('toast-live-region-assertive')).toContainText(
+      'Request unauthorized.',
+    );
+    await expect(page).toHaveURL(scheduleEditUrl);
+  });
 });

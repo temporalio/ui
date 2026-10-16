@@ -193,4 +193,36 @@ test.describe('Creates Schedule Successfully', () => {
       page.locator('#catchup-window-policy-duration-unit-select'),
     ).toHaveValue('day(s)');
   });
+
+  test('preserves form edits and surfaces error alert and toast when create fails with 403', async ({
+    page,
+  }) => {
+    await page.route('**/schedules/test*', (route) => {
+      if (route.request().method() === 'POST') {
+        return route.fulfill({
+          status: 403,
+          contentType: 'application/json',
+          body: JSON.stringify({ message: 'Request unauthorized.' }),
+        });
+      }
+      return route.fallback();
+    });
+
+    await fillBaseFields(page);
+    await page.getByTestId('spec-type-0-button').click();
+    await page.getByRole('option', { name: 'Interval' }).click();
+    await page.getByLabel('Time Interval').fill('90');
+
+    await page.getByTestId('create-schedule-button').click();
+
+    await expect(page.getByTestId('schedule-name-input')).toHaveValue('test');
+    await expect(page.getByLabel('Time Interval')).toHaveValue('90');
+    await expect(
+      page.getByRole('alert').filter({ hasText: 'Request unauthorized.' }),
+    ).toBeVisible();
+    await expect(page.getByTestId('toast-live-region-assertive')).toContainText(
+      'Request unauthorized.',
+    );
+    await expect(page).toHaveURL(createScheduleUrl);
+  });
 });

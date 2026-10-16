@@ -15,6 +15,7 @@ import {
   triggerImmediately,
   unpauseSchedule,
 } from '$lib/services/schedule-service';
+import { toaster } from '$lib/stores/toaster';
 import type {
   DescribeFullSchedule,
   OverlapPolicy,
@@ -92,13 +93,13 @@ export async function submitCreateSchedule(
   try {
     body = await getRequestBody(formData);
   } catch (e) {
-    serverError.set(
-      `${translate('data-encoder.encode-error')}: ${(e as Error)?.message}`,
-    );
+    const errorMessage = `${translate('data-encoder.encode-error')}: ${(e as Error)?.message}`;
+    serverError.set(errorMessage);
+    toaster.push({ variant: 'error', message: errorMessage });
     return;
   }
 
-  loading.set(true);
+  serverError.set('');
   const { error: err } = await createSchedule({
     identity,
     scheduleId: formData.name,
@@ -108,8 +109,9 @@ export async function submitCreateSchedule(
 
   if (err) {
     serverError.set(err);
-    loading.set(false);
+    toaster.push({ variant: 'error', message: err });
   } else {
+    loading.set(true);
     setScheduleTimeout('create', () => {
       serverError.set('');
       loading.set(false);
@@ -129,13 +131,13 @@ export async function submitEditSchedule(
   try {
     body = await getRequestBody(formData, schedule);
   } catch (e) {
-    serverError.set(
-      `${translate('data-encoder.encode-error')}: ${(e as Error)?.message}`,
-    );
+    const errorMessage = `${translate('data-encoder.encode-error')}: ${(e as Error)?.message}`;
+    serverError.set(errorMessage);
+    toaster.push({ variant: 'error', message: errorMessage });
     return;
   }
 
-  loading.set(true);
+  serverError.set('');
   const { error: err } = await editSchedule({
     identity,
     namespace,
@@ -145,8 +147,9 @@ export async function submitEditSchedule(
 
   if (err) {
     serverError.set(err);
-    loading.set(false);
+    toaster.push({ variant: 'error', message: err });
   } else {
+    loading.set(true);
     setScheduleTimeout('edit', () => {
       goto(routeForSchedule({ namespace, scheduleId: formData.name }));
       serverError.set('');
@@ -211,8 +214,8 @@ export async function submitPauseSchedule(
     serverError.set(
       translate(
         isPaused
-          ? 'schedules.pause-schedule-error'
-          : 'schedules.unpause-schedule-error',
+          ? 'schedules.unpause-schedule-error'
+          : 'schedules.pause-schedule-error',
         {
           error: (e as Error)?.message,
         },
