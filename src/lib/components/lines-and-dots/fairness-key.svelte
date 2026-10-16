@@ -46,10 +46,13 @@
   }
 
   function handlePointerDown(event: PointerEvent) {
-    if (event.button === 0) isPinned = true;
+    if (event.button !== 0) return;
+    dismissed = false;
+    isPinned = true;
   }
 
   function handleClick() {
+    dismissed = false;
     isPinned = true;
   }
 

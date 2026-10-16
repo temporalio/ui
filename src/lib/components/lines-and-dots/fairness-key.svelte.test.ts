@@ -132,6 +132,33 @@ describe('FairnessKey', () => {
     expect(trigger?.getAttribute('aria-expanded')).toBe('false');
   });
 
+  it('does not pin the visible key after a non-primary pointer sequence exits', () => {
+    client.setNamespaceFairness({ enabled: false });
+    const target = client.render();
+    const trigger = target.querySelector<HTMLButtonElement>(
+      'button[aria-haspopup="dialog"]',
+    );
+    const key = trigger?.querySelector<HTMLElement>(':scope > span');
+
+    key?.dispatchEvent(new MouseEvent('pointerover', { bubbles: true }));
+    client.flush();
+    expect(target.querySelector('[role="dialog"]')).not.toBeNull();
+
+    key?.dispatchEvent(
+      new MouseEvent('pointerdown', { bubbles: true, button: 2 }),
+    );
+    key?.dispatchEvent(
+      new MouseEvent('pointerout', { bubbles: true, relatedTarget: null }),
+    );
+    trigger?.dispatchEvent(
+      new FocusEvent('focusout', { bubbles: true, relatedTarget: null }),
+    );
+    client.flush();
+
+    expect(target.querySelector('[role="dialog"]')).toBeNull();
+    expect(trigger?.getAttribute('aria-expanded')).toBe('false');
+  });
+
   it('keeps the popover open while the pointer moves to the CTA', () => {
     client.setNamespaceFairness({
       enabled: false,
@@ -220,10 +247,14 @@ describe('FairnessKey', () => {
     expect(target.querySelector('[role="dialog"]')).not.toBeNull();
 
     const outside = document.body.appendChild(document.createElement('button'));
-    outside.focus();
-    client.flush();
-    expect(target.querySelector('[role="dialog"]')).toBeNull();
-    expect(trigger?.getAttribute('aria-expanded')).toBe('false');
+    try {
+      outside.focus();
+      client.flush();
+      expect(target.querySelector('[role="dialog"]')).toBeNull();
+      expect(trigger?.getAttribute('aria-expanded')).toBe('false');
+    } finally {
+      outside.remove();
+    }
 
     trigger?.focus();
     trigger?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
@@ -233,5 +264,10 @@ describe('FairnessKey', () => {
     window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
     client.flush();
     expect(target.querySelector('[role="dialog"]')).toBeNull();
+
+    trigger?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    client.flush();
+    expect(target.querySelector('[role="dialog"]')).not.toBeNull();
+    expect(trigger?.getAttribute('aria-expanded')).toBe('true');
   });
 });
