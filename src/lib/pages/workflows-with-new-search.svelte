@@ -142,7 +142,9 @@
   let terminateConfirmationModalOpen = $state(false);
   let cancelConfirmationModalOpen = $state(false);
 
-  const workflowStartEnabled = $derived(!workflowCreateDisabled(page));
+  const workflowStartEnabled = $derived(
+    !workflowCreateDisabled(namespace, page.data.settings),
+  );
 
   const terminableWorkflows = derivedStore(selectedWorkflows, (workflows) =>
     workflows.filter((workflow) => workflow.canBeTerminated),

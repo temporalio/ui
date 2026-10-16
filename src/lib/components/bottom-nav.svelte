@@ -142,7 +142,7 @@
 {#if menuIsOpen}
   <div
     class={merge(
-      'group fixed top-0 z-50 h-[calc(100%-64px)] w-full overflow-auto border-b border-primary bg-surface-primary text-primary md:hidden',
+      'group fixed top-[var(--environment-banner-height,0px)] z-50 h-[calc(100%-64px-var(--environment-banner-height,0px))] w-full overflow-auto border-b border-primary bg-surface-primary text-primary md:hidden',
       'focus-visible:[&_[role=button]]:outline-none focus-visible:[&_[role=button]]:ring-2 focus-visible:[&_[role=button]]:ring-interactive-primary focus-visible:[&_a]:outline-none focus-visible:[&_a]:ring-2 focus-visible:[&_a]:ring-interactive-primary',
     )}
     data-nav="open"
