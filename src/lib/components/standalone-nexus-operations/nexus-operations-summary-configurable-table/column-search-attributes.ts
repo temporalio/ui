@@ -1,4 +1,5 @@
 import type { NexusOperationExecutionListInfo } from '$lib/types/nexus-operation-execution';
+import type { SearchAttributes } from '$lib/types/workflows';
 import {
   durationStringToMilliseconds,
   toQueryDuration,
@@ -9,6 +10,7 @@ import {
   getColumnAttribute,
   type QuickFilterColumns,
 } from '$lib/utilities/query/quick-filter-table';
+import { searchAttributeSortColumns } from '$lib/utilities/search-attribute-table-sort';
 
 export const NEXUS_OPERATION_COLUMN_ATTRIBUTE: Record<string, string> = {
   'Operation ID': 'OperationId',
@@ -67,3 +69,20 @@ export const NEXUS_OPERATION_QUICK_FILTER_COLUMNS: QuickFilterColumns<NexusOpera
     getValue: getNexusOperationColumnValue,
     unfilterable: UNFILTERABLE_NEXUS_OPERATION_COLUMNS,
   };
+
+export const getNexusOperationSortColumns = (
+  labels: string[],
+  attributes: SearchAttributes,
+) =>
+  searchAttributeSortColumns(
+    labels,
+    NEXUS_OPERATION_QUICK_FILTER_COLUMNS,
+    attributes,
+    {
+      'Execution Duration': {
+        getValue: (operation) =>
+          durationStringToMilliseconds(operation.executionDuration),
+        type: 'number',
+      },
+    },
+  );

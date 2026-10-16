@@ -18,6 +18,10 @@
     nexusOperationLoading,
     nexusOperationRefresh,
   } from '$lib/stores/nexus-operations';
+  import { nexusOperationSearchAttributes } from '$lib/stores/search-attributes';
+  import type { TableSort } from '$lib/utilities/table-sort';
+
+  import { getNexusOperationSortColumns } from './nexus-operations-summary-configurable-table/column-search-attributes';
 
   import TableBodyCell from './nexus-operations-summary-configurable-table/table-body-cell.svelte';
   import TableEmptyState from './nexus-operations-summary-configurable-table/table-empty-state.svelte';
@@ -37,14 +41,28 @@
   );
   const query = $derived(page.url.searchParams.get('query') ?? '');
 
+  let sort = $derived.by((): TableSort | undefined => {
+    void namespace;
+    void query;
+    return undefined;
+  });
+
   const onFetch = $derived(() =>
     fetchPaginatedNexusOperations(namespace, query),
+  );
+  const sortColumns = $derived(
+    getNexusOperationSortColumns(
+      columns.map((column) => column.label),
+      $nexusOperationSearchAttributes,
+    ),
   );
 </script>
 
 {#key [namespace, query, $nexusOperationRefresh]}
   <PaginatedTable
     total={$nexusOperationCount.count}
+    bind:sort
+    {sortColumns}
     {onFetch}
     aria-label={translate(
       'standalone-nexus-operations.standalone-nexus-operations',

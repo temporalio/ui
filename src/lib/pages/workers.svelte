@@ -21,9 +21,16 @@
   } from '$lib/stores/search-attributes';
   import { refresh, workerCount } from '$lib/stores/workers';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
+  import type { TableSort } from '$lib/utilities/table-sort';
 
   const { namespace } = $derived(page.params);
   const query = $derived(page.url.searchParams.get('query') || '');
+
+  let sort = $derived.by((): TableSort | undefined => {
+    void namespace;
+    void query;
+    return undefined;
+  });
 
   onMount(() => {
     const query = page.url.searchParams.get('query') ?? '';
@@ -56,6 +63,7 @@
     />
     {#key [namespace, query, $refresh]}
       <WorkersTable
+        bind:sort
         {namespace}
         onFetch={() => fetchPaginatedWorkers({ namespace, query })}
         total={$workerCount.count}

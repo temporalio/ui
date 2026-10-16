@@ -32,6 +32,7 @@
     TABLE_TYPE,
   } from '$lib/stores/configurable-table-columns';
   import { viewFeature } from '$lib/stores/new-feature-tags';
+  import { searchAttributes } from '$lib/stores/search-attributes';
   import { tableDensity } from '$lib/stores/table-density';
   import { refresh, workflowCount } from '$lib/stores/workflows';
   import type { WorkflowExecution } from '$lib/types/workflows';
@@ -40,6 +41,9 @@
     getPageSelectionStatus,
     type PageSelectionStatus,
   } from '$lib/utilities/batch-selection';
+  import type { TableSort } from '$lib/utilities/table-sort';
+
+  import { getWorkflowSortColumns } from './workflows-summary-configurable-table/column-search-attributes';
 
   import TableBodyCell from './workflows-summary-configurable-table/table-body-cell.svelte';
   import TableHeaderCell from './workflows-summary-configurable-table/table-header-cell.svelte';
@@ -61,6 +65,13 @@
     $configurableTableColumns?.[namespace]?.workflows ?? [],
   );
   const query = $derived(page.url.searchParams.get('query') ?? '');
+
+  // Keep sorting across table refreshes, but reset it for a different search.
+  let sort = $derived.by((): TableSort | undefined => {
+    void namespace;
+    void query;
+    return undefined;
+  });
 
   const hasVersioningFilter = $derived(
     query?.includes('TemporalWorkerDeploymentVersion') ?? false,
@@ -221,11 +232,19 @@
     void $allSelected;
     prevClickedRow = null;
   });
+  const sortColumns = $derived(
+    getWorkflowSortColumns(
+      columns.map((column) => column.label),
+      $searchAttributes,
+    ),
+  );
 </script>
 
 {#key [namespace, query, $refresh]}
   <PaginatedTable
     total={$workflowCount.count}
+    bind:sort
+    {sortColumns}
     {onFetch}
     onItemsChange={(items) => {
       visiblePaginatedItems = items;

@@ -76,7 +76,16 @@ test.describe('Schedules List with schedules', () => {
     await page.route(SCHEDULES_API, (route) =>
       route.fulfill({
         json: {
-          schedules: [mockListSchedule, mockListSchedule],
+          schedules: [
+            mockListSchedule,
+            {
+              ...mockListSchedule,
+              info: {
+                ...mockListSchedule.info,
+                workflowType: { name: 'another-workflow' },
+              },
+            },
+          ],
           nextPageToken: null,
         },
       }),
@@ -85,6 +94,31 @@ test.describe('Schedules List with schedules', () => {
     await page.goto(schedulesUrl);
 
     await page.waitForResponse(SCHEDULES_COUNT_API);
-    await expect(page.locator('table tbody tr')).toHaveCount(2);
+    const rows = page.locator('table tbody tr');
+    await expect(rows).toHaveCount(2);
+
+    const workflowTypes = rows.getByRole('link', {
+      name: /^(run-regularly|another-workflow)$/,
+    });
+    await expect(workflowTypes).toHaveText([
+      'run-regularly',
+      'another-workflow',
+    ]);
+
+    const sortButton = page.getByRole('button', {
+      name: 'Workflow Type',
+      exact: true,
+    });
+    await sortButton.click();
+    await expect(workflowTypes).toHaveText([
+      'another-workflow',
+      'run-regularly',
+    ]);
+
+    await sortButton.click();
+    await expect(workflowTypes).toHaveText([
+      'run-regularly',
+      'another-workflow',
+    ]);
   });
 });
