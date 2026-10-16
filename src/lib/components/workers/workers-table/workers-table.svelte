@@ -79,7 +79,9 @@
     },
     [translate('workers.sdk')]: {
       getValue: (worker) =>
-        `${formatSDKName(worker.sdkName)} ${worker.sdkVersion ?? ''}`,
+        worker.sdkName
+          ? `${formatSDKName(worker.sdkName)} ${worker.sdkVersion ?? ''}`.trim()
+          : undefined,
       type: 'string',
     },
   };

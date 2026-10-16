@@ -96,7 +96,7 @@
   };
   const sortColumns = $derived(
     Object.fromEntries(
-      columns.map(({ label }) => [label, sortableColumns[label]]),
+      columns.map(({ label }) => [columnLabel(label), sortableColumns[label]]),
     ),
   );
 
@@ -143,8 +143,7 @@
         <tr class="text-left">
           {#each columns as { label, width } (label)}
             <SortableTableHeader
-              column={label}
-              label={columnLabel(label)}
+              column={columnLabel(label)}
               style={columnWidthStyle(width)}
             >
               <ColumnResizeHandle
