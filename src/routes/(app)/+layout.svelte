@@ -6,6 +6,7 @@
 
   import BottomNavigation from '$lib/components/bottom-nav.svelte';
   import DataEncoderSettings from '$lib/components/data-encoder-settings.svelte';
+  import EnvironmentBanner from '$lib/components/environment-banner.svelte';
   import ExtensionSlot from '$lib/components/extensions/extension-slot.svelte';
   import NamespacePicker from '$lib/components/namespace-picker.svelte';
   import NewsFeedWidget from '$lib/components/news-feed/news-feed-widget.svelte';
@@ -74,6 +75,8 @@
   }
 
   let { children }: Props = $props();
+
+  const banner = $derived(page.data?.settings?.banner);
 
   initializeNavDefaults(page.data?.settings?.navCollapsedByDefault);
 
@@ -409,7 +412,10 @@
 <DarkMode />
 <SkipNavigation />
 
-<div class="flex h-[calc(100dvh-var(--layout-pt))] w-screen flex-row">
+<div
+  class="flex h-[calc(100dvh-var(--layout-pt))] w-screen flex-row pt-[var(--environment-banner-height,0px)]"
+>
+  <EnvironmentBanner text={banner?.text ?? ''} color={banner?.color} />
   <Toaster
     closeButtonLabel={translate('common.close')}
     pop={toaster.pop}
