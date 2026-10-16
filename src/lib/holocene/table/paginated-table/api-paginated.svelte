@@ -15,6 +15,7 @@
   import { twMerge as merge } from 'tailwind-merge';
 
   import Alert from '$lib/holocene/alert.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import IconButton from '$lib/holocene/icon-button.svelte';
   import FilterSelect from '$lib/holocene/select/filter-select.svelte';
@@ -337,14 +338,14 @@
     {#if sort && sortColumn}
       <div
         class={merge(
-          'flex shrink-0 items-center justify-between gap-3 border-y border-information bg-surface-information px-3 py-1 text-sm text-information',
+          'flex shrink-0 items-center justify-between gap-3 border-b bg-surface-information px-3 py-1 text-xs text-information',
           !maximizable && 'rounded-t-lg',
         )}
         data-testid="table-sort-banner"
       >
         <p role="status" class="flex min-w-0 items-center gap-2">
           <IconInfo class="shrink-0" />
-          <span class="break-words [overflow-wrap:anywhere]">
+          <span class="break-words">
             {#if !$store.loading && !fetchError && adjustedTotal !== undefined}
               {translate('common.sort-page-notice-with-count', {
                 column: sort.column,
@@ -356,14 +357,14 @@
             {/if}
           </span>
         </p>
-        <button
-          type="button"
-          class="min-h-7 shrink-0 rounded-sm px-1 font-medium underline underline-offset-4 hover:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary [@media(pointer:coarse)]:min-h-11"
+        <Button
+          size="xs"
+          variant="ghost"
           onclick={clearSort}
           onkeydown={(event) => event.stopPropagation()}
         >
           {translate('common.clear-sort')}
-        </button>
+        </Button>
       </div>
     {/if}
   {/snippet}
