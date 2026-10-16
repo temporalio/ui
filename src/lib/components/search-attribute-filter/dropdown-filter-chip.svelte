@@ -3,6 +3,7 @@
 
   import { timestamp } from '$lib/components/timestamp.svelte';
   import { Menu, MenuButton, MenuContainer } from '$lib/holocene/menu';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { isNullConditional } from '$lib/utilities/is';
@@ -31,6 +32,10 @@
   }: Props = $props();
 
   const open = writable(false);
+
+  const displayText = $derived(
+    `${getDisplayKeyWithConditional(filter)} ${getDisplayValue(filter)}`,
+  );
 
   const controlsId = $derived(
     `dropdown-filter-chip-${filter.attribute}-${index}`,
@@ -90,6 +95,8 @@
       $open = true;
     }
   });
+
+  let chipContentWidthPx = $state(0);
 </script>
 
 <MenuContainer {open} class="min-w-0 max-w-full">
@@ -98,14 +105,26 @@
     controls={controlsId}
     hasIndicator
     class="h-auto min-h-8 min-w-0 max-w-full whitespace-normal bg-surface-secondary"
-    title="{getDisplayKeyWithConditional(filter)} {getDisplayValue(filter)}"
   >
-    <div class="min-w-0 text-left">
-      <span class="break-words text-primary"
-        >{getDisplayKeyWithConditional(filter)}</span
+    <Tooltip
+      text={displayText}
+      hide={$open}
+      class="min-w-0 max-w-full"
+      width={chipContentWidthPx}
+      usePortal
+      portalOffset={{ y: 12 }}
+      bottom
+    >
+      <div
+        bind:clientWidth={chipContentWidthPx}
+        class="min-w-0 max-w-full truncate text-left"
       >
-      <span class="break-all text-brand">{getDisplayValue(filter)}</span>
-    </div>
+        <span class="break-words text-primary"
+          >{getDisplayKeyWithConditional(filter)}</span
+        >
+        <span class="break-all text-brand">{getDisplayValue(filter)}</span>
+      </div>
+    </Tooltip>
   </MenuButton>
 
   <Menu

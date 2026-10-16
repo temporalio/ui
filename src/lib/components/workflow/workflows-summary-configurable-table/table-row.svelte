@@ -89,7 +89,7 @@
         ? 'w-auto'
         : 'w-6'}"
     >
-      {#if !workflowCreateDisabled(page)}
+      {#if !workflowCreateDisabled(namespace, page.data.settings)}
         <StartWorkflowButton
           {namespace}
           runId={workflow.runId}

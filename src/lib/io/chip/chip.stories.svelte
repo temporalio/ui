@@ -2,10 +2,8 @@
   import { defineMeta } from '@storybook/addon-svelte-csf';
   import type { ComponentProps } from 'svelte';
 
+  import { Chip, type ChipColorScheme } from '$lib/io/chip';
   import { IconClose, IconRegions } from '$lib/io/icon';
-
-  import type { ChipColorScheme } from './chip.svelte';
-  import Chip from './chip.svelte';
 
   const colorSchemes: ChipColorScheme[] = [
     'neutral',
