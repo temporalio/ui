@@ -1,3 +1,5 @@
+import { readFile } from 'node:fs/promises';
+
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 
 import {
@@ -107,7 +109,7 @@ describe('FairnessKey', () => {
     expect(target.querySelector('[role="dialog"]')).toBeNull();
   });
 
-  it('announces the fairness key and warning and supports focus, CTA, and Escape', () => {
+  it('announces the fairness key and warning and supports focus, CTA, and Escape', async () => {
     client.setNamespaceFairness({
       enabled: false,
       enableHref: '/namespaces/default?edit=fairness',
@@ -132,6 +134,10 @@ describe('FairnessKey', () => {
     expect(cta?.classList).toContain('light');
     expect(cta?.classList).not.toContain('mt-2');
     expect(cta?.parentElement?.classList).toContain('mt-2');
+    const linkSource = await readFile('src/lib/holocene/link.svelte', 'utf8');
+    expect(linkSource).toContain(
+      '@apply text-white hover:text-white focus-visible:text-primary;',
+    );
     cta?.focus();
     expect(document.activeElement).toBe(cta);
 
