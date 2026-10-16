@@ -20,7 +20,8 @@
   });
 </script>
 
-<Story name="Sortable" />
+<Story name="Sortable" args={{ total: 5 }} />
+<Story name="Unknown total" />
 <Story
   name="Empty"
   args={{ onFetch: async () => async () => ({ items: [], nextPageToken: '' }) }}

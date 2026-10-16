@@ -18,7 +18,8 @@
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import IconButton from '$lib/holocene/icon-button.svelte';
   import FilterSelect from '$lib/holocene/select/filter-select.svelte';
-  import { IconArrowLeft, IconArrowRight } from '$lib/io/icon';
+  import { translate } from '$lib/i18n/translate';
+  import { IconArrowLeft, IconArrowRight, IconInfo } from '$lib/io/icon';
   import {
     createPaginationStore,
     type PaginationStore,
@@ -51,6 +52,7 @@
     onError?: ((error: Error | unknown) => void) | undefined;
     onFetch: () => Promise<PaginatedRequest<T>>;
     onItemsChange?: (items: T[]) => void;
+    sort?: TableSort;
     sortColumns?: Record<string, TableSortColumn<T>>;
     onLoadingChange?: ((loading: boolean) => void) | undefined;
     onShiftUp?: KeyboardHandler;
@@ -81,6 +83,7 @@
     onError,
     onFetch,
     onItemsChange,
+    sort = $bindable(),
     sortColumns = {},
     onLoadingChange,
     onShiftUp,
@@ -112,15 +115,16 @@
   );
   let fetchError = $state<Error | undefined>();
   let paginatedTable = $state<PaginatedTable<T>>();
-  let sort = $state<TableSort>();
   const pageItems = $derived($store.visibleItems);
+  const sortColumn = $derived(sort ? sortColumns[sort.column] : undefined);
   const visibleItems = $derived(
-    sortTableItems(
-      pageItems,
-      sort ? sortColumns[sort.column] : undefined,
-      sort?.direction,
-    ),
+    sortTableItems(pageItems, sortColumn, sort?.direction),
   );
+
+  function clearSort() {
+    sort = undefined;
+    store.setActiveIndex(0);
+  }
 
   setContext<TableSortContext>(TABLE_SORT_CONTEXT, {
     isSortable: (column) =>
@@ -309,13 +313,48 @@
   {maxHeight}
   verticalScroll={maximizable && $maximized ? 'table' : 'responsive'}
   class={merge(maximizable && 'rounded-none border-0 border-t')}
-  tableClass={maximizable ? 'rounded-none' : ''}
+  tableClass={maximizable || (sort && sortColumn) ? 'rounded-none' : ''}
   {id}
   {caption}
   {headers}
   empty={indexEmpty}
 >
   {@render rows?.({ visibleItems })}
+
+  {#snippet banner()}
+    {#if sort && sortColumn}
+      <div
+        class={merge(
+          'flex shrink-0 items-center justify-between gap-3 border-y border-information bg-surface-information px-3 py-1 text-sm text-information',
+          !maximizable && 'rounded-t-lg',
+        )}
+        data-testid="table-sort-banner"
+      >
+        <p role="status" class="flex min-w-0 items-center gap-2">
+          <IconInfo class="shrink-0" />
+          <span class="break-words [overflow-wrap:anywhere]">
+            {#if !$store.loading && !fetchError && adjustedTotal !== undefined}
+              {translate('common.sort-page-notice-with-count', {
+                column: sort.column,
+                visible: visibleItems.length.toLocaleString(),
+                total: adjustedTotal.toLocaleString(),
+              })}
+            {:else}
+              {translate('common.sort-page-notice', { column: sort.column })}
+            {/if}
+          </span>
+        </p>
+        <button
+          type="button"
+          class="min-h-7 shrink-0 rounded-sm px-1 font-medium underline underline-offset-4 hover:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary [@media(pointer:coarse)]:min-h-11"
+          onclick={clearSort}
+          onkeydown={(event) => event.stopPropagation()}
+        >
+          {translate('common.clear-sort')}
+        </button>
+      </div>
+    {/if}
+  {/snippet}
 
   {#snippet actionsStart()}
     <FilterSelect

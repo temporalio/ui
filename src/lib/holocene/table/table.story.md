@@ -89,6 +89,10 @@ Pass `sortColumns` to `ApiPaginated` and render `SortableTableHeader` for each s
 
 The first click sorts ascending; subsequent clicks toggle descending and ascending. Only the current API page is sorted, with the same choice applied when navigating pages. Sorting does not fetch data or mutate cached API results. Missing and invalid values stay last in both directions, and ties retain their original order. Rows, header snippets, action snippets, and `onItemsChange` all receive the same sorted items.
 
+Bind the optional `sort` prop to parent component state to preserve the selection when a keyed refresh recreates the table. Keeping that state in memory resets the selection when the parent remounts, including on a browser reload.
+
+An active sort shows a banner above the headers explaining that sorting applies only to the current page, with the visible and total counts when known. **Clear sort** restores the current page's API order without fetching data or changing pages.
+
 Headers expose `aria-sort` and support Enter/Space. Put resize handles or other controls in the header's children snippet, outside its sort button. A header without a configured sort column renders as a plain header.
 
 <!-- For more Table examples, see the Table story -->

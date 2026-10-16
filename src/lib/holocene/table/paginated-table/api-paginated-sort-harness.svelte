@@ -39,7 +39,7 @@
 </script>
 
 <script lang="ts">
-  import type { TableSortColumn } from '$lib/utilities/table-sort';
+  import type { TableSort, TableSortColumn } from '$lib/utilities/table-sort';
 
   import ColumnResizeHandle from '../column-resize-handle.svelte';
   import SortableTableHeader from '../sortable-table-header.svelte';
@@ -52,11 +52,15 @@
       nextPageToken: token ? '' : 'page-2',
     }),
     onItemsChange,
+    total,
   }: {
     onFetch?: () => Promise<PaginatedRequest<SortableItem>>;
     onItemsChange?: (items: SortableItem[]) => void;
+    total?: number;
   } = $props();
   let visibleItems = $state<SortableItem[]>([]);
+  let sort = $state<TableSort>();
+  let refreshKey = $state(0);
   let width = $state<number>();
   let sortColumns = $state<Record<string, TableSortColumn<SortableItem>>>({
     Name: { getValue: (item) => item.name, type: 'string' },
@@ -69,50 +73,58 @@
     const { Count: _, ...remaining } = sortColumns;
     sortColumns = remaining;
   }
+
+  export function refresh() {
+    refreshKey += 1;
+  }
 </script>
 
-<ApiPaginated
-  {onFetch}
-  {sortColumns}
-  onItemsChange={(items) => {
-    visibleItems = items;
-    onItemsChange?.(items);
-  }}
-  debounceDelay={0}
-  pageSizeOptions={['3', '5']}
-  pageSizeSelectLabel="Per page"
-  previousButtonLabel="Previous"
-  nextButtonLabel="Next"
-  emptyStateTitle="No results"
->
-  {#snippet headers({ visibleItems: headerItems })}
-    <tr data-header-items={headerItems.map((item) => item.name).join(',')}>
-      <SortableTableHeader column="Name" />
-      <SortableTableHeader
-        column="Count"
-        style={width ? `width: ${width}px` : undefined}
-      >
-        <ColumnResizeHandle
-          label="Count"
-          {width}
-          onResize={(value) => (width = value)}
-        />
-      </SortableTableHeader>
-      <SortableTableHeader column="Started" />
-      <SortableTableHeader column="Enabled" />
-      <SortableTableHeader column="Actions" />
-    </tr>
-  {/snippet}
-  {#snippet rows()}
-    {#each visibleItems as item (item.name)}
-      <tr data-name={item.name}>
-        <td>{item.name}</td><td>{item.count}</td><td>{item.started ?? '—'}</td
-        ><td>{String(item.enabled)}</td><td></td>
+{#key refreshKey}
+  <ApiPaginated
+    {onFetch}
+    bind:sort
+    {sortColumns}
+    {total}
+    onItemsChange={(items) => {
+      visibleItems = items;
+      onItemsChange?.(items);
+    }}
+    debounceDelay={0}
+    pageSizeOptions={['3', '5']}
+    pageSizeSelectLabel="Per page"
+    previousButtonLabel="Previous"
+    nextButtonLabel="Next"
+    emptyStateTitle="No results"
+  >
+    {#snippet headers({ visibleItems: headerItems })}
+      <tr data-header-items={headerItems.map((item) => item.name).join(',')}>
+        <SortableTableHeader column="Name" />
+        <SortableTableHeader
+          column="Count"
+          style={width ? `width: ${width}px` : undefined}
+        >
+          <ColumnResizeHandle
+            label="Count"
+            {width}
+            onResize={(value) => (width = value)}
+          />
+        </SortableTableHeader>
+        <SortableTableHeader column="Started" />
+        <SortableTableHeader column="Enabled" />
+        <SortableTableHeader column="Actions" />
       </tr>
-    {/each}
-  {/snippet}
-  {#snippet actionsEndAdditional({ visibleItems: actionItems })}
-    <span data-action-items={actionItems.map((item) => item.name).join(',')}
-    ></span>
-  {/snippet}
-</ApiPaginated>
+    {/snippet}
+    {#snippet rows()}
+      {#each visibleItems as item (item.name)}
+        <tr data-name={item.name}>
+          <td>{item.name}</td><td>{item.count}</td><td>{item.started ?? '—'}</td
+          ><td>{String(item.enabled)}</td><td></td>
+        </tr>
+      {/each}
+    {/snippet}
+    {#snippet actionsEndAdditional({ visibleItems: actionItems })}
+      <span data-action-items={actionItems.map((item) => item.name).join(',')}
+      ></span>
+    {/snippet}
+  </ApiPaginated>
+{/key}
