@@ -25,8 +25,11 @@
   });
 
   function handleFocusOut(event: FocusEvent) {
-    const next = event.relatedTarget as HTMLElement | null;
-    if (next && container?.contains(next)) return;
+    if (
+      event.relatedTarget instanceof Node &&
+      container?.contains(event.relatedTarget)
+    )
+      return;
     isFocused = false;
   }
 
