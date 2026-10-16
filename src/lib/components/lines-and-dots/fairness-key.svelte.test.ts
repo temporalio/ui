@@ -129,6 +129,9 @@ describe('FairnessKey', () => {
     const cta = dialog?.querySelector<HTMLAnchorElement>('a');
     expect(dialog).not.toBeNull();
     expect(cta?.getAttribute('href')).toBe('/namespaces/default?edit=fairness');
+    expect(cta?.classList).toContain('light');
+    expect(cta?.classList).not.toContain('mt-2');
+    expect(cta?.parentElement?.classList).toContain('mt-2');
     cta?.focus();
     expect(document.activeElement).toBe(cta);
 

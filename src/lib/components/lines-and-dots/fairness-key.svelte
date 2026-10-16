@@ -90,9 +90,11 @@
         >
           <p>{translate('workflows.fairness-disabled-description')}</p>
           {#if $namespaceFairness.enableHref}
-            <Link href={$namespaceFairness.enableHref} class="mt-2 text-white">
-              {translate('workflows.enable-fairness-in-namespace')}
-            </Link>
+            <div class="mt-2">
+              <Link href={$namespaceFairness.enableHref} light>
+                {translate('workflows.enable-fairness-in-namespace')}
+              </Link>
+            </div>
           {/if}
         </div>
       </div>
