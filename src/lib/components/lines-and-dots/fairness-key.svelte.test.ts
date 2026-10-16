@@ -188,9 +188,11 @@ describe('FairnessKey', () => {
     expect(lightLinkStyles).toMatch(
       /\.link\.light:hover\s*\{\s*color:\s*var\(--color-content-white\)/,
     );
-    expect(lightLinkStyles).toMatch(
-      /\.link\.light:focus-visible\s*\{\s*color:\s*var\(--color-content-white\)/,
-    );
+    const lightFocusRule = lightLinkStyles.match(
+      /\.link\.light:focus-visible\s*\{(?<rules>[^}]*)\}/,
+    )?.groups?.rules;
+    expect(lightFocusRule).toContain('background-color: transparent');
+    expect(lightFocusRule).toContain('color: var(--color-content-white)');
     cta?.focus();
     expect(document.activeElement).toBe(cta);
 

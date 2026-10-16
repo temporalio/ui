@@ -111,7 +111,7 @@
     }
 
     &.light {
-      @apply text-white hover:text-white focus-visible:text-white;
+      @apply text-white hover:text-white focus-visible:bg-transparent focus-visible:text-white;
     }
   }
 
