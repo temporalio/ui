@@ -357,7 +357,12 @@ export const Strings = {
   'start-to-close-timeout': 'Start to Close Timeout',
   'related-events': 'Related Events',
   priority: 'Priority',
-  fairness: 'Fairness',
+  fairness: 'Fairness Key',
+  'fairness-disabled-alert': 'Fairness is disabled for this Namespace',
+  'fairness-disabled-popover-label': 'Fairness is disabled',
+  'fairness-disabled-description':
+    "This Workflow sets a fairness key, but fairness isn't enabled for this Namespace. Tasks are dispatched without fairness.",
+  'enable-fairness-in-namespace': 'Enable Fairness in Namespace',
   'workflow-start-delay': 'Workflow Start Delay',
   delayed: 'Delayed',
   'task-failure': 'Task Failure',
