@@ -51,7 +51,6 @@
       aria-controls={isOpen ? popoverId : undefined}
       aria-expanded={isOpen}
       aria-haspopup="dialog"
-      aria-label={translate('workflows.fairness-disabled-alert')}
       class="inline-flex min-w-0 items-center gap-1 rounded-sm text-left font-mono leading-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary"
     >
       <span class="truncate border-b border-dotted border-current"
@@ -60,21 +59,29 @@
       <span aria-hidden="true" class="flex shrink-0">
         <IconWarning class="text-warning" />
       </span>
+      <span class="sr-only">
+        {translate('workflows.fairness-disabled-alert')}
+      </span>
     </button>
 
     {#if isOpen}
       <div
-        id={popoverId}
-        role="dialog"
-        aria-label={translate('workflows.fairness-disabled-popover-label')}
-        class="absolute left-0 top-full z-50 mt-2 w-72 rounded bg-neutral-7 p-3 text-sm text-white shadow-lg"
+        data-testid="fairness-key-popover-bridge"
+        class="absolute left-0 top-full z-50 w-72 pt-2"
       >
-        <p>{translate('workflows.fairness-disabled-description')}</p>
-        {#if $namespaceFairness.enableHref}
-          <Link href={$namespaceFairness.enableHref} class="mt-2 text-white">
-            {translate('workflows.enable-fairness-in-namespace')}
-          </Link>
-        {/if}
+        <div
+          id={popoverId}
+          role="dialog"
+          aria-label={translate('workflows.fairness-disabled-popover-label')}
+          class="rounded bg-neutral-7 p-3 text-sm text-white shadow-lg"
+        >
+          <p>{translate('workflows.fairness-disabled-description')}</p>
+          {#if $namespaceFairness.enableHref}
+            <Link href={$namespaceFairness.enableHref} class="mt-2 text-white">
+              {translate('workflows.enable-fairness-in-namespace')}
+            </Link>
+          {/if}
+        </div>
       </div>
     {/if}
   </div>

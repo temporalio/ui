@@ -44,7 +44,7 @@ describe('FairnessKey', () => {
     expect(dialog?.querySelector('a')).toBeNull();
   });
 
-  it('keeps the popover open from trigger to CTA and closes it with Escape', () => {
+  it('announces the fairness key and warning, bridges the CTA hover path, and closes with Escape', () => {
     client.setNamespaceFairness({
       enabled: false,
       enableHref: '/namespaces/default?edit=fairness',
@@ -54,16 +54,29 @@ describe('FairnessKey', () => {
       'button[aria-haspopup="dialog"]',
     );
 
-    expect(trigger?.getAttribute('aria-label')).toBe(
+    expect(trigger?.getAttribute('aria-label')).toBeNull();
+    expect(trigger?.textContent).toContain('payments');
+    expect(trigger?.textContent).toContain(
       'Fairness is disabled for this Namespace',
     );
     trigger?.focus();
     client.flush();
 
     const dialog = target.querySelector<HTMLElement>('[role="dialog"]');
+    const bridge = target.querySelector<HTMLElement>(
+      '[data-testid="fairness-key-popover-bridge"]',
+    );
     const cta = dialog?.querySelector<HTMLAnchorElement>('a');
     expect(dialog).not.toBeNull();
+    expect(bridge?.classList).toContain('pt-2');
+    expect(dialog?.classList).not.toContain('mt-2');
     expect(cta?.getAttribute('href')).toBe('/namespaces/default?edit=fairness');
+
+    trigger?.dispatchEvent(new MouseEvent('mouseleave', { bubbles: true }));
+    bridge?.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+    client.flush();
+    expect(target.querySelector('[role="dialog"]')).not.toBeNull();
+
     cta?.focus();
     expect(document.activeElement).toBe(cta);
 
