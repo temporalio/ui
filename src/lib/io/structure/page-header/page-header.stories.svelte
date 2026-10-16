@@ -66,6 +66,21 @@
   Workflows
 {/snippet}
 
+{#snippet listHeading()}
+  1,248 Workflows
+{/snippet}
+
+{#snippet lastRefreshed()}
+  <time datetime="2026-10-16T14:32:00Z">Oct 16, 2026, 14:32:00 UTC</time>
+{/snippet}
+
+{#snippet listActions()}
+  <Button colorScheme="secondary" size="sm" onclick={action('Connect')}>
+    Connect
+  </Button>
+  <Button size="sm" onclick={action('Start Workflow')}>Start Workflow</Button>
+{/snippet}
+
 {#snippet longHeading()}
   {workflowId}
 {/snippet}
@@ -74,7 +89,7 @@
   <Copyable
     content={workflowId}
     clickAllToCopy
-    container-class="inline"
+    container-class="!inline-flex max-w-full align-middle"
     copyIconTitle={translate('common.copy-icon-title')}
     copySuccessIconTitle={translate('common.copy-success-icon-title')}
   />
@@ -132,7 +147,6 @@
 {/snippet}
 
 {#snippet workflowActions()}
-  <Button size="sm" onclick={action('Reset workflow')}>Reset</Button>
   <Button
     colorScheme="secondary"
     size="sm"
@@ -141,20 +155,7 @@
   >
     More actions
   </Button>
-{/snippet}
-
-{#snippet wrappingActions()}
-  <Button colorScheme="tertiary" size="sm" onclick={action('View history')}>
-    View history
-  </Button>
-  <Button
-    colorScheme="secondary"
-    size="sm"
-    onclick={action('Edit configuration')}
-  >
-    Edit configuration
-  </Button>
-  <Button size="sm" onclick={action('Start workflow')}>Start workflow</Button>
+  <Button size="sm" onclick={action('Reset workflow')}>Reset</Button>
 {/snippet}
 
 {#snippet filters()}
@@ -185,14 +186,21 @@
   {@render example(args, 1200)}
 {/snippet}
 
-<Story name="Heading only" />
-
 <Story
   name="Heading controls and tags"
   args={{ leading, headingActions, tags, description }}
 />
 
-<Story name="List page" args={{ headingActions, actions, filters }} />
+<Story
+  name="List page"
+  args={{
+    heading: listHeading,
+    headingActions,
+    description: lastRefreshed,
+    actions: listActions,
+    filters,
+  }}
+/>
 
 <Story
   name="Copyable details heading"
@@ -212,7 +220,7 @@
 />
 
 <Story
-  name="All regions"
+  name="Kitchen sink"
   args={{
     leading,
     headingActions,
@@ -225,7 +233,7 @@
 />
 
 <Story
-  name="Flow-root — content wraps around actions"
+  name="Content wraps around actions"
   args={{
     heading: longHeading,
     description: wrappingDescription,
@@ -248,22 +256,7 @@
 </Story>
 
 <Story
-  name="Flow-root — wrapping action group"
-  args={{
-    heading: longHeading,
-    description: wrappingDescription,
-    actions: wrappingActions,
-    filters,
-    metadata,
-  }}
->
-  {#snippet template(args: ComponentProps<typeof PageHeader>)}
-    {@render example(args, 800)}
-  {/snippet}
-</Story>
-
-<Story
-  name="Container transition — floated versus stacked"
+  name="Floated vs stacked"
   args={{ description: wrappingDescription, actions }}
 >
   {#snippet template(args: ComponentProps<typeof PageHeader>)}
