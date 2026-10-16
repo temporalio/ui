@@ -14,6 +14,20 @@ export type PostResponseHook = (
   context: RequestContext & { retry: () => Promise<Response> },
 ) => Promise<Response>;
 
+export type NamespacePermissionCheck = (namespace: string) => boolean;
+
+export type CorePermissions = {
+  namespaces: {
+    canStartWorkflow: NamespacePermissionCheck;
+    canRequestWorkflowCancellation: NamespacePermissionCheck;
+    canSignalWorkflow: NamespacePermissionCheck;
+    canUpdateWorkflow: NamespacePermissionCheck;
+    canTerminateWorkflow: NamespacePermissionCheck;
+    canResetWorkflow: NamespacePermissionCheck;
+    canChangeWorkflowPauseState: NamespacePermissionCheck;
+  };
+};
+
 export type CoreProvider = {
   getAccessToken: () => Promise<string>;
   getIdToken: () => Promise<string | undefined>;
@@ -24,6 +38,7 @@ export type CoreProvider = {
   };
   getDataEncoderEndpoint: (namespace: string) => Promise<string>;
   searchNamespaces: (query: string) => Promise<string[]>;
+  permissions: CorePermissions;
 };
 
 export type InitOptions = {
@@ -36,12 +51,25 @@ export type InitOptions = {
   };
   getDataEncoderEndpoint?: (namespace: string) => Promise<string>;
   searchNamespaces?: (query: string) => Promise<string[]>;
+  permissions?: CorePermissions;
 };
 
-let provider: CoreProvider | null = null;
+let provider: CoreProvider | undefined;
 
 const passthrough: PreRequestHook = async (ctx) => ctx;
 const passthroughResponse: PostResponseHook = async (res) => res;
+
+const defaultPermissions: CorePermissions = {
+  namespaces: {
+    canStartWorkflow: () => true,
+    canRequestWorkflowCancellation: () => true,
+    canSignalWorkflow: () => true,
+    canUpdateWorkflow: () => true,
+    canTerminateWorkflow: () => true,
+    canResetWorkflow: () => true,
+    canChangeWorkflowPauseState: () => true,
+  },
+};
 
 export function initCoreProvider(options: InitOptions): void {
   provider = {
@@ -54,8 +82,39 @@ export function initCoreProvider(options: InitOptions): void {
     },
     getDataEncoderEndpoint: options.getDataEncoderEndpoint ?? (async () => ''),
     searchNamespaces: options.searchNamespaces ?? (async () => []),
+    permissions: options.permissions ?? defaultPermissions,
   };
 }
+
+function getCoreProvider(): CoreProvider {
+  if (!provider) {
+    throw new Error('Core provider has not been initialized');
+  }
+  return provider;
+}
+
+export const corePermissions: CorePermissions = {
+  namespaces: {
+    canStartWorkflow: (namespace) =>
+      getCoreProvider().permissions.namespaces.canStartWorkflow(namespace),
+    canRequestWorkflowCancellation: (namespace) =>
+      getCoreProvider().permissions.namespaces.canRequestWorkflowCancellation(
+        namespace,
+      ),
+    canSignalWorkflow: (namespace) =>
+      getCoreProvider().permissions.namespaces.canSignalWorkflow(namespace),
+    canUpdateWorkflow: (namespace) =>
+      getCoreProvider().permissions.namespaces.canUpdateWorkflow(namespace),
+    canTerminateWorkflow: (namespace) =>
+      getCoreProvider().permissions.namespaces.canTerminateWorkflow(namespace),
+    canResetWorkflow: (namespace) =>
+      getCoreProvider().permissions.namespaces.canResetWorkflow(namespace),
+    canChangeWorkflowPauseState: (namespace) =>
+      getCoreProvider().permissions.namespaces.canChangeWorkflowPauseState(
+        namespace,
+      ),
+  },
+};
 
 export async function getAccessToken(): Promise<string> {
   if (!BROWSER || !provider) return '';
