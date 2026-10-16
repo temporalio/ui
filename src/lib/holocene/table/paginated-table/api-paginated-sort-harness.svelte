@@ -62,12 +62,21 @@
   let sort = $state<TableSort>();
   let refreshKey = $state(0);
   let width = $state<number>();
-  let sortColumns = $state<Record<string, TableSortColumn<SortableItem>>>({
+  const buildSortColumns = (
+    countType: TableSortColumn<SortableItem>['type'] = 'integer',
+  ): Record<string, TableSortColumn<SortableItem>> => ({
     Name: { getValue: (item) => item.name, type: 'string' },
-    Count: { getValue: (item) => item.count, type: 'integer' },
+    Count: { getValue: (item) => item.count, type: countType },
     Started: { getValue: (item) => item.started, type: 'datetime' },
     Enabled: { getValue: (item) => item.enabled, type: 'boolean' },
   });
+  let sortColumns = $state(buildSortColumns());
+
+  export function rebuildSortColumns(
+    countType?: TableSortColumn<SortableItem>['type'],
+  ) {
+    sortColumns = buildSortColumns(countType);
+  }
 
   export function removeCountSort() {
     const { Count: _, ...remaining } = sortColumns;

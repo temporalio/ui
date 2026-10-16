@@ -11,7 +11,7 @@
 
   import { debounce } from 'es-toolkit';
   import type { Snippet } from 'svelte';
-  import { getContext, onMount, setContext } from 'svelte';
+  import { getContext, onMount, setContext, untrack } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import Alert from '$lib/holocene/alert.svelte';
@@ -109,6 +109,7 @@
     actionsEndAdditional,
   }: Props = $props();
 
+  // svelte-ignore state_referenced_locally
   const store: PaginationStore<T> = createPaginationStore(
     pageSizeOptions,
     pageSizeOptions[0],
@@ -117,9 +118,16 @@
   let paginatedTable = $state<PaginatedTable<T>>();
   const pageItems = $derived($store.visibleItems);
   const sortColumn = $derived(sort ? sortColumns[sort.column] : undefined);
-  const visibleItems = $derived(
-    sortTableItems(pageItems, sortColumn, sort?.direction),
+  const activeSortKey = $derived(
+    sort && sortColumn
+      ? `${sort.column}:${sort.direction}:${sortColumn.type ?? ''}`
+      : undefined,
   );
+  const visibleItems = $derived.by(() => {
+    const items = pageItems;
+    if (!activeSortKey) return items;
+    return untrack(() => sortTableItems(items, sortColumn, sort?.direction));
+  });
 
   function clearSort() {
     sort = undefined;

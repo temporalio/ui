@@ -1,6 +1,8 @@
 import { flushSync, mount, unmount } from 'svelte';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import type { TableSortType } from '$lib/utilities/table-sort';
+
 import Harness, {
   examplePages,
   type SortableItem,
@@ -8,7 +10,11 @@ import Harness, {
 
 describe('API paginated table sorting', () => {
   let target: HTMLDivElement;
-  let component: { removeCountSort: () => void; refresh: () => void };
+  let component: {
+    removeCountSort: () => void;
+    rebuildSortColumns: (countType?: TableSortType) => void;
+    refresh: () => void;
+  };
   const onItemsChange = vi.fn();
   const fetchPage = vi.fn(async (_size: number, token: string) => ({
     items: examplePages[token ? 1 : 0],
@@ -270,6 +276,34 @@ describe('API paginated table sorting', () => {
     flushSync();
     expect(rowNames()).toEqual(['Charlie', 'Alpha', 'Bravo']);
     expect(header('Count').hasAttribute('aria-sort')).toBe(false);
+  });
+
+  it('does not re-sort or notify consumers when equivalent sort columns are rebuilt', () => {
+    clickSort('Count');
+    const callCount = onItemsChange.mock.calls.length;
+    const sortedItems = onItemsChange.mock.lastCall?.[0];
+
+    component.rebuildSortColumns();
+    flushSync();
+    component.rebuildSortColumns();
+    flushSync();
+
+    expect(rowNames()).toEqual(['Alpha', 'Charlie', 'Bravo']);
+    expect(onItemsChange).toHaveBeenCalledTimes(callCount);
+    expect(onItemsChange.mock.lastCall?.[0]).toBe(sortedItems);
+  });
+
+  it('re-sorts when the sorted column type changes', () => {
+    clickSort('Count');
+    expect(rowNames()).toEqual(['Alpha', 'Charlie', 'Bravo']);
+
+    component.rebuildSortColumns('string');
+    flushSync();
+
+    expect(rowNames()).toEqual(['Charlie', 'Bravo', 'Alpha']);
+    expect(
+      onItemsChange.mock.lastCall?.[0].map((item: SortableItem) => item.name),
+    ).toEqual(rowNames());
   });
 
   it('falls back to API order when the sorted column is removed', () => {
