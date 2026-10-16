@@ -1441,7 +1441,7 @@ registry.registerExample({
           'package.json',
           'svelte.config.js',
           'tsconfig.json',
-          'scripts/generate-exports.mjs',
+          'scripts/generate-exports.ts',
           'src/lib/holocene/button.svelte',
           'src/lib/holocene/card.svelte',
           'src/lib/holocene/copyable',
@@ -1554,9 +1554,37 @@ registry.registerExample({
         await readFile(join(packageDirectory, 'package.json'), 'utf8'),
       );
       packageJson.scripts.prepare = 'svelte-kit sync';
+      packageJson.scripts.prepack = 'pnpm generate:exports && pnpm package';
       await writeFile(
         join(packageDirectory, 'package.json'),
         `${JSON.stringify(packageJson, null, 2)}\n`,
+      );
+      await writeFile(
+        join(packageDirectory, 'scripts/public-exports.ts'),
+        [
+          'export const publicSubpaths = [',
+          "  'catalog/authoring',",
+          "  'catalog/browser/catalog',",
+          "  'catalog/browser/catalog-detail.svelte',",
+          "  'catalog/browser/catalog-list.svelte',",
+          "  'catalog/browser/routing',",
+          "  'catalog/worker/connection-config',",
+          "  'catalog/worker/development',",
+          "  'catalog/worker/registry',",
+          "  'catalog/worker/routing-config',",
+          "  'catalog/worker/runner',",
+          "  'catalog/worker/shared-registrations',",
+          "  'catalog/worker/workflow-execution-logger',",
+          "  'catalog/worker/workflows',",
+          "  'io/icon',",
+          "  'svelte-mocks/app/environment',",
+          "  'svelte-mocks/app/navigation',",
+          "  'svelte-mocks/app/paths',",
+          "  'svelte-mocks/app/state',",
+          "  'svelte-mocks/app/stores',",
+          '];',
+          '',
+        ].join('\n'),
       );
       await symlink(
         join(rootDirectory, 'node_modules'),
