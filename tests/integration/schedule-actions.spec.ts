@@ -158,4 +158,143 @@ test.describe('Schedule actions', () => {
     await modal.getByTestId('confirm-modal-button').click();
     await deleteRequest;
   });
+
+  test('pause keeps the modal open and displays the error on 403', async ({
+    page,
+  }) => {
+    await page.route('**/schedules/test-schedule/patch*', (route) =>
+      route.fulfill({
+        status: 403,
+        contentType: 'application/json',
+        body: JSON.stringify({ message: 'Request unauthorized.' }),
+      }),
+    );
+
+    await page.locator('#schedule-actions-primary-button').click();
+
+    const modal = page.locator('#pause-schedule-modal');
+    await expect(modal).toBeVisible();
+    await modal.locator('#pause-reason').fill('maintenance');
+    await modal.getByTestId('confirm-modal-button').click();
+
+    await expect(modal).toBeVisible();
+    await expect(modal.getByRole('alert')).toHaveText(
+      'There was an error pausing the schedule. Request unauthorized.',
+    );
+    await expect(page).toHaveURL(scheduleUrl);
+  });
+
+  test('unpause keeps the modal open and displays the error on 403', async ({
+    page,
+  }) => {
+    await mockScheduleApi(page, {
+      ...mockSchedule,
+      schedule: {
+        ...mockSchedule.schedule,
+        state: { paused: true },
+      },
+    });
+    await page.route('**/schedules/test-schedule/patch*', (route) =>
+      route.fulfill({
+        status: 403,
+        contentType: 'application/json',
+        body: JSON.stringify({ message: 'Request unauthorized.' }),
+      }),
+    );
+    await page.goto(scheduleUrl);
+    await expect(page.getByTestId('schedule-name')).toContainText(
+      'test-schedule',
+    );
+
+    await page.locator('#schedule-actions-primary-button').click();
+
+    const modal = page.locator('#pause-schedule-modal');
+    await expect(modal).toBeVisible();
+    await modal.locator('#pause-reason').fill('resuming');
+    await modal.getByTestId('confirm-modal-button').click();
+
+    await expect(modal).toBeVisible();
+    await expect(modal.getByRole('alert')).toHaveText(
+      'There was an error unpausing the schedule. Request unauthorized.',
+    );
+    await expect(page).toHaveURL(scheduleUrl);
+  });
+
+  test('trigger keeps the modal open and displays the error on 403', async ({
+    page,
+  }) => {
+    await page.route('**/schedules/test-schedule/patch*', (route) =>
+      route.fulfill({
+        status: 403,
+        contentType: 'application/json',
+        body: JSON.stringify({ message: 'Request unauthorized.' }),
+      }),
+    );
+
+    await page.getByLabel('Schedule Actions').click();
+    await page.getByTestId('trigger-schedule').click();
+
+    const modal = page.locator('#trigger-schedule-modal');
+    await expect(modal).toBeVisible();
+    await modal.getByTestId('confirm-modal-button').click();
+
+    await expect(modal).toBeVisible();
+    await expect(modal.getByRole('alert')).toHaveText(
+      'There was an error triggering the schedule. Request unauthorized.',
+    );
+    await expect(page).toHaveURL(scheduleUrl);
+  });
+
+  test('backfill keeps the modal open and displays the error on 403', async ({
+    page,
+  }) => {
+    await page.route('**/schedules/test-schedule/patch*', (route) =>
+      route.fulfill({
+        status: 403,
+        contentType: 'application/json',
+        body: JSON.stringify({ message: 'Request unauthorized.' }),
+      }),
+    );
+
+    await page.getByLabel('Schedule Actions').click();
+    await page.getByTestId('backfill-schedule').click();
+
+    const modal = page.locator('#backfill-schedule-modal');
+    await expect(modal).toBeVisible();
+    await modal.getByTestId('confirm-modal-button').click();
+
+    await expect(modal).toBeVisible();
+    await expect(modal.getByRole('alert')).toHaveText(
+      'There was an error backfilling the schedule. Request unauthorized.',
+    );
+    await expect(page).toHaveURL(scheduleUrl);
+  });
+
+  test('delete keeps the modal open and displays the error on 403', async ({
+    page,
+  }) => {
+    await page.route('**/schedules/test-schedule*', (route) => {
+      if (route.request().method() === 'DELETE') {
+        return route.fulfill({
+          status: 403,
+          contentType: 'application/json',
+          body: JSON.stringify({ message: 'Request unauthorized.' }),
+        });
+      }
+      return route.fallback();
+    });
+
+    await page.getByLabel('Schedule Actions').click();
+    await page.getByTestId('delete-schedule').click();
+
+    const modal = page.locator('#delete-schedule-modal');
+    await expect(modal).toBeVisible();
+    await modal.getByTestId('confirm-modal-button').click();
+
+    await expect(modal).toBeVisible();
+    await expect(modal.getByRole('alert')).toHaveText(
+      'Cannot delete schedule. Request unauthorized.',
+    );
+    await expect(page).toHaveURL(scheduleUrl);
+  });
 });

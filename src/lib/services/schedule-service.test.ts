@@ -1,12 +1,39 @@
+import { get } from 'svelte/store';
+
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
-import type { DescribeFullSchedule } from '$lib/types/schedule';
+import type { FormScheduleSchema } from '$lib/components/schedule/schema/form';
+import {
+  actionPending,
+  confirmationModal,
+  loading,
+  openConfirmationModal,
+  serverError,
+  submitBackfillSchedule,
+  submitCreateSchedule,
+  submitDeleteSchedule,
+  submitEditSchedule,
+  submitPauseSchedule,
+  submitTriggerImmediatelySchedule,
+} from '$lib/stores/schedules';
+import { toaster } from '$lib/stores/toaster';
+import type {
+  DescribeFullSchedule,
+  ScheduleRequestBody,
+} from '$lib/types/schedule';
 import type { WorkflowExecution } from '$lib/types/workflows';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 
 import {
+  backfillRequest,
+  createSchedule,
+  deleteSchedule,
+  editSchedule,
   fetchRecentScheduleRunStatuses,
+  pauseSchedule,
   toRecentScheduleRuns,
+  triggerImmediately,
+  unpauseSchedule,
   withLatestWorkflowStatuses,
 } from './schedule-service';
 
@@ -324,5 +351,310 @@ describe('fetchRecentScheduleRunStatuses', () => {
 
     expect(requestFromAPI).not.toHaveBeenCalled();
     expect(result).toEqual([]);
+  });
+});
+
+describe('schedule mutations error handling', () => {
+  const handleError = vi.fn();
+  const forbiddenFetch = () =>
+    Promise.resolve(
+      new Response(JSON.stringify({ message: 'Request unauthorized.' }), {
+        status: 403,
+        statusText: 'Forbidden',
+      }),
+    );
+
+  const validFormData: FormScheduleSchema = {
+    name: 'daily',
+    workflowType: 'run-regularly',
+    workflowId: 'wf-1',
+    taskQueue: 'default-tq',
+    input: '',
+    encoding: 'json/plain',
+    messageType: '',
+    editInput: false,
+    startTime: '2026-08-01',
+    endKind: 'never',
+    endTime: '2026-08-01',
+    endAfterOccurrences: 1,
+    timezoneName: 'UTC',
+    jitter: 0,
+    specs: [
+      {
+        type: 'interval',
+        interval: 60,
+        intervalUnit: 'second(s)',
+        offset: 0,
+        offsetUnit: 'second(s)',
+      },
+    ],
+    overlapPolicy: 'Skip',
+    pauseOnFailure: false,
+    pauseSchedule: false,
+    catchupWindow: '31536000s',
+    taskTimeout: '0s',
+    runTimeout: '0s',
+    executionTimeout: '0s',
+    searchAttributes: [],
+    workflowSearchAttributes: [],
+  };
+
+  beforeEach(async () => {
+    const actual = await vi.importActual<
+      typeof import('$lib/utilities/request-from-api')
+    >('$lib/utilities/request-from-api');
+
+    handleError.mockReset();
+    serverError.set('');
+    loading.set(false);
+    actionPending.set(false);
+    confirmationModal.set('none');
+    toaster.toasts.set([]);
+
+    vi.mocked(requestFromAPI).mockReset();
+    vi.mocked(requestFromAPI).mockImplementation((endpoint, init = {}) =>
+      actual.requestFromAPI(endpoint, {
+        ...init,
+        request: forbiddenFetch as typeof fetch,
+        handleError,
+        isBrowser: false,
+      }),
+    );
+  });
+
+  test('pauseSchedule rejects with NetworkError on 403 without calling handleError', async () => {
+    await expect(
+      pauseSchedule({
+        namespace: 'default',
+        scheduleId: 'daily',
+        reason: 'maintenance',
+      }),
+    ).rejects.toMatchObject({
+      statusCode: 403,
+      message: 'Request unauthorized.',
+    });
+
+    expect(handleError).not.toHaveBeenCalled();
+  });
+
+  test('unpauseSchedule rejects with NetworkError on 403 without calling handleError', async () => {
+    await expect(
+      unpauseSchedule({
+        namespace: 'default',
+        scheduleId: 'daily',
+        reason: 'resuming',
+      }),
+    ).rejects.toMatchObject({
+      statusCode: 403,
+      message: 'Request unauthorized.',
+    });
+
+    expect(handleError).not.toHaveBeenCalled();
+  });
+
+  test('triggerImmediately rejects with NetworkError on 403 without calling handleError', async () => {
+    await expect(
+      triggerImmediately({
+        namespace: 'default',
+        scheduleId: 'daily',
+        overlapPolicy: 'Skip',
+      }),
+    ).rejects.toMatchObject({
+      statusCode: 403,
+      message: 'Request unauthorized.',
+    });
+
+    expect(handleError).not.toHaveBeenCalled();
+  });
+
+  test('backfillRequest rejects with NetworkError on 403 without calling handleError', async () => {
+    await expect(
+      backfillRequest({
+        namespace: 'default',
+        scheduleId: 'daily',
+        overlapPolicy: 'Skip',
+        startTime: '2026-08-01T00:00:00Z',
+        endTime: '2026-08-01T01:00:00Z',
+      }),
+    ).rejects.toMatchObject({
+      statusCode: 403,
+      message: 'Request unauthorized.',
+    });
+
+    expect(handleError).not.toHaveBeenCalled();
+  });
+
+  test('deleteSchedule rejects with NetworkError on 403 without calling handleError', async () => {
+    await expect(
+      deleteSchedule({
+        namespace: 'default',
+        scheduleId: 'daily',
+      }),
+    ).rejects.toMatchObject({
+      statusCode: 403,
+      message: 'Request unauthorized.',
+    });
+
+    expect(handleError).not.toHaveBeenCalled();
+  });
+
+  test('createSchedule returns error on 403 without calling handleError', async () => {
+    const result = await createSchedule({
+      namespace: 'default',
+      scheduleId: 'daily',
+      body: {} as ScheduleRequestBody,
+    });
+
+    expect(result).toEqual({
+      conflictToken: '',
+      error: 'Request unauthorized.',
+    });
+    expect(handleError).not.toHaveBeenCalled();
+    expect(vi.mocked(requestFromAPI).mock.calls[0][1]?.notifyOnError).toBe(
+      false,
+    );
+  });
+
+  test('editSchedule returns error on 403 without calling handleError', async () => {
+    const result = await editSchedule({
+      namespace: 'default',
+      scheduleId: 'daily',
+      body: {} as ScheduleRequestBody,
+    });
+
+    expect(result).toEqual({
+      error: 'Request unauthorized.',
+    });
+    expect(handleError).not.toHaveBeenCalled();
+    expect(vi.mocked(requestFromAPI).mock.calls[0][1]?.notifyOnError).toBe(
+      false,
+    );
+  });
+
+  test('submitPauseSchedule keeps pause modal open and sets pause error on 403', async () => {
+    openConfirmationModal('pause');
+
+    await submitPauseSchedule('maintenance', {
+      namespace: 'default',
+      scheduleId: 'daily',
+      isPaused: false,
+    });
+
+    expect(get(confirmationModal)).toBe('pause');
+    expect(get(actionPending)).toBe(false);
+    expect(get(serverError)).toBe(
+      'There was an error pausing the schedule. Request unauthorized.',
+    );
+  });
+
+  test('submitPauseSchedule keeps pause modal open and sets unpause error on 403', async () => {
+    openConfirmationModal('pause');
+
+    await submitPauseSchedule('resuming', {
+      namespace: 'default',
+      scheduleId: 'daily',
+      isPaused: true,
+    });
+
+    expect(get(confirmationModal)).toBe('pause');
+    expect(get(actionPending)).toBe(false);
+    expect(get(serverError)).toBe(
+      'There was an error unpausing the schedule. Request unauthorized.',
+    );
+  });
+
+  test('submitTriggerImmediatelySchedule keeps trigger modal open and sets trigger error on 403', async () => {
+    openConfirmationModal('trigger');
+
+    await submitTriggerImmediatelySchedule('Skip', {
+      namespace: 'default',
+      scheduleId: 'daily',
+    });
+
+    expect(get(confirmationModal)).toBe('trigger');
+    expect(get(actionPending)).toBe(false);
+    expect(get(serverError)).toBe(
+      'There was an error triggering the schedule. Request unauthorized.',
+    );
+  });
+
+  test('submitBackfillSchedule keeps backfill modal open and sets backfill error on 403', async () => {
+    openConfirmationModal('backfill');
+
+    await submitBackfillSchedule(
+      {
+        startTime: '2026-08-01T00:00:00Z',
+        endTime: '2026-08-01T01:00:00Z',
+        overlapPolicy: 'Skip',
+      },
+      {
+        namespace: 'default',
+        scheduleId: 'daily',
+      },
+    );
+
+    expect(get(confirmationModal)).toBe('backfill');
+    expect(get(actionPending)).toBe(false);
+    expect(get(serverError)).toBe(
+      'There was an error backfilling the schedule. Request unauthorized.',
+    );
+  });
+
+  test('submitDeleteSchedule keeps delete modal open and sets delete error on 403', async () => {
+    openConfirmationModal('delete');
+
+    await submitDeleteSchedule({
+      namespace: 'default',
+      scheduleId: 'daily',
+    });
+
+    expect(get(confirmationModal)).toBe('delete');
+    expect(get(actionPending)).toBe(false);
+    expect(get(serverError)).toBe(
+      'Cannot delete schedule. Request unauthorized.',
+    );
+  });
+
+  test('submitCreateSchedule does not toggle loading, sets serverError, and pushes error toast on 403', async () => {
+    const loadingStates: boolean[] = [];
+    const unsubscribe = loading.subscribe((value) => loadingStates.push(value));
+
+    await submitCreateSchedule(validFormData, { namespace: 'default' });
+    unsubscribe();
+
+    expect(loadingStates).toEqual([false]);
+    expect(get(serverError)).toBe('Request unauthorized.');
+    expect(get(toaster.toasts)).toEqual([
+      expect.objectContaining({
+        variant: 'error',
+        message: 'Request unauthorized.',
+      }),
+    ]);
+  });
+
+  test('submitEditSchedule does not toggle loading, sets serverError, and pushes error toast on 403', async () => {
+    const loadingStates: boolean[] = [];
+    const unsubscribe = loading.subscribe((value) => loadingStates.push(value));
+
+    await submitEditSchedule(
+      validFormData,
+      {
+        schedule: { spec: {}, action: {}, policies: {}, state: {} },
+      } as unknown as DescribeFullSchedule,
+      {
+        namespace: 'default',
+        scheduleId: 'daily',
+      },
+    );
+    unsubscribe();
+
+    expect(loadingStates).toEqual([false]);
+    expect(get(serverError)).toBe('Request unauthorized.');
+    expect(get(toaster.toasts)).toEqual([
+      expect.objectContaining({
+        variant: 'error',
+        message: 'Request unauthorized.',
+      }),
+    ]);
   });
 });
