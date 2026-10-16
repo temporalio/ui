@@ -1,11 +1,34 @@
 import { readFile } from 'node:fs/promises';
 
+import autoprefixer from 'autoprefixer';
+import postcss from 'postcss';
+import tailwindcss from 'tailwindcss';
+import tailwindcssNesting from 'tailwindcss/nesting';
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 
 import {
   closeFairnessKeyClientTestRunner,
   getFairnessKeyClientTestRunner,
 } from './fairness-key-client-test-runner';
+
+async function getCompiledLightLinkStyles() {
+  const linkSource = await readFile('src/lib/holocene/link.svelte', 'utf8');
+  const styleSource = linkSource.match(
+    /<style lang="postcss">(?<css>[\s\S]*)<\/style>/,
+  )?.groups?.css;
+
+  if (!styleSource) throw new Error('Expected Link to define PostCSS styles');
+
+  return (
+    await postcss([
+      autoprefixer(),
+      tailwindcssNesting(),
+      tailwindcss(),
+    ]).process(styleSource, {
+      from: 'src/lib/holocene/link.svelte',
+    })
+  ).css;
+}
 
 describe('FairnessKey', () => {
   let client: Awaited<ReturnType<typeof getFairnessKeyClientTestRunner>>;
@@ -134,9 +157,12 @@ describe('FairnessKey', () => {
     expect(cta?.classList).toContain('light');
     expect(cta?.classList).not.toContain('mt-2');
     expect(cta?.parentElement?.classList).toContain('mt-2');
-    const linkSource = await readFile('src/lib/holocene/link.svelte', 'utf8');
-    expect(linkSource).toContain(
-      '@apply text-white hover:text-white focus-visible:text-primary;',
+    const lightLinkStyles = await getCompiledLightLinkStyles();
+    expect(lightLinkStyles).toMatch(
+      /\.link\.light:hover\s*\{\s*color:\s*var\(--color-content-white\)/,
+    );
+    expect(lightLinkStyles).toMatch(
+      /\.link\.light:focus-visible\s*\{\s*color:\s*var\(--color-content-white\)/,
     );
     cta?.focus();
     expect(document.activeElement).toBe(cta);

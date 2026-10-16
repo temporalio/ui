@@ -111,7 +111,7 @@
     }
 
     &.light {
-      @apply text-white hover:text-white focus-visible:text-primary;
+      @apply text-white hover:text-white focus-visible:text-white;
     }
   }
 
