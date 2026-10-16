@@ -335,6 +335,10 @@
       "types": "./dist/io/tag/index.d.ts",
       "import": "./dist/io/tag/index.js"
     },
+    "./io/structure/page-header": {
+      "types": "./dist/io/structure/page-header/index.d.ts",
+      "import": "./dist/io/structure/page-header/index.js"
+    },
     "./theme/preset": {
       "types": "./dist/theme/preset.d.ts",
       "import": "./dist/theme/preset.js",
