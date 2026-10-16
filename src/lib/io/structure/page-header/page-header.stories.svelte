@@ -3,8 +3,6 @@
   import { action } from 'storybook/actions';
   import type { ComponentProps } from 'svelte';
 
-  import Copyable from '$lib/holocene/copyable/index.svelte';
-  import { translate } from '$lib/i18n/translate';
   import BadgeStatus from '$lib/io/badge-status/badge-status.svelte';
   import Button from '$lib/io/button/button.svelte';
   import Chip from '$lib/io/chip/chip.svelte';
@@ -14,15 +12,18 @@
   import {
     IconAdd,
     IconAwsColor,
-    IconChevronDown,
+    IconDot,
     IconHeartbeat,
+    IconKey,
+    IconLightningBolt,
+    IconLock,
     IconRetry,
+    IconTemporal,
   } from '$lib/io/icon';
   import Tag from '$lib/io/tag/tag.svelte';
 
   import PageHeader from './page-header.svelte';
 
-  const workflowId = 'customer-order-processing-production-us-west-2';
   const statuses: ChipStatusValue[] = [
     'Running',
     'Paused',
@@ -49,67 +50,44 @@
       metadata: { control: false },
       class: { table: { disable: true } },
     },
-    parameters: {
-      layout: 'padded',
-      docs: {
-        description: {
-          component:
-            'A semantic page header with a required heading snippet and optional leading content, heading controls, tags, description, page actions, filters, and metadata. At an inner container width of 518px or more, actions float right (up to 35% width) inside a flow-root: inline heading content and description text flow beside the actions, then use the full width below them. The flow-root contains the float so filters and metadata remain separate full-width rows. Narrower containers stack the actions below the heading and description. The threshold is based on available header width, not viewport width. Buttons log to the Actions panel.',
-        },
-      },
-    },
+    parameters: { layout: 'padded' },
     render: template,
   });
 </script>
 
 {#snippet heading()}
-  Workflows
+  Heading
 {/snippet}
 
 {#snippet listHeading()}
   1,248 Workflows
 {/snippet}
 
-{#snippet lastRefreshed()}
-  <time datetime="2026-10-16T14:32:00Z">Oct 16, 2026, 14:32:00 UTC</time>
-{/snippet}
-
-{#snippet listActions()}
-  <Button colorScheme="secondary" size="sm" onclick={action('Connect')}>
-    Connect
-  </Button>
-  <Button size="sm" onclick={action('Start Workflow')}>Start Workflow</Button>
-{/snippet}
-
-{#snippet longHeading()}
-  {workflowId}
-{/snippet}
-
-{#snippet copyableHeading()}
-  <Copyable
-    content={workflowId}
-    clickAllToCopy
-    container-class="!inline-flex max-w-full align-middle"
-    copyIconTitle={translate('common.copy-icon-title')}
-    copySuccessIconTitle={translate('common.copy-success-icon-title')}
-  />
+{#snippet detailHeading()}
+  frontend.a2dd6
 {/snippet}
 
 {#snippet leading()}
   <BadgeStatus status="Running" TrailIcon={IconHeartbeat} />
 {/snippet}
 
-{#snippet completedStatus()}
-  <BadgeStatus status="Completed" />
-{/snippet}
-
-{#snippet headingActions()}
+{#snippet refresh()}
   <Button
     colorScheme="ghost"
     size="sm"
     LeadingIcon={IconRetry}
     aria-label="Refresh"
     onclick={action('Refresh')}
+  />
+{/snippet}
+
+{#snippet detailHeadingActions()}
+  <Button
+    colorScheme="ghost"
+    size="sm"
+    LeadingIcon={IconTemporal}
+    aria-label="Namespace information"
+    onclick={action('Namespace information')}
   />
 {/snippet}
 
@@ -122,43 +100,60 @@
     LeadingIcon={IconAdd}
     onclick={action('Add tags')}
   >
-    Add tags
+    Add Tags
   </Button>
+{/snippet}
+
+{#snippet detailTags()}
+  <Tag text="environment" colorScheme="success" />
+  <Tag text="team" />
 {/snippet}
 
 {#snippet description()}
-  Processes customer orders for the production payments service.
+  Processes customer orders for the production payments service, including
+  payment authorization, inventory updates, and fulfillment notifications.
 {/snippet}
 
-{#snippet wrappingDescription()}
-  Processes customer orders for the production payments service, including
-  payment authorization, inventory updates, and fulfillment notifications across
-  all supported regions. Each order is validated before payment is collected,
-  and fulfillment starts only after inventory has been reserved. Retries
-  preserve the order history so operators can inspect previous attempts and
-  investigate failures without losing context.
+{#snippet detailDescription()}
+  This is a super cool description of the namespace.
+{/snippet}
+
+{#snippet lastRefreshed()}
+  <time datetime="2026-10-16T14:32:00Z">Oct 16, 2026, 14:32:00 UTC</time>
 {/snippet}
 
 {#snippet actions()}
-  <Button colorScheme="secondary" size="sm" onclick={action('Export')}>
-    Export
-  </Button>
-  <Button size="sm" onclick={action('Start workflow')}>Start workflow</Button>
-{/snippet}
-
-{#snippet workflowActions()}
   <Button
     colorScheme="secondary"
     size="sm"
-    TrailingIcon={IconChevronDown}
-    onclick={action('More actions')}
+    onclick={action('Secondary action')}
   >
-    More actions
+    Secondary
   </Button>
-  <Button size="sm" onclick={action('Reset workflow')}>Reset</Button>
+  <Button size="sm" onclick={action('Primary action')}>Primary</Button>
+{/snippet}
+
+{#snippet listActions()}
+  <Button colorScheme="secondary" size="sm" onclick={action('Connect')}>
+    Connect
+  </Button>
+  <Button size="sm" onclick={action('Start Workflow')}>Start Workflow</Button>
+{/snippet}
+
+{#snippet detailActions()}
+  <Button colorScheme="secondary" size="sm" onclick={action('Settings')}>
+    Settings
+  </Button>
+  <Button size="sm" onclick={action('Connect')}>Connect</Button>
 {/snippet}
 
 {#snippet filters()}
+  {#each statuses as status (status)}
+    <ChipStatus {status} extension={135} onclick={action(`Filter ${status}`)} />
+  {/each}
+{/snippet}
+
+{#snippet listFilters()}
   {#each statuses as status (status)}
     <ChipStatus {status} count={14} onclick={action(`Filter ${status}`)} />
   {/each}
@@ -170,6 +165,39 @@
     Icon={IconAwsColor}
     extension={{ text: 'US-WEST-2' }}
     onclick={action('Region metadata')}
+  />
+{/snippet}
+
+{#snippet detailMetadata()}
+  <Chip
+    text="primary"
+    Icon={IconDot}
+    extension={{ text: 'us-west-2', Icon: IconAwsColor }}
+    onclick={action('Primary region')}
+  />
+  <Chip
+    text="secondary"
+    Icon={IconAwsColor}
+    extension={{ text: 'us-east-1' }}
+    onclick={action('Secondary region')}
+  />
+  <Chip
+    text="on-demand"
+    Icon={IconLightningBolt}
+    extension={{ text: '500 aps' }}
+    onclick={action('Namespace capacity')}
+  />
+  <Chip
+    text="encryption"
+    Icon={IconLock}
+    extension={{ text: 'on' }}
+    onclick={action('Encryption settings')}
+  />
+  <Chip
+    text="Fairness"
+    Icon={IconKey}
+    extension={{ text: 'on' }}
+    onclick={action('Fairness settings')}
   />
 {/snippet}
 
@@ -187,110 +215,64 @@
 {/snippet}
 
 <Story
-  name="Heading controls and tags"
-  args={{ leading, headingActions, tags, description }}
+  name="Kitchen sink"
+  args={{
+    leading,
+    headingActions: refresh,
+    tags,
+    description,
+    actions,
+    filters,
+    metadata,
+  }}
 />
 
 <Story
   name="List page"
   args={{
     heading: listHeading,
-    headingActions,
+    headingActions: refresh,
     description: lastRefreshed,
     actions: listActions,
-    filters,
+    filters: listFilters,
   }}
 />
 
 <Story
-  name="Copyable details heading"
+  name="Detail page"
   args={{
-    heading: copyableHeading,
-    leading: completedStatus,
-    actions: workflowActions,
-  }}
-  parameters={{
-    docs: {
-      description: {
-        story:
-          'Supply an inline Copyable component through the heading snippet. More actions logs a click; it is not a wired dropdown.',
-      },
-    },
+    heading: detailHeading,
+    headingActions: detailHeadingActions,
+    tags: detailTags,
+    description: detailDescription,
+    actions: detailActions,
+    metadata: detailMetadata,
   }}
 />
 
 <Story
-  name="Kitchen sink"
+  name="Stacked vs Unstacked Actions"
   args={{
-    leading,
-    headingActions,
-    tags,
-    description,
-    actions,
-    filters,
-    metadata,
+    heading: listHeading,
+    headingActions: refresh,
+    description: lastRefreshed,
+    actions: listActions,
   }}
-/>
-
-<Story
-  name="Content wraps around actions"
-  args={{
-    heading: longHeading,
-    description: wrappingDescription,
-    actions,
-    filters,
-    metadata,
-  }}
-  parameters={{
-    docs: {
-      description: {
-        story:
-          'At 800px, actions float on the right. Heading and description lines can use the space below the action group rather than staying in a permanently narrow column. Filters and metadata start after the float-containing section.',
-      },
-    },
-  }}
->
-  {#snippet template(args: ComponentProps<typeof PageHeader>)}
-    {@render example(args, 800)}
-  {/snippet}
-</Story>
-
-<Story
-  name="Floated vs stacked"
-  args={{ description: wrappingDescription, actions }}
 >
   {#snippet template(args: ComponentProps<typeof PageHeader>)}
     <div class="flex flex-col gap-6">
       <section>
         <h2 class="mb-2 text-sm font-medium">
-          620px container — floated actions
+          Unstacked actions — wide container
         </h2>
-        {@render example(args, 620)}
+        {@render example(args, 1200)}
       </section>
       <section>
         <h2 class="mb-2 text-sm font-medium">
-          580px container — stacked actions
+          Stacked actions — narrow container
         </h2>
-        {@render example(args, 580)}
+        {@render example(args, 480)}
       </section>
     </div>
-  {/snippet}
-</Story>
-
-<Story
-  name="Narrow container"
-  args={{
-    heading: longHeading,
-    leading,
-    headingActions,
-    tags,
-    description,
-    actions,
-    filters,
-    metadata,
-  }}
->
-  {#snippet template(args: ComponentProps<typeof PageHeader>)}
-    {@render example(args, 360)}
   {/snippet}
 </Story>
