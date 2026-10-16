@@ -44,6 +44,29 @@ describe('FairnessKey', () => {
     expect(dialog?.querySelector('a')).toBeNull();
   });
 
+  it('keeps the explanation open after a touch-like pointer exit and click', () => {
+    client.setNamespaceFairness({ enabled: false });
+    const target = client.render();
+    const trigger = target.querySelector<HTMLButtonElement>(
+      'button[aria-haspopup="dialog"]',
+    );
+
+    trigger?.dispatchEvent(new MouseEvent('pointerover', { bubbles: true }));
+    client.flush();
+    expect(target.querySelector('[role="dialog"]')).not.toBeNull();
+
+    trigger?.dispatchEvent(
+      new MouseEvent('pointerout', { bubbles: true, relatedTarget: null }),
+    );
+    client.flush();
+    expect(target.querySelector('[role="dialog"]')).toBeNull();
+
+    trigger?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    client.flush();
+    expect(document.activeElement).toBe(trigger);
+    expect(target.querySelector('[role="dialog"]')).not.toBeNull();
+  });
+
   it('keeps the popover open while the pointer moves to the CTA', () => {
     client.setNamespaceFairness({
       enabled: false,

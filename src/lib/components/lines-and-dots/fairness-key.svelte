@@ -63,6 +63,7 @@
       aria-controls={isOpen ? popoverId : undefined}
       aria-expanded={isOpen}
       aria-haspopup="dialog"
+      onclick={(event) => event.currentTarget.focus()}
       class="inline-flex min-w-0 items-center gap-1 rounded-sm text-left font-mono leading-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary"
     >
       <span class="truncate border-b border-dotted border-current"
