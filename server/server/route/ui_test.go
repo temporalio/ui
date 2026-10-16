@@ -10,10 +10,12 @@ import (
 	"testing/fstest"
 
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/temporalio/ui-server/v2/server/config"
+	"github.com/temporalio/ui-server/v2/server/csrf"
 )
 
 var testIndexHTML = `<!DOCTYPE html>
@@ -336,6 +338,119 @@ func TestBuildUIIndexHandler_FailsClosedForInvalidExtensionConfiguration(t *test
 	require.ErrorAs(t, err, &httpErr)
 	assert.Equal(t, http.StatusInternalServerError, httpErr.Code)
 	assert.Empty(t, rec.Header().Get("Content-Security-Policy"))
+}
+
+func TestBuildUIAssetsHandler_CacheControl(t *testing.T) {
+	handler := buildUIAssetsHandler(fstest.MapFS{
+		"_app/immutable/chunk.js":   &fstest.MapFile{Data: []byte("chunk")},
+		"_app/immutable/index.html": &fstest.MapFile{Data: []byte("index")},
+		"_app/styles.css":           &fstest.MapFile{Data: []byte("styles")},
+	})
+
+	tests := []struct {
+		name         string
+		path         string
+		rangeHeader  string
+		status       int
+		cacheControl string
+		location     string
+	}{
+		{
+			name:         "immutable asset is cached",
+			path:         "/_app/immutable/chunk.js",
+			status:       http.StatusOK,
+			cacheControl: "public, max-age=31536000, immutable",
+		},
+		{
+			name:         "immutable range response is cached",
+			path:         "/_app/immutable/chunk.js",
+			rangeHeader:  "bytes=0-1",
+			status:       http.StatusPartialContent,
+			cacheControl: "public, max-age=31536000, immutable",
+		},
+		{
+			name:   "non immutable asset is unchanged",
+			path:   "/_app/styles.css",
+			status: http.StatusOK,
+		},
+		{
+			name:     "immutable redirect is unchanged",
+			path:     "/_app/immutable/index.html",
+			status:   http.StatusMovedPermanently,
+			location: "./",
+		},
+		{
+			name:   "missing immutable asset is unchanged",
+			path:   "/_app/immutable/missing.js",
+			status: http.StatusNotFound,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			e := echo.New()
+			req := httptest.NewRequest(http.MethodGet, tt.path, nil)
+			if tt.rangeHeader != "" {
+				req.Header.Set("Range", tt.rangeHeader)
+			}
+			rec := httptest.NewRecorder()
+
+			err := handler(e.NewContext(req, rec))
+			require.NoError(t, err)
+			assert.Equal(t, tt.status, rec.Code)
+			assert.Equal(t, tt.cacheControl, rec.Header().Get("Cache-Control"))
+			assert.Equal(t, tt.location, rec.Header().Get("Location"))
+		})
+	}
+}
+
+func TestBuildUIAssetsHandler_CacheControlWithCSRFMiddleware(t *testing.T) {
+	assets := fstest.MapFS{
+		"_app":                    &fstest.MapFile{Mode: os.ModeDir},
+		"_app/immutable":          &fstest.MapFile{Mode: os.ModeDir},
+		"_app/immutable/chunk.js": &fstest.MapFile{Data: []byte("chunk")},
+	}
+	provider := &routeTestConfigProvider{cfg: &config.Config{}}
+	e := echo.New()
+	e.Use(middleware.Gzip())
+	e.Use(csrf.EnsureTokenCookie(false))
+	e.Use(middleware.CSRFWithConfig(csrf.MiddlewareConfig(provider, false)))
+	e.GET("/_app/*", buildUIAssetsHandler(assets))
+
+	tests := []struct {
+		name         string
+		path         string
+		cacheControl string
+		setCookie    bool
+	}{
+		{
+			name:         "immutable file is cacheable without a csrf cookie",
+			path:         "/_app/immutable/chunk.js",
+			cacheControl: "public, max-age=31536000, immutable",
+		},
+		{
+			name:      "immutable directory is not cacheable",
+			path:      "/_app/immutable/",
+			setCookie: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req := httptest.NewRequest(http.MethodGet, tt.path, nil)
+			req.Header.Set("Accept-Encoding", "gzip")
+			rec := httptest.NewRecorder()
+			e.ServeHTTP(rec, req)
+
+			assert.Equal(t, http.StatusOK, rec.Code)
+			assert.Equal(t, tt.cacheControl, rec.Header().Get("Cache-Control"))
+			assert.Equal(t, tt.setCookie, len(rec.Result().Cookies()) > 0)
+			if tt.cacheControl != "" {
+				assert.Contains(t, rec.Header().Values("Vary"), "Accept-Encoding")
+				assert.NotContains(t, strings.Join(rec.Header().Values("Vary"), ","), "Cookie")
+			}
+		})
+	}
 }
 
 func renderRequest(t *testing.T, query string) string {
