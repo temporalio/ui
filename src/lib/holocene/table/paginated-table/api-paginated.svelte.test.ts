@@ -14,6 +14,7 @@ describe('API paginated table sorting', () => {
     removeCountSort: () => void;
     rebuildSortColumns: (countType?: TableSortType) => void;
     refresh: () => void;
+    search: (query: string) => void;
   };
   const onItemsChange = vi.fn();
   const fetchPage = vi.fn(async (_size: number, token: string) => ({
@@ -237,6 +238,28 @@ describe('API paginated table sorting', () => {
     },
   );
 
+  it('clears a bound sort when the search changes', async () => {
+    clickSort('Count');
+    expect(sortBanner()).not.toBeNull();
+
+    component.search('WorkflowType = "other"');
+    flushSync();
+
+    await vi.waitFor(() =>
+      expect(rowNames()).toEqual(['Charlie', 'Alpha', 'Bravo']),
+    );
+    expect(header('Count').hasAttribute('aria-sort')).toBe(false);
+    expect(sortBanner()).toBeNull();
+
+    clickSort('Count');
+    component.refresh();
+    flushSync();
+    await vi.waitFor(() =>
+      expect(rowNames()).toEqual(['Alpha', 'Charlie', 'Bravo']),
+    );
+    expect(header('Count').getAttribute('aria-sort')).toBe('ascending');
+  });
+
   it('clears sorting when the parent is remounted, as on a browser reload', async () => {
     clickSort('Count');
     expect(rowNames()).toEqual(['Alpha', 'Charlie', 'Bravo']);
@@ -312,6 +335,12 @@ describe('API paginated table sorting', () => {
     flushSync();
     expect(rowNames()).toEqual(['Charlie', 'Alpha', 'Bravo']);
     expect(header('Count').querySelector('button')).toBeNull();
+    expect(header('Count').hasAttribute('aria-sort')).toBe(false);
+    expect(sortBanner()).toBeNull();
+
+    component.rebuildSortColumns();
+    flushSync();
+    expect(rowNames()).toEqual(['Charlie', 'Alpha', 'Bravo']);
     expect(header('Count').hasAttribute('aria-sort')).toBe(false);
     expect(sortBanner()).toBeNull();
   });

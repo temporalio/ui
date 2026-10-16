@@ -67,11 +67,10 @@
   const query = $derived(page.url.searchParams.get('query') ?? '');
 
   // Keep sorting across table refreshes, but reset it for a different search.
-  let sort = $state<TableSort>();
-  $effect(() => {
+  let sort = $derived.by((): TableSort | undefined => {
     void namespace;
     void query;
-    sort = undefined;
+    return undefined;
   });
 
   const hasVersioningFilter = $derived(

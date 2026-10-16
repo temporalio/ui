@@ -134,6 +134,10 @@
     store.setActiveIndex(0);
   }
 
+  $effect(() => {
+    if (sort && !sortColumn) untrack(clearSort);
+  });
+
   setContext<TableSortContext>(TABLE_SORT_CONTEXT, {
     isSortable: (column) =>
       Object.prototype.hasOwnProperty.call(sortColumns, column) &&

@@ -41,11 +41,10 @@
   );
   const query = $derived(page.url.searchParams.get('query') ?? '');
 
-  let sort = $state<TableSort>();
-  $effect(() => {
+  let sort = $derived.by((): TableSort | undefined => {
     void namespace;
     void query;
-    sort = undefined;
+    return undefined;
   });
 
   const onFetch = $derived(() =>

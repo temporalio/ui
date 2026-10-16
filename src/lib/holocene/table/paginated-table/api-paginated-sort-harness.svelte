@@ -59,7 +59,11 @@
     total?: number;
   } = $props();
   let visibleItems = $state<SortableItem[]>([]);
-  let sort = $state<TableSort>();
+  let query = $state('');
+  let sort = $derived.by((): TableSort | undefined => {
+    void query;
+    return undefined;
+  });
   let refreshKey = $state(0);
   let width = $state<number>();
   const buildSortColumns = (
@@ -84,6 +88,11 @@
   }
 
   export function refresh() {
+    refreshKey += 1;
+  }
+
+  export function search(value: string) {
+    query = value;
     refreshKey += 1;
   }
 </script>

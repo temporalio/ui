@@ -41,10 +41,9 @@
   let error = $state('');
 
   const namespace = $derived(page.params.namespace);
-  let sort = $state<TableSort>();
-  $effect(() => {
+  let sort = $derived.by((): TableSort | undefined => {
     void namespace;
-    sort = undefined;
+    return undefined;
   });
 
   const createHref = $derived(routeForWorkerDeploymentCreate({ namespace }));
