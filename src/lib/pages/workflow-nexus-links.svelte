@@ -2,9 +2,9 @@
   import { page } from '$app/state';
 
   import Link from '$lib/holocene/link.svelte';
+  import PaginatedTable from '$lib/holocene/table/paginated-table/paginated.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
-  import Table from '$lib/holocene/table/table.svelte';
   import { translate } from '$lib/i18n/translate';
   import { groupEvents } from '$lib/models/event-groups';
   import {
@@ -67,10 +67,22 @@
     </p>
   {/if}
   {#if inboundLinkEvents?.length}
-    <h3>Inbound</h3>
-    <Table class="mb-6 w-full min-w-[600px]" fixed>
+    <h3>{translate('nexus.inbound-links')}</h3>
+    <PaginatedTable
+      id="inbound-nexus-links"
+      class="mb-6 w-full min-w-[600px]"
+      fixed
+      aria-label={translate('nexus.inbound-links')}
+      perPageLabel={translate('common.per-page')}
+      nextPageButtonLabel={translate('common.next-page')}
+      previousPageButtonLabel={translate('common.previous-page')}
+      pageButtonLabel={(p) => translate('common.go-to-page', { page: p })}
+      pageParameter="inbound-page"
+      perPageParameter="inbound-per-page"
+      items={inboundLinkEvents}
+    >
       {#snippet caption()}
-        <caption class="sr-only">{translate('workflows.workers-tab')}</caption>
+        <caption class="sr-only">{translate('nexus.inbound-links')}</caption>
       {/snippet}
       {#snippet headers()}
         <TableHeaderRow>
@@ -80,44 +92,58 @@
           <th>{translate('nexus.handler-event')}</th>
         </TableHeaderRow>
       {/snippet}
-      {#each inboundLinkEvents as event (event?.id)}
-        {@const link = event ? getInboundLinkForEvent(event) : undefined}
-        {@const linkView = toEventLinkView(link || undefined, { namespace })}
-        <TableRow data-testid="worker-row">
-          <td class="break-all text-left" data-testid="caller-event">
-            {#if linkView.event}
-              {@render linkDisplay(linkView.event)}
-            {/if}
-          </td>
-          <td class="break-all text-left" data-testid="link-event">
-            {@render linkDisplay(linkView)}
-          </td>
-          <td class="break-all text-left" data-testid="link-namespace">
-            {#if linkView.namespace}
-              {@render linkDisplay(linkView.namespace)}
-            {/if}
-          </td>
-          <td class="break-all text-left" data-testid="handler-event">
-            <Link
-              href={routeForEventHistoryEvent({
-                namespace: namespace,
-                workflow: workflowId,
-                run,
-                eventId: event?.id,
-              })}
-              >{event?.name}
-              ({event?.id})
-            </Link>
-          </td>
-        </TableRow>
-      {/each}
-    </Table>
+      {#snippet rows({ visibleItems })}
+        {#each visibleItems as event (event?.id)}
+          {@const link = event ? getInboundLinkForEvent(event) : undefined}
+          {@const linkView = toEventLinkView(link || undefined, { namespace })}
+          <TableRow data-testid="worker-row">
+            <td class="break-all text-left" data-testid="caller-event">
+              {#if linkView.event}
+                {@render linkDisplay(linkView.event)}
+              {/if}
+            </td>
+            <td class="break-all text-left" data-testid="link-event">
+              {@render linkDisplay(linkView)}
+            </td>
+            <td class="break-all text-left" data-testid="link-namespace">
+              {#if linkView.namespace}
+                {@render linkDisplay(linkView.namespace)}
+              {/if}
+            </td>
+            <td class="break-all text-left" data-testid="handler-event">
+              <Link
+                href={routeForEventHistoryEvent({
+                  namespace: namespace,
+                  workflow: workflowId,
+                  run,
+                  eventId: event?.id,
+                })}
+                >{event?.name}
+                ({event?.id})
+              </Link>
+            </td>
+          </TableRow>
+        {/each}
+      {/snippet}
+    </PaginatedTable>
   {/if}
   {#if nexusGroups.length}
-    <h3>Outbound</h3>
-    <Table class="mb-6 w-full min-w-[600px]" fixed>
+    <h3>{translate('nexus.outbound-links')}</h3>
+    <PaginatedTable
+      id="outbound-nexus-links"
+      class="mb-6 w-full min-w-[600px]"
+      fixed
+      aria-label={translate('nexus.outbound-links')}
+      perPageLabel={translate('common.per-page')}
+      nextPageButtonLabel={translate('common.next-page')}
+      previousPageButtonLabel={translate('common.previous-page')}
+      pageButtonLabel={(p) => translate('common.go-to-page', { page: p })}
+      pageParameter="outbound-page"
+      perPageParameter="outbound-per-page"
+      items={nexusGroups}
+    >
       {#snippet caption()}
-        <caption class="sr-only">{translate('workflows.workers-tab')}</caption>
+        <caption class="sr-only">{translate('nexus.outbound-links')}</caption>
       {/snippet}
       {#snippet headers()}
         <TableHeaderRow>
@@ -130,56 +156,59 @@
           <th>{translate('nexus.handler-event')}</th>
         </TableHeaderRow>
       {/snippet}
-      {#each nexusGroups as group (group.id)}
-        {@const link = group.links?.[0]}
-        {@const linkView = toEventLinkView(link, { namespace })}
-        {@const targetTypeLabel = eventLinkTargetTypeLabel(linkView.variant)}
-        {@const scheduledEvent = group.eventList.find((e) =>
-          isNexusOperationScheduledEvent(e),
-        )}
-        <TableRow data-testid="worker-row">
-          <td class="break-all text-left" data-testid="link-event">
-            <Link
-              href={routeForEventHistoryEvent({
-                namespace,
-                workflow: workflowId,
-                run,
-                eventId: scheduledEvent?.id,
-              })}>{scheduledEvent?.id}</Link
-            >
-          </td>
-          <td class="break-all text-left" data-testid="link-endpoint">
-            {scheduledEvent?.nexusOperationScheduledEventAttributes?.endpoint}
-          </td>
-          <td class="break-all text-left" data-testid="link-service">
-            {scheduledEvent?.nexusOperationScheduledEventAttributes?.service}
-          </td>
-          <td class="break-all text-left" data-testid="link-operation">
-            {scheduledEvent?.nexusOperationScheduledEventAttributes?.operation}
-          </td>
-          <td class="break-all text-left" data-testid="link-namespace">
-            {#if linkView.namespace}
-              {@render linkDisplay(linkView.namespace)}
-            {/if}
-          </td>
-          <td class="break-all text-left" data-testid="link-href">
-            {@render linkDisplay(linkView)}
-            {#if targetTypeLabel}
-              <p
-                class="text-xs text-secondary opacity-80"
-                data-testid="link-target-type"
+      {#snippet rows({ visibleItems })}
+        {#each visibleItems as group (group.id)}
+          {@const link = group.links?.[0]}
+          {@const linkView = toEventLinkView(link, { namespace })}
+          {@const targetTypeLabel = eventLinkTargetTypeLabel(linkView.variant)}
+          {@const scheduledEvent = group.eventList.find((e) =>
+            isNexusOperationScheduledEvent(e),
+          )}
+          <TableRow data-testid="worker-row">
+            <td class="break-all text-left" data-testid="link-event">
+              <Link
+                href={routeForEventHistoryEvent({
+                  namespace,
+                  workflow: workflowId,
+                  run,
+                  eventId: scheduledEvent?.id,
+                })}>{scheduledEvent?.id}</Link
               >
-                {targetTypeLabel}
-              </p>
-            {/if}
-          </td>
-          <td class="break-all text-left" data-testid="link-href">
-            {#if linkView.event}
-              {@render linkDisplay(linkView.event)}
-            {/if}
-          </td>
-        </TableRow>
-      {/each}
-    </Table>
+            </td>
+            <td class="break-all text-left" data-testid="link-endpoint">
+              {scheduledEvent?.nexusOperationScheduledEventAttributes?.endpoint}
+            </td>
+            <td class="break-all text-left" data-testid="link-service">
+              {scheduledEvent?.nexusOperationScheduledEventAttributes?.service}
+            </td>
+            <td class="break-all text-left" data-testid="link-operation">
+              {scheduledEvent?.nexusOperationScheduledEventAttributes
+                ?.operation}
+            </td>
+            <td class="break-all text-left" data-testid="link-namespace">
+              {#if linkView.namespace}
+                {@render linkDisplay(linkView.namespace)}
+              {/if}
+            </td>
+            <td class="break-all text-left" data-testid="link-href">
+              {@render linkDisplay(linkView)}
+              {#if targetTypeLabel}
+                <p
+                  class="text-xs text-secondary opacity-80"
+                  data-testid="link-target-type"
+                >
+                  {targetTypeLabel}
+                </p>
+              {/if}
+            </td>
+            <td class="break-all text-left" data-testid="link-href">
+              {#if linkView.event}
+                {@render linkDisplay(linkView.event)}
+              {/if}
+            </td>
+          </TableRow>
+        {/each}
+      {/snippet}
+    </PaginatedTable>
   {/if}
 </section>
