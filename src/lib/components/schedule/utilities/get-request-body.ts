@@ -2,6 +2,7 @@ import { parseDuration } from '$lib/holocene/duration-input/duration-input.svelt
 import type { Payload } from '$lib/types';
 import {
   encodePayloads,
+  isBase64EncodedPayload,
   setSearchAttributes,
 } from '$lib/utilities/encode-payload';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
@@ -51,6 +52,9 @@ async function encodeHeaderFields(
 
   const encodedEntries = await Promise.all(
     Object.entries(fields).map(async ([key, value]) => {
+      if (isBase64EncodedPayload(value)) {
+        return [key, value] as const;
+      }
       const encodedValue = await encodePayloads({
         input: stringifyWithBigInt(value),
         encoding: 'json/plain',

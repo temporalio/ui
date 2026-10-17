@@ -1,4 +1,9 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+
+import {
+  codecEndpoint,
+  overrideRemoteCodecConfiguration,
+} from '$lib/stores/data-encoder-config';
 
 import { getRequestBody } from './get-request-body';
 import { DEFAULT_CATCHUP_WINDOW, DEFAULT_TASK_TIMEOUT } from '../constants';
@@ -22,6 +27,12 @@ const buildForm = (
   });
 
 describe('getRequestBody', () => {
+  afterEach(() => {
+    codecEndpoint.set(null);
+    overrideRemoteCodecConfiguration.set(false);
+    vi.unstubAllGlobals();
+  });
+
   it('maps core action fields', async () => {
     const body = await getRequestBody(buildForm());
 
@@ -226,6 +237,37 @@ describe('getRequestBody', () => {
         { dayOfWeek: [{ start: 6 }] },
       ]);
       expect(body.schedule.spec!.timezoneData).toBe('dGVzdA==');
+    });
+
+    it('does not send existing header payloads through the codec server', async () => {
+      const header = {
+        fields: {
+          trace: {
+            metadata: { encoding: 'anNvbi9wbGFpbg==' },
+            data: 'eyJ0cmFjZUlkIjoiMTIzIn0=',
+          },
+        },
+      };
+      const fetch = vi.fn(async () =>
+        Response.json({
+          payloads: [
+            {
+              metadata: { encoding: 'YmluYXJ5L2VuY3J5cHRlZA==' },
+              data: 'ZW5jcnlwdGVk',
+            },
+          ],
+        }),
+      );
+      vi.stubGlobal('fetch', fetch);
+      codecEndpoint.set('http://localhost:8888');
+      overrideRemoteCodecConfiguration.set(true);
+
+      const body = await getRequestBody(buildForm(), {
+        schedule: { action: { startWorkflow: { header } } },
+      } as unknown as DescribeFullSchedule);
+
+      expect(fetch).not.toHaveBeenCalled();
+      expect(body.schedule.action!.startWorkflow.header).toEqual(header);
     });
 
     it('keeps the exact start time when its calendar date is unchanged', async () => {
