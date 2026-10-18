@@ -1,43 +1,38 @@
 <script lang="ts">
-  import Alert from '$lib/holocene/alert.svelte';
+  import TaskQueueAvailability from '$lib/components/workers/task-queue-availability.svelte';
   import { getPollers } from '$lib/services/pollers-service';
-  import type { Endpoint } from '$lib/types';
-  import { pluralize } from '$lib/utilities/pluralize';
+  import type { Endpoint, TaskQueueResponse } from '$lib/types';
 
   let { endpoint }: { endpoint: Endpoint } = $props();
-  let pollerCount: number | undefined = $state(undefined);
 
-  const checkTaskQueue = async (endpoint: Endpoint) => {
-    const targetNamespace = endpoint?.spec?.target?.worker?.namespace;
-    const targetTaskQueue = endpoint?.spec?.target?.worker?.taskQueue;
-    if (targetNamespace && targetTaskQueue) {
-      try {
-        const { pollers } = await getPollers({
-          namespace: targetNamespace,
-          queue: targetTaskQueue,
-        });
-        pollerCount = pollers?.length ?? 0;
-      } catch {
-        pollerCount = undefined;
-      }
-    }
-  };
+  const targetNamespace = $derived(endpoint?.spec?.target?.worker?.namespace);
+  const targetTaskQueue = $derived(endpoint?.spec?.target?.worker?.taskQueue);
+
+  let workers = $state<TaskQueueResponse>();
 
   $effect(() => {
-    checkTaskQueue(endpoint);
+    const namespace = targetNamespace;
+    const queue = targetTaskQueue;
+    workers = undefined;
+    if (!namespace || !queue) return;
+
+    const controller = new AbortController();
+    getPollers({ namespace, queue }, fetch, controller.signal)
+      .then((response) => {
+        if (!controller.signal.aborted) workers = response;
+      })
+      .catch(() => {
+        // requestFromAPI has already shown an error toast.
+      });
+
+    return () => controller.abort();
   });
 </script>
 
-{#if pollerCount !== undefined}
-  <Alert
-    intent={pollerCount > 0 ? 'success' : 'warning'}
-    title={pollerCount ? 'Task Queue is Active' : 'Task Queue is Inactive'}
-  >
-    <div class="flex w-full items-center justify-between">
-      <p>
-        {pollerCount}
-        {pluralize('Worker', pollerCount)}
-      </p>
-    </div></Alert
-  >
+{#if targetNamespace && targetTaskQueue && workers}
+  <TaskQueueAvailability
+    namespace={targetNamespace}
+    taskQueue={targetTaskQueue}
+    {workers}
+  />
 {/if}

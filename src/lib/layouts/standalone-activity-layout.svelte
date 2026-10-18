@@ -6,7 +6,7 @@
   import ActivityDetailsLoading from '$lib/components/standalone-activities/activity-details-loading.svelte';
   import ActivityHeaderLoading from '$lib/components/standalone-activities/activity-header-loading.svelte';
   import ActivityExecutionHeader from '$lib/components/standalone-activities/activity-header.svelte';
-  import NoWorkersPollingAlert from '$lib/components/workers/no-workers-polling-alert.svelte';
+  import WorkerAvailabilityAlert from '$lib/components/workers/worker-availability-alert.svelte';
   import ErrorComponent from '$lib/holocene/error.svelte';
   import Link from '$lib/holocene/link.svelte';
   import TabList from '$lib/holocene/tab/tab-list.svelte';
@@ -196,12 +196,12 @@
   {#if $activityExecution}
     {#if getPollersRequest}
       {#await getPollersRequest then response}
-        <NoWorkersPollingAlert
+        <WorkerAvailabilityAlert
           {namespace}
           taskQueue={$activityExecution.info.taskQueue ?? ''}
-          runningWithNoWorkers={!response.pollers?.length &&
-            $activityExecution.info.status ===
-              'ACTIVITY_EXECUTION_STATUS_RUNNING'}
+          waiting={$activityExecution.info.status ===
+            'ACTIVITY_EXECUTION_STATUS_RUNNING'}
+          workers={response}
           deployment={getWorkerDeploymentName(response, null)}
         />
       {/await}

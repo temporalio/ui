@@ -1,3 +1,5 @@
+import type { WorkerAvailability } from '$lib/utilities/worker-availability';
+
 import { ApiObservationError } from './observation';
 import { declaredExecutionId } from '../browser/start-example';
 import type {
@@ -13,6 +15,7 @@ import type {
   ReadinessCheck,
   StartCommand,
   WorkbenchHost,
+  WorkerReadinessCheck,
 } from '../browser/workbench-host';
 
 type LaunchRequestBase = {
@@ -64,7 +67,7 @@ export type WorkbenchHostDependencies = {
       taskQueueType: 1 | 2 | 3;
     },
     signal?: AbortSignal,
-  ) => Promise<boolean>;
+  ) => Promise<WorkerAvailability>;
   checkNexusEndpoint: (
     request: { namespace: string; endpoint: string },
     signal?: AbortSignal,
@@ -81,6 +84,29 @@ const targetFor = (execution: BrowserCatalogExecution): LaunchTarget => ({
 });
 
 const configuredExecutionId = declaredExecutionId;
+
+// A scaled-to-zero serverless deployment is ready: running the example is
+// what starts its Worker.
+const workerReadiness = (
+  availability: WorkerAvailability,
+  taskQueueType: 1 | 2 | 3,
+): WorkerReadinessCheck => {
+  const check = { kind: 'worker', required: false, taskQueueType } as const;
+  switch (availability.state) {
+    case 'polling':
+      return { ...check, state: 'ready' };
+    case 'serverless-idle':
+      return {
+        ...check,
+        state: 'ready',
+        serverlessDeployment: availability.deployment,
+      };
+    case 'no-workers':
+      return { ...check, state: 'unavailable' };
+    default:
+      return { ...check, state: 'indeterminate' };
+  }
+};
 
 const launchRequestFor = (
   descriptor: BrowserCatalogDescriptor,
@@ -231,26 +257,30 @@ export const assembleWorkbenchHost = ({
           : descriptor.execution.kind === 'standalone-activity'
             ? 2
             : 3;
-      let state: ReadinessCheck['state'];
+      let workerCheck: WorkerReadinessCheck;
 
       try {
-        state = (await checkWorker(
-          {
-            namespace: descriptor.execution.namespace,
-            taskQueue: descriptor.execution.taskQueue,
-            taskQueueType,
-          },
-          signal,
-        ))
-          ? 'ready'
-          : 'unavailable';
+        workerCheck = workerReadiness(
+          await checkWorker(
+            {
+              namespace: descriptor.execution.namespace,
+              taskQueue: descriptor.execution.taskQueue,
+              taskQueueType,
+            },
+            signal,
+          ),
+          taskQueueType,
+        );
       } catch {
-        state = 'indeterminate';
+        workerCheck = {
+          kind: 'worker',
+          required: false,
+          state: 'indeterminate',
+          taskQueueType,
+        };
       }
 
-      const checks: ReadinessCheck[] = [
-        { kind: 'worker', required: false, state, taskQueueType },
-      ];
+      const checks: ReadinessCheck[] = [workerCheck];
 
       const declaredEndpoints =
         descriptor.execution.kind === 'standalone-nexus-operation'
