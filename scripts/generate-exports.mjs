@@ -18,7 +18,7 @@ const allFiles = new Set(
   [...walk(distPath)].map((f) => relative(distPath, f).replace(/\\/g, '/')),
 );
 
-const isTestOrSpec = (rel) => /\.(test|spec)\./.test(rel);
+const isTestOrSpec = (rel) => /\.(test|spec|figma)\./.test(rel);
 
 const exports = {};
 
