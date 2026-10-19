@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { tick } from 'svelte';
   import { superForm } from 'sveltekit-superforms';
   import { zodClient } from 'sveltekit-superforms/adapters';
 
@@ -18,7 +19,10 @@
     serverError,
   } from '$lib/stores/schedules';
   import { customSearchAttributes } from '$lib/stores/search-attributes';
-  import type { DescribeFullSchedule } from '$lib/types/schedule';
+  import type {
+    DescribeFullSchedule,
+    StartWorkflowRequest,
+  } from '$lib/types/schedule';
   import type { SearchAttributes } from '$lib/types/workflows';
   import {
     routeForSchedule,
@@ -27,7 +31,15 @@
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
   import DeleteScheduleModal from '../schedule-action-modals/delete-schedule-modal.svelte';
-  import { type FormScheduleSchema, formScheduleSchema } from '../schema/form';
+  import type {
+    ActionFormMode,
+    ScheduledActionForm,
+    ScheduledActionSummaryItem,
+  } from '../scheduled-action-types/types';
+  import { getWorkflowDetailsDefaults } from '../scheduled-action-types/workflow/defaults';
+  import WorkflowForm from '../scheduled-action-types/workflow/form.svelte';
+  import { formScheduleSchema } from '../schema/form';
+  import type { ScheduleFormData } from '../types';
   import { getFormScheduleDefaults } from '../utilities/get-form-schedule-defaults';
 
   import ScheduleDetailsCard from './schedule-details-card.svelte';
@@ -39,7 +51,7 @@
   interface Props {
     schedule?: DescribeFullSchedule | null;
     searchAttributes?: SearchAttributes;
-    onSubmit: (formData: FormScheduleSchema) => Promise<void>;
+    onSubmit: (formData: ScheduleFormData) => Promise<void>;
   }
 
   let { schedule = null, searchAttributes = {}, onSubmit }: Props = $props();
@@ -71,15 +83,31 @@
     }),
   );
 
+  const workflowMode = $derived.by(
+    (): ActionFormMode<StartWorkflowRequest> | null => {
+      if (!schedule) return { isEditing: false };
+
+      const existingWorkflow = schedule.schedule?.action?.startWorkflow;
+      if (!existingWorkflow) return null;
+
+      return { isEditing: true, existingAction: existingWorkflow };
+    },
+  );
+
+  const initialWorkflowValues = $derived(
+    getWorkflowDetailsDefaults(schedule, $customSearchAttributes),
+  );
+
   // svelte-ignore state_referenced_locally
   const superform = superForm(initialFormValues, {
     SPA: true,
     dataType: 'json',
     validators: zodClient(formScheduleSchema),
     resetForm: false,
-    onUpdate: async ({ form }) => {
-      if (!form.valid) return;
-      await onSubmit(form.data);
+    onSubmit: async ({ cancel }) => {
+      // 'cancel'ing because we handle validation coordination and submission in the handleSubmit function
+      cancel();
+      await handleSubmit();
     },
   });
 
@@ -88,7 +116,6 @@
     errors: formErrors,
     allErrors,
     enhance,
-    submitting,
     validateForm,
   } = superform;
 
@@ -99,14 +126,48 @@
   // whole-array add/remove. Bridge through local $state proxies and sync the
   // snapshots back to `$form` so the changes are committed before submit.
   let scheduleSearchAttributes = $state($form.searchAttributes);
-  let workflowSearchAttributes = $state($form.workflowSearchAttributes);
+  // svelte-ignore state_referenced_locally
+  let actionSearchAttributes = $state(
+    initialWorkflowValues.workflowSearchAttributes,
+  );
+  let actionForm = $state<ScheduledActionForm>();
+  let actionSummary = $state<ScheduledActionSummaryItem[]>([]);
+  let submitting = $state(false);
+  let formElement: HTMLFormElement;
 
   $effect(() => {
     $form.searchAttributes = $state.snapshot(scheduleSearchAttributes);
   });
-  $effect(() => {
-    $form.workflowSearchAttributes = $state.snapshot(workflowSearchAttributes);
-  });
+  const handleSubmit = async () => {
+    if (submitting || !actionForm || !writeActionsAreAllowed()) {
+      return;
+    }
+
+    submitting = true;
+
+    try {
+      const [validatedSchedule, validatedAction] = await Promise.all([
+        validateForm({ update: true, focusOnError: false }),
+        actionForm.validate(),
+      ]);
+      if (!validatedSchedule.valid || !validatedAction) {
+        await tick();
+        const invalidField = formElement.querySelector<HTMLElement>(
+          '[aria-invalid="true"]',
+        );
+        invalidField?.focus();
+        invalidField?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        return;
+      }
+
+      await onSubmit({
+        schedule: validatedSchedule.data,
+        action: validatedAction,
+      });
+    } finally {
+      submitting = false;
+    }
+  };
 
   const onInput = () => {
     if ($serverError) {
@@ -124,13 +185,14 @@
 <div class="flex flex-col gap-4 pb-10">
   {#if $loading}
     <Loading />
-  {:else}
+  {/if}
+  <div class="flex flex-col gap-4" class:hidden={$loading}>
     <Link href={backHref} LeadingIcon={IconChevronLeft}>
       {backTitle}
     </Link>
     <h1>{title}</h1>
 
-    <form novalidate use:enhance oninput={onInput}>
+    <form novalidate bind:this={formElement} use:enhance oninput={onInput}>
       <div
         class="relative grid grid-cols-1 gap-6 xl:grid-cols-[minmax(min-content,54rem),minmax(19rem,23rem)]"
       >
@@ -142,15 +204,30 @@
             {validateForm}
             {schedule}
           />
+          <SchedulePoliciesCard {form} />
+          {#if workflowMode}
+            <WorkflowForm
+              {...workflowMode}
+              bind:this={actionForm}
+              initialValues={initialWorkflowValues}
+              bind:searchAttributes={actionSearchAttributes}
+              onSummaryChange={(summary) => (actionSummary = summary)}
+            />
+          {:else}
+            <Alert
+              intent="error"
+              title={translate('schedules.unsupported-action-edit')}
+            />
+          {/if}
           <SchedulesSearchAttributesCard
             bind:scheduleSearchAttributes
-            bind:workflowSearchAttributes
+            bind:actionSearchAttributes
+            actionType={workflowMode ? 'workflow' : null}
           />
-          <SchedulePoliciesCard {form} />
         </div>
 
         <div class="w-full xl:col-start-2 xl:row-start-1">
-          <ScheduleSummarySidebar {form} />
+          <ScheduleSummarySidebar {form} {actionSummary} />
         </div>
 
         <Alert
@@ -171,7 +248,7 @@
           class="flex flex-row items-center gap-4 max-sm:flex-col xl:col-start-1"
         >
           <Button
-            disabled={$submitting || !writeActionsAreAllowed()}
+            disabled={!workflowMode || submitting || !writeActionsAreAllowed()}
             type="submit"
             class="max-sm:w-full"
             data-testid="create-schedule-button">{confirmText}</Button
@@ -186,7 +263,7 @@
           >
           {#if Boolean(schedule)}
             <Button
-              disabled={$submitting || !writeActionsAreAllowed()}
+              disabled={submitting || !writeActionsAreAllowed()}
               variant="destructive"
               type="button"
               data-testid="delete-schedule-button"
@@ -204,5 +281,5 @@
 
     <Alert intent="error" title={$serverError} hidden={!$serverError} />
     <CodecServerErrorBanner />
-  {/if}
+  </div>
 </div>

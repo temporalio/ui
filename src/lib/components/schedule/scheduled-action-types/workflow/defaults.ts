@@ -2,7 +2,7 @@ import { parseDuration } from '$lib/holocene/duration-input/duration-input.svelt
 import type { DescribeFullSchedule } from '$lib/types/schedule';
 import type { SearchAttributes } from '$lib/types/workflows';
 
-import type { FormWorkflowConfiguration } from './schema';
+import type { FormWorkflowDetails } from './schema';
 import { DEFAULT_TASK_TIMEOUT } from '../../constants';
 import {
   decodeSearchAttributeRows,
@@ -15,10 +15,10 @@ function toOptionalDurationString(value: unknown) {
   return duration && Number(parseDuration(duration)) > 0 ? duration : '';
 }
 
-export function getWorkflowConfigurationDefaults(
+export function getWorkflowDetailsDefaults(
   describeFullSchedule: DescribeFullSchedule | null,
   customSearchAttributes: SearchAttributes,
-): FormWorkflowConfiguration {
+): FormWorkflowDetails {
   const startWorkflow = describeFullSchedule?.schedule?.action?.startWorkflow;
 
   return {

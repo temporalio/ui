@@ -17,14 +17,16 @@ const optionalDurationString = () =>
     )
     .default('');
 
-export const formWorkflowOptionsSchema = z.object({
+export const formWorkflowPoliciesSchema = z.object({
   taskTimeout: durationStringWithDefault(DEFAULT_TASK_TIMEOUT),
   runTimeout: optionalDurationString(),
   executionTimeout: optionalDurationString(),
   keepOriginalWorkflowId: z.boolean().optional(),
 });
 
-export const formWorkflowConfigurationSchema = z
+export type FormWorkflowPolicies = z.infer<typeof formWorkflowPoliciesSchema>;
+
+export const formWorkflowDetailsSchema = z
   .object({
     workflowType: z.string().trim().min(1, 'Workflow type is required'),
     workflowId: z.string().trim().default(''),
@@ -35,8 +37,6 @@ export const formWorkflowConfigurationSchema = z
     messageType: z.string().trim().optional(),
     workflowSearchAttributes: searchAttributesSchema.default([]),
   })
-  .merge(formWorkflowOptionsSchema);
+  .merge(formWorkflowPoliciesSchema);
 
-export type FormWorkflowConfiguration = z.infer<
-  typeof formWorkflowConfigurationSchema
->;
+export type FormWorkflowDetails = z.infer<typeof formWorkflowDetailsSchema>;

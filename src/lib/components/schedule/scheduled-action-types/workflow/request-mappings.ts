@@ -6,7 +6,7 @@ import type {
 } from '$lib/types/schedule';
 import { encodePayloads } from '$lib/utilities/encode-payload';
 
-import type { FormWorkflowConfiguration } from './schema';
+import type { FormWorkflowDetails } from './schema';
 import { getSearchAttributes } from '../../utilities/get-search-attributes';
 
 // Omit zero/empty workflow timeouts so the server applies its defaults
@@ -20,49 +20,45 @@ function toWorkflowTimeout(value: string | undefined): string | undefined {
 }
 
 export function getWorkflowPoliciesRequest(
-  configuration: FormWorkflowConfiguration,
+  details: FormWorkflowDetails,
 ): Pick<SchedulePoliciesRequest, 'keepOriginalWorkflowId'> {
   return {
-    keepOriginalWorkflowId: configuration.keepOriginalWorkflowId,
+    keepOriginalWorkflowId: details.keepOriginalWorkflowId,
   };
 }
 
 export async function getWorkflowActionRequest(
-  configuration: FormWorkflowConfiguration,
+  details: FormWorkflowDetails,
   existingWorkflow: StartWorkflowRequest | null = null,
 ): Promise<ScheduleActionRequest> {
   const startWorkflow = existingWorkflow ?? {};
 
   const payloads =
-    configuration.editInput && configuration.input
+    details.editInput && details.input
       ? await encodePayloads({
-          input: configuration.input,
-          encoding: configuration.encoding,
-          messageType: configuration.messageType,
+          input: details.input,
+          encoding: details.encoding,
+          messageType: details.messageType,
         })
       : null;
 
   return {
     startWorkflow: {
       ...startWorkflow,
-      workflowId: configuration.workflowId,
+      workflowId: details.workflowId,
       workflowType: {
-        name: configuration.workflowType,
+        name: details.workflowType,
       },
       taskQueue: {
-        name: configuration.taskQueue,
+        name: details.taskQueue,
       },
-      ...(configuration.editInput && {
+      ...(details.editInput && {
         input: payloads ? { payloads } : null,
       }),
-      searchAttributes: getSearchAttributes(
-        configuration.workflowSearchAttributes,
-      ),
-      workflowTaskTimeout: toWorkflowTimeout(configuration.taskTimeout),
-      workflowRunTimeout: toWorkflowTimeout(configuration.runTimeout),
-      workflowExecutionTimeout: toWorkflowTimeout(
-        configuration.executionTimeout,
-      ),
+      searchAttributes: getSearchAttributes(details.workflowSearchAttributes),
+      workflowTaskTimeout: toWorkflowTimeout(details.taskTimeout),
+      workflowRunTimeout: toWorkflowTimeout(details.runTimeout),
+      workflowExecutionTimeout: toWorkflowTimeout(details.executionTimeout),
     },
   } satisfies ScheduleActionRequest;
 }

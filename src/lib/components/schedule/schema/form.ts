@@ -9,10 +9,6 @@ import {
   structuredCalendarSchema,
 } from './common';
 import { DEFAULT_CATCHUP_WINDOW, MIN_CATCHUP_SECONDS } from '../constants';
-import {
-  formWorkflowConfigurationSchema,
-  formWorkflowOptionsSchema,
-} from '../scheduled-action-types/workflow/schema';
 import { isValidCronString } from '../utilities/cron';
 import { getNowCalendarDateStr } from '../utilities/date';
 
@@ -29,23 +25,21 @@ export const overlapPolicy = z
 
 export type OverlapPolicy = z.infer<typeof overlapPolicy>;
 
-export const formSchedulePoliciesSchema = z
-  .object({
-    overlapPolicy,
-    pauseOnFailure: z.boolean().default(false),
-    pauseSchedule: z.boolean().default(false),
-    catchupWindow: durationStringWithDefault(DEFAULT_CATCHUP_WINDOW).refine(
-      (durationStr) => {
-        const seconds = Number(parseDuration(durationStr));
+export const formSchedulePoliciesSchema = z.object({
+  overlapPolicy,
+  pauseOnFailure: z.boolean().default(false),
+  pauseSchedule: z.boolean().default(false),
+  catchupWindow: durationStringWithDefault(DEFAULT_CATCHUP_WINDOW).refine(
+    (durationStr) => {
+      const seconds = Number(parseDuration(durationStr));
 
-        return seconds >= MIN_CATCHUP_SECONDS;
-      },
-      {
-        message: 'Catchup window must be at least 10 seconds.',
-      },
-    ),
-  })
-  .merge(formWorkflowOptionsSchema);
+      return seconds >= MIN_CATCHUP_SECONDS;
+    },
+    {
+      message: `Catchup window must be at least ${MIN_CATCHUP_SECONDS} seconds.`,
+    },
+  ),
+});
 
 export type FormSchedulePoliciesSchema = z.infer<
   typeof formSchedulePoliciesSchema
@@ -169,7 +163,6 @@ export const formScheduleSchema = z
   })
   .merge(formSchedulePoliciesSchema)
   .merge(formScheduleTimingSchema)
-  .merge(formWorkflowConfigurationSchema)
   .superRefine((schedule, ctx) => {
     if (schedule.endKind === 'on' && !schedule.endTime) {
       ctx.addIssue({

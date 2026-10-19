@@ -1,3 +1,4 @@
+import type { ScheduleFormData } from '../types';
 import { isValidCronString } from './cron';
 import {
   calendarDateStrToEndOfDayTimestamp,
@@ -209,21 +210,23 @@ function getScheduleSpecRequest(
 }
 
 export async function getRequestBody(
-  scheduleForm: FormScheduleSchema,
+  formData: ScheduleFormData,
   describeFullSchedule: DescribeFullSchedule | null = null,
 ): Promise<ScheduleRequestBody> {
+  const { schedule: scheduleForm, action } = formData;
+
   return {
     schedule_id: describeFullSchedule?.schedule_id ?? scheduleForm.name,
     searchAttributes: getSearchAttributes(scheduleForm.searchAttributes),
     schedule: {
       spec: getScheduleSpecRequest(scheduleForm, describeFullSchedule),
       action: await getWorkflowActionRequest(
-        scheduleForm,
+        action.details,
         describeFullSchedule?.schedule?.action?.startWorkflow,
       ),
       policies: {
         ...getSchedulePoliciesRequest(scheduleForm),
-        ...getWorkflowPoliciesRequest(scheduleForm),
+        ...getWorkflowPoliciesRequest(action.details),
       },
       state: getScheduleStateRequest(scheduleForm, describeFullSchedule),
     },

@@ -8,15 +8,24 @@
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributesSchema } from '$lib/stores/search-attributes';
 
+  import { scheduledActionTypes } from '../scheduled-action-types/registry';
+  import type { ScheduledActionFormData } from '../scheduled-action-types/types';
+
   interface Props {
     scheduleSearchAttributes: SearchAttributesSchema;
-    workflowSearchAttributes: SearchAttributesSchema;
+    actionSearchAttributes: SearchAttributesSchema;
+    actionType: ScheduledActionFormData['type'] | null;
   }
 
   let {
     scheduleSearchAttributes = $bindable([]),
-    workflowSearchAttributes = $bindable([]),
+    actionSearchAttributes = $bindable([]),
+    actionType,
   }: Props = $props();
+
+  const actionView = $derived(
+    actionType ? scheduledActionTypes[actionType].searchAttributes : null,
+  );
 </script>
 
 <Card class="w-full">
@@ -35,13 +44,15 @@
         panelId="schedule-panel"
         class="px-1"
       />
-      <Tab
-        label={translate('common.workflows')}
-        id="workflows-tab"
-        data-testid="workflows-tab"
-        panelId="workflows-panel"
-        class="px-1"
-      />
+      {#if actionView}
+        <Tab
+          label={actionView.label()}
+          id={actionView.tabId}
+          data-testid={actionView.tabId}
+          panelId={actionView.panelId}
+          class="px-1"
+        />
+      {/if}
     </TabList>
 
     <div class="flex w-full flex-wrap gap-4">
@@ -58,18 +69,18 @@
         />
       </TabPanel>
 
-      <TabPanel
-        id="workflows-panel"
-        tabId="workflows-tab"
-        class="w-full"
-        data-testid="workflows-panel"
-      >
-        <AddSearchAttributes
-          variant="secondary"
-          bind:attributesToAdd={workflowSearchAttributes}
+      {#if actionView}
+        <TabPanel
+          id={actionView.panelId}
+          tabId={actionView.tabId}
           class="w-full"
-        />
-      </TabPanel>
+          data-testid={actionView.panelId}
+        >
+          {#key actionType}
+            <actionView.View bind:attributes={actionSearchAttributes} />
+          {/key}
+        </TabPanel>
+      {/if}
     </div>
   </Tabs>
 </Card>

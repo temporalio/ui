@@ -12,6 +12,7 @@ import {
   getFormScheduleDefaults,
   parseOverlapPolicy,
 } from './get-form-schedule-defaults';
+import { getWorkflowDetailsDefaults } from '../scheduled-action-types/workflow/defaults';
 
 const noAttributes = { searchAttributes: {}, customSearchAttributes: {} };
 
@@ -41,15 +42,16 @@ describe('getFormScheduleDefaults', () => {
 
   describe('without an existing schedule', () => {
     const defaults = getFormScheduleDefaults(null, noAttributes);
+    const workflowDefaults = getWorkflowDetailsDefaults(null, {});
 
     it('uses empty identifiers', () => {
       expect(defaults.name).toBe('');
-      expect(defaults.workflowType).toBe('');
-      expect(defaults.taskQueue).toBe('');
+      expect(workflowDefaults.workflowType).toBe('');
+      expect(workflowDefaults.taskQueue).toBe('');
     });
 
     it('enables input editing for new schedules', () => {
-      expect(defaults.editInput).toBe(true);
+      expect(workflowDefaults.editInput).toBe(true);
     });
 
     it('seeds a single cron spec', () => {
@@ -65,14 +67,14 @@ describe('getFormScheduleDefaults', () => {
       expect(defaults.pauseOnFailure).toBe(false);
       expect(defaults.pauseSchedule).toBe(false);
       expect(defaults.catchupWindow).toBe(DEFAULT_CATCHUP_WINDOW);
-      expect(defaults.taskTimeout).toBe(DEFAULT_TASK_TIMEOUT);
-      expect(defaults.runTimeout).toBe(DEFAULT_RUN_TIMEOUT);
-      expect(defaults.executionTimeout).toBe(DEFAULT_EXECUTION_TIMEOUT);
+      expect(workflowDefaults.taskTimeout).toBe(DEFAULT_TASK_TIMEOUT);
+      expect(workflowDefaults.runTimeout).toBe(DEFAULT_RUN_TIMEOUT);
+      expect(workflowDefaults.executionTimeout).toBe(DEFAULT_EXECUTION_TIMEOUT);
     });
 
     it('starts with no search attributes', () => {
       expect(defaults.searchAttributes).toEqual([]);
-      expect(defaults.workflowSearchAttributes).toEqual([]);
+      expect(workflowDefaults.workflowSearchAttributes).toEqual([]);
     });
   });
 
@@ -111,16 +113,20 @@ describe('getFormScheduleDefaults', () => {
       describeFullSchedule,
       noAttributes,
     );
+    const workflowDefaults = getWorkflowDetailsDefaults(
+      describeFullSchedule,
+      {},
+    );
 
     it('maps the workflow action fields', () => {
       expect(defaults.name).toBe('sched-1');
-      expect(defaults.workflowType).toBe('MyWorkflow');
-      expect(defaults.workflowId).toBe('my-workflow-id');
-      expect(defaults.taskQueue).toBe('my-task-queue');
+      expect(workflowDefaults.workflowType).toBe('MyWorkflow');
+      expect(workflowDefaults.workflowId).toBe('my-workflow-id');
+      expect(workflowDefaults.taskQueue).toBe('my-task-queue');
     });
 
     it('disables input editing for existing schedules', () => {
-      expect(defaults.editInput).toBe(false);
+      expect(workflowDefaults.editInput).toBe(false);
     });
 
     it('reads the spec timezone and start time', () => {
@@ -142,8 +148,8 @@ describe('getFormScheduleDefaults', () => {
       expect(defaults.pauseOnFailure).toBe(true);
       expect(defaults.pauseSchedule).toBe(true);
       expect(defaults.catchupWindow).toBe('600s');
-      expect(defaults.runTimeout).toBe('300s');
-      expect(defaults.executionTimeout).toBe('');
+      expect(workflowDefaults.runTimeout).toBe('300s');
+      expect(workflowDefaults.executionTimeout).toBe('');
     });
 
     it('derives the end condition from limited actions', () => {
@@ -153,7 +159,7 @@ describe('getFormScheduleDefaults', () => {
   });
 
   it('normalizes a stored 0s run/execution timeout to empty', () => {
-    const defaults = getFormScheduleDefaults(
+    const defaults = getWorkflowDetailsDefaults(
       {
         schedule: {
           action: {
@@ -164,7 +170,7 @@ describe('getFormScheduleDefaults', () => {
           },
         },
       } as unknown as DescribeFullSchedule,
-      noAttributes,
+      {},
     );
 
     expect(defaults.runTimeout).toBe('');

@@ -5,6 +5,9 @@ export const Strings = {
   create: 'Create Schedule',
   delete: 'Delete Schedule',
   'fix-form-errors': 'Please fix the following errors:',
+  'fix-workflow-form-errors': 'Please fix the following workflow errors:',
+  'unsupported-action-edit':
+    'This schedule cannot be edited because its action is missing or its action type is not supported.',
   editing: 'Editing Schedule...',
   creating: 'Creating Schedule...',
   'back-to-schedule': 'Back to Schedule',
@@ -160,6 +163,10 @@ export const Strings = {
   'run-time-heading': 'Run time',
   'run-time-description':
     'Specify the time ({{- timezoneName }}) for this schedule to run. The schedule will run at 00:00 {{- timezoneName }} if left blank.',
+  'execution-details-heading': 'Execution Details',
+  'workflow-policies-heading': 'Workflow Policies',
+  'workflow-policies-title': 'Edit Workflow Policies',
+  'workflow-policies-drawer-close': 'Cancel workflow policy edits',
   'policies-title': 'Edit Schedule Policies',
   'policies-drawer-close': 'Cancel policy edits',
   'overlap-policy-description':
@@ -189,7 +196,7 @@ export const Strings = {
   'update-policies': 'Update Policies',
   'policies-heading': 'Schedule Policies',
   'policies-description':
-    'Schedule policies allow you to customize Schedule and Workflow behavior.',
+    'Schedule policies allow you to customize Schedule behavior.',
   'policies-learn-more': 'Read more about Schedule policies',
   'pause-on-start': 'Pause on start',
   'do-not-pause-on-start': 'Do not pause on start',

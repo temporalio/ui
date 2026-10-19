@@ -8,7 +8,6 @@ import { decodeSearchAttributeRows, toDurationString } from './form-defaults';
 import { getFormSpecsFromDescribeFullSchedule } from './get-form-spec';
 import { getFormSpecInitialData } from './get-form-spec-initial-data';
 import { DEFAULT_CATCHUP_WINDOW } from '../constants';
-import { getWorkflowConfigurationDefaults } from '../scheduled-action-types/workflow/defaults';
 import {
   type FormScheduleSchema,
   type OverlapPolicy,
@@ -91,10 +90,6 @@ export function getFormScheduleDefaults(
 
   return {
     name: describeFullSchedule?.schedule_id ?? '',
-    ...getWorkflowConfigurationDefaults(
-      describeFullSchedule,
-      customSearchAttributes,
-    ),
 
     specs: getSpecs(describeFullSchedule),
     timezoneName: spec?.timezoneName || 'UTC',
