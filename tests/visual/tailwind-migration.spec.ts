@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { mockNow } from './fixed-now';
+import { mockNow, waitForImages } from './fixed-now';
 import { mockWorkflowApis } from '../test-utilities/mock-apis';
 import { mockDate } from '../test-utilities/mock-date';
 import { mockWorkflow } from '../test-utilities/mocks/workflow';
@@ -28,6 +28,7 @@ test('workflow history in light mode', async ({ page, isMobile }) => {
   const eventSummaryTable = page.getByTestId('event-summary-table');
   await expect(eventSummaryTable).toBeVisible();
   await expect(page.locator('body')).toHaveAttribute('data-theme', 'light');
+  await waitForImages(page);
   await expect(page).toHaveScreenshot(
     'workflow-history-light.png',
     screenshotOptions,
@@ -51,6 +52,7 @@ test('workflow history in dark mode', async ({ page, isMobile }) => {
   const eventSummaryTable = page.getByTestId('event-summary-table');
   await expect(eventSummaryTable).toBeVisible();
   await expect(page.locator('body')).toHaveAttribute('data-theme', 'dark');
+  await waitForImages(page);
   await expect(page).toHaveScreenshot(
     'workflow-history-dark.png',
     screenshotOptions,
