@@ -1,72 +1,44 @@
-import { describe, expect, test } from 'vitest';
+import { beforeEach, describe, expect, test } from 'vitest';
 
+import { initCoreProvider } from './core-provider';
 import { workflowTerminateEnabled } from './workflow-terminate-enabled';
 
 describe('workflowTerminateEnabled', () => {
-  const coreUser = {
-    namespaceWriteDisabled: (ns: string) => ns === 'ns-write-disabled',
-  };
+  beforeEach(() => {
+    initCoreProvider({ getAccessToken: async () => '' });
+  });
 
-  test('returns true when global write actions terminate, and namespace write actions are all enabled', () => {
+  test('returns true when global write actions and terminate are enabled', () => {
     expect(
-      workflowTerminateEnabled(
-        {
-          disableWriteActions: false,
-          workflowTerminateDisabled: false,
-        },
-        coreUser,
-        'ns-write-enabled',
-      ),
-    );
+      workflowTerminateEnabled('namespace', {
+        disableWriteActions: false,
+        workflowTerminateDisabled: false,
+      }),
+    ).toBe(true);
   });
 
   describe('returns false', () => {
     test('when write actions are disabled', () => {
       expect(
-        workflowTerminateEnabled(
-          { disableWriteActions: true },
-          coreUser,
-          'ns-write-enabled',
-        ),
+        workflowTerminateEnabled('namespace', { disableWriteActions: true }),
       ).toBe(false);
     });
 
     test('when terminate is disabled', () => {
       expect(
-        workflowTerminateEnabled(
-          {
-            disableWriteActions: false,
-            workflowTerminateDisabled: true,
-          },
-          coreUser,
-          'ns-write-enabled',
-        ),
+        workflowTerminateEnabled('namespace', {
+          disableWriteActions: false,
+          workflowTerminateDisabled: true,
+        }),
       ).toBe(false);
     });
 
     test('when write actions and terminate are both disabled', () => {
       expect(
-        workflowTerminateEnabled(
-          {
-            disableWriteActions: true,
-            workflowTerminateDisabled: true,
-          },
-          coreUser,
-          'ns-write-enabled',
-        ),
-      ).toBe(false);
-    });
-
-    test('when namespace write actions are disabled', () => {
-      expect(
-        workflowTerminateEnabled(
-          {
-            disableWriteActions: false,
-            workflowTerminateDisabled: false,
-          },
-          coreUser,
-          'ns-write-disabled',
-        ),
+        workflowTerminateEnabled('namespace', {
+          disableWriteActions: true,
+          workflowTerminateDisabled: true,
+        }),
       ).toBe(false);
     });
   });

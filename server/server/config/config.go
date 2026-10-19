@@ -26,7 +26,11 @@ package config
 
 import (
 	"errors"
+	"strings"
 	"time"
+	"unicode"
+
+	"gopkg.in/yaml.v3"
 )
 
 type (
@@ -41,6 +45,7 @@ type (
 		EnableUI            bool   `yaml:"enableUi"`
 		CloudUI             bool   `yaml:"cloudUi"`
 		UIAssetPath         string `yaml:"uiAssetPath"`
+		Banner              Banner `yaml:"banner"`
 		CORS                CORS   `yaml:"cors"`
 		DefaultNamespace    string `yaml:"defaultNamespace"`
 		FeedbackURL         string `yaml:"feedbackUrl"`
@@ -82,6 +87,11 @@ type (
 		HideLogs       bool     `yaml:"hideLogs"`
 		// TLS configuration options to start UI Server in TLS mode
 		UIServerTLS UIServerTLS `yaml:"uiServerTLS"`
+	}
+
+	Banner struct {
+		Text  string `yaml:"text"`
+		Color string `yaml:"color"`
 	}
 
 	CORS struct {
@@ -209,6 +219,36 @@ type (
 		Path string `yaml:"path"`
 	}
 )
+
+// UnmarshalYAML ignores invalid banner settings so they cannot prevent startup.
+func (b *Banner) UnmarshalYAML(node *yaml.Node) error {
+	*b = Banner{}
+	if node.Kind != yaml.MappingNode {
+		return nil
+	}
+	var fields struct {
+		Text  yaml.Node `yaml:"text"`
+		Color yaml.Node `yaml:"color"`
+	}
+	if err := node.Decode(&fields); err != nil {
+		return nil
+	}
+	if fields.Text.Kind != yaml.ScalarNode || fields.Text.Tag != "!!str" ||
+		fields.Color.Kind != yaml.ScalarNode || fields.Color.Tag != "!!str" {
+		return nil
+	}
+	text := strings.TrimSpace(fields.Text.Value)
+	color := strings.ToLower(strings.TrimSpace(fields.Color.Value))
+	if text == "" || strings.ContainsAny(fields.Text.Value, "\"'&:") ||
+		strings.IndexFunc(fields.Text.Value, unicode.IsControl) >= 0 {
+		return nil
+	}
+	switch color {
+	case "neutral", "info", "warning", "success", "danger", "error", "accent":
+		*b = Banner{Text: text, Color: color}
+	}
+	return nil
+}
 
 // Validate validates this config
 func (c *Config) Validate() error {

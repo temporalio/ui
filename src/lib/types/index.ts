@@ -380,6 +380,10 @@ export type CustomUIResponse = CustomUISettingsResponse & {
 };
 
 export type SettingsResponse = {
+  Banner?: {
+    Text?: string;
+    Color?: string;
+  };
   Auth: {
     Enabled: boolean;
     Options: string[] | null;
