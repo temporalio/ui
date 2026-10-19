@@ -134,22 +134,22 @@ export const Strings = {
     'Every {{- interval}} {{- intervalUnit}} offset by {{- offset}} {{- offsetUnit}}',
   'overlap-skip-label': 'Skip',
   'overlap-skip-description':
-    'Workflow Executions are not started when a previously started Workflow Execution started by this schedule is already running.',
+    'New Actions are not started when when an Action started by this Schedule is still running.',
   'overlap-buffer-one-label': 'Buffer One',
   'overlap-buffer-one-description':
-    'Starts the Workflow Execution as soon as the current one completes. Limited to one.',
+    'Starts the Action as soon as the current one completes. Limited to one.',
   'overlap-buffer-all-label': 'Buffer All',
   'overlap-buffer-all-description':
-    'Allows an unlimited number of Workflows to buffer; Workflows start in order they were added to buffer.',
+    'Allows an unlimited number of Actions to buffer; Actions start in order they were added to buffer.',
   'overlap-cancel-other-label': 'Cancel Other',
   'overlap-cancel-other-description':
-    'Cancels currently running Workflow Execution, starts new one after cancellation completes.',
+    'Cancels currently running Action, starts new one after cancellation completes.',
   'overlap-terminate-other-label': 'Terminate Other',
   'overlap-terminate-other-description':
-    'Terminates currently running Workflow Execution, starts new one immediately.',
+    'Terminates currently running Action, starts new one immediately.',
   'overlap-allow-all-label': 'Allow All',
   'overlap-allow-all-description':
-    'Starts any number of concurrent Workflow Executions; more than one Workflow Execution can run simultaneously.',
+    'Starts any number of concurrent Actions; more than one Action can run simultaneously.',
   'overlap-default-suffix': '(Default)',
   'overlap-schedule-policy-suffix': "(Schedule's current policy)",
   'recurrence-label': 'Recurrence',
@@ -170,15 +170,16 @@ export const Strings = {
   'policies-title': 'Edit Schedule Policies',
   'policies-drawer-close': 'Cancel policy edits',
   'overlap-policy-description':
-    'Define what to do when a Workflow Execution started by this Schedule is running when the Schedule is triggered.',
+    'Define what to do when an Action started by this Schedule is running when the Schedule is triggered.',
   'on-start-behavior': 'On Start Behavior',
   'on-start-behavior-description':
     'Define what happens when the Schedule starts.',
   'on-schedule-start': 'On Schedule Start',
   'pause-schedule-label': 'Pause Schedule',
-  'pause-schedule-description': 'Schedule will not run if paused.',
+  'pause-schedule-description':
+    'Schedule will not run if paused. Cannot be used in conjuction with trigger immediately or backfill all action at once policies.',
   'pause-on-failure-description':
-    'If true, pauses Schedule after any Workflow failure.',
+    'If true, pauses Schedule after any Action failure.',
   'do-not-pause': 'Do not pause',
   'catchup-window-policy-description':
     'Define what happens to actions missed during an outage when the service returns.',

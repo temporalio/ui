@@ -5,16 +5,17 @@
   import WorkflowStatusBadge from '$lib/components/workflow/workflow-status-badge.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
-  import {
-    fetchRecentScheduleRunStatuses,
-    toRecentScheduleRuns,
-  } from '$lib/services/schedule-service';
-  import type {
-    DescribeFullSchedule,
-    RecentScheduleRun,
-    RecentScheduleRunEnriched,
-  } from '$lib/types/schedule';
+  import type { DescribeFullSchedule } from '$lib/types/schedule';
   import { routeForWorkflow } from '$lib/utilities/route-for';
+
+  import {
+    fetchRecentWorkflowRunStatuses,
+    toRecentWorkflowRuns,
+  } from '../scheduled-action-types/workflow/recent-runs';
+  import type {
+    RecentWorkflowRun,
+    RecentWorkflowRunEnriched,
+  } from '../scheduled-action-types/workflow/types';
 
   import WorkflowRunsEmpty from './workflow-runs-empty.svelte';
 
@@ -34,9 +35,9 @@
     openTriggerConfirmationModal,
   }: Props = $props();
 
-  const recordedRuns = $derived(toRecentScheduleRuns(schedule));
+  const recordedRuns = $derived(toRecentWorkflowRuns(schedule));
   const enrichedRunsPromise = $derived(
-    fetchRecentScheduleRunStatuses({
+    fetchRecentWorkflowRunStatuses({
       namespace,
       scheduleId: schedule.schedule_id,
       runs: recordedRuns,
@@ -64,7 +65,7 @@
   {/await}
 {/if}
 
-{#snippet runList(runs: (RecentScheduleRun | RecentScheduleRunEnriched)[])}
+{#snippet runList(runs: (RecentWorkflowRun | RecentWorkflowRunEnriched)[])}
   <ul class={twMerge('flex flex-col gap-2', className)}>
     {#each runs as run, i (run.runId || i)}
       {@const isEnriched =

@@ -5,10 +5,10 @@ import type { WorkflowExecution } from '$lib/types/workflows';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 
 import {
-  fetchRecentScheduleRunStatuses,
-  toRecentScheduleRuns,
+  fetchRecentWorkflowRunStatuses,
+  toRecentWorkflowRuns,
   withLatestWorkflowStatuses,
-} from './schedule-service';
+} from './recent-runs';
 
 vi.mock('$lib/utilities/request-from-api', () => ({
   requestFromAPI: vi.fn(),
@@ -32,9 +32,19 @@ const execution = (
   startTime: string,
   status: string,
   runId = `${id}-run`,
-) => ({ id, runId, startTime, status }) as unknown as WorkflowExecution;
+  reportedProblems: string[] = [],
+) =>
+  ({
+    id,
+    runId,
+    startTime,
+    status,
+    searchAttributes: {
+      indexedFields: { TemporalReportedProblems: reportedProblems },
+    },
+  }) as unknown as WorkflowExecution;
 
-describe('toRecentScheduleRuns', () => {
+describe('toRecentWorkflowRuns', () => {
   test('sorts by actual time descending and caps the list', () => {
     const schedule = scheduleWith([
       action('a', '2026-08-01T00:00:00Z'),
@@ -43,7 +53,7 @@ describe('toRecentScheduleRuns', () => {
     ]);
 
     expect(
-      toRecentScheduleRuns(schedule, 2).map((run) => run.workflowId),
+      toRecentWorkflowRuns(schedule, 2).map((run) => run.workflowId),
     ).toEqual(['c', 'b']);
   });
 
@@ -52,7 +62,7 @@ describe('toRecentScheduleRuns', () => {
       action(`wf-${index}`, `2026-08-0${index + 1}T00:00:00Z`),
     );
 
-    expect(toRecentScheduleRuns(scheduleWith(actions))).toHaveLength(5);
+    expect(toRecentWorkflowRuns(scheduleWith(actions))).toHaveLength(5);
   });
 
   test('converts the recorded status to its readable form', () => {
@@ -60,7 +70,7 @@ describe('toRecentScheduleRuns', () => {
       action('a', '2026-08-01T00:00:00Z', 'WORKFLOW_EXECUTION_STATUS_RUNNING'),
     ]);
 
-    expect(toRecentScheduleRuns(schedule)[0].status).toBe('Running');
+    expect(toRecentWorkflowRuns(schedule)[0].status).toBe('Running');
   });
 
   test('does not add visibility-derived fields to recorded runs', () => {
@@ -68,7 +78,7 @@ describe('toRecentScheduleRuns', () => {
       action('a', '2026-08-01T00:00:00Z', 'WORKFLOW_EXECUTION_STATUS_RUNNING'),
     ]);
 
-    const run = toRecentScheduleRuns(schedule)[0];
+    const run = toRecentWorkflowRuns(schedule)[0];
     expect(run).not.toHaveProperty('delayed');
     expect(run).not.toHaveProperty('taskFailure');
     expect(run).not.toHaveProperty('inVisibility');
@@ -81,20 +91,20 @@ describe('toRecentScheduleRuns', () => {
     ];
     const schedule = scheduleWith(actions);
 
-    toRecentScheduleRuns(schedule);
+    toRecentWorkflowRuns(schedule);
 
-    expect(schedule.info.recentActions[0].startWorkflowResult.workflowId).toBe(
-      'a',
-    );
+    expect(
+      schedule.info?.recentActions?.[0].startWorkflowResult?.workflowId,
+    ).toBe('a');
   });
 
   test('returns an empty list when the schedule has no recent actions', () => {
-    expect(toRecentScheduleRuns({} as DescribeFullSchedule)).toEqual([]);
+    expect(toRecentWorkflowRuns({} as DescribeFullSchedule)).toEqual([]);
   });
 });
 
 describe('withLatestWorkflowStatuses', () => {
-  const runs = toRecentScheduleRuns(
+  const runs = toRecentWorkflowRuns(
     scheduleWith([
       action('a', '2026-08-01T00:00:00Z', 'WORKFLOW_EXECUTION_STATUS_RUNNING'),
       action('b', '2026-08-02T00:00:00Z', 'WORKFLOW_EXECUTION_STATUS_RUNNING'),
@@ -133,10 +143,9 @@ describe('withLatestWorkflowStatuses', () => {
       const originalRuns = structuredClone(runs);
       const merged = withLatestWorkflowStatuses(runs, [
         {
-          ...execution('a', '2026-08-01T00:00:00Z', 'Running'),
-          searchAttributes: {
-            indexedFields: { TemporalReportedProblems: [problem] },
-          },
+          ...execution('a', '2026-08-01T00:00:00Z', 'Running', 'a-run', [
+            problem,
+          ]),
         },
       ]);
 
@@ -150,12 +159,9 @@ describe('withLatestWorkflowStatuses', () => {
   test('does not mark completed workflows as task-failed', () => {
     const merged = withLatestWorkflowStatuses(runs, [
       {
-        ...execution('a', '2026-08-01T00:00:00Z', 'Completed'),
-        searchAttributes: {
-          indexedFields: {
-            TemporalReportedProblems: ['category=WorkflowTaskFailed'],
-          },
-        },
+        ...execution('a', '2026-08-01T00:00:00Z', 'Completed', 'a-run', [
+          'category=WorkflowTaskFailed',
+        ]),
       },
     ]);
 
@@ -167,13 +173,10 @@ describe('withLatestWorkflowStatuses', () => {
   test('derives both modifiers from the newest execution', () => {
     const merged = withLatestWorkflowStatuses(runs, [
       {
-        ...execution('a', '2026-08-05T00:00:00Z', 'Running', 'a-run-2'),
+        ...execution('a', '2026-08-05T00:00:00Z', 'Running', 'a-run-2', [
+          'category=WorkflowTaskFailed',
+        ]),
         executionTime: '2026-08-07T00:00:00Z',
-        searchAttributes: {
-          indexedFields: {
-            TemporalReportedProblems: ['category=WorkflowTaskFailed'],
-          },
-        },
       },
       execution('a', '2026-08-01T00:00:00Z', 'ContinuedAsNew', 'a-run-1'),
     ]);
@@ -248,8 +251,8 @@ describe('withLatestWorkflowStatuses', () => {
   });
 });
 
-describe('fetchRecentScheduleRunStatuses', () => {
-  const twoRuns = toRecentScheduleRuns(
+describe('fetchRecentWorkflowRunStatuses', () => {
+  const twoRuns = toRecentWorkflowRuns(
     scheduleWith([
       action('a', '2026-08-01T00:00:00Z', 'WORKFLOW_EXECUTION_STATUS_RUNNING'),
       action('b', '2026-08-02T00:00:00Z', 'WORKFLOW_EXECUTION_STATUS_RUNNING'),
@@ -268,7 +271,7 @@ describe('fetchRecentScheduleRunStatuses', () => {
   });
 
   test('bounds the query to the runs on screen and to one execution each', async () => {
-    await fetchRecentScheduleRunStatuses({
+    await fetchRecentWorkflowRunStatuses({
       namespace: 'default',
       scheduleId: 'daily',
       runs: twoRuns,
@@ -280,10 +283,10 @@ describe('fetchRecentScheduleRunStatuses', () => {
   });
 
   test('escapes quotes in workflow ids', async () => {
-    await fetchRecentScheduleRunStatuses({
+    await fetchRecentWorkflowRunStatuses({
       namespace: 'default',
       scheduleId: 'daily',
-      runs: toRecentScheduleRuns(
+      runs: toRecentWorkflowRuns(
         scheduleWith([action('say "hi"', '2026-08-01T00:00:00Z')]),
       ),
     });
@@ -292,10 +295,10 @@ describe('fetchRecentScheduleRunStatuses', () => {
   });
 
   test('escapes backslashes in workflow ids', async () => {
-    await fetchRecentScheduleRunStatuses({
+    await fetchRecentWorkflowRunStatuses({
       namespace: 'default',
       scheduleId: 'daily',
-      runs: toRecentScheduleRuns(
+      runs: toRecentWorkflowRuns(
         scheduleWith([action('back\\slash', '2026-08-01T00:00:00Z')]),
       ),
     });
@@ -304,10 +307,10 @@ describe('fetchRecentScheduleRunStatuses', () => {
   });
 
   test('escapes a trailing backslash so it cannot escape the closing quote', async () => {
-    await fetchRecentScheduleRunStatuses({
+    await fetchRecentWorkflowRunStatuses({
       namespace: 'default',
       scheduleId: 'daily',
-      runs: toRecentScheduleRuns(
+      runs: toRecentWorkflowRuns(
         scheduleWith([action('trailing\\', '2026-08-01T00:00:00Z')]),
       ),
     });
@@ -316,7 +319,7 @@ describe('fetchRecentScheduleRunStatuses', () => {
   });
 
   test('does not call the API when there are no runs', async () => {
-    const result = await fetchRecentScheduleRunStatuses({
+    const result = await fetchRecentWorkflowRunStatuses({
       namespace: 'default',
       scheduleId: 'daily',
       runs: [],

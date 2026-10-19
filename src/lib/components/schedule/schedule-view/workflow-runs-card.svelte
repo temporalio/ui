@@ -7,13 +7,12 @@
   import TabPanels from '$lib/holocene/tabs-primitive/tab-panels.svelte';
   import Tabs from '$lib/holocene/tabs-primitive/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
-  import {
-    toRecentScheduleRuns,
-    toUpcomingScheduleRuns,
-  } from '$lib/services/schedule-service';
+  import { toUpcomingScheduleRuns } from '$lib/services/schedule-service';
   import { workflowCount } from '$lib/stores/workflows';
   import type { DescribeFullSchedule } from '$lib/types/schedule';
   import { routeForWorkflowsWithQuery } from '$lib/utilities/route-for';
+
+  import { toRecentWorkflowRuns } from '../scheduled-action-types/workflow/recent-runs';
 
   import WorkflowRunsRecent from './workflow-runs-recent.svelte';
   import WorkflowRunsUpcoming from './workflow-runs-upcoming.svelte';
@@ -36,7 +35,7 @@
 
   const id = $props.id();
 
-  const recentRunCount = $derived(toRecentScheduleRuns(schedule).length);
+  const recentRunCount = $derived(toRecentWorkflowRuns(schedule).length);
   const upcomingRunCount = $derived(toUpcomingScheduleRuns(schedule).length);
 
   type View = 'recent' | 'upcoming';
