@@ -1,8 +1,5 @@
-import { get } from 'svelte/store';
-
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { dataEncoder } from '$lib/stores/data-encoder';
 import {
   codecEndpoint,
   overrideRemoteCodecConfiguration,
@@ -261,13 +258,12 @@ describe('getRequestBody', () => {
           payloads: [
             {
               metadata: { encoding: 'YmluYXJ5L2VuY3J5cHRlZA==' },
-              data: 'ZG91YmxlLWVuY3J5cHRlZA==',
+              data: 'ZW5jb2RlZC1pbnB1dA==',
             },
           ],
         }),
       );
       vi.stubGlobal('fetch', fetch);
-      expect(get(dataEncoder).endpoint).toBe('http://localhost:8888');
 
       let schedule = {
         schedule_id: 'existing-id',
@@ -292,6 +288,18 @@ describe('getRequestBody', () => {
           },
         };
       }
+
+      const body = await getRequestBody(
+        buildForm({ editInput: true, input: '"updated input"' }),
+        schedule,
+      );
+
+      expect(fetch).toHaveBeenCalledOnce();
+      expect(fetch).toHaveBeenCalledWith(
+        'http://localhost:8888/encode?preserveStorageRefs=true',
+        expect.objectContaining({ method: 'POST' }),
+      );
+      expect(body.schedule.action!.startWorkflow.header).toEqual(header);
     });
 
     it('keeps the exact start time when its calendar date is unchanged', async () => {
