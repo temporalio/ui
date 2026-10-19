@@ -1,5 +1,8 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { get } from 'svelte/store';
 
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { dataEncoder } from '$lib/stores/data-encoder';
 import {
   codecEndpoint,
   overrideRemoteCodecConfiguration,
@@ -27,12 +30,6 @@ const buildForm = (
   });
 
 describe('getRequestBody', () => {
-  afterEach(() => {
-    codecEndpoint.set(null);
-    overrideRemoteCodecConfiguration.set(false);
-    vi.unstubAllGlobals();
-  });
-
   it('maps core action fields', async () => {
     const body = await getRequestBody(buildForm());
 
@@ -218,6 +215,17 @@ describe('getRequestBody', () => {
   });
 
   describe('editing an existing schedule', () => {
+    beforeEach(() => {
+      codecEndpoint.set('http://localhost:8888');
+      overrideRemoteCodecConfiguration.set(true);
+    });
+
+    afterEach(() => {
+      codecEndpoint.set(null);
+      overrideRemoteCodecConfiguration.set(false);
+      vi.unstubAllGlobals();
+    });
+
     const describeWithSpec = (spec: Record<string, unknown>) =>
       ({
         schedule_id: 'existing-id',
@@ -259,8 +267,7 @@ describe('getRequestBody', () => {
         }),
       );
       vi.stubGlobal('fetch', fetch);
-      codecEndpoint.set('http://localhost:8888');
-      overrideRemoteCodecConfiguration.set(true);
+      expect(get(dataEncoder).endpoint).toBe('http://localhost:8888');
 
       let schedule = {
         schedule_id: 'existing-id',
