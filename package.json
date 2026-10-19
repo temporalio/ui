@@ -56,6 +56,7 @@
     "test:e2e:ui": "pnpm test:e2e --ui",
     "test:integration": "PW_MODE=integration playwright test tests/integration",
     "test:integration:ui": "PW_MODE=integration playwright test --ui tests/integration",
+    "test:visual": "PW_MODE=integration playwright test tests/visual",
     "lint": "pnpm prettier; pnpm eslint; pnpm stylelint",
     "lint:ci": "pnpm prettier && pnpm eslint && pnpm stylelint",
     "format": "pnpm prettier:fix; pnpm eslint:fix; pnpm stylelint:fix",
