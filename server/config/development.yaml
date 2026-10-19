@@ -5,6 +5,10 @@
 publicPath:
 port: 8081
 enableUi: true
+banner:
+  # Both fields are required to show banner. Color: neutral, info, warning, success, danger, error, or accent (case-insensitive).
+  text: ""
+  color: ""
 cors:
   cookieInsecure: false
   allowOrigins:

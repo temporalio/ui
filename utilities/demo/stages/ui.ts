@@ -5,10 +5,10 @@ import { join } from 'path';
 import waitForPort from 'wait-port';
 import { $, chalk } from 'zx';
 
-import type { UiDefinition } from '../definition';
-import { type Logger, runDirFor, WORK_DIR } from '../paths';
-import { startDetached, type Supervised } from '../process';
-import { failure } from '../remedy';
+import type { UiDefinition } from '../../../src/lib/demo/definition';
+import { type Logger, runDirFor, WORK_DIR } from '../../../src/lib/demo/paths';
+import { startDetached, type Supervised } from '../../../src/lib/demo/process';
+import { failure } from '../../../src/lib/demo/remedy';
 
 export type RunningUi = {
   apiUrl?: string;

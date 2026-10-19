@@ -1,6 +1,14 @@
 <script lang="ts">
+  import { untrack } from 'svelte';
+
+  import { replaceState } from '$app/navigation';
   import { page } from '$app/state';
 
+  import {
+    type CatalogFilters,
+    catalogFiltersFromSearchParams,
+    catalogFiltersUrl,
+  } from '$lib/catalog/browser/catalog-list-state';
   import CatalogList from '$lib/catalog/browser/catalog-list.svelte';
   import PageTitle from '$lib/components/page-title.svelte';
   import { coreUserStore } from '$lib/stores/core-user';
@@ -22,6 +30,15 @@
         $coreUser.namespaceWriteDisabled(candidate),
     }),
   );
+  const initialFilters = untrack(() =>
+    catalogFiltersFromSearchParams(page.url.searchParams),
+  );
+
+  const syncFiltersToUrl = (filters: CatalogFilters) => {
+    const url = catalogFiltersUrl(page.url, filters);
+    if (url.search === page.url.search) return;
+    replaceState(url, page.state);
+  };
 </script>
 
 <PageTitle title="Catalog" />
@@ -38,4 +55,6 @@
   host={services.host}
   sessionStore={services.sessionStore}
   exampleHref={(exampleId) => routeForCatalogExample({ namespace, exampleId })}
+  {initialFilters}
+  onfilterschange={syncFiltersToUrl}
 />

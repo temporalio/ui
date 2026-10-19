@@ -3,13 +3,23 @@ import { join } from 'path';
 
 import { chalk } from 'zx';
 
-import { catalogExampleUrl } from './catalog';
-import type { Definition, Stage } from './definition';
+import type { Definition } from './definition';
 import { runDirFor } from './paths';
 import type { StartedWorkflow } from './scenario';
 
+/**
+ * Where the catalog page shows an example. Pure string building, so it belongs
+ * beside the summary that is its only caller rather than with the catalog
+ * reader, which a consumer without a catalog cannot load.
+ */
+export const catalogExampleUrl = (
+  base: string,
+  namespace: string,
+  id: string,
+) => `${base}/namespaces/${namespace}/catalog/${encodeURIComponent(id)}`;
+
 export type StageOutcome = {
-  stage: Stage;
+  stage: string;
   ran: boolean;
   reason?: string;
   details: string[];

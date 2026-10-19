@@ -239,13 +239,14 @@
   };
 
   const inputValid = $derived(!input || inputIsJSON(input));
+  const hasRequiredStartFields = $derived(
+    Boolean(workflowId && taskQueue && workflowType),
+  );
 
   const enableStart = $derived(
-    !!workflowId &&
-      !!taskQueue &&
-      !!workflowType &&
-      !!inputValid &&
-      !workflowCreateDisabled(page),
+    hasRequiredStartFields &&
+      inputValid &&
+      !workflowCreateDisabled(namespace, page.data.settings),
   );
 
   $effect(() => {

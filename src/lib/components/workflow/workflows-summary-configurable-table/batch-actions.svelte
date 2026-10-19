@@ -11,7 +11,6 @@
     type BatchOperationContext,
   } from '$lib/pages/workflows-with-new-search.svelte';
   import { isCloud } from '$lib/stores/advanced-visibility';
-  import { coreUserStore } from '$lib/stores/core-user';
   import { temporalVersion } from '$lib/stores/versions';
   import { workflowCount, workflowsQuery } from '$lib/stores/workflows';
   import type { WorkflowExecution } from '$lib/types/workflows';
@@ -36,30 +35,23 @@
     openBatchResetConfirmationModal,
   } = getContext<BatchOperationContext>(BATCH_OPERATION_CONTEXT);
 
-  const coreUser = coreUserStore();
-
   const selectedWorkflowsCount = $derived($selectedWorkflows?.length ?? 0);
 
   const terminateEnabled = $derived(
-    workflowTerminateEnabled(
-      page.data.settings,
-      $coreUser,
-      page.params.namespace,
-    ),
+    workflowTerminateEnabled(page.params.namespace, page.data.settings),
   );
 
   const cancelEnabled = $derived(
-    workflowCancelEnabled(page.data.settings, $coreUser, page.params.namespace),
+    workflowCancelEnabled(page.params.namespace, page.data.settings),
+  );
+
+  const resetSupported = $derived(
+    $isCloud || minimumVersionRequired('1.23.0', $temporalVersion),
   );
 
   const resetEnabled = $derived(
-    workflowResetEnabled(
-      page.data.settings,
-      $coreUser,
-      page.params.namespace,
-    ) && $isCloud
-      ? true
-      : minimumVersionRequired('1.23.0', $temporalVersion),
+    workflowResetEnabled(page.params.namespace, page.data.settings) &&
+      resetSupported,
   );
 </script>
 

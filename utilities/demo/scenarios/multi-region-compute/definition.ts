@@ -1,4 +1,4 @@
-import { defineScenario } from '../../definition';
+import { defineScenario } from '../../../../src/lib/demo/definition';
 
 const PRIMARY = 'aws-us-east-1';
 const REPLICA = 'aws-us-west-2';

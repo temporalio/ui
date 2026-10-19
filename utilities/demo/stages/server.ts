@@ -10,9 +10,12 @@ import tar from 'tar-fs';
 import waitForPort from 'wait-port';
 import { $, chalk } from 'zx';
 
-import { expandPath, type ServerDefinition } from '../definition';
-import { type Logger, runDirFor, WORK_DIR } from '../paths';
-import { startDetached, type Supervised } from '../process';
+import {
+  expandPath,
+  type ServerDefinition,
+} from '../../../src/lib/demo/definition';
+import { type Logger, runDirFor, WORK_DIR } from '../../../src/lib/demo/paths';
+import { startDetached, type Supervised } from '../../../src/lib/demo/process';
 import {
   type CliCandidate,
   type CommitFacts,
@@ -22,7 +25,7 @@ import {
   satisfies,
   unmetModuleRequirements,
   workspaceGoVersion,
-} from '../requirements';
+} from '../../../src/lib/demo/requirements';
 
 export type ProvisionedServer = {
   binary: string;

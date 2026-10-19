@@ -4,9 +4,9 @@ import { join } from 'path';
 
 import { chalk } from 'zx';
 
-import type { WorkerDefinition } from '../definition';
-import { type Logger, runDirFor } from '../paths';
-import { startDetached, type Supervised } from '../process';
+import type { WorkerDefinition } from '../../../src/lib/demo/definition';
+import { type Logger, runDirFor } from '../../../src/lib/demo/paths';
+import { startDetached, type Supervised } from '../../../src/lib/demo/process';
 
 export type RunningWorker = {
   process?: Supervised;

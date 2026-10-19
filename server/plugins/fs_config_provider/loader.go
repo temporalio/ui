@@ -27,6 +27,7 @@ package fs_config_provider
 import (
 	"bufio"
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"io"
@@ -91,6 +92,12 @@ func Load(configDir string, config interface{}, env string) error {
 	log.Printf("Loading config files=%v\n", files)
 
 	templateFuncs := sprig.FuncMap()
+	// JSON strings are valid YAML scalars. Preserve their escaping instead of
+	// applying HTML escaping, since these templates produce YAML, not HTML.
+	templateFuncs["yamlString"] = func(value string) (template.HTML, error) {
+		quoted, err := json.Marshal(value)
+		return template.HTML(quoted), err
+	}
 
 	for _, f := range files {
 		// This is tagged nosec because the file names being read are for config files that are not user supplied

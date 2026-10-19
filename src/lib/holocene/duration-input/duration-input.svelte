@@ -103,6 +103,7 @@
   import { composeEventHandlers } from '$lib/utilities/event-handlers';
 
   import Label from '../label.svelte';
+  import NativeSelect from '../select/native-select.svelte';
 
   type K = $$Generic<string>;
   type T = $$Generic<Units<K>>;
@@ -215,10 +216,14 @@
       {...inputProps}
       oninput={composeEventHandlers(handleNumberInput, inputProps.oninput)}
     />
-    <select
+    <NativeSelect
+      wrapperClass={twMerge(
+        'h-full shrink-0 rounded-r-[inherit] text-primary',
+        disabled && 'text-tertiary',
+      )}
       id="{id}-unit-select"
       class={twMerge(
-        'h-full rounded-r-[inherit] bg-surface-secondary pl-2 text-primary focus-visible:outline-none disabled:cursor-not-allowed',
+        'h-full rounded-r-[inherit] bg-surface-secondary text-primary focus-visible:outline-none disabled:cursor-not-allowed',
         disabled && 'bg-surface-tertiary text-tertiary',
       )}
       {disabled}
@@ -228,7 +233,7 @@
       {#each units as { label }, i (i)}
         <option value={label}>{label}</option>
       {/each}
-    </select>
+    </NativeSelect>
   </div>
   {#if hintText}
     <p class={twMerge('text-xs text-secondary', error && 'text-danger')}>
