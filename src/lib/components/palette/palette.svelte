@@ -783,10 +783,10 @@
                     class="flex items-center gap-2 px-3 pb-1 pt-3 text-xs font-medium text-secondary"
                     role="presentation"
                   >
+                    {section.title}
                     {#if !isDev && section.variant === 'dev'}
                       {@render devMarker()}
                     {/if}
-                    {section.title}
                   </div>
                 {/if}
                 {#each section.items as item, itemIndex (item.id)}
@@ -808,9 +808,6 @@
                     onmousemove={() => select(index)}
                     onclick={() => runAction(item, 0)}
                   >
-                    {#if section.variant !== 'dev' && showsDevMarker(item)}
-                      {@render devMarker()}
-                    {/if}
                     <div class="min-w-0 flex-1">
                       <div class="truncate text-sm text-primary">
                         {item.title}
@@ -821,6 +818,9 @@
                         </div>
                       {/if}
                     </div>
+                    {#if section.variant !== 'dev' && showsDevMarker(item)}
+                      {@render devMarker()}
+                    {/if}
                     {#if item.accessory}
                       <span
                         class={[

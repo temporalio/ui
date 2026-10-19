@@ -328,7 +328,7 @@ describe('Palette', () => {
     const titles = () =>
       screen
         .getAllByRole('option')
-        .map((option) => option.textContent?.replace(/^\s*dev\s*/, '').trim());
+        .map((option) => option.textContent?.replace(/\s*dev\s*$/, '').trim());
 
     beforeEach(() => run.mockClear());
 
@@ -534,9 +534,10 @@ describe('Palette', () => {
       expect(screen.getAllByText('On this page')).toHaveLength(1);
       expect(titles()).toEqual(['current item', 'json item']);
       const devRow = screen.getAllByRole('option')[1];
-      expect(devRow.querySelector('[aria-hidden="true"]')?.textContent).toBe(
-        'dev',
-      );
+      const marker = devRow.querySelector('[aria-hidden="true"]');
+      expect(marker?.textContent).toBe('dev');
+      // After the title, so every title starts at the same left edge.
+      expect(devRow.firstElementChild?.textContent).toContain('json item');
     });
 
     it('opens the actions menu from the row button', async () => {
