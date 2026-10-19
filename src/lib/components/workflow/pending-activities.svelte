@@ -187,6 +187,8 @@
 {/if}
 
 <style lang="postcss">
+  @reference '../../../app.css';
+
   .pending-activity-row-container {
     @apply mt-4;
   }

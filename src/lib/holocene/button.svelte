@@ -24,7 +24,7 @@
       'border-box',
       'transition-colors',
       'transition-shadow',
-      'focus-visible:outline-none',
+      'focus-visible:outline-hidden',
       'focus-visible:ring-2',
       'focus-visible:ring-interactive-primary',
       'focus-visible:ring-offset-2',
@@ -204,7 +204,7 @@
     {/if}
     {#if count > 0}
       <BadgeCount
-        class="absolute right-0 top-0 translate-x-[10px] translate-y-[-10px]"
+        class="absolute top-0 right-0 translate-x-[10px] translate-y-[-10px]"
         value={count}
       />
     {/if}
@@ -243,7 +243,7 @@
     {/if}
     {#if count > 0}
       <BadgeCount
-        class="absolute right-0 top-0 translate-x-[10px] translate-y-[-10px]"
+        class="absolute top-0 right-0 translate-x-[10px] translate-y-[-10px]"
         value={count}
       />
     {/if}

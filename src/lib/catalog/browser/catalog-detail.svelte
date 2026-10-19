@@ -509,7 +509,7 @@
   >
     <div class="min-w-0 space-y-6">
       <section
-        class="min-w-0 space-y-4 rounded-sm border border-primary bg-surface-primary p-4 text-primary"
+        class="min-w-0 space-y-4 rounded-xs border border-primary bg-surface-primary p-4 text-primary"
         aria-label="Configuration"
       >
         <h2 class="text-lg">Configuration</h2>
@@ -541,7 +541,7 @@
           aria-label="Start options"
           hidden={!configureOpen}
         >
-          <div class="rounded-sm border border-primary p-3">
+          <div class="rounded-xs border border-primary p-3">
             <PayloadInput
               id="catalog-start-options"
               bind:input={startOptionsEditor}
@@ -551,7 +551,7 @@
           </div>
 
           {#if sharedStartOptionsDeclared}
-            <div class="space-y-2 rounded-sm border border-primary p-3">
+            <div class="space-y-2 rounded-xs border border-primary p-3">
               <div>
                 <h3 class="text-sm font-medium">Custom Search Attributes</h3>
                 <p class="text-xs text-secondary">
@@ -566,7 +566,7 @@
               />
             </div>
 
-            <div class="space-y-2 rounded-sm border border-primary p-3">
+            <div class="space-y-2 rounded-xs border border-primary p-3">
               <div>
                 <Label
                   for="catalog-start-delay"
@@ -590,7 +590,7 @@
               />
             </div>
 
-            <div class="space-y-2 rounded-sm border border-primary p-3">
+            <div class="space-y-2 rounded-xs border border-primary p-3">
               <div>
                 <h3 class="text-sm font-medium">User Metadata</h3>
                 <p class="text-xs text-secondary">
@@ -648,7 +648,7 @@
                 <th scope="col">{executionIdLabel}</th>
                 <th scope="col" class="w-32">Started</th>
                 <th scope="col" class="w-36">Status</th>
-                <th scope="col" class="w-60 !text-right">Actions</th>
+                <th scope="col" class="w-60 text-right!">Actions</th>
               </TableHeaderRow>
             {/snippet}
             {#if sessions.length}
@@ -736,7 +736,7 @@
 
     <aside class="space-y-4" aria-label="Execution details">
       <section
-        class="space-y-4 rounded-sm border border-primary bg-surface-primary p-4 text-primary"
+        class="space-y-4 rounded-xs border border-primary bg-surface-primary p-4 text-primary"
         aria-label="Execution details"
       >
         <h2 class="text-base">Execution details</h2>
@@ -758,14 +758,14 @@
           </div>
           <div class="py-2 last:pb-0">
             <dt class="body-small text-secondary">Target</dt>
-            <dd class="mt-0.5 break-all font-mono text-xs">
+            <dd class="mt-0.5 font-mono text-xs break-all">
               {descriptor.execution.targetId}
             </dd>
           </div>
         </dl>
       </section>
       <section
-        class="space-y-3 rounded-sm border border-primary bg-surface-primary p-4 text-primary"
+        class="space-y-3 rounded-xs border border-primary bg-surface-primary p-4 text-primary"
         aria-label="Readiness"
       >
         <div class="flex items-center justify-between gap-2">
@@ -780,7 +780,7 @@
         </div>
         <span class="sr-only" aria-live="polite">{readinessAnnouncement}</span>
         <div class="space-y-2">
-          <div class="rounded-sm bg-surface-secondary p-2 text-primary">
+          <div class="rounded-xs bg-surface-secondary p-2 text-primary">
             <div class="flex items-center gap-2 text-sm">
               <Tooltip text={workerPresentation.tooltip} bottom>
                 <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
@@ -819,7 +819,7 @@
                 state: check.state,
                 taskQueue: descriptor.execution.taskQueue,
               })}
-              <div class="rounded-sm bg-surface-secondary p-2 text-primary">
+              <div class="rounded-xs bg-surface-secondary p-2 text-primary">
                 <div class="flex items-center gap-2 text-sm">
                   <Tooltip text={presentation.tooltip} bottom>
                     <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
@@ -858,7 +858,7 @@
       </section>
       {#if descriptor.setupMarkdown}
         <section
-          class="rounded-sm border border-primary bg-surface-primary p-4 text-primary"
+          class="rounded-xs border border-primary bg-surface-primary p-4 text-primary"
           aria-label="Setup"
         >
           <h2 class="text-base">Setup</h2>
@@ -871,7 +871,7 @@
         </section>
       {/if}
       <section
-        class="rounded-sm border border-primary bg-surface-primary p-4 text-primary"
+        class="rounded-xs border border-primary bg-surface-primary p-4 text-primary"
         aria-label="What to verify"
       >
         <h2 class="text-base">What to verify</h2>

@@ -117,7 +117,7 @@
   class={merge(
     'relative',
     maximized &&
-      'fixed left-0 right-0 top-0 z-100 h-full w-full overflow-y-auto bg-background-primary text-primary',
+      'fixed top-0 right-0 left-0 z-100 h-full w-full overflow-y-auto bg-background-primary text-primary',
     className,
   )}
   tabindex="-1"
@@ -130,7 +130,7 @@
     class={merge(
       'absolute',
       maximized && 'fixed',
-      'right-2 top-2 flex items-center',
+      'top-2 right-2 flex items-center',
     )}
   >
     {@render actions?.()}

@@ -123,7 +123,7 @@
       {#if hasMoreBelow}
         <span
           aria-hidden="true"
-          class="pointer-events-none absolute inset-x-0 bottom-0 flex h-10 items-end justify-center bg-gradient-to-t from-surface-primary to-transparent"
+          class="pointer-events-none absolute inset-x-0 bottom-0 flex h-10 items-end justify-center bg-linear-to-t from-surface-primary to-transparent"
         >
         </span>
       {/if}

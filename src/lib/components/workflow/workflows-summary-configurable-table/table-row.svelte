@@ -127,6 +127,8 @@
 </tr>
 
 <style lang="postcss">
+  @reference '../../../../app.css';
+
   .child {
     @apply bg-surface-secondary;
   }

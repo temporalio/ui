@@ -47,7 +47,7 @@
 <div
   class="flex flex-row items-center gap-2 overflow-hidden first:pt-0 last:border-b-0 {className}"
 >
-  <p class="max-w-fit whitespace-nowrap text-right {labelClass}">
+  <p class="max-w-fit text-right whitespace-nowrap {labelClass}">
     {resolvedLabel}
   </p>
   <div class="overflow-hidden {linkClass}">

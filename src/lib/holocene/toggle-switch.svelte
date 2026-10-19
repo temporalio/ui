@@ -37,7 +37,7 @@
   data-testid={testId}
 >
   <span
-    class="whitespace-nowrap text-sm font-medium"
+    class="text-sm font-medium whitespace-nowrap"
     class:sr-only={labelHidden}
   >
     {label}

@@ -160,7 +160,7 @@
       <Menu
         id={menuId}
         usePortal
-        class="max-h-fit w-min min-w-0 max-w-[calc(100dvw-1rem)] p-4"
+        class="max-h-fit w-min max-w-[calc(100dvw-1rem)] min-w-0 p-4"
       >
         <FilterEditor
           filter={seed}

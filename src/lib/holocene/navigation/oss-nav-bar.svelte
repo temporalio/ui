@@ -54,7 +54,7 @@
   </div>
   <button
     title={navOpen ? 'Collapse Navigation' : 'Expand Navigation'}
-    class="flex size-6 shrink-0 items-center justify-center rounded text-primary opacity-0 transition-opacity hover:bg-surface-overlay-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary group-hover:opacity-100 group-focus:opacity-100 group-data-[nav=closed]:justify-self-center"
+    class="nav-toggle flex size-6 shrink-0 items-center justify-center rounded text-primary transition-opacity group-data-[nav=closed]:justify-self-center hover:bg-surface-overlay-primary focus-visible:ring-2 focus-visible:ring-interactive-primary focus-visible:outline-hidden"
     onclick={ontoggle}
   >
     {#if navOpen}
@@ -80,3 +80,16 @@
     {version}
   </div>
 </div>
+
+<style>
+  @media (hover: hover) {
+    .nav-toggle {
+      opacity: 0;
+    }
+
+    :global(.group:hover) .nav-toggle,
+    :global(.group:focus-within) .nav-toggle {
+      opacity: 1;
+    }
+  }
+</style>

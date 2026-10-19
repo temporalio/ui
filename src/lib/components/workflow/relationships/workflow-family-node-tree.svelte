@@ -198,7 +198,7 @@
       id: child.workflow.id,
       status: child.workflow.status ?? '',
     })}
-    class="outline-none transition-all"
+    class="outline-hidden transition-all"
     onclick={(e) => nodeClick(e, child)}
     onkeydown={(e) => handleNodeKeydown(e, child)}
   >
@@ -321,7 +321,7 @@
 {#if generation === 1}
   <g
     role="button"
-    class="outline-none"
+    class="outline-hidden"
     tabindex="0"
     aria-label={translate('workflows.family-node-label', {
       id: root.workflow.id,

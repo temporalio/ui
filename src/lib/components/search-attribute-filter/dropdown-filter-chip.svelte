@@ -99,17 +99,17 @@
   let chipContentWidthPx = $state(0);
 </script>
 
-<MenuContainer {open} class="min-w-0 max-w-full">
+<MenuContainer {open} class="max-w-full min-w-0">
   <MenuButton
     size="xs"
     controls={controlsId}
     hasIndicator
-    class="h-auto min-h-8 min-w-0 max-w-full whitespace-normal bg-surface-secondary"
+    class="h-auto min-h-8 max-w-full min-w-0 bg-surface-secondary whitespace-normal"
   >
     <Tooltip
       text={displayText}
       hide={$open}
-      class="min-w-0 max-w-full"
+      class="max-w-full min-w-0"
       width={chipContentWidthPx}
       usePortal
       portalOffset={{ y: 12 }}
@@ -117,7 +117,7 @@
     >
       <div
         bind:clientWidth={chipContentWidthPx}
-        class="min-w-0 max-w-full truncate text-left"
+        class="max-w-full min-w-0 truncate text-left"
       >
         <span class="break-words text-primary"
           >{getDisplayKeyWithConditional(filter)}</span
@@ -130,7 +130,7 @@
   <Menu
     id={controlsId}
     usePortal
-    class="max-h-fit w-min min-w-0 max-w-[calc(100dvw-1rem)] p-4"
+    class="max-h-fit w-min max-w-[calc(100dvw-1rem)] min-w-0 p-4"
   >
     <!-- Keyed on open so the editor remounts seeded from the applied filter,
          discarding anything typed and then dismissed. -->

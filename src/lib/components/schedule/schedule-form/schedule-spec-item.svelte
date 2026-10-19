@@ -110,7 +110,7 @@
           size="sm"
           Icon={IconTrash}
           label={translate('common.delete')}
-          class="mr-4 mt-7 h-10"
+          class="mt-7 mr-4 h-10"
           onclick={onRemove}
         />
       {/if}

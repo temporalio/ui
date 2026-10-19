@@ -202,7 +202,7 @@
       </td>
     {/if}
   {/each}
-  <td class="w-24 whitespace-pre-line break-words">
+  <td class="w-24 break-words whitespace-pre-line">
     <MenuContainer>
       <MenuButton
         label={translate('deployments.actions')}

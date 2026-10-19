@@ -205,16 +205,18 @@
 </div>
 
 <style lang="postcss">
+  @reference '../../../app.css';
+
   .invalid {
     @apply border-danger focus-within:border-danger focus-within:ring-danger;
   }
 
   input {
-    @apply inline-block grow bg-transparent text-primary placeholder:text-tertiary focus:outline-none disabled:text-tertiary;
+    @apply inline-block grow bg-transparent text-primary placeholder:text-tertiary focus:outline-hidden disabled:text-tertiary;
   }
 
   .error-msg {
-    @apply break-words text-sm text-danger;
+    @apply text-sm break-words text-danger;
   }
 
   .error-msg.min-width {

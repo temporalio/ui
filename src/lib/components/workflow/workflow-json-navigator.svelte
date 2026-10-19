@@ -67,7 +67,7 @@
         aria-label={translate('common.previous')}
       >
         <span
-          class="arrow arrow-left border-b-transparent border-t-transparent"
+          class="arrow arrow-left border-t-transparent border-b-transparent"
           class:border-r-content-primary={index !== 1}
           class:border-r-content-tertiary={index === 1}
         ></span>
@@ -81,7 +81,7 @@
         aria-label={translate('common.next')}
       >
         <span
-          class="arrow arrow-right border-b-transparent border-t-transparent"
+          class="arrow arrow-right border-t-transparent border-b-transparent"
           class:border-l-content-tertiary={index === events.length}
           class:border-l-content-primary={index !== events.length}
         ></span>
@@ -111,6 +111,8 @@
 </div>
 
 <style lang="postcss">
+  @reference '../../../app.css';
+
   .caret {
     @apply relative;
 
@@ -123,7 +125,7 @@
   }
 
   .arrow {
-    @apply absolute left-0 top-0 h-0 w-0;
+    @apply absolute top-0 left-0 h-0 w-0;
 
     border-style: solid;
     border-width: 6px 12px 6px 0;

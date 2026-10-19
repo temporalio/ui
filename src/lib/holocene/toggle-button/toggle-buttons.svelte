@@ -16,7 +16,7 @@
 
 <div
   class={twMerge(
-    'flex [&>*>button:first-child]:rounded-none [&>:first-child>button:first-child]:rounded-l [&>:first-child]:rounded-l [&>:last-child>button:first-child]:rounded-r [&>:last-child]:rounded-r',
+    'flex [&>*>button:first-child]:rounded-none [&>:first-child]:rounded-l [&>:first-child>button:first-child]:rounded-l [&>:last-child]:rounded-r [&>:last-child>button:first-child]:rounded-r',
     className,
   )}
   {...rest}

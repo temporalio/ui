@@ -25,6 +25,8 @@
 </div>
 
 <style lang="postcss">
+  @reference '../../../app.css';
+
   .orderable-section {
     @apply flex flex-col gap-1;
   }

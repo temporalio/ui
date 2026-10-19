@@ -38,6 +38,8 @@
 </Tooltip>
 
 <style lang="postcss">
+  @reference '../../../app.css';
+
   .shortcut {
     @apply inline-flex w-auto min-w-[32px] items-center justify-center border border-tertiary bg-surface-tertiary px-1 py-1.5 text-xs font-semibold text-primary;
   }

@@ -67,6 +67,8 @@
 </div>
 
 <style lang="postcss">
+  @reference '../../app.css';
+
   .container {
     @apply mt-2 h-[224px] w-[265px] px-4;
   }
@@ -76,7 +78,7 @@
   }
 
   .cell {
-    @apply m-1 inline-flex h-[24px] w-[24px] items-center justify-center rounded-xl p-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background-primary;
+    @apply m-1 inline-flex h-[24px] w-[24px] items-center justify-center rounded-xl p-2 text-sm focus-visible:ring-2 focus-visible:ring-interactive-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background-primary focus-visible:outline-hidden;
   }
 
   .selected {

@@ -72,7 +72,7 @@
       </td>
     {:else if label === translate('schedules.id')}
       <td
-        class={twMerge('cell whitespace-pre-line break-words', clampToWidth)}
+        class={twMerge('cell break-words whitespace-pre-line', clampToWidth)}
         style={widthStyle}
       >
         <Link href={route}>{schedule.scheduleId}</Link>
@@ -90,7 +90,7 @@
           .join(' AND '),
       })}
       <TableCellWithFilterOrCopyButtons
-        class={twMerge('cell whitespace-pre-line break-words', clampToWidth)}
+        class={twMerge('cell break-words whitespace-pre-line', clampToWidth)}
         style={widthStyle}
         filterIconTitle={translate('common.filter-workflows')}
         copyValue={workflowTypeName ?? undefined}
@@ -155,6 +155,8 @@
 </tr>
 
 <style lang="postcss">
+  @reference '../../../../app.css';
+
   .cell {
     @apply p-2 text-left;
   }

@@ -82,14 +82,16 @@
 {/if}
 
 <style lang="postcss">
+  @reference '../../app.css';
+
   /* Sits over the right edge of the cell it belongs to, so it is obvious which
      value it acts on. Absolute, so it still reserves no width. */
   .copy-or-filter {
-    @apply absolute right-1 top-1/2 z-10 inline-flex -translate-y-1/2 items-center gap-1 rounded border border-primary bg-surface-secondary p-1 shadow;
+    @apply absolute top-1/2 right-1 z-10 inline-flex -translate-y-1/2 items-center gap-1 rounded border border-primary bg-surface-secondary p-1 shadow;
   }
 
   .copy-or-filter-button {
-    @apply h-6 w-6 rounded-full bg-surface-primary p-0.5 text-primary hover:bg-interactive-tertiary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background-primary active:bg-interactive-tertiary-press;
+    @apply h-6 w-6 rounded-full bg-surface-primary p-0.5 text-primary hover:bg-interactive-tertiary-hover focus-visible:ring-2 focus-visible:ring-interactive-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background-primary focus-visible:outline-hidden active:bg-interactive-tertiary-press;
   }
 
   .filtered {

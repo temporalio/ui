@@ -100,7 +100,7 @@
         <p class="flex items-center gap-2">
           {translate('nexus.last-attempt-completed-time')}
           <span
-            class="rounded-sm border border-primary bg-surface-secondary px-1.5 py-0.5 font-mono text-xs text-secondary"
+            class="rounded-xs border border-primary bg-surface-secondary px-1.5 py-0.5 font-mono text-xs text-secondary"
             >{completedTime}</span
           >
         </p>
@@ -109,7 +109,7 @@
         <p class="flex items-center gap-2">
           {translate('nexus.next-attempt-scheduled-time')}
           <span
-            class="rounded-sm border border-primary bg-surface-secondary px-1.5 py-0.5 font-mono text-xs text-secondary"
+            class="rounded-xs border border-primary bg-surface-secondary px-1.5 py-0.5 font-mono text-xs text-secondary"
             >{nextTime}</span
           >
         </p>
@@ -119,7 +119,7 @@
       <p class="flex items-center gap-2">
         {translate('nexus.callback-url')}
         <span
-          class="break-all rounded-sm border border-primary bg-surface-secondary px-1.5 py-0.5 font-mono text-xs text-secondary"
+          class="rounded-xs border border-primary bg-surface-secondary px-1.5 py-0.5 font-mono text-xs break-all text-secondary"
         >
           {callbackUrl}
         </span>
@@ -129,7 +129,7 @@
       <p class="flex items-center gap-2">
         {translate('nexus.blocked-reason')}
         <span
-          class="rounded-sm border border-primary bg-surface-secondary px-1.5 py-0.5 text-secondary"
+          class="rounded-xs border border-primary bg-surface-secondary px-1.5 py-0.5 text-secondary"
           >{blockedReason}</span
         >
       </p>

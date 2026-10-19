@@ -66,7 +66,7 @@
   <div class="flex items-center">
     <div
       class={merge(
-        'relative box-border flex h-10 min-w-16 items-center rounded border border-primary bg-background-primary text-sm text-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-interactive-primary focus-within:ring-offset-2 focus-within:ring-offset-background-primary',
+        'relative box-border flex h-10 min-w-16 items-center rounded border border-primary bg-background-primary text-sm text-primary focus-within:ring-2 focus-within:ring-interactive-primary focus-within:ring-offset-2 focus-within:ring-offset-background-primary focus-within:outline-hidden',
         units && 'rounded-r-none',
         !disabled &&
           !readonly &&
@@ -86,7 +86,7 @@
         </span>
       {/if}
       <input
-        class="m-2 block w-full bg-transparent text-center text-primary placeholder:text-tertiary focus:outline-none focus:ring-0 disabled:text-tertiary"
+        class="m-2 block w-full bg-transparent text-center text-primary placeholder:text-tertiary focus:ring-0 focus:outline-hidden disabled:text-tertiary"
         type="number"
         {max}
         {min}
@@ -129,6 +129,8 @@
 </span>
 
 <style lang="postcss">
+  @reference '../../../app.css';
+
   .search {
     @apply w-fit;
 
