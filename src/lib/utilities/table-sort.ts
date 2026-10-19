@@ -18,7 +18,10 @@ export type TableSort = {
   direction: TableSortDirection;
 };
 
-const collator = new Intl.Collator(undefined, { sensitivity: 'base' });
+const collator = new Intl.Collator(undefined, {
+  sensitivity: 'base',
+  numeric: true,
+});
 
 function normalize(
   value: unknown,
@@ -80,7 +83,8 @@ export function sortTableItems<T>(
   return items
     .map((item) => ({
       item,
-      value: normalize(column.getValue(item), column.type),
+      value:
+        item == null ? null : normalize(column.getValue(item), column.type),
     }))
     .sort((a, b) => {
       // Missing and invalid values stay last in either direction.

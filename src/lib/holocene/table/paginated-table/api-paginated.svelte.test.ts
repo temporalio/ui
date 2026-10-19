@@ -320,10 +320,10 @@ describe('API paginated table sorting', () => {
     clickSort('Count');
     expect(rowNames()).toEqual(['Alpha', 'Charlie', 'Bravo']);
 
-    component.rebuildSortColumns('string');
+    component.rebuildSortColumns('boolean');
     flushSync();
 
-    expect(rowNames()).toEqual(['Charlie', 'Bravo', 'Alpha']);
+    expect(rowNames()).toEqual(['Charlie', 'Alpha', 'Bravo']);
     expect(
       onItemsChange.mock.lastCall?.[0].map((item: SortableItem) => item.name),
     ).toEqual(rowNames());

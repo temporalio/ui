@@ -118,7 +118,11 @@
   let fetchError = $state<Error | undefined>();
   let paginatedTable = $state<PaginatedTable<T>>();
   const pageItems = $derived($store.visibleItems);
-  const sortColumn = $derived(sort ? sortColumns[sort.column] : undefined);
+  const getSortColumn = (column: string) =>
+    Object.prototype.hasOwnProperty.call(sortColumns, column)
+      ? sortColumns[column]
+      : undefined;
+  const sortColumn = $derived(sort ? getSortColumn(sort.column) : undefined);
   const activeSortKey = $derived(
     sort && sortColumn
       ? `${sort.column}:${sort.direction}:${sortColumn.type ?? ''}`
@@ -140,17 +144,11 @@
   });
 
   setContext<TableSortContext>(TABLE_SORT_CONTEXT, {
-    isSortable: (column) =>
-      Object.prototype.hasOwnProperty.call(sortColumns, column) &&
-      Boolean(sortColumns[column]),
+    isSortable: (column) => Boolean(getSortColumn(column)),
     direction: (column) =>
       sort?.column === column ? sort.direction : undefined,
     toggle: (column) => {
-      if (
-        !Object.prototype.hasOwnProperty.call(sortColumns, column) ||
-        !sortColumns[column]
-      )
-        return;
+      if (!getSortColumn(column)) return;
       sort = {
         column,
         direction:

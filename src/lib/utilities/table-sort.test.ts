@@ -31,7 +31,25 @@ describe('sortTableItems', () => {
       '2.5',
       '10',
     ]);
-    expect(sort(['10', '2'], 'string')).toEqual(['10', '2']);
+  });
+
+  it('sorts embedded numbers in strings naturally', () => {
+    expect(sort(['order-10', 'order-2', 'order-1'], 'string')).toEqual([
+      'order-1',
+      'order-2',
+      'order-10',
+    ]);
+    expect(sort(['10', '2'])).toEqual(['2', '10']);
+  });
+
+  it('keeps missing items last instead of reading from them', () => {
+    const items = [{ name: 'b' }, undefined, { name: 'a' }];
+    expect(
+      sortTableItems(items, {
+        getValue: (item) => (item as { name: string }).name,
+        type: 'string',
+      }),
+    ).toEqual([{ name: 'a' }, { name: 'b' }, undefined]);
   });
 
   it('sorts strings alphabetically, keeping equal values in their original order', () => {

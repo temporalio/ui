@@ -10,6 +10,7 @@
   import { workflowRun } from '$lib/stores/workflow-run';
   import type { WorkerHeartbeat, WorkerListInfo } from '$lib/types';
   import { formatSDKName } from '$lib/utilities/get-sdk-version';
+  import { getWorkerHostName } from '$lib/utilities/get-worker-host-name';
   import { isRunningWithNoWorkers } from '$lib/utilities/is-running-with-no-workers';
   import { toWorkerStatusReadable } from '$lib/utilities/screaming-enums';
   import type { TableSort, TableSortColumn } from '$lib/utilities/table-sort';
@@ -65,12 +66,7 @@
       type: 'string',
     },
     [translate('workers.host-name')]: {
-      getValue: (worker) =>
-        'hostName' in worker
-          ? worker.hostName
-          : 'hostInfo' in worker
-            ? worker.hostInfo?.hostName
-            : undefined,
+      getValue: getWorkerHostName,
       type: 'string',
     },
     [translate('common.start-time')]: {
