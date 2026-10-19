@@ -32,6 +32,12 @@ export const durationString = () =>
     )
     .refine((val): val is DurationString => /^\d+s$/.test(val));
 
+export const durationStringWithDefault = (fallback: DurationString) =>
+  z.preprocess(
+    (input) => (input == null || input === '' ? fallback : input),
+    durationString(),
+  );
+
 export const jsonString = () =>
   z
     .string()
