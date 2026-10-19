@@ -22,6 +22,7 @@
   import { translate } from '$lib/i18n/translate';
   import { IconTemporalSettings, IconWarning } from '$lib/io/icon';
   import { createCountPoller } from '$lib/runes/count-poller.svelte';
+  import { createTableSort } from '$lib/runes/table-sort-state.svelte';
   import { fetchPaginatedSchedules } from '$lib/services/schedule-service';
   import { fetchScheduleCount } from '$lib/services/workflow-counts';
   import {
@@ -50,7 +51,7 @@
   import type { APIErrorResponse } from '$lib/utilities/request-from-api';
   import { routeForScheduleCreate } from '$lib/utilities/route-for';
   import { searchAttributeSortType } from '$lib/utilities/search-attribute-table-sort';
-  import type { TableSort, TableSortColumn } from '$lib/utilities/table-sort';
+  import type { TableSortColumn } from '$lib/utilities/table-sort';
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
   import type { ScheduleListEntry } from '$types';
@@ -58,11 +59,7 @@
   const { namespace } = $derived(page.params);
   const query = $derived(page.url.searchParams.get('query') ?? '');
 
-  let sort = $derived.by((): TableSort | undefined => {
-    void namespace;
-    void query;
-    return undefined;
-  });
+  const tableSort = createTableSort(() => [namespace, query]);
 
   const countPoller = createCountPoller({
     getStore: () => schedulesCount,
@@ -222,7 +219,7 @@
   />
   {#key [namespace, query, $schedulesRefresh]}
     <PaginatedTable
-      bind:sort
+      bind:sort={tableSort.value}
       {sortColumns}
       {onFetch}
       {onError}

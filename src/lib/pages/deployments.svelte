@@ -12,6 +12,7 @@
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { IconTemporalSettings } from '$lib/io/icon';
+  import { createTableSort } from '$lib/runes/table-sort-state.svelte';
   import { fetchPaginatedDeployments } from '$lib/services/deployments-service';
   import {
     availableDeploymentColumns,
@@ -26,7 +27,7 @@
   import { columnWidthStyle } from '$lib/utilities/column-width';
   import { has } from '$lib/utilities/has';
   import { routeForWorkerDeploymentCreate } from '$lib/utilities/route-for';
-  import type { TableSort, TableSortColumn } from '$lib/utilities/table-sort';
+  import type { TableSortColumn } from '$lib/utilities/table-sort';
 
   interface Props {
     canCreateServerlessDeployment?: boolean;
@@ -41,10 +42,7 @@
   let error = $state('');
 
   const namespace = $derived(page.params.namespace);
-  let sort = $derived.by((): TableSort | undefined => {
-    void namespace;
-    return undefined;
-  });
+  const tableSort = createTableSort(() => namespace);
 
   const createHref = $derived(routeForWorkerDeploymentCreate({ namespace }));
 
@@ -123,7 +121,7 @@
 {#key [namespace, $refresh]}
   <div class="flex min-h-0 grow flex-col gap-4">
     <PaginatedTable
-      bind:sort
+      bind:sort={tableSort.value}
       {sortColumns}
       {onFetch}
       {onError}

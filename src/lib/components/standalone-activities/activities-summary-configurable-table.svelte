@@ -15,6 +15,7 @@
     type ActivityBatchOperationContext,
     activityKey,
   } from '$lib/pages/standalone-activities.svelte';
+  import { createTableSort } from '$lib/runes/table-sort-state.svelte';
   import { fetchPaginatedActivities } from '$lib/services/standalone-activities';
   import { activityCount, activityRefresh } from '$lib/stores/activities';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
@@ -31,7 +32,6 @@
     type PageSelectionStatus,
   } from '$lib/utilities/batch-selection';
   import { standaloneActivityBulkActionsEnabled } from '$lib/utilities/standalone-activities-commands-disabled';
-  import type { TableSort } from '$lib/utilities/table-sort';
 
   import { getActivitySortColumns } from './activities-summary-configurable-table/column-search-attributes';
 
@@ -56,11 +56,7 @@
   );
   const query = $derived(page.url.searchParams.get('query') ?? '');
 
-  let sort = $derived.by((): TableSort | undefined => {
-    void namespace;
-    void query;
-    return undefined;
-  });
+  const tableSort = createTableSort(() => [namespace, query]);
 
   const onFetch = $derived(() => fetchPaginatedActivities(namespace, query));
 
@@ -121,7 +117,7 @@
 {#key [namespace, query, $activityRefresh]}
   <PaginatedTable
     total={$activityCount.count}
-    bind:sort
+    bind:sort={tableSort.value}
     {sortColumns}
     {onFetch}
     onItemsChange={(items) => {

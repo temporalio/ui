@@ -22,6 +22,7 @@
     BATCH_OPERATION_CONTEXT,
     type BatchOperationContext,
   } from '$lib/pages/workflows-with-new-search.svelte';
+  import { createTableSort } from '$lib/runes/table-sort-state.svelte';
   import {
     fetchAllChildWorkflows,
     fetchPaginatedWorkflows,
@@ -41,7 +42,6 @@
     getPageSelectionStatus,
     type PageSelectionStatus,
   } from '$lib/utilities/batch-selection';
-  import type { TableSort } from '$lib/utilities/table-sort';
 
   import { getWorkflowSortColumns } from './workflows-summary-configurable-table/column-search-attributes';
 
@@ -66,12 +66,7 @@
   );
   const query = $derived(page.url.searchParams.get('query') ?? '');
 
-  // Keep sorting across table refreshes, but reset it for a different search.
-  let sort = $derived.by((): TableSort | undefined => {
-    void namespace;
-    void query;
-    return undefined;
-  });
+  const tableSort = createTableSort(() => [namespace, query]);
 
   const hasVersioningFilter = $derived(
     query?.includes('TemporalWorkerDeploymentVersion') ?? false,
@@ -243,7 +238,7 @@
 {#key [namespace, query, $refresh]}
   <PaginatedTable
     total={$workflowCount.count}
-    bind:sort
+    bind:sort={tableSort.value}
     {sortColumns}
     {onFetch}
     onItemsChange={(items) => {

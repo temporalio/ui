@@ -7,6 +7,7 @@
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { IconTemporalSettings } from '$lib/io/icon';
+  import { createTableSort } from '$lib/runes/table-sort-state.svelte';
   import { fetchPaginatedNexusOperations } from '$lib/services/standalone-nexus-operations';
   import {
     configurableTableColumns,
@@ -19,7 +20,6 @@
     nexusOperationRefresh,
   } from '$lib/stores/nexus-operations';
   import { nexusOperationSearchAttributes } from '$lib/stores/search-attributes';
-  import type { TableSort } from '$lib/utilities/table-sort';
 
   import { getNexusOperationSortColumns } from './nexus-operations-summary-configurable-table/column-search-attributes';
 
@@ -41,11 +41,7 @@
   );
   const query = $derived(page.url.searchParams.get('query') ?? '');
 
-  let sort = $derived.by((): TableSort | undefined => {
-    void namespace;
-    void query;
-    return undefined;
-  });
+  const tableSort = createTableSort(() => [namespace, query]);
 
   const onFetch = $derived(() =>
     fetchPaginatedNexusOperations(namespace, query),
@@ -61,7 +57,7 @@
 {#key [namespace, query, $nexusOperationRefresh]}
   <PaginatedTable
     total={$nexusOperationCount.count}
-    bind:sort
+    bind:sort={tableSort.value}
     {sortColumns}
     {onFetch}
     aria-label={translate(

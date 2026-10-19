@@ -39,7 +39,8 @@
 </script>
 
 <script lang="ts">
-  import type { TableSort, TableSortColumn } from '$lib/utilities/table-sort';
+  import { createTableSort } from '$lib/runes/table-sort-state.svelte';
+  import type { TableSortColumn } from '$lib/utilities/table-sort';
 
   import ColumnResizeHandle from '../column-resize-handle.svelte';
   import SortableTableHeader from '../sortable-table-header.svelte';
@@ -60,10 +61,7 @@
   } = $props();
   let visibleItems = $state<SortableItem[]>([]);
   let query = $state('');
-  let sort = $derived.by((): TableSort | undefined => {
-    void query;
-    return undefined;
-  });
+  const tableSort = createTableSort(() => query);
   let refreshKey = $state(0);
   let width = $state<number>();
   const buildSortColumns = (
@@ -100,7 +98,7 @@
 {#key refreshKey}
   <ApiPaginated
     {onFetch}
-    bind:sort
+    bind:sort={tableSort.value}
     {sortColumns}
     {total}
     onItemsChange={(items) => {
