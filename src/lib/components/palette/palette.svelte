@@ -145,7 +145,8 @@
     ),
   );
 
-  // Page items first, then recent items, then everything else.
+  // Page items, then every item in its natural order, then recent items.
+  // Recent items show twice, so nothing above them moves when they change.
   function rootSections(entries: PaletteEntry[]): PaletteSection[] {
     const byId = new Map(entries.map((entry) => [entry.item.id, entry]));
     const recentEntries = recent
@@ -154,7 +155,6 @@
         return entry && !entry.page ? [entry] : [];
       })
       .slice(0, RECENT_LIMIT);
-    const recentIds = new Set(recentEntries.map(({ item }) => item.id));
 
     // Page and recent items mix sets under one heading. Dev rows keep
     // their own marker.
@@ -162,12 +162,12 @@
       ...entries
         .filter(({ page }) => page)
         .map((entry) => ({ ...entry, variant: 'default' as const })),
+      ...entries.filter(({ page }) => !page),
       ...recentEntries.map((entry) => ({
         ...entry,
         section: translate('palette.recent'),
         variant: 'default' as const,
       })),
-      ...entries.filter(({ page, item }) => !page && !recentIds.has(item.id)),
     ]);
   }
 
@@ -206,6 +206,16 @@
   });
 
   const visibleItems = $derived(sections.flatMap(({ items }) => items));
+  // An item can show in two sections, so rows are indexed by position.
+  const sectionStarts = $derived(
+    sections.reduce<number[]>(
+      (starts, section, index) => [
+        ...starts,
+        index === 0 ? 0 : starts[index - 1] + sections[index - 1].items.length,
+      ],
+      [],
+    ),
+  );
   const selectedIndex = $derived(
     Math.min(selected, Math.max(visibleItems.length - 1, 0)),
   );
@@ -778,8 +788,8 @@
                     {section.title}
                   </div>
                 {/if}
-                {#each section.items as item (item.id)}
-                  {@const index = visibleItems.indexOf(item)}
+                {#each section.items as item, itemIndex (item.id)}
+                  {@const index = sectionStarts[sectionIndex] + itemIndex}
                   {@const isSelected = index === selectedIndex}
                   <!-- svelte-ignore a11y_click_events_have_key_events -->
                   <div
