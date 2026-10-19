@@ -2,8 +2,8 @@ import { parseDuration } from '$lib/holocene/duration-input/duration-input.svelt
 import type { DescribeFullSchedule } from '$lib/types/schedule';
 import type { SearchAttributes } from '$lib/types/workflows';
 
+import { DEFAULT_TASK_TIMEOUT } from './constants';
 import type { FormWorkflowDetails } from './schema';
-import { DEFAULT_TASK_TIMEOUT } from '../../constants';
 import {
   decodeSearchAttributeRows,
   toDurationString,

@@ -164,9 +164,7 @@ export const Strings = {
   'run-time-description':
     'Specify the time ({{- timezoneName }}) for this schedule to run. The schedule will run at 00:00 {{- timezoneName }} if left blank.',
   'execution-details-heading': 'Execution Details',
-  'workflow-policies-heading': 'Workflow Policies',
-  'workflow-policies-title': 'Edit Workflow Policies',
-  'workflow-policies-drawer-close': 'Cancel workflow policy edits',
+
   'policies-title': 'Edit Schedule Policies',
   'policies-drawer-close': 'Cancel policy edits',
   'overlap-policy-description':
@@ -192,8 +190,15 @@ export const Strings = {
   'timeouts-description':
     'Define how long a scheduled task, run, or execution should continue before considering it failed.',
   'task-timeout': 'Task Timeout',
+  'task-timeout-max-error': 'Task Timeout must be at most {{max}} seconds.',
+  'task-timeout-description':
+    'The maximum time a Worker has to execute a Workflow Task after picking it up from the Task Queue. The default is 10 seconds, with a maximum of 120 seconds.',
   'run-timeout': 'Run Timeout',
+  'run-timeout-description':
+    'The maximum duration of a single Workflow Run, which excludes retries and Continue-As-New. The default matches the Workflow Execution Timeout.',
   'execution-timeout': 'Execution Timeout',
+  'execution-timeout-description':
+    'The maximum time a Workflow Execution can stay Open, including retries and any use of Continue-As-New. The default is infinite.',
   'update-policies': 'Update Policies',
   'policies-heading': 'Schedule Policies',
   'policies-description':

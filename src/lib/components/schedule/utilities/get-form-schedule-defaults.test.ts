@@ -2,16 +2,16 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import type { DescribeFullSchedule } from '$lib/types/schedule';
 
-import {
-  DEFAULT_CATCHUP_WINDOW,
-  DEFAULT_EXECUTION_TIMEOUT,
-  DEFAULT_RUN_TIMEOUT,
-  DEFAULT_TASK_TIMEOUT,
-} from '../constants';
+import { DEFAULT_CATCHUP_WINDOW } from '../constants';
 import {
   getFormScheduleDefaults,
   parseOverlapPolicy,
 } from './get-form-schedule-defaults';
+import {
+  DEFAULT_EXECUTION_TIMEOUT,
+  DEFAULT_RUN_TIMEOUT,
+  DEFAULT_TASK_TIMEOUT,
+} from '../scheduled-action-types/workflow/constants';
 import { getWorkflowDetailsDefaults } from '../scheduled-action-types/workflow/defaults';
 
 const noAttributes = { searchAttributes: {}, customSearchAttributes: {} };

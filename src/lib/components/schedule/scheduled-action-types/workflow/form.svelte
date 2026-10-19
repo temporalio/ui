@@ -17,12 +17,10 @@
   import {
     type FormWorkflowDetails,
     formWorkflowDetailsSchema,
-    type FormWorkflowPolicies,
   } from './schema';
   import ActionDetailsCard from '../../schedule-form/action-details-card.svelte';
 
   import WorkflowDetails from './workflow-details.svelte';
-  import WorkflowPoliciesCard from './workflow-policies-card.svelte';
 
   type Props = ActionFormMode<StartWorkflowRequest> & {
     initialValues: FormWorkflowDetails;
@@ -77,17 +75,6 @@
     ]);
   });
 
-  const workflowPolicies = $derived({
-    taskTimeout: $form.taskTimeout,
-    runTimeout: $form.runTimeout,
-    executionTimeout: $form.executionTimeout,
-    keepOriginalWorkflowId: $form.keepOriginalWorkflowId,
-  });
-
-  const updateWorkflowPolicies = (policies: FormWorkflowPolicies) => {
-    form.update((current) => ({ ...current, ...policies }));
-  };
-
   export async function validate(): Promise<ScheduledActionFormData | null> {
     const result = await validateForm({ update: true });
 
@@ -102,10 +89,7 @@
 <ActionDetailsCard>
   <WorkflowDetails {form} {errors} {validateField} {...mode} />
 </ActionDetailsCard>
-<WorkflowPoliciesCard
-  policies={workflowPolicies}
-  onUpdate={updateWorkflowPolicies}
-/>
+
 <Alert
   intent="error"
   title={translate('schedules.fix-workflow-form-errors')}

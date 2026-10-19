@@ -2,12 +2,18 @@
   import { tick } from 'svelte';
   import type { SuperForm } from 'sveltekit-superforms';
 
+  import DurationInput, {
+    getFirstWholeNumberUnit,
+    SECONDS,
+  } from '$lib/holocene/duration-input/duration-input.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { StartWorkflowRequest } from '$lib/types/schedule';
 
   import type { ActionFormMode } from '../types';
+  import { DEFAULT_TASK_TIMEOUT, MAX_TASK_TIMEOUT_SECONDS } from './constants';
   import type { FormWorkflowDetails } from './schema';
+  import { durationUnits } from '../../constants';
 
   import WorkflowInputPayload from './workflow-input-payload.svelte';
 
@@ -18,13 +24,32 @@
   };
 
   let { form, errors, validateField, ...mode }: Props = $props();
+
   const validateChangedField = async (
-    field: 'workflowType' | 'workflowId' | 'taskQueue',
+    field:
+      | 'workflowType'
+      | 'workflowId'
+      | 'taskQueue'
+      | 'taskTimeout'
+      | 'runTimeout'
+      | 'executionTimeout',
   ) => {
     await tick();
     if ($errors[field]) {
       await validateField(field, { update: 'errors' });
     }
+  };
+
+  let taskTimeoutResetKey = $state(0);
+
+  const handleTaskTimeoutBlur = async (
+    event: FocusEvent & { currentTarget: HTMLInputElement },
+  ) => {
+    if (!event.currentTarget.value) {
+      $form.taskTimeout = DEFAULT_TASK_TIMEOUT;
+      taskTimeoutResetKey += 1;
+    }
+    await validateField('taskTimeout');
   };
 </script>
 
@@ -71,4 +96,61 @@
     ? (mode.existingAction.input ?? undefined)
     : undefined}
   showEditActions={mode.isEditing}
+/>
+{#key taskTimeoutResetKey}
+  <DurationInput
+    id="task-timeout-duration"
+    label={translate('schedules.task-timeout')}
+    inputmode="numeric"
+    bind:value={$form.taskTimeout}
+    units={[SECONDS]}
+    initialUnit="second(s)"
+    error={!!$errors.taskTimeout?.[0]}
+    hintText={$errors.taskTimeout?.[0] ||
+      translate('schedules.task-timeout-description')}
+    inputClass="max-w-80"
+    min={0}
+    max={MAX_TASK_TIMEOUT_SECONDS}
+    step={1}
+    onblur={handleTaskTimeoutBlur}
+    oninput={() => validateChangedField('taskTimeout')}
+  />
+{/key}
+<DurationInput
+  id="run-timeout-duration"
+  label={translate('schedules.run-timeout')}
+  inputmode="numeric"
+  bind:value={$form.runTimeout}
+  initialUnit={getFirstWholeNumberUnit(
+    $form.runTimeout,
+    durationUnits,
+    'second(s)',
+  )}
+  units={durationUnits}
+  error={!!$errors.runTimeout?.[0]}
+  hintText={$errors.runTimeout?.[0] ||
+    translate('schedules.run-timeout-description')}
+  inputClass="max-w-80"
+  min={0}
+  onblur={() => validateField('runTimeout')}
+  oninput={() => validateChangedField('runTimeout')}
+/>
+<DurationInput
+  id="execution-timeout-duration"
+  label={translate('schedules.execution-timeout')}
+  inputmode="numeric"
+  bind:value={$form.executionTimeout}
+  initialUnit={getFirstWholeNumberUnit(
+    $form.executionTimeout,
+    durationUnits,
+    'second(s)',
+  )}
+  units={durationUnits}
+  error={!!$errors.executionTimeout?.[0]}
+  hintText={$errors.executionTimeout?.[0] ||
+    translate('schedules.execution-timeout-description')}
+  inputClass="max-w-80"
+  min={0}
+  onblur={() => validateField('executionTimeout')}
+  oninput={() => validateChangedField('executionTimeout')}
 />

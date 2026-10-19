@@ -6,7 +6,8 @@ import {
 } from '$lib/stores/data-encoder-config';
 
 import { getRequestBody } from './get-request-body';
-import { DEFAULT_CATCHUP_WINDOW, DEFAULT_TASK_TIMEOUT } from '../constants';
+import { DEFAULT_CATCHUP_WINDOW } from '../constants';
+import { DEFAULT_TASK_TIMEOUT } from '../scheduled-action-types/workflow/constants';
 import { formWorkflowDetailsSchema } from '../scheduled-action-types/workflow/schema';
 import { formScheduleSchema } from '../schema/form';
 import type { ScheduleFormData } from '../types';
