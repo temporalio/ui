@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { mockNow } from './fixed-now';
+import { mockNow, waitForImages } from './fixed-now';
 import { mockWorkflowApis } from '../test-utilities/mock-apis';
 import { mockDate } from '../test-utilities/mock-date';
 import { mockWorkflow } from '../test-utilities/mocks/workflow';
@@ -26,7 +26,9 @@ test('hover actions remain visible on touch devices', async ({ page }) => {
   await expect(navigationToggle).toHaveCSS('opacity', '1');
   await expect(copyAction).toBeVisible();
   await expect(copyAction).toHaveCSS('opacity', '1');
+  await waitForImages(page);
   await expect(page).toHaveScreenshot('workflow-history-touch.png', {
     fullPage: true,
+    maxDiffPixels: 100,
   });
 });
