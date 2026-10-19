@@ -1,20 +1,18 @@
-import { parseDuration } from '$lib/holocene/duration-input/duration-input.svelte';
-import {
-  encodePayloads,
-  setSearchAttributes,
-} from '$lib/utilities/encode-payload';
-
 import { isValidCronString } from './cron';
 import {
   calendarDateStrToEndOfDayTimestamp,
   calendarDateStrToTimestamp,
   isoStringToCalendarDateStr,
 } from './date';
+import { getSearchAttributes } from './get-search-attributes';
+import {
+  getWorkflowActionRequest,
+  getWorkflowPoliciesRequest,
+} from '../scheduled-action-types/workflow/request-mappings';
 import type { FormScheduleSchema } from '../schema/form';
 
 import type {
   DescribeFullSchedule,
-  ScheduleActionRequest,
   ScheduleInterval,
   SchedulePoliciesRequest,
   ScheduleRequestBody,
@@ -22,16 +20,6 @@ import type {
   ScheduleStateRequest,
   StructuredCalendar,
 } from '$types/schedule';
-
-function getSearchAttributes(attrs: Parameters<typeof setSearchAttributes>[0]) {
-  if (!attrs.length) {
-    return null;
-  }
-
-  return {
-    indexedFields: { ...setSearchAttributes(attrs) },
-  };
-}
 
 function getScheduleStateRequest(
   scheduleForm: FormScheduleSchema,
@@ -58,59 +46,7 @@ function getSchedulePoliciesRequest(
     overlapPolicy: scheduleForm.overlapPolicy,
     catchupWindow: scheduleForm.catchupWindow || undefined,
     pauseOnFailure: scheduleForm.pauseOnFailure,
-    keepOriginalWorkflowId: scheduleForm.keepOriginalWorkflowId,
   } satisfies SchedulePoliciesRequest;
-}
-
-// Omit zero/empty workflow timeouts so the server applies its defaults
-// (execution/run: unlimited, task: 10s) rather than sending an explicit 0.
-function toWorkflowTimeout(value: string | undefined): string | undefined {
-  if (!value || Number(parseDuration(value)) <= 0) {
-    return undefined;
-  }
-
-  return value;
-}
-
-async function getScheduleActionRequest(
-  scheduleForm: FormScheduleSchema,
-  describeFullSchedule: DescribeFullSchedule | null = null,
-): Promise<ScheduleActionRequest> {
-  const startWorkflow =
-    describeFullSchedule?.schedule?.action?.startWorkflow ?? {};
-
-  const payloads =
-    scheduleForm.editInput && scheduleForm.input
-      ? await encodePayloads({
-          input: scheduleForm.input,
-          encoding: scheduleForm.encoding,
-          messageType: scheduleForm.messageType,
-        })
-      : null;
-
-  return {
-    startWorkflow: {
-      ...startWorkflow,
-      workflowId: scheduleForm.workflowId,
-      workflowType: {
-        name: scheduleForm.workflowType,
-      },
-      taskQueue: {
-        name: scheduleForm.taskQueue,
-      },
-      ...(scheduleForm.editInput && {
-        input: payloads ? { payloads } : null,
-      }),
-      searchAttributes: getSearchAttributes(
-        scheduleForm.workflowSearchAttributes,
-      ),
-      workflowTaskTimeout: toWorkflowTimeout(scheduleForm.taskTimeout),
-      workflowRunTimeout: toWorkflowTimeout(scheduleForm.runTimeout),
-      workflowExecutionTimeout: toWorkflowTimeout(
-        scheduleForm.executionTimeout,
-      ),
-    },
-  } satisfies ScheduleActionRequest;
 }
 
 type SpecFormItem = FormScheduleSchema['specs'][number];
@@ -281,11 +217,14 @@ export async function getRequestBody(
     searchAttributes: getSearchAttributes(scheduleForm.searchAttributes),
     schedule: {
       spec: getScheduleSpecRequest(scheduleForm, describeFullSchedule),
-      action: await getScheduleActionRequest(
+      action: await getWorkflowActionRequest(
         scheduleForm,
-        describeFullSchedule,
+        describeFullSchedule?.schedule?.action?.startWorkflow,
       ),
-      policies: getSchedulePoliciesRequest(scheduleForm),
+      policies: {
+        ...getSchedulePoliciesRequest(scheduleForm),
+        ...getWorkflowPoliciesRequest(scheduleForm),
+      },
       state: getScheduleStateRequest(scheduleForm, describeFullSchedule),
     },
   } satisfies ScheduleRequestBody;
