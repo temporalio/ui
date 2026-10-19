@@ -288,6 +288,8 @@
 </div>
 
 <style lang="postcss">
+  @reference '../../app.css';
+
   .caret {
     @apply inline-flex items-center justify-center rounded;
 
@@ -309,12 +311,12 @@
   .arrow-left {
     border-width: 6px 12px 6px 0;
 
-    @apply border-b-transparent border-l-transparent border-r-content-primary border-t-transparent;
+    @apply border-t-transparent border-r-content-primary border-b-transparent border-l-transparent;
   }
 
   .arrow-right {
     border-width: 6px 0 6px 12px;
 
-    @apply border-b-transparent border-l-content-primary border-r-transparent border-t-transparent;
+    @apply border-t-transparent border-r-transparent border-b-transparent border-l-content-primary;
   }
 </style>

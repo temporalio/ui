@@ -122,7 +122,7 @@
       description={translate('schedules.end-date-label')}
     >
       {@const rowClass =
-        'grid h-11 grid-cols-[theme(spacing.24)_1fr] items-center gap-3'}
+        'grid h-11 grid-cols-[var(--spacing-24)_1fr] items-center gap-3'}
       <div class={rowClass}>
         <RadioInput
           id="end-date-never"

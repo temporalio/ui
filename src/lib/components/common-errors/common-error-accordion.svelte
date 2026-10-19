@@ -36,7 +36,7 @@
     id="{id}-trigger"
     aria-controls="{id}-content"
     aria-expanded={open}
-    class="flex w-full items-center gap-2 p-3 text-left hover:bg-interactive-secondary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-interactive-primary"
+    class="flex w-full items-center gap-2 p-3 text-left hover:bg-interactive-secondary-hover focus-visible:ring-2 focus-visible:ring-interactive-primary focus-visible:outline-hidden focus-visible:ring-inset"
     type="button"
     onclick={onToggle}
   >
@@ -53,7 +53,7 @@
   <div
     id="{id}-content"
     aria-labelledby="{id}-trigger"
-    class="flex flex-col items-start gap-2 py-4 pl-11 pr-4 text-sm"
+    class="flex flex-col items-start gap-2 py-4 pr-4 pl-11 text-sm"
     class:hidden={!open}
   >
     <p>{error.description}</p>

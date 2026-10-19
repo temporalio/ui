@@ -261,9 +261,9 @@
 <tr
   class={merge(
     'hover:cursor-pointer',
-    failure && '!bg-alpha-red-40 hover:!bg-alpha-red-60',
-    canceled && '!bg-alpha-amber-30 hover:!bg-alpha-amber-50',
-    terminated && '!bg-alpha-pink-30 hover:!bg-alpha-pink-50',
+    failure && 'bg-alpha-red-40! hover:bg-alpha-red-60!',
+    canceled && 'bg-alpha-amber-30! hover:bg-alpha-amber-50!',
+    terminated && 'bg-alpha-pink-30! hover:bg-alpha-pink-50!',
     hasRelatedActivities(group, hoveredEventId) && 'active',
   )}
   id={`${event.id}-${index}`}
@@ -379,7 +379,7 @@
         <div
           class="flex max-w-xl items-center gap-2 first:pt-0 last:border-b-0 md:w-auto"
         >
-          <p class="whitespace-nowrap text-right text-xs">Summary</p>
+          <p class="text-right text-xs whitespace-nowrap">Summary</p>
           <PayloadSummary value={currentEvent.userMetadata.summary}>
             {#snippet children(decodedValue)}
               <Preview
@@ -457,7 +457,7 @@
     class="w-full text-sm no-underline"
     data-testid="event-summary-row-expanded"
   >
-    <td class="!p-0" colspan={$isCloud ? 5 : 4}>
+    <td class="p-0!" colspan={$isCloud ? 5 : 4}>
       <EventDetailsFull
         {group}
         event={currentEvent}
@@ -468,6 +468,8 @@
 {/if}
 
 <style lang="postcss">
+  @reference '../../../app.css';
+
   tr[data-testid='event-summary-row'].active {
     @apply bg-interactive-secondary-hover text-primary;
   }

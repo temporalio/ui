@@ -49,7 +49,7 @@
             class="flex flex-col items-center gap-2 rounded-lg border border-primary bg-surface-primary p-3 text-center text-primary"
           >
             <span class="text-2xl"><Glyph /></span>
-            <code class="break-all text-[0.625rem] leading-tight opacity-70">
+            <code class="text-[0.625rem] leading-tight break-all opacity-70">
               {name}
             </code>
           </li>
@@ -81,7 +81,7 @@
                   {#each [{ label: 'base', Component: Base }, { label: 'optical', Component: Glyph }] as variant (variant.label)}
                     {@const Rendered = variant.Component}
                     <div class="flex flex-col items-center gap-1">
-                      <span class="outline-dotted outline-1 outline-danger">
+                      <span class="outline-1 outline-danger outline-dotted">
                         <Rendered width={size} height={size} />
                       </span>
                       <span class="text-[0.625rem] opacity-60">

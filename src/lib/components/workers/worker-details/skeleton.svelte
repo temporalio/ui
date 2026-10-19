@@ -16,7 +16,7 @@
 <div class="flex items-center gap-2">
   {@render breadcrumb()}
   <IconChevronLeft />
-  <Skeleton class="h-5 w-96 rounded-sm" />
+  <Skeleton class="h-5 w-96 rounded-xs" />
 </div>
 
 <section
@@ -26,7 +26,7 @@
   <header
     class="flex w-full flex-col items-start gap-4 xl:flex-row xl:items-center"
   >
-    <Skeleton class="h-6 w-24 rounded-sm" />
+    <Skeleton class="h-6 w-24 rounded-xs" />
     <Skeleton class="h-8 w-96" />
   </header>
 
@@ -42,8 +42,8 @@
   </div>
 
   <div class="flex flex-wrap items-center gap-2">
-    <Skeleton class="h-7 w-32 rounded-sm" />
-    <Skeleton class="h-4 w-48 rounded-sm" />
+    <Skeleton class="h-7 w-32 rounded-xs" />
+    <Skeleton class="h-4 w-48 rounded-xs" />
   </div>
 
   <div class="flex flex-col gap-4 xl:flex-row">

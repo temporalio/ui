@@ -115,13 +115,13 @@
         <tr
           aria-hidden="true"
           class={merge(
-            '!h-0 bg-transparent transition-opacity',
+            'h-0! bg-transparent transition-opacity',
             loadingBarVisible
               ? 'opacity-100 duration-[250ms]'
               : 'opacity-0 duration-[350ms]',
           )}
         >
-          <th colspan="1000" class="relative !h-0 !border-0 !p-0">
+          <th colspan="1000" class="relative h-0! border-0! p-0!">
             <ProgressBar subtle class="bottom-0" />
           </th>
         </tr>
@@ -135,6 +135,8 @@
 </div>
 
 <style lang="postcss">
+  @reference '../../../app.css';
+
   .holocene-table {
     @apply table-auto bg-surface-primary text-primary;
 

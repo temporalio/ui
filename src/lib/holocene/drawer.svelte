@@ -60,9 +60,9 @@
     data-theme={dark ? 'dark' : undefined}
     class={merge(
       'fixed z-[55] h-auto overflow-y-auto border-tertiary bg-background-primary text-primary',
-      position === 'bottom' && 'bottom-0 left-0 right-0 border-t',
+      position === 'bottom' && 'right-0 bottom-0 left-0 border-t',
       position === 'right' &&
-        'right-0 top-0 h-full w-screen border-l sm:max-w-fit',
+        'top-0 right-0 h-full w-screen border-l sm:max-w-fit',
       className,
     )}
     in:fly={flyParamsIn}
@@ -74,7 +74,7 @@
     use:clickoutside={onClick}
   >
     <div class="relative h-full" class:pt-10={closePadding}>
-      <div class="absolute right-2 top-2">
+      <div class="absolute top-2 right-2">
         <IconButton
           data-testid="drawer-close-button"
           label={closeButtonLabel}

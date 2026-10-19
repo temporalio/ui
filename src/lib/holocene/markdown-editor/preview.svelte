@@ -194,7 +194,7 @@
 <section
   class={twMerge(
     fitContent
-      ? 'inline-flex min-w-0 max-w-full'
+      ? 'inline-flex max-w-full min-w-0'
       : fill
         ? 'h-full w-full'
         : 'w-full',
@@ -207,9 +207,9 @@
     {title}
     class={twMerge(
       fitContent
-        ? 'block min-w-0 max-w-full border-0 align-middle'
+        ? 'block max-w-full min-w-0 border-0 align-middle'
         : 'block w-full border-0',
-      fitContent && loading && 'invisible !h-0 !w-0',
+      fitContent && loading && 'invisible h-0! w-0!',
     )}
     id={frameId}
   ></iframe>

@@ -115,7 +115,7 @@
   <Menu
     id={menuId}
     usePortal
-    class="w-max min-w-full max-w-[min(100dvw-1rem,32rem)]"
+    class="w-max max-w-[min(100dvw-1rem,32rem)] min-w-full"
   >
     <MenuItem
       class="p-0"

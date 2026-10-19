@@ -685,7 +685,7 @@ describe('CatalogDetail', () => {
     });
 
     expect(body).toMatch(
-      /<th[^>]*class="[^"]*w-60[^"]*!text-right[^"]*"[^>]*>Actions<\/th>/,
+      /<th[^>]*class="[^"]*w-60[^"]*text-right![^"]*"[^>]*>Actions<\/th>/,
     );
     expect(body).toMatch(/<table[^>]*class="[^"]*min-w-\[44rem\][^"]*"/);
     expect(body).toMatch(

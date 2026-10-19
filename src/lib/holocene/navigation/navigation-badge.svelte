@@ -39,17 +39,17 @@
       href={link}
       {rel}
       {target}
-      class="relative flex cursor-pointer items-center border border-primary bg-surface-overlay-primary text-primary hover:bg-interactive-tertiary-hover group-data-[nav=closed]:p-1 group-data-[nav=open]:px-2.5 group-data-[nav=open]:py-2"
+      class="relative flex cursor-pointer items-center border border-primary bg-surface-overlay-primary text-primary group-data-[nav=closed]:p-1 group-data-[nav=open]:px-2.5 group-data-[nav=open]:py-2 hover:bg-interactive-tertiary-hover"
     >
       <div
-        class="flex h-6 w-6 items-center whitespace-nowrap group-data-[nav=open]:hidden group-data-[nav=closed]:justify-center"
+        class="flex h-6 w-6 items-center whitespace-nowrap group-data-[nav=closed]:justify-center group-data-[nav=open]:hidden"
       >
         {#if Icon}
           <Icon />
         {/if}
       </div>
       <div
-        class="text-center group-data-[nav=open]:visible group-data-[nav=closed]:hidden"
+        class="text-center group-data-[nav=closed]:hidden group-data-[nav=open]:visible"
       >
         {@render children?.()}
       </div>

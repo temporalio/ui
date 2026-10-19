@@ -36,7 +36,7 @@
     'text-primary',
     'text-sm',
     'font-medium',
-    'focus:outline-none',
+    'focus:outline-hidden',
     hidden && 'sr-only',
     disabled && 'cursor-not-allowed',
     className,

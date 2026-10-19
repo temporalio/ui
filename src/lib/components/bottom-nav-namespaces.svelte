@@ -56,8 +56,10 @@
 {/if}
 
 <style lang="postcss">
+  @reference '../../app.css';
+
   .namespace {
-    @apply w-full cursor-pointer border border-transparent text-left text-sm font-medium hover:bg-interactive-secondary hover:text-primary focus-visible:border-slate-1 focus-visible:bg-interactive-secondary focus-visible:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary;
+    @apply w-full cursor-pointer border border-transparent text-left text-sm font-medium hover:bg-interactive-secondary hover:text-primary focus-visible:border-slate-1 focus-visible:bg-interactive-secondary focus-visible:text-primary focus-visible:ring-2 focus-visible:ring-interactive-primary focus-visible:outline-hidden;
 
     &.selected {
       @apply text-brand;

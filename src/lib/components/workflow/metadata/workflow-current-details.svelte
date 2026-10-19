@@ -69,7 +69,7 @@
       <div class="flex flex-row items-center gap-2 lg:flex-col xl:flex-row">
         <p class="hidden sm:block">
           Press the <span
-            class="mx-1 rounded bg-surface-tertiary px-1 text-sm font-medium leading-4"
+            class="mx-1 rounded bg-surface-tertiary px-1 text-sm leading-4 font-medium"
             >R</span
           > for freshness
         </p>

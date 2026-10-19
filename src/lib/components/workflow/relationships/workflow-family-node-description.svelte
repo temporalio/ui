@@ -46,7 +46,7 @@
 
 <div class="w-full">
   <button
-    class="relative flex w-full select-text border-primary {isActive &&
+    class="relative flex w-full border-primary select-text {isActive &&
       'bg-interactive-primary text-white hover:bg-interactive-primary-hover focus-visible:bg-interactive-primary-hover active:bg-interactive-primary-press'} {isCurrent &&
       !isActive &&
       'bg-surface-tertiary text-primary'} items-center gap-1 px-2 py-1 lg:py-2 {!isActive &&
@@ -59,7 +59,7 @@
   >
     {#if !isRootWorkflow && !isActive}
       <div
-        class="absolute left-0 top-[25%] h-[1px] w-3 bg-border-primary lg:top-[50%] lg:w-6"
+        class="absolute top-[25%] left-0 h-[1px] w-3 bg-border-primary lg:top-[50%] lg:w-6"
       ></div>
     {/if}
     <div class="flex w-full items-center gap-3 pr-2 text-sm">

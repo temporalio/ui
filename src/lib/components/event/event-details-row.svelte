@@ -42,7 +42,7 @@
     class="flex max-w-xl items-center gap-2 first:pt-0 last:border-b-0 md:w-auto"
   >
     {#if showKey}
-      <p class="whitespace-nowrap text-right text-xs">
+      <p class="text-right text-xs whitespace-nowrap">
         {format(key)}
       </p>
     {/if}
@@ -69,7 +69,7 @@
     {:else}
       <Tooltip top hide={!tooltip} text={tooltip} class="min-w-0">
         <span
-          class="block select-none truncate rounded-sm border border-primary bg-surface-secondary px-1.5 py-0.5 text-secondary"
+          class="block truncate rounded-xs border border-primary bg-surface-secondary px-1.5 py-0.5 text-secondary select-none"
         >
           {formatSummaryAttributeDisplayValue(value)}
         </span>

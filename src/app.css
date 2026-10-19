@@ -1,6 +1,34 @@
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
+@import 'tailwindcss' source('./');
+@config '../tailwind.config.ts';
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+@theme {
+  --font-*: initial;
+  --font-sans:
+    ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji,
+    Segoe UI Symbol, Noto Color Emoji;
+  --font-serif: ui-serif, Georgia, Cambria, Times New Roman, Times, serif;
+  --font-mono:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono,
+    Courier New, monospace;
+
+  --animate-spin-slow: spin 3s linear infinite;
+
+  --text-2xs: 0.625rem;
+
+  --z-index-100: 100;
+}
+
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-border-primary);
+  }
+}
 
 @layer base {
   :root {
@@ -29,7 +57,18 @@
   }
 
   body {
-    @apply body-normal relative overscroll-none bg-background-primary text-primary antialiased;
+    @apply relative overscroll-none bg-background-primary text-primary antialiased;
+    font-size: 0.875rem;
+    font-weight: 400;
+  }
+
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
+    cursor: pointer;
+  }
+
+  dialog {
+    margin: auto;
   }
 
   body[data-theme='light'] {

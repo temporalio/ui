@@ -43,7 +43,7 @@
 
 <span
   class={merge(
-    'flex h-5 w-fit items-center whitespace-nowrap rounded-sm px-1 py-0.5 text-xs font-medium leading-4',
+    'flex h-5 w-fit items-center rounded-xs px-1 py-0.5 text-xs leading-4 font-medium whitespace-nowrap',
     stateColors[state],
     className,
   )}

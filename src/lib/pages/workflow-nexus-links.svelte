@@ -121,20 +121,20 @@
         {@const link = event ? getInboundLinkForEvent(event) : undefined}
         {@const linkView = toEventLinkView(link || undefined, { namespace })}
         <TableRow data-testid="worker-row">
-          <td class="break-all text-left" data-testid="caller-event">
+          <td class="text-left break-all" data-testid="caller-event">
             {#if linkView.event}
               {@render linkDisplay(linkView.event)}
             {/if}
           </td>
-          <td class="break-all text-left" data-testid="link-event">
+          <td class="text-left break-all" data-testid="link-event">
             {@render linkDisplay(linkView)}
           </td>
-          <td class="break-all text-left" data-testid="link-namespace">
+          <td class="text-left break-all" data-testid="link-namespace">
             {#if linkView.namespace}
               {@render linkDisplay(linkView.namespace)}
             {/if}
           </td>
-          <td class="break-all text-left" data-testid="handler-event">
+          <td class="text-left break-all" data-testid="handler-event">
             <Link
               href={routeForEventHistoryEvent({
                 namespace: namespace,
@@ -192,7 +192,7 @@
           isNexusOperationScheduledEvent(e),
         )}
         <TableRow data-testid="worker-row">
-          <td class="break-all text-left" data-testid="link-event">
+          <td class="text-left break-all" data-testid="link-event">
             <Link
               href={routeForEventHistoryEvent({
                 namespace,
@@ -202,21 +202,21 @@
               })}>{scheduledEvent?.id}</Link
             >
           </td>
-          <td class="break-all text-left" data-testid="link-endpoint">
+          <td class="text-left break-all" data-testid="link-endpoint">
             {scheduledEvent?.nexusOperationScheduledEventAttributes?.endpoint}
           </td>
-          <td class="break-all text-left" data-testid="link-service">
+          <td class="text-left break-all" data-testid="link-service">
             {scheduledEvent?.nexusOperationScheduledEventAttributes?.service}
           </td>
-          <td class="break-all text-left" data-testid="link-operation">
+          <td class="text-left break-all" data-testid="link-operation">
             {scheduledEvent?.nexusOperationScheduledEventAttributes?.operation}
           </td>
-          <td class="break-all text-left" data-testid="link-namespace">
+          <td class="text-left break-all" data-testid="link-namespace">
             {#if linkView.namespace}
               {@render linkDisplay(linkView.namespace)}
             {/if}
           </td>
-          <td class="break-all text-left" data-testid="link-href">
+          <td class="text-left break-all" data-testid="link-href">
             {@render linkDisplay(linkView)}
             {#if targetTypeLabel}
               <p
@@ -227,7 +227,7 @@
               </p>
             {/if}
           </td>
-          <td class="break-all text-left" data-testid="link-href">
+          <td class="text-left break-all" data-testid="link-href">
             {#if linkView.event}
               {@render linkDisplay(linkView.event)}
             {/if}

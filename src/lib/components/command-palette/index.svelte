@@ -341,7 +341,7 @@
   {#each filteredCommands as command, index (command.id)}
     <button
       type="button"
-      class="flex w-full items-center justify-between rounded-lg border border-transparent px-6 py-4 text-left transition-all duration-200 hover:bg-interactive-tertiary-hover hover:shadow-sm"
+      class="flex w-full items-center justify-between rounded-lg border border-transparent px-6 py-4 text-left transition-all duration-200 hover:bg-interactive-tertiary-hover hover:shadow-xs"
       class:selected={index === selectedIndex}
       onclick={() => handleCommandClick(command)}
       onmouseenter={() => (selectedIndex = index)}
@@ -351,7 +351,7 @@
       <div class="flex items-center gap-4">
         {#if command.Icon}
           {@const CommandIcon = command.Icon}
-          <div class="h-6 w-6 flex-shrink-0 text-secondary">
+          <div class="h-6 w-6 shrink-0 text-secondary">
             <CommandIcon />
           </div>
         {/if}
@@ -396,7 +396,7 @@
   {#snippet content()}
     <div class="flex h-full flex-1 flex-col">
       <div
-        class="sticky top-0 z-20 border-b border-primary bg-surface-primary pb-4 pt-2"
+        class="sticky top-0 z-20 border-b border-primary bg-surface-primary pt-2 pb-4"
       >
         <div class="flex items-center justify-between px-6 py-3">
           <div
@@ -448,8 +448,10 @@
 </Modal>
 
 <style lang="postcss">
+  @reference '../../../app.css';
+
   .selected {
-    @apply border-brand bg-surface-brand shadow-sm;
+    @apply border-brand bg-surface-brand shadow-xs;
   }
 
   :global(.body::backdrop) {

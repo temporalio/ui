@@ -374,7 +374,7 @@
   </td>
   <Timestamp
     as="td"
-    class="whitespace-pre-line break-words text-left"
+    class="text-left break-words whitespace-pre-line"
     dateTime={version?.createTime}
   />
   <VersionActionsMenu
@@ -396,7 +396,7 @@
 
 {#if expanded}
   <tr class="border-y border-primary bg-surface-primary text-primary">
-    <td colspan="5" class="!p-1">
+    <td colspan="5" class="p-1!">
       <VersionRowDetails
         {namespace}
         {deploymentName}

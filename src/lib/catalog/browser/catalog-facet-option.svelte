@@ -41,12 +41,14 @@
   <span class="min-w-0 flex-1 truncate">{label}</span>
   <BadgeCount
     value={option.count}
-    class="tabular-nums text-secondary"
+    class="text-secondary tabular-nums"
     aria-hidden="true"
   />
 </button>
 
 <style lang="postcss">
+  @reference '../../../app.css';
+
   .catalog-facet-option {
     @apply flex items-center gap-2 text-left text-sm;
 
@@ -60,6 +62,6 @@
   }
 
   .chip {
-    @apply h-9 shrink-0 whitespace-nowrap rounded border border-primary bg-surface-primary px-3;
+    @apply h-9 shrink-0 rounded border border-primary bg-surface-primary px-3 whitespace-nowrap;
   }
 </style>

@@ -174,7 +174,7 @@
 
     {#if !$relativeTime}
       <div
-        class="mx-4 mb-2 mt-4 flex gap-2 max-md:flex-col md:flex-row md:items-center md:justify-between"
+        class="mx-4 mt-4 mb-2 flex gap-2 max-md:flex-col md:flex-row md:items-center md:justify-between"
       >
         <p class="font-medium">Timestamp Format</p>
         <ToggleButtons>
@@ -227,7 +227,7 @@
         </ToggleButtons>
       </div>
 
-      <div class="mx-4 mb-4 mt-3">
+      <div class="mx-4 mt-3 mb-4">
         <Timestamp
           as="p"
           class="text-xs text-secondary"

@@ -573,7 +573,7 @@
         <ul class="pointer-events-none absolute inset-0 m-0 list-none p-0">
           {#each pool as slot, slotIndex (slotIndex)}
             <li
-              class="absolute left-0 right-0 top-0"
+              class="absolute top-0 right-0 left-0"
               style:display={slot ? 'block' : 'none'}
               style:height="{ROW_HEIGHT}px"
               style:contain="layout"

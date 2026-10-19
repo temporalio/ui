@@ -39,7 +39,7 @@
     'border',
     'border-transparent',
     'cursor-pointer',
-    'focus-visible:outline-none',
+    'focus-visible:outline-hidden',
     'focus-visible:ring-2',
     'focus-visible:ring-interactive-primary-press',
     'focus-visible:ring-offset-2',

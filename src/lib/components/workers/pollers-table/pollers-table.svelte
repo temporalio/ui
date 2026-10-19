@@ -111,13 +111,13 @@
         <th scope="col" class="hidden md:table-cell"
           >{translate('workflows.last-accessed')}</th
         >
-        <th scope="col" class="!text-center xl:w-48">
+        <th scope="col" class="text-center! xl:w-48">
           {translate('workflows.workflow-task-handler')}
         </th>
-        <th scope="col" class="!text-center xl:w-36">
+        <th scope="col" class="text-center! xl:w-36">
           {translate('workflows.activity-handler')}
         </th>
-        <th scope="col" class="!text-center xl:w-36">
+        <th scope="col" class="text-center! xl:w-36">
           {translate('workflows.nexus-handler')}
         </th>
       </TableHeaderRow>
@@ -128,10 +128,10 @@
       {@const status = getPollerStatus(poller)}
       {@const label = getPollerLabel(poller)}
       <TableRow data-testid="poller-row">
-        <td class="select-all break-all" data-testid="poller-identity">
+        <td class="break-all select-all" data-testid="poller-identity">
           {poller.identity}
         </td>
-        <td class="select-all break-all" data-testid="poller-build-id">
+        <td class="break-all select-all" data-testid="poller-build-id">
           <div class="flex items-center gap-2">
             {buildId}
             {#if status}
@@ -139,7 +139,7 @@
             {/if}
           </div>
         </td>
-        <td class="select-all break-all" data-testid="poller-deployment">
+        <td class="break-all select-all" data-testid="poller-deployment">
           {#if deployment}
             <Link
               href={routeForWorkerDeployment({

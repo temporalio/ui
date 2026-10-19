@@ -48,7 +48,7 @@
       {#if subtitleHref}
         <a
           href={subtitleHref}
-          class="inline-flex items-center rounded hover:bg-surface-overlay-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary"
+          class="inline-flex items-center rounded hover:bg-surface-overlay-primary focus-visible:ring-2 focus-visible:ring-interactive-primary focus-visible:outline-hidden"
         >
           <IconArrowLeft
             title="Project Namespaces"
@@ -56,7 +56,7 @@
           />
           <h2
             class={merge(
-              'mb-0 hidden whitespace-nowrap px-1 pr-2 font-sans font-medium not-italic text-primary underline hover:text-primary group-data-[nav=open]:block',
+              'mb-0 hidden px-1 pr-2 font-sans font-medium whitespace-nowrap text-primary not-italic underline group-data-[nav=open]:block hover:text-primary',
               subtitle === 'Cloud' ? 'text-2xl' : 'text-xs underline-offset-2',
             )}
           >
@@ -66,7 +66,7 @@
       {:else}
         <h2
           class={merge(
-            'mb-0 hidden whitespace-nowrap pl-2 font-sans font-medium not-italic text-primary group-data-[nav=open]:block',
+            'mb-0 hidden pl-2 font-sans font-medium whitespace-nowrap text-primary not-italic group-data-[nav=open]:block',
             subtitle === 'Cloud' ? 'pl-1 text-base' : 'text-xs',
           )}
         >
@@ -77,7 +77,7 @@
   </div>
   <button
     title={navOpen ? 'Collapse Navigation' : 'Expand Navigation'}
-    class="flex size-6 shrink-0 items-center justify-center rounded text-secondary transition-[opacity,transform] hover:bg-surface-overlay-primary hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary"
+    class="flex size-6 shrink-0 items-center justify-center rounded text-secondary transition-[opacity,transform] hover:bg-surface-overlay-primary hover:text-primary focus-visible:ring-2 focus-visible:ring-interactive-primary focus-visible:outline-hidden"
     onclick={ontoggle}
   >
     {#if navOpen}

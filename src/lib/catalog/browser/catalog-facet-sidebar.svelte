@@ -25,7 +25,7 @@
   {#each catalogFilterKeys as key (key)}
     <fieldset class="flex min-w-0 flex-col gap-0.5" data-facet={key}>
       <legend
-        class="mb-1.5 text-xs font-medium uppercase tracking-wider text-secondary"
+        class="mb-1.5 text-xs font-medium tracking-wider text-secondary uppercase"
       >
         {catalogFilterTitle(key)}
       </legend>

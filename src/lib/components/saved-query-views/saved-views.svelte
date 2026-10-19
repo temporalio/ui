@@ -437,7 +437,7 @@
         size="xs"
       >
         {@const Glyph = lastViewedSavedQuery.Icon || IconBookmark}
-        <Glyph class="h-4 w-4 flex-shrink-0" />
+        <Glyph class="h-4 w-4 shrink-0" />
         <span class="min-w-0 truncate font-normal"
           >{lastViewedSavedQuery.name}</span
         >
@@ -551,7 +551,7 @@
       size="xs"
     >
       {@const Glyph = view.Icon || IconBookmark}
-      <Glyph class="h-4 w-4 flex-shrink-0" />
+      <Glyph class="h-4 w-4 shrink-0" />
       <span class="truncate font-normal max-xl:sr-only xl:inline-block"
         >{view.name}</span
       >

@@ -202,11 +202,11 @@
       container-class="min-w-0"
     >
       {#if view.href}
-        <Link href={view.href} class="whitespace-pre-line break-all"
+        <Link href={view.href} class="break-all whitespace-pre-line"
           >{view.value}</Link
         >
       {:else}
-        <span class="whitespace-pre-line break-all">{view.value}</span>
+        <span class="break-all whitespace-pre-line">{view.value}</span>
       {/if}
     </Copyable>
   </div>
@@ -288,7 +288,7 @@
     <p class="min-w-56 text-sm text-secondary">
       {translate('events.event-groups')}
     </p>
-    <p class="whitespace-pre-line break-all">
+    <p class="break-all whitespace-pre-line">
       {#await decodeEventGroupNames(groups)}
         {formatEventGroupNames(groups)}
       {:then names}
@@ -371,11 +371,11 @@
       container-class="min-w-0"
     >
       {#if nexusLink.href}
-        <Link href={nexusLink.href} class="whitespace-pre-line break-all"
+        <Link href={nexusLink.href} class="break-all whitespace-pre-line"
           >{nexusLink.value}</Link
         >
       {:else}
-        <p class="whitespace-pre-line break-all text-sm">{nexusLink.value}</p>
+        <p class="text-sm break-all whitespace-pre-line">{nexusLink.value}</p>
       {/if}
     </Copyable>
   </div>
@@ -396,7 +396,7 @@
         value={String(value)}
         {attributes}
         type={displayLinkType(key, attributes)}
-        class="whitespace-pre-line break-all"
+        class="break-all whitespace-pre-line"
       />
     </Copyable>
   </div>
@@ -417,7 +417,7 @@
         </Tooltip>
       {/if}
     </div>
-    <div class="whitespace-pre-line break-all">
+    <div class="break-all whitespace-pre-line">
       {#if shouldDisplayAsTime(key)}
         <Timestamp dateTime={value} />
       {:else if key === 'startToFireTimeout' && fireTime}

@@ -405,12 +405,12 @@
 
 {#if showJson}
   <div
-    class="relative h-auto whitespace-break-spaces break-words bg-surface-primary p-4"
+    class="relative h-auto bg-surface-primary p-4 break-words whitespace-break-spaces"
   >
     <CopyButton
       copyIconTitle={translate('common.copy-icon-title')}
       copySuccessIconTitle={translate('common.copy-success-icon-title')}
-      class="absolute right-1 top-1"
+      class="absolute top-1 right-1"
       onclick={handleCopy}
       copied={$copied}
     />
