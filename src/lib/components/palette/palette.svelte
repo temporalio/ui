@@ -145,8 +145,9 @@
     ),
   );
 
-  // Page items, then every item in its natural order, then recent items.
-  // Recent items show twice, so nothing above them moves when they change.
+  // Recent items, then page items, then every item in its natural order.
+  // Recent items also keep their place in the list, so the list below
+  // them never reorders.
   function rootSections(entries: PaletteEntry[]): PaletteSection[] {
     const byId = new Map(entries.map((entry) => [entry.item.id, entry]));
     const recentEntries = recent
@@ -159,15 +160,15 @@
     // Page and recent items mix sets under one heading. Dev rows keep
     // their own marker.
     return groupIntoSections([
-      ...entries
-        .filter(({ page }) => page)
-        .map((entry) => ({ ...entry, variant: 'default' as const })),
-      ...entries.filter(({ page }) => !page),
       ...recentEntries.map((entry) => ({
         ...entry,
         section: translate('palette.recent'),
         variant: 'default' as const,
       })),
+      ...entries
+        .filter(({ page }) => page)
+        .map((entry) => ({ ...entry, variant: 'default' as const })),
+      ...entries.filter(({ page }) => !page),
     ]);
   }
 

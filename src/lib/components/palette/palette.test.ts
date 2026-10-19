@@ -459,7 +459,7 @@ describe('Palette', () => {
       expect(titles()).toEqual(['Open workflow flags', 'Feature Flags']);
     });
 
-    it('adds recently used items in a Recent section after the natural list', async () => {
+    it('adds recently used items in a Recent section above the natural list', async () => {
       scopedSetup();
       let input = await openPalette();
       const before = titles();
@@ -470,8 +470,8 @@ describe('Palette', () => {
       await fireEvent.keyDown(input, { key: 'Escape' });
       input = await openPalette();
       expect(screen.getByText('Recent')).toBeTruthy();
-      expect(titles().slice(0, before.length)).toEqual(before);
-      expect(titles().at(-1)).toContain('Feature Flags');
+      expect(titles()[0]).toContain('Feature Flags');
+      expect(titles().slice(1)).toEqual(before);
       expect(
         titles().filter((title) => title?.includes('Feature Flags')),
       ).toHaveLength(2);
@@ -489,12 +489,19 @@ describe('Palette', () => {
       const ids = options.map((option) => option.id);
       expect(new Set(ids).size).toBe(ids.length);
 
-      await fireEvent.keyDown(input, { key: 'ArrowUp' });
-      const selected = screen
-        .getAllByRole('option')
-        .filter((option) => option.getAttribute('aria-selected') === 'true');
-      expect(selected).toHaveLength(1);
-      expect(selected[0]).toBe(options.at(-1));
+      const selected = () =>
+        screen
+          .getAllByRole('option')
+          .filter((option) => option.getAttribute('aria-selected') === 'true');
+      expect(selected()).toEqual([options[0]]);
+
+      const copy = options.findLastIndex((option) =>
+        option.textContent?.includes('Feature Flags'),
+      );
+      for (let step = 0; step < copy; step++) {
+        await fireEvent.keyDown(input, { key: 'ArrowDown' });
+      }
+      expect(selected()).toEqual([options[copy]]);
     });
 
     it('puts user and dev page items under one heading', async () => {
