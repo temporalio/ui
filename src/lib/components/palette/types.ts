@@ -1,3 +1,5 @@
+import type { IconComponent } from '$lib/io/icon';
+
 // A palette is a Raycast-style command menu. It renders whatever tool sets it
 // is given, so dev tools and user tools share one UI.
 //
@@ -51,6 +53,8 @@ export interface PaletteItem {
   id: string;
   title: string;
   subtitle?: string;
+  // Defaults to the tool's icon.
+  icon?: IconComponent;
   // Extra words that match the search but are not shown.
   keywords?: string[];
   accessory?: { label: string; tone?: PaletteTone };
@@ -106,6 +110,8 @@ export interface PaletteTool {
   id: string;
   // Heading for this tool's items in the root list.
   section: string;
+  // The icon for items that do not set their own.
+  icon?: IconComponent;
   // Lower sorts first. Defaults to 100.
   order?: number;
   rules?: PaletteRules;

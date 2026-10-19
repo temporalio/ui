@@ -8,6 +8,8 @@ vi.mock('$lib/stores/toaster', () => ({
 
 import '$lib/test-utilities/jsdom-browser-apis';
 
+import { IconFlag } from '$lib/io/icon';
+
 import type { PaletteToolSet, PaletteView } from './types';
 
 import Palette from './palette.svelte';
@@ -538,6 +540,34 @@ describe('Palette', () => {
       expect(marker?.textContent).toBe('dev');
       // After the title, so every title starts at the same left edge.
       expect(devRow.firstElementChild?.textContent).toContain('json item');
+    });
+
+    it('shows an icon column only when some item has an icon', async () => {
+      const iconSet = (icon?: typeof IconFlag): PaletteToolSet => ({
+        id: 'flags',
+        label: 'Flags',
+        key: 'f',
+        tools: [
+          {
+            id: 'flags',
+            section: 'Flags',
+            icon,
+            items: () => [{ id: 'a', title: 'Alpha', actions: [] }],
+          },
+        ],
+      });
+      const { unmount } = render(Palette, {
+        props: { toolSets: [iconSet(IconFlag)] },
+      });
+      await openPalette();
+      expect(screen.getByRole('option').querySelector('svg')).toBeTruthy();
+      unmount();
+
+      render(Palette, { props: { toolSets: [iconSet()] } });
+      await openPalette();
+      const option = screen.getByRole('option');
+      expect(option.querySelector('svg')).toBeNull();
+      expect(option.firstElementChild?.textContent).toContain('Alpha');
     });
 
     it('opens the actions menu from the row button', async () => {

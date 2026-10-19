@@ -63,7 +63,11 @@ function entries(
         variant: toolSet.variant ?? 'default',
         page,
         fallback: tool.fallback ?? false,
-        item: { ...item, id: `${toolSet.id}:${tool.id}:${item.id}` },
+        item: {
+          ...item,
+          id: `${toolSet.id}:${tool.id}:${item.id}`,
+          icon: item.icon ?? tool.icon,
+        },
       }));
     }),
   );

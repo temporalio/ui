@@ -207,6 +207,9 @@
   });
 
   const visibleItems = $derived(sections.flatMap(({ items }) => items));
+  // Icons get a column only when some item has one, so plain lists such as
+  // a flag list keep their full width.
+  const showIcons = $derived(visibleItems.some(({ icon }) => icon));
   // An item can show in two sections, so rows are indexed by position.
   const sectionStarts = $derived(
     sections.reduce<number[]>(
@@ -780,7 +783,7 @@
               {#each sections as section, sectionIndex (sectionIndex)}
                 {#if section.title}
                   <div
-                    class="flex items-center gap-2 px-3 pb-1 pt-3 text-xs font-medium text-secondary"
+                    class="flex items-center gap-2 px-3 pb-1.5 pt-4 text-xs font-medium text-secondary first:pt-1"
                     role="presentation"
                   >
                     {section.title}
@@ -800,7 +803,7 @@
                     aria-selected={isSelected}
                     aria-disabled={Boolean(item.disabled)}
                     class={[
-                      'flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2',
+                      'flex min-h-10 cursor-pointer items-center gap-3 rounded-lg px-3 py-2',
                       isSelected && 'bg-interactive-tertiary-hover',
                       item.disabled && 'opacity-60',
                     ]}
@@ -808,14 +811,27 @@
                     onmousemove={() => select(index)}
                     onclick={() => runAction(item, 0)}
                   >
-                    <div class="min-w-0 flex-1">
-                      <div class="truncate text-sm text-primary">
+                    {#if showIcons}
+                      {@const Icon = item.icon}
+                      <span
+                        class="flex h-6 w-6 shrink-0 items-center justify-center text-secondary"
+                        aria-hidden="true"
+                      >
+                        {#if Icon}
+                          <Icon class="h-4 w-4" />
+                        {/if}
+                      </span>
+                    {/if}
+                    <div class="flex min-w-0 flex-1 items-baseline gap-2">
+                      <span
+                        class="max-w-full shrink-0 truncate text-sm text-primary"
+                      >
                         {item.title}
-                      </div>
+                      </span>
                       {#if item.subtitle || item.disabled}
-                        <div class="truncate text-xs text-secondary">
+                        <span class="min-w-0 truncate text-sm text-secondary">
                           {item.disabled ?? item.subtitle}
-                        </div>
+                        </span>
                       {/if}
                     </div>
                     {#if section.variant !== 'dev' && showsDevMarker(item)}

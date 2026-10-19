@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
+import { IconFlag, IconKey } from '$lib/io/icon';
+
 import {
   groupIntoSections,
   rootItems,
@@ -27,6 +29,29 @@ function tool(id: string, section: string, extra: Partial<PaletteTool> = {}) {
 }
 
 describe('rootItems', () => {
+  it("gives items their tool's icon unless they set their own", () => {
+    const set: PaletteToolSet = {
+      id: 'dev',
+      label: 'Dev',
+      key: 'd',
+      tools: [
+        {
+          id: 'flags',
+          section: 'Flags',
+          icon: IconFlag,
+          items: () => [
+            { id: 'plain', title: 'Plain', actions: [] },
+            { id: 'own', title: 'Own', icon: IconKey, actions: [] },
+          ],
+        },
+      ],
+    };
+    const icons = rootItems([set], ctx, 'On this page').map(
+      ({ item }) => item.icon,
+    );
+    expect(icons).toEqual([IconFlag, IconKey]);
+  });
+
   it('sorts tools by order', () => {
     const set: PaletteToolSet = {
       id: 'dev',
