@@ -14,17 +14,17 @@ type ChildRow = {
 
 export type VisibleRow = RootRow | ChildRow;
 
-export function createVisibleRows() {
+export function createVisibleRowsSelector() {
   // Keep keyed row props stable when only their order changes. Weak keys let
   // replaced API data be collected with its row metadata.
   const roots = new WeakMap<WorkflowExecution, RootRow>();
   const children = new WeakMap<WorkflowExecution, ChildRow>();
 
-  return (
+  return function selectVisibleRows(
     workflows: WorkflowExecution[],
     visibleChildren: ReadonlyMap<string, WorkflowExecution[]>,
-  ): VisibleRow[] =>
-    workflows.flatMap((workflow) => {
+  ): VisibleRow[] {
+    return workflows.flatMap((workflow) => {
       const childWorkflows = visibleChildren.get(workflow.runId);
       let root = roots.get(workflow);
       if (!root || root.childCount !== childWorkflows?.length) {
@@ -49,4 +49,5 @@ export function createVisibleRows() {
         }),
       ];
     });
+  };
 }

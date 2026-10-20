@@ -45,7 +45,7 @@
 
   import { getWorkflowSortColumns } from './workflows-summary-configurable-table/column-search-attributes';
   import {
-    createVisibleRows,
+    createVisibleRowsSelector,
     type VisibleRow,
   } from './workflows-summary-configurable-table/visible-rows';
 
@@ -148,9 +148,9 @@
   // so unchanged cells do not recompute through a fresh set of deep proxies.
   let visiblePaginatedItems: WorkflowExecution[] = $state.raw([]);
 
-  const getVisibleRows = createVisibleRows();
+  const selectVisibleRows = createVisibleRowsSelector();
   const visibleRows = $derived(
-    getVisibleRows(visiblePaginatedItems, visibleChildrenMap),
+    selectVisibleRows(visiblePaginatedItems, visibleChildrenMap),
   );
 
   let prevClickedRow = $state<VisibleRow | null>(null);

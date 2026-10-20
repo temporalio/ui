@@ -2,19 +2,19 @@ import { describe, expect, it } from 'vitest';
 
 import type { WorkflowExecution } from '$lib/types/workflows';
 
-import { createVisibleRows } from './visible-rows';
+import { createVisibleRowsSelector } from './visible-rows';
 
 const workflow = (runId: string) => ({ runId }) as WorkflowExecution;
 
 describe('workflow table visible rows', () => {
   it('reorders existing rows and keeps expanded children with their parent', () => {
-    const rowsFor = createVisibleRows();
+    const selectVisibleRows = createVisibleRowsSelector();
     const first = workflow('first');
     const second = workflow('second');
     const child = workflow('child');
     const children = new Map([[first.runId, [child]]]);
-    const before = rowsFor([first, second], children);
-    const after = rowsFor([second, first], children);
+    const before = selectVisibleRows([first, second], children);
+    const after = selectVisibleRows([second, first], children);
 
     expect(after.map((row) => row.value.runId)).toEqual([
       'second',
@@ -31,23 +31,25 @@ describe('workflow table visible rows', () => {
   });
 
   it('updates child counts and parent references on expansion and collapse', () => {
-    const rowsFor = createVisibleRows();
+    const selectVisibleRows = createVisibleRowsSelector();
     const parent = workflow('parent');
     const firstChild = workflow('first-child');
     const secondChild = workflow('second-child');
     const children = new Map<string, WorkflowExecution[]>();
 
-    expect(rowsFor([parent], children)[0]).toMatchObject({
+    expect(selectVisibleRows([parent], children)[0]).toMatchObject({
       childCount: undefined,
     });
     children.set(parent.runId, []);
-    expect(rowsFor([parent], children)[0]).toMatchObject({ childCount: 0 });
+    expect(selectVisibleRows([parent], children)[0]).toMatchObject({
+      childCount: 0,
+    });
     children.set(parent.runId, [firstChild]);
-    const expanded = rowsFor([parent], children);
+    const expanded = selectVisibleRows([parent], children);
     expect(expanded[0]).toMatchObject({ childCount: 1 });
 
     children.set(parent.runId, [firstChild, secondChild]);
-    const updated = rowsFor([parent], children);
+    const updated = selectVisibleRows([parent], children);
     expect(updated[0]).toMatchObject({ childCount: 2 });
     expect(updated[0]).not.toBe(expanded[0]);
     for (const row of updated.slice(1)) {
@@ -56,19 +58,22 @@ describe('workflow table visible rows', () => {
     }
 
     children.clear();
-    const collapsed = rowsFor([parent], children);
+    const collapsed = selectVisibleRows([parent], children);
     expect(collapsed).toHaveLength(1);
     expect(collapsed[0]).toMatchObject({ childCount: undefined });
   });
 
   it('uses refreshed workflow and child data even when run IDs are unchanged', () => {
-    const rowsFor = createVisibleRows();
+    const selectVisibleRows = createVisibleRowsSelector();
     const parent = workflow('parent');
     const child = workflow('child');
-    const before = rowsFor([parent], new Map([[parent.runId, [child]]]));
+    const before = selectVisibleRows(
+      [parent],
+      new Map([[parent.runId, [child]]]),
+    );
     const refreshedParent = { ...parent, name: 'Updated workflow' };
     const refreshedChild = { ...child, name: 'Updated child' };
-    const after = rowsFor(
+    const after = selectVisibleRows(
       [refreshedParent],
       new Map([[parent.runId, [refreshedChild]]]),
     );
