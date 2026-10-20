@@ -436,6 +436,14 @@ func TestBuildUIAssetsHandler_CacheControlWithCSRFMiddleware(t *testing.T) {
 			cacheControl: "public, max-age=31536000, immutable",
 		},
 		{
+			name:            "not modified immutable asset is cacheable without a csrf cookie vary",
+			path:            "/_app/immutable/chunk.js",
+			ifModifiedSince: modifiedAt.Format(http.TimeFormat),
+			status:          http.StatusNotModified,
+			cacheControl:    "public, max-age=31536000, immutable",
+			lastModified:    modifiedAt.Format(http.TimeFormat),
+		},
+		{
 			name:            "not modified immutable browser asset is cacheable without a csrf cookie",
 			path:            "/_app/immutable/chunk.js",
 			ifModifiedSince: modifiedAt.Format(http.TimeFormat),
