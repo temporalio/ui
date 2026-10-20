@@ -7,7 +7,6 @@
   import { formatList } from '$lib/i18n/format-list';
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributesSchema } from '$lib/stores/search-attributes';
-  import type { StartWorkflowRequest } from '$lib/types/schedule';
 
   import type {
     ActionFormMode,
@@ -18,11 +17,12 @@
     type FormWorkflowDetails,
     formWorkflowDetailsSchema,
   } from './schema';
+  import type { WorkflowSchedule } from './types';
   import ActionDetailsCard from '../../schedule-form/action-details-card.svelte';
 
   import WorkflowDetails from './workflow-details.svelte';
 
-  type Props = ActionFormMode<StartWorkflowRequest> & {
+  type Props = ActionFormMode<WorkflowSchedule> & {
     initialValues: FormWorkflowDetails;
 
     searchAttributes: SearchAttributesSchema;

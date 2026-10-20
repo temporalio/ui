@@ -8,16 +8,16 @@
   } from '$lib/holocene/duration-input/duration-input.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import { translate } from '$lib/i18n/translate';
-  import type { StartWorkflowRequest } from '$lib/types/schedule';
 
   import type { ActionFormMode } from '../types';
   import { DEFAULT_TASK_TIMEOUT, MAX_TASK_TIMEOUT_SECONDS } from './constants';
   import type { FormWorkflowDetails } from './schema';
+  import type { WorkflowSchedule } from './types';
   import { durationUnits } from '../../constants';
 
   import WorkflowInputPayload from './workflow-input-payload.svelte';
 
-  type Props = ActionFormMode<StartWorkflowRequest> & {
+  type Props = ActionFormMode<WorkflowSchedule> & {
     form: SuperForm<FormWorkflowDetails>['form'];
     errors: SuperForm<FormWorkflowDetails>['errors'];
     validateField: SuperForm<FormWorkflowDetails>['validate'];
@@ -93,7 +93,7 @@
     () => $form.messageType ?? '', (value) => ($form.messageType = value)
   }
   payloads={mode.isEditing
-    ? (mode.existingAction.input ?? undefined)
+    ? (mode.schedule.schedule.action.startWorkflow.input ?? undefined)
     : undefined}
   showEditActions={mode.isEditing}
 />

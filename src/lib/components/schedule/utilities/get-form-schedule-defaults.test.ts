@@ -12,7 +12,8 @@ import {
   DEFAULT_RUN_TIMEOUT,
   DEFAULT_TASK_TIMEOUT,
 } from '../scheduled-action-types/workflow/constants';
-import { getWorkflowDetailsDefaults } from '../scheduled-action-types/workflow/defaults';
+import { getWorkflowDetailsDefaults } from '../scheduled-action-types/workflow/workflow-details-defaults';
+import { getWorkflowFormMode } from '../scheduled-action-types/workflow/workflow-form-mode';
 
 const noAttributes = { searchAttributes: {}, customSearchAttributes: {} };
 
@@ -42,7 +43,10 @@ describe('getFormScheduleDefaults', () => {
 
   describe('without an existing schedule', () => {
     const defaults = getFormScheduleDefaults(null, noAttributes);
-    const workflowDefaults = getWorkflowDetailsDefaults(null, {});
+    const workflowDefaults = getWorkflowDetailsDefaults(
+      { isEditing: false, schedule: null },
+      {},
+    );
 
     it('uses empty identifiers', () => {
       expect(defaults.name).toBe('');
@@ -113,10 +117,10 @@ describe('getFormScheduleDefaults', () => {
       describeFullSchedule,
       noAttributes,
     );
-    const workflowDefaults = getWorkflowDetailsDefaults(
-      describeFullSchedule,
-      {},
-    );
+    const mode = getWorkflowFormMode(describeFullSchedule);
+    if (!mode) throw new Error('Expected a workflow schedule');
+
+    const workflowDefaults = getWorkflowDetailsDefaults(mode, {});
 
     it('maps the workflow action fields', () => {
       expect(defaults.name).toBe('sched-1');
@@ -159,19 +163,19 @@ describe('getFormScheduleDefaults', () => {
   });
 
   it('normalizes a stored 0s run/execution timeout to empty', () => {
-    const defaults = getWorkflowDetailsDefaults(
-      {
-        schedule: {
-          action: {
-            startWorkflow: {
-              workflowRunTimeout: '0s',
-              workflowExecutionTimeout: '0s',
-            },
+    const mode = getWorkflowFormMode({
+      schedule: {
+        action: {
+          startWorkflow: {
+            workflowRunTimeout: '0s',
+            workflowExecutionTimeout: '0s',
           },
         },
-      } as unknown as DescribeFullSchedule,
-      {},
-    );
+      },
+    } as unknown as DescribeFullSchedule);
+    if (!mode) throw new Error('Expected a workflow schedule');
+
+    const defaults = getWorkflowDetailsDefaults(mode, {});
 
     expect(defaults.runTimeout).toBe('');
     expect(defaults.executionTimeout).toBe('');

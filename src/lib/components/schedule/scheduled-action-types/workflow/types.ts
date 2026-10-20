@@ -1,5 +1,22 @@
 import type { ScheduleActionResult } from '$lib/types';
+import type {
+  DescribeFullSchedule,
+  ScheduleResponse,
+  StartWorkflowRequest,
+} from '$lib/types/schedule';
 import type { WorkflowStatus } from '$lib/types/workflows';
+
+import type { ActionFormMode } from '../types';
+
+export type WorkflowSchedule = DescribeFullSchedule & {
+  schedule: ScheduleResponse & {
+    action: { startWorkflow: StartWorkflowRequest };
+  };
+};
+
+export type ResolvedWorkflowAction = {
+  type: 'workflow';
+} & ActionFormMode<WorkflowSchedule>;
 
 /**
  * A row in the schedule's recent runs list. `status` and `runId` start out as

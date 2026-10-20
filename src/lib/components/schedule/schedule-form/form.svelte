@@ -18,11 +18,11 @@
     openConfirmationModal,
     serverError,
   } from '$lib/stores/schedules';
-  import { customSearchAttributes } from '$lib/stores/search-attributes';
-  import type {
-    DescribeFullSchedule,
-    StartWorkflowRequest,
-  } from '$lib/types/schedule';
+  import {
+    customSearchAttributes,
+    type SearchAttributesSchema,
+  } from '$lib/stores/search-attributes';
+  import type { DescribeFullSchedule } from '$lib/types/schedule';
   import type { SearchAttributes } from '$lib/types/workflows';
   import {
     routeForSchedule,
@@ -31,13 +31,14 @@
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
   import DeleteScheduleModal from '../schedule-action-modals/delete-schedule-modal.svelte';
+  import {
+    resolveScheduledAction,
+    scheduledActionTypes,
+  } from '../scheduled-action-types/registry';
   import type {
-    ActionFormMode,
     ScheduledActionForm,
     ScheduledActionSummaryItem,
   } from '../scheduled-action-types/types';
-  import { getWorkflowDetailsDefaults } from '../scheduled-action-types/workflow/defaults';
-  import WorkflowForm from '../scheduled-action-types/workflow/form.svelte';
   import { formScheduleSchema } from '../schema/form';
   import type { ScheduleFormData } from '../types';
   import { getFormScheduleDefaults } from '../utilities/get-form-schedule-defaults';
@@ -83,20 +84,12 @@
     }),
   );
 
-  const workflowMode = $derived.by(
-    (): ActionFormMode<StartWorkflowRequest> | null => {
-      if (!schedule) return { isEditing: false };
-
-      const existingWorkflow = schedule.schedule?.action?.startWorkflow;
-      if (!existingWorkflow) return null;
-
-      return { isEditing: true, existingAction: existingWorkflow };
-    },
+  const resolvedAction = $derived(resolveScheduledAction(schedule));
+  const actionType = $derived(resolvedAction?.type ?? null);
+  const actionDefinition = $derived(
+    actionType ? scheduledActionTypes[actionType] : null,
   );
-
-  const initialWorkflowValues = $derived(
-    getWorkflowDetailsDefaults(schedule, $customSearchAttributes),
-  );
+  const actionFormAdapter = $derived(actionDefinition?.loadFormAdapter());
 
   // svelte-ignore state_referenced_locally
   const superform = superForm(initialFormValues, {
@@ -126,10 +119,7 @@
   // whole-array add/remove. Bridge through local $state proxies and sync the
   // snapshots back to `$form` so the changes are committed before submit.
   let scheduleSearchAttributes = $state($form.searchAttributes);
-  // svelte-ignore state_referenced_locally
-  let actionSearchAttributes = $state(
-    initialWorkflowValues.workflowSearchAttributes,
-  );
+  let actionSearchAttributes = $state<SearchAttributesSchema>([]);
   let actionForm = $state<ScheduledActionForm>();
   let actionSummary = $state<ScheduledActionSummaryItem[]>([]);
   let submitting = $state(false);
@@ -139,7 +129,12 @@
     $form.searchAttributes = $state.snapshot(scheduleSearchAttributes);
   });
   const handleSubmit = async () => {
-    if (submitting || !actionForm || !writeActionsAreAllowed()) {
+    if (
+      submitting ||
+      !actionDefinition ||
+      !actionForm ||
+      !writeActionsAreAllowed()
+    ) {
       return;
     }
 
@@ -205,14 +200,27 @@
             {schedule}
           />
           <SchedulePoliciesCard {form} />
-          {#if workflowMode}
-            <WorkflowForm
-              {...workflowMode}
-              bind:this={actionForm}
-              initialValues={initialWorkflowValues}
-              bind:searchAttributes={actionSearchAttributes}
-              onSummaryChange={(summary) => (actionSummary = summary)}
-            />
+          {#if actionDefinition && resolvedAction}
+            {#await actionFormAdapter}
+              <Loading />
+            {:then FormAdapter}
+              {#if FormAdapter}
+                {#key actionDefinition.type}
+                  <FormAdapter
+                    {resolvedAction}
+                    customSearchAttributes={$customSearchAttributes}
+                    bind:this={actionForm}
+                    bind:searchAttributes={actionSearchAttributes}
+                    onSummaryChange={(summary) => (actionSummary = summary)}
+                  />
+                {/key}
+              {/if}
+            {:catch}
+              <Alert
+                intent="error"
+                title={translate('schedules.action-form-load-error')}
+              />
+            {/await}
           {:else}
             <Alert
               intent="error"
@@ -222,12 +230,15 @@
           <SchedulesSearchAttributesCard
             bind:scheduleSearchAttributes
             bind:actionSearchAttributes
-            actionType={workflowMode ? 'workflow' : null}
+            actionType={actionForm ? actionType : null}
           />
         </div>
 
         <div class="w-full xl:col-start-2 xl:row-start-1">
-          <ScheduleSummarySidebar {form} {actionSummary} />
+          <ScheduleSummarySidebar
+            {form}
+            actionSummary={actionDefinition ? actionSummary : []}
+          />
         </div>
 
         <Alert
@@ -248,7 +259,10 @@
           class="flex flex-row items-center gap-4 max-sm:flex-col xl:col-start-1"
         >
           <Button
-            disabled={!workflowMode || submitting || !writeActionsAreAllowed()}
+            disabled={!actionDefinition ||
+              !actionForm ||
+              submitting ||
+              !writeActionsAreAllowed()}
             type="submit"
             class="max-sm:w-full"
             data-testid="create-schedule-button">{confirmText}</Button

@@ -7,9 +7,9 @@ import {
 } from './date';
 import { getSearchAttributes } from './get-search-attributes';
 import {
-  getWorkflowActionRequest,
-  getWorkflowPoliciesRequest,
-} from '../scheduled-action-types/workflow/request-mappings';
+  resolveScheduledAction,
+  scheduledActionTypes,
+} from '../scheduled-action-types/registry';
 import type { FormScheduleSchema } from '../schema/form';
 
 import type {
@@ -214,19 +214,30 @@ export async function getRequestBody(
   describeFullSchedule: DescribeFullSchedule | null = null,
 ): Promise<ScheduleRequestBody> {
   const { schedule: scheduleForm, action } = formData;
+  const resolvedAction = resolveScheduledAction(
+    describeFullSchedule,
+    action.type,
+  );
+  if (!resolvedAction || resolvedAction.type !== action.type) {
+    throw new Error(
+      'Cannot save a schedule with a missing, unsupported, or mismatched action type',
+    );
+  }
+
+  const actionParts = await scheduledActionTypes[action.type].toRequest(
+    action,
+    resolvedAction,
+  );
 
   return {
     schedule_id: describeFullSchedule?.schedule_id ?? scheduleForm.name,
     searchAttributes: getSearchAttributes(scheduleForm.searchAttributes),
     schedule: {
       spec: getScheduleSpecRequest(scheduleForm, describeFullSchedule),
-      action: await getWorkflowActionRequest(
-        action.details,
-        describeFullSchedule?.schedule?.action?.startWorkflow,
-      ),
+      action: actionParts.action,
       policies: {
         ...getSchedulePoliciesRequest(scheduleForm),
-        ...getWorkflowPoliciesRequest(action.details),
+        ...actionParts.policies,
       },
       state: getScheduleStateRequest(scheduleForm, describeFullSchedule),
     },

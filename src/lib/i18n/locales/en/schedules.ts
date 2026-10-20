@@ -8,6 +8,8 @@ export const Strings = {
   'fix-workflow-form-errors': 'Please fix the following workflow errors:',
   'unsupported-action-edit':
     'This schedule cannot be edited because its action is missing or its action type is not supported.',
+  'action-form-load-error':
+    'Unable to load the form for this action type. Reload the page to try again.',
   editing: 'Editing Schedule...',
   creating: 'Creating Schedule...',
   'back-to-schedule': 'Back to Schedule',

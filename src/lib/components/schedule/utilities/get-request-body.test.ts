@@ -56,7 +56,7 @@ describe('getRequestBody', () => {
   it('prefers an existing schedule id over the form name', async () => {
     const body = await getRequestBody(buildForm(), {
       schedule_id: 'existing-id',
-      schedule: {},
+      schedule: { action: { startWorkflow: {} } },
     } as DescribeFullSchedule);
 
     expect(body.schedule_id).toBe('existing-id');
@@ -239,7 +239,7 @@ describe('getRequestBody', () => {
     const describeWithSpec = (spec: Record<string, unknown>) =>
       ({
         schedule_id: 'existing-id',
-        schedule: { spec },
+        schedule: { spec, action: { startWorkflow: {} } },
       }) as unknown as DescribeFullSchedule;
 
     it('preserves exclusion calendars and timezone data', async () => {
