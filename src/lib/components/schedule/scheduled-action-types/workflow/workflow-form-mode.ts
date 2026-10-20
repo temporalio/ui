@@ -19,8 +19,16 @@ export function getWorkflowFormMode(
 }
 
 export function resolveWorkflowAction(
+  schedule: null,
+): Extract<ResolvedWorkflowAction, { isEditing: false }>;
+export function resolveWorkflowAction(
+  schedule: DescribeFullSchedule,
+): Extract<ResolvedWorkflowAction, { isEditing: true }> | null;
+export function resolveWorkflowAction(
   schedule: DescribeFullSchedule | null,
 ): ResolvedWorkflowAction | null {
-  const mode = getWorkflowFormMode(schedule);
-  return mode ? { type: 'workflow', ...mode } : null;
+  if (!schedule) return { type: 'workflow', isEditing: false, schedule: null };
+  if (!isWorkflowSchedule(schedule)) return null;
+
+  return { type: 'workflow', isEditing: true, schedule };
 }

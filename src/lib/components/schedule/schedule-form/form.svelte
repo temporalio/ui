@@ -84,12 +84,16 @@
     }),
   );
 
-  const resolvedAction = $derived(resolveScheduledAction(schedule));
-  const actionType = $derived(resolvedAction?.type ?? null);
-  const actionDefinition = $derived(
-    actionType ? scheduledActionTypes[actionType] : null,
-  );
-  const actionFormAdapter = $derived(actionDefinition?.loadFormAdapter());
+  const actionResolution = $derived.by(() => {
+    const resolution = resolveScheduledAction(schedule);
+    if (resolution.status === 'unknown') return resolution;
+
+    return {
+      ...resolution,
+      formAdapter:
+        scheduledActionTypes[resolution.action.type].loadFormAdapter(),
+    };
+  });
 
   // svelte-ignore state_referenced_locally
   const superform = superForm(initialFormValues, {
@@ -131,7 +135,7 @@
   const handleSubmit = async () => {
     if (
       submitting ||
-      !actionDefinition ||
+      actionResolution.status === 'unknown' ||
       !actionForm ||
       !writeActionsAreAllowed()
     ) {
@@ -200,21 +204,19 @@
             {schedule}
           />
           <SchedulePoliciesCard {form} />
-          {#if actionDefinition && resolvedAction}
-            {#await actionFormAdapter}
+          {#if actionResolution.status === 'known'}
+            {#await actionResolution.formAdapter}
               <Loading />
             {:then FormAdapter}
-              {#if FormAdapter}
-                {#key actionDefinition.type}
-                  <FormAdapter
-                    {resolvedAction}
-                    customSearchAttributes={$customSearchAttributes}
-                    bind:this={actionForm}
-                    bind:searchAttributes={actionSearchAttributes}
-                    onSummaryChange={(summary) => (actionSummary = summary)}
-                  />
-                {/key}
-              {/if}
+              {#key actionResolution.action.type}
+                <FormAdapter
+                  resolvedAction={actionResolution.action}
+                  customSearchAttributes={$customSearchAttributes}
+                  bind:this={actionForm}
+                  bind:searchAttributes={actionSearchAttributes}
+                  onSummaryChange={(summary) => (actionSummary = summary)}
+                />
+              {/key}
             {:catch}
               <Alert
                 intent="error"
@@ -230,14 +232,18 @@
           <SchedulesSearchAttributesCard
             bind:scheduleSearchAttributes
             bind:actionSearchAttributes
-            actionType={actionForm ? actionType : null}
+            actionType={actionResolution.status === 'known' && actionForm
+              ? actionResolution.action.type
+              : null}
           />
         </div>
 
         <div class="w-full xl:col-start-2 xl:row-start-1">
           <ScheduleSummarySidebar
             {form}
-            actionSummary={actionDefinition ? actionSummary : []}
+            actionSummary={actionResolution.status === 'known'
+              ? actionSummary
+              : []}
           />
         </div>
 
@@ -259,7 +265,7 @@
           class="flex flex-row items-center gap-4 max-sm:flex-col xl:col-start-1"
         >
           <Button
-            disabled={!actionDefinition ||
+            disabled={actionResolution.status === 'unknown' ||
               !actionForm ||
               submitting ||
               !writeActionsAreAllowed()}

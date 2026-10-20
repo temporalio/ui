@@ -15,18 +15,14 @@
     customSearchAttributes,
     searchAttributes = $bindable(),
     onSummaryChange,
-  }: ScheduledActionFormAdapterProps = $props();
+  }: ScheduledActionFormAdapterProps<'workflow'> = $props();
 
-  const mode = untrack(() =>
-    resolvedAction.type === 'workflow' ? resolvedAction : null,
+  const mode = untrack(() => resolvedAction);
+  const initialValues = untrack(() =>
+    getWorkflowDetailsDefaults(mode, customSearchAttributes),
   );
-  const initialValues = mode
-    ? untrack(() => getWorkflowDetailsDefaults(mode, customSearchAttributes))
-    : null;
 
-  if (initialValues) {
-    searchAttributes = initialValues.workflowSearchAttributes;
-  }
+  searchAttributes = initialValues.workflowSearchAttributes;
 
   let workflowForm = $state<ScheduledActionForm>();
 
@@ -35,12 +31,10 @@
   }
 </script>
 
-{#if mode && initialValues}
-  <WorkflowForm
-    {...mode}
-    {initialValues}
-    bind:this={workflowForm}
-    bind:searchAttributes
-    {onSummaryChange}
-  />
-{/if}
+<WorkflowForm
+  {...mode}
+  {initialValues}
+  bind:this={workflowForm}
+  bind:searchAttributes
+  {onSummaryChange}
+/>

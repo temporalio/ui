@@ -24,34 +24,45 @@ export type ScheduledActionType = ScheduledActionFormData['type'];
 
 export type ResolvedScheduledAction = ResolvedWorkflowAction;
 
-export type ScheduledActionFormAdapterProps = {
-  resolvedAction: ResolvedScheduledAction;
+export type ScheduledActionResolution =
+  | { status: 'known'; action: ResolvedScheduledAction }
+  | { status: 'unknown'; schedule: DescribeFullSchedule };
+
+export type ScheduledActionFormAdapterProps<
+  Type extends ScheduledActionType = ScheduledActionType,
+> = {
+  resolvedAction: Extract<ResolvedScheduledAction, { type: Type }>;
   customSearchAttributes: SearchAttributes;
   searchAttributes: SearchAttributesSchema;
   onSummaryChange: (summary: ScheduledActionSummaryItem[]) => void;
 };
 
-export type ScheduledActionRequestParts = {
+export type ScheduledActionRequest = {
   action: ScheduleActionRequest;
   policies: Partial<SchedulePoliciesRequest>;
 };
 
-export type ScheduledActionDefinition = {
-  type: ScheduledActionType;
-  resolve: (
-    schedule: DescribeFullSchedule | null,
-  ) => ResolvedScheduledAction | null;
+export type ScheduledActionDefinition<
+  Type extends ScheduledActionType = ScheduledActionType,
+> = {
+  type: Type;
+  resolve: {
+    (schedule: null): Extract<ResolvedScheduledAction, { type: Type }>;
+    (
+      schedule: DescribeFullSchedule,
+    ): Extract<ResolvedScheduledAction, { type: Type }> | null;
+  };
   loadFormAdapter: () => Promise<
     Component<
-      ScheduledActionFormAdapterProps,
+      ScheduledActionFormAdapterProps<Type>,
       ScheduledActionForm,
       'searchAttributes'
     >
   >;
   toRequest: (
-    data: ScheduledActionFormData,
-    resolvedAction: ResolvedScheduledAction,
-  ) => Promise<ScheduledActionRequestParts>;
+    data: Extract<ScheduledActionFormData, { type: Type }>,
+    resolvedAction: Extract<ResolvedScheduledAction, { type: Type }>,
+  ) => Promise<ScheduledActionRequest>;
   searchAttributes: {
     label: () => string;
     tabId: string;

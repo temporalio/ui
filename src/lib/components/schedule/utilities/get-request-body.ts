@@ -213,31 +213,35 @@ export async function getRequestBody(
   formData: ScheduleFormData,
   describeFullSchedule: DescribeFullSchedule | null = null,
 ): Promise<ScheduleRequestBody> {
-  const { schedule: scheduleForm, action } = formData;
-  const resolvedAction = resolveScheduledAction(
+  const { schedule: scheduleForm, action: actionForm } = formData;
+  const resolution = resolveScheduledAction(
     describeFullSchedule,
-    action.type,
+    actionForm.type,
   );
-  if (!resolvedAction || resolvedAction.type !== action.type) {
+  if (
+    resolution.status === 'unknown' ||
+    resolution.action.type !== actionForm.type
+  ) {
     throw new Error(
       'Cannot save a schedule with a missing, unsupported, or mismatched action type',
     );
   }
 
-  const actionParts = await scheduledActionTypes[action.type].toRequest(
-    action,
-    resolvedAction,
-  );
+  const { action: actionRequest, policies: actionPoliciesRequest } =
+    await scheduledActionTypes[actionForm.type].toRequest(
+      actionForm,
+      resolution.action,
+    );
 
   return {
     schedule_id: describeFullSchedule?.schedule_id ?? scheduleForm.name,
     searchAttributes: getSearchAttributes(scheduleForm.searchAttributes),
     schedule: {
       spec: getScheduleSpecRequest(scheduleForm, describeFullSchedule),
-      action: actionParts.action,
+      action: actionRequest,
       policies: {
         ...getSchedulePoliciesRequest(scheduleForm),
-        ...actionParts.policies,
+        ...actionPoliciesRequest,
       },
       state: getScheduleStateRequest(scheduleForm, describeFullSchedule),
     },
