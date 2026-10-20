@@ -29,7 +29,7 @@ workflowResetDisabled: {{ env "TEMPORAL_WORKFLOW_RESET_DISABLED" | default "fals
 workflowPauseDisabled: {{ env "TEMPORAL_WORKFLOW_PAUSE_DISABLED" | default "false" }}
 batchActionsDisabled: {{ env "TEMPORAL_BATCH_ACTIONS_DISABLED" | default "false" }}
 startWorkflowDisabled: {{ env "TEMPORAL_START_WORKFLOW_DISABLED" | default "false" }}
-hideWorkflowQueryErrors: {{ env "TEMPORAL_HIDE_WORKFLOW_QUERY_ERRORS" | default "false" }} 
+hideWorkflowQueryErrors: {{ env "TEMPORAL_HIDE_WORKFLOW_QUERY_ERRORS" | default "false" }}
 refreshWorkflowCountsDisabled: {{ env "TEMPORAL_REFRESH_WORKFLOW_COUNTS_DISABLED" | default "false" }}
 activityCommandsDisabled: {{ env "TEMPORAL_ACTIVITY_COMMANDS_DISABLED" | default "false" }}
 cors:
@@ -53,6 +53,7 @@ tls:
   keyData: {{ env "TEMPORAL_TLS_KEY_DATA" | default "" }}
   enableHostVerification: {{ env "TEMPORAL_TLS_ENABLE_HOST_VERIFICATION" | default "false" }}
   serverName: {{ env "TEMPORAL_TLS_SERVER_NAME" | default "" }}
+temporalApiKey: {{ env "TEMPORAL_API_KEY" | default "" }}
 uiServerTLS:
   certFile: {{ env "TEMPORAL_UI_SERVER_TLS_CERT" | default "" }}
   keyFile: {{ env "TEMPORAL_UI_SERVER_TLS_KEY" | default "" }}

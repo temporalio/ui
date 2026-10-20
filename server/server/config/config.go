@@ -42,6 +42,7 @@ type (
 		PublicPath          string `yaml:"publicPath"`
 		TLS                 TLS    `yaml:"tls"`
 		Auth                Auth   `yaml:"auth"`
+		TemporalAPIKey      string `yaml:"temporalApiKey"`
 		EnableUI            bool   `yaml:"enableUi"`
 		CloudUI             bool   `yaml:"cloudUi"`
 		UIAssetPath         string `yaml:"uiAssetPath"`
