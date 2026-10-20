@@ -32,11 +32,13 @@
 
   import DeleteScheduleModal from '../schedule-action-modals/delete-schedule-modal.svelte';
   import {
+    getScheduledActionCreateMode,
     resolveScheduledAction,
     scheduledActionTypes,
   } from '../scheduled-action-types/registry';
   import type {
     ScheduledActionForm,
+    ScheduledActionResolution,
     ScheduledActionSummaryItem,
   } from '../scheduled-action-types/types';
   import { formScheduleSchema } from '../schema/form';
@@ -85,7 +87,9 @@
   );
 
   const actionResolution = $derived.by(() => {
-    const resolution = resolveScheduledAction(schedule);
+    const resolution: ScheduledActionResolution = schedule
+      ? resolveScheduledAction(schedule)
+      : { status: 'known', action: getScheduledActionCreateMode() };
     if (resolution.status === 'unknown') return resolution;
 
     return {

@@ -1,6 +1,7 @@
 import type { DescribeFullSchedule } from '$lib/types/schedule';
 
 import type {
+  ResolvedScheduledAction,
   ScheduledActionDefinition,
   ScheduledActionResolution,
   ScheduledActionType,
@@ -15,17 +16,17 @@ export const scheduledActionTypes: {
   workflow: workflowActionDefinition,
 };
 
-export function resolveScheduledAction(
-  schedule: DescribeFullSchedule | null,
-  selectedType: ScheduledActionType = DEFAULT_SCHEDULED_ACTION_TYPE,
-): ScheduledActionResolution {
-  if (!schedule) {
-    return {
-      status: 'known',
-      action: scheduledActionTypes[selectedType].resolve(null),
-    };
-  }
+export function getScheduledActionCreateMode(
+  type: ScheduledActionType = DEFAULT_SCHEDULED_ACTION_TYPE,
+): Extract<ResolvedScheduledAction, { isEditing: false }> {
+  return { type, isEditing: false, schedule: null };
+}
 
+export function resolveScheduledAction(
+  schedule: DescribeFullSchedule,
+): ScheduledActionResolution<
+  Extract<ResolvedScheduledAction, { isEditing: true }>
+> {
   for (const definition of Object.values(scheduledActionTypes)) {
     const resolvedAction = definition.resolve(schedule);
     if (resolvedAction) return { status: 'known', action: resolvedAction };

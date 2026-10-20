@@ -24,8 +24,10 @@ export type ScheduledActionType = ScheduledActionFormData['type'];
 
 export type ResolvedScheduledAction = ResolvedWorkflowAction;
 
-export type ScheduledActionResolution =
-  | { status: 'known'; action: ResolvedScheduledAction }
+export type ScheduledActionResolution<
+  Action extends ResolvedScheduledAction = ResolvedScheduledAction,
+> =
+  | { status: 'known'; action: Action }
   | { status: 'unknown'; schedule: DescribeFullSchedule };
 
 export type ScheduledActionFormAdapterProps<
@@ -46,12 +48,9 @@ export type ScheduledActionDefinition<
   Type extends ScheduledActionType = ScheduledActionType,
 > = {
   type: Type;
-  resolve: {
-    (schedule: null): Extract<ResolvedScheduledAction, { type: Type }>;
-    (
-      schedule: DescribeFullSchedule,
-    ): Extract<ResolvedScheduledAction, { type: Type }> | null;
-  };
+  resolve: (
+    schedule: DescribeFullSchedule,
+  ) => Extract<ResolvedScheduledAction, { type: Type; isEditing: true }> | null;
   loadFormAdapter: () => Promise<
     Component<
       ScheduledActionFormAdapterProps<Type>,

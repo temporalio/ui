@@ -7,9 +7,11 @@ import {
 } from './date';
 import { getSearchAttributes } from './get-search-attributes';
 import {
+  getScheduledActionCreateMode,
   resolveScheduledAction,
   scheduledActionTypes,
 } from '../scheduled-action-types/registry';
+import type { ResolvedScheduledAction } from '../scheduled-action-types/types';
 import type { FormScheduleSchema } from '../schema/form';
 
 import type {
@@ -214,23 +216,28 @@ export async function getRequestBody(
   describeFullSchedule: DescribeFullSchedule | null = null,
 ): Promise<ScheduleRequestBody> {
   const { schedule: scheduleForm, action: actionForm } = formData;
-  const resolution = resolveScheduledAction(
-    describeFullSchedule,
-    actionForm.type,
-  );
-  if (
-    resolution.status === 'unknown' ||
-    resolution.action.type !== actionForm.type
-  ) {
-    throw new Error(
-      'Cannot save a schedule with a missing, unsupported, or mismatched action type',
-    );
+
+  let resolvedAction: ResolvedScheduledAction;
+
+  if (describeFullSchedule) {
+    const resolution = resolveScheduledAction(describeFullSchedule);
+    if (
+      resolution.status === 'unknown' ||
+      resolution.action.type !== actionForm.type
+    ) {
+      throw new Error(
+        'Cannot save a schedule with a missing, unsupported, or mismatched action type',
+      );
+    }
+    resolvedAction = resolution.action;
+  } else {
+    resolvedAction = getScheduledActionCreateMode(actionForm.type);
   }
 
   const { action: actionRequest, policies: actionPoliciesRequest } =
     await scheduledActionTypes[actionForm.type].toRequest(
       actionForm,
-      resolution.action,
+      resolvedAction,
     );
 
   return {

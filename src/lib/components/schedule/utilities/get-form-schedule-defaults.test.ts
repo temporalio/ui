@@ -13,7 +13,7 @@ import {
   DEFAULT_TASK_TIMEOUT,
 } from '../scheduled-action-types/workflow/constants';
 import { getWorkflowDetailsDefaults } from '../scheduled-action-types/workflow/workflow-details-defaults';
-import { getWorkflowFormMode } from '../scheduled-action-types/workflow/workflow-form-mode';
+import { resolveWorkflowAction } from '../scheduled-action-types/workflow/workflow-form-mode';
 
 const noAttributes = { searchAttributes: {}, customSearchAttributes: {} };
 
@@ -117,7 +117,7 @@ describe('getFormScheduleDefaults', () => {
       describeFullSchedule,
       noAttributes,
     );
-    const mode = getWorkflowFormMode(describeFullSchedule);
+    const mode = resolveWorkflowAction(describeFullSchedule);
     if (!mode) throw new Error('Expected a workflow schedule');
 
     const workflowDefaults = getWorkflowDetailsDefaults(mode, {});
@@ -163,7 +163,7 @@ describe('getFormScheduleDefaults', () => {
   });
 
   it('normalizes a stored 0s run/execution timeout to empty', () => {
-    const mode = getWorkflowFormMode({
+    const mode = resolveWorkflowAction({
       schedule: {
         action: {
           startWorkflow: {
