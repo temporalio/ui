@@ -5,6 +5,7 @@
 
   import Error from '$lib/holocene/error.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { routeForNexus } from '$lib/utilities/route-for';
 
   interface Props {
     data: LayoutData;
@@ -21,6 +22,12 @@
       message: translate('common.page-not-found'),
     }}
     status={404}
+    resource={translate('nexus.nexus-endpoint-simple')}
+    namespaced={false}
+    back={{
+      href: routeForNexus(),
+      label: translate('nexus.back-to-endpoints'),
+    }}
   />
 {:else}
   {@render children()}

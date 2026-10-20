@@ -5,6 +5,7 @@ import * as Common from './common';
 import * as DataEncoder from './data-encoder';
 import * as DatePicker from './date-picker';
 import * as Deployments from './deployments';
+import * as Errors from './errors';
 import * as Events from './events';
 import * as Namespaces from './namespaces';
 import * as Nexus from './nexus';
@@ -25,6 +26,7 @@ export const English = {
   [Common.Namespace]: Common.Strings,
   [DatePicker.Namespace]: DatePicker.Strings,
   [Deployments.Namespace]: Deployments.Strings,
+  [Errors.Namespace]: Errors.Strings,
   [Workflows.Namespace]: Workflows.Strings,
   [TypedErrors.Namespace]: TypedErrors.Strings,
   [Events.Namespace]: Events.Strings,

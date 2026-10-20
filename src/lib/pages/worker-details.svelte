@@ -55,8 +55,15 @@
 {/snippet}
 
 {#if error}
-  {@render breadcrumb()}
-  <Error {error} status={error.statusCode} />
+  <Error
+    {error}
+    status={error.statusCode}
+    resource={translate('workers.worker')}
+    back={{
+      href: routeForWorkers({ namespace }),
+      label: translate('workers.back-to-workers'),
+    }}
+  />
 {:else if worker === undefined}
   <Skeleton {breadcrumb} />
 {:else}

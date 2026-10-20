@@ -6,6 +6,7 @@
   import { page } from '$app/state';
 
   import Error from '$lib/holocene/error.svelte';
+  import DarkMode from '$lib/utilities/dark-mode';
   import { isNetworkError } from '$lib/utilities/is-network-error';
   import { parseWithBigInt } from '$lib/utilities/parse-with-big-int';
 
@@ -30,4 +31,5 @@
   });
 </script>
 
+<DarkMode />
 <Error {error} {status} />
