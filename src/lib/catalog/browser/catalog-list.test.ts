@@ -28,7 +28,7 @@ beforeAll(async () => {
       root: projectRoot,
       configFile: false,
       appType: 'custom',
-      plugins: [svelte({ hot: false })],
+      plugins: [svelte({ compilerOptions: { hmr: false } })],
       resolve: {
         alias: {
           $lib: path.resolve(projectRoot, 'src/lib'),

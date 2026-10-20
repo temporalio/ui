@@ -14,7 +14,7 @@ import { getLocalTime } from './timezone';
 const DateTimeFormat = Intl.DateTimeFormat;
 const dateTimeFormatSpy = vi
   .spyOn(global.Intl, 'DateTimeFormat')
-  .mockImplementation((_, options) => {
+  .mockImplementation(function (_, options) {
     const hour12 = options?.hour12 !== undefined ? options.hour12 : true;
     const hourCycle = options?.hour12 !== undefined ? undefined : 'h11';
     return new DateTimeFormat('en-US', {
