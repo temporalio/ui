@@ -33,6 +33,7 @@
     PaletteContext,
     PaletteItem,
     PaletteStatusVariant,
+    PaletteTone,
     PaletteToolSet,
     PaletteVariant,
     PaletteView,
@@ -599,11 +600,14 @@
       : { duration: 200, easing: cubicOut },
   );
 
-  const toneClass = {
+  const toneClass: Record<PaletteTone, string> = {
     neutral: 'text-secondary',
     success: 'text-success',
     danger: 'text-danger',
     warning: 'text-warning',
+    information: 'text-information',
+    accent: 'text-accent',
+    error: 'text-error',
     // Brand blue fails contrast on the selected row, and the label already
     // says what it means.
     brand: 'font-medium text-primary',

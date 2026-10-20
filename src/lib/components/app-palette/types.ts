@@ -11,7 +11,10 @@ export type PaletteTone =
   | 'success'
   | 'danger'
   | 'warning'
-  | 'brand';
+  | 'brand'
+  | 'information'
+  | 'accent'
+  | 'error';
 
 export type PaletteVariant = 'default' | 'dev';
 

@@ -542,6 +542,40 @@ describe('Palette', () => {
       expect(devRow.firstElementChild?.textContent).toContain('json item');
     });
 
+    it('colors accessories by tone', async () => {
+      const tones = ['information', 'accent', 'error'] as const;
+      render(Palette, {
+        props: {
+          toolSets: [
+            {
+              id: 'tones',
+              label: 'Tones',
+              key: 't',
+              tools: [
+                {
+                  id: 'tones',
+                  section: 'Tones',
+                  items: () =>
+                    tones.map((tone) => ({
+                      id: tone,
+                      title: tone,
+                      accessory: { label: `${tone} label`, tone },
+                      actions: [],
+                    })),
+                },
+              ],
+            },
+          ],
+        },
+      });
+      await openPalette();
+      for (const tone of tones) {
+        expect(screen.getByText(`${tone} label`).className).toContain(
+          `text-${tone}`,
+        );
+      }
+    });
+
     it('shows an icon column only when some item has an icon', async () => {
       const iconSet = (icon?: typeof IconFlag): PaletteToolSet => ({
         id: 'flags',
