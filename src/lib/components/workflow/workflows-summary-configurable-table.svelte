@@ -44,6 +44,10 @@
   } from '$lib/utilities/batch-selection';
 
   import { getWorkflowSortColumns } from './workflows-summary-configurable-table/column-search-attributes';
+  import {
+    createVisibleRowsSelector,
+    type VisibleRow,
+  } from './workflows-summary-configurable-table/visible-rows';
 
   import TableBodyCell from './workflows-summary-configurable-table/table-body-cell.svelte';
   import TableHeaderCell from './workflows-summary-configurable-table/table-header-cell.svelte';
@@ -140,39 +144,14 @@
     viewFeature('tableDensity');
   };
 
-  let visiblePaginatedItems: WorkflowExecution[] = $state([]);
+  // Pages are replaced, never mutated here. Preserve row identities when sorting
+  // so unchanged cells do not recompute through a fresh set of deep proxies.
+  let visiblePaginatedItems: WorkflowExecution[] = $state.raw([]);
 
-  type VisibleRow =
-    | {
-        rowType: 'root';
-        childCount: number | undefined;
-        value: WorkflowExecution;
-      }
-    | {
-        rowType: 'child';
-        parentRow: Extract<VisibleRow, { rowType: 'root' }>;
-        value: WorkflowExecution;
-      };
-  const visibleRows: VisibleRow[] = $derived.by(() => {
-    return visiblePaginatedItems.flatMap((workflow) => {
-      const visibleChildren = visibleChildrenMap.get(workflow.runId);
-
-      const rootRow = {
-        rowType: 'root' as const,
-        childCount: visibleChildren?.length,
-        value: workflow,
-      };
-
-      return [
-        rootRow,
-        ...(visibleChildren || []).map((c) => ({
-          rowType: 'child' as const,
-          parentRow: rootRow,
-          value: c,
-        })),
-      ];
-    });
-  });
+  const selectVisibleRows = createVisibleRowsSelector();
+  const visibleRows = $derived(
+    selectVisibleRows(visiblePaginatedItems, visibleChildrenMap),
+  );
 
   let prevClickedRow = $state<VisibleRow | null>(null);
 
@@ -281,9 +260,10 @@
     {/snippet}
     {#snippet rows()}
       {#each visibleRows as row, visibleRowIndex (row.value.runId)}
+        {@const workflow = row.value}
         {@const isChildRow = row.rowType === 'child'}
         <TableRow
-          workflow={row.value}
+          {workflow}
           {toggleChildrenVisibility}
           childCount={!isChildRow && row.childCount != null
             ? row.childCount
@@ -293,7 +273,7 @@
             handleBatchSelect(event, row, visibleRowIndex)}
         >
           {#each columns as column (column.label)}
-            <TableBodyCell workflow={row.value} {column} truncate={dense} />
+            <TableBodyCell {workflow} {column} truncate={dense} />
           {/each}
         </TableRow>
       {/each}
