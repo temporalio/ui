@@ -84,12 +84,7 @@
 >
   {#if LeadingIcon}
     <LeadingIcon class="mt-0.5" />
-  {/if}
-  {#if text}
-    {text}
-  {/if}
-  {@render children?.()}
-  {#if TrailingIcon}
+  {/if}{#if text}{text}{/if}{@render children?.()}{#if TrailingIcon}
     <TrailingIcon class="mt-0.5" />
   {/if}
 </a>
