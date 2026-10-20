@@ -17,7 +17,6 @@ server/ui/assets
 /test-results/
 /playwright-report/
 /playwright/.cache/
-/migration-evidence/
 /dist
 /storybook-static
 /audits
