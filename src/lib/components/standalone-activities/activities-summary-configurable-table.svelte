@@ -64,7 +64,9 @@
     standaloneActivityBulkActionsEnabled(page) && $supportsAdvancedVisibility,
   );
 
-  let visiblePaginatedItems: ActivityExecutionListInfo[] = $state([]);
+  // Pages are replaced, never mutated here. Preserve row identities when sorting
+  // so unchanged cells do not recompute through a fresh set of deep proxies.
+  let visiblePaginatedItems: ActivityExecutionListInfo[] = $state.raw([]);
 
   const pageSelectionStatus: PageSelectionStatus = $derived(
     getPageSelectionStatus(
