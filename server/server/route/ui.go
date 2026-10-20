@@ -156,7 +156,7 @@ type immutableAssetResponseWriter struct {
 
 func (w *immutableAssetResponseWriter) WriteHeader(status int) {
 	if !w.wroteHeader {
-		if status >= http.StatusOK && status < http.StatusMultipleChoices {
+		if (status >= http.StatusOK && status < http.StatusMultipleChoices) || status == http.StatusNotModified {
 			w.Header().Del("Set-Cookie")
 			vary := w.Header().Values("Vary")
 			w.Header().Del("Vary")

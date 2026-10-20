@@ -8,6 +8,7 @@ import (
 	"strings"
 	"testing"
 	"testing/fstest"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -405,10 +406,11 @@ func TestBuildUIAssetsHandler_CacheControl(t *testing.T) {
 }
 
 func TestBuildUIAssetsHandler_CacheControlWithCSRFMiddleware(t *testing.T) {
+	modifiedAt := time.Date(2026, time.October, 20, 18, 0, 0, 0, time.UTC)
 	assets := fstest.MapFS{
 		"_app":                    &fstest.MapFile{Mode: os.ModeDir},
 		"_app/immutable":          &fstest.MapFile{Mode: os.ModeDir},
-		"_app/immutable/chunk.js": &fstest.MapFile{Data: []byte("chunk")},
+		"_app/immutable/chunk.js": &fstest.MapFile{Data: []byte("chunk"), ModTime: modifiedAt},
 	}
 	provider := &routeTestConfigProvider{cfg: &config.Config{}}
 	e := echo.New()
@@ -418,19 +420,34 @@ func TestBuildUIAssetsHandler_CacheControlWithCSRFMiddleware(t *testing.T) {
 	e.GET("/_app/*", buildUIAssetsHandler(assets))
 
 	tests := []struct {
-		name         string
-		path         string
-		cacheControl string
-		setCookie    bool
+		name            string
+		path            string
+		ifModifiedSince string
+		secFetchSite    string
+		status          int
+		cacheControl    string
+		setCookie       bool
+		lastModified    string
 	}{
 		{
 			name:         "immutable file is cacheable without a csrf cookie",
 			path:         "/_app/immutable/chunk.js",
+			status:       http.StatusOK,
 			cacheControl: "public, max-age=31536000, immutable",
+		},
+		{
+			name:            "not modified immutable browser asset is cacheable without a csrf cookie",
+			path:            "/_app/immutable/chunk.js",
+			ifModifiedSince: modifiedAt.Format(http.TimeFormat),
+			secFetchSite:    "same-origin",
+			status:          http.StatusNotModified,
+			cacheControl:    "public, max-age=31536000, immutable",
+			lastModified:    modifiedAt.Format(http.TimeFormat),
 		},
 		{
 			name:      "immutable directory is not cacheable",
 			path:      "/_app/immutable/",
+			status:    http.StatusOK,
 			setCookie: true,
 		},
 	}
@@ -439,15 +456,25 @@ func TestBuildUIAssetsHandler_CacheControlWithCSRFMiddleware(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			req := httptest.NewRequest(http.MethodGet, tt.path, nil)
 			req.Header.Set("Accept-Encoding", "gzip")
+			if tt.ifModifiedSince != "" {
+				req.Header.Set("If-Modified-Since", tt.ifModifiedSince)
+			}
+			if tt.secFetchSite != "" {
+				req.Header.Set("Sec-Fetch-Site", tt.secFetchSite)
+			}
 			rec := httptest.NewRecorder()
 			e.ServeHTTP(rec, req)
 
-			assert.Equal(t, http.StatusOK, rec.Code)
+			assert.Equal(t, tt.status, rec.Code)
 			assert.Equal(t, tt.cacheControl, rec.Header().Get("Cache-Control"))
 			assert.Equal(t, tt.setCookie, len(rec.Result().Cookies()) > 0)
+			if tt.lastModified != "" {
+				assert.Equal(t, tt.lastModified, rec.Header().Get("Last-Modified"))
+			}
 			if tt.cacheControl != "" {
 				assert.Contains(t, rec.Header().Values("Vary"), "Accept-Encoding")
 				assert.NotContains(t, strings.Join(rec.Header().Values("Vary"), ","), "Cookie")
+				assert.Empty(t, rec.Header().Values("Set-Cookie"))
 			}
 		})
 	}
