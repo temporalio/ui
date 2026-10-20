@@ -198,9 +198,6 @@ describe('deployment connection status visibility', () => {
     expect(regionCell?.textContent).toContain('Connected');
     // A legacy single-group config is keyed "default", which is not a region.
     expect(regionCell?.textContent).not.toContain('default');
-    const details = client.expandDetails(target);
-    expect(details).not.toBeNull();
-    expect(details?.getAttribute('colspan')).toBe('5');
   });
 
   test('renders connection status in the Region column when enabled', async () => {
@@ -216,9 +213,6 @@ describe('deployment connection status visibility', () => {
     expect(
       target.querySelector('tbody td:nth-child(3)')?.textContent,
     ).toContain('Connected');
-    const details = client.expandDetails(target);
-    expect(details).not.toBeNull();
-    expect(details?.getAttribute('colspan')).toBe('5');
   });
 
   test('hides connection status when the consumer opts out', async () => {
@@ -232,9 +226,6 @@ describe('deployment connection status visibility', () => {
       'Deployed At',
     );
     expect(target.textContent).not.toContain('Connected');
-    const details = client.expandDetails(target);
-    expect(details).not.toBeNull();
-    expect(details?.getAttribute('colspan')).toBe('5');
   });
 
   test('hides connection status for a self-hosted deployment', async () => {
@@ -251,8 +242,6 @@ describe('deployment connection status visibility', () => {
       'Actions',
     ]);
     expect(target.textContent).not.toContain('Connected');
-    const details = client.expandDetails(target);
-    expect(details).toBeNull();
   });
 
   test('shows the pending connection state for a version with no completed check', async () => {
@@ -284,6 +273,7 @@ describe('deployment connection status visibility', () => {
 
     const versionMenu = client.openMenu('version-actions-build-id');
     expect(menuItems(versionMenu)).toEqual([
+      'View Details',
       'Edit',
       'Unset Current',
       'Set Ramping Version',
@@ -308,6 +298,7 @@ describe('deployment connection status visibility', () => {
 
     const versionMenu = client.openMenu('version-actions-build-id');
     expect(menuItems(versionMenu)).toEqual([
+      'View Details',
       'Unset Current',
       'Set Ramping Version',
       'View Workflows',
@@ -316,6 +307,7 @@ describe('deployment connection status visibility', () => {
 
     const inactiveVersionMenu = client.openMenu('version-actions-build-id-2');
     expect(menuItems(inactiveVersionMenu)).toEqual([
+      'View Details',
       'Set Current Version',
       'Set Ramping Version',
       'View Workflows',

@@ -36,3 +36,17 @@ vi.mock('esm-env', () => {
   const DEV = false;
   return { BROWSER, DEV };
 });
+
+// jsdom has no matchMedia. Svelte's prefersReducedMotion reads it on import.
+if (typeof window !== 'undefined' && !window.matchMedia) {
+  vi.stubGlobal('matchMedia', (query: string) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addEventListener: () => {},
+    removeEventListener: () => {},
+    addListener: () => {},
+    removeListener: () => {},
+    dispatchEvent: () => false,
+  }));
+}

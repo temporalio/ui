@@ -116,27 +116,51 @@ export interface VersioningInfo {
 
 export interface WorkerDeploymentVersionInfo {
   version: string;
+  /** A `WorkerDeploymentVersionStatus` enum name. */
+  status?: string;
   deploymentVersion?: WorkerDeploymentVersion;
   deploymentName: string;
-  createTime: Timestamp;
-  routingChangedTime: Timestamp;
-  currentSinceTime: Timestamp;
-  rampingSinceTime: Timestamp;
-  rampPercentage: number;
-  taskQueueInfos: TaskQueueInfo[];
+  createTime: ApiTimestamp;
+  routingChangedTime?: ApiTimestamp;
+  currentSinceTime?: ApiTimestamp;
+  rampingSinceTime?: ApiTimestamp;
+  firstActivationTime?: ApiTimestamp;
+  lastCurrentTime?: ApiTimestamp;
+  lastDeactivationTime?: ApiTimestamp;
+  rampPercentage?: number;
+  taskQueueInfos?: TaskQueueInfo[];
   computeConfig?: ComputeConfig;
-  drainageInfo: {
-    status: string;
-    lastChangedTime: Timestamp;
-    lastCheckedTime: Timestamp;
+  drainageInfo?: {
+    status?: string;
+    lastChangedTime?: ApiTimestamp;
+    lastCheckedTime?: ApiTimestamp;
   };
-  metadata: {
-    entries: Record<string, string>;
+  metadata?: {
+    /** User-defined values. The API sends each as a Payload. */
+    entries?: Record<string, Payload>;
   };
+  lastModifierIdentity?: string;
+}
+
+export interface TaskQueueStats {
+  approximateBacklogCount?: string | number;
+  /** A proto Duration as JSON, e.g. "130.5s". */
+  approximateBacklogAge?: string;
+  tasksAddRate?: number;
+  tasksDispatchRate?: number;
+}
+
+export interface VersionTaskQueue {
+  name: string;
+  /** A `TaskQueueType` enum name. */
+  type: string;
+  stats?: TaskQueueStats;
 }
 
 export interface WorkerDeploymentVersionResponse {
   workerDeploymentVersionInfo: WorkerDeploymentVersionInfo;
+  /** Present when the request sets `reportTaskQueueStats`. */
+  versionTaskQueues?: VersionTaskQueue[];
 }
 
 export interface Payload {
