@@ -154,7 +154,7 @@
     <Timestamp as="p" class="text-sm" dateTime={event.eventTime} />
   </div>
   <div class="flex flex-col gap-1 xl:flex-row">
-    <div class="flex w-full flex-col gap-1 xl:w-1/2">
+    <div class="flex w-full min-w-0 flex-col gap-1 xl:w-1/2">
       {#if event?.links?.length && !systemNexus}
         {#if event.category === 'nexus'}
           {@render nexusHandlerLinks(event.links)}
@@ -181,7 +181,7 @@
       {/if}
     </div>
     {#if payloadFields.length}
-      <div class="flex w-full flex-col gap-1 xl:w-1/2">
+      <div class="flex w-full min-w-0 flex-col gap-1 xl:w-1/2">
         {#each payloadFields as [key, value] (key)}
           {@render payloads(key, value)}
         {/each}
@@ -199,11 +199,14 @@
       copyIconTitle={translate('common.copy-icon-title')}
       copySuccessIconTitle={translate('common.copy-success-icon-title')}
       content={view.value}
+      container-class="min-w-0"
     >
       {#if view.href}
-        <Link href={view.href} class="whitespace-pre-line">{view.value}</Link>
+        <Link href={view.href} class="whitespace-pre-line break-all"
+          >{view.value}</Link
+        >
       {:else}
-        <span class="whitespace-pre-line">{view.value}</span>
+        <span class="whitespace-pre-line break-all">{view.value}</span>
       {/if}
     </Copyable>
   </div>
@@ -365,13 +368,14 @@
       copyIconTitle={translate('common.copy-icon-title')}
       copySuccessIconTitle={translate('common.copy-success-icon-title')}
       content={nexusLink.value}
+      container-class="min-w-0"
     >
       {#if nexusLink.href}
-        <Link href={nexusLink.href} class="whitespace-pre-line"
+        <Link href={nexusLink.href} class="whitespace-pre-line break-all"
           >{nexusLink.value}</Link
         >
       {:else}
-        <p class="whitespace-pre-line text-sm">{nexusLink.value}</p>
+        <p class="whitespace-pre-line break-all text-sm">{nexusLink.value}</p>
       {/if}
     </Copyable>
   </div>
@@ -386,12 +390,13 @@
       copyIconTitle={translate('common.copy-icon-title')}
       copySuccessIconTitle={translate('common.copy-success-icon-title')}
       content={String(value)}
+      container-class="min-w-0"
     >
       <EventDetailsLink
         value={String(value)}
         {attributes}
         type={displayLinkType(key, attributes)}
-        class="whitespace-pre-line"
+        class="whitespace-pre-line break-all"
       />
     </Copyable>
   </div>
