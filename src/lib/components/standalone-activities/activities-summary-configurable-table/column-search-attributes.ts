@@ -1,4 +1,5 @@
 import type { ActivityExecutionListInfo } from '$lib/types/activity-execution';
+import type { SearchAttributes } from '$lib/types/workflows';
 import {
   durationStringToMilliseconds,
   toQueryDuration,
@@ -9,6 +10,7 @@ import {
   getColumnAttribute,
   type QuickFilterColumns,
 } from '$lib/utilities/query/quick-filter-table';
+import { searchAttributeSortColumns } from '$lib/utilities/search-attribute-table-sort';
 
 export const ACTIVITY_COLUMN_ATTRIBUTE: Record<string, string> = {
   'Activity ID': 'ActivityId',
@@ -67,3 +69,20 @@ export const ACTIVITY_QUICK_FILTER_COLUMNS: QuickFilterColumns<ActivityExecution
     getValue: getActivityColumnValue,
     unfilterable: UNFILTERABLE_ACTIVITY_COLUMNS,
   };
+
+export const getActivitySortColumns = (
+  labels: string[],
+  attributes: SearchAttributes,
+) =>
+  searchAttributeSortColumns(
+    labels,
+    ACTIVITY_QUICK_FILTER_COLUMNS,
+    attributes,
+    {
+      'Execution Duration': {
+        getValue: (activity) =>
+          durationStringToMilliseconds(activity.executionDuration),
+        type: 'number',
+      },
+    },
+  );

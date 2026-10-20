@@ -11,20 +11,32 @@
 
   import { debounce } from 'es-toolkit';
   import type { Snippet } from 'svelte';
-  import { getContext, onMount } from 'svelte';
+  import { getContext, onMount, setContext, untrack } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import Alert from '$lib/holocene/alert.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import IconButton from '$lib/holocene/icon-button.svelte';
   import FilterSelect from '$lib/holocene/select/filter-select.svelte';
-  import { IconArrowLeft, IconArrowRight } from '$lib/io/icon';
+  import { translate } from '$lib/i18n/translate';
+  import { IconArrowLeft, IconArrowRight, IconInfo } from '$lib/io/icon';
   import {
     createPaginationStore,
     type PaginationStore,
   } from '$lib/stores/api-pagination';
   import { options } from '$lib/stores/pagination';
   import { isError } from '$lib/utilities/is';
+  import {
+    sortTableItems,
+    type TableSort,
+    type TableSortColumn,
+  } from '$lib/utilities/table-sort';
+
+  import {
+    TABLE_SORT_CONTEXT,
+    type TableSortContext,
+  } from '../table-sort-context';
 
   import PaginatedTable from './index.svelte';
   import {
@@ -41,6 +53,8 @@
     onError?: ((error: Error | unknown) => void) | undefined;
     onFetch: () => Promise<PaginatedRequest<T>>;
     onItemsChange?: (items: T[]) => void;
+    sort?: TableSort;
+    sortColumns?: Record<string, TableSortColumn<T>>;
     onLoadingChange?: ((loading: boolean) => void) | undefined;
     onShiftUp?: KeyboardHandler;
     onShiftDown?: KeyboardHandler;
@@ -70,6 +84,8 @@
     onError,
     onFetch,
     onItemsChange,
+    sort = $bindable(),
+    sortColumns = {},
     onLoadingChange,
     onShiftUp,
     onShiftDown,
@@ -94,12 +110,55 @@
     actionsEndAdditional,
   }: Props = $props();
 
+  // svelte-ignore state_referenced_locally
   const store: PaginationStore<T> = createPaginationStore(
     pageSizeOptions,
     pageSizeOptions[0],
   );
   let fetchError = $state<Error | undefined>();
   let paginatedTable = $state<PaginatedTable<T>>();
+  const pageItems = $derived($store.visibleItems);
+  const getSortColumn = (column: string) =>
+    Object.prototype.hasOwnProperty.call(sortColumns, column)
+      ? sortColumns[column]
+      : undefined;
+  const sortColumn = $derived(sort ? getSortColumn(sort.column) : undefined);
+  const activeSortKey = $derived(
+    sort && sortColumn
+      ? `${sort.column}:${sort.direction}:${sortColumn.type ?? ''}`
+      : undefined,
+  );
+  const visibleItems = $derived.by(() => {
+    const items = pageItems;
+    if (!activeSortKey) return items;
+    return untrack(() => sortTableItems(items, sortColumn, sort?.direction));
+  });
+
+  function clearSort() {
+    sort = undefined;
+    store.setActiveIndex(0);
+  }
+
+  $effect(() => {
+    if (sort && !sortColumn) untrack(clearSort);
+  });
+
+  setContext<TableSortContext>(TABLE_SORT_CONTEXT, {
+    isSortable: (column) => Boolean(getSortColumn(column)),
+    direction: (column) =>
+      sort?.column === column ? sort.direction : undefined,
+    toggle: (column) => {
+      if (!getSortColumn(column)) return;
+      sort = {
+        column,
+        direction:
+          sort?.column === column && sort.direction === 'ascending'
+            ? 'descending'
+            : 'ascending',
+      };
+      store.setActiveIndex(0);
+    },
+  });
 
   function clearError() {
     if (fetchError) fetchError = undefined;
@@ -222,9 +281,9 @@
 
   let previousItems: T[] | undefined;
   $effect(() => {
-    if (onItemsChange && $store.visibleItems !== previousItems) {
-      previousItems = $store.visibleItems;
-      onItemsChange($store.visibleItems);
+    if (onItemsChange && visibleItems !== previousItems) {
+      previousItems = visibleItems;
+      onItemsChange(visibleItems);
     }
   });
 
@@ -261,17 +320,52 @@
   bind:this={paginatedTable}
   loading={$store.loading}
   updating={$store.updating}
-  visibleItems={$store.visibleItems}
+  {visibleItems}
   {maxHeight}
   verticalScroll={maximizable && $maximized ? 'table' : 'responsive'}
   class={merge(maximizable && 'rounded-none border-0 border-t')}
-  tableClass={maximizable ? 'rounded-none' : ''}
+  tableClass={maximizable || (sort && sortColumn) ? 'rounded-none' : ''}
   {id}
   {caption}
   {headers}
   empty={indexEmpty}
 >
-  {@render rows?.({ visibleItems: $store.visibleItems })}
+  {@render rows?.({ visibleItems })}
+
+  {#snippet banner()}
+    {#if sort && sortColumn}
+      <div
+        class={merge(
+          'flex shrink-0 items-center justify-between gap-3 border-b bg-surface-information px-3 py-1 text-xs text-information',
+          !maximizable && 'rounded-t-lg',
+        )}
+        data-testid="table-sort-banner"
+      >
+        <p role="status" class="flex min-w-0 items-center gap-2">
+          <IconInfo class="shrink-0" />
+          <span class="break-words">
+            {#if !$store.loading && !fetchError && adjustedTotal !== undefined}
+              {translate('common.sort-page-notice-with-count', {
+                column: sort.column,
+                visible: visibleItems.length.toLocaleString(),
+                total: adjustedTotal.toLocaleString(),
+              })}
+            {:else}
+              {translate('common.sort-page-notice', { column: sort.column })}
+            {/if}
+          </span>
+        </p>
+        <Button
+          size="xs"
+          variant="ghost"
+          onclick={clearSort}
+          onkeydown={(event) => event.stopPropagation()}
+        >
+          {translate('common.clear-sort')}
+        </Button>
+      </div>
+    {/if}
+  {/snippet}
 
   {#snippet actionsStart()}
     <FilterSelect
@@ -285,7 +379,7 @@
   {#snippet actionsEnd()}
     <div class="ml-auto flex shrink-0 items-center gap-2">
       {@render actionsEndAdditional?.({
-        visibleItems: $store.visibleItems,
+        visibleItems,
         page: $store.index + 1,
       })}
       {#if maximizable}

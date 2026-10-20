@@ -7,6 +7,7 @@
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { IconTemporalSettings } from '$lib/io/icon';
+  import { createTableSort } from '$lib/runes/table-sort-state.svelte';
   import { fetchPaginatedNexusOperations } from '$lib/services/standalone-nexus-operations';
   import {
     configurableTableColumns,
@@ -18,6 +19,9 @@
     nexusOperationLoading,
     nexusOperationRefresh,
   } from '$lib/stores/nexus-operations';
+  import { nexusOperationSearchAttributes } from '$lib/stores/search-attributes';
+
+  import { getNexusOperationSortColumns } from './nexus-operations-summary-configurable-table/column-search-attributes';
 
   import TableBodyCell from './nexus-operations-summary-configurable-table/table-body-cell.svelte';
   import TableEmptyState from './nexus-operations-summary-configurable-table/table-empty-state.svelte';
@@ -37,14 +41,24 @@
   );
   const query = $derived(page.url.searchParams.get('query') ?? '');
 
+  const tableSort = createTableSort(() => [namespace, query]);
+
   const onFetch = $derived(() =>
     fetchPaginatedNexusOperations(namespace, query),
+  );
+  const sortColumns = $derived(
+    getNexusOperationSortColumns(
+      columns.map((column) => column.label),
+      $nexusOperationSearchAttributes,
+    ),
   );
 </script>
 
 {#key [namespace, query, $nexusOperationRefresh]}
   <PaginatedTable
     total={$nexusOperationCount.count}
+    bind:sort={tableSort.value}
+    {sortColumns}
     {onFetch}
     aria-label={translate(
       'standalone-nexus-operations.standalone-nexus-operations',
