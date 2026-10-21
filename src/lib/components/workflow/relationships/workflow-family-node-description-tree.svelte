@@ -23,9 +23,10 @@
   }: Props = $props();
 </script>
 
-{#each root?.children as child}
+{#each root?.children as child, index (child.workflow.runId)}
   <WorkflowFamilyNodeDescription
     root={child}
+    lastChild={index === root.children.length - 1}
     {expandAll}
     {onNodeClick}
     {activeWorkflow}
