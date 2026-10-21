@@ -31,6 +31,22 @@ const cryptoMock = {
 
 vi.stubGlobal('crypto', cryptoMock);
 
+if (typeof Element !== 'undefined') {
+  Element.prototype.animate = function () {
+    const animation = {
+      currentTime: 0,
+      effect: null,
+      playState: 'finished',
+      onfinish: null as (() => void) | null,
+      cancel: () => {
+        animation.onfinish = null;
+      },
+    };
+    queueMicrotask(() => animation.onfinish?.());
+    return animation as unknown as Animation;
+  };
+}
+
 vi.mock('esm-env', () => {
   const BROWSER = true;
   const DEV = false;
