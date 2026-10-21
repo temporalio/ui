@@ -69,7 +69,8 @@ For each finding include:
 - **Why it matters**: user impact or system consistency
 - **Suggested fix**: concrete, smallest viable change, with accurate component/prop guidance when known
 - **Verification**: what would confirm the fix or resolve uncertainty
-  Finish with `Passing checks`, `Unverified / missing evidence`, and `Recommended next steps`. For a clean review say `No confirmed contract violations in reviewed scope`, never `fully compliant`.
+
+Finish with `Passing checks`, `Unverified / missing evidence`, and `Recommended next steps`. For a clean review say `No confirmed contract violations in reviewed scope`, never `fully compliant`.
 
 # Design-only reviews
 
