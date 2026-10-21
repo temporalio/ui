@@ -1,12 +1,10 @@
 <script lang="ts">
   import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
-  import CountRefreshButton from '$lib/components/count-refresh-button.svelte';
   import {
     DetailList,
     DetailListLabel,
     DetailListTimestampValue,
   } from '$lib/components/detail-list';
-  import StatusCounts from '$lib/components/status-counts.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Link from '$lib/holocene/link.svelte';
   import MenuItem from '$lib/holocene/menu/menu-item.svelte';
@@ -15,14 +13,7 @@
   import { BadgeStatus } from '$lib/io/badge-status';
   import { IconChevronLeft } from '$lib/io/icon';
   import { coreUserStore } from '$lib/stores/core-user';
-  import {
-    openConfirmationModal,
-    refreshCurrentScheduleFetch,
-  } from '$lib/stores/schedules';
-  import {
-    workflowCount,
-    refresh as workflowRefresh,
-  } from '$lib/stores/workflows';
+  import { openConfirmationModal } from '$lib/stores/schedules';
   import type { DescribeFullSchedule } from '$lib/types/schedule';
   import {
     routeForScheduleEdit,
@@ -31,15 +22,12 @@
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
   import ScheduleActionModals from '../schedule-action-modals/schedule-action-modals.svelte';
-  import {
-    resolveScheduledAction,
-    scheduledActionTypes,
-  } from '../scheduled-action-types/registry';
+  import { scheduledActionPresentations } from '../scheduled-action-types/presentation-registry';
+  import { resolveScheduledAction } from '../scheduled-action-types/resolve-scheduled-action';
 
   import AdvancedSettingsCard from './advanced-settings-card.svelte';
   import CustomSearchAttributesCard from './custom-search-attributes-card.svelte';
   import ScheduleSpecCard from './schedule-spec-card.svelte';
-  import WorkflowRunsCard from './workflow-runs-card.svelte';
 
   interface Props {
     schedule: DescribeFullSchedule;
@@ -49,17 +37,7 @@
 
   let { schedule, namespace, scheduleId }: Props = $props();
 
-  const actionResolution = $derived.by(() => {
-    const resolution = resolveScheduledAction(schedule);
-    if (resolution.status === 'unknown') return resolution;
-
-    return {
-      ...resolution,
-      views: scheduledActionTypes[resolution.action.type].views,
-    };
-  });
-
-  const workflowQuery = $derived(`TemporalScheduledById="${scheduleId}"`);
+  const resolvedAction = $derived(resolveScheduledAction(schedule));
 
   const coreUser = coreUserStore();
   const editDisabled = $derived(
@@ -124,12 +102,9 @@
   </div>
 
   <DetailList rowCount={3}>
-    {#if actionResolution.status === 'known'}
-      <actionResolution.views.Details
-        resolvedAction={actionResolution.action}
-        {namespace}
-        {scheduleId}
-      />
+    {#if resolvedAction.type !== 'unknown' && resolvedAction.isEditing}
+      {@const presentation = scheduledActionPresentations[resolvedAction.type]}
+      <presentation.view.Details {resolvedAction} {namespace} {scheduleId} />
     {/if}
 
     <DetailListLabel class="items-center">
@@ -145,24 +120,10 @@
     {/if}
   </DetailList>
 
-  <dl class="-mt-2 flex flex-col gap-1">
-    <dt class="text-secondary">
-      {translate('schedules.total-workflows')}
-    </dt>
-    <dd class="flex flex-wrap items-center gap-2">
-      <span class="font-mono" data-testid="workflow-count"
-        >{$workflowCount.count.toLocaleString()}
-      </span>
-      <CountRefreshButton
-        refresh={workflowRefresh}
-        count={$workflowCount.newCount}
-        onRefresh={() => {
-          refreshCurrentScheduleFetch({ namespace, scheduleId });
-        }}
-      />
-      <StatusCounts class="p-0" staticQuery={workflowQuery} />
-    </dd>
-  </dl>
+  {#if resolvedAction.type !== 'unknown' && resolvedAction.isEditing}
+    {@const presentation = scheduledActionPresentations[resolvedAction.type]}
+    <presentation.view.Header {resolvedAction} {namespace} {scheduleId} />
+  {/if}
 </header>
 <CodecServerErrorBanner />
 <div class="flex flex-col gap-4 pb-24">
@@ -178,21 +139,28 @@
   {/if}
   <div class="flex flex-col gap-4 xl:flex-row">
     <div class="flex w-full flex-col items-start gap-4 xl:w-2/3">
-      <WorkflowRunsCard
-        {namespace}
-        {schedule}
-        {workflowQuery}
-        openTriggerConfirmationModal={() => openConfirmationModal('trigger')}
-        openBackfillConfirmationModal={() => openConfirmationModal('backfill')}
-      />
+      {#if resolvedAction.type !== 'unknown' && resolvedAction.isEditing}
+        {@const presentation =
+          scheduledActionPresentations[resolvedAction.type]}
+        <presentation.view.RunsCard
+          {resolvedAction}
+          {namespace}
+          {scheduleId}
+          openTriggerConfirmationModal={() => openConfirmationModal('trigger')}
+          openBackfillConfirmationModal={() =>
+            openConfirmationModal('backfill')}
+        />
+      {/if}
       <AdvancedSettingsCard {schedule} />
-      <CustomSearchAttributesCard {schedule} />
+      <CustomSearchAttributesCard {schedule} {resolvedAction} />
     </div>
 
     <div class="flex w-full flex-col gap-4 xl:w-1/3">
-      {#if actionResolution.status === 'known'}
-        <actionResolution.views.Input
-          resolvedAction={actionResolution.action}
+      {#if resolvedAction.type !== 'unknown' && resolvedAction.isEditing}
+        {@const presentation =
+          scheduledActionPresentations[resolvedAction.type]}
+        <presentation.view.InputCard
+          {resolvedAction}
           {namespace}
           {scheduleId}
         />

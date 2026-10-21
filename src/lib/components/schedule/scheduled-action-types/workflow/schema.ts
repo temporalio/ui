@@ -6,18 +6,10 @@ import { searchAttributesSchema } from '$lib/stores/search-attributes';
 
 import { DEFAULT_TASK_TIMEOUT, MAX_TASK_TIMEOUT_SECONDS } from './constants';
 import {
-  durationString,
   durationStringWithDefault,
   jsonString,
+  optionalDurationString,
 } from '../../schema/common';
-
-const optionalDurationString = () =>
-  z
-    .preprocess(
-      (input) => input ?? '',
-      z.union([z.literal(''), durationString()]),
-    )
-    .default('');
 
 export const formWorkflowDetailsSchema = z.object({
   workflowType: z.string().trim().min(1, 'Workflow type is required'),

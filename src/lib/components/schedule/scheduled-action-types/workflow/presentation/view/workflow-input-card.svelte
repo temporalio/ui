@@ -3,10 +3,14 @@
   import InputAndResultsPayload from '$lib/components/workflow/input-and-results-payload.svelte';
   import { translate } from '$lib/i18n/translate';
 
-  import type { ScheduledActionViewProps } from '../types';
+  import type { ResolvedWorkflowAction } from '../../types';
 
-  let { resolvedAction, scheduleId }: ScheduledActionViewProps<'workflow'> =
-    $props();
+  type Props = {
+    resolvedAction: Extract<ResolvedWorkflowAction, { isEditing: true }>;
+    scheduleId: string;
+  };
+
+  let { resolvedAction, scheduleId }: Props = $props();
 
   const input = $derived(
     resolvedAction.schedule.schedule.action.startWorkflow.input ?? undefined,

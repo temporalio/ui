@@ -36,12 +36,18 @@
   }: Props = $props();
 
   const encodingStore: Writable<PayloadInputEncoding> = writable(encoding);
+
   $effect(() => {
-    if (get(encodingStore) !== encoding) encodingStore.set(encoding);
+    if (get(encodingStore) !== encoding) {
+      encodingStore.set(encoding);
+    }
   });
+
   $effect(() => {
     const val = $encodingStore;
-    if (val !== encoding) encoding = val;
+    if (val !== encoding) {
+      encoding = val;
+    }
   });
 
   let initialInput = $state('');

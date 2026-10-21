@@ -9,11 +9,14 @@
   import Input from '$lib/holocene/input/input.svelte';
   import { translate } from '$lib/i18n/translate';
 
-  import type { ActionFormMode } from '../types';
-  import { DEFAULT_TASK_TIMEOUT, MAX_TASK_TIMEOUT_SECONDS } from './constants';
-  import type { FormWorkflowDetails } from './schema';
-  import type { WorkflowSchedule } from './types';
-  import { durationUnits } from '../../constants';
+  import { durationUnits } from '../../../../constants';
+  import type { ActionFormMode } from '../../../types';
+  import {
+    DEFAULT_TASK_TIMEOUT,
+    MAX_TASK_TIMEOUT_SECONDS,
+  } from '../../constants';
+  import type { FormWorkflowDetails } from '../../schema';
+  import type { WorkflowSchedule } from '../../types';
 
   import WorkflowInputPayload from './workflow-input-payload.svelte';
 

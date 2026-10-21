@@ -8,19 +8,19 @@
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributesSchema } from '$lib/stores/search-attributes';
 
+  import ActionDetailsCard from '../../../../schedule-form/action-details-card.svelte';
   import type {
     ActionFormMode,
     ScheduledActionFormData,
     ScheduledActionSummaryItem,
-  } from '../types';
+  } from '../../../types';
   import {
     type FormWorkflowDetails,
     formWorkflowDetailsSchema,
-  } from './schema';
-  import type { WorkflowSchedule } from './types';
-  import ActionDetailsCard from '../../schedule-form/action-details-card.svelte';
+  } from '../../schema';
+  import type { WorkflowSchedule } from '../../types';
 
-  import WorkflowDetails from './workflow-details.svelte';
+  import WorkflowDetailsForm from './workflow-details-form.svelte';
 
   type Props = ActionFormMode<WorkflowSchedule> & {
     initialValues: FormWorkflowDetails;
@@ -87,7 +87,7 @@
 </script>
 
 <ActionDetailsCard>
-  <WorkflowDetails {form} {errors} {validateField} {...mode} />
+  <WorkflowDetailsForm {form} {errors} {validateField} {...mode} />
 </ActionDetailsCard>
 
 <Alert

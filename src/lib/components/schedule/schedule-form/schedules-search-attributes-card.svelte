@@ -8,7 +8,7 @@
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributesSchema } from '$lib/stores/search-attributes';
 
-  import { scheduledActionTypes } from '../scheduled-action-types/registry';
+  import { scheduledActionPresentations } from '../scheduled-action-types/presentation-registry';
   import type { ScheduledActionFormData } from '../scheduled-action-types/types';
 
   interface Props {
@@ -23,8 +23,8 @@
     actionType,
   }: Props = $props();
 
-  const actionView = $derived(
-    actionType ? scheduledActionTypes[actionType].searchAttributes : null,
+  const presentation = $derived(
+    actionType ? scheduledActionPresentations[actionType] : null,
   );
 </script>
 
@@ -44,12 +44,12 @@
         panelId="schedule-panel"
         class="px-1"
       />
-      {#if actionView}
+      {#if presentation}
         <Tab
-          label={actionView.label()}
-          id={actionView.tabId}
-          data-testid={actionView.tabId}
-          panelId={actionView.panelId}
+          label={presentation.form.searchAttributes.label()}
+          id={presentation.form.searchAttributes.tabId}
+          data-testid={presentation.form.searchAttributes.tabId}
+          panelId={presentation.form.searchAttributes.panelId}
           class="px-1"
         />
       {/if}
@@ -69,15 +69,17 @@
         />
       </TabPanel>
 
-      {#if actionView}
+      {#if presentation}
         <TabPanel
-          id={actionView.panelId}
-          tabId={actionView.tabId}
+          id={presentation.form.searchAttributes.panelId}
+          tabId={presentation.form.searchAttributes.tabId}
           class="w-full"
-          data-testid={actionView.panelId}
+          data-testid={presentation.form.searchAttributes.panelId}
         >
           {#key actionType}
-            <actionView.View bind:attributes={actionSearchAttributes} />
+            <presentation.form.searchAttributes.Component
+              bind:attributes={actionSearchAttributes}
+            />
           {/key}
         </TabPanel>
       {/if}

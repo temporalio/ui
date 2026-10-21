@@ -9,31 +9,33 @@
   import { translate } from '$lib/i18n/translate';
   import { toUpcomingScheduleRuns } from '$lib/services/schedule-service';
   import { workflowCount } from '$lib/stores/workflows';
-  import type { DescribeFullSchedule } from '$lib/types/schedule';
   import { routeForWorkflowsWithQuery } from '$lib/utilities/route-for';
 
-  import { toRecentWorkflowRuns } from '../scheduled-action-types/workflow/recent-runs';
+  import { toRecentWorkflowRuns } from './recent-runs';
+  import type { ResolvedWorkflowAction } from '../../types';
 
   import WorkflowRunsRecent from './workflow-runs-recent.svelte';
   import WorkflowRunsUpcoming from './workflow-runs-upcoming.svelte';
 
   interface Props {
     namespace: string;
-    schedule: DescribeFullSchedule;
-    workflowQuery: string;
+    resolvedAction: Extract<ResolvedWorkflowAction, { isEditing: true }>;
+    scheduleId: string;
     openBackfillConfirmationModal: () => void;
     openTriggerConfirmationModal: () => void;
   }
 
   const {
-    schedule,
+    resolvedAction,
     namespace,
-    workflowQuery,
+    scheduleId,
     openBackfillConfirmationModal,
     openTriggerConfirmationModal,
   }: Props = $props();
 
   const id = $props.id();
+  const schedule = $derived(resolvedAction.schedule);
+  const workflowQuery = $derived(`TemporalScheduledById="${scheduleId}"`);
 
   const recentRunCount = $derived(toRecentWorkflowRuns(schedule).length);
   const upcomingRunCount = $derived(toUpcomingScheduleRuns(schedule).length);

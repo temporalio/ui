@@ -10,12 +10,10 @@
 
   import {
     fetchRecentWorkflowRunStatuses,
+    type RecentWorkflowRun,
+    type RecentWorkflowRunEnriched,
     toRecentWorkflowRuns,
-  } from '../scheduled-action-types/workflow/recent-runs';
-  import type {
-    RecentWorkflowRun,
-    RecentWorkflowRunEnriched,
-  } from '../scheduled-action-types/workflow/types';
+  } from './recent-runs';
 
   import WorkflowRunsEmpty from './workflow-runs-empty.svelte';
 

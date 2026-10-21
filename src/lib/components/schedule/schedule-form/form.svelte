@@ -31,14 +31,10 @@
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
   import DeleteScheduleModal from '../schedule-action-modals/delete-schedule-modal.svelte';
-  import {
-    getScheduledActionCreateMode,
-    resolveScheduledAction,
-    scheduledActionTypes,
-  } from '../scheduled-action-types/registry';
+  import { scheduledActionPresentations } from '../scheduled-action-types/presentation-registry';
+  import { resolveScheduledAction } from '../scheduled-action-types/resolve-scheduled-action';
   import type {
     ScheduledActionForm,
-    ScheduledActionResolution,
     ScheduledActionSummaryItem,
   } from '../scheduled-action-types/types';
   import { formScheduleSchema } from '../schema/form';
@@ -86,17 +82,7 @@
     }),
   );
 
-  const actionResolution = $derived.by(() => {
-    const resolution: ScheduledActionResolution = schedule
-      ? resolveScheduledAction(schedule)
-      : { status: 'known', action: getScheduledActionCreateMode() };
-    if (resolution.status === 'unknown') return resolution;
-
-    return {
-      ...resolution,
-      FormAdapter: scheduledActionTypes[resolution.action.type].FormAdapter,
-    };
-  });
+  const resolvedAction = $derived(resolveScheduledAction(schedule));
 
   // svelte-ignore state_referenced_locally
   const superform = superForm(initialFormValues, {
@@ -138,7 +124,7 @@
   const handleSubmit = async () => {
     if (
       submitting ||
-      actionResolution.status === 'unknown' ||
+      resolvedAction.type === 'unknown' ||
       !actionForm ||
       !writeActionsAreAllowed()
     ) {
@@ -207,10 +193,12 @@
             {schedule}
           />
           <SchedulePoliciesCard {form} />
-          {#if actionResolution.status === 'known'}
-            {#key actionResolution.action.type}
-              <actionResolution.FormAdapter
-                resolvedAction={actionResolution.action}
+          {#if resolvedAction.type !== 'unknown'}
+            {@const presentation =
+              scheduledActionPresentations[resolvedAction.type]}
+            {#key resolvedAction.type}
+              <presentation.form.Component
+                {resolvedAction}
                 customSearchAttributes={$customSearchAttributes}
                 bind:this={actionForm}
                 bind:searchAttributes={actionSearchAttributes}
@@ -226,8 +214,8 @@
           <SchedulesSearchAttributesCard
             bind:scheduleSearchAttributes
             bind:actionSearchAttributes
-            actionType={actionResolution.status === 'known' && actionForm
-              ? actionResolution.action.type
+            actionType={resolvedAction.type !== 'unknown' && actionForm
+              ? resolvedAction.type
               : null}
           />
         </div>
@@ -235,7 +223,7 @@
         <div class="w-full xl:col-start-2 xl:row-start-1">
           <ScheduleSummarySidebar
             {form}
-            actionSummary={actionResolution.status === 'known'
+            actionSummary={resolvedAction.type !== 'unknown'
               ? actionSummary
               : []}
           />
@@ -259,7 +247,7 @@
           class="flex flex-row items-center gap-4 max-sm:flex-col xl:col-start-1"
         >
           <Button
-            disabled={actionResolution.status === 'unknown' ||
+            disabled={resolvedAction.type === 'unknown' ||
               !actionForm ||
               submitting ||
               !writeActionsAreAllowed()}

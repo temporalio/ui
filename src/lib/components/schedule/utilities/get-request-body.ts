@@ -6,12 +6,8 @@ import {
   isoStringToCalendarDateStr,
 } from './date';
 import { getSearchAttributes } from './get-search-attributes';
-import {
-  getScheduledActionCreateMode,
-  resolveScheduledAction,
-  scheduledActionTypes,
-} from '../scheduled-action-types/registry';
-import type { ResolvedScheduledAction } from '../scheduled-action-types/types';
+import { toScheduledActionRequest } from '../scheduled-action-types/request-mappings';
+import { resolveScheduledAction } from '../scheduled-action-types/resolve-scheduled-action';
 import type { FormScheduleSchema } from '../schema/form';
 
 import type {
@@ -217,28 +213,21 @@ export async function getRequestBody(
 ): Promise<ScheduleRequestBody> {
   const { schedule: scheduleForm, action: actionForm } = formData;
 
-  let resolvedAction: ResolvedScheduledAction;
-
-  if (describeFullSchedule) {
-    const resolution = resolveScheduledAction(describeFullSchedule);
-    if (
-      resolution.status === 'unknown' ||
-      resolution.action.type !== actionForm.type
-    ) {
-      throw new Error(
-        'Cannot save a schedule with a missing, unsupported, or mismatched action type',
-      );
-    }
-    resolvedAction = resolution.action;
-  } else {
-    resolvedAction = getScheduledActionCreateMode(actionForm.type);
+  const resolvedAction = resolveScheduledAction(
+    describeFullSchedule,
+    actionForm.type,
+  );
+  if (
+    resolvedAction.type === 'unknown' ||
+    resolvedAction.type !== actionForm.type
+  ) {
+    throw new Error(
+      'Cannot save a schedule with a missing, unsupported, or mismatched action type',
+    );
   }
 
   const { action: actionRequest, policies: actionPoliciesRequest } =
-    await scheduledActionTypes[actionForm.type].toRequest(
-      actionForm,
-      resolvedAction,
-    );
+    await toScheduledActionRequest(actionForm, resolvedAction);
 
   return {
     schedule_id: describeFullSchedule?.schedule_id ?? scheduleForm.name,

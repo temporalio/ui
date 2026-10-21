@@ -7,13 +7,13 @@ import {
   getFormScheduleDefaults,
   parseOverlapPolicy,
 } from './get-form-schedule-defaults';
+import { resolveWorkflowAction } from '../scheduled-action-types/workflow/action';
 import {
   DEFAULT_EXECUTION_TIMEOUT,
   DEFAULT_RUN_TIMEOUT,
   DEFAULT_TASK_TIMEOUT,
 } from '../scheduled-action-types/workflow/constants';
-import { getWorkflowDetailsDefaults } from '../scheduled-action-types/workflow/workflow-details-defaults';
-import { resolveWorkflowAction } from '../scheduled-action-types/workflow/workflow-form-mode';
+import { getWorkflowDetailsDefaults } from '../scheduled-action-types/workflow/presentation/form/workflow-details-defaults';
 
 const noAttributes = { searchAttributes: {}, customSearchAttributes: {} };
 
