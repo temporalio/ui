@@ -28,9 +28,9 @@
     onSummaryChange,
   }: Props = $props();
 
-  const mode = untrack(() => resolvedAction);
+  const schedule = untrack(() => resolvedAction.schedule);
   const initialValues = untrack(() =>
-    getWorkflowDetailsDefaults(mode, customSearchAttributes),
+    getWorkflowDetailsDefaults(schedule, customSearchAttributes),
   );
 
   searchAttributes = initialValues.workflowSearchAttributes;
@@ -43,7 +43,7 @@
 </script>
 
 <WorkflowForm
-  {...mode}
+  {schedule}
   {initialValues}
   bind:this={workflowForm}
   bind:searchAttributes

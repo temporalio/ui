@@ -5,7 +5,6 @@ import {
   decodeSearchAttributeRows,
   toDurationString,
 } from '../../../../utilities/form-defaults';
-import type { ActionFormMode } from '../../../types';
 import { DEFAULT_TASK_TIMEOUT } from '../../constants';
 import type { FormWorkflowDetails } from '../../schema';
 import type { WorkflowSchedule } from '../../types';
@@ -17,24 +16,21 @@ function toOptionalDurationString(value: unknown) {
 }
 
 export function getWorkflowDetailsDefaults(
-  mode: ActionFormMode<WorkflowSchedule>,
+  schedule: WorkflowSchedule | null,
   customSearchAttributes: SearchAttributes,
 ): FormWorkflowDetails {
-  const startWorkflow = mode.isEditing
-    ? mode.schedule.schedule.action.startWorkflow
-    : null;
+  const startWorkflow = schedule?.schedule.action.startWorkflow;
 
   return {
     workflowType: startWorkflow?.workflowType?.name ?? '',
     workflowId: startWorkflow?.workflowId ?? '',
     taskQueue: startWorkflow?.taskQueue?.name ?? '',
     input: '',
-    editInput: !mode.isEditing,
+    editInput: schedule === null,
     encoding: 'json/plain',
     messageType: '',
-    keepOriginalWorkflowId: mode.isEditing
-      ? (mode.schedule.schedule.policies?.keepOriginalWorkflowId ?? false)
-      : false,
+    keepOriginalWorkflowId:
+      schedule?.schedule.policies?.keepOriginalWorkflowId ?? false,
     taskTimeout: toDurationString(
       startWorkflow?.workflowTaskTimeout,
       DEFAULT_TASK_TIMEOUT,

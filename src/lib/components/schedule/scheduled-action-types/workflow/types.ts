@@ -4,8 +4,6 @@ import type {
   StartWorkflowRequest,
 } from '$lib/types/schedule';
 
-import type { ActionFormMode } from '../types';
-
 export type WorkflowSchedule = DescribeFullSchedule & {
   schedule: ScheduleResponse & {
     action: { startWorkflow: StartWorkflowRequest };
@@ -14,4 +12,5 @@ export type WorkflowSchedule = DescribeFullSchedule & {
 
 export type ResolvedWorkflowAction = {
   type: 'workflow';
-} & ActionFormMode<WorkflowSchedule>;
+  schedule: WorkflowSchedule | null;
+};

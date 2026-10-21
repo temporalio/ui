@@ -10,7 +10,6 @@
   import { translate } from '$lib/i18n/translate';
 
   import { durationUnits } from '../../../../constants';
-  import type { ActionFormMode } from '../../../types';
   import {
     DEFAULT_TASK_TIMEOUT,
     MAX_TASK_TIMEOUT_SECONDS,
@@ -20,13 +19,14 @@
 
   import WorkflowInputPayload from './workflow-input-payload.svelte';
 
-  type Props = ActionFormMode<WorkflowSchedule> & {
+  type Props = {
+    schedule: WorkflowSchedule | null;
     form: SuperForm<FormWorkflowDetails>['form'];
     errors: SuperForm<FormWorkflowDetails>['errors'];
     validateField: SuperForm<FormWorkflowDetails>['validate'];
   };
 
-  let { form, errors, validateField, ...mode }: Props = $props();
+  let { form, errors, validateField, schedule }: Props = $props();
 
   const validateChangedField = async (
     field:
@@ -95,10 +95,8 @@
   bind:messageType={
     () => $form.messageType ?? '', (value) => ($form.messageType = value)
   }
-  payloads={mode.isEditing
-    ? (mode.schedule.schedule.action.startWorkflow.input ?? undefined)
-    : undefined}
-  showEditActions={mode.isEditing}
+  payloads={schedule?.schedule.action.startWorkflow.input ?? undefined}
+  showEditActions={schedule !== null}
 />
 {#key taskTimeoutResetKey}
   <DurationInput

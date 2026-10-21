@@ -10,7 +10,6 @@
 
   import ActionDetailsCard from '../../../../schedule-form/action-details-card.svelte';
   import type {
-    ActionFormMode,
     ScheduledActionFormData,
     ScheduledActionSummaryItem,
   } from '../../../types';
@@ -22,19 +21,18 @@
 
   import WorkflowDetailsForm from './workflow-details-form.svelte';
 
-  type Props = ActionFormMode<WorkflowSchedule> & {
+  type Props = {
+    schedule: WorkflowSchedule | null;
     initialValues: FormWorkflowDetails;
-
     searchAttributes: SearchAttributesSchema;
     onSummaryChange: (summary: ScheduledActionSummaryItem[]) => void;
   };
 
   let {
+    schedule,
     initialValues,
-
     searchAttributes = $bindable(),
     onSummaryChange,
-    ...mode
   }: Props = $props();
 
   const superform = superForm(
@@ -87,7 +85,7 @@
 </script>
 
 <ActionDetailsCard>
-  <WorkflowDetailsForm {form} {errors} {validateField} {...mode} />
+  <WorkflowDetailsForm {form} {errors} {validateField} {schedule} />
 </ActionDetailsCard>
 
 <Alert

@@ -4,6 +4,7 @@ import type { ScheduledActionPresentation } from '../../presentation-registry';
 
 import WorkflowFormAdapter from './form/workflow-form-adapter.svelte';
 import WorkflowSearchAttributes from './form/workflow-search-attributes.svelte';
+import WorkflowAdvancedSettings from './view/workflow-advanced-settings.svelte';
 import WorkflowDetailsView from './view/workflow-details-view.svelte';
 import WorkflowHeader from './view/workflow-header.svelte';
 import WorkflowInputCard from './view/workflow-input-card.svelte';
@@ -21,15 +22,16 @@ export const workflowActionPresentation = {
     },
   },
   view: {
+    AdvancedSettings: WorkflowAdvancedSettings,
     Header: WorkflowHeader,
     Details: WorkflowDetailsView,
     InputCard: WorkflowInputCard,
     RunsCard: WorkflowRunsCard,
     searchAttributes: {
       Component: WorkflowSearchAttributesView,
-      getCount: (resolvedAction) =>
+      getCount: (schedule) =>
         Object.keys(
-          resolvedAction.schedule.schedule.action.startWorkflow.searchAttributes
+          schedule.schedule.action.startWorkflow.searchAttributes
             ?.indexedFields ?? {},
         ).length,
     },

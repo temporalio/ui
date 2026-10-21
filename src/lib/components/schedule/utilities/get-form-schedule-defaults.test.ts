@@ -43,10 +43,7 @@ describe('getFormScheduleDefaults', () => {
 
   describe('without an existing schedule', () => {
     const defaults = getFormScheduleDefaults(null, noAttributes);
-    const workflowDefaults = getWorkflowDetailsDefaults(
-      { isEditing: false, schedule: null },
-      {},
-    );
+    const workflowDefaults = getWorkflowDetailsDefaults(null, {});
 
     it('uses empty identifiers', () => {
       expect(defaults.name).toBe('');
@@ -117,10 +114,10 @@ describe('getFormScheduleDefaults', () => {
       describeFullSchedule,
       noAttributes,
     );
-    const mode = resolveWorkflowAction(describeFullSchedule);
-    if (!mode) throw new Error('Expected a workflow schedule');
+    const action = resolveWorkflowAction(describeFullSchedule);
+    if (!action) throw new Error('Expected a workflow schedule');
 
-    const workflowDefaults = getWorkflowDetailsDefaults(mode, {});
+    const workflowDefaults = getWorkflowDetailsDefaults(action.schedule, {});
 
     it('maps the workflow action fields', () => {
       expect(defaults.name).toBe('sched-1');
@@ -163,7 +160,7 @@ describe('getFormScheduleDefaults', () => {
   });
 
   it('normalizes a stored 0s run/execution timeout to empty', () => {
-    const mode = resolveWorkflowAction({
+    const action = resolveWorkflowAction({
       schedule: {
         action: {
           startWorkflow: {
@@ -173,9 +170,9 @@ describe('getFormScheduleDefaults', () => {
         },
       },
     } as unknown as DescribeFullSchedule);
-    if (!mode) throw new Error('Expected a workflow schedule');
+    if (!action) throw new Error('Expected a workflow schedule');
 
-    const defaults = getWorkflowDetailsDefaults(mode, {});
+    const defaults = getWorkflowDetailsDefaults(action.schedule, {});
 
     expect(defaults.runTimeout).toBe('');
     expect(defaults.executionTimeout).toBe('');

@@ -36,9 +36,7 @@ export async function toWorkflowScheduleRequest(
   return {
     action: await getWorkflowActionRequest(
       data.details,
-      resolvedAction.isEditing
-        ? resolvedAction.schedule.schedule.action.startWorkflow
-        : null,
+      resolvedAction.schedule?.schedule.action.startWorkflow ?? null,
     ),
     policies: getWorkflowPoliciesRequest(data.details),
   };

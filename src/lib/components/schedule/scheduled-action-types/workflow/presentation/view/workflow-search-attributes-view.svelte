@@ -5,21 +5,21 @@
   import { parsePayloadAttributes } from '$lib/utilities/decode-payload';
   import { routeForWorkflowsWithQuery } from '$lib/utilities/route-for';
 
-  import type { ResolvedWorkflowAction } from '../../types';
+  import type { WorkflowSchedule } from '../../types';
 
   type Props = {
-    resolvedAction: Extract<ResolvedWorkflowAction, { isEditing: true }>;
+    schedule: WorkflowSchedule;
     namespace: string;
   };
 
-  let { resolvedAction, namespace }: Props = $props();
+  let { schedule, namespace }: Props = $props();
 
   const attributes = $derived(
     parsePayloadAttributes({
       searchAttributes: {
         indexedFields: {
-          ...resolvedAction.schedule.schedule.action.startWorkflow
-            .searchAttributes?.indexedFields,
+          ...schedule.schedule.action.startWorkflow.searchAttributes
+            ?.indexedFields,
         },
       },
     }).searchAttributes.indexedFields,

@@ -19,9 +19,8 @@ type ActionFormProps<Type extends ScheduledActionType> = {
 };
 
 type ActionViewProps<Type extends ScheduledActionType> = {
-  resolvedAction: Extract<
-    SupportedScheduledAction,
-    { type: Type; isEditing: true }
+  schedule: NonNullable<
+    Extract<SupportedScheduledAction, { type: Type }>['schedule']
   >;
   namespace: string;
   scheduleId: string;
@@ -46,14 +45,13 @@ export type ScheduledActionPresentation<Type extends ScheduledActionType> = {
     };
   };
   view: {
+    AdvancedSettings: Component<ActionViewProps<Type>>;
     Header: Component<ActionViewProps<Type>>;
     Details: Component<ActionViewProps<Type>>;
     InputCard: Component<ActionViewProps<Type>>;
     searchAttributes: {
       Component: Component<ActionViewProps<Type>>;
-      getCount: (
-        resolvedAction: ActionViewProps<Type>['resolvedAction'],
-      ) => number;
+      getCount: (schedule: ActionViewProps<Type>['schedule']) => number;
     };
     RunsCard: Component<
       ActionViewProps<Type> & {

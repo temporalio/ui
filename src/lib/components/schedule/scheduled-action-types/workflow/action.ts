@@ -10,8 +10,8 @@ export function isWorkflowSchedule(
 
 export function resolveWorkflowAction(
   schedule: DescribeFullSchedule,
-): Extract<ResolvedWorkflowAction, { isEditing: true }> | null {
+): ResolvedWorkflowAction | null {
   if (!isWorkflowSchedule(schedule)) return null;
 
-  return { type: 'workflow', isEditing: true, schedule };
+  return { type: 'workflow', schedule };
 }

@@ -7,10 +7,6 @@ import type {
 import type { FormWorkflowDetails } from './workflow/schema';
 import type { ResolvedWorkflowAction } from './workflow/types';
 
-export type ActionFormMode<ExistingSchedule extends DescribeFullSchedule> =
-  | { isEditing: false; schedule: null }
-  | { isEditing: true; schedule: ExistingSchedule };
-
 export type ScheduledActionFormData = {
   type: 'workflow';
   details: FormWorkflowDetails;
@@ -24,7 +20,7 @@ export type ResolvedScheduledAction =
   | SupportedScheduledAction
   | {
       type: 'unknown';
-      isEditing: true;
+
       schedule: DescribeFullSchedule;
     };
 

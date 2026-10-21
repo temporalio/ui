@@ -28,10 +28,10 @@
     }).searchAttributes.indexedFields,
   );
   const actionAttributeCount = $derived(
-    resolvedAction.type !== 'unknown' && resolvedAction.isEditing
+    resolvedAction.type !== 'unknown' && resolvedAction.schedule
       ? scheduledActionPresentations[
           resolvedAction.type
-        ].view.searchAttributes.getCount(resolvedAction)
+        ].view.searchAttributes.getCount(resolvedAction.schedule)
       : 0,
   );
   const searchAttributeCount = $derived(
@@ -62,10 +62,10 @@
           })}
       />
     </section>
-    {#if resolvedAction.type !== 'unknown' && resolvedAction.isEditing}
+    {#if resolvedAction.type !== 'unknown' && resolvedAction.schedule}
       {@const presentation = scheduledActionPresentations[resolvedAction.type]}
       <presentation.view.searchAttributes.Component
-        {resolvedAction}
+        schedule={resolvedAction.schedule}
         namespace={page.params.namespace}
         scheduleId={schedule.schedule_id}
       />

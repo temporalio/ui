@@ -12,21 +12,21 @@
   import { routeForWorkflowsWithQuery } from '$lib/utilities/route-for';
 
   import { toRecentWorkflowRuns } from './recent-runs';
-  import type { ResolvedWorkflowAction } from '../../types';
+  import type { WorkflowSchedule } from '../../types';
 
   import WorkflowRunsRecent from './workflow-runs-recent.svelte';
   import WorkflowRunsUpcoming from './workflow-runs-upcoming.svelte';
 
   interface Props {
     namespace: string;
-    resolvedAction: Extract<ResolvedWorkflowAction, { isEditing: true }>;
+    schedule: WorkflowSchedule;
     scheduleId: string;
     openBackfillConfirmationModal: () => void;
     openTriggerConfirmationModal: () => void;
   }
 
   const {
-    resolvedAction,
+    schedule,
     namespace,
     scheduleId,
     openBackfillConfirmationModal,
@@ -34,7 +34,7 @@
   }: Props = $props();
 
   const id = $props.id();
-  const schedule = $derived(resolvedAction.schedule);
+
   const workflowQuery = $derived(`TemporalScheduledById="${scheduleId}"`);
 
   const recentRunCount = $derived(toRecentWorkflowRuns(schedule).length);

@@ -102,9 +102,13 @@
   </div>
 
   <DetailList rowCount={3}>
-    {#if resolvedAction.type !== 'unknown' && resolvedAction.isEditing}
+    {#if resolvedAction.type !== 'unknown' && resolvedAction.schedule}
       {@const presentation = scheduledActionPresentations[resolvedAction.type]}
-      <presentation.view.Details {resolvedAction} {namespace} {scheduleId} />
+      <presentation.view.Details
+        schedule={resolvedAction.schedule}
+        {namespace}
+        {scheduleId}
+      />
     {/if}
 
     <DetailListLabel class="items-center">
@@ -120,9 +124,13 @@
     {/if}
   </DetailList>
 
-  {#if resolvedAction.type !== 'unknown' && resolvedAction.isEditing}
+  {#if resolvedAction.type !== 'unknown' && resolvedAction.schedule}
     {@const presentation = scheduledActionPresentations[resolvedAction.type]}
-    <presentation.view.Header {resolvedAction} {namespace} {scheduleId} />
+    <presentation.view.Header
+      schedule={resolvedAction.schedule}
+      {namespace}
+      {scheduleId}
+    />
   {/if}
 </header>
 <CodecServerErrorBanner />
@@ -139,11 +147,11 @@
   {/if}
   <div class="flex flex-col gap-4 xl:flex-row">
     <div class="flex w-full flex-col items-start gap-4 xl:w-2/3">
-      {#if resolvedAction.type !== 'unknown' && resolvedAction.isEditing}
+      {#if resolvedAction.type !== 'unknown' && resolvedAction.schedule}
         {@const presentation =
           scheduledActionPresentations[resolvedAction.type]}
         <presentation.view.RunsCard
-          {resolvedAction}
+          schedule={resolvedAction.schedule}
           {namespace}
           {scheduleId}
           openTriggerConfirmationModal={() => openConfirmationModal('trigger')}
@@ -151,16 +159,26 @@
             openConfirmationModal('backfill')}
         />
       {/if}
-      <AdvancedSettingsCard {schedule} />
+      <AdvancedSettingsCard {schedule}>
+        {#if resolvedAction.type !== 'unknown' && resolvedAction.schedule}
+          {@const presentation =
+            scheduledActionPresentations[resolvedAction.type]}
+          <presentation.view.AdvancedSettings
+            schedule={resolvedAction.schedule}
+            {namespace}
+            {scheduleId}
+          />
+        {/if}
+      </AdvancedSettingsCard>
       <CustomSearchAttributesCard {schedule} {resolvedAction} />
     </div>
 
     <div class="flex w-full flex-col gap-4 xl:w-1/3">
-      {#if resolvedAction.type !== 'unknown' && resolvedAction.isEditing}
+      {#if resolvedAction.type !== 'unknown' && resolvedAction.schedule}
         {@const presentation =
           scheduledActionPresentations[resolvedAction.type]}
         <presentation.view.InputCard
-          {resolvedAction}
+          schedule={resolvedAction.schedule}
           {namespace}
           {scheduleId}
         />

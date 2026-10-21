@@ -5,18 +5,18 @@
   import { IconFilter } from '$lib/io/icon';
   import { routeForWorkflowsWithQuery } from '$lib/utilities/route-for';
 
-  import type { ResolvedWorkflowAction } from '../../types';
+  import type { WorkflowSchedule } from '../../types';
 
   type Props = {
-    resolvedAction: Extract<ResolvedWorkflowAction, { isEditing: true }>;
+    schedule: WorkflowSchedule;
     namespace: string;
     scheduleId: string;
   };
 
-  let { resolvedAction, namespace, scheduleId }: Props = $props();
+  let { schedule, namespace, scheduleId }: Props = $props();
 
   const workflowType = $derived(
-    resolvedAction.schedule.schedule.action.startWorkflow.workflowType?.name,
+    schedule.schedule.action.startWorkflow.workflowType?.name,
   );
 </script>
 
