@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { HTMLTableAttributes } from 'svelte/elements';
+  import { fade } from 'svelte/transition';
 
   import type { Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
@@ -69,7 +70,12 @@
     <thead class="holocene-table-header">
       {@render headers?.()}
       {#if updating}
-        <tr aria-hidden="true" class="!h-0 bg-transparent">
+        <tr
+          aria-hidden="true"
+          class="!h-0 bg-transparent"
+          in:fade={{ delay: 150, duration: 250 }}
+          out:fade={{ duration: 350 }}
+        >
           <th colspan="1000" class="relative !h-0 !border-0 !p-0">
             <ProgressBar subtle class="bottom-0" />
           </th>
