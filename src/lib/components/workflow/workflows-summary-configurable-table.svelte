@@ -269,6 +269,8 @@
             ? row.childCount
             : undefined}
           child={isChildRow}
+          lastChild={isChildRow &&
+            visibleRows[visibleRowIndex + 1]?.rowType !== 'child'}
           onClickBatchSelect={(event) =>
             handleBatchSelect(event, row, visibleRowIndex)}
         >
