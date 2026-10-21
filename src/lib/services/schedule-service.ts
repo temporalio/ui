@@ -246,13 +246,7 @@ export async function createSchedule({
   scheduleId,
   body,
   identity,
-}: CreateScheduleOptions): Promise<{ error: string; conflictToken: string }> {
-  let error = '';
-  const onError: ErrorCallback = (err) =>
-    (error =
-      err?.body?.message ??
-      `Error creating schedule: ${err.status}: ${err.statusText}`);
-
+}: CreateScheduleOptions): Promise<{ conflictToken: string }> {
   const route = routeForApi('schedule', {
     namespace,
     scheduleId,
@@ -268,10 +262,9 @@ export async function createSchedule({
         }),
       },
       notifyOnError: false,
-      onError,
     })) ?? {};
 
-  return { conflictToken, error };
+  return { conflictToken };
 }
 
 type EditScheduleOptions = {
@@ -286,15 +279,7 @@ export async function editSchedule({
   scheduleId,
   body,
   identity,
-}: Partial<EditScheduleOptions> & { identity?: string }): Promise<{
-  error: string;
-}> {
-  let error = '';
-  const onError: ErrorCallback = (err) =>
-    (error =
-      err?.body?.message ??
-      `Error editing schedule: ${err.status}: ${err.statusText}`);
-
+}: Partial<EditScheduleOptions> & { identity?: string }): Promise<void> {
   const route = routeForApi('schedule.edit', {
     namespace: namespace ?? '',
     scheduleId: scheduleId ?? '',
@@ -309,10 +294,7 @@ export async function editSchedule({
       }),
     },
     notifyOnError: false,
-    onError,
   });
-
-  return { error };
 }
 
 type PauseScheduleOptions = {

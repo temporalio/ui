@@ -194,35 +194,84 @@ test.describe('Creates Schedule Successfully', () => {
     ).toHaveValue('day(s)');
   });
 
-  test('preserves form edits and surfaces error alert and toast when create fails with 403', async ({
+  test('preserves form edits after create fails with 403 and retries successfully', async ({
     page,
   }) => {
-    await page.route('**/schedules/test*', (route) => {
-      if (route.request().method() === 'POST') {
-        return route.fulfill({
-          status: 403,
-          contentType: 'application/json',
-          body: JSON.stringify({ message: 'Request unauthorized.' }),
-        });
-      }
-      return route.fallback();
+    await page.route(
+      '**/schedules/test*',
+      (route) => {
+        if (route.request().method() === 'POST') {
+          return route.fulfill({
+            status: 403,
+            contentType: 'application/json',
+            body: JSON.stringify({ message: 'Request unauthorized.' }),
+          });
+        }
+        return route.fallback();
+      },
+      { times: 1 },
+    );
+
+    const intervalInput = page.getByLabel('Time Interval');
+    const createButton = page.getByTestId('create-schedule-button');
+
+    await test.step('fill fields', async () => {
+      await fillBaseFields(page);
+      await page.getByTestId('spec-type-0-button').click();
+      await page.getByRole('option', { name: 'Interval' }).click();
+      await intervalInput
+        .locator('..')
+        .getByRole('combobox')
+        .selectOption('second(s)');
+      await intervalInput.fill('90');
     });
 
-    await fillBaseFields(page);
-    await page.getByTestId('spec-type-0-button').click();
-    await page.getByRole('option', { name: 'Interval' }).click();
-    await page.getByLabel('Time Interval').fill('90');
+    const failedBody =
+      await test.step('failed submit keeps edits', async () => {
+        const failedRequest = page.waitForRequest(isCreateRequest);
+        await createButton.click();
+        const body = (await failedRequest).postDataJSON();
 
-    await page.getByTestId('create-schedule-button').click();
+        await expect(
+          page.getByRole('alert').filter({
+            hasText: 'Error creating schedule: 403: Request unauthorized.',
+          }),
+        ).toBeVisible();
+        await expect(createButton).toBeEnabled();
+        await expect(page.getByTestId('schedule-name-input')).toHaveValue(
+          'test',
+        );
+        await expect(page.getByTestId('schedule-type-input')).toHaveValue(
+          'test',
+        );
+        await expect(
+          page.getByTestId('schedule-workflow-id-input'),
+        ).toHaveValue('test');
+        await expect(page.getByTestId('schedule-task-queue-input')).toHaveValue(
+          'test',
+        );
+        await expect(intervalInput).toHaveValue('90');
+        await expect(
+          page.getByTestId('toast-live-region-assertive'),
+        ).toContainText('Error creating schedule: 403: Request unauthorized.');
+        await expect(page).toHaveURL(createScheduleUrl);
+        return body;
+      });
 
-    await expect(page.getByTestId('schedule-name-input')).toHaveValue('test');
-    await expect(page.getByLabel('Time Interval')).toHaveValue('90');
-    await expect(
-      page.getByRole('alert').filter({ hasText: 'Request unauthorized.' }),
-    ).toBeVisible();
-    await expect(page.getByTestId('toast-live-region-assertive')).toContainText(
-      'Request unauthorized.',
-    );
-    await expect(page).toHaveURL(createScheduleUrl);
+    await test.step('retry sends the same body and succeeds', async () => {
+      const retryRequest = page.waitForRequest(isCreateRequest);
+      await createButton.click();
+      const retryBody = (await retryRequest).postDataJSON();
+      expect(retryBody.schedule).toEqual(failedBody.schedule);
+      expect(retryBody.schedule.action.startWorkflow).toMatchObject({
+        workflowId: 'test',
+        workflowType: { name: 'test' },
+        taskQueue: { name: 'test' },
+      });
+      expect(retryBody.schedule.spec.interval).toEqual([
+        { interval: '90s', phase: '0s' },
+      ]);
+      await expect(page).toHaveURL('/namespaces/default/schedules');
+    });
   });
 });

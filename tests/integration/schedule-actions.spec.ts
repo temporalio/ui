@@ -159,6 +159,8 @@ test.describe('Schedule actions', () => {
     await deleteRequest;
   });
 
+  const errorMessage = '403: Request failed.';
+
   test('pause keeps the modal open and displays the error on 403', async ({
     page,
   }) => {
@@ -166,7 +168,7 @@ test.describe('Schedule actions', () => {
       route.fulfill({
         status: 403,
         contentType: 'application/json',
-        body: JSON.stringify({ message: 'Request unauthorized.' }),
+        body: JSON.stringify({ message: 'Request failed.' }),
       }),
     );
 
@@ -179,8 +181,9 @@ test.describe('Schedule actions', () => {
 
     await expect(modal).toBeVisible();
     await expect(modal.getByRole('alert')).toHaveText(
-      'There was an error pausing the schedule. Request unauthorized.',
+      `There was an error pausing the schedule. ${errorMessage}`,
     );
+    await expect(modal.getByTestId('confirm-modal-button')).toBeEnabled();
     await expect(page).toHaveURL(scheduleUrl);
   });
 
@@ -198,7 +201,7 @@ test.describe('Schedule actions', () => {
       route.fulfill({
         status: 403,
         contentType: 'application/json',
-        body: JSON.stringify({ message: 'Request unauthorized.' }),
+        body: JSON.stringify({ message: 'Request failed.' }),
       }),
     );
     await page.goto(scheduleUrl);
@@ -215,8 +218,9 @@ test.describe('Schedule actions', () => {
 
     await expect(modal).toBeVisible();
     await expect(modal.getByRole('alert')).toHaveText(
-      'There was an error unpausing the schedule. Request unauthorized.',
+      `There was an error unpausing the schedule. ${errorMessage}`,
     );
+    await expect(modal.getByTestId('confirm-modal-button')).toBeEnabled();
     await expect(page).toHaveURL(scheduleUrl);
   });
 
@@ -227,7 +231,7 @@ test.describe('Schedule actions', () => {
       route.fulfill({
         status: 403,
         contentType: 'application/json',
-        body: JSON.stringify({ message: 'Request unauthorized.' }),
+        body: JSON.stringify({ message: 'Request failed.' }),
       }),
     );
 
@@ -240,8 +244,9 @@ test.describe('Schedule actions', () => {
 
     await expect(modal).toBeVisible();
     await expect(modal.getByRole('alert')).toHaveText(
-      'There was an error triggering the schedule. Request unauthorized.',
+      `There was an error triggering the schedule. ${errorMessage}`,
     );
+    await expect(modal.getByTestId('confirm-modal-button')).toBeEnabled();
     await expect(page).toHaveURL(scheduleUrl);
   });
 
@@ -252,7 +257,7 @@ test.describe('Schedule actions', () => {
       route.fulfill({
         status: 403,
         contentType: 'application/json',
-        body: JSON.stringify({ message: 'Request unauthorized.' }),
+        body: JSON.stringify({ message: 'Request failed.' }),
       }),
     );
 
@@ -265,8 +270,9 @@ test.describe('Schedule actions', () => {
 
     await expect(modal).toBeVisible();
     await expect(modal.getByRole('alert')).toHaveText(
-      'There was an error backfilling the schedule. Request unauthorized.',
+      `There was an error backfilling the schedule. ${errorMessage}`,
     );
+    await expect(modal.getByTestId('confirm-modal-button')).toBeEnabled();
     await expect(page).toHaveURL(scheduleUrl);
   });
 
@@ -278,7 +284,7 @@ test.describe('Schedule actions', () => {
         return route.fulfill({
           status: 403,
           contentType: 'application/json',
-          body: JSON.stringify({ message: 'Request unauthorized.' }),
+          body: JSON.stringify({ message: 'Request failed.' }),
         });
       }
       return route.fallback();
@@ -293,8 +299,9 @@ test.describe('Schedule actions', () => {
 
     await expect(modal).toBeVisible();
     await expect(modal.getByRole('alert')).toHaveText(
-      'Cannot delete schedule. Request unauthorized.',
+      `Cannot delete schedule. ${errorMessage}`,
     );
+    await expect(modal.getByTestId('confirm-modal-button')).toBeEnabled();
     await expect(page).toHaveURL(scheduleUrl);
   });
 });
