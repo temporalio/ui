@@ -56,7 +56,7 @@
           class="flex w-full items-start justify-between gap-2 border-b border-primary py-2 last-of-type:border-b-0"
         >
           <div class="flex flex-wrap items-center gap-2 truncate">
-            <span class="select-all truncate font-mono text-sm"
+            <span class="truncate font-mono text-sm select-all"
               >{getBuildId(version)}</span
             >
             <DeploymentStatus {status} {label} />

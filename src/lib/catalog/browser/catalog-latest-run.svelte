@@ -37,7 +37,7 @@
       <Link
         href={evidence.href}
         aria-label={evidence.label}
-        class="inline-flex items-center !no-underline"
+        class="inline-flex items-center no-underline!"
       >
         <IconExternalLink class="h-3.5 w-3.5" />
       </Link>

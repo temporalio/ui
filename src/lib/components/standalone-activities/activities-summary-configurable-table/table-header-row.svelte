@@ -64,7 +64,7 @@
   {#if showBatchActions && $batchActionsVisible}
     <th
       scope="col"
-      class="overflow-visible whitespace-nowrap font-medium"
+      class="overflow-visible font-medium whitespace-nowrap"
       colspan={columnsCount}
     >
       <BatchActions {activities} />

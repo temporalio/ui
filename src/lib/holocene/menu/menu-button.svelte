@@ -121,7 +121,7 @@
     {@render trailing?.()}
     {#if count > 0}
       <BadgeCount
-        class="absolute right-0 top-0 translate-x-[10px] translate-y-[-10px]"
+        class="absolute top-0 right-0 translate-x-[10px] translate-y-[-10px]"
         value={count}
       />
     {/if}

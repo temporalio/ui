@@ -146,8 +146,10 @@
 </li>
 
 <style lang="postcss">
+  @reference '../../../app.css';
+
   .orderable-item {
-    @apply flex select-none list-none flex-row items-center justify-between border-b border-primary p-2 text-sm font-medium last-of-type:border-b-0;
+    @apply flex list-none flex-row items-center justify-between border-b border-primary p-2 text-sm font-medium select-none last-of-type:border-b-0;
   }
 
   .orderable-item[draggable='true'] {

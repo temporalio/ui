@@ -19,12 +19,14 @@
   {...rest}
   type="radio"
   class={merge(
-    'radio-control box-border h-5 w-5 cursor-pointer appearance-none rounded-full border border-secondary bg-background-primary outline-none',
+    'radio-control box-border h-5 w-5 cursor-pointer appearance-none rounded-full border border-secondary bg-background-primary outline-hidden',
     className,
   )}
 />
 
 <style lang="postcss">
+  @reference '../../../app.css';
+
   .radio-control {
     &:checked {
       @apply bg-interactive-primary;

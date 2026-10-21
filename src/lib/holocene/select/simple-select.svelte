@@ -39,7 +39,7 @@
   <NativeSelect
     wrapperClass="text-primary"
     class={merge(
-      'inline h-10 w-full rounded border border-tertiary bg-background-primary py-0 text-base text-primary outline-none focus-visible:outline focus-visible:outline-interactive-primary disabled:bg-surface-tertiary',
+      'inline h-10 w-full rounded border border-tertiary bg-background-primary py-0 text-base text-primary outline-hidden focus-visible:outline focus-visible:outline-interactive-primary disabled:bg-surface-tertiary',
       className,
     )}
     {name}

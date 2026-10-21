@@ -76,7 +76,7 @@
     </p>
 
     <dl
-      class="flex flex-col gap-y-4 lg:grid lg:grid-cols-[max-content,1fr] lg:grid-rows-none lg:gap-x-6 lg:gap-y-2"
+      class="flex flex-col gap-y-4 lg:grid lg:grid-cols-[max-content_1fr] lg:grid-rows-none lg:gap-x-6 lg:gap-y-2"
     >
       <div class="lg:contents">
         <dt class="text-xs text-secondary lg:text-sm">
@@ -123,7 +123,7 @@
         <dd>{timeoutsSummary}</dd>
       </div>
     </dl>
-    <div class="mr-auto mt-2">
+    <div class="mt-2 mr-auto">
       <Button
         bind:this={editPoliciesButton}
         variant="secondary"

@@ -54,7 +54,7 @@
       data-track-intent="navigate"
       data-track-text={label}
       class={merge(
-        'mb-2 flex items-center whitespace-nowrap rounded px-2 py-1 text-sm font-medium text-secondary hover:bg-surface-overlay-primary hover:text-primary',
+        'mb-2 flex items-center rounded px-2 py-1 text-sm font-medium whitespace-nowrap text-secondary hover:bg-surface-overlay-primary hover:text-primary',
         active &&
           'bg-interactive-secondary-hover text-brand hover:bg-interactive-secondary-press hover:text-brand',
         disabled && 'pointer-events-none cursor-not-allowed opacity-disabled',
@@ -67,7 +67,7 @@
         </div>
       {/if}
       <div
-        class="opacity-0 transition-opacity group-data-[nav=closed]:pointer-events-none group-data-[nav=open]:opacity-100 group-data-[nav=open]:delay-75 group-data-[nav=closed]:duration-75 group-data-[nav=open]:duration-150 group-data-[nav=closed]:ease-out group-data-[nav=open]:ease-linear motion-reduce:transition-none"
+        class="opacity-0 transition-opacity group-data-[nav=closed]:pointer-events-none group-data-[nav=closed]:duration-75 group-data-[nav=closed]:ease-out group-data-[nav=open]:opacity-100 group-data-[nav=open]:delay-75 group-data-[nav=open]:duration-150 group-data-[nav=open]:ease-linear motion-reduce:transition-none"
       >
         {label}
       </div>

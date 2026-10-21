@@ -145,7 +145,7 @@
         'checkbox-control',
         [
           'relative',
-          'rounded-sm',
+          'rounded-xs',
           'box-border',
           'flex',
           'h-5',
@@ -167,7 +167,7 @@
             'peer-focus-visible:ring-interactive-primary',
             'peer-focus-visible:ring-offset-2',
             'peer-focus-visible:ring-offset-background-primary',
-            'peer-focus-visible:shadow-sm',
+            'peer-focus-visible:shadow-xs',
           ],
         !disabled &&
           valid && [
@@ -178,7 +178,7 @@
           ],
         disabled && ['cursor-not-allowed', 'opacity-50'],
         !valid &&
-          'border-danger peer-checked:border-danger peer-indeterminate:border-danger peer-focus-visible:shadow-sm peer-focus-visible:ring-2 peer-focus-visible:ring-danger peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-background-primary',
+          'border-danger peer-checked:border-danger peer-indeterminate:border-danger peer-focus-visible:shadow-xs peer-focus-visible:ring-2 peer-focus-visible:ring-danger peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-background-primary',
       )}
     >
       {#if CheckIcon}
@@ -213,6 +213,8 @@
 </div>
 
 <style lang="postcss">
+  @reference '../../app.css';
+
   .peer:not([aria-invalid='true']):checked:focus-visible + .checkbox-control,
   .peer:not([aria-invalid='true']):indeterminate:focus-visible
     + .checkbox-control {

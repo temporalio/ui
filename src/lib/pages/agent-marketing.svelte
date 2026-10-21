@@ -334,7 +334,7 @@
               </video>
               {#if !agentHarnessDemoStarted}
                 <Button
-                  class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white"
+                  class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white"
                   onclick={playAgentHarnessDemo}
                   variant="tertiary"
                   size="md"

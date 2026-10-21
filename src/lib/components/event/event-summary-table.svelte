@@ -142,7 +142,7 @@
     maxHeight="none"
   >
     {#snippet headers()}
-      <TableHeaderRow class="!h-8">
+      <TableHeaderRow class="h-8!">
         {#each columns as { label }, i (`${label}:${i}`)}
           <th scope="col" class="relative">
             <div class="flex items-center gap-2 overflow-hidden">

@@ -69,8 +69,8 @@
     <thead class="holocene-table-header">
       {@render headers?.()}
       {#if updating}
-        <tr aria-hidden="true" class="!h-0 bg-transparent">
-          <th colspan="1000" class="relative !h-0 !border-0 !p-0">
+        <tr aria-hidden="true" class="h-0! bg-transparent">
+          <th colspan="1000" class="relative h-0! border-0! p-0!">
             <ProgressBar subtle class="bottom-0" />
           </th>
         </tr>
@@ -84,6 +84,8 @@
 </div>
 
 <style lang="postcss">
+  @reference '../../../app.css';
+
   .holocene-table {
     @apply table-auto bg-surface-primary text-primary;
 

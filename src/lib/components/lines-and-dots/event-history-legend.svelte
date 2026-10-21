@@ -110,11 +110,11 @@
 <Tooltip
   bottomLeft
   width={380}
-  tooltipClass="border border-primary !bg-surface-primary !text-primary"
+  tooltipClass="border border-primary bg-surface-primary! text-primary!"
   usePortal
 >
   {#snippet content()}
-    <div class="flex gap-6 whitespace-normal p-2 text-xs max-sm:flex-col">
+    <div class="flex gap-6 p-2 text-xs whitespace-normal max-sm:flex-col">
       {#if !eventTypesOnly}
         <dl>
           {@render term(translate('common.status'))}

@@ -276,7 +276,7 @@
     numberOfItemsSelectedLabel: () => '',
   }}
   play={async ({ canvasElement }) => {
-    expect(canvasElement.querySelectorAll('.rounded-sm.p-1')).toHaveLength(0);
+    expect(canvasElement.querySelectorAll('.rounded-xs.p-1')).toHaveLength(0);
   }}
 />
 

@@ -107,7 +107,7 @@
       {translate('workers.workers')}
     </ToggleButton>
     <ToggleButton
-      class="!border-r"
+      class="border-r!"
       active={selected === View.Pollers}
       onclick={() => (selected = View.Pollers)}
     >

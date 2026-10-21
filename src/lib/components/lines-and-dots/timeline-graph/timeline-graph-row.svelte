@@ -251,14 +251,14 @@
   <!-- transform (not left/top) so streaming/live reprojection composites the dot
        instead of triggering layout; anchored at 0,0 by left-0 top-0. -->
   <div
-    class="absolute left-0 top-0 h-[var(--dot)] w-[var(--dot)] rounded-[var(--dot-r)] border-2 border-solid"
+    class="absolute top-0 left-0 h-[var(--dot)] w-[var(--dot)] rounded-[var(--dot-r)] border-2 border-solid"
     style:transform="translate({bounds.left}px, {bounds.top}px)"
     style:border-color={colors.stroke}
     style:background={colors.fill}
   >
     {#if icon}
       <svg
-        class="absolute left-1/2 top-1/2 h-[var(--dot-icon)] w-[var(--dot-icon)] -translate-x-1/2 -translate-y-1/2 text-black"
+        class="absolute top-1/2 left-1/2 h-[var(--dot-icon)] w-[var(--dot-icon)] -translate-x-1/2 -translate-y-1/2 text-black"
         viewBox="0 0 16 16"
       >
         <use href="#ti-{icon}" />
@@ -335,7 +335,7 @@
             ? 'retry'
             : undefined}
         <div
-          class="pointer-events-auto absolute flex w-max select-none items-center gap-1 whitespace-nowrap text-[14px] leading-none {textAnchor ===
+          class="pointer-events-auto absolute flex w-max items-center gap-1 text-[14px] leading-none whitespace-nowrap select-none {textAnchor ===
           'end'
             ? '-translate-x-full -translate-y-1/2 flex-row-reverse'
             : '-translate-y-1/2'}"
@@ -344,7 +344,7 @@
           style:max-width="{labelMaxWidth}px"
         >
           <span
-            class="inline-flex min-h-[var(--dot)] min-w-0 max-w-full items-center overflow-hidden rounded-full bg-surface-primary px-1.5 text-current"
+            class="inline-flex min-h-[var(--dot)] max-w-full min-w-0 items-center overflow-hidden rounded-full bg-surface-primary px-1.5 text-current"
           >
             {#if iconName}
               <svg class="h-[14px] w-[20px] text-current" viewBox="0 0 16 16">

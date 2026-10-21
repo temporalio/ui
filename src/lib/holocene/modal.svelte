@@ -172,6 +172,8 @@
 </dialog>
 
 <style lang="postcss">
+  @reference '../../app.css';
+
   .body {
     @apply z-50 w-full max-w-lg overflow-y-auto rounded-lg border border-tertiary bg-background-primary p-0 text-primary shadow-xl md:h-max;
   }
@@ -181,7 +183,7 @@
   }
 
   .body.hightlightNav::backdrop {
-    @apply left-[60px] top-[40px];
+    @apply top-[40px] left-[60px];
   }
 
   .large {
@@ -189,10 +191,10 @@
   }
 
   .title {
-    @apply bg-background-primary px-8 pb-0 pt-8 text-2xl text-primary;
+    @apply bg-background-primary px-8 pt-8 pb-0 text-2xl text-primary;
   }
 
   .content {
-    @apply whitespace-normal p-8;
+    @apply p-8 whitespace-normal;
   }
 </style>

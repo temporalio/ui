@@ -30,6 +30,8 @@
 </div>
 
 <style lang="postcss">
+  @reference '../../app.css';
+
   .heart-beat {
     @apply relative flex w-5 shrink-0 items-center justify-center overflow-hidden text-center;
   }

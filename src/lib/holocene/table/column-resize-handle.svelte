@@ -109,15 +109,17 @@
 ></div>
 
 <style lang="postcss">
+  @reference '../../../app.css';
+
   .resize-handle {
-    @apply absolute right-0 top-0 z-10 h-full w-2 translate-x-1/2 cursor-col-resize touch-none;
+    @apply absolute top-0 right-0 z-10 h-full w-2 translate-x-1/2 cursor-col-resize touch-none;
 
     &::after {
-      @apply absolute left-1/2 top-1/2 h-4 w-px -translate-x-1/2 -translate-y-1/2 bg-border-primary transition-[height,width,background-color] duration-150 ease-out content-[''];
+      @apply absolute top-1/2 left-1/2 h-4 w-px -translate-x-1/2 -translate-y-1/2 bg-border-primary transition-[height,width,background-color] duration-150 ease-out content-[''];
     }
 
     &:focus-visible {
-      @apply outline-none ring-2 ring-inset ring-primary;
+      @apply ring-2 ring-primary outline-hidden ring-inset;
     }
 
     &:hover::after,

@@ -115,7 +115,7 @@
         />
         <Label hidden {label} for="{id}-range" />
       </div>
-      <span class="absolute -bottom-6 right-0 text-xs font-normal">
+      <span class="absolute right-0 -bottom-6 text-xs font-normal">
         {max}
       </span>
     </div>
@@ -138,12 +138,14 @@
 </div>
 
 <style lang="postcss">
+  @reference '../../../app.css';
+
   .range-input-container {
     @apply inline-flex w-full flex-row items-center gap-4 whitespace-nowrap text-primary;
   }
 
   .numeric-input {
-    @apply h-10 w-10 border border-primary bg-surface-information text-center text-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-interactive-primary focus-within:ring-offset-2 focus-within:ring-offset-background-primary;
+    @apply h-10 w-10 border border-primary bg-surface-information text-center text-sm focus-within:ring-2 focus-within:ring-interactive-primary focus-within:ring-offset-2 focus-within:ring-offset-background-primary focus-within:outline-hidden;
 
     appearance: textfield;
   }
@@ -159,7 +161,7 @@
   }
 
   .numeric-input:focus {
-    @apply outline ring-2;
+    @apply ring-2 outline;
   }
 
   .floating-value {
@@ -175,7 +177,7 @@
   }
 
   input[type='range']:focus {
-    @apply outline-none;
+    @apply outline-hidden;
   }
 
   input[type='range']:focus::-webkit-slider-thumb {

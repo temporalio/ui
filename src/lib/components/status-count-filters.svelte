@@ -116,7 +116,7 @@
         />
       {/if}
     {:else}
-      <Skeleton class="h-6 w-24 rounded-sm" />
+      <Skeleton class="h-6 w-24 rounded-xs" />
     {/if}
   {/each}
 </div>

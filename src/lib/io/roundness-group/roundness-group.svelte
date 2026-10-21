@@ -21,7 +21,7 @@
 
   const roundnessClasses: Record<GroupRoundness, string> = {
     none: '',
-    sm: twJoin('[&>*:first-child]:rounded-l-sm [&>*:last-child]:rounded-r-sm'),
+    sm: twJoin('[&>*:first-child]:rounded-l-xs [&>*:last-child]:rounded-r-xs'),
     base: twJoin('[&>*:first-child]:rounded-l [&>*:last-child]:rounded-r'),
     lg: twJoin('[&>*:first-child]:rounded-l-lg [&>*:last-child]:rounded-r-lg'),
     full: twJoin(
@@ -31,10 +31,10 @@
 
   const wrapperRoundnessClasses: Record<GroupRoundness, string> = {
     none: twJoin('[--group-radius:0px]'),
-    sm: twJoin('[--group-radius:theme(borderRadius.sm)]'),
-    base: twJoin('[--group-radius:theme(borderRadius.DEFAULT)]'),
-    lg: twJoin('[--group-radius:theme(borderRadius.lg)]'),
-    full: twJoin('[--group-radius:theme(borderRadius.full)]'),
+    sm: twJoin('[--group-radius:var(--radius-xs)]'),
+    base: twJoin('[--group-radius:var(--radius-sm)]'),
+    lg: twJoin('[--group-radius:var(--radius-lg)]'),
+    full: twJoin('[--group-radius:var(--radius-full)]'),
   };
 
   const wrapperClasses = twJoin(

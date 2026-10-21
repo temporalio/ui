@@ -40,6 +40,8 @@
 </div>
 
 <style lang="postcss">
+  @reference '../../app.css';
+
   .title-wrapper {
     @apply flex flex-col justify-center gap-2 p-6;
 
@@ -53,6 +55,6 @@
   }
 
   .content {
-    @apply whitespace-normal px-6 pb-6;
+    @apply px-6 pb-6 whitespace-normal;
   }
 </style>

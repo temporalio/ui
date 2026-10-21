@@ -10,7 +10,7 @@
 
 {#if show && count > 0}
   <span
-    class="absolute right-0 top-0 flex w-fit origin-bottom-left translate-x-[10px] translate-y-[-10px] flex-row items-center justify-center gap-1 text-nowrap rounded-full border border-secondary bg-surface-tertiary px-1 py-0 font-mono text-xs font-normal leading-4 text-primary{className}"
+    class="absolute top-0 right-0 flex w-fit origin-bottom-left translate-x-[10px] translate-y-[-10px] flex-row items-center justify-center gap-1 rounded-full border border-secondary bg-surface-tertiary px-1 py-0 font-mono text-xs leading-4 font-normal text-nowrap text-primary{className}"
   >
     {count}
   </span>

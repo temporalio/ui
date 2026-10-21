@@ -209,7 +209,7 @@
   >
     <input
       {id}
-      class="flex h-full grow border-r border-primary bg-transparent p-2 text-primary placeholder:text-tertiary focus-visible:outline-none disabled:cursor-not-allowed disabled:text-tertiary"
+      class="flex h-full grow border-r border-primary bg-transparent p-2 text-primary placeholder:text-tertiary focus-visible:outline-hidden disabled:cursor-not-allowed disabled:text-tertiary"
       type="number"
       {disabled}
       bind:value={rawValue}
@@ -223,7 +223,7 @@
       )}
       id="{id}-unit-select"
       class={twMerge(
-        'h-full rounded-r-[inherit] bg-surface-secondary text-primary focus-visible:outline-none disabled:cursor-not-allowed',
+        'h-full rounded-r-[inherit] bg-surface-secondary text-primary focus-visible:outline-hidden disabled:cursor-not-allowed',
         disabled && 'bg-surface-tertiary text-tertiary',
       )}
       {disabled}

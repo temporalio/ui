@@ -3,51 +3,62 @@ import plugin from 'tailwindcss/plugin';
 import { themesBaseStyles } from './io/themes';
 import { colorTheme, opacityTheme } from './tailwind-colors';
 
+type FontSizeThemeValue =
+  | string
+  | [string, { lineHeight?: string }]
+  | { fontSize: string };
+
+const fontSizeValue = (value: FontSizeThemeValue) => {
+  if (typeof value === 'string') return value;
+  if (Array.isArray(value)) return value[0];
+  return value.fontSize;
+};
+
 const textStyles = plugin(({ addBase, theme }) => {
   addBase({
     h1: {
-      fontSize: theme('fontSize.3xl'),
+      fontSize: fontSizeValue(theme('fontSize.3xl')),
       fontWeight: theme('fontWeight.medium'),
     },
     h2: {
-      fontSize: theme('fontSize.2xl'),
+      fontSize: fontSizeValue(theme('fontSize.2xl')),
       fontWeight: theme('fontWeight.medium'),
     },
     h3: {
-      fontSize: theme('fontSize.xl'),
+      fontSize: fontSizeValue(theme('fontSize.xl')),
       fontWeight: theme('fontWeight.medium'),
     },
     h4: {
-      fontSize: theme('fontSize.lg'),
+      fontSize: fontSizeValue(theme('fontSize.lg')),
       fontWeight: theme('fontWeight.medium'),
     },
     h5: {
-      fontSize: theme('fontSize.base'),
+      fontSize: fontSizeValue(theme('fontSize.base')),
       fontWeight: theme('fontWeight.medium'),
     },
     h6: {
-      fontSize: theme('fontSize.sm'),
+      fontSize: fontSizeValue(theme('fontSize.sm')),
       fontWeight: theme('fontWeight.medium'),
     },
     '.body-normal': {
-      fontSize: theme('fontSize.sm'),
+      fontSize: fontSizeValue(theme('fontSize.sm')),
       fontWeight: theme('fontWeight.normal'),
     },
     '.body-medium': {
-      fontSize: theme('fontSize.sm'),
+      fontSize: fontSizeValue(theme('fontSize.sm')),
       fontWeight: theme('fontWeight.medium'),
     },
     '.body-small': {
-      fontSize: theme('fontSize.xs'),
+      fontSize: fontSizeValue(theme('fontSize.xs')),
       fontWeight: theme('fontWeight.normal'),
     },
     '.body-small-medium': {
-      fontSize: theme('fontSize.xs'),
+      fontSize: fontSizeValue(theme('fontSize.xs')),
       fontWeight: theme('fontWeight.medium'),
     },
     '.body-small-mono': {
       fontFamily: theme('fontFamily.mono'),
-      fontSize: theme('fontSize.xs'),
+      fontSize: fontSizeValue(theme('fontSize.xs')),
       fontWeight: theme('fontWeight.normal'),
     },
   });

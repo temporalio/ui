@@ -35,7 +35,7 @@ export const catalogKinds: Readonly<
     locationLabel: 'Task Queue',
     location: taskQueue,
     pollingWorkerLabel: 'A Worker is polling for Workflow Tasks',
-    glyphClass: 'rounded-sm bg-action-workflow',
+    glyphClass: 'rounded-xs bg-action-workflow',
     badgeClass: 'bg-action-workflow-overlay',
   },
   'standalone-activity': {

@@ -16,6 +16,13 @@
         "ignoreAtRules": [
           "tailwind",
           "apply",
+          "config",
+          "custom-variant",
+          "plugin",
+          "reference",
+          "source",
+          "theme",
+          "utility",
           "variants",
           "responsive",
           "screen",

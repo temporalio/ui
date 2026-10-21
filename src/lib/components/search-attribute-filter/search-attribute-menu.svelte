@@ -125,7 +125,7 @@
           !!$filters.find((f) => f.attribute === statusAttribute)}
       >
         <div>
-          <p class="break-all leading-3">{label}</p>
+          <p class="leading-3 break-all">{label}</p>
           <small class="text-secondary">{type}</small>
         </div>
       </MenuItem>
