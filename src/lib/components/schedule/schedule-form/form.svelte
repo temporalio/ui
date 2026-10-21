@@ -94,8 +94,7 @@
 
     return {
       ...resolution,
-      formAdapter:
-        scheduledActionTypes[resolution.action.type].loadFormAdapter(),
+      FormAdapter: scheduledActionTypes[resolution.action.type].FormAdapter,
     };
   });
 
@@ -209,24 +208,15 @@
           />
           <SchedulePoliciesCard {form} />
           {#if actionResolution.status === 'known'}
-            {#await actionResolution.formAdapter}
-              <Loading />
-            {:then FormAdapter}
-              {#key actionResolution.action.type}
-                <FormAdapter
-                  resolvedAction={actionResolution.action}
-                  customSearchAttributes={$customSearchAttributes}
-                  bind:this={actionForm}
-                  bind:searchAttributes={actionSearchAttributes}
-                  onSummaryChange={(summary) => (actionSummary = summary)}
-                />
-              {/key}
-            {:catch}
-              <Alert
-                intent="error"
-                title={translate('schedules.action-form-load-error')}
+            {#key actionResolution.action.type}
+              <actionResolution.FormAdapter
+                resolvedAction={actionResolution.action}
+                customSearchAttributes={$customSearchAttributes}
+                bind:this={actionForm}
+                bind:searchAttributes={actionSearchAttributes}
+                onSummaryChange={(summary) => (actionSummary = summary)}
               />
-            {/await}
+            {/key}
           {:else}
             <Alert
               intent="error"

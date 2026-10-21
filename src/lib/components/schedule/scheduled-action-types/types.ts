@@ -39,6 +39,17 @@ export type ScheduledActionFormAdapterProps<
   onSummaryChange: (summary: ScheduledActionSummaryItem[]) => void;
 };
 
+export type ScheduledActionViewProps<
+  Type extends ScheduledActionType = ScheduledActionType,
+> = {
+  resolvedAction: Extract<
+    ResolvedScheduledAction,
+    { type: Type; isEditing: true }
+  >;
+  namespace: string;
+  scheduleId: string;
+};
+
 export type ScheduledActionRequest = {
   action: ScheduleActionRequest;
   policies: Partial<SchedulePoliciesRequest>;
@@ -51,13 +62,15 @@ export type ScheduledActionDefinition<
   resolve: (
     schedule: DescribeFullSchedule,
   ) => Extract<ResolvedScheduledAction, { type: Type; isEditing: true }> | null;
-  loadFormAdapter: () => Promise<
-    Component<
-      ScheduledActionFormAdapterProps<Type>,
-      ScheduledActionForm,
-      'searchAttributes'
-    >
+  FormAdapter: Component<
+    ScheduledActionFormAdapterProps<Type>,
+    ScheduledActionForm,
+    'searchAttributes'
   >;
+  views: {
+    Details: Component<ScheduledActionViewProps<Type>>;
+    Input: Component<ScheduledActionViewProps<Type>>;
+  };
   toRequest: (
     data: Extract<ScheduledActionFormData, { type: Type }>,
     resolvedAction: Extract<ResolvedScheduledAction, { type: Type }>,

@@ -2,14 +2,15 @@
   import Panel from '$lib/components/panel.svelte';
   import InputAndResultsPayload from '$lib/components/workflow/input-and-results-payload.svelte';
   import { translate } from '$lib/i18n/translate';
-  import type { Payloads } from '$lib/types';
 
-  interface Props {
-    input?: Payloads;
-    scheduleId: string;
-  }
+  import type { ScheduledActionViewProps } from '../types';
 
-  let { input, scheduleId }: Props = $props();
+  let { resolvedAction, scheduleId }: ScheduledActionViewProps<'workflow'> =
+    $props();
+
+  const input = $derived(
+    resolvedAction.schedule.schedule.action.startWorkflow.input ?? undefined,
+  );
 </script>
 
 <Panel

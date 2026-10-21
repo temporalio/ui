@@ -6,7 +6,6 @@
     DetailListLabel,
     DetailListTimestampValue,
   } from '$lib/components/detail-list';
-  import DetailListLinkValue from '$lib/components/detail-list/detail-list-link-value.svelte';
   import StatusCounts from '$lib/components/status-counts.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Link from '$lib/holocene/link.svelte';
@@ -14,7 +13,7 @@
   import SplitButton from '$lib/holocene/split-button.svelte';
   import { translate } from '$lib/i18n/translate';
   import { BadgeStatus } from '$lib/io/badge-status';
-  import { IconChevronLeft, IconFilter } from '$lib/io/icon';
+  import { IconChevronLeft } from '$lib/io/icon';
   import { coreUserStore } from '$lib/stores/core-user';
   import {
     openConfirmationModal,
@@ -28,16 +27,18 @@
   import {
     routeForScheduleEdit,
     routeForSchedules,
-    routeForWorkflowsWithQuery,
   } from '$lib/utilities/route-for';
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
   import ScheduleActionModals from '../schedule-action-modals/schedule-action-modals.svelte';
+  import {
+    resolveScheduledAction,
+    scheduledActionTypes,
+  } from '../scheduled-action-types/registry';
 
   import AdvancedSettingsCard from './advanced-settings-card.svelte';
   import CustomSearchAttributesCard from './custom-search-attributes-card.svelte';
   import ScheduleSpecCard from './schedule-spec-card.svelte';
-  import WorkflowInputCard from './workflow-input-card.svelte';
   import WorkflowRunsCard from './workflow-runs-card.svelte';
 
   interface Props {
@@ -47,6 +48,16 @@
   }
 
   let { schedule, namespace, scheduleId }: Props = $props();
+
+  const actionResolution = $derived.by(() => {
+    const resolution = resolveScheduledAction(schedule);
+    if (resolution.status === 'unknown') return resolution;
+
+    return {
+      ...resolution,
+      views: scheduledActionTypes[resolution.action.type].views,
+    };
+  });
 
   const workflowQuery = $derived(`TemporalScheduledById="${scheduleId}"`);
 
@@ -113,27 +124,13 @@
   </div>
 
   <DetailList rowCount={3}>
-    <DetailListLabel class="flex min-h-6 items-center"
-      >{translate('common.workflow-type')}</DetailListLabel
-    >
-    <DetailListLinkValue
-      href={routeForWorkflowsWithQuery({
-        namespace,
-        query: [
-          `WorkflowType="${
-            schedule?.schedule?.action?.startWorkflow?.workflowType?.name
-          }"`,
-          `TemporalScheduledById="${scheduleId}"`,
-        ].join(' AND '),
-      }) ?? ''}
-      text={schedule?.schedule?.action?.startWorkflow?.workflowType?.name ?? ''}
-      Icon={IconFilter}
-      copyable={Boolean(
-        schedule?.schedule?.action?.startWorkflow?.workflowType?.name,
-      )}
-      copyableText={schedule?.schedule?.action?.startWorkflow?.workflowType
-        ?.name ?? undefined}
-    />
+    {#if actionResolution.status === 'known'}
+      <actionResolution.views.Details
+        resolvedAction={actionResolution.action}
+        {namespace}
+        {scheduleId}
+      />
+    {/if}
 
     <DetailListLabel class="items-center">
       {translate('common.created-label')}
@@ -193,10 +190,13 @@
     </div>
 
     <div class="flex w-full flex-col gap-4 xl:w-1/3">
-      <WorkflowInputCard
-        {scheduleId}
-        input={schedule?.schedule?.action?.startWorkflow?.input ?? undefined}
-      />
+      {#if actionResolution.status === 'known'}
+        <actionResolution.views.Input
+          resolvedAction={actionResolution.action}
+          {namespace}
+          {scheduleId}
+        />
+      {/if}
       <ScheduleSpecCard {schedule} />
     </div>
   </div>
