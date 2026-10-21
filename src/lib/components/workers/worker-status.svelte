@@ -1,6 +1,6 @@
 <script lang="ts">
   import { translate } from '$lib/i18n/translate';
-  import Badge, { type BadgeColorScheme } from '$lib/io/badge/badge.svelte';
+  import { Badge, type BadgeColorScheme } from '$lib/io/badge';
   import type { WorkerStatus } from '$lib/models/worker-status';
 
   interface Props {

@@ -3,21 +3,18 @@ import {
   Connection,
   WorkflowExecutionAlreadyStartedError,
 } from '@temporalio/client';
-import { z } from 'zod';
 
 import { assertValidExampleInput, requireWorkflowExample } from './catalog';
-import type { ScenarioContext, ScenarioResult } from './scenario';
+import {
+  type ExampleEntry,
+  exampleEntrySchema,
+} from '../../src/lib/demo/definition';
+import type {
+  ScenarioContext,
+  ScenarioResult,
+} from '../../src/lib/demo/scenario';
 
-export const exampleEntrySchema = z.object({
-  id: z.string(),
-  workflowId: z.string().optional(),
-  /** Replaces the example's own default input when given. */
-  input: z.array(z.unknown()).optional(),
-  role: z.string().optional(),
-  note: z.string().optional(),
-});
-
-export type ExampleEntry = z.infer<typeof exampleEntrySchema>;
+export { exampleEntrySchema, type ExampleEntry };
 
 /**
  * Starts the catalog examples a demo names. The catalog's generated artifact

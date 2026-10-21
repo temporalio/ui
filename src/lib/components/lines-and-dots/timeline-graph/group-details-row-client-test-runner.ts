@@ -46,7 +46,12 @@ export async function getGroupDetailsRowClientTestRunner(): Promise<ClientRunner
       root: projectRoot,
       configFile: false,
       appType: 'custom',
-      plugins: [svelte({ hot: false, prebundleSvelteLibraries: false })],
+      plugins: [
+        svelte({
+          compilerOptions: { hmr: false },
+          prebundleSvelteLibraries: false,
+        }),
+      ],
       optimizeDeps: {
         noDiscovery: true,
         exclude: ['svelte'],

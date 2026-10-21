@@ -100,7 +100,9 @@
 
   // Seeded from activity.activityOptions once when the drawer opens. These must
   // NOT reset reactively if the activity prop changes while the user is
-  // mid-edit — untrack() captures the initial values intentionally.
+  // mid-edit — untrack() captures the initial values intentionally. Re-seeding
+  // on each open comes from the {#key} around the drawer in
+  // activity-commands.svelte, which remounts this form.
   const initialData: z.infer<typeof schema> = untrack(() => ({
     taskQueue: initialOptions?.taskQueue?.name ?? '',
     scheduleToCloseTimeout: String(

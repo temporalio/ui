@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { sharedWorkflowCorpusInventory } from './inventory.js';
 import { priorityFairnessWorkflow } from './priority-fairness/workflow.js';
 import { logStep } from './sequential-markdown-activities/activities.js';
+import { recordMultilineActivity } from './sequential-multiline-summary-activities/activities.js';
 import { recordActivityWithoutSummary } from './sequential-no-summary-activities/activities.js';
 import { recordActivity } from './sequential-plain-text-activities/activities.js';
 import { greet } from './shared-activities.js';
@@ -49,8 +50,10 @@ const proofExampleIds = [
   'standalone-activity',
   'nexus-greeting',
   'sequential-markdown-activities',
+  'sequential-multiline-summary-activities',
   'sequential-no-summary-activities',
   'sequential-plain-text-activities',
+  'satellite-launch-event-groups',
 ] as const;
 
 const activitySummaryExamples = [
@@ -65,6 +68,18 @@ const activitySummaryExamples = [
       'The configured number of non-overlapping activity executions in deterministic order.',
       'When included, logging step 10 fails three attempts and succeeds on attempt four.',
       'Each activity summary displays a Logging System link.',
+    ],
+  },
+  {
+    id: 'sequential-multiline-summary-activities',
+    title: 'Sequential activities with multi-line Markdown summaries',
+    workflowType: 'sequentialMultilineSummaryActivities',
+    activityName: 'recordMultilineActivity',
+    activity: recordMultilineActivity,
+    capabilityTags: ['activities', 'sequencing'],
+    expectedEvidence: [
+      'The configured number of non-overlapping activity executions in deterministic order.',
+      'Each activity summary spans two Markdown blocks, and the timeline label stays on one line.',
     ],
   },
   {
@@ -161,6 +176,7 @@ describe('shared workflow corpus', () => {
         ...migratedWorkflowTypes,
         'priorityFairnessWorkflow',
         'nexusGreeting',
+        'satelliteLaunchEventGroups',
         ...activitySummaryExamples.map(({ workflowType }) => workflowType),
       ].sort(),
     );
@@ -588,6 +604,9 @@ describe('shared workflow corpus', () => {
         'src/lib/catalog/worker/examples/sequential-markdown-activities/activities.ts',
         'src/lib/catalog/worker/examples/sequential-markdown-activities/example.ts',
         'src/lib/catalog/worker/examples/sequential-markdown-activities/workflow.ts',
+        'src/lib/catalog/worker/examples/sequential-multiline-summary-activities/activities.ts',
+        'src/lib/catalog/worker/examples/sequential-multiline-summary-activities/example.ts',
+        'src/lib/catalog/worker/examples/sequential-multiline-summary-activities/workflow.ts',
         'src/lib/catalog/worker/examples/sequential-no-summary-activities/activities.ts',
         'src/lib/catalog/worker/examples/sequential-no-summary-activities/example.ts',
         'src/lib/catalog/worker/examples/sequential-no-summary-activities/workflow.ts',
@@ -630,6 +649,12 @@ describe('shared workflow corpus', () => {
         'src/lib/catalog/worker/examples/nexus-greeting/workflow.ts',
         'src/lib/catalog/worker/examples/nexus-greeting/service.ts',
         'src/lib/catalog/worker/examples/nexus-greeting/handler.ts',
+        'src/lib/catalog/worker/examples/satellite-launch-event-groups/example.ts',
+        'src/lib/catalog/worker/examples/satellite-launch-event-groups/workflow.ts',
+        'src/lib/catalog/worker/examples/satellite-launch-event-groups/activity.ts',
+        'src/lib/catalog/worker/examples/slow-nexus-operation/example.ts',
+        'src/lib/catalog/worker/examples/slow-nexus-operation/handler.ts',
+        'src/lib/catalog/worker/examples/slow-nexus-operation/service.ts',
       ].sort(),
     );
   });

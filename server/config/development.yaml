@@ -5,6 +5,10 @@
 publicPath:
 port: 8081
 enableUi: true
+banner:
+  # Both fields are required to show banner. Color: neutral, info, warning, success, danger, error, or accent (case-insensitive).
+  text: ""
+  color: ""
 cors:
   cookieInsecure: false
   allowOrigins:
@@ -61,6 +65,11 @@ tls:
 uiServerTLS:
   certFile:
   keyFile:
+  # mTLS block is optional. Uncomment to require inbound clients to present
+  # a certificate signed by the configured CA (requires certFile+keyFile).
+  # mTLS:
+  #   caFile:      # required: path to PEM-encoded client CA bundle
+  #   clientAuth:  # optional: requireAndVerify (default), verifyIfGiven, request, requireAny
 codec:
   endpoint:
   passAccessToken: false

@@ -70,6 +70,58 @@ describe('directory catalog promotion planning', () => {
     });
   });
 
+  it('plans promotion of a standalone example without a workflow module', async () => {
+    const rootDirectory = await createTemporaryDirectory();
+    const directory = join(rootDirectory, 'catalog.local/examples/slow-nexus');
+    await mkdir(directory, { recursive: true });
+    await Promise.all([
+      writeFile(
+        join(directory, 'example.ts'),
+        "import { handler } from './handler.js';\nexport const catalogExample = { id: 'slow-nexus', execution: { kind: 'standalone-nexus-operation', handler } };\n",
+      ),
+      writeFile(join(directory, 'handler.ts'), 'export const handler = {};\n'),
+    ]);
+
+    await expect(
+      planDirectoryCatalogPromotion({
+        exampleId: 'slow-nexus',
+        rootDirectory,
+      }),
+    ).resolves.toEqual({
+      operations: [
+        {
+          from: 'catalog.local/examples/slow-nexus',
+          kind: 'move-directory',
+          to: 'src/lib/catalog/worker/examples/slow-nexus',
+        },
+        { kind: 'generate' },
+        { kind: 'verify' },
+      ],
+    });
+  });
+
+  it('rejects a workflow example without a workflow module', async () => {
+    const rootDirectory = await createTemporaryDirectory();
+    const directory = join(
+      rootDirectory,
+      'catalog.local/examples/order-lifecycle',
+    );
+    await mkdir(directory, { recursive: true });
+    await writeFile(
+      join(directory, 'example.ts'),
+      "export const catalogExample = { id: 'order-lifecycle', execution: { kind: 'workflow', workflowType: 'orderLifecycle' } };\n",
+    );
+
+    await expect(
+      planDirectoryCatalogPromotion({
+        exampleId: 'order-lifecycle',
+        rootDirectory,
+      }),
+    ).rejects.toThrow(
+      'catalog.local/examples/order-lifecycle must contain workflow.ts for a workflow example',
+    );
+  });
+
   it('collects static module specifiers and rejects computed loading', () => {
     expect(
       parseCatalogTypeScriptModuleSpecifiers({

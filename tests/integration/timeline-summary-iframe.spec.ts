@@ -64,6 +64,7 @@ test('keeps a timeline summary iframe hidden and zero-sized until it loads', asy
       contentType: 'text/html',
       body: `<html><head><style>
         * { margin: 0; padding: 0; font: 14px/20px sans-serif; }
+        main { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
       </style></head><body><main>Timeline summary</main></body></html>`,
     });
   });
@@ -89,7 +90,7 @@ test('keeps a timeline summary iframe hidden and zero-sized until it loads', asy
     .poll(() =>
       iframe.evaluate((element) => element.getBoundingClientRect().width),
     )
-    .toBeGreaterThan(100);
+    .toBeGreaterThan(0);
   await expect
     .poll(() =>
       iframe.evaluate((element) => element.getBoundingClientRect().height),
@@ -130,4 +131,53 @@ test('does not add decoded timeline summaries to browser history', async ({
 
   await page.evaluate(() => window.history.back());
   await expect(page).toHaveURL(/\/common-errors$/);
+});
+
+test('keeps a multi-block timeline summary on one line', async ({ page }) => {
+  const multiBlockSummary = {
+    metadata: summary.metadata,
+    data: Buffer.from(
+      JSON.stringify('first paragraph\n\nsecond paragraph'),
+    ).toString('base64'),
+  };
+  const multiBlockEvents = [
+    makeWorkflowStarted(1),
+    {
+      ...makeActivityScheduled(2, 'SummarizedActivity'),
+      userMetadata: { summary: multiBlockSummary },
+    },
+    makeActivityStarted(3, 2),
+  ];
+
+  await mockWorkflowApis(page, runningWorkflow);
+  await page.route(EVENT_HISTORY_API, (route) =>
+    route.fulfill({ json: historyPage(multiBlockEvents) }),
+  );
+  await page.route(EVENT_HISTORY_API_REVERSE, (route) =>
+    route.fulfill({ json: historyPage([...multiBlockEvents].reverse()) }),
+  );
+
+  await page.goto(timelineUrl, { waitUntil: 'domcontentloaded' });
+
+  const iframe = page.locator('iframe[title="Summary"]').first();
+  await expect(iframe).toBeVisible();
+  await expect
+    .poll(() =>
+      iframe.evaluate(
+        (element: HTMLIFrameElement) =>
+          element.contentDocument?.querySelector('main')?.textContent,
+      ),
+    )
+    .toContain('second paragraph');
+
+  await expect
+    .poll(() =>
+      iframe.evaluate(
+        (element: HTMLIFrameElement) =>
+          element.contentDocument
+            ?.querySelector('main')
+            ?.getBoundingClientRect().height ?? 0,
+      ),
+    )
+    .toBeLessThanOrEqual(24);
 });

@@ -1,12 +1,9 @@
 <script lang="ts">
-  import { mapValues } from 'es-toolkit';
-
   import { page } from '$app/state';
 
   import WorkersTable from '$lib/components/workers/workers-table/task-queue-workers-table.svelte';
   import { activityWorkerCount } from '$lib/stores/activities';
-  import { parseRawPayloadToJSON } from '$lib/utilities/decode-payload';
-  import { isEmptyObject } from '$lib/utilities/is';
+  import { parseSearchAttributes } from '$lib/utilities/decode-payload';
   import { activityExecution } from '$lib/utilities/standalone-activity-poller.svelte';
 
   interface Props {
@@ -22,15 +19,9 @@
     !!page.data.namespace.namespaceInfo?.capabilities?.workerHeartbeats,
   );
 
-  const decodedSearchAttributes = $derived.by(() => {
-    if (isEmptyObject(searchAttributes)) return {};
-
-    const decoded = mapValues(
-      searchAttributes?.indexedFields ?? {},
-      (payload) => parseRawPayloadToJSON(payload),
-    ) as Record<string, string>;
-    return decoded;
-  });
+  const decodedSearchAttributes = $derived(
+    parseSearchAttributes(searchAttributes ?? {}).indexedFields ?? {},
+  );
 </script>
 
 <WorkersTable

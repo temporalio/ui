@@ -67,7 +67,20 @@ func ExchangeCode(ctx context.Context, r *http.Request, config *oauth2.Config, p
 		return nil, echo.NewHTTPError(http.StatusBadRequest, "State cookie did not match")
 	}
 
-	oauth2Token, err := config.Exchange(ctx, r.URL.Query().Get("code"))
+	if providerErr := r.URL.Query().Get("error"); providerErr != "" {
+		message := "SSO provider returned an error: " + providerErr
+		if description := r.URL.Query().Get("error_description"); description != "" {
+			message += " - " + description
+		}
+		return nil, echo.NewHTTPError(http.StatusUnauthorized, message)
+	}
+
+	code := r.URL.Query().Get("code")
+	if code == "" {
+		return nil, echo.NewHTTPError(http.StatusBadRequest, "Authorization code is missing from the SSO callback")
+	}
+
+	oauth2Token, err := config.Exchange(ctx, code)
 	if err != nil {
 		return nil, echo.NewHTTPError(http.StatusInternalServerError, "Unable to exchange token: "+err.Error())
 	}

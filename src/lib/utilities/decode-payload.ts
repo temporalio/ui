@@ -1,9 +1,15 @@
+import { mapValues } from 'es-toolkit';
+
 import { decodePayloadsWithCodec as callCodecEndpoint } from '$lib/services/data-encoder';
 import type { DownloadEventHistorySetting } from '$lib/stores/events';
 import { schemaForMessageType } from '$lib/system-nexus-endpoints';
-import type { Memo, Payload, Payloads } from '$lib/types';
+import type { Memo, Payload, Payloads, SearchAttribute } from '$lib/types';
 import type { EventAttribute, WorkflowEvent } from '$lib/types/events';
 import type { Optional, Replace } from '$lib/types/global';
+import type {
+  DecodedWorkflowSearchAttributes,
+  WorkflowSearchAttributes,
+} from '$lib/types/workflows';
 
 import { atob } from './atob';
 import {
@@ -161,6 +167,19 @@ export function parseRawPayloadToJSON(
 
   return payload;
 }
+
+export const parseSearchAttributes = (
+  apiSearchAttributes: WorkflowSearchAttributes | SearchAttribute,
+): DecodedWorkflowSearchAttributes => {
+  if (!apiSearchAttributes || !apiSearchAttributes.indexedFields) return {};
+  const decoded = mapValues(apiSearchAttributes.indexedFields, (payload) =>
+    parseRawPayloadToJSON(payload),
+  ) as Record<string, string>;
+
+  return {
+    indexedFields: decoded,
+  };
+};
 
 /**
  * Phase 1 — synchronous, no network.

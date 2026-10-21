@@ -12,7 +12,6 @@
   import {
     isLazyGroup,
     type LazyGroup,
-    materializeGroup,
   } from '$lib/services/grouped-event-buffer';
   import { eventBuffer } from '$lib/services/grouped-event-buffer.svelte';
   import { isCloud } from '$lib/stores/advanced-visibility';
@@ -33,7 +32,6 @@
   } from '$lib/utilities/is-pending-activity';
 
   import HistoryGraph from '../lines-and-dots/history-graph/history-graph.svelte';
-  import TableHeaderCell from '../workflow/workflows-summary-configurable-table/table-header-cell.svelte';
 
   import EventEmptyRow from './event-empty-row.svelte';
   import EventSummaryRow from './event-summary-row.svelte';
@@ -104,10 +102,7 @@
 
   const materializeRowReactive = (
     item: IterableEventWithPending | LazyGroup,
-  ) => {
-    void eventBuffer.version;
-    return isLazyGroup(item) ? materializeGroup(item) : item;
-  };
+  ) => (isLazyGroup(item) ? eventBuffer.materializeGroup(item) : item);
 
   const iterableKey = (event: IterableEventWithPending | LazyGroup) => {
     if (isPendingNexusOperation(event)) {
@@ -148,12 +143,15 @@
   >
     {#snippet headers()}
       <TableHeaderRow class="!h-8">
-        {#each columns as column, i (`${column.label}:${i}`)}
-          <TableHeaderCell {column}>
-            {#if column.label === 'Event Type'}
-              <EventHistoryLegend eventTypesOnly />
-            {/if}
-          </TableHeaderCell>
+        {#each columns as { label }, i (`${label}:${i}`)}
+          <th scope="col" class="relative">
+            <div class="flex items-center gap-2 overflow-hidden">
+              <span class="truncate">{label}</span>
+              {#if label === 'Event Type'}
+                <EventHistoryLegend eventTypesOnly />
+              {/if}
+            </div>
+          </th>
         {/each}
       </TableHeaderRow>
     {/snippet}

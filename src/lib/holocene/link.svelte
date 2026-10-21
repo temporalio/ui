@@ -65,6 +65,11 @@
   };
 </script>
 
+<!--
+  Keep the text, children and TrailingIcon blocks together on one line.
+  A line break between them renders as a space inside the <a>, and the
+  underline continues onto that space when the link is inside a sentence.
+-->
 <a
   href={disabled ? undefined : href}
   target={newTab ? '_blank' : null}
@@ -84,12 +89,7 @@
 >
   {#if LeadingIcon}
     <LeadingIcon class="mt-0.5" />
-  {/if}
-  {#if text}
-    {text}
-  {/if}
-  {@render children?.()}
-  {#if TrailingIcon}
+  {/if}{#if text}{text}{/if}{@render children?.()}{#if TrailingIcon}
     <TrailingIcon class="mt-0.5" />
   {/if}
 </a>

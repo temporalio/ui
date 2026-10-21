@@ -1,4 +1,5 @@
 <script module lang="ts">
+  import { type CatalogExecutionKind, catalogKinds } from './catalog-kinds';
   import type { ReadinessCheck as HostReadinessCheck } from './workbench-host';
 
   export type WorkerReadinessDisplayState =
@@ -32,19 +33,21 @@
 
   export const readinessPresentation = ({
     kind,
+    executionKind,
     state,
     taskQueue,
   }: {
     kind: HostReadinessCheck['kind'];
+    executionKind: CatalogExecutionKind;
     state: WorkerReadinessDisplayState | 'loading';
     taskQueue: string;
   }): ReadinessPresentation => {
     const label =
       kind === 'worker'
-        ? 'Handler worker is polling'
-        : 'Endpoint matches the declared target and policy';
+        ? catalogKinds[executionKind].pollingWorkerLabel
+        : 'Nexus Endpoint matches the declared target and policy';
     const iconSubject =
-      kind === 'worker' ? 'Worker readiness' : 'Nexus endpoint readiness';
+      kind === 'worker' ? 'Worker readiness' : 'Nexus Endpoint readiness';
 
     if (state === 'loading') {
       return {
@@ -54,8 +57,8 @@
         label,
         tooltip:
           kind === 'worker'
-            ? 'Checking for workers…'
-            : 'Checking Nexus endpoint readiness…',
+            ? 'Checking for Workers…'
+            : 'Checking Nexus Endpoint readiness…',
       };
     }
 
@@ -68,7 +71,7 @@
         tooltip:
           kind === 'worker'
             ? 'A Worker is polling.'
-            : 'Nexus endpoint is ready.',
+            : 'Nexus Endpoint is ready.',
       };
     }
 
@@ -81,7 +84,7 @@
         tooltip:
           kind === 'worker'
             ? `This run will wait for a Worker to poll the ${taskQueue} Task Queue. Run "pnpm catalog worker" to start one.`
-            : 'Nexus endpoint is unavailable.',
+            : 'Nexus Endpoint is unavailable.',
       };
     }
 
@@ -93,7 +96,7 @@
       tooltip:
         kind === 'worker'
           ? 'Worker status couldn’t be checked.'
-          : 'Nexus endpoint status couldn’t be checked.',
+          : 'Nexus Endpoint status couldn’t be checked.',
     };
   };
 
@@ -144,11 +147,11 @@
   import type { SearchAttributesSchema } from '$lib/stores/search-attributes';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
 
+  import { featureLabel } from './catalog-features';
   import { launchOutcomeExplanation } from './launch-outcome-presentation';
   import { createReadinessLoader } from './readiness-loader';
-  import { terminalStatusPresentation } from './session-presentation';
+  import { sessionStatusPresentation } from './session-presentation';
   import {
-    type CatalogSessionState,
     type CatalogSessionStore,
     catalogTargetFingerprint,
   } from './session-store';
@@ -277,7 +280,7 @@
       taskQueue,
       {
         id: 'catalog-endpoint',
-        label: 'Endpoint',
+        label: 'Nexus Endpoint',
         value: execution.endpoint,
       },
       {
@@ -309,6 +312,7 @@
   let workerPresentation = $derived(
     readinessPresentation({
       kind: 'worker',
+      executionKind: descriptor.execution.kind,
       state: readinessLoading ? 'loading' : workerReadinessState,
       taskQueue: descriptor.execution.taskQueue,
     }),
@@ -325,6 +329,7 @@
             (check) =>
               readinessPresentation({
                 kind: check.kind,
+                executionKind: descriptor.execution.kind,
                 state: check.state,
                 taskQueue: descriptor.execution.taskQueue,
               }).iconLabel,
@@ -351,28 +356,9 @@
 
   const formatJson = (value: JsonValue) => JSON.stringify(value, null, 2);
 
-  const executionKindLabels: Record<
-    BrowserCatalogDescriptor['execution']['kind'],
-    string
-  > = {
-    workflow: 'Workflow',
-    'standalone-activity': 'Standalone Activity',
-    'standalone-nexus-operation': 'Standalone Nexus Operation',
-  };
-
   let executionKindLabel = $derived(
-    executionKindLabels[descriptor.execution.kind],
+    catalogKinds[descriptor.execution.kind].label,
   );
-
-  const sessionStateLabels: Record<CatalogSessionState, string> = {
-    'execution-terminal': 'Finished',
-    'launch-rejected': 'Start failed',
-    'launch-uncertain': 'Start not confirmed',
-    'observation-paused': 'Status checks paused',
-    observing: 'Running',
-    starting: 'Starting',
-    stopped: 'Status checks stopped',
-  };
 
   const relativeSessionTime = (createdAt: number) => {
     const distance = formatDistanceAbbreviated({
@@ -671,6 +657,7 @@
                   session.outcome?.status === 'accepted'
                     ? host.evidenceLink(session.outcome)
                     : undefined}
+                {@const status = sessionStatusPresentation(session)}
                 <TableRow>
                   <td class="truncate py-2 font-mono text-xs text-secondary">
                     {session.reference.attempt.executionId}
@@ -679,16 +666,13 @@
                     {relativeSessionTime(session.createdAt)}
                   </td>
                   <td>
-                    {#if session.state === 'execution-terminal'}
-                      {@const status = terminalStatusPresentation(
-                        session.terminalStatus!,
-                      )}
-                      <BadgeStatus status={status.status} text={status.label} />
+                    {#if 'status' in status}
+                      <BadgeStatus status={status.status} />
                     {:else}
                       {@const explanation =
                         launchOutcomeExplanation(session.outcome) ??
                         session.error}
-                      <Badge text={sessionStateLabels[session.state]} />
+                      <Badge text={status.label} />
                       {#if explanation}
                         <p class="mt-1 text-xs text-secondary">
                           {explanation}
@@ -759,13 +743,13 @@
         {#if capabilityTags.length}
           <ul class="flex flex-wrap gap-2" aria-label="Capabilities">
             {#each capabilityTags as capability (capability)}
-              <li><Tag text={capability} Icon={null} /></li>
+              <li><Tag text={featureLabel(capability)} Icon={null} /></li>
             {/each}
           </ul>
         {/if}
         <dl class="divide-y divide-primary text-sm">
           <div class="py-2 first:pt-0">
-            <dt class="body-small text-secondary">Type</dt>
+            <dt class="body-small text-secondary">Execution</dt>
             <dd class="mt-0.5">{executionKindLabel}</dd>
           </div>
           <div class="py-2 first:pt-0">
@@ -831,6 +815,7 @@
             {#each prerequisiteReadiness as check, index (`${check.kind}-${index}`)}
               {@const presentation = readinessPresentation({
                 kind: check.kind,
+                executionKind: descriptor.execution.kind,
                 state: check.state,
                 taskQueue: descriptor.execution.taskQueue,
               })}

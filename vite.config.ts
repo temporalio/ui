@@ -19,6 +19,10 @@ export default defineConfig({
   optimizeDeps: {
     include: ['date-fns', 'date-fns-tz'],
   },
+  build: {
+    // Keep JS transforms aligned with package.json browserslist; Vite 8 defaults to newer browsers.
+    target: ['chrome87', 'edge88', 'firefox78', 'safari14'],
+  },
   resolve: {
     alias: {
       $types: path.resolve('./src/types'),

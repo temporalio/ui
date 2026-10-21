@@ -6,6 +6,7 @@
 
   import BottomNavigation from '$lib/components/bottom-nav.svelte';
   import DataEncoderSettings from '$lib/components/data-encoder-settings.svelte';
+  import EnvironmentBanner from '$lib/components/environment-banner.svelte';
   import ExtensionSlot from '$lib/components/extensions/extension-slot.svelte';
   import NamespacePicker from '$lib/components/namespace-picker.svelte';
   import NewsFeedWidget from '$lib/components/news-feed/news-feed-widget.svelte';
@@ -37,7 +38,11 @@
   } from '$lib/io/icon';
   import { authUser, logout as logoutAuthUser } from '$lib/stores/auth-user';
   import { inProgressBatchOperation } from '$lib/stores/batch-operations';
-  import { lastUsedNamespace, namespaces } from '$lib/stores/namespaces';
+  import {
+    lastUsedNamespace,
+    namespaces,
+    namespacesLoading,
+  } from '$lib/stores/namespaces';
   import { initializeNavDefaults } from '$lib/stores/nav-open';
   import { toaster } from '$lib/stores/toaster';
   import { temporalVersion } from '$lib/stores/versions';
@@ -70,6 +75,8 @@
   }
 
   let { children }: Props = $props();
+
+  const banner = $derived(page.data?.settings?.banner);
 
   initializeNavDefaults(page.data?.settings?.navCollapsedByDefault);
 
@@ -405,7 +412,10 @@
 <DarkMode />
 <SkipNavigation />
 
-<div class="flex h-[calc(100dvh-var(--layout-pt))] w-screen flex-row">
+<div
+  class="flex h-[calc(100dvh-var(--layout-pt))] w-screen flex-row pt-[var(--environment-banner-height,0px)]"
+>
+  <EnvironmentBanner text={banner?.text ?? ''} color={banner?.color} />
   <Toaster
     closeButtonLabel={translate('common.close')}
     pop={toaster.pop}
@@ -436,7 +446,7 @@
     <TopNavigation>
       {#snippet left()}
         {#if showNamespacePicker}
-          <NamespacePicker {namespaceList} />
+          <NamespacePicker {namespaceList} loading={$namespacesLoading} />
         {/if}
       {/snippet}
       {#if showNewsFeed}

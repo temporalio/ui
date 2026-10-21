@@ -3,6 +3,7 @@
 
   import PayloadInline from '$lib/components/payload/payload-inline.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { isRawPayload, isRawPayloads } from '$lib/utilities/decode-payload';
   import { format } from '$lib/utilities/format-camel-case';
@@ -20,6 +21,7 @@
     value: SummaryAttribute['value'] | number | boolean | null;
     attributes: CombinedAttributes;
     showKey?: boolean;
+    tooltip?: string;
     class?: ClassNameValue;
   }
 
@@ -28,6 +30,7 @@
     value,
     attributes,
     showKey = true,
+    tooltip,
     class: className = '',
   }: Props = $props();
 
@@ -64,11 +67,13 @@
         />
       </Copyable>
     {:else}
-      <span
-        class="block select-none truncate rounded-sm border border-primary bg-surface-secondary px-1.5 py-0.5 text-secondary"
-      >
-        {formatSummaryAttributeDisplayValue(value)}
-      </span>
+      <Tooltip top hide={!tooltip} text={tooltip} class="min-w-0">
+        <span
+          class="block select-none truncate rounded-sm border border-primary bg-surface-secondary px-1.5 py-0.5 text-secondary"
+        >
+          {formatSummaryAttributeDisplayValue(value)}
+        </span>
+      </Tooltip>
     {/if}
   </div>
 {/if}

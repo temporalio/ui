@@ -59,8 +59,14 @@ type CodecResponse struct {
 	DefaultErrorLink    string
 }
 
+type BannerResponse struct {
+	Text  string
+	Color string
+}
+
 type SettingsResponse struct {
 	Auth                          *Auth
+	Banner                        *BannerResponse
 	DefaultNamespace              string
 	ShowTemporalSystemNamespace   bool
 	NavCollapsedByDefault         bool
@@ -285,6 +291,10 @@ func GetSettings(cfgProvider *config.ConfigProviderWithRefresh) func(echo.Contex
 				Options:            options,
 				RedirectToProvider: cfg.Auth.RedirectToProvider,
 			},
+			Banner: &BannerResponse{
+				Text:  cfg.Banner.Text,
+				Color: cfg.Banner.Color,
+			},
 			DefaultNamespace:            cfg.DefaultNamespace,
 			ShowTemporalSystemNamespace: cfg.ShowTemporalSystemNamespace,
 			NavCollapsedByDefault:       cfg.NavCollapsedByDefault,
@@ -366,6 +376,13 @@ func getTemporalClientMux(c echo.Context, temporalConn *grpc.ClientConn, apiMidd
 			// This is necessary to get error details properly
 			// marshalled in unary requests.
 			runtime.WithErrorHandler(errorHandler),
+			// Without this the mux honours X-HTTP-Method-Override on POSTs sent
+			// as application/x-www-form-urlencoded, rewriting the method before
+			// routing. A proxy or WAF in front of this that allows or denies by
+			// method would be deciding on a method the mux then discards
+			// (CVE-2026-37236). Nothing here needs the header, and the option is
+			// opt-in, so upgrading alone would not have removed the behaviour.
+			runtime.WithDisableHTTPMethodOverride(),
 		)...,
 	)
 

@@ -47,6 +47,7 @@
   import { decodePayloadAndParseDataToJSON } from '$lib/utilities/decode-payload';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
   import { routeForApi } from '$lib/utilities/route-for-api';
+  import { shouldRefetchWorkflowRun } from '$lib/utilities/should-refetch-workflow-run';
 
   interface Props {
     children: Snippet;
@@ -84,6 +85,7 @@
   let _resumeRequested = false;
   let _lastPollToken = '';
   let _pollPaused = false;
+  let _refetchSeq = 0;
 
   const ctx: HistoryContext = {
     get fetchComplete() {
@@ -151,7 +153,8 @@
     startToken: string,
   ) => {
     livePollingController?.abort();
-    livePollingController = new AbortController();
+    const controller = new AbortController();
+    livePollingController = controller;
     runLivePoll({
       route: routeForApi('events.ascending', {
         namespace: ns,
@@ -159,7 +162,7 @@
       }),
       runId: rId,
       startToken,
-      signal: livePollingController.signal,
+      signal: controller.signal,
       onEvent: (ev) => {
         const isNew = ingestHistoryEvent(ev);
         if (isNew)
@@ -168,6 +171,7 @@
       },
     }).then((lastToken) => {
       _lastPollToken = lastToken;
+      if (!controller.signal.aborted) livePollingController = null;
     });
   };
 
@@ -278,22 +282,35 @@
     refreshAction: RefreshAction,
     pause: boolean,
   ) => {
-    const shouldFetch =
-      refreshAction.timestamp &&
-      (refreshAction.action || (!pause && $workflowRun?.workflow?.isRunning));
+    const shouldFetch = shouldRefetchWorkflowRun({
+      refresh: refreshAction,
+      pauseLiveUpdates: pause,
+      isRunning: $workflowRun?.workflow?.isRunning,
+    });
+    if (!shouldFetch) return;
 
-    if (shouldFetch) {
-      const { workflow, error } = await fetchWorkflow({
-        namespace,
-        workflowId,
-        runId,
-      });
-      if (error) {
-        workflowError = error;
-        return;
-      }
-      $workflowRun.workflow = workflow ?? null;
+    // The 10s poll and an action's refetch overlap, so a poll that started
+    // before a mutation can resolve after it and write back a pre-mutation
+    // snapshot. Only the newest request for the current run may land.
+    const seq = ++_refetchSeq;
+    const ns = namespace;
+    const wfId = workflowId;
+    const rId = runId;
+
+    const { workflow, error } = await fetchWorkflow({
+      namespace: ns,
+      workflowId: wfId,
+      runId: rId,
+    });
+
+    if (seq !== _refetchSeq) return;
+    if (ns !== namespace || wfId !== workflowId || rId !== runId) return;
+
+    if (error) {
+      workflowError = error;
+      return;
     }
+    $workflowRun.workflow = workflow ?? null;
   };
 
   const abortAll = () => {
@@ -328,6 +345,7 @@
     _resumeRequested = false;
     _lastPollToken = '';
     _pollPaused = false;
+    _refetchSeq++;
     abortAll();
     resetLastDataEncoderSuccess();
     if (refreshInterval) clearInterval(refreshInterval);

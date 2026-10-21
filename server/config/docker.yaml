@@ -6,6 +6,10 @@ temporalGrpcAddress: {{ env "TEMPORAL_ADDRESS" | default "127.0.0.1:7233" }}
 port: {{ env "TEMPORAL_UI_PORT" | default "8080" }}
 publicPath: {{ env "TEMPORAL_UI_PUBLIC_PATH" | default "" }}
 enableUi: {{ env "TEMPORAL_UI_ENABLED" | default "true" }}
+banner:
+  # Both fields are required. Color: neutral, info, warning, success, danger, error, or accent (case-insensitive).
+  text: {{ env "TEMPORAL_UI_BANNER_TEXT" | yamlString }}
+  color: {{ env "TEMPORAL_UI_BANNER_COLOR" | yamlString }}
 cloudUi: {{ env "TEMPORAL_CLOUD_UI" | default "false" }}
 defaultNamespace: {{ env "TEMPORAL_DEFAULT_NAMESPACE" | default "default" }}
 feedbackUrl: {{ env "TEMPORAL_FEEDBACK_URL" | default "" }}
@@ -52,6 +56,11 @@ tls:
 uiServerTLS:
   certFile: {{ env "TEMPORAL_UI_SERVER_TLS_CERT" | default "" }}
   keyFile: {{ env "TEMPORAL_UI_SERVER_TLS_KEY" | default "" }}
+  # mTLS block is optional. Uncomment to require inbound clients to present
+  # a certificate signed by the configured CA (requires certFile+keyFile).
+  # mTLS:
+  #   caFile: {{ env "TEMPORAL_UI_SERVER_MTLS_CA" | default "" }}
+  #   clientAuth: {{ env "TEMPORAL_UI_SERVER_MTLS_CLIENT_AUTH" | default "" }}
 auth:
   enabled: {{ env "TEMPORAL_AUTH_ENABLED" | default "false" }}
   redirectToProvider: {{ env "TEMPORAL_AUTH_REDIRECT_TO_PROVIDER" | default "false" }}

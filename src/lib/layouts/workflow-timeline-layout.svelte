@@ -4,6 +4,7 @@
   import { beforeNavigate, goto } from '$app/navigation';
   import { page } from '$app/state';
 
+  import EventGroupFilter from '$lib/components/lines-and-dots/event-group-filter/event-group-filter.svelte';
   import EventHistoryLegend from '$lib/components/lines-and-dots/event-history-legend.svelte';
   import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
   import TimelineGraph from '$lib/components/lines-and-dots/timeline-graph/timeline-graph.svelte';
@@ -64,9 +65,17 @@
 
   const bufferLazyGroups = $derived(eventBuffer.lazyGroupsWithoutWorkflowTasks);
 
+  const eventGroupMatcher = $derived(
+    eventBuffer.eventGroupMatcher(urlParams.eventGroups),
+  );
+
   const filteredBufferLazyGroups = $derived.by(() => {
     const active = $eventTypeFilter;
-    return bufferLazyGroups.filter((g) => active.includes(g.category));
+    return bufferLazyGroups.filter(
+      (g) =>
+        active.includes(g.category) &&
+        (!eventGroupMatcher || eventGroupMatcher.hasGroup(g.id)),
+    );
   });
 
   const lazyGroups = $derived(
@@ -185,6 +194,7 @@
             : translate('workflows.hide-idle-time')}
         </ToggleButton>
         <EventTypeFilter compact={false} />
+        <EventGroupFilter options={eventBuffer.eventGroupOptions} />
         <ToggleButton
           disabled={isNotPending}
           data-testid="pause"
