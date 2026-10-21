@@ -33,8 +33,13 @@ const store = writable<SearchAttributes>({
 // force GH action runners to use en-US and 12-hour clocks starting at 0:00
 const DateTimeFormat = Intl.DateTimeFormat;
 vi.spyOn(global.Intl, 'DateTimeFormat').mockImplementation(
-  (_, options) =>
-    new DateTimeFormat('en-US', { ...options, hour12: true, hourCycle: 'h11' }),
+  function (_, options) {
+    return new DateTimeFormat('en-US', {
+      ...options,
+      hour12: true,
+      hourCycle: 'h11',
+    });
+  },
 );
 
 describe('isStatusFilter', () => {

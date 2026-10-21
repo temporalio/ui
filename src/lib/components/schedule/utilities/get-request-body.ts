@@ -1,10 +1,8 @@
 import { parseDuration } from '$lib/holocene/duration-input/duration-input.svelte';
-import type { Payload } from '$lib/types';
 import {
   encodePayloads,
   setSearchAttributes,
 } from '$lib/utilities/encode-payload';
-import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
 import { isValidCronString } from './cron';
 import {
@@ -33,33 +31,6 @@ function getSearchAttributes(attrs: Parameters<typeof setSearchAttributes>[0]) {
   return {
     indexedFields: { ...setSearchAttributes(attrs) },
   };
-}
-
-type StartWorkflowHeader = NonNullable<
-  NonNullable<
-    NonNullable<DescribeFullSchedule['schedule']>['action']
-  >['startWorkflow']
->['header'];
-
-async function encodeHeaderFields(
-  header: StartWorkflowHeader,
-): Promise<StartWorkflowHeader> {
-  const fields = header?.fields;
-  if (!fields || Object.keys(fields).length === 0) {
-    return header;
-  }
-
-  const encodedEntries = await Promise.all(
-    Object.entries(fields).map(async ([key, value]) => {
-      const encodedValue = await encodePayloads({
-        input: stringifyWithBigInt(value),
-        encoding: 'json/plain',
-      });
-      return [key, (encodedValue ?? [])[0]] as const;
-    }),
-  );
-
-  return { ...header, fields: Object.fromEntries(encodedEntries) };
 }
 
 function getScheduleStateRequest(
@@ -108,16 +79,14 @@ async function getScheduleActionRequest(
   const startWorkflow =
     describeFullSchedule?.schedule?.action?.startWorkflow ?? {};
 
-  const [payloads, header] = await Promise.all([
+  const payloads =
     scheduleForm.editInput && scheduleForm.input
-      ? encodePayloads({
+      ? await encodePayloads({
           input: scheduleForm.input,
           encoding: scheduleForm.encoding,
           messageType: scheduleForm.messageType,
         })
-      : (null as null | Payload[]),
-    encodeHeaderFields(startWorkflow.header),
-  ]);
+      : null;
 
   return {
     startWorkflow: {
@@ -140,7 +109,6 @@ async function getScheduleActionRequest(
       workflowExecutionTimeout: toWorkflowTimeout(
         scheduleForm.executionTimeout,
       ),
-      ...(header && { header }),
     },
   } satisfies ScheduleActionRequest;
 }

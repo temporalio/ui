@@ -16,6 +16,7 @@
     verticalScroll?: 'responsive' | 'table';
     class?: ClassNameValue;
     tableClass?: string;
+    banner?: Snippet;
     caption?: Snippet;
     headers?: Snippet<[{ visibleItems: Item[] }]>;
     children?: Snippet;
@@ -35,6 +36,7 @@
     verticalScroll = 'responsive',
     class: className = '',
     tableClass = '',
+    banner,
     caption,
     headers,
     children,
@@ -89,6 +91,7 @@
   style:scroll-padding-bottom="{footerHeight}px"
   style:--table-header-h="2.25rem"
 >
+  {@render banner?.()}
   {#if loading}
     {#if loadingContent}
       {@render loadingContent()}
