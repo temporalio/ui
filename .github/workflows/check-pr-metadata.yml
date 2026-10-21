@@ -1,0 +1,35 @@
+name: check-pr-metadata
+
+on:
+  pull_request_target:
+    branches: [main, 'codefreeze-*']
+    types: [opened, synchronize, edited, reopened, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  check-pr-metadata:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout trusted metadata script
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: ${{ github.repository }}
+          ref: ${{ github.event.pull_request.base.sha }}
+          persist-credentials: false
+          sparse-checkout: .github/scripts/pr-metadata.mjs
+          sparse-checkout-cone-mode: false
+      - name: Check PR metadata
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+        with:
+          script: |
+            const { pathToFileURL } = require('node:url');
+            const script = pathToFileURL(`${process.env.GITHUB_WORKSPACE}/.github/scripts/pr-metadata.mjs`);
+            const { checkPrMetadata } = await import(script.href);
+            await checkPrMetadata({ github, context, core });
