@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { appPalette } from '$lib/components/app-palette/app-palette-state.svelte';
+  import { MOD } from '$lib/components/app-palette/keys';
   import DarkModeMenu from '$lib/components/dark-mode-menu.svelte';
   import {
     Menu,
@@ -7,7 +9,7 @@
     MenuItem,
   } from '$lib/holocene/menu';
   import { translate } from '$lib/i18n/translate';
-  import { IconAstronaut, IconLogout } from '$lib/io/icon';
+  import { IconAstronaut, IconKeyboard, IconLogout } from '$lib/io/icon';
   import { authUser } from '$lib/stores/auth-user';
   import ziggy from '$lib/vendor/ziggy-full-face.png';
 
@@ -76,6 +78,16 @@
       <MenuDivider />
     {:else}
       <MenuItem disabled>Anonymous Tardigrade</MenuItem>
+      <MenuDivider />
+    {/if}
+    {#if appPalette.available}
+      <MenuItem onclick={() => (appPalette.open = true)}>
+        <div class="flex w-full items-center justify-start gap-4">
+          <IconKeyboard />
+          {translate('palette.label')}
+          <kbd class="ml-auto font-mono text-xs text-secondary">{MOD}K</kbd>
+        </div>
+      </MenuItem>
       <MenuDivider />
     {/if}
     <li
