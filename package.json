@@ -3,7 +3,7 @@
   "version": "2.57.0",
   "engines": {
     "pnpm": ">=10.10.0",
-    "node": ">=22.23.4"
+    "node": "^22.23.4"
   },
   "browserslist": [
     "chrome >= 87",
