@@ -35,8 +35,11 @@
   }: Props = $props();
 </script>
 
-<div class="rounded-lg border border-primary">
-  {#if region || title}
+<!-- The card IS the region boundary, so with no region to name there is nothing
+to bound: the children render bare, exactly as they did before this component
+existed. Otherwise every single-region form would gain a border it never had. -->
+{#if region || title}
+  <div class="rounded-lg border border-primary">
     <div
       class="flex min-h-12 items-center gap-2 rounded-t-lg border-b border-primary bg-surface-secondary px-4 py-2"
     >
@@ -73,8 +76,10 @@
         <div class="ml-auto">{@render action()}</div>
       {/if}
     </div>
-  {/if}
-  <div class={merge('px-4 pb-4 pt-5', bodyClass)}>
-    {@render children()}
+    <div class={merge('px-4 pb-4 pt-5', bodyClass)}>
+      {@render children()}
+    </div>
   </div>
-</div>
+{:else}
+  {@render children()}
+{/if}

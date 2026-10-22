@@ -4,24 +4,17 @@
   import PageTitle from '$lib/components/page-title.svelte';
   import { translate } from '$lib/i18n/translate';
   import WorkerDeploymentVersionEdit from '$lib/pages/worker-deployment-version-edit.svelte';
-  import { namespaceRegionsFromEnv } from '$lib/utilities/env-regions';
 
   const namespace = $derived(page.params.namespace);
   const deployment = $derived(page.params.deployment);
   const buildId = $derived(page.params.buildId);
-  // A self-hosted server has no host region for region_ids to match, so it
-  // offers no high availability. A development setting can stand in for a
-  // consumer such as Temporal Cloud, which passes its own config.
-  const providerConfig = $derived({ regions: namespaceRegionsFromEnv() });
+  // No providerConfig: a self-hosted server has no host region for a scaling
+  // group's region_ids to match, so it offers no high availability. A consumer
+  // such as Temporal Cloud passes its own.
 </script>
 
 <PageTitle
   title={translate('workers.edit-version-title')}
   url={page.url.href}
 />
-<WorkerDeploymentVersionEdit
-  {namespace}
-  {deployment}
-  {buildId}
-  {providerConfig}
-/>
+<WorkerDeploymentVersionEdit {namespace} {deployment} {buildId} />
