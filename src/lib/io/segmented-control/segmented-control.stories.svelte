@@ -4,6 +4,7 @@
 
   import { IconAdd } from '$lib/io/icon';
 
+  import SegmentLink from './segment-link.svelte';
   import Segment from './segment.svelte';
   import SegmentedControl from './segmented-control.svelte';
 
@@ -37,6 +38,7 @@
 
 <script lang="ts">
   let selectedSegment = $state('first');
+  let currentPage = $state('history');
 </script>
 
 {#snippet template(args: ComponentProps<typeof Segment>)}
@@ -114,6 +116,26 @@
         <Segment Icon={IconAdd}>With icon</Segment>
         <Segment isLoading>Loading</Segment>
         <Segment disabled count={0}>Disabled</Segment>
+      </SegmentedControl>
+    </div>
+  {/snippet}
+</Story>
+
+<Story name="Navigation">
+  {#snippet template()}
+    <div class="bg-background-primary p-6 text-primary">
+      <SegmentedControl element="nav" aria-label="Workflow pages">
+        {#each [{ page: 'history', count: 12 }, { page: 'workers', count: 2 }, { page: 'relationships', count: 0 }] as { page, count } (page)}
+          <SegmentLink
+            href={`#${page}`}
+            selected={currentPage === page}
+            {count}
+            onclick={(event) => {
+              event.preventDefault();
+              currentPage = page;
+            }}>{page}</SegmentLink
+          >
+        {/each}
       </SegmentedControl>
     </div>
   {/snippet}

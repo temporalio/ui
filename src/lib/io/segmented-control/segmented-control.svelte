@@ -3,14 +3,21 @@
 
   import { twMerge } from 'tailwind-merge';
 
-  interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'class'> {
+  interface Props extends Omit<HTMLAttributes<HTMLElement>, 'class'> {
+    element?: 'div' | 'nav';
     class?: string;
   }
 
-  let { class: className, children, ...rest }: Props = $props();
+  let {
+    element = 'div',
+    class: className,
+    children,
+    ...rest
+  }: Props = $props();
 </script>
 
-<div
+<svelte:element
+  this={element}
   {...rest}
   class={twMerge(
     'inline-flex flex-wrap items-center gap-2 rounded border border-primary bg-surface-primary p-px',
@@ -18,4 +25,4 @@
   )}
 >
   {@render children?.()}
-</div>
+</svelte:element>
