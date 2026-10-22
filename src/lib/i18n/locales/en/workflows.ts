@@ -39,7 +39,7 @@ export const Strings = {
   'configure-headers': 'Configure {{title}}',
   'close-configure-headers': 'Close {{title}} configuration',
   'configure-headers-description':
-    'Add (<1></1>), re-arrange (<2></2>), and remove (<3></3>), {{type}} to personalize the {{title}} Table.',
+    'Add (<1></1>), re-arrange (<2></2>), and remove (<3></3>), {{type}} to personalize the {{title}}.',
   'all-statuses': 'All Statuses',
   'row-accessible-name': 'Workflow {{workflowId}}: {{status}}',
   running: 'Running',
@@ -289,6 +289,9 @@ export const Strings = {
   'remove-column-label': 'Remove {{column}} column',
   'all-headings-in-view': 'All available columns are in view',
   'no-headings-in-view': 'No columns in view',
+  'available-columns': 'Available Columns',
+  'in-view': '(in view)',
+  'not-in-view': '(not in view)',
   'archived-workflows': 'Archived Workflows',
   'archived-workflow-history': 'Archived Workflow History',
   archival: 'Archival',
