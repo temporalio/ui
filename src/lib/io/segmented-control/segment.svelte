@@ -3,7 +3,6 @@
 
   import { twJoin, twMerge } from 'tailwind-merge';
 
-  import BadgeCount from '$lib/io/badge-count/badge-count.svelte';
   import { type IconComponent, IconSpinner } from '$lib/io/icon';
   import type { ConditionalValue } from '$lib/io/types';
 
@@ -55,6 +54,26 @@
       className,
     );
 
+  const countClasses = twJoin(
+    'inline-flex',
+    'items-center',
+    'justify-center',
+    'rounded-full',
+    'px-1',
+    'py-0.5',
+    'font-mono',
+    'text-xs',
+    'leading-none',
+  );
+
+  export const segmentCountRecipe = ({ selected }: { selected: boolean }) =>
+    twJoin(
+      countClasses,
+      selected
+        ? 'bg-interactive-secondary-hover text-brand'
+        : 'bg-surface-overlay-tertiary text-secondary',
+    );
+
   export interface SegmentProps extends Omit<HTMLButtonAttributes, 'class'> {
     selected?: boolean;
     count?: number;
@@ -93,6 +112,8 @@
     <span class="contents">{@render children()}</span>
   {/if}
   {#if count != null}
-    <BadgeCount size="sm" value={count} />
+    <span data-segment-count class={segmentCountRecipe({ selected })}
+      >{count}</span
+    >
   {/if}
 </button>

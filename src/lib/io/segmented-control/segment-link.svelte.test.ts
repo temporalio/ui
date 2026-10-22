@@ -68,4 +68,26 @@ describe('SegmentLink', () => {
     expect(link.dataset.testid).toBe('history-segment');
     expect(link.target).toBe('_blank');
   });
+
+  it('renders an unselected count with neutral colors and no border', () => {
+    const link = mountSegmentLink({ count: 3 });
+    const count = link.querySelector('[data-segment-count]') as HTMLElement;
+
+    expect(count.textContent).toBe('3');
+    expect(count.classList.contains('bg-surface-overlay-tertiary')).toBe(true);
+    expect(count.classList.contains('text-secondary')).toBe(true);
+    expect(count.classList.contains('font-mono')).toBe(true);
+    expect(count.classList.contains('border')).toBe(false);
+  });
+
+  it('renders a selected count with brand colors', () => {
+    const link = mountSegmentLink({ count: 3, selected: true });
+    const count = link.querySelector('[data-segment-count]') as HTMLElement;
+
+    expect(count.classList.contains('bg-interactive-secondary-hover')).toBe(
+      true,
+    );
+    expect(count.classList.contains('text-brand')).toBe(true);
+    expect(count.classList.contains('bg-surface-overlay-tertiary')).toBe(false);
+  });
 });

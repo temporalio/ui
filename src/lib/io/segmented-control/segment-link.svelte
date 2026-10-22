@@ -1,9 +1,11 @@
 <script lang="ts">
   import type { HTMLAnchorAttributes } from 'svelte/elements';
 
-  import BadgeCount from '$lib/io/badge-count/badge-count.svelte';
-
-  import { type SegmentProps, segmentRecipe } from './segment.svelte';
+  import {
+    segmentCountRecipe,
+    type SegmentProps,
+    segmentRecipe,
+  } from './segment.svelte';
 
   export interface SegmentLinkProps
     extends
@@ -37,6 +39,8 @@
     <span class="contents">{@render children()}</span>
   {/if}
   {#if count != null}
-    <BadgeCount size="sm" value={count} />
+    <span data-segment-count class={segmentCountRecipe({ selected })}
+      >{count}</span
+    >
   {/if}
 </a>
