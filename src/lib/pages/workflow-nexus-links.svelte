@@ -9,8 +9,8 @@
   import TabPanels from '$lib/holocene/tabs-primitive/tab-panels.svelte';
   import Tabs from '$lib/holocene/tabs-primitive/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
-  import PillGroup from '$lib/io/pill/pill-group.svelte';
-  import Pill from '$lib/io/pill/pill.svelte';
+  import Segment from '$lib/io/segmented-control/segment.svelte';
+  import SegmentedControl from '$lib/io/segmented-control/segmented-control.svelte';
   import { groupEvents } from '$lib/models/event-groups';
   import {
     getInboundLinkForEvent,
@@ -248,26 +248,26 @@
       selectedTab={selectedView}
       onSelectedTabChange={handleViewChange}
     >
-      <PillGroup class="mr-auto">
+      <SegmentedControl class="mr-auto">
         <TabButtonList
           aria-label={translate('workflows.nexus-links-tab')}
           class="contents"
         >
           {#snippet tabButtonSnippet(getTabButtonProps, { isSelected, tab })}
             {@const view = tab as NexusLinksView}
-            <Pill
+            <Segment
               {...getTabButtonProps()}
               id={`nexus-links-${view}`}
-              active={isSelected}
+              selected={isSelected}
               disabled={!counts[view]}
               count={counts[view]}
-              data-testid={`nexus-links-${view}-pill`}
+              data-testid={`nexus-links-${view}-segment`}
             >
               {viewLabels[view]}
-            </Pill>
+            </Segment>
           {/snippet}
         </TabButtonList>
-      </PillGroup>
+      </SegmentedControl>
       <TabPanels>
         {#snippet tabPanelSnippet(getTabPanelProps, { isSelected, tab })}
           <div {...getTabPanelProps()}>

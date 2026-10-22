@@ -4,21 +4,22 @@
 
   import { IconAdd } from '$lib/io/icon';
 
-  import PillGroup from './pill-group.svelte';
-  import Pill from './pill.svelte';
+  import Segment from './segment.svelte';
+  import SegmentedControl from './segmented-control.svelte';
 
   const states = ['default', 'hover', 'active', 'disabled'];
 
   const { Story } = defineMeta({
-    title: 'IO/Design System/Pill',
-    component: Pill,
+    title: 'IO/Design System/Segmented Control',
+    component: Segment,
     args: {
-      active: false,
+      selected: false,
       disabled: false,
       isLoading: false,
+      count: 0,
     },
     argTypes: {
-      active: { control: 'boolean' },
+      selected: { control: 'boolean' },
       disabled: { control: 'boolean' },
       isLoading: { control: 'boolean' },
       count: { control: 'number' },
@@ -35,18 +36,34 @@
 </script>
 
 <script lang="ts">
-  let selected = $state('inbound');
+  let selectedSegment = $state('first');
 </script>
 
-{#snippet template(args: ComponentProps<typeof Pill>)}
+{#snippet template(args: ComponentProps<typeof Segment>)}
   <div class="bg-background-primary p-6 text-primary">
-    <PillGroup>
-      <Pill {...args}>Pill</Pill>
-    </PillGroup>
+    <SegmentedControl>
+      <Segment {...args}>Segment</Segment>
+    </SegmentedControl>
   </div>
 {/snippet}
 
 <Story name="Playground" {template} />
+
+<Story name="Default">
+  {#snippet template()}
+    <div class="bg-background-primary p-6 text-primary">
+      <SegmentedControl aria-label="Segments">
+        {#each ['first', 'second', 'third'] as segment (segment)}
+          <Segment
+            selected={selectedSegment === segment}
+            count={0}
+            onclick={() => (selectedSegment = segment)}>Segment</Segment
+          >
+        {/each}
+      </SegmentedControl>
+    </div>
+  {/snippet}
+</Story>
 
 <Story name="States">
   {#snippet template()}
@@ -63,21 +80,21 @@
           </tr>
         </thead>
         <tbody>
-          {#each [false, true] as active (active)}
+          {#each [false, true] as selected (selected)}
             <tr>
               <th scope="row" class="text-left text-xs text-secondary">
-                {active ? 'active' : 'inactive'}
+                {selected ? 'selected' : 'unselected'}
               </th>
               {#each states as state (state)}
                 <td>
-                  <PillGroup>
-                    <Pill
-                      {active}
+                  <SegmentedControl>
+                    <Segment
+                      {selected}
                       data-state={state}
                       disabled={state === 'disabled'}
-                      count={4}>Pill</Pill
+                      count={4}>Segment</Segment
                     >
-                  </PillGroup>
+                  </SegmentedControl>
                 </td>
               {/each}
             </tr>
@@ -90,32 +107,14 @@
 
 <Story name="Variants">
   {#snippet template()}
-    <div
-      class="flex flex-wrap items-center gap-4 bg-background-primary p-6 text-primary"
-    >
-      <PillGroup>
-        <Pill>Text only</Pill>
-        <Pill count={12}>With count</Pill>
-        <Pill Icon={IconAdd}>With icon</Pill>
-        <Pill isLoading>Loading</Pill>
-      </PillGroup>
-    </div>
-  {/snippet}
-</Story>
-
-<Story name="Group">
-  {#snippet template()}
     <div class="bg-background-primary p-6 text-primary">
-      <PillGroup>
-        {#each ['inbound', 'outbound', 'empty'] as view (view)}
-          <Pill
-            active={selected === view}
-            disabled={view === 'empty'}
-            count={view === 'empty' ? 0 : 3}
-            onclick={() => (selected = view)}>{view}</Pill
-          >
-        {/each}
-      </PillGroup>
+      <SegmentedControl>
+        <Segment selected>Text only</Segment>
+        <Segment count={12}>With count</Segment>
+        <Segment Icon={IconAdd}>With icon</Segment>
+        <Segment isLoading>Loading</Segment>
+        <Segment disabled count={0}>Disabled</Segment>
+      </SegmentedControl>
     </div>
   {/snippet}
 </Story>

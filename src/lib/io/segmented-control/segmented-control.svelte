@@ -13,7 +13,7 @@
 <div
   {...rest}
   class={twMerge(
-    'inline-flex items-center gap-1 rounded-full bg-surface-tertiary p-1 text-primary',
+    'inline-flex flex-wrap items-center gap-2 rounded border border-primary bg-surface-primary p-px',
     className,
   )}
 >

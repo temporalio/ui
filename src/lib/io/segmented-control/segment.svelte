@@ -13,13 +13,15 @@
     'shrink-0',
     'items-center',
     'justify-center',
-    'gap-2',
+    'gap-1',
     'whitespace-nowrap',
-    'rounded-full',
-    'px-3',
-    'py-1',
+    'rounded',
+    'px-1',
+    'py-0.5',
     'font-sans',
-    'text-sm',
+    'font-medium',
+    'text-xs',
+    'leading-4',
     'cursor-pointer',
     'focus-visible:outline-none',
     'focus-visible:ring-2',
@@ -30,37 +32,31 @@
     'disabled:[&:not([aria-busy=true])]:opacity-disabled',
   );
 
-  const inactiveClasses = twJoin(
-    'bg-transparent text-primary',
-    '[&:not(:disabled)]:hover:bg-interactive-tertiary-hover',
-    '[&:not(:disabled)[data-state=hover]]:bg-interactive-tertiary-hover',
-    '[&:not(:disabled)]:active:bg-interactive-tertiary-press',
-    '[&:not(:disabled)[data-state=active]]:bg-interactive-tertiary-press',
+  const unselectedClasses = twJoin(
+    'bg-transparent text-secondary',
+    '[&:not(:disabled)]:hover:bg-surface-overlay-primary',
+    '[&:not(:disabled)[data-state=hover]]:bg-surface-overlay-primary',
+    '[&:not(:disabled)]:active:bg-surface-overlay-secondary',
+    '[&:not(:disabled)[data-state=active]]:bg-surface-overlay-secondary',
   );
 
-  const activeClasses = twJoin(
-    'bg-interactive-primary text-white',
-    '[&:not(:disabled)]:hover:bg-interactive-primary-hover',
-    '[&:not(:disabled)[data-state=hover]]:bg-interactive-primary-hover',
-    '[&:not(:disabled)]:active:bg-interactive-primary-press',
-    '[&:not(:disabled)[data-state=active]]:bg-interactive-primary-press',
-  );
+  const selectedClasses = twJoin('bg-interactive-secondary-hover text-brand');
 
-  export const pillRecipe = ({
-    active,
+  export const segmentRecipe = ({
+    selected,
     className,
   }: {
-    active: boolean;
+    selected: boolean;
     className?: string;
   }) =>
     twMerge(
       wrapperClasses,
-      active ? activeClasses : inactiveClasses,
+      selected ? selectedClasses : unselectedClasses,
       className,
     );
 
-  export interface PillProps extends Omit<HTMLButtonAttributes, 'class'> {
-    active?: boolean;
+  export interface SegmentProps extends Omit<HTMLButtonAttributes, 'class'> {
+    selected?: boolean;
     count?: number;
     Icon?: ConditionalValue<IconComponent>;
     isLoading?: boolean;
@@ -70,7 +66,7 @@
 
 <script lang="ts">
   let {
-    active = false,
+    selected = false,
     count,
     Icon,
     isLoading,
@@ -78,25 +74,25 @@
     type = 'button',
     children,
     ...rest
-  }: PillProps = $props();
+  }: SegmentProps = $props();
 </script>
 
 <button
   aria-busy={isLoading}
   {...rest}
   {type}
-  data-active={active}
-  class={pillRecipe({ active, className })}
+  data-selected={selected}
+  class={segmentRecipe({ selected, className })}
 >
   {#if isLoading}
-    <IconSpinner class="animate-spin" width={16} height={16} />
+    <IconSpinner class="animate-spin" width={12} height={12} />
   {:else if Icon}
-    <Icon width={16} height={16} />
+    <Icon width={12} height={12} />
   {/if}
   {#if children}
     <span class="contents">{@render children()}</span>
   {/if}
   {#if count != null}
-    <BadgeCount value={count} />
+    <BadgeCount size="sm" value={count} />
   {/if}
 </button>

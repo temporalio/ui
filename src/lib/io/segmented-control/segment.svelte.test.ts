@@ -1,7 +1,7 @@
 import { createRawSnippet, flushSync, mount, unmount } from 'svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import Pill, { type PillProps } from './pill.svelte';
+import Segment, { type SegmentProps } from './segment.svelte';
 
 const label = createRawSnippet(() => ({
   render: () => '<span>Inbound</span>',
@@ -9,10 +9,10 @@ const label = createRawSnippet(() => ({
 
 let component: ReturnType<typeof mount> | undefined;
 
-const mountPill = (props: PillProps = {}) => {
+const mountSegment = (props: SegmentProps = {}) => {
   const target = document.createElement('div');
   document.body.appendChild(target);
-  component = mount(Pill, { target, props: { children: label, ...props } });
+  component = mount(Segment, { target, props: { children: label, ...props } });
   flushSync();
   return target.querySelector('button') as HTMLButtonElement;
 };
@@ -23,28 +23,33 @@ afterEach(() => {
   document.body.innerHTML = '';
 });
 
-describe('Pill', () => {
-  it('renders an inactive button by default', () => {
-    const button = mountPill();
+describe('Segment', () => {
+  it('renders an unselected button by default', () => {
+    const button = mountSegment();
 
     expect(button.type).toBe('button');
-    expect(button.dataset.active).toBe('false');
-    expect(button.classList.contains('bg-transparent')).toBe(true);
-    expect(button.classList.contains('bg-interactive-primary')).toBe(false);
+    expect(button.dataset.selected).toBe('false');
+    expect(button.classList.contains('text-secondary')).toBe(true);
+    expect(button.classList.contains('bg-interactive-secondary-hover')).toBe(
+      false,
+    );
     expect(button.textContent).toContain('Inbound');
   });
 
-  it('applies the primary fill when active', () => {
-    const button = mountPill({ active: true });
+  it('applies the brand tint when selected', () => {
+    const button = mountSegment({ selected: true });
 
-    expect(button.dataset.active).toBe('true');
-    expect(button.classList.contains('bg-interactive-primary')).toBe(true);
-    expect(button.classList.contains('text-white')).toBe(true);
+    expect(button.dataset.selected).toBe('true');
+    expect(button.classList.contains('bg-interactive-secondary-hover')).toBe(
+      true,
+    );
+    expect(button.classList.contains('text-brand')).toBe(true);
+    expect(button.classList.contains('text-secondary')).toBe(false);
   });
 
   it('calls onclick when enabled', () => {
     const onclick = vi.fn();
-    const button = mountPill({ onclick });
+    const button = mountSegment({ onclick });
 
     button.click();
 
@@ -53,7 +58,7 @@ describe('Pill', () => {
 
   it('does not call onclick when disabled', () => {
     const onclick = vi.fn();
-    const button = mountPill({ onclick, disabled: true });
+    const button = mountSegment({ onclick, disabled: true });
 
     button.click();
 
@@ -62,19 +67,19 @@ describe('Pill', () => {
   });
 
   it('renders the count, including zero', () => {
-    const button = mountPill({ count: 0 });
+    const button = mountSegment({ count: 0 });
 
     expect(button.textContent).toContain('0');
   });
 
   it('omits the count when not provided', () => {
-    const button = mountPill();
+    const button = mountSegment();
 
     expect(button.textContent?.trim()).toBe('Inbound');
   });
 
   it('passes tab attributes through to the button', () => {
-    const button = mountPill({
+    const button = mountSegment({
       id: 'nexus-links-inbound',
       role: 'tab',
       'aria-selected': true,
@@ -88,7 +93,7 @@ describe('Pill', () => {
   });
 
   it('marks the button busy while loading', () => {
-    const button = mountPill({ isLoading: true });
+    const button = mountSegment({ isLoading: true });
 
     expect(button.getAttribute('aria-busy')).toBe('true');
     expect(button.querySelector('svg.animate-spin')).not.toBeNull();
