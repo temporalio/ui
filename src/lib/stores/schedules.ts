@@ -15,11 +15,13 @@ import {
   triggerImmediately,
   unpauseSchedule,
 } from '$lib/services/schedule-service';
+import { toaster } from '$lib/stores/toaster';
 import type {
   DescribeFullSchedule,
   OverlapPolicy,
   ScheduleRequestBody,
 } from '$lib/types/schedule';
+import { getErrorMessage } from '$lib/utilities/error-message';
 import { routeForSchedule, routeForSchedules } from '$lib/utilities/route-for';
 
 type ScheduleContext = {
@@ -91,30 +93,34 @@ export async function submitCreateSchedule(
   let body: ScheduleRequestBody;
   try {
     body = await getRequestBody(formData);
-  } catch (e) {
-    serverError.set(
-      `${translate('data-encoder.encode-error')}: ${(e as Error)?.message}`,
-    );
+  } catch (error) {
+    const errorMessage = `${translate('data-encoder.encode-error')}: ${getErrorMessage(error)}`;
+    serverError.set(errorMessage);
+    toaster.push({ variant: 'error', message: errorMessage });
     return;
   }
 
-  loading.set(true);
-  const { error: err } = await createSchedule({
-    identity,
-    scheduleId: formData.schedule.name,
-    namespace,
-    body,
-  });
+  serverError.set('');
+  try {
+    await createSchedule({
+      identity,
+      scheduleId: formData.schedule.name,
+      namespace,
+      body,
+    });
 
-  if (err) {
-    serverError.set(err);
-    loading.set(false);
-  } else {
+    loading.set(true);
     setScheduleTimeout('create', () => {
       serverError.set('');
       loading.set(false);
       goto(routeForSchedules({ namespace }));
     });
+  } catch (error) {
+    const errorMessage = translate('schedules.create-schedule-error', {
+      error: getErrorMessage(error),
+    });
+    serverError.set(errorMessage);
+    toaster.push({ variant: 'error', message: errorMessage });
   }
 }
 
@@ -128,30 +134,34 @@ export async function submitEditSchedule(
   let body: ScheduleRequestBody;
   try {
     body = await getRequestBody(formData, schedule);
-  } catch (e) {
-    serverError.set(
-      `${translate('data-encoder.encode-error')}: ${(e as Error)?.message}`,
-    );
+  } catch (error) {
+    const errorMessage = `${translate('data-encoder.encode-error')}: ${getErrorMessage(error)}`;
+    serverError.set(errorMessage);
+    toaster.push({ variant: 'error', message: errorMessage });
     return;
   }
 
-  loading.set(true);
-  const { error: err } = await editSchedule({
-    identity,
-    namespace,
-    scheduleId,
-    body,
-  });
+  serverError.set('');
+  try {
+    await editSchedule({
+      identity,
+      namespace,
+      scheduleId,
+      body,
+    });
 
-  if (err) {
-    serverError.set(err);
-    loading.set(false);
-  } else {
+    loading.set(true);
     setScheduleTimeout('edit', () => {
       goto(routeForSchedule({ namespace, scheduleId: formData.schedule.name }));
       serverError.set('');
       loading.set(false);
     });
+  } catch (error) {
+    const errorMessage = translate('schedules.edit-schedule-error', {
+      error: getErrorMessage(error),
+    });
+    serverError.set(errorMessage);
+    toaster.push({ variant: 'error', message: errorMessage });
   }
 }
 
@@ -170,11 +180,11 @@ export async function submitDeleteSchedule(context: ScheduleContext) {
       currentScheduleFetch.set(Promise.resolve(null));
       goto(routeForSchedules({ namespace }));
     });
-  } catch (e) {
+  } catch (error) {
     actionPending.set(false);
     serverError.set(
       translate('schedules.delete-schedule-error', {
-        error: (e as Error)?.message,
+        error: getErrorMessage(error),
       }),
     );
   }
@@ -207,14 +217,14 @@ export async function submitPauseSchedule(
     refreshCurrentScheduleFetch({ namespace, scheduleId });
     closeConfirmationModal('pause');
     serverError.set('');
-  } catch (e) {
+  } catch (error) {
     serverError.set(
       translate(
         isPaused
-          ? 'schedules.pause-schedule-error'
-          : 'schedules.unpause-schedule-error',
+          ? 'schedules.unpause-schedule-error'
+          : 'schedules.pause-schedule-error',
         {
-          error: (e as Error)?.message,
+          error: getErrorMessage(error),
         },
       ),
     );
@@ -250,11 +260,11 @@ export async function submitTriggerImmediatelySchedule(
       },
       1000,
     );
-  } catch (e) {
+  } catch (error) {
     actionPending.set(false);
     serverError.set(
       translate('schedules.trigger-schedule-error', {
-        error: (e as Error)?.message,
+        error: getErrorMessage(error),
       }),
     );
   }
@@ -297,11 +307,11 @@ export async function submitBackfillSchedule(
       },
       1000,
     );
-  } catch (e) {
+  } catch (error) {
     actionPending.set(false);
     serverError.set(
       translate('schedules.backfill-schedule-error', {
-        error: (e as Error)?.message,
+        error: getErrorMessage(error),
       }),
     );
   }

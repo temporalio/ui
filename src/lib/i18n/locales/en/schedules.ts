@@ -11,6 +11,8 @@ export const Strings = {
 
   editing: 'Editing Schedule...',
   creating: 'Creating Schedule...',
+  'create-schedule-error': 'Error creating schedule: {{error}}',
+  'edit-schedule-error': 'Error editing schedule: {{error}}',
   'back-to-schedule': 'Back to Schedule',
   'back-to-schedules': 'Back to Schedules',
   id: 'Schedule ID',

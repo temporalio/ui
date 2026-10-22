@@ -119,6 +119,7 @@ export async function deleteSchedule(
   const route = routeForApi('schedule', { namespace, scheduleId });
   return requestFromAPI(route, {
     request,
+    notifyOnError: false,
     options: { method: 'DELETE' },
     params: identity ? { identity } : {},
   });
@@ -136,20 +137,13 @@ export async function createSchedule({
   scheduleId,
   body,
   identity,
-}: CreateScheduleOptions): Promise<{ error: string; conflictToken: string }> {
-  let error = '';
-  const onError: ErrorCallback = (err) =>
-    (error =
-      err?.body?.message ??
-      `Error creating schedule: ${err.status}: ${err.statusText}`);
-
+}: CreateScheduleOptions): Promise<{ conflictToken: string }> {
   const route = routeForApi('schedule', {
     namespace,
     scheduleId,
   });
-  const { conflictToken } = (await requestFromAPI<{ conflictToken: string }>(
-    route,
-    {
+  const { conflictToken = '' } =
+    (await requestFromAPI<{ conflictToken: string }>(route, {
       options: {
         method: 'POST',
         body: stringifyWithBigInt({
@@ -158,11 +152,10 @@ export async function createSchedule({
           ...(identity && { identity }),
         }),
       },
-      onError,
-    },
-  )) ?? { conflictToken: '' };
+      notifyOnError: false,
+    })) ?? {};
 
-  return { conflictToken, error };
+  return { conflictToken };
 }
 
 type EditScheduleOptions = {
@@ -177,15 +170,7 @@ export async function editSchedule({
   scheduleId,
   body,
   identity,
-}: Partial<EditScheduleOptions> & { identity?: string }): Promise<{
-  error: string;
-}> {
-  let error = '';
-  const onError: ErrorCallback = (err) =>
-    (error =
-      err?.body?.message ??
-      `Error editing schedule: ${err.status}: ${err.statusText}`);
-
+}: Partial<EditScheduleOptions> & { identity?: string }): Promise<void> {
   const route = routeForApi('schedule.edit', {
     namespace: namespace ?? '',
     scheduleId: scheduleId ?? '',
@@ -199,10 +184,8 @@ export async function editSchedule({
         ...(identity && { identity }),
       }),
     },
-    onError,
+    notifyOnError: false,
   });
-
-  return { error };
 }
 
 type PauseScheduleOptions = {
@@ -238,7 +221,7 @@ export async function pauseSchedule({
           ...(identity && { identity }),
         }),
       },
-      onError: (error) => console.error(error),
+      notifyOnError: false,
     })) ?? null
   );
 }
@@ -276,6 +259,7 @@ export async function unpauseSchedule({
           ...(identity && { identity }),
         }),
       },
+      notifyOnError: false,
     })) ?? null
   );
 }
@@ -315,6 +299,7 @@ export async function triggerImmediately({
           ...(identity && { identity }),
         }),
       },
+      notifyOnError: false,
     })) ?? null
   );
 }
@@ -358,6 +343,7 @@ export async function backfillRequest({
           ...(identity && { identity }),
         }),
       },
+      notifyOnError: false,
     })) ?? null
   );
 }

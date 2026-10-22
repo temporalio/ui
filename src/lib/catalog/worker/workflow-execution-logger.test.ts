@@ -1,7 +1,11 @@
 import type { Logger } from '@temporalio/common';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { createCatalogExecutionLogger } from './workflow-execution-logger.js';
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 const createFallbackLogger = (): Logger => ({
   log: vi.fn(),
