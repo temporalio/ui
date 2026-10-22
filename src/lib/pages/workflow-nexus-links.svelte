@@ -174,7 +174,7 @@
     {/snippet}
     {#snippet headers()}
       <TableHeaderRow>
-        <th class="w-28">{translate('nexus.source-event')}</th>
+        <th>{translate('nexus.source-event')}</th>
         <th>{translate('nexus.nexus-endpoint-simple')}</th>
         <th>{translate('nexus.nexus-service')}</th>
         <th>{translate('nexus.nexus-operation')}</th>
