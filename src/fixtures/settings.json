@@ -3,7 +3,10 @@
     "Enabled": false,
     "Options": null
   },
-  "BannerText": "",
+  "Banner": {
+    "Text": "",
+    "Color": ""
+  },
   "DefaultNamespace": "default",
   "ShowTemporalSystemNamespace": false,
   "FeedbackURL": "",

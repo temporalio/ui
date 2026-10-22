@@ -1,6 +1,6 @@
 import { writable } from 'svelte/store';
 
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import type { SearchAttributes } from '$lib/types/workflows';
 
@@ -8,6 +8,14 @@ import { isSearchAttribute } from './is-search-attribute';
 
 const store = writable<SearchAttributes>({
   WorkflowType: 'Keyword',
+});
+
+vi.mock('$lib/stores/search-attributes', () => {
+  return {
+    searchAttributes: writable<SearchAttributes>({
+      WorkflowType: 'Keyword',
+    }),
+  };
 });
 
 describe('isSearchAttribute', () => {
@@ -30,20 +38,6 @@ describe('isSearchAttribute', () => {
   });
 
   describe('with store', () => {
-    beforeEach(() => {
-      vi.mock('$lib/stores/search-attributes', () => {
-        return {
-          searchAttributes: writable<SearchAttributes>({
-            WorkflowType: 'Keyword',
-          }),
-        };
-      });
-    });
-
-    afterEach(() => {
-      vi.restoreAllMocks();
-    });
-
     it('should return true if the attribute is a key in the search attributes', () => {
       expect(isSearchAttribute('WorkflowType')).toBe(true);
     });
