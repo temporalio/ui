@@ -1,10 +1,16 @@
 {
   "name": "@temporalio/ui",
-  "version": "2.54.1",
+  "version": "2.57.0",
   "engines": {
     "pnpm": ">=10.10.0",
-    "node": ">=22.14.0"
+    "node": ">=22.23.4"
   },
+  "browserslist": [
+    "chrome >= 87",
+    "edge >= 88",
+    "firefox >= 78",
+    "safari >= 14"
+  ],
   "type": "module",
   "description": "Temporal.io UI",
   "keywords": [
@@ -29,6 +35,10 @@
     "dev:temporal-cli": "vite dev --mode temporal-server",
     "dev:docker": ". ./.env && VITE_API=http://localhost:8080 vite dev --mode docker",
     "dev:with-auth": "vite dev --mode with-auth",
+    "dev:ui:extension-example": "TEMPORAL_UI_EXTENSION_EXAMPLE_ENABLED=true pnpm dev:local-temporal",
+    "dev:extension-example": "node examples/custom-ui-extension/server.mjs",
+    "dev:ui:extension-auth-example": "TEMPORAL_UI_EXTENSION_AUTH_EXAMPLE_ENABLED=true pnpm dev:local-temporal",
+    "dev:extension-auth-example": "node examples/custom-ui-extension-with-auth/server.mjs",
     "build:local": "vite build",
     "build:docker": "VITE_API=http://localhost:8080 vite build",
     "build:server": "VITE_API= BUILD_PATH=server/ui/assets/local vite build",
@@ -78,7 +88,8 @@
     "validate:versions": "./scripts/validate-versions.sh",
     "knip": "knip",
     "a11y:manifest:test": "node scripts/a11y/manifest.test.mjs",
-    "test:github-automation": "node --test .github/scripts/weekly-dependency-security-audit.test.mjs .github/scripts/apply-weekly-dependency-remediation.test.mjs .github/scripts/verify-weekly-dependency-remediation.test.mjs .github/scripts/weekly-dependency-security-digest.test.mjs"
+    "test:github-automation": "node --test .github/scripts/weekly-dependency-security-audit.test.mjs .github/scripts/apply-weekly-dependency-remediation.test.mjs .github/scripts/verify-weekly-dependency-remediation.test.mjs .github/scripts/weekly-dependency-security-digest.test.mjs",
+    "generate:markdown-css": "esno scripts/generate-markdown-css.ts"
   },
   "dependencies": {
     "@codemirror/autocomplete": "^6.18.7",
@@ -96,11 +107,10 @@
     "@hyperjump/json-schema": "^1.17.8",
     "@lezer/highlight": "^1.1.3",
     "@sveltejs/package": "^2.3.10",
-    "@temporalio/activity": "1.22.0",
-    "@temporalio/workflow": "1.22.0",
+    "@temporalio/activity": "1.24.0",
+    "@temporalio/workflow": "1.24.0",
     "class-variance-authority": "^0.7.0",
     "cronstrue": "^3.14.0",
-    "danger": "^13.0.5",
     "date-fns": "2.29.x",
     "date-fns-tz": "1.3.x",
     "es-toolkit": "^1.49.0",
@@ -141,21 +151,21 @@
     "@sveltejs/adapter-static": "^3.0.8",
     "@sveltejs/adapter-vercel": "^6.3.2",
     "@sveltejs/kit": "2.70.2",
-    "@sveltejs/vite-plugin-svelte": "^6.2.4",
-    "@temporalio/client": "1.22.0",
-    "@temporalio/common": "1.22.0",
-    "@temporalio/proto": "1.22.0",
-    "@temporalio/worker": "1.22.0",
+    "@sveltejs/vite-plugin-svelte": "7.3.1",
+    "@temporalio/client": "1.24.0",
+    "@temporalio/common": "1.24.0",
+    "@temporalio/proto": "1.24.0",
+    "@temporalio/worker": "1.24.0",
     "@types/cors": "^2.8.13",
     "@types/express": "^4.17.17",
     "@types/js-yaml": "^4.0.9",
     "@types/json-bigint": "^1.0.1",
-    "@types/node": "^18.15.3",
+    "@types/node": "22.18.0",
     "@types/tar-fs": "^2.0.4",
     "@types/yargs": "^17.0.24",
     "@typescript/native-preview": "7.0.0-dev.20260506.1",
-    "@vitest/coverage-v8": "^4.1.5",
-    "@vitest/ui": "^3.1.1",
+    "@vitest/coverage-v8": "4.1.11",
+    "@vitest/ui": "4.1.11",
     "autoprefixer": "^10.4.13",
     "axe-core": "^4.10.0",
     "axe-playwright": "^2.0.3",
@@ -182,7 +192,7 @@
     "lint-staged": "^16.2.7",
     "mkdirp": "^2.1.3",
     "nanoid": "^5.1.5",
-    "nexus-rpc": "0.0.2",
+    "nexus-rpc": "0.0.3",
     "node-fetch": "^3.3.0",
     "oidc-provider": "^9.0.1",
     "postcss": "^8.5.23",
@@ -210,8 +220,8 @@
     "typescript": "6.0.3",
     "typescript-eslint": "^8.54.0",
     "unist-util-visit": "^5.0.0",
-    "vite": "^6.4.2",
-    "vitest": "^3.2.6",
+    "vite": "8.3.4",
+    "vitest": "4.1.11",
     "vitest-localstorage-mock": "^0.1.2",
     "wait-port": "^1.0.4",
     "yargs": "^17.7.2",
@@ -220,14 +230,18 @@
   "peerDependenciesMeta": {
     "nexus-rpc": {
       "optional": true
+    },
+    "zx": {
+      "optional": true
     }
   },
   "peerDependencies": {
     "@sveltejs/kit": "^2.53.0",
     "date-fns": "2.29.x",
     "date-fns-tz": "1.3.x",
-    "nexus-rpc": "^0.0.2",
-    "svelte": "^5.53.3"
+    "nexus-rpc": "^0.0.3",
+    "svelte": "^5.53.3",
+    "zx": "^8.8.5"
   },
   "pnpm": {
     "overrides": {
@@ -239,7 +253,7 @@
       "@tootallnate/once": ">=2.0.1 <3",
       "cookie": "0.7.0",
       "micromatch": "^4.0.8",
-      "esbuild": "^0.25.0",
+      "esbuild": "^0.28.0",
       "serialize-javascript": "^7.0.5",
       "picomatch@>=2 <3": "^2.3.2",
       "picomatch@>=4": "^4.0.4",
@@ -257,7 +271,8 @@
       "yaml": "^2.8.3",
       "qs": ">=6.16.0",
       "effect": "^3.21.0",
-      "protobufjs": ">=7.6.5 <7.7.0",
+      "protobufjs@<8": ">=7.6.5 <7.7.0",
+      "protobufjs@>=8 <9": ">=8.8.0 <8.9.0",
       "fast-uri": ">=3.1.6 <3.2.0",
       "joi": ">=17.13.6 <17.14.0",
       "uuid": ">=11.1.1 <12",
@@ -302,6 +317,10 @@
     "./io/badge-status": {
       "types": "./dist/io/badge-status/index.d.ts",
       "import": "./dist/io/badge-status/index.js"
+    },
+    "./io/button": {
+      "types": "./dist/io/button/index.d.ts",
+      "import": "./dist/io/button/index.js"
     },
     "./io/chip": {
       "types": "./dist/io/chip/index.d.ts",

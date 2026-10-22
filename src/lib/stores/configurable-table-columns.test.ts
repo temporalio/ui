@@ -6,10 +6,12 @@ import {
   addColumn,
   DEFAULT_DEPLOYMENTS_COLUMNS,
   migrateColumnLabels,
+  MIN_COLUMN_WIDTH,
   moveColumn,
   persistedDeploymentsTableColumns,
   persistedWorkflowTableColumns,
   removeColumn,
+  resizeColumn,
   TABLE_TYPE,
 } from './configurable-table-columns';
 
@@ -55,6 +57,60 @@ describe('Workflow Table Columns store', () => {
       });
     });
   });
+
+  describe('resizeColumn', () => {
+    test('sets the width of the targeted column only', () => {
+      persistedWorkflowTableColumns.set({
+        default: [{ label: 'Start' }, { label: 'End' }],
+      });
+      resizeColumn('Start', 240, 'default', TABLE_TYPE.WORKFLOWS);
+      expect(get(persistedWorkflowTableColumns)).toEqual({
+        default: [{ label: 'Start', width: 240 }, { label: 'End' }],
+      });
+    });
+
+    test('clamps the width to the minimum column width', () => {
+      persistedWorkflowTableColumns.set({
+        default: [{ label: 'Start' }],
+      });
+      resizeColumn('Start', 10, 'default', TABLE_TYPE.WORKFLOWS);
+      expect(get(persistedWorkflowTableColumns)).toEqual({
+        default: [{ label: 'Start', width: MIN_COLUMN_WIDTH }],
+      });
+    });
+
+    test('removes the width when resizing to undefined', () => {
+      persistedWorkflowTableColumns.set({
+        default: [{ label: 'Start', width: 240 }],
+      });
+      resizeColumn('Start', undefined, 'default', TABLE_TYPE.WORKFLOWS);
+      expect(get(persistedWorkflowTableColumns)).toEqual({
+        default: [{ label: 'Start' }],
+      });
+    });
+
+    test('preserves other column properties', () => {
+      persistedWorkflowTableColumns.set({
+        default: [{ label: 'Start', pinned: true, width: 100 }],
+      });
+      resizeColumn('Start', 240, 'default', TABLE_TYPE.WORKFLOWS);
+      expect(get(persistedWorkflowTableColumns)).toEqual({
+        default: [{ label: 'Start', pinned: true, width: 240 }],
+      });
+    });
+
+    test('leaves other namespaces untouched', () => {
+      persistedWorkflowTableColumns.set({
+        default: [{ label: 'Start' }],
+        other: [{ label: 'Start' }],
+      });
+      resizeColumn('Start', 240, 'default', TABLE_TYPE.WORKFLOWS);
+      expect(get(persistedWorkflowTableColumns)).toEqual({
+        default: [{ label: 'Start', width: 240 }],
+        other: [{ label: 'Start' }],
+      });
+    });
+  });
 });
 
 describe('Deployment Table Columns store', () => {
@@ -83,6 +139,24 @@ describe('Deployment Table Columns store', () => {
       });
       removeColumn('Latest Version', 'default', TABLE_TYPE.DEPLOYMENTS);
       expect(get(persistedDeploymentsTableColumns)).toEqual({ default: [] });
+    });
+  });
+
+  describe('resizeColumn', () => {
+    test('writes the width to the deployments store, not the workflows store', () => {
+      persistedWorkflowTableColumns.set({
+        default: [{ label: 'Deployment' }],
+      });
+      persistedDeploymentsTableColumns.set({
+        default: [{ label: 'Deployment' }],
+      });
+      resizeColumn('Deployment', 320, 'default', TABLE_TYPE.DEPLOYMENTS);
+      expect(get(persistedDeploymentsTableColumns)).toEqual({
+        default: [{ label: 'Deployment', width: 320 }],
+      });
+      expect(get(persistedWorkflowTableColumns)).toEqual({
+        default: [{ label: 'Deployment' }],
+      });
     });
   });
 });

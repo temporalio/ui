@@ -2,48 +2,34 @@
   import type { IconComponent } from '$lib/io/icon';
   import type { ConditionalValue } from '$lib/io/types';
 
-  export type BadgeColorScheme =
-    | 'neutral'
-    | 'info'
-    | 'success'
-    | 'warning'
-    | 'danger'
-    | 'error'
-    | 'accent';
-
-  export type BadgeSize = 'sm' | 'md';
+  import {
+    type BadgeColorScheme,
+    badgeContentRecipe,
+    badgeRecipe,
+    badgeSegmentRecipe,
+    type BadgeSize,
+  } from './recipe';
 
   export type BadgeExtension = {
     text?: string;
+    colorScheme?: BadgeColorScheme;
+    truncate?: boolean;
     LeadIcon?: ConditionalValue<IconComponent>;
     TrailIcon?: ConditionalValue<IconComponent>;
   };
 
-  const sharedClasses =
-    'inline-flex whitespace-nowrap divide-x divide-inherit rounded-full border font-mono font-medium leading-none uppercase';
-  const segmentClasses =
-    'inline-flex flex-nowrap items-center justify-center gap-1';
+  export type BadgeExtensions = ConditionalValue<BadgeExtension>[];
 
-  const sizeClasses: Record<BadgeSize, { badge: string; segment: string }> = {
-    sm: { badge: 'text-2xs', segment: 'py-0.5 px-1' },
-    md: { badge: 'text-xs', segment: 'py-1 px-1.5' },
-  };
-
-  const colorSchemeClasses: Record<BadgeColorScheme, string> = {
-    neutral: 'border-tertiary bg-surface-tertiary text-secondary',
-    info: 'border-information bg-surface-information text-information',
-    success: 'border-success bg-surface-success text-success',
-    warning: 'border-warning bg-surface-warning text-warning',
-    danger: 'border-danger bg-surface-danger text-danger',
-    error: 'border-error bg-surface-error text-error',
-    accent: 'border-accent bg-surface-accent text-accent',
-  };
+  const isBadgeExtension = (
+    extension: ConditionalValue<BadgeExtension>,
+  ): extension is BadgeExtension =>
+    extension !== false && extension !== null && extension !== undefined;
 </script>
 
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
 
-  import { twMerge } from 'tailwind-merge';
+  import { RoundnessGroup } from '$lib/io/roundness-group';
 
   interface Props extends Omit<
     HTMLAttributes<HTMLSpanElement>,
@@ -52,8 +38,10 @@
     text: string;
     colorScheme?: BadgeColorScheme;
     size?: BadgeSize;
+    truncate?: boolean;
     Icon?: ConditionalValue<IconComponent>;
     extension?: ConditionalValue<BadgeExtension>;
+    extensions?: ConditionalValue<BadgeExtensions>;
     class?: string;
   }
 
@@ -61,30 +49,47 @@
     text,
     colorScheme = 'neutral',
     size = 'md',
+    truncate = false,
     Icon,
     extension,
+    extensions,
     class: className,
     ...rest
   }: Props = $props();
+
+  const visibleExtensions = $derived(
+    [extension, ...(extensions || [])].filter(isBadgeExtension),
+  );
 </script>
 
-<span
-  class={twMerge(
-    sharedClasses,
-    sizeClasses[size].badge,
-    colorSchemeClasses[colorScheme],
-    className,
-  )}
+<RoundnessGroup
+  roundness="full"
+  innerBorderHandling="collapse"
+  class={badgeRecipe({ size, truncate, className })}
   {...rest}
 >
-  <span class={twMerge(segmentClasses, sizeClasses[size].segment)}>
+  <span
+    class={badgeSegmentRecipe({
+      size,
+      colorScheme,
+      truncatable: true,
+      className: badgeContentRecipe({ size }),
+    })}
+  >
     <span>{text}</span>
     {#if Icon}
       <Icon width="1em" height="1em" />
     {/if}
   </span>
-  {#if extension}
-    <span class={twMerge(segmentClasses, sizeClasses[size].segment)}>
+  {#each visibleExtensions as extension, index (index)}
+    <span
+      class={badgeSegmentRecipe({
+        size,
+        colorScheme: extension.colorScheme ?? colorScheme,
+        truncatable: extension.truncate,
+        className: badgeContentRecipe({ size }),
+      })}
+    >
       {#if extension.LeadIcon}
         <extension.LeadIcon width="1em" height="1em" />
       {/if}
@@ -95,5 +100,5 @@
         <extension.TrailIcon width="1em" height="1em" />
       {/if}
     </span>
-  {/if}
-</span>
+  {/each}
+</RoundnessGroup>

@@ -2,6 +2,10 @@
   import { goto } from '$app/navigation';
 
   import DeleteWorkerModal from '$lib/components/workers/delete-worker-modal.svelte';
+  import {
+    type ComputeProviderTemplates,
+    type ComputeProviderValue,
+  } from '$lib/components/workers/serverless-worker-form/compute-providers';
   import EditVersionForm from '$lib/components/workers/serverless-worker-form/edit-version-form.svelte';
   import type { ComputeProviderOption } from '$lib/components/workers/serverless-worker-form/shared';
   import {
@@ -32,8 +36,7 @@
     buildId: string;
     computeProviders?: readonly ComputeProviderOption[];
     gcpRegions?: string[];
-    terraformTemplate?: string;
-    cloudRunTerraformTemplate?: string;
+    templates?: Record<ComputeProviderValue, ComputeProviderTemplates>;
   }
 
   let {
@@ -42,8 +45,7 @@
     buildId,
     computeProviders,
     gcpRegions,
-    terraformTemplate,
-    cloudRunTerraformTemplate,
+    templates,
   }: Props = $props();
 
   let error = $state<string | undefined>();
@@ -83,8 +85,7 @@
       {error}
       computeProviders={lockProvidersTo(configuredProvider, computeProviders)}
       {gcpRegions}
-      {terraformTemplate}
-      {cloudRunTerraformTemplate}
+      {templates}
       initialData={{
         provider: configuredProvider,
         lambdaArn: providerDetails.lambdaArn ?? '',

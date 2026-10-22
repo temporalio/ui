@@ -7,23 +7,29 @@
   import SavedQueryViews from '$lib/components/saved-query-views/saved-views.svelte';
   import SchedulesTableRow from '$lib/components/schedule/schedules-list/schedules-table-row.svelte';
   import FilterBar from '$lib/components/search-attribute-filter/filter-bar.svelte';
+  import ResetColumnWidthsButton from '$lib/components/table/reset-column-widths-button.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
   import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import ColumnResizeHandle from '$lib/holocene/table/column-resize-handle.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
   import MaximizableTableView from '$lib/holocene/table/paginated-table/maximizable-view.svelte';
+  import SortableTableHeader from '$lib/holocene/table/sortable-table-header.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { IconTemporalSettings, IconWarning } from '$lib/io/icon';
   import { createCountPoller } from '$lib/runes/count-poller.svelte';
+  import { createTableSort } from '$lib/runes/table-sort-state.svelte';
   import { fetchPaginatedSchedules } from '$lib/services/schedule-service';
   import { fetchScheduleCount } from '$lib/services/workflow-counts';
   import {
     availableScheduleColumns,
     configurableTableColumns,
+    MIN_COLUMN_WIDTH,
+    resizeColumn,
     TABLE_TYPE,
   } from '$lib/stores/configurable-table-columns';
   import { coreUserStore } from '$lib/stores/core-user';
@@ -38,13 +44,22 @@
     scheduleSearchAttributeOptions,
     scheduleSearchAttributes,
   } from '$lib/stores/search-attributes';
+  import { columnWidthStyle } from '$lib/utilities/column-width';
+  import { parseSearchAttributes } from '$lib/utilities/decode-payload';
+  import { isTimestamp, timestampToDate } from '$lib/utilities/format-time';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import type { APIErrorResponse } from '$lib/utilities/request-from-api';
   import { routeForScheduleCreate } from '$lib/utilities/route-for';
+  import { searchAttributeSortType } from '$lib/utilities/search-attribute-table-sort';
+  import type { TableSortColumn } from '$lib/utilities/table-sort';
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
+
+  import type { ScheduleListEntry } from '$types';
 
   const { namespace } = $derived(page.params);
   const query = $derived(page.url.searchParams.get('query') ?? '');
+
+  const tableSort = createTableSort(() => [namespace, query]);
 
   const countPoller = createCountPoller({
     getStore: () => schedulesCount,
@@ -77,6 +92,53 @@
     return fetchPaginatedSchedules(namespace, query, onError);
   });
   const availableColumns = $derived(availableScheduleColumns(namespace));
+
+  const sortColumns = $derived.by(() => {
+    const builtIn: Record<string, TableSortColumn<ScheduleListEntry>> = {
+      [translate('common.status')]: {
+        getValue: (schedule) => (schedule.info?.paused ? 'Paused' : 'Running'),
+        type: 'string',
+      },
+      [translate('schedules.id')]: {
+        getValue: (schedule) => schedule.scheduleId,
+        type: 'string',
+      },
+      [translate('common.workflow-type')]: {
+        getValue: (schedule) => schedule.info?.workflowType?.name,
+        type: 'string',
+      },
+      [translate('schedules.recent-runs')]: {
+        getValue: (schedule) => {
+          const times = (schedule.info?.recentActions ?? [])
+            .map(({ actualTime }) =>
+              isTimestamp(actualTime)
+                ? timestampToDate(actualTime).getTime()
+                : new Date(actualTime ?? '').getTime(),
+            )
+            .filter(Number.isFinite);
+          return times.length ? Math.max(...times) : undefined;
+        },
+        type: 'datetime',
+      },
+      [translate('schedules.upcoming-runs')]: {
+        getValue: (schedule) => schedule.info?.futureActionTimes?.[0],
+        type: 'datetime',
+      },
+    };
+    return Object.fromEntries(
+      columns
+        .filter(({ label }) => label !== translate('schedules.schedule-spec'))
+        .map(({ label }) => [
+          label,
+          builtIn[label] ?? {
+            getValue: (schedule: ScheduleListEntry) =>
+              parseSearchAttributes(schedule.searchAttributes ?? {})
+                .indexedFields?.[label],
+            type: searchAttributeSortType($scheduleSearchAttributes[label]),
+          },
+        ]),
+    );
+  });
 
   onMount(() => {
     if (query) {
@@ -157,6 +219,8 @@
   />
   {#key [namespace, query, $schedulesRefresh]}
     <PaginatedTable
+      bind:sort={tableSort.value}
+      {sortColumns}
       {onFetch}
       {onError}
       total={$schedulesCount.count}
@@ -172,13 +236,27 @@
       {/snippet}
       {#snippet headers()}
         <tr class="text-left">
-          {#each columns as { label }, i (`${label}:${i}`)}
-            <th>{label}</th>
+          {#each columns as { label, width }, i (`${label}:${i}`)}
+            <SortableTableHeader column={label} style={columnWidthStyle(width)}>
+              <ColumnResizeHandle
+                {label}
+                {width}
+                min={MIN_COLUMN_WIDTH}
+                onResize={(newWidth) =>
+                  resizeColumn(
+                    label,
+                    newWidth,
+                    namespace,
+                    TABLE_TYPE.SCHEDULES,
+                  )}
+              />
+            </SortableTableHeader>
           {/each}
         </tr>
       {/snippet}
       {#snippet rows({ visibleItems })}
-        {#each visibleItems as schedule}
+        <!-- IDs can repeat in visibility results; entry identity stays unique when sorting. -->
+        {#each visibleItems as schedule (schedule)}
           <SchedulesTableRow {schedule} {columns} />
         {/each}
       {/snippet}
@@ -213,6 +291,11 @@
         </div>
       {/snippet}
       {#snippet actionsEndAdditional()}
+        <ResetColumnWidthsButton
+          {columns}
+          {namespace}
+          table={TABLE_TYPE.SCHEDULES}
+        />
         <Tooltip text={translate('common.configure-columns')} top>
           <Button
             onclick={openCustomizationDrawer}

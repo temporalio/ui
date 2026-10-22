@@ -339,8 +339,51 @@ export type PluginInfo = temporal.api.worker.v1.PluginInfo;
 export type Timestamp = google.protobuf.ITimestamp;
 export type Duration = google.protobuf.IDuration;
 
+export type { Settings } from './global';
+
 // extra APIs
+export type IframeExtensionSandboxResponse = {
+  AllowDownloads?: boolean;
+  AllowForms?: boolean;
+  AllowModals?: boolean;
+  AllowPopups?: boolean;
+  AllowSameOrigin?: boolean;
+};
+
+export type IframeExtensionSizingResponse = {
+  DefaultHeight?: number;
+  MinHeight?: number;
+  MaxHeight?: number;
+  DefaultWidth?: number;
+  MinWidth?: number;
+  MaxWidth?: number;
+};
+
+export type IframeExtensionResponse = {
+  ID: string;
+  Title?: string;
+  Slot: string;
+  Src: string;
+  AllowedOrigin: string;
+  RoutePatterns?: string[];
+  Sandbox?: IframeExtensionSandboxResponse;
+  Sizing?: IframeExtensionSizingResponse;
+  Permissions?: string[];
+};
+
+export type CustomUISettingsResponse = {
+  Enabled?: boolean;
+};
+
+export type CustomUIResponse = CustomUISettingsResponse & {
+  IframeExtensions?: IframeExtensionResponse[];
+};
+
 export type SettingsResponse = {
+  Banner?: {
+    Text?: string;
+    Color?: string;
+  };
   Auth: {
     Enabled: boolean;
     Options: string[] | null;
@@ -353,6 +396,7 @@ export type SettingsResponse = {
     DefaultErrorMessage?: string;
     DefaultErrorLink?: string;
   };
+  CustomUI?: CustomUISettingsResponse;
   DefaultNamespace: string;
   DisableWriteActions: boolean;
   WorkflowTerminateDisabled: boolean;
@@ -370,6 +414,10 @@ export type SettingsResponse = {
   NavCollapsedByDefault: boolean;
   FeedbackURL: string;
   DisableNewsFetch: boolean;
+  NotifyOnNewVersion?: boolean;
+  Distribution?: string;
+  DistributionVersion?: string;
+  SupportURL?: string;
   Version: string;
 };
 

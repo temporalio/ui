@@ -1,6 +1,8 @@
 import type { ActivityExecutionInfo } from '$lib/types/activity-execution';
 import { isFuture } from '$lib/utilities/format-date';
 
-export const isActivityDelayed = (activity: ActivityExecutionInfo): boolean => {
+export const isActivityDelayed = (
+  activity: Pick<ActivityExecutionInfo, 'executionTime'>,
+): boolean => {
   return !!activity.executionTime && isFuture(activity.executionTime);
 };

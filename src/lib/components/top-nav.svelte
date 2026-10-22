@@ -5,6 +5,7 @@
   import { type ClassNameValue, twMerge as merge } from 'tailwind-merge';
 
   import DataEncoderStatus from '$lib/components/data-encoder-status.svelte';
+  import ExtensionSlot from '$lib/components/extensions/extension-slot.svelte';
   import TimezoneSelect from '$lib/components/timezone-select.svelte';
   import { translate } from '$lib/i18n/translate';
 
@@ -39,8 +40,10 @@
       {@render left?.()}
     </div>
     <div class="flex items-center gap-2">
+      <ExtensionSlot name="app.top-nav.actions.before" />
       <TimezoneSelect />
       <DataEncoderStatus />
+      <ExtensionSlot name="app.top-nav.actions.after" />
       {@render children?.()}
     </div>
   </nav>

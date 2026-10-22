@@ -1,18 +1,27 @@
 <script lang="ts">
   import { page } from '$app/state';
 
+  import ResetColumnWidthsButton from '$lib/components/table/reset-column-widths-button.svelte';
   import Button from '$lib/holocene/button.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { IconTemporalSettings } from '$lib/io/icon';
+  import { createTableSort } from '$lib/runes/table-sort-state.svelte';
   import { fetchPaginatedNexusOperations } from '$lib/services/standalone-nexus-operations';
-  import { configurableTableColumns } from '$lib/stores/configurable-table-columns';
+  import {
+    configurableTableColumns,
+    resizeColumn,
+    TABLE_TYPE,
+  } from '$lib/stores/configurable-table-columns';
   import {
     nexusOperationCount,
     nexusOperationLoading,
     nexusOperationRefresh,
   } from '$lib/stores/nexus-operations';
+  import { nexusOperationSearchAttributes } from '$lib/stores/search-attributes';
+
+  import { getNexusOperationSortColumns } from './nexus-operations-summary-configurable-table/column-search-attributes';
 
   import TableBodyCell from './nexus-operations-summary-configurable-table/table-body-cell.svelte';
   import TableEmptyState from './nexus-operations-summary-configurable-table/table-empty-state.svelte';
@@ -32,14 +41,24 @@
   );
   const query = $derived(page.url.searchParams.get('query') ?? '');
 
+  const tableSort = createTableSort(() => [namespace, query]);
+
   const onFetch = $derived(() =>
     fetchPaginatedNexusOperations(namespace, query),
+  );
+  const sortColumns = $derived(
+    getNexusOperationSortColumns(
+      columns.map((column) => column.label),
+      $nexusOperationSearchAttributes,
+    ),
   );
 </script>
 
 {#key [namespace, query, $nexusOperationRefresh]}
   <PaginatedTable
     total={$nexusOperationCount.count}
+    bind:sort={tableSort.value}
+    {sortColumns}
     {onFetch}
     aria-label={translate(
       'standalone-nexus-operations.standalone-nexus-operations',
@@ -63,7 +82,16 @@
       <TableHeaderRow>
         <th></th>
         {#each columns as column (column.label)}
-          <TableHeaderCell {column} />
+          <TableHeaderCell
+            {column}
+            onResize={(width) =>
+              resizeColumn(
+                column.label,
+                width,
+                namespace,
+                TABLE_TYPE.NEXUS_OPERATIONS,
+              )}
+          />
         {/each}
       </TableHeaderRow>
     {/snippet}
@@ -80,6 +108,11 @@
       <TableEmptyState />
     {/snippet}
     {#snippet actionsEndAdditional()}
+      <ResetColumnWidthsButton
+        {columns}
+        {namespace}
+        table={TABLE_TYPE.NEXUS_OPERATIONS}
+      />
       <Tooltip text={translate('common.configure-columns')} top>
         <Button
           onclick={onClickConfigure}

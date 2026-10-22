@@ -1,10 +1,28 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import type { HistoryEvent } from '$lib/types/events';
+import type { DecodeFunctions } from '$lib/utilities/decode-payload';
 
 import { getEventAttributes, toEventHistory } from '.';
 
 import eventsFixture from '$fixtures/raw-events.descending.completed.json';
+
+vi.mock('$lib/utilities/decode-payload', () => {
+  const fn = async <T>(x: T): Promise<T> => x;
+
+  const decodeEventAttributes = vi.fn(fn);
+  const parsePayloadAttributes = vi.fn(fn);
+
+  return {
+    decodeEventAttributes,
+    parsePayloadAttributes,
+  };
+});
+
+const createConvertWithCodec = () =>
+  vi.fn<NonNullable<DecodeFunctions['convertWithCodec']>>(async (value) => {
+    return value;
+  });
 
 const historyEvent = {
   eventId: '1',
@@ -78,20 +96,6 @@ const historyEvent = {
 } as unknown as HistoryEvent;
 
 describe('getEventAttributes', () => {
-  beforeEach(() => {
-    vi.mock('$lib/utilities/decode-payload', () => {
-      const fn = async <T>(x: T): Promise<T> => x;
-
-      const decodeEventAttributes = vi.fn(fn);
-      const parsePayloadAttributes = vi.fn(fn);
-
-      return {
-        decodeEventAttributes,
-        parsePayloadAttributes,
-      };
-    });
-  });
-
   afterEach(() => {
     vi.clearAllMocks();
   });
@@ -103,7 +107,7 @@ describe('getEventAttributes', () => {
   });
 
   it('should call convertWithCodec if not provided an endpoint', async () => {
-    const convertWithCodec = vi.fn(async <T>(x: T): Promise<T> => x);
+    const convertWithCodec = createConvertWithCodec();
 
     await getEventAttributes(historyEvent, {
       convertWithCodec,
@@ -113,7 +117,7 @@ describe('getEventAttributes', () => {
   });
 
   it('should call convertWithCodec if provided an endpoint in settings', async () => {
-    const convertWithCodec = vi.fn(async <T>(x: T): Promise<T> => x);
+    const convertWithCodec = createConvertWithCodec();
 
     await getEventAttributes(historyEvent, {
       convertWithCodec,
@@ -123,7 +127,7 @@ describe('getEventAttributes', () => {
   });
 
   it('should call convertWithCodec if provided an endpoint in settings', async () => {
-    const convertWithCodec = vi.fn(async <T>(x: T): Promise<T> => x);
+    const convertWithCodec = createConvertWithCodec();
 
     await getEventAttributes(historyEvent, {
       convertWithCodec,

@@ -1,57 +1,20 @@
-import fs from 'fs';
 import crypto from 'node:crypto';
-import path from 'path';
 
 import { toHtml } from 'hast-util-to-html';
 import { h } from 'hastscript';
 import { toHast } from 'mdast-util-to-hast';
 
-import {
-  type IoTheme,
-  ioThemeToCssVariables,
-  themes,
-} from '$lib/theme/io/themes';
+import { markdownStylesheet } from '$lib/utilities/markdown-stylesheet';
 import { process } from '$lib/utilities/render-markdown';
 
 type RenderOptions = {
   compact?: boolean;
+  inline?: boolean;
   host: string;
   nonce: string;
   theme?: string;
   overrideTheme?: string;
 };
-
-const { dark: darkTheme, light: lightTheme } = themes;
-
-const markdownColorVariableNames = new Set([
-  '--color-background-primary',
-  '--color-content-brand',
-  '--color-content-primary',
-  '--color-border-brand',
-  '--color-border-secondary',
-  '--color-surface-primary',
-  '--color-surface-secondary',
-]);
-
-const markdownColorVariables = (theme: IoTheme) =>
-  Object.fromEntries(
-    Object.entries(ioThemeToCssVariables(theme)).filter(([name]) =>
-      markdownColorVariableNames.has(name),
-    ),
-  );
-
-const markdownColorRule = (selector: string, theme: IoTheme): string => {
-  const declarations = Object.entries(markdownColorVariables(theme))
-    .map(([name, value]) => `${name}: ${value};`)
-    .join('\n');
-
-  return `${selector} {\n${declarations}\n}`;
-};
-
-const markdownThemeCss = [
-  markdownColorRule(':root', lightTheme),
-  markdownColorRule("body[data-theme^='dark']", darkTheme),
-].join('\n');
 
 /**
  * Generate a random nonce.
@@ -76,15 +39,24 @@ const generateContentSecurityPolicy = ({ nonce }: RenderOptions) => {
   return `base-uri 'self'; default-src 'none'; style-src 'nonce-${nonce}'; script-src 'nonce-${nonce}'; frame-ancestors 'self'; form-action 'none'; ${sandbox};`;
 };
 
+const bodyClass = ({
+  compact,
+  inline,
+}: Pick<RenderOptions, 'compact' | 'inline'>) => {
+  const classes = ['prose'];
+  if (compact || inline) classes.push('compact');
+  if (inline) classes.push('inline');
+
+  return classes.join(' ');
+};
+
 /**
  * Create a new HTML page with the given AST.
  */
 const createPage = (
   ast: ReturnType<typeof toHast>,
-  { compact, nonce, theme, overrideTheme }: RenderOptions,
+  { compact, inline, nonce, theme, overrideTheme }: RenderOptions,
 ) => {
-  const cssPath = path.resolve('src/markdown.reset.css');
-  const css = `${markdownThemeCss}\n${fs.readFileSync(cssPath, 'utf8')}`;
   return toHtml(
     h('html', [
       h('head', [
@@ -95,12 +67,12 @@ const createPage = (
           name: 'viewport',
           content: 'width=device-width, initial-scale=1',
         }),
-        h('style', { nonce }, css),
+        h('style', { nonce }, markdownStylesheet),
       ]),
       h(
         'body',
         {
-          class: compact ? 'prose compact' : 'prose',
+          class: bodyClass({ compact, inline }),
           'data-theme': overrideTheme ? `${theme}-${overrideTheme}` : theme,
         },
         h('main', ast),
@@ -117,6 +89,7 @@ export const GET = async (req: Request) => {
   const theme = url.searchParams.get('theme') || '';
   const overrideTheme = url.searchParams.get('overrideTheme') || '';
   const compact = url.searchParams.get('compact') === 'true';
+  const inline = url.searchParams.get('inline') === 'true';
 
   if (host === null) return new Response('Not found', { status: 404 });
   if (content === null) return new Response('Not found', { status: 404 });
@@ -124,6 +97,7 @@ export const GET = async (req: Request) => {
   const nonce = generateNonce();
   const html = createPage(await process(content), {
     compact,
+    inline,
     nonce,
     host,
     theme,

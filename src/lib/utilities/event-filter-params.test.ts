@@ -1,5 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
+import type { EventGroupKey } from '$lib/models/event-history/event-group-markers';
+
 import {
   parseEventFilterParams,
   updateEventFilterParams,
@@ -79,5 +81,61 @@ describe('updateEventFilterParams', () => {
     const calledUrl = mockGoto.mock.calls[0][0] as string;
     expect(calledUrl).toContain('sort=ascending');
     expect(calledUrl).toContain('refresh_off=true');
+  });
+});
+
+describe('event group filter params', () => {
+  it('defaults to no event groups', () => {
+    expect(
+      parseEventFilterParams(new URL('http://localhost/')).eventGroups,
+    ).toEqual([]);
+  });
+
+  it('round-trips event group keys containing separators', async () => {
+    const keys: EventGroupKey[] = [
+      'label:a,b',
+      'update:adjust orbit',
+      'event:18',
+    ];
+    const mockGoto = vi.fn(() => Promise.resolve());
+
+    await updateEventFilterParams(
+      new URL('http://localhost/'),
+      { eventGroups: keys },
+      mockGoto,
+    );
+
+    const [href] = mockGoto.mock.calls[0] as unknown as [string];
+    expect(
+      parseEventFilterParams(new URL(href, 'http://localhost')).eventGroups,
+    ).toEqual(keys);
+  });
+
+  it('removes the param when the selection is cleared', async () => {
+    const mockGoto = vi.fn(() => Promise.resolve());
+
+    await updateEventFilterParams(
+      new URL('http://localhost/?groups=label%3Aa'),
+      { eventGroups: null },
+      mockGoto,
+    );
+
+    const [href] = mockGoto.mock.calls[0] as unknown as [string];
+    expect(href).not.toContain('groups=');
+  });
+
+  it('drops keys without a known kind', () => {
+    expect(
+      parseEventFilterParams(
+        new URL('http://localhost/?groups=label%3Aa,phase,timer%3A5'),
+      ).eventGroups,
+    ).toEqual(['label:a']);
+  });
+
+  it('keeps malformed keys instead of throwing', () => {
+    expect(
+      parseEventFilterParams(new URL('http://localhost/?groups=label%3A%25E0'))
+        .eventGroups,
+    ).toEqual(['label:%E0']);
   });
 });

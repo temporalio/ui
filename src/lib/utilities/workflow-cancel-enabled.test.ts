@@ -1,75 +1,47 @@
-import { describe, expect, test } from 'vitest';
+import { beforeEach, describe, expect, test } from 'vitest';
 
+import { initCoreProvider } from './core-provider';
 import { workflowCancelEnabled } from './workflow-cancel-enabled';
 
 describe('workflowCancelEnabled', () => {
-  const coreUser = {
-    namespaceWriteDisabled: (ns: string) => ns === 'ns-write-disabled',
-  };
+  beforeEach(() => {
+    initCoreProvider({ getAccessToken: async () => '' });
+  });
 
-  test('returns true when global write actions, cancel, and namespace write are all enabled', () => {
+  test('returns true when global write actions and cancel are enabled', () => {
     expect(
-      workflowCancelEnabled(
-        {
-          disableWriteActions: false,
-          worklowCancelDisabled: false,
-        },
-        coreUser,
-        'ns-write-enabled',
-      ),
+      workflowCancelEnabled('namespace', {
+        disableWriteActions: false,
+        workflowCancelDisabled: false,
+      }),
     ).toBe(true);
   });
 
   describe('returns false', () => {
     test('when write actions are disabled', () => {
       expect(
-        workflowCancelEnabled(
-          {
-            disableWriteActions: true,
-            workflowCancelDisabled: false,
-          },
-          coreUser,
-          'ns-write-enabled',
-        ),
+        workflowCancelEnabled('namespace', {
+          disableWriteActions: true,
+          workflowCancelDisabled: false,
+        }),
       ).toBe(false);
     });
 
     test('when cancel is disabled', () => {
       expect(
-        workflowCancelEnabled(
-          {
-            disableWriteActions: false,
-            workflowCancelDisabled: true,
-          },
-          coreUser,
-          'ns-write-enabled',
-        ),
+        workflowCancelEnabled('namespace', {
+          disableWriteActions: false,
+          workflowCancelDisabled: true,
+        }),
       ).toBe(false);
     });
 
     test('when write actions and cancel are both disabled', () => {
       expect(
-        workflowCancelEnabled(
-          {
-            disableWriteActions: true,
-            workflowCancelDisabled: true,
-          },
-          coreUser,
-          'ns-write-enabled',
-        ),
-      ).toBe(false);
-    });
-
-    test('when write actions are disabled on the namespace', () => {
-      expect(
-        workflowCancelEnabled(
-          {
-            disableWriteActions: false,
-            workflowCancelDisabled: false,
-          },
-          coreUser,
-          'ns-write-disabled',
-        ),
+        workflowCancelEnabled('namespace', {
+          disableWriteActions: true,
+          workflowCancelDisabled: true,
+        }),
       ).toBe(false);
     });
   });

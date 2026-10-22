@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import type { DescribeFullSchedule } from '$lib/types/schedule';
 import type { WorkflowExecution } from '$lib/types/workflows';
@@ -63,6 +63,17 @@ describe('toRecentScheduleRuns', () => {
     expect(toRecentScheduleRuns(schedule)[0].status).toBe('Running');
   });
 
+  test('does not add visibility-derived fields to recorded runs', () => {
+    const schedule = scheduleWith([
+      action('a', '2026-08-01T00:00:00Z', 'WORKFLOW_EXECUTION_STATUS_RUNNING'),
+    ]);
+
+    const run = toRecentScheduleRuns(schedule)[0];
+    expect(run).not.toHaveProperty('delayed');
+    expect(run).not.toHaveProperty('taskFailure');
+    expect(run).not.toHaveProperty('inVisibility');
+  });
+
   test('does not mutate the schedule response', () => {
     const actions = [
       action('a', '2026-08-01T00:00:00Z'),
@@ -90,6 +101,90 @@ describe('withLatestWorkflowStatuses', () => {
     ]),
   );
 
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-08-06T00:00:00Z'));
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  test('derives delay flags from execution time', () => {
+    const originalRuns = structuredClone(runs);
+    const merged = withLatestWorkflowStatuses(runs, [
+      {
+        ...execution('a', '2026-08-01T00:00:00Z', 'Running'),
+        executionTime: '2026-08-07T00:00:00Z',
+      },
+      {
+        ...execution('b', '2026-08-02T00:00:00Z', 'Running'),
+        executionTime: '2026-08-05T00:00:00Z',
+      },
+    ]);
+
+    expect(merged.map((run) => run.delayed)).toEqual([false, true]);
+    expect(runs).toEqual(originalRuns);
+  });
+
+  test.each(['category=WorkflowTaskFailed', 'category=WorkflowTaskTimedOut'])(
+    'sets taskFailure for a running workflow reporting %s',
+    (problem) => {
+      const originalRuns = structuredClone(runs);
+      const merged = withLatestWorkflowStatuses(runs, [
+        {
+          ...execution('a', '2026-08-01T00:00:00Z', 'Running'),
+          searchAttributes: {
+            indexedFields: { TemporalReportedProblems: [problem] },
+          },
+        },
+      ]);
+
+      expect(merged.find((run) => run.workflowId === 'a')?.taskFailure).toBe(
+        true,
+      );
+      expect(runs).toEqual(originalRuns);
+    },
+  );
+
+  test('does not mark completed workflows as task-failed', () => {
+    const merged = withLatestWorkflowStatuses(runs, [
+      {
+        ...execution('a', '2026-08-01T00:00:00Z', 'Completed'),
+        searchAttributes: {
+          indexedFields: {
+            TemporalReportedProblems: ['category=WorkflowTaskFailed'],
+          },
+        },
+      },
+    ]);
+
+    expect(merged.find((run) => run.workflowId === 'a')?.taskFailure).toBe(
+      false,
+    );
+  });
+
+  test('derives both modifiers from the newest execution', () => {
+    const merged = withLatestWorkflowStatuses(runs, [
+      {
+        ...execution('a', '2026-08-05T00:00:00Z', 'Running', 'a-run-2'),
+        executionTime: '2026-08-07T00:00:00Z',
+        searchAttributes: {
+          indexedFields: {
+            TemporalReportedProblems: ['category=WorkflowTaskFailed'],
+          },
+        },
+      },
+      execution('a', '2026-08-01T00:00:00Z', 'ContinuedAsNew', 'a-run-1'),
+    ]);
+
+    expect(merged.find((run) => run.workflowId === 'a')).toMatchObject({
+      runId: 'a-run-2',
+      delayed: true,
+      taskFailure: true,
+    });
+  });
+
   test('replaces the recorded status with the live one', () => {
     const merged = withLatestWorkflowStatuses(runs, [
       execution('a', '2026-08-01T00:00:00Z', 'Terminated'),
@@ -107,6 +202,15 @@ describe('withLatestWorkflowStatuses', () => {
     expect(merged.map((run) => run.status)).toEqual(['Completed', 'Running']);
   });
 
+  test('marks only matched runs as present in visibility', () => {
+    const merged = withLatestWorkflowStatuses(runs, [
+      execution('b', '2026-08-02T00:00:00Z', 'Completed'),
+    ]);
+
+    expect(merged.map((run) => run.inVisibility)).toEqual([true, false]);
+    expect(runs.every((run) => !('inVisibility' in run))).toBe(true);
+  });
+
   test('uses the newest execution of a continue-as-new chain', () => {
     const merged = withLatestWorkflowStatuses(runs, [
       execution('a', '2026-08-01T00:00:00Z', 'ContinuedAsNew', 'a-run-1'),
@@ -117,6 +221,7 @@ describe('withLatestWorkflowStatuses', () => {
     expect(merged.find((run) => run.workflowId === 'a')).toMatchObject({
       status: 'Failed',
       runId: 'a-run-3',
+      inVisibility: true,
     });
   });
 
@@ -131,8 +236,15 @@ describe('withLatestWorkflowStatuses', () => {
     });
   });
 
-  test('leaves runs untouched when visibility returns nothing', () => {
-    expect(withLatestWorkflowStatuses(runs, [])).toEqual(runs);
+  test('defaults modifier and visibility flags when visibility returns nothing', () => {
+    expect(withLatestWorkflowStatuses(runs, [])).toEqual(
+      runs.map((run) => ({
+        ...run,
+        delayed: false,
+        taskFailure: false,
+        inVisibility: false,
+      })),
+    );
   });
 });
 

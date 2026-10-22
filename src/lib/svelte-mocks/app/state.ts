@@ -1,6 +1,7 @@
 import type { Settings } from '$lib/types/global';
 
 const settings: Settings = {
+  banner: { text: '', color: 'info' },
   auth: {
     enabled: false,
     options: null,
@@ -24,9 +25,16 @@ const settings: Settings = {
   workflowUpdateDisabled: false,
   workflowTerminateDisabled: false,
   hideWorkflowQueryErrors: false,
+  startWorkflowDisabled: false,
+  refreshWorkflowCountsDisabled: false,
   activityCommandsDisabled: false,
+  customUi: {
+    enabled: false,
+    iframeExtensions: [],
+  },
   feedbackURL: '',
   disableNewsFetch: false,
+  notifyOnNewVersion: false,
   runtimeEnvironment: {
     isCloud: false,
     isLocal: true,

@@ -4,7 +4,10 @@ import type { LayoutData, LayoutLoad } from './$types';
 
 import { fetchCluster, fetchSystemInfo } from '$lib/services/cluster-service';
 import { fetchNamespaces } from '$lib/services/namespaces-service';
-import { fetchSettings } from '$lib/services/settings-service';
+import {
+  fetchSettings,
+  fetchUiExtensions,
+} from '$lib/services/settings-service';
 import { clearAuthUser, getAuthUser } from '$lib/stores/auth-user';
 import type { GetClusterInfoResponse, GetSystemInfoResponse } from '$lib/types';
 import type { Settings } from '$lib/types/global';
@@ -27,6 +30,10 @@ export const load: LayoutLoad = async function ({
 
   if (!isAuthorized(settings, user)) {
     redirect(302, routeForAuthenticationRedirect(settings, url));
+  }
+
+  if (settings.customUi.enabled) {
+    settings.customUi.iframeExtensions = await fetchUiExtensions(fetch);
   }
 
   fetchNamespaces(settings, fetch);

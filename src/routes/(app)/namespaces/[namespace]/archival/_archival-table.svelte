@@ -2,12 +2,14 @@
   import { page } from '$app/state';
 
   import DownloadJsonButton from '$lib/components/download-json-button.svelte';
+  import { getWorkflowSortColumns } from '$lib/components/workflow/workflows-summary-configurable-table/column-search-attributes';
   import TableBodyCell from '$lib/components/workflow/workflows-summary-configurable-table/table-body-cell.svelte';
   import TableHeaderCell from '$lib/components/workflow/workflows-summary-configurable-table/table-header-cell.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
   import { translate } from '$lib/i18n/translate';
   import { fetchPaginatedArchivedWorkflows } from '$lib/services/workflow-service';
   import { DEFAULT_WORKFLOWS_COLUMNS } from '$lib/stores/configurable-table-columns';
+  import { searchAttributes } from '$lib/stores/search-attributes';
 
   const namespace = $derived(page.params.namespace);
   const query = $derived(page.url.searchParams.get('query') ?? undefined);
@@ -17,10 +19,17 @@
   );
 
   const columns = $derived(DEFAULT_WORKFLOWS_COLUMNS);
+  const sortColumns = $derived(
+    getWorkflowSortColumns(
+      columns.map((column) => column.label),
+      $searchAttributes,
+    ),
+  );
 </script>
 
 {#key [namespace, query]}
   <PaginatedTable
+    {sortColumns}
     {onFetch}
     aria-label={translate('common.workflows')}
     pageSizeSelectLabel={translate('common.per-page')}

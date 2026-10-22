@@ -11,6 +11,10 @@
   import type { VersionSummary } from '$lib/types/deployments';
 
   import {
+    type ComputeProviderTemplates,
+    type ComputeProviderValue,
+  } from './compute-providers';
+  import {
     type ComputeProviderOption,
     type CreateVersionFormData,
     createVersionSchema,
@@ -31,8 +35,7 @@
     computeProviders?: readonly ComputeProviderOption[];
     initialProvider?: ComputeProviderOption['value'];
     gcpRegions?: string[];
-    terraformTemplate?: string;
-    cloudRunTerraformTemplate?: string;
+    templates?: Record<ComputeProviderValue, ComputeProviderTemplates>;
   }
 
   let {
@@ -43,8 +46,7 @@
     computeProviders,
     initialProvider,
     gcpRegions,
-    terraformTemplate,
-    cloudRunTerraformTemplate,
+    templates,
   }: Props = $props();
 
   const superform = superForm(
@@ -147,8 +149,7 @@
           bind:scaleUpBacklogThreshold={$form.scaleUpBacklogThreshold}
           bind:maxWorkerLifetimeMs={$form.maxWorkerLifetimeMs}
           bind:metricsPollIntervalMs={$form.metricsPollIntervalMs}
-          {terraformTemplate}
-          {cloudRunTerraformTemplate}
+          {templates}
           errors={$errors}
         />
       </ComputeProviderPicker>

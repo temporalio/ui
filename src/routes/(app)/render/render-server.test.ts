@@ -19,6 +19,20 @@ describe('/render', () => {
     expect(html).toMatch(/body \{[^}]*overflow-wrap: break-word/);
   });
 
+  it('sets the page in the system font stack, not Helvetica', async () => {
+    const { html } = await render({ content: 'hello', compact: 'true' });
+
+    // The sandboxed frame cannot load the page's webfonts, so it uses the
+    // same system stacks the page falls back to. A bare sans-serif resolved
+    // to Helvetica on macOS and sat visibly apart from the page text.
+    expect(html).toMatch(
+      /body \{[^}]*font-family: var\(--markdown-font-sans\)/,
+    );
+    expect(html).toMatch(/--markdown-font-sans:[^;]*system-ui/);
+    expect(html).toMatch(/--markdown-font-mono:[^;]*ui-monospace/);
+    expect(html).not.toMatch(/font-family: sans-serif;/);
+  });
+
   it('renders bold at bold weight', async () => {
     const { html } = await render({ content: '**loud**', compact: 'true' });
 
@@ -47,6 +61,24 @@ describe('/render', () => {
 
     expect(html).toContain('class="prose compact"');
     expect(html).toContain('body.compact');
+  });
+
+  it('holds the content to one line in inline mode', async () => {
+    const { html } = await render({
+      content: 'orders • shipped\n\nsecond paragraph',
+      inline: 'true',
+    });
+
+    expect(html).toContain('class="prose compact inline"');
+    expect(html).toContain('body.inline main {');
+    expect(html).toContain('body.inline main * {');
+    expect(html).toContain('body.inline :is(br, hr) {');
+  });
+
+  it('only opts into inline on the exact string', async () => {
+    const { html } = await render({ content: 'hello', inline: 'TRUE' });
+
+    expect(html).toContain('class="prose"');
   });
 
   // A compact frame that paints its own canvas shows as a white box on a dark

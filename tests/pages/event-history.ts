@@ -25,6 +25,23 @@ export class EventHistoryPage {
     return nth === 'last' ? rows.last() : rows.first();
   }
 
+  eventSummary(
+    eventTypeText: string,
+    nth: 'first' | 'last' = 'first',
+  ): Locator {
+    return this.eventRow(eventTypeText, nth)
+      .locator('iframe[title="Summary"]')
+      .contentFrame()
+      .locator('body');
+  }
+
+  expandedSummary(nth: 'first' | 'last' = 'first'): Locator {
+    return this.expandedRow(nth)
+      .locator('iframe[title="Summary"]')
+      .contentFrame()
+      .locator('body');
+  }
+
   expandedEditor(rowNth: 'first' | 'last' = 'first', editorNth = 0): Locator {
     return this.expandedRow(rowNth).getByRole('textbox').nth(editorNth);
   }

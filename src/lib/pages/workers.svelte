@@ -8,6 +8,7 @@
   import WorkerHeartbeatsDisabled from '$lib/components/workers/worker-heartbeats-disabled.svelte';
   import WorkersTable from '$lib/components/workers/workers-table/workers-table.svelte';
   import MaximizableTableView from '$lib/holocene/table/paginated-table/maximizable-view.svelte';
+  import { createTableSort } from '$lib/runes/table-sort-state.svelte';
   import { fetchPaginatedWorkers } from '$lib/services/worker-service';
   import { workerFilters } from '$lib/stores/filters';
   import {
@@ -24,6 +25,8 @@
 
   const { namespace } = $derived(page.params);
   const query = $derived(page.url.searchParams.get('query') || '');
+
+  const tableSort = createTableSort(() => [namespace, query]);
 
   onMount(() => {
     const query = page.url.searchParams.get('query') ?? '';
@@ -56,6 +59,7 @@
     />
     {#key [namespace, query, $refresh]}
       <WorkersTable
+        bind:sort={tableSort.value}
         {namespace}
         onFetch={() => fetchPaginatedWorkers({ namespace, query })}
         total={$workerCount.count}

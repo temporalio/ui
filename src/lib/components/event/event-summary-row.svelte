@@ -10,6 +10,7 @@
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import IconButton from '$lib/holocene/icon-button.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import Preview from '$lib/holocene/markdown-editor/preview.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { BadgeCount } from '$lib/io/badge-count';
@@ -34,6 +35,7 @@
   import {
     getPrimaryAttributeForEvent,
     getSecondaryAttributeForEvent,
+    getTimerFireTime,
   } from '$lib/utilities/get-single-attribute-for-event';
   import {
     isActivityTaskStartedEvent,
@@ -146,6 +148,18 @@
         )
       : undefined,
   );
+
+  const primaryAttributeTooltip = $derived.by(() => {
+    if (primaryAttribute?.key !== 'startToFireTimeout') return undefined;
+    const fireTime = getTimerFireTime(
+      isEventGroup(event) ? event.initialEvent : event,
+    );
+    return fireTime
+      ? translate('events.timer-fire-time-estimated', {
+          time: $timestamp(fireTime),
+        })
+      : undefined;
+  });
 
   const effectiveCategory = $derived(
     systemNexus?.timelineCategory ?? event.category,
@@ -352,7 +366,11 @@
         />
       {/if}
       {#if !primaryLocalAttribute && primaryAttribute?.key}
-        <EventDetailsRow {...primaryAttribute} {attributes} />
+        <EventDetailsRow
+          {...primaryAttribute}
+          {attributes}
+          tooltip={primaryAttributeTooltip}
+        />
       {/if}
       {#if primaryLocalAttribute && primaryLocalAttribute.key}
         <EventDetailsRow {...primaryLocalAttribute} {attributes} />
@@ -362,7 +380,19 @@
           class="flex max-w-xl items-center gap-2 first:pt-0 last:border-b-0 md:w-auto"
         >
           <p class="whitespace-nowrap text-right text-xs">Summary</p>
-          <PayloadSummary value={currentEvent.userMetadata.summary} />
+          <PayloadSummary value={currentEvent.userMetadata.summary}>
+            {#snippet children(decodedValue)}
+              <Preview
+                content={decodedValue}
+                fill={false}
+                fitContent
+                inline
+                minHeight={0}
+                overrideTheme="primary"
+                title={translate('workflows.summary')}
+              />
+            {/snippet}
+          </PayloadSummary>
         </div>
       {/if}
       {#if systemNexus?.summaryAttribute}

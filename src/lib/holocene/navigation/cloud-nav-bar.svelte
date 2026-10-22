@@ -34,14 +34,14 @@
 </script>
 
 <div
-  class="flex min-h-7 items-center justify-between pb-2 group-data-[nav=closed]:justify-center"
+  class="flex min-h-7 items-center justify-between gap-2 pb-2 group-data-[nav=closed]:justify-center"
 >
   <div
     class="flex flex-row items-center justify-start group-data-[nav=closed]:hidden"
   >
     {#if subtitle === 'Cloud'}
       <a href={base || '/'} class="flex items-center text-inherit">
-        <Logo height={24} width={24} />
+        <Logo height={24} width={24} class="m-1" />
       </a>
     {/if}
     {#if subtitle}
@@ -67,7 +67,7 @@
         <h2
           class={merge(
             'mb-0 hidden whitespace-nowrap pl-2 font-sans font-medium not-italic text-primary group-data-[nav=open]:block',
-            subtitle === 'Cloud' ? 'text-2xl' : 'text-xs',
+            subtitle === 'Cloud' ? 'pl-1 text-base' : 'text-xs',
           )}
         >
           {subtitle}
@@ -77,7 +77,7 @@
   </div>
   <button
     title={navOpen ? 'Collapse Navigation' : 'Expand Navigation'}
-    class="mx-[8px] flex size-6 items-center justify-center justify-self-end rounded text-secondary transition-[opacity,transform] hover:bg-surface-overlay-primary hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary"
+    class="flex size-6 shrink-0 items-center justify-center rounded text-secondary transition-[opacity,transform] hover:bg-surface-overlay-primary hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary"
     onclick={ontoggle}
   >
     {#if navOpen}
@@ -97,7 +97,7 @@
     {@render bottom()}
   {/if}
   <div
-    class="self-center justify-self-center py-3 text-center text-[0.6rem] text-inverse-secondary"
+    class="self-center justify-self-center py-3 text-center text-[0.6rem] text-secondary"
   >
     <span class="sr-only">{translate('common.version')}</span>
     {version}

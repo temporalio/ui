@@ -5,23 +5,21 @@ import type { WorkflowStatus } from '$lib/types/workflows';
 const DEFAULT_STROKE_COLOR = 'currentColor';
 
 const WORKFLOW_ACTION_COLOR_VARIABLES = {
-  workflow: 'var(--color-action-workflow-workflow)',
-  activity: 'var(--color-action-workflow-activity)',
-  signal: 'var(--color-action-workflow-signal)',
-  timer: 'var(--color-action-workflow-timer)',
-  nexus: 'var(--color-action-workflow-nexus)',
+  workflow: 'var(--color-action-workflow)',
+  activity: 'var(--color-action-activity)',
+  signal: 'var(--color-action-signal)',
+  timer: 'var(--color-action-timer)',
+  nexus: 'var(--color-action-nexus)',
 };
 
 export const WORKFLOW_ACTION_HOVER_CLASSES = {
-  workflow: 'border-action-workflow-workflow bg-action-workflow-workflow-hover',
-  activity: 'border-action-workflow-activity bg-action-workflow-activity-hover',
-  'child-workflow':
-    'border-action-workflow-workflow bg-action-workflow-workflow-hover',
-  timer: 'border-action-workflow-timer bg-action-workflow-timer-hover',
-  signal: 'border-action-workflow-signal bg-action-workflow-signal-hover',
-  nexus: 'border-action-workflow-nexus bg-action-workflow-nexus-hover',
-  'local-activity':
-    'border-action-workflow-activity bg-action-workflow-activity-hover',
+  workflow: 'border-action-workflow bg-action-workflow-overlay',
+  activity: 'border-action-activity bg-action-activity-overlay',
+  'child-workflow': 'border-action-workflow bg-action-workflow-overlay',
+  timer: 'border-action-timer bg-action-timer-overlay',
+  signal: 'border-action-signal bg-action-signal-overlay',
+  nexus: 'border-action-nexus bg-action-nexus-overlay',
+  'local-activity': 'border-action-activity bg-action-activity-overlay',
 };
 
 const STATUS_STROKE_COLORS: Record<

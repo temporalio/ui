@@ -15,7 +15,6 @@ import {
   routeForCallStack,
   routeForCatalog,
   routeForCatalogExample,
-  routeForCommonErrors,
   routeForEventHistory,
   routeForEventHistoryEvent,
   routeForEventHistoryImport,
@@ -34,6 +33,7 @@ import {
   routeForScheduleCreate,
   routeForScheduleEdit,
   routeForSchedules,
+  routeForSchedulesWithQuery,
   routeForStandaloneActivities,
   routeForStandaloneActivitiesWithQuery,
   routeForStandaloneActivityDetails,
@@ -242,6 +242,15 @@ describe('routeFor functions should resolve the base path exactly once', () => {
       () => routeForWorkflowsWithQuery({ namespace: 'default', query: 'test' }),
     ],
     [
+      'routeForSchedulesWithQuery',
+      () =>
+        routeForSchedulesWithQuery({
+          namespace: 'default',
+          query: 'ScheduleTag="s1"',
+          page: '2',
+        }),
+    ],
+    [
       'routeForAuthentication',
       () =>
         routeForAuthentication({
@@ -261,7 +270,6 @@ describe('routeFor functions should resolve the base path exactly once', () => {
         ),
     ],
     ['routeForLoginPage', () => routeForLoginPage('', false)],
-    ['routeForCommonErrors', () => routeForCommonErrors()],
     ['routeForWorkflowWorkers', () => routeForWorkflowWorkers(workflowParams)],
     [
       'routeForWorkerInstance',
@@ -495,6 +503,15 @@ describe('routeFor functions with prefix should resolve base + prefix correctly'
     [
       'routeForWorkflowsWithQuery',
       () => routeForWorkflowsWithQuery({ namespace: 'default', query: 'test' }),
+    ],
+    [
+      'routeForSchedulesWithQuery',
+      () =>
+        routeForSchedulesWithQuery({
+          namespace: 'default',
+          query: 'ScheduleTag="s1"',
+          page: '2',
+        }),
     ],
   ];
 

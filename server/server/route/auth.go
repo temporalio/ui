@@ -114,11 +114,14 @@ func SetAuthRoutes(e *echo.Echo, cfgProvider *config.ConfigProviderWithRefresh) 
 		log.Fatal(err)
 	}
 
+	maxSessionDuration := serverCfg.Auth.MaxSessionDuration
+	refreshTokenDuration := providerCfg.RefreshTokenDuration
+
 	api := e.Group("/auth")
 	api.GET("/sso", authenticate(&oauthCfg, providerCfg.Options, serverCfg.CORS.AllowOrigins, secure, serverCfg.Auth.PKCEEnabled))
-	api.GET("/sso/callback", authenticateCb(ctx, &oauthCfg, provider, serverCfg.Auth.MaxSessionDuration, secure, serverCfg.Auth.PKCEEnabled))
-	api.GET("/sso_callback", authenticateCb(ctx, &oauthCfg, provider, serverCfg.Auth.MaxSessionDuration, secure, serverCfg.Auth.PKCEEnabled)) // compatibility with UI v1
-	api.GET("/refresh", refreshTokens(ctx, &oauthCfg, provider, serverCfg.Auth.MaxSessionDuration, secure))
+	api.GET("/sso/callback", authenticateCb(ctx, &oauthCfg, provider, maxSessionDuration, refreshTokenDuration, secure, serverCfg.Auth.PKCEEnabled))
+	api.GET("/sso_callback", authenticateCb(ctx, &oauthCfg, provider, maxSessionDuration, refreshTokenDuration, secure, serverCfg.Auth.PKCEEnabled)) // compatibility with UI v1
+	api.GET("/refresh", refreshTokens(ctx, &oauthCfg, provider, maxSessionDuration, refreshTokenDuration, secure))
 	api.GET("/logout", logout(secure))
 }
 
@@ -194,7 +197,7 @@ func authenticate(config *oauth2.Config, options map[string]interface{}, allowed
 	}
 }
 
-func authenticateCb(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc.Provider, maxSessionDuration time.Duration, secure bool, pkceEnabled bool) func(echo.Context) error {
+func authenticateCb(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc.Provider, maxSessionDuration time.Duration, refreshTokenDuration time.Duration, secure bool, pkceEnabled bool) func(echo.Context) error {
 	return func(c echo.Context) error {
 		// Always clear the code_verifier cookie once the callback handler is
 		// entered. PKCE verifiers are single-use by design (RFC 7636 §4.6):
@@ -210,7 +213,17 @@ func authenticateCb(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc
 			return err
 		}
 
-		err = auth.SetUser(c, user, secure)
+		// The session starts now, so SetSessionStart below records this same instant.
+		var sessionExpiresAt time.Time
+		if maxSessionDuration > 0 {
+			sessionExpiresAt = time.Now().Add(maxSessionDuration)
+		}
+
+		err = auth.SetUser(c, user, auth.CookieOptions{
+			Secure:               secure,
+			SessionExpiresAt:     sessionExpiresAt,
+			RefreshTokenDuration: refreshTokenDuration,
+		})
 		if err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, "unable to set user: "+err.Error())
 		}
@@ -238,7 +251,7 @@ func authenticateCb(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc
 
 // refreshTokens exchanges a refresh token (stored in an HttpOnly cookie) for a new access token
 // and optionally a new ID token. It resets the cookies using auth.SetUser and returns 200.
-func refreshTokens(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc.Provider, maxSessionDuration time.Duration, secure bool) func(echo.Context) error {
+func refreshTokens(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc.Provider, maxSessionDuration time.Duration, refreshTokenDuration time.Duration, secure bool) func(echo.Context) error {
 	return func(c echo.Context) error {
 		startTime := time.Now()
 		clientIP := c.RealIP()
@@ -288,7 +301,15 @@ func refreshTokens(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc.
 			}
 		}
 
-		if err := auth.SetUser(c, &user, secure); err != nil {
+		// The session began at the session_start cookie, not now: a refresh extends
+		// the tokens but never the session.
+		opts := auth.CookieOptions{
+			Secure:               secure,
+			SessionExpiresAt:     auth.SessionExpiresAt(c, maxSessionDuration),
+			RefreshTokenDuration: refreshTokenDuration,
+		}
+
+		if err := auth.SetUser(c, &user, opts); err != nil {
 			duration := time.Since(startTime).Milliseconds()
 			log.Printf("token_refresh_failed reason=set_user_failed ip=%s error=%q duration_ms=%d", clientIP, err.Error(), duration)
 			return echo.NewHTTPError(http.StatusInternalServerError, "unable to set refreshed user: "+err.Error())

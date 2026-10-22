@@ -101,7 +101,7 @@
   const { copy, copied } = copyToClipboard();
 </script>
 
-<div class={merge('group flex flex-col gap-1', className)}>
+<div class={merge('group flex flex-col gap-2', className)}>
   <div
     class={merge(
       'flex items-center justify-start gap-2',
@@ -288,7 +288,7 @@
   }
 
   .hint-text {
-    @apply text-xs text-tertiary;
+    @apply text-xs text-secondary;
 
     &.error,
     &.invalid {

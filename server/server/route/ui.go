@@ -25,6 +25,7 @@ package route
 import (
 	"bytes"
 	"crypto/rand"
+	_ "embed"
 	"encoding/hex"
 	"fmt"
 	"html/template"
@@ -40,10 +41,17 @@ import (
 	"github.com/gomarkdown/markdown/parser"
 
 	"github.com/labstack/echo/v4"
+
+	"github.com/temporalio/ui-server/v2/server/config"
 )
 
 // SetUIRoutes sets UI routes
-func SetUIRoutes(e *echo.Echo, publicPath string, assets fs.FS) error {
+func SetUIRoutes(
+	e *echo.Echo,
+	publicPath string,
+	assets fs.FS,
+	cfgProvider *config.ConfigProviderWithRefresh,
+) error {
 	assetsHandler := buildUIAssetsHandler(assets)
 	e.GET("/_app/*", assetsHandler)
 	e.GET("/css/*", assetsHandler)
@@ -56,7 +64,7 @@ func SetUIRoutes(e *echo.Echo, publicPath string, assets fs.FS) error {
 	e.GET("/Temporal_Logo_Animation.gif", assetsHandler)
 	e.GET("/site.webmanifest", assetsHandler)
 	e.GET("/i18n/*", assetsHandler)
-	indexHandler, err := buildUIIndexHandler(publicPath, assets)
+	indexHandler, err := buildUIIndexHandler(publicPath, assets, cfgProvider)
 	if err != nil {
 		return err
 	}
@@ -71,7 +79,11 @@ func removeCSPMeta(htmlStr string) string {
 	return re.ReplaceAllString(htmlStr, "")
 }
 
-func buildUIIndexHandler(publicPath string, assets fs.FS) (echo.HandlerFunc, error) {
+func buildUIIndexHandler(
+	publicPath string,
+	assets fs.FS,
+	cfgProvider *config.ConfigProviderWithRefresh,
+) (echo.HandlerFunc, error) {
 	indexHTMLBytes, err := fs.ReadFile(assets, "index.html")
 	if err != nil {
 		return nil, err
@@ -95,8 +107,24 @@ func buildUIIndexHandler(publicPath string, assets fs.FS) (echo.HandlerFunc, err
 			}
 			return c.Redirect(http.StatusPermanentRedirect, target)
 		}
+
+		cfg, err := cfgProvider.GetConfig()
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, "unable to load UI configuration").SetInternal(err)
+		}
+		frameSources, err := cfg.CustomUI.IframeFrameSources(cfg.Auth.Enabled)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, "invalid custom UI configuration").SetInternal(err)
+		}
+		c.Response().Header().Set("Content-Security-Policy", frameSourceCSP(frameSources))
+
 		return c.Stream(http.StatusOK, "text/html", bytes.NewBuffer(indexHTMLBytes))
 	}, nil
+}
+
+func frameSourceCSP(origins []string) string {
+	sources := append([]string{"'self'"}, origins...)
+	return "frame-src " + strings.Join(sources, " ") + ";"
 }
 
 func hasPathPrefix(p, prefix string) bool {
@@ -112,7 +140,50 @@ func splitRequestURI(uri string) (reqPath, rawQuery string) {
 
 func buildUIAssetsHandler(assets fs.FS) echo.HandlerFunc {
 	handler := http.FileServer(http.FS(assets))
-	return echo.WrapHandler(handler)
+	return echo.WrapHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if strings.HasPrefix(r.URL.Path, "/_app/immutable/") && !strings.HasSuffix(r.URL.Path, "/") {
+			handler.ServeHTTP(&immutableAssetResponseWriter{ResponseWriter: w}, r)
+			return
+		}
+		handler.ServeHTTP(w, r)
+	}))
+}
+
+type immutableAssetResponseWriter struct {
+	http.ResponseWriter
+	wroteHeader bool
+}
+
+func (w *immutableAssetResponseWriter) WriteHeader(status int) {
+	if !w.wroteHeader {
+		if (status >= http.StatusOK && status < http.StatusMultipleChoices) || status == http.StatusNotModified {
+			w.Header().Del("Set-Cookie")
+			vary := w.Header().Values("Vary")
+			w.Header().Del("Vary")
+			for _, value := range vary {
+				var tokens []string
+				for _, token := range strings.Split(value, ",") {
+					token = strings.TrimSpace(token)
+					if !strings.EqualFold(token, "Cookie") {
+						tokens = append(tokens, token)
+					}
+				}
+				if len(tokens) > 0 {
+					w.Header().Add("Vary", strings.Join(tokens, ", "))
+				}
+			}
+			w.Header().Set("Cache-Control", "public, max-age=31536000, immutable")
+		}
+		w.wroteHeader = true
+	}
+	w.ResponseWriter.WriteHeader(status)
+}
+
+func (w *immutableAssetResponseWriter) Write(data []byte) (int, error) {
+	if !w.wroteHeader {
+		w.WriteHeader(http.StatusOK)
+	}
+	return w.ResponseWriter.Write(data)
 }
 
 func generateNonce() string {
@@ -150,6 +221,14 @@ func processMarkdown(content string) string {
 	// Render to HTML
 	return string(markdown.Render(ast, renderer))
 }
+
+// The stylesheet is generated from src/lib/utilities/markdown-reset.ts and
+// the Io theme colours by scripts/generate-markdown-css.ts, so this route and
+// the SvelteKit one at src/routes/(app)/render serve identical CSS. Edit the
+// reset, then run `pnpm generate:markdown-css`.
+//
+//go:embed markdown.gen.css
+var markdownCSS string
 
 // Template for the HTML page
 const pageTemplate = `
@@ -189,9 +268,14 @@ func SetRenderRoute(e *echo.Echo, publicPath string) {
 		}
 
 		// Matches the SvelteKit route's parsing: only the exact string opts in.
+		inline := c.QueryParam("inline") == "true"
+		compact := c.QueryParam("compact") == "true"
 		bodyClass := "prose"
-		if c.QueryParam("compact") == "true" {
-			bodyClass = "prose compact"
+		if inline || compact {
+			bodyClass += " compact"
+		}
+		if inline {
+			bodyClass += " inline"
 		}
 
 		// Process markdown to HTML
@@ -210,247 +294,7 @@ func SetRenderRoute(e *echo.Echo, publicPath string) {
 			Nonce:     nonce,
 			Theme:     finalTheme,
 			BodyClass: bodyClass,
-			CSS: template.CSS(`*,
-		body {
-			margin: 0;
-			padding: 0;
-			border: 0;
-			font-size: 100%;
-			vertical-align: baseline;
-		}
-
-		body {
-			overscroll-behavior: none;
-			position: relative;
-			overflow-wrap: break-word;
-			padding: 1rem;
-			white-space: pre-line;
-			font-family: sans-serif;
-		}
-
-		/* No page padding, so a short string renders as a line of text rather than
-		   a padded box. Wrapping stays on. */
-		body.compact {
-			padding: 0;
-			overflow: hidden;
-			white-space: normal;
-		}
-
-		/* The reset above sizes every element with a star selector, which beats
-		   inheritance, so compact restates the metrics or the frame renders at
-		   16px beside the 14px text around it. */
-		body.compact,
-		body.compact main,
-		body.compact p,
-		body.compact strong,
-		body.compact em,
-		body.compact a {
-			font-size: 14px;
-			line-height: 20px;
-		}
-
-		/* Blocks with the margins zeroed, not display: inline. The embedder
-		   measures the frame from main, and an inline box reports the text box
-		   rather than the line box, which clips descenders. */
-		body.compact main,
-		body.compact p {
-			display: block;
-			margin: 0;
-		}
-
-		/* Vertical padding on an inline code span grows the line box. */
-		body.compact code {
-			padding: 0 0.375rem;
-			font-size: 13px;
-			line-height: 20px;
-		}
-
-		h1 {
-			font-size: 2em;
-		}
-
-		h2 {
-			font-size: 1.5em;
-		}
-
-		h3 {
-			font-size: 1.17em;
-		}
-
-		h4 {
-			font-size: 1em;
-		}
-
-		h5 {
-			font-size: 0.83em;
-		}
-
-		h6 {
-			font-size: 0.67em;
-		}
-
-		/* Pinned rather than left to the UA default, so bold matches the 600 the
-		   SvelteKit stylesheet renders at instead of the UA's 700. */
-		strong,
-		b {
-			font-weight: 600;
-		}
-
-		blockquote,
-		q {
-			quotes: none;
-		}
-		blockquote:before,
-		blockquote:after,
-		q:before,
-		q:after {
-			content: '';
-			content: none;
-		}
-
-		table {
-			border-collapse: collapse;
-			border-spacing: 0;
-		}
-
-		ul,
-		ol {
-			white-space: normal;
-		}
-
-		li {
-			list-style-position: inside;
-		}
-
-		li * {
-			display: inline;
-		}
-
-		a {
-			gap: 0.5rem;
-			align-items: center;
-			border-radius: 0.25rem;
-			max-width: fit-content;
-			text-decoration: underline;
-			text-underline-offset: 2px;
-			cursor: pointer;
-		}
-
-		blockquote {
-			padding-top: 0;
-			padding-bottom: 0;
-			padding-left: 0.5rem;
-			border-left: 4px solid;
-			border-left-color: #92a4c3;
-			background: #e8efff;
-			color: #121416;
-		}
-
-		blockquote p {
-			font-size: 1.25rem;
-			line-height: 1.75rem;
-		}
-
-		code {
-			font-family: monospace;
-			padding-top: 0.125rem;
-			padding-bottom: 0.125rem;
-			padding-left: 0.25rem;
-			padding-right: 0.25rem;
-			border-radius: 0.25rem;
-			background: #e8efff;
-			color: #121416;
-		}
-
-		pre {
-			font-family: monospace;
-			padding: 0.25rem;
-			border-radius: 0.25rem;
-			background: #e8efff;
-			color: #121416;
-		}
-
-		pre code {
-			padding: 0;
-		}
-
-		body[data-theme='light'] {
-			background-color: #fff;
-			color: #121416;
-		}
-
-		body[data-theme='light'] a {
-			color: #444ce7;
-		}
-
-		body[data-theme='dark'] {
-			background-color: #141414;
-			color: #f8fafc;
-		}
-
-		body[data-theme='dark'] a {
-			color: #8098f9;
-		}
-
-		body[data-theme='light-background'] {
-			background-color: #f8fafc;
-			color: #121416;
-		}
-
-		body[data-theme='light-background'] a {
-			color: #444ce7;
-		}
-
-		body[data-theme='dark-background'] {
-			background-color: #141414;
-			color: #f8fafc;
-		}
-
-		body[data-theme='dark-background'] a {
-			color: #8098f9;
-		}
-
-		body[data-theme='light-primary'] {
-			background-color: #fff;
-			color: #121416;
-		}
-
-		body[data-theme='light-primary'] a {
-			color: #444ce7;
-		}
-
-		body[data-theme='dark-primary'] {
-			background-color: #000;
-			color: #f8fafc;
-		}
-
-		body[data-theme='dark-primary'] a {
-			color: #8098f9;
-		}
-
-		/* A compact frame paints no background of its own. An iframe's canvas is
-		   transparent when the embedded document is, so the frame takes whatever
-		   surface the page put it on, in either colour scheme, without the page
-		   having to name that surface.
-
-		   Last in the file on purpose: the theme rules above set background-color
-		   at the same specificity, so order decides. */
-		body.compact {
-			background-color: transparent;
-		}
-
-		/* The transparency only holds if this document's colour scheme matches
-		   the one the page gave the iframe element. When they differ the browser
-		   paints an opaque canvas instead, so a dark page shows a white box. The
-		   theme is an attribute on body, so the root reads it from there. */
-		html {
-			color-scheme: light;
-		}
-
-		html:has(body[data-theme^='dark']) {
-			color-scheme: dark;
-		}
-	`),
+			CSS:       template.CSS(markdownCSS),
 		}
 
 		// Set headers

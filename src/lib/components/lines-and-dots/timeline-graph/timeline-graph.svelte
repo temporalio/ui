@@ -10,6 +10,7 @@
     type LazyGroup,
     materializeGroup,
   } from '$lib/services/grouped-event-buffer';
+  import { eventBuffer } from '$lib/services/grouped-event-buffer.svelte';
   import { activeGroups } from '$lib/stores/active-events';
   import { collapseIdleTime } from '$lib/stores/event-view';
   import { fullEventHistory } from '$lib/stores/events';
@@ -26,7 +27,12 @@
     getPendingBlockY,
     getRowY,
     getTotalForY,
+    removePanelGapFromBand,
   } from './timeline-positioning';
+  import {
+    assignTimelineRowPool,
+    type TimelineRowSlot,
+  } from './timeline-row-pool';
 
   import GroupDetailsRow from './group-details-row.svelte';
   import TimelineAxis from './timeline-axis.svelte';
@@ -70,6 +76,11 @@
   // Dot geometry, published as CSS vars on .canvas (consumed by every row's dot).
   const dotSize = 2 * RADIUS + DOT_STROKE;
   const dotRadius = RADIUS * 0.3 + DOT_STROKE / 2;
+  // Icon size is a ratio of the dot's padding box (dotSize minus the border-2
+  // the rows hardcode), snapped to an even px.
+  const DOT_ICON_RATIO = 0.75;
+  const dotIconSize =
+    2 * Math.round(((dotSize - 2 * DOT_STROKE) * DOT_ICON_RATIO) / 2);
   const completedColor = getStatusStrokeColor('Completed');
   const failedColor = dotColors('Failed').fill;
 
@@ -271,6 +282,16 @@
     $activeGroups.length > 0 ? (groupIndexMap.get($activeGroups[0]) ?? -1) : -1,
   );
 
+  // Materialized here rather than inline in the template: a GroupRecord keeps
+  // the same identity for the life of the run, so a derived over the lazy group
+  // alone never invalidates and the open panel would keep the EventGroup it was
+  // built with, missing later pending-metadata changes.
+  const activeGroup = $derived(
+    activeIdx >= 0 && filteredLazyGroups[activeIdx]
+      ? eventBuffer.materializeGroup(filteredLazyGroups[activeIdx])
+      : undefined,
+  );
+
   $effect(() => {
     if ($activeGroups.length === 0) panelHeight = 0;
   });
@@ -291,10 +312,16 @@
     getTotalForY(filteredLazyGroups.length, pendingGroupCount, descStart),
   );
 
-  // Widen the mount window by the panel's row span: shiftFor moves rows down but
-  // getWindowBounds maps on the unshifted y, so without this they'd leave a blank.
-  const windowOverscan = $derived(
-    OVERSCAN + Math.ceil(panelHeight / ROW_HEIGHT),
+  const activePanelY = $derived(
+    activeIdx >= 0
+      ? getRowY(activeIdx, {
+          descStart,
+          pendingGroupCount,
+          totalForY,
+          reverseSort,
+        }) +
+          1.33 * RADIUS
+      : null,
   );
 
   // Full drawn height (rows + axis + detail panel). The container is this tall and
@@ -321,6 +348,16 @@
   const layerBandHeight = $derived(
     visibleBand ? visibleBand[1] - visibleBand[0] : timelineHeight,
   );
+
+  const rowWindowBand = $derived.by(() => {
+    const band = visibleBand;
+    return removePanelGapFromBand({
+      bandTop: band ? band[0] : 0,
+      bandHeight: band ? band[1] - band[0] : Math.min(svgHeight, 1000),
+      panelHeight,
+      panelTop: activePanelY,
+    });
+  });
 
   let scroller: HTMLElement | null = null;
   let bandRafId: ReturnType<typeof requestAnimationFrame> | undefined;
@@ -395,14 +432,11 @@
   });
 
   const [windowStart, windowEnd] = $derived.by(() => {
-    const band = visibleBand;
-    const bandTop = band ? band[0] : 0;
-    const bandHeight = band ? band[1] - band[0] : Math.min(svgHeight, 1000);
     return getWindowBounds({
-      bandTop,
-      bandHeight,
+      bandTop: rowWindowBand.bandTop,
+      bandHeight: rowWindowBand.bandHeight,
       total: filteredLazyGroups.length,
-      overscan: windowOverscan,
+      overscan: OVERSCAN,
       reverseSort,
       descStart,
       pendingCount: pendingGroupCount,
@@ -416,39 +450,25 @@
   // re-point to a new group — avoids the mount churn that caused major-GC pauses.
   const POOL_SLACK = 4;
   const poolSize = $derived.by(() => {
-    const band = visibleBand;
-    const bandHeight = band ? band[1] - band[0] : Math.min(svgHeight, 1000);
-    return Math.ceil(bandHeight / ROW_HEIGHT) + 2 * windowOverscan + POOL_SLACK;
+    return (
+      Math.ceil(rowWindowBand.bandHeight / ROW_HEIGHT) +
+      2 * OVERSCAN +
+      POOL_SLACK
+    );
   });
 
   // Reuse the prior slot object when nothing changed, or every row re-renders.
   // Version counts as changed: a lazy group's identity is stable for the whole
   // run, so identity alone would miss a group that gained an event.
-  type Slot = {
-    index: number;
-    lazy: LazyGroup;
-    version: number | undefined;
-  };
-  let prevSlots: (Slot | null)[] = [];
+  let prevSlots: (TimelineRowSlot<LazyGroup> | null)[] = [];
   const pool = $derived.by(() => {
-    const total = filteredLazyGroups.length;
-    const slots: (Slot | null)[] = new Array(poolSize).fill(null);
-    const end = Math.min(windowEnd, total, windowStart + poolSize);
-    for (let index = windowStart; index < end; index++) {
-      const slotIndex = index % poolSize;
-      const lazy = filteredLazyGroups[index];
-      const prev = prevSlots[slotIndex];
-      if (
-        prev &&
-        prev.index === index &&
-        prev.lazy === lazy &&
-        prev.version === lazy.version
-      ) {
-        slots[slotIndex] = prev;
-      } else {
-        slots[slotIndex] = { index, lazy, version: lazy.version };
-      }
-    }
+    const slots = assignTimelineRowPool({
+      groups: filteredLazyGroups,
+      poolSize,
+      previousSlots: prevSlots,
+      windowEnd,
+      windowStart,
+    });
     prevSlots = slots;
     return slots;
   });
@@ -472,7 +492,7 @@
 <div
   id="event-history-timeline-graph"
   class={twMerge(
-    'relative overflow-hidden rounded-lg border border-primary bg-surface-primary',
+    'relative isolate overflow-hidden rounded-lg border border-primary bg-surface-primary',
     error && 'bg-surface-danger',
   )}
   style:height="{svgHeight}px"
@@ -501,6 +521,7 @@
         style:height="{svgHeight}px"
         style:--dot="{dotSize}px"
         style:--dot-r="{dotRadius}px"
+        style:--dot-icon="{dotIconSize}px"
         style:--completed-color={completedColor}
         style:--failed-color={failedColor}
       >
@@ -590,20 +611,17 @@
         {/if}
 
         <!-- Last child so it paints above rows; onHeight feeds shiftFor. -->
-        {#if !readOnly && activeIdx >= 0}
-          {@const activeLazyGroup = filteredLazyGroups[activeIdx]}
-          {#if activeLazyGroup}
-            {@const panelY = getY(activeIdx) + 1.33 * RADIUS}
-            <GroupDetailsRow
-              y={panelY}
-              group={materializeGroup(activeLazyGroup)}
-              {canvasWidth}
-              endTime={workflow?.endTime ? endTime : nowMs}
-              onHeight={(height) => {
-                panelHeight = height;
-              }}
-            />
-          {/if}
+        {#if !readOnly && activeGroup}
+          {@const panelY = getY(activeIdx) + 1.33 * RADIUS}
+          <GroupDetailsRow
+            y={panelY}
+            group={activeGroup}
+            {canvasWidth}
+            endTime={workflow?.endTime ? endTime : nowMs}
+            onHeight={(height) => {
+              panelHeight = height;
+            }}
+          />
         {/if}
       </div>
     {/snippet}

@@ -17,7 +17,6 @@
   import Menu from '$lib/holocene/menu/menu.svelte';
   import { translate } from '$lib/i18n/translate';
   import { isCloud } from '$lib/stores/advanced-visibility';
-  import { coreUserStore } from '$lib/stores/core-user';
   import { resetEvents } from '$lib/stores/events';
   import { temporalVersion } from '$lib/stores/versions';
   import type { WorkflowEvent } from '$lib/types/events';
@@ -52,26 +51,24 @@
   let updateConfirmationModalOpen = $state(false);
   let pauseConfirmationModalOpen = $state(false);
 
-  let coreUser = coreUserStore();
-
   let cancelEnabled = $derived(
-    workflowCancelEnabled(page.data.settings, $coreUser, namespace),
+    workflowCancelEnabled(namespace, page.data.settings),
   );
 
   let signalEnabled = $derived(
-    workflowSignalEnabled(page.data.settings, $coreUser, namespace),
+    workflowSignalEnabled(namespace, page.data.settings),
   );
 
   let updateEnabled = $derived(
-    workflowUpdateEnabled(page.data.settings, $coreUser, namespace),
+    workflowUpdateEnabled(namespace, page.data.settings),
   );
 
   let terminateEnabled = $derived(
-    workflowTerminateEnabled(page.data.settings, $coreUser, namespace),
+    workflowTerminateEnabled(namespace, page.data.settings),
   );
 
   let resetAuthorized = $derived(
-    workflowResetEnabled(page.data.settings, $coreUser, namespace),
+    workflowResetEnabled(namespace, page.data.settings),
   );
 
   // https://github.com/temporalio/temporal/releases/tag/v1.27.1
@@ -87,11 +84,13 @@
       $resetEvents.length > 0,
   );
 
-  let startWorkflowDisabled = $derived(workflowCreateDisabled(page));
+  let startWorkflowDisabled = $derived(
+    workflowCreateDisabled(namespace, page.data.settings),
+  );
 
   const isDelayed = $derived(isWorkflowDelayed(workflow));
   const pauseAuthorized = $derived(
-    workflowPauseEnabled(page.data.settings, $coreUser, namespace),
+    workflowPauseEnabled(namespace, page.data.settings),
   );
   const pauseEnabled = $derived(
     !!page.data.namespace.namespaceInfo?.capabilities?.workflowPause,
@@ -142,7 +141,7 @@
             label: translate('workflows.request-cancellation'),
             onClick: () => (cancelConfirmationModalOpen = true),
             testId: 'request-cancellation-button',
-            enabled: cancelEnabled || !cancelInProgress,
+            enabled: cancelEnabled && !cancelInProgress,
             description: '',
           },
         ]
@@ -245,14 +244,14 @@
   </MenuItem>
 {/snippet}
 
-{#snippet showWorkflowCommonErrors()}
+{#snippet showWorkflowDiagnostics()}
   {#if $dismissedWorkflowCommonErrors}
     <MenuItem
       onclick={() => ($dismissedWorkflowCommonErrors = false)}
-      data-testid="show-common-errors-button"
-      description={translate('workflows.show-common-errors-description')}
+      data-testid="show-diagnostics-button"
+      description={translate('workflows.show-diagnostics-description')}
     >
-      {translate('workflows.show-common-errors')}
+      {translate('workflows.show-diagnostics')}
     </MenuItem>
   {/if}
 {/snippet}
@@ -274,12 +273,12 @@
   {/each}
   <MenuDivider />
   {@render startWorkflow()}
-  {@render showWorkflowCommonErrors()}
+  {@render showWorkflowDiagnostics()}
 {/snippet}
 
-{#snippet worklfowActions()}
+{#snippet actions()}
   {@render startWorkflow()}
-  {@render showWorkflowCommonErrors()}
+  {@render showWorkflowDiagnostics()}
   {#if terminateEnabled && next}
     <MenuDivider />
     <MenuItem
@@ -316,7 +315,7 @@
       {#if isRunning || isPaused}
         {@render runningWorkflowActions()}
       {:else}
-        {@render worklfowActions()}
+        {@render actions()}
       {/if}
     </Menu>
   </MenuContainer>

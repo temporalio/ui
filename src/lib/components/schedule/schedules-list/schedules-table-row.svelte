@@ -1,14 +1,22 @@
 <script lang="ts">
+  import { twMerge } from 'tailwind-merge';
+
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
+  import SearchAttributeValue from '$lib/components/table/search-attribute-value.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
-  import WorkflowStatusBadge from '$lib/components/workflow/workflow-status-badge.svelte';
   import Link from '$lib/holocene/link.svelte';
   import TableCellWithFilterOrCopyButtons from '$lib/holocene/table/table-cell-with-filter-or-copy-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { BadgeStatus } from '$lib/io/badge-status';
   import type { ConfigurableTableHeader } from '$lib/stores/configurable-table-columns';
-  import { parsePayloadAttributes } from '$lib/utilities/decode-payload';
+  import { customSearchAttributes } from '$lib/stores/search-attributes';
+  import {
+    COLUMN_WIDTH_CLAMP_CLASSES,
+    columnWidthStyle,
+  } from '$lib/utilities/column-width';
+  import { parseSearchAttributes } from '$lib/utilities/decode-payload';
   import {
     routeForSchedule,
     routeForWorkflow,
@@ -30,9 +38,8 @@
 
   const status = $derived(schedule?.info?.paused ? 'Paused' : 'Running');
   const spec = $derived(schedule?.info?.spec);
-  const searchAttributes = $derived(schedule?.searchAttributes ?? {});
-  const decodedAttributes = $derived(
-    parsePayloadAttributes({ searchAttributes }),
+  const decodedSearchAttributes = $derived(
+    parseSearchAttributes(schedule?.searchAttributes ?? {}).indexedFields ?? {},
   );
 
   const sortRecentActions = (recentActions: ScheduleActionResult[]) => {
@@ -56,13 +63,18 @@
 </script>
 
 <tr class="max-h-32">
-  {#each columns as { label } (label)}
+  {#each columns as { label, width } (label)}
+    {@const widthStyle = columnWidthStyle(width)}
+    {@const clampToWidth = width !== undefined && COLUMN_WIDTH_CLAMP_CLASSES}
     {#if label === translate('common.status')}
-      <td class="cell">
-        <WorkflowStatusBadge {status} />
+      <td class={twMerge('cell', clampToWidth)} style={widthStyle}>
+        <BadgeStatus {status} data-testid="schedule-status" />
       </td>
     {:else if label === translate('schedules.id')}
-      <td class="cell whitespace-pre-line break-words">
+      <td
+        class={twMerge('cell whitespace-pre-line break-words', clampToWidth)}
+        style={widthStyle}
+      >
         <Link href={route}>{schedule.scheduleId}</Link>
       </td>
     {:else if label === translate('common.workflow-type')}
@@ -78,7 +90,8 @@
           .join(' AND '),
       })}
       <TableCellWithFilterOrCopyButtons
-        class="cell whitespace-pre-line break-words"
+        class={twMerge('cell whitespace-pre-line break-words', clampToWidth)}
+        style={widthStyle}
         filterIconTitle={translate('common.filter-workflows')}
         copyValue={workflowTypeName ?? undefined}
         onFilter={() => {
@@ -96,7 +109,7 @@
         {/if}
       </TableCellWithFilterOrCopyButtons>
     {:else if label === translate('schedules.recent-runs')}
-      <td class="cell truncate">
+      <td class={twMerge('cell truncate', clampToWidth)} style={widthStyle}>
         {#each sortRecentActions(schedule?.info?.recentActions ?? []) as run (run)}
           {@const startWorkflowResult = run?.startWorkflowResult}
           <p>
@@ -117,20 +130,25 @@
         {/each}
       </td>
     {:else if label === translate('schedules.upcoming-runs')}
-      <td class="cell truncate">
+      <td class={twMerge('cell truncate', clampToWidth)} style={widthStyle}>
         {#each schedule?.info?.futureActionTimes?.slice(0, 5) ?? [] as run (run)}
           <Timestamp as="div" dateTime={run} />
         {/each}
       </td>
     {:else if label === translate('schedules.schedule-spec')}
-      <td class="cell">
+      <td class={twMerge('cell', clampToWidth)} style={widthStyle}>
         {#if spec}
           <ScheduleFrequency {spec} />
         {/if}
       </td>
     {:else}
-      <td class="cell">
-        {decodedAttributes?.searchAttributes?.indexedFields?.[label] ?? ''}
+      <td class={twMerge('cell', clampToWidth)} style={widthStyle}>
+        {#if decodedSearchAttributes[label] !== undefined}
+          <SearchAttributeValue
+            value={decodedSearchAttributes[label]}
+            type={$customSearchAttributes[label]}
+          />
+        {/if}
       </td>
     {/if}
   {/each}

@@ -8,6 +8,7 @@
   import Card from '$lib/holocene/card.svelte';
   import { translate } from '$lib/i18n/translate';
 
+  import { type ComputeProviderTemplates } from './compute-providers';
   import {
     type ComputeProviderOption,
     type ComputeProviderValue,
@@ -47,8 +48,7 @@
     error?: string;
     computeProviders?: readonly ComputeProviderOption[];
     gcpRegions?: string[];
-    terraformTemplate?: string;
-    cloudRunTerraformTemplate?: string;
+    templates?: Record<ComputeProviderValue, ComputeProviderTemplates>;
   }
 
   let {
@@ -59,8 +59,7 @@
     error,
     computeProviders,
     gcpRegions,
-    terraformTemplate,
-    cloudRunTerraformTemplate,
+    templates,
   }: Props = $props();
 
   const superform = superForm(
@@ -141,8 +140,7 @@
         bind:scaleUpBacklogThreshold={$form.scaleUpBacklogThreshold}
         bind:maxWorkerLifetimeMs={$form.maxWorkerLifetimeMs}
         bind:metricsPollIntervalMs={$form.metricsPollIntervalMs}
-        {terraformTemplate}
-        {cloudRunTerraformTemplate}
+        {templates}
         errors={$errors}
       />
     </Card>

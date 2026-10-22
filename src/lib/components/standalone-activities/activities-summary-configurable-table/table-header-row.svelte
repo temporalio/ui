@@ -7,20 +7,20 @@
     ACTIVITY_BATCH_OPERATION_CONTEXT,
     type ActivityBatchOperationContext,
   } from '$lib/pages/standalone-activities.svelte';
-  import type { ActivityExecutionInfo } from '$lib/types/activity-execution';
+  import type { ActivityExecutionListInfo } from '$lib/types/activity-execution';
   import type { PageSelectionStatus } from '$lib/utilities/batch-selection';
 
   import BatchActions from './batch-actions.svelte';
 
   type Props = {
-    activities?: ActivityExecutionInfo[];
+    activities?: ActivityExecutionListInfo[];
     empty?: boolean;
     columnsCount?: number;
     showBatchActions?: boolean;
     pageSelectionStatus?: PageSelectionStatus;
     onSelectPage?: (
       selected: boolean,
-      activities: ActivityExecutionInfo[],
+      activities: ActivityExecutionListInfo[],
     ) => void;
     children?: Snippet;
   };

@@ -26,7 +26,11 @@ package config
 
 import (
 	"errors"
+	"strings"
 	"time"
+	"unicode"
+
+	"gopkg.in/yaml.v3"
 )
 
 type (
@@ -41,10 +45,16 @@ type (
 		EnableUI            bool   `yaml:"enableUi"`
 		CloudUI             bool   `yaml:"cloudUi"`
 		UIAssetPath         string `yaml:"uiAssetPath"`
+		Banner              Banner `yaml:"banner"`
 		CORS                CORS   `yaml:"cors"`
 		DefaultNamespace    string `yaml:"defaultNamespace"`
 		FeedbackURL         string `yaml:"feedbackUrl"`
 		DisableNewsFetch    bool   `yaml:"disableNewsFetch"`
+		NotifyOnNewVersion  bool   `yaml:"notifyOnNewVersion"`
+		// How this server was installed: cli, docker, helm, or server
+		Distribution string `yaml:"distribution"`
+		// Version of the distribution, such as the CLI or Helm chart version
+		DistributionVersion string `yaml:"distributionVersion"`
 		// Show temporal-system namespace in namespace selector
 		ShowTemporalSystemNamespace bool `yaml:"showTemporalSystemNamespace"`
 		// Collapse the left navigation and saved views navigation by default
@@ -70,11 +80,18 @@ type (
 		RefreshWorkflowCountsDisabled bool `yaml:"refreshWorkflowCountsDisabled"`
 		// Whether to disable activity commands in the UI
 		ActivityCommandsDisabled bool `yaml:"activityCommandsDisabled"`
+		// Custom UI extensions that can mount iframe content into stable UI slots
+		CustomUI CustomUI `yaml:"customUi"`
 		// Forward specified HTTP headers from HTTP API requests to Temporal gRPC backend
 		ForwardHeaders []string `yaml:"forwardHeaders"`
 		HideLogs       bool     `yaml:"hideLogs"`
 		// TLS configuration options to start UI Server in TLS mode
 		UIServerTLS UIServerTLS `yaml:"uiServerTLS"`
+	}
+
+	Banner struct {
+		Text  string `yaml:"text"`
+		Color string `yaml:"color"`
 	}
 
 	CORS struct {
@@ -100,6 +117,20 @@ type (
 	UIServerTLS struct {
 		CertFile string `yaml:"certFile"`
 		KeyFile  string `yaml:"keyFile"`
+		// MTLS - optional. When set, enables mTLS on the UI server.
+		MTLS *UIServerMTLS `yaml:"mTLS,omitempty"`
+	}
+
+	UIServerMTLS struct {
+		// CaFile is the path to a CA bundle used to verify client certificates.
+		CaFile string `yaml:"caFile"`
+		// ClientAuth controls how client certificates are handled. Valid values:
+		//   ""                 -> tls.RequireAndVerifyClientCert (default)
+		//   "requireAndVerify" -> tls.RequireAndVerifyClientCert
+		//   "verifyIfGiven"    -> tls.VerifyClientCertIfGiven
+		//   "request"          -> tls.RequestClientCert
+		//   "requireAny"       -> tls.RequireAnyClientCert
+		ClientAuth string `yaml:"clientAuth"`
 	}
 
 	Auth struct {
@@ -138,6 +169,12 @@ type (
 		Options map[string]interface{} `yaml:"options"`
 		// UseIDTokenAsBearer - Use ID token instead of access token as Bearer in Authorization header
 		UseIDTokenAsBearer bool `yaml:"useIdTokenAsBearer"`
+		// RefreshTokenDuration - optional lifetime of the refresh token this provider issues.
+		// It is only needed for providers that issue opaque (non-JWT) refresh tokens, whose
+		// lifetime the server cannot read. For JWT refresh tokens the exp claim is used and
+		// this value is ignored. If neither is available, a 7 day default applies.
+		// Example values: "8h", "24h", "168h" (1 week).
+		RefreshTokenDuration time.Duration `yaml:"refreshTokenDuration"`
 	}
 
 	Codec struct {
@@ -148,10 +185,74 @@ type (
 		DefaultErrorLink    string `yaml:"defaultErrorLink"`
 	}
 
+	CustomUI struct {
+		Enabled          bool              `yaml:"enabled"`
+		IframeExtensions []IframeExtension `yaml:"iframeExtensions"`
+	}
+
+	IframeExtension struct {
+		ID            string                `yaml:"id"`
+		Title         string                `yaml:"title"`
+		Slot          string                `yaml:"slot"`
+		Src           string                `yaml:"src"`
+		AllowedOrigin string                `yaml:"allowedOrigin"`
+		RoutePatterns []string              `yaml:"routePatterns"`
+		Sandbox       IframeSandbox         `yaml:"sandbox"`
+		Sizing        IframeExtensionSizing `yaml:"sizing"`
+		Permissions   []string              `yaml:"permissions"`
+	}
+
+	IframeSandbox struct {
+		AllowDownloads  bool `yaml:"allowDownloads"`
+		AllowForms      bool `yaml:"allowForms"`
+		AllowModals     bool `yaml:"allowModals"`
+		AllowPopups     bool `yaml:"allowPopups"`
+		AllowSameOrigin bool `yaml:"allowSameOrigin"`
+	}
+
+	IframeExtensionSizing struct {
+		DefaultHeight int `yaml:"defaultHeight"`
+		MinHeight     int `yaml:"minHeight"`
+		MaxHeight     int `yaml:"maxHeight"`
+		DefaultWidth  int `yaml:"defaultWidth"`
+		MinWidth      int `yaml:"minWidth"`
+		MaxWidth      int `yaml:"maxWidth"`
+	}
+
 	Filesystem struct {
 		Path string `yaml:"path"`
 	}
 )
+
+// UnmarshalYAML ignores invalid banner settings so they cannot prevent startup.
+func (b *Banner) UnmarshalYAML(node *yaml.Node) error {
+	*b = Banner{}
+	if node.Kind != yaml.MappingNode {
+		return nil
+	}
+	var fields struct {
+		Text  yaml.Node `yaml:"text"`
+		Color yaml.Node `yaml:"color"`
+	}
+	if err := node.Decode(&fields); err != nil {
+		return nil
+	}
+	if fields.Text.Kind != yaml.ScalarNode || fields.Text.Tag != "!!str" ||
+		fields.Color.Kind != yaml.ScalarNode || fields.Color.Tag != "!!str" {
+		return nil
+	}
+	text := strings.TrimSpace(fields.Text.Value)
+	color := strings.ToLower(strings.TrimSpace(fields.Color.Value))
+	if text == "" || strings.ContainsAny(fields.Text.Value, "\"'&:") ||
+		strings.IndexFunc(fields.Text.Value, unicode.IsControl) >= 0 {
+		return nil
+	}
+	switch color {
+	case "neutral", "info", "warning", "success", "danger", "error", "accent":
+		*b = Banner{Text: text, Color: color}
+	}
+	return nil
+}
 
 // Validate validates this config
 func (c *Config) Validate() error {
@@ -160,6 +261,14 @@ func (c *Config) Validate() error {
 	}
 
 	if err := c.Auth.Validate(); err != nil {
+		return err
+	}
+
+	if err := c.CustomUI.Validate(c.Auth.Enabled); err != nil {
+		return err
+	}
+
+	if err := c.UIServerTLS.Validate(); err != nil {
 		return err
 	}
 

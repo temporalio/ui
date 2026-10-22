@@ -18,6 +18,7 @@
 
 <script lang="ts">
   import PayloadSummary from '$lib/components/payload/payload-summary.svelte';
+  import Preview from '$lib/holocene/markdown-editor/preview.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { setActiveGroup } from '$lib/stores/active-events';
@@ -187,7 +188,31 @@
         : RADIUS * 3),
   );
   const spanCy = HALO; // button-local vertical center
+  const labelMaxWidth = $derived(
+    Math.max(
+      0,
+      textAnchor === 'end'
+        ? textPosition[0] - GUTTER
+        : canvasWidth - GUTTER - textPosition[0],
+    ),
+  );
 </script>
+
+{#snippet summary(value: string)}
+  {#if group?.userMetadata?.summary}
+    <Preview
+      content={value}
+      fill={false}
+      fitContent
+      inline
+      minHeight={0}
+      overrideTheme="primary"
+      title={translate('workflows.summary')}
+    />
+  {:else}
+    {value}
+  {/if}
+{/snippet}
 
 <!-- lines/dots are inline snippets, not child components — plain divs, no
      per-element instances. -->
@@ -233,7 +258,7 @@
   >
     {#if icon}
       <svg
-        class="absolute left-1/2 top-1/2 h-[55%] w-[55%] -translate-x-1/2 -translate-y-1/2 text-black"
+        class="absolute left-1/2 top-1/2 h-[var(--dot-icon)] w-[var(--dot-icon)] -translate-x-1/2 -translate-y-1/2 text-black"
         viewBox="0 0 16 16"
       >
         <use href="#ti-{icon}" />
@@ -310,32 +335,33 @@
             ? 'retry'
             : undefined}
         <div
-          class="pointer-events-auto absolute flex select-none items-center gap-1 whitespace-nowrap text-[13px] leading-none {textAnchor ===
+          class="pointer-events-auto absolute flex w-max select-none items-center gap-1 whitespace-nowrap text-[14px] leading-none {textAnchor ===
           'end'
             ? '-translate-x-full -translate-y-1/2 flex-row-reverse'
             : '-translate-y-1/2'}"
           style:left="{textPosition[0] - spanLeft}px"
           style:top="{spanCy}px"
+          style:max-width="{labelMaxWidth}px"
         >
-          {#if iconName}
-            <svg class="h-[14px] w-[14px] text-current" viewBox="0 0 16 16">
-              <use href="#ti-{iconName}" />
-            </svg>
-          {/if}
           <span
-            class="inline-flex min-h-[var(--dot)] items-center rounded-full bg-surface-primary px-1.5 text-current"
+            class="inline-flex min-h-[var(--dot)] min-w-0 max-w-full items-center overflow-hidden rounded-full bg-surface-primary px-1.5 text-current"
           >
+            {#if iconName}
+              <svg class="h-[14px] w-[20px] text-current" viewBox="0 0 16 16">
+                <use href="#ti-{iconName}" />
+              </svg>
+            {/if}
             {#if pendingActivity}
               {translate('workflows.attempt')}
               {pendingActivity.attempt} / {pendingActivity.maximumAttempts ||
                 '∞'}
-              •&nbsp;{decodedValue}
+              •&nbsp;{@render summary(decodedValue)}
             {:else if retried}
-              {retryAttempt} • {decodedValue}
+              {retryAttempt} •&nbsp; {@render summary(decodedValue)}
             {:else if decodedLocalActivity}
               {decodedLocalActivity.value}
             {:else}
-              {decodedValue}
+              {@render summary(decodedValue)}
             {/if}
           </span>
         </div>

@@ -9,6 +9,11 @@ import {
 import type { EventGroup } from '$lib/models/event-groups/event-groups';
 import { getGroupId } from '$lib/models/event-groups/get-group-id';
 import { toEvent } from '$lib/models/event-history';
+import {
+  createEventGroupLabelRegistry,
+  type EventGroupKey,
+  type EventGroupLabel,
+} from '$lib/models/event-history/event-group-markers';
 import type {
   CommonHistoryEvent,
   HistoryEvent,
@@ -170,6 +175,21 @@ class GroupRecord implements LazyGroup {
 
 export type ChangeListener = (immediate: boolean) => void;
 
+export type EventGroupOption = {
+  group: EventGroupLabel;
+  eventCount: number;
+  firstEventId: number;
+};
+
+type EventGroupIndexEntry = EventGroupOption & {
+  headSlots: Set<number>;
+};
+
+export type EventGroupMatcher = {
+  hasGroup: (groupId: string) => boolean;
+  hasEvent: (event: WorkflowEvent) => boolean;
+};
+
 export type GroupArrayOptions = {
   excludeWorkflowTasks?: boolean;
 };
@@ -189,6 +209,13 @@ let failedEvent: HistoryEvent | null = null;
 // and the live poll — the direction an event arrives from is a fetch detail,
 // and one workflow task's markers bill once however they were loaded.
 const processedWorkflowTaskIds = new Set<string>();
+let eventGroupLabels = createEventGroupLabelRegistry();
+
+// Event group key -> the events carrying that marker and the lifecycle groups
+// they belong to, so the event group filter is a set lookup per row.
+let eventGroupIndex = new Map<EventGroupKey, EventGroupIndexEntry>();
+let cachedEventGroupOptions: EventGroupOption[] | null = null;
+let cachedEventGroupOptionsRevision = -1;
 
 // Bumped by every write. Read caches hold the revision they were built at, so
 // invalidation is a single counter rather than scattered cache-busting calls.
@@ -216,6 +243,13 @@ let pendingByActivityId = new Map<string, PendingActivity>();
 let pendingByNexusScheduledId = new Map<string, PendingNexusOperation>();
 const enrichedRecords = new Set<GroupRecord>();
 
+// Head event of each currently-pending activity's group, keyed by activityId.
+// Maintained alongside enrichedRecords so a pending-activity card can diff its
+// current options against the ones it was scheduled with without scanning. The
+// head is always ActivityTaskScheduled: that is the only branch in
+// applyPendingMetadataTo that assigns pendingActivity.
+const scheduledEventByActivityId = new Map<string, WorkflowEvent>();
+
 /** Returns whether the record's pending metadata changed. */
 function applyPendingMetadataTo(record: GroupRecord): boolean {
   const head = record.initialEvent;
@@ -242,8 +276,18 @@ function applyPendingMetadataTo(record: GroupRecord): boolean {
     return false;
   }
 
+  const previousActivityId = record.pendingActivity?.activityId;
   record.pendingActivity = pendingActivity;
   record.pendingNexusOperation = pendingNexusOperation;
+  if (
+    previousActivityId &&
+    previousActivityId !== pendingActivity?.activityId
+  ) {
+    scheduledEventByActivityId.delete(previousActivityId);
+  }
+  if (pendingActivity) {
+    scheduledEventByActivityId.set(pendingActivity.activityId, head);
+  }
   if (pendingActivity || pendingNexusOperation) {
     enrichedRecords.add(record);
   } else {
@@ -279,7 +323,38 @@ function toWorkflowEvent(raw: HistoryEvent): WorkflowEvent {
   return toEvent(raw, {
     shouldNotAddBillableAction,
     processedWorkflowTaskIds,
+    eventGroupLabels,
   });
+}
+
+// An event whose head is unknown (malformed attributes) heads its own group.
+function headSlotFor(event: WorkflowEvent, slot: number): number {
+  const parsedHeadSlot = parseInt(getGroupId(event as CommonHistoryEvent)) - 1;
+  return parsedHeadSlot >= 0 ? parsedHeadSlot : slot;
+}
+
+function indexEventGroups(
+  event: WorkflowEvent,
+  slot: number,
+  headSlot: number,
+): void {
+  if (!event.eventGroups) return;
+  const eventId = slot + 1;
+  for (const group of event.eventGroups) {
+    let entry = eventGroupIndex.get(group.key);
+    if (!entry) {
+      entry = {
+        group,
+        eventCount: 0,
+        firstEventId: eventId,
+        headSlots: new Set(),
+      };
+      eventGroupIndex.set(group.key, entry);
+    }
+    entry.eventCount++;
+    if (eventId < entry.firstEventId) entry.firstEventId = eventId;
+    entry.headSlots.add(headSlot);
+  }
 }
 
 function recordFor(headSlot: number): GroupRecord {
@@ -373,12 +448,16 @@ export function reset(historyLength: number): void {
   headGroup = new Int32Array(size);
   records = [];
   enrichedRecords.clear();
+  scheduledEventByActivityId.clear();
   pendingByActivityId = new Map();
   pendingByNexusScheduledId = new Map();
   maxSlot = -1;
 
   failedEvent = null;
   processedWorkflowTaskIds.clear();
+  eventGroupLabels = createEventGroupLabelRegistry();
+  eventGroupIndex = new Map();
+  cachedEventGroupOptions = null;
 
   revision++;
   cachedGroups = null;
@@ -413,12 +492,11 @@ export function ingestHistoryEvent(raw: HistoryEvent): boolean {
   events[slot] = event;
   if (slot > maxSlot) maxSlot = slot;
 
-  // An event whose head is unknown (malformed attributes) heads its own group.
-  const parsedHeadSlot = parseInt(getGroupId(event as CommonHistoryEvent)) - 1;
-  const headSlot = parsedHeadSlot >= 0 ? parsedHeadSlot : slot;
+  const headSlot = headSlotFor(event, slot);
   grow(headSlot);
 
   recordFor(headSlot).addMember(slot, event);
+  indexEventGroups(event, slot, headSlot);
   revision++;
 
   notifyChanged();
@@ -458,6 +536,17 @@ export function setPendingMetadata(
   }
 
   if (changed) notifyChanged();
+}
+
+/**
+ * The ActivityTaskScheduled event that started a currently-pending activity, or
+ * undefined when that event has not been ingested yet. Only pending activities
+ * are indexed: a resolved one drops out with its pending metadata.
+ */
+export function getPendingActivityScheduledEvent(
+  activityId: string,
+): WorkflowEvent | undefined {
+  return scheduledEventByActivityId.get(activityId);
 }
 
 /**
@@ -556,6 +645,48 @@ export function getGroupArray(opts?: GroupArrayOptions): EventGroup[] {
     cachedGroupsRevision = revision;
   }
   return result;
+}
+
+/** Every event group in the run, in order of the first event carrying it. */
+export function getEventGroupOptions(): EventGroupOption[] {
+  if (cachedEventGroupOptions && cachedEventGroupOptionsRevision === revision) {
+    return cachedEventGroupOptions;
+  }
+
+  const result = [...eventGroupIndex.values()]
+    .map(({ group, eventCount, firstEventId }) => ({
+      group,
+      eventCount,
+      firstEventId,
+    }))
+    .sort((a, b) => a.firstEventId - b.firstEventId);
+
+  cachedEventGroupOptions = result;
+  cachedEventGroupOptionsRevision = revision;
+  return result;
+}
+
+/**
+ * Matches lifecycle groups, and the events in them, that contain an event
+ * carrying any of `keys`. Keys not in this run are ignored; returns undefined
+ * when none remain, so a stale selection never hides the whole history.
+ */
+export function getEventGroupMatcher(
+  keys: readonly EventGroupKey[],
+): EventGroupMatcher | undefined {
+  const headSlots = new Set<number>();
+  for (const key of keys) {
+    for (const headSlot of eventGroupIndex.get(key)?.headSlots ?? []) {
+      headSlots.add(headSlot);
+    }
+  }
+  if (!headSlots.size) return;
+
+  return {
+    hasGroup: (groupId) => headSlots.has(parseInt(groupId) - 1),
+    hasEvent: (event) =>
+      headSlots.has(headSlotFor(event, parseInt(event.id) - 1)),
+  };
 }
 
 /** Flat WorkflowEvent[] in ascending event-id order. */

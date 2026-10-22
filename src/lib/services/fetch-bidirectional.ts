@@ -5,7 +5,7 @@ import type {
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
 
-export type BidirectionalProgress = {
+type BidirectionalProgress = {
   ascEvents: number;
   descEvents: number;
   ascPages: number;
@@ -16,7 +16,7 @@ export type BidirectionalProgress = {
   totalEstimated: number;
 };
 
-export type BidirectionalStats = {
+type BidirectionalStats = {
   durationMs: number;
   totalEvents: number;
   overlap: number;

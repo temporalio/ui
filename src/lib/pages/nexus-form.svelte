@@ -2,11 +2,13 @@
   import type { Snippet } from 'svelte';
   import { superForm } from 'sveltekit-superforms';
   import { zodClient } from 'sveltekit-superforms/adapters';
+  import { twMerge as merge } from 'tailwind-merge';
   import { z } from 'zod/v3';
 
   import Message from '$lib/components/form/message.svelte';
   import IsOssGuard from '$lib/components/is-oss-guard.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import Card from '$lib/holocene/card.svelte';
   import Combobox from '$lib/holocene/combobox/combobox.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import MarkdownEditor from '$lib/holocene/markdown-editor/markdown-editor.svelte';
@@ -26,6 +28,11 @@
     endpoint?: NexusEndpoint;
     nameDisabled?: boolean;
     footer?: Snippet<[{ submitting: boolean }]>;
+    nameLeading?: Snippet;
+    fieldsInert?: boolean;
+    submitDisabled?: boolean;
+    class?: string;
+    card?: boolean;
     validateNamespacesExist?: ValidateNamespacesExist;
   };
 
@@ -41,6 +48,11 @@
     endpoint = undefined,
     nameDisabled = false,
     footer,
+    nameLeading,
+    fieldsInert = false,
+    submitDisabled = false,
+    class: className = '',
+    card = false,
     validateNamespacesExist,
   }: Props = $props();
 
@@ -98,7 +110,7 @@
     resetForm: false,
     dataType: 'json',
     onUpdate: async ({ form, cancel }) => {
-      if (!form.valid) return;
+      if (!form.valid || fieldsInert || submitDisabled) return;
 
       if (
         isCloud &&
@@ -193,95 +205,139 @@
   );
 </script>
 
-<form class="flex w-full flex-col gap-4 xl:w-1/2" use:enhance novalidate>
-  <Input
-    bind:value={$form.name}
-    required
-    disabled={nameDisabled}
-    error={!!$errors.name?.[0]}
-    hintText={$errors.name?.[0] || nameHintText}
-    label={translate('nexus.endpoint-name')}
-    id="name"
-    name="name"
-    maxLength={200}
-    placeholder={translate('nexus.endpoint-name-placeholder')}
-    {...$constraints.name}
-  />
-  <div class="flex flex-col gap-0">
-    <p class="text-base text-primary">{translate('nexus.target')}</p>
-    <p class="text-xs text-secondary">
-      {translate('nexus.target-description')}
-    </p>
-  </div>
-  <Combobox
-    label={translate('nexus.target-namespace')}
-    noResultsText={translate('common.no-results')}
-    valid={!$errors.targetNamespace}
-    error={$errors.targetNamespace?.[0] ||
-      translate('nexus.target-namespace-required')}
-    bind:value={$form.targetNamespace}
-    required
-    id="target-namespace"
-    name="targetNamespace"
-    placeholder={translate('nexus.select-namespace')}
-    LeadingIcon={IconNamespaceSwitcher}
-    options={targetNamespaceList}
-    optionValueKey="namespace"
-    minSize={32}
-  />
-  <Input
-    bind:value={$form.taskQueue}
-    required
-    error={!!$errors.taskQueue?.[0]}
-    hintText={$errors.taskQueue?.[0]}
-    label={translate('common.task-queue')}
-    id="task-queue"
-    name="taskQueue"
-    placeholder={translate('nexus.task-queue-placeholder')}
-    {...$constraints.taskQueue}
-  />
-  <IsOssGuard {isCloud}>
-    <div class="flex flex-col gap-0">
-      <p class="text-base text-primary">
-        {translate('nexus.access-policy')}
-      </p>
-      <p class="text-xs text-secondary">
-        {translate('nexus.allowed-caller-namespaces-description')}
-      </p>
-    </div>
-    <Combobox
-      id="caller-namespace-filter-menu"
-      name="allowedCallerNamespaces"
-      multiselect
-      displayChips={false}
-      allowCustomValue
+<form
+  class={merge('flex w-full flex-col gap-4 xl:w-1/2', className)}
+  use:enhance
+  novalidate
+>
+  {#snippet nameInput()}
+    <Input
+      bind:value={$form.name}
       required
-      bind:value={$form.allowedCallerNamespaces}
-      options={callerNamespaces}
-      label={translate('nexus.allowed-caller-namespaces')}
-      LeadingIcon={IconSearch}
-      noResultsText={translate('common.no-results')}
-      valid={!$errors.allowedCallerNamespaces}
-      error={$errors.allowedCallerNamespaces?._errors?.[0] ||
-        translate('nexus.caller-namespace-required')}
-      placeholder={translate('nexus.select-namespaces')}
-      optionValueKey="value"
-      optionLabelKey="label"
+      disabled={nameDisabled}
+      error={!!$errors.name?.[0]}
+      hintText={$errors.name?.[0] || nameHintText}
+      label={translate('nexus.endpoint-name')}
+      id="name"
+      name="name"
+      maxLength={200}
+      placeholder={translate('nexus.endpoint-name-placeholder')}
+      {...$constraints.name}
     />
-  </IsOssGuard>
-  <div class="flex flex-col gap-2">
-    <p class="text-sm font-medium">
-      {translate('nexus.description-label')}
-    </p>
-    <MarkdownEditor bind:content={$form.descriptionString} />
-    <p class="text-xs text-secondary">
-      {translate('nexus.description-hint')}
-    </p>
-  </div>
+  {/snippet}
+  {#snippet fields()}
+    {#if nameLeading}
+      <div
+        class="grid grid-cols-1 gap-4 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,2fr)] sm:gap-x-2"
+      >
+        <div>
+          {@render nameLeading()}
+        </div>
+        <span
+          class="mt-6 hidden h-10 items-center text-2xl text-tertiary sm:flex"
+          aria-hidden="true">/</span
+        >
+        <div class:opacity-50={fieldsInert} inert={fieldsInert}>
+          {@render nameInput()}
+        </div>
+      </div>
+    {:else}
+      <div class:opacity-50={fieldsInert} inert={fieldsInert}>
+        {@render nameInput()}
+      </div>
+    {/if}
+    <div
+      class="flex flex-col gap-4"
+      class:opacity-50={fieldsInert}
+      inert={fieldsInert}
+    >
+      <div class="flex flex-col gap-0">
+        <p class="text-base text-primary">{translate('nexus.target')}</p>
+        <p class="text-xs text-secondary">
+          {translate('nexus.target-description')}
+        </p>
+      </div>
+      <Combobox
+        label={translate('nexus.target-namespace')}
+        noResultsText={translate('common.no-results')}
+        valid={!$errors.targetNamespace}
+        error={$errors.targetNamespace?.[0] ||
+          translate('nexus.target-namespace-required')}
+        bind:value={$form.targetNamespace}
+        required
+        id="target-namespace"
+        name="targetNamespace"
+        placeholder={translate('nexus.select-namespace')}
+        LeadingIcon={IconNamespaceSwitcher}
+        options={targetNamespaceList}
+        optionValueKey="namespace"
+        minSize={32}
+      />
+      <Input
+        bind:value={$form.taskQueue}
+        required
+        error={!!$errors.taskQueue?.[0]}
+        hintText={$errors.taskQueue?.[0]}
+        label={translate('common.task-queue')}
+        id="task-queue"
+        name="taskQueue"
+        placeholder={translate('nexus.task-queue-placeholder')}
+        {...$constraints.taskQueue}
+      />
+      <IsOssGuard {isCloud}>
+        <div class="flex flex-col gap-0">
+          <p class="text-base text-primary">
+            {translate('nexus.access-policy')}
+          </p>
+          <p class="text-xs text-secondary">
+            {translate('nexus.allowed-caller-namespaces-description')}
+          </p>
+        </div>
+        <Combobox
+          id="caller-namespace-filter-menu"
+          name="allowedCallerNamespaces"
+          multiselect
+          displayChips={false}
+          allowCustomValue
+          required
+          bind:value={$form.allowedCallerNamespaces}
+          options={callerNamespaces}
+          label={translate('nexus.allowed-caller-namespaces')}
+          LeadingIcon={IconSearch}
+          noResultsText={translate('common.no-results')}
+          valid={!$errors.allowedCallerNamespaces}
+          error={$errors.allowedCallerNamespaces?._errors?.[0] ||
+            translate('nexus.caller-namespace-required')}
+          placeholder={translate('nexus.select-namespaces')}
+          optionValueKey="value"
+          optionLabelKey="label"
+        />
+      </IsOssGuard>
+      <div class="flex flex-col gap-2">
+        <p class="text-sm font-medium">
+          {translate('nexus.description-label')}
+        </p>
+        <MarkdownEditor bind:content={$form.descriptionString} />
+        <p class="text-xs text-secondary">
+          {translate('nexus.description-hint')}
+        </p>
+      </div>
+    </div>
+  {/snippet}
+  {#if card}
+    <Card class="flex flex-col gap-4 p-5">
+      {@render fields()}
+    </Card>
+  {:else}
+    {@render fields()}
+  {/if}
   <div class="flex w-full flex-col items-center gap-4 sm:flex-row">
     <Button
       type="submit"
-      disabled={$submitting || (endpoint && !isTainted($tainted))}
+      disabled={fieldsInert ||
+        submitDisabled ||
+        $submitting ||
+        (endpoint && !isTainted($tainted))}
       loading={$submitting}
       class="max-sm:w-full"
       data-testid="nexus-form-submit-button"

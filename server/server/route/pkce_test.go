@@ -64,7 +64,7 @@ func TestAuthenticate_AddsPKCEParamsToAuthURL(t *testing.T) {
 	c := e.NewContext(req, rec)
 
 	oauthCfg := &oauth2.Config{
-		ClientID:    "test-client",
+		ClientID: "test-client",
 		Endpoint: oauth2.Endpoint{
 			AuthURL:  "https://idp.example.com/auth",
 			TokenURL: "https://idp.example.com/token",
@@ -368,7 +368,7 @@ func TestAuthenticateCb_ClearsCodeVerifier_OnExchangeError(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
-	handler := authenticateCb(context.Background(), &oauth2.Config{}, nil, time.Hour, false, true)
+	handler := authenticateCb(context.Background(), &oauth2.Config{}, nil, time.Hour, 0, false, true)
 	err := handler(c)
 	require.Error(t, err)
 
@@ -390,7 +390,7 @@ func TestAuthenticateCb_DoesNotClearCodeVerifier_WhenPKCEDisabled(t *testing.T) 
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
-	handler := authenticateCb(context.Background(), &oauth2.Config{}, nil, time.Hour, false, false)
+	handler := authenticateCb(context.Background(), &oauth2.Config{}, nil, time.Hour, 0, false, false)
 	err := handler(c)
 	require.Error(t, err)
 

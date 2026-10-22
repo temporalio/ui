@@ -28,6 +28,7 @@
     ) => void | Promise<void>;
     childCount?: number | undefined;
     child?: boolean;
+    lastChild?: boolean;
     onClickBatchSelect?: (e: MouseEvent) => void;
     children?: Snippet;
   };
@@ -38,6 +39,7 @@
     toggleChildrenVisibility = () => {},
     childCount = undefined,
     child = false,
+    lastChild = false,
     onClickBatchSelect = () => {},
     children,
   }: Props = $props();
@@ -82,14 +84,29 @@
         disabled={$allSelected}
         aria-label={label}
       />
+      {#if child}
+        {@const branch =
+          $tableDensity === 'dense'
+            ? 'left-[calc(100%+18px)] w-2.5'
+            : 'left-[calc(100%+24px)] w-4'}
+        <span
+          class="absolute top-0 h-1/2 border-b border-l border-secondary {branch}"
+          class:rounded-bl={lastChild}
+        ></span>
+        {#if !lastChild}
+          <span
+            class="absolute bottom-0 h-1/2 border-l border-secondary {branch}"
+          ></span>
+        {/if}
+      {/if}
     </td>
     <td
-      class="cursor-point relative flex items-center justify-center gap-0.5 py-0.5 {parentWorkflows ||
+      class="cursor-point relative flex items-center gap-0.5 py-0.5 {parentWorkflows ||
       child
         ? 'w-auto'
-        : 'w-6'}"
+        : 'w-6'} {child ? 'justify-end' : 'justify-center'}"
     >
-      {#if !workflowCreateDisabled(page)}
+      {#if !workflowCreateDisabled(namespace, page.data.settings)}
         <StartWorkflowButton
           {namespace}
           runId={workflow.runId}

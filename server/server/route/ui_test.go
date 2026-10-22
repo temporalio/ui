@@ -8,9 +8,15 @@ import (
 	"strings"
 	"testing"
 	"testing/fstest"
+	"time"
 
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
+	"github.com/temporalio/ui-server/v2/server/config"
+	"github.com/temporalio/ui-server/v2/server/csrf"
 )
 
 var testIndexHTML = `<!DOCTYPE html>
@@ -33,8 +39,29 @@ func newTestAssets(html string) fstest.MapFS {
 	}
 }
 
+type routeTestConfigProvider struct {
+	cfg *config.Config
+}
+
+func (p *routeTestConfigProvider) GetConfig() (*config.Config, error) {
+	return p.cfg, nil
+}
+
+func newRouteTestConfigProvider(t *testing.T, cfg *config.Config) *config.ConfigProviderWithRefresh {
+	t.Helper()
+	provider, err := config.NewConfigProviderWithRefresh(&routeTestConfigProvider{cfg: cfg})
+	require.NoError(t, err)
+	t.Cleanup(provider.Close)
+	return provider
+}
+
+func buildTestUIIndexHandler(t *testing.T, publicPath string, assets fstest.MapFS) (echo.HandlerFunc, error) {
+	t.Helper()
+	return buildUIIndexHandler(publicPath, assets, newRouteTestConfigProvider(t, &config.Config{}))
+}
+
 func TestBuildUIIndexHandler_NoPublicPath(t *testing.T) {
-	handler, err := buildUIIndexHandler("", newTestAssets(testIndexHTML))
+	handler, err := buildTestUIIndexHandler(t, "", newTestAssets(testIndexHTML))
 	assert.NoError(t, err)
 
 	tests := []struct {
@@ -69,6 +96,7 @@ func TestBuildUIIndexHandler_NoPublicPath(t *testing.T) {
 			err := handler(c)
 			assert.NoError(t, err)
 			assert.Equal(t, http.StatusOK, rec.Code)
+			assert.Equal(t, "frame-src 'self';", rec.Header().Get("Content-Security-Policy"))
 
 			body := rec.Body.String()
 			assert.Contains(t, body, `base: ""`)
@@ -79,7 +107,7 @@ func TestBuildUIIndexHandler_NoPublicPath(t *testing.T) {
 }
 
 func TestBuildUIIndexHandler_WithPublicPath_RewritesBaseAndAssets(t *testing.T) {
-	handler, err := buildUIIndexHandler("/temporal", newTestAssets(testIndexHTML))
+	handler, err := buildTestUIIndexHandler(t, "/temporal", newTestAssets(testIndexHTML))
 	assert.NoError(t, err)
 
 	e := echo.New()
@@ -90,6 +118,7 @@ func TestBuildUIIndexHandler_WithPublicPath_RewritesBaseAndAssets(t *testing.T) 
 	err = handler(c)
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusOK, rec.Code)
+	assert.Equal(t, "frame-src 'self';", rec.Header().Get("Content-Security-Policy"))
 
 	body := rec.Body.String()
 	assert.Contains(t, body, `base: "/temporal"`)
@@ -98,7 +127,7 @@ func TestBuildUIIndexHandler_WithPublicPath_RewritesBaseAndAssets(t *testing.T) 
 }
 
 func TestBuildUIIndexHandler_WithPublicPath_RedirectsWhenPrefixMissing(t *testing.T) {
-	handler, err := buildUIIndexHandler("/temporal", newTestAssets(testIndexHTML))
+	handler, err := buildTestUIIndexHandler(t, "/temporal", newTestAssets(testIndexHTML))
 	assert.NoError(t, err)
 
 	tests := []struct {
@@ -159,7 +188,7 @@ func TestBuildUIIndexHandler_WithPublicPath_RedirectsWhenPrefixMissing(t *testin
 }
 
 func TestBuildUIIndexHandler_WithPublicPath_ServesWhenPrefixPresent(t *testing.T) {
-	handler, err := buildUIIndexHandler("/temporal", newTestAssets(testIndexHTML))
+	handler, err := buildTestUIIndexHandler(t, "/temporal", newTestAssets(testIndexHTML))
 	assert.NoError(t, err)
 
 	tests := []struct {
@@ -211,7 +240,7 @@ func TestBuildUIIndexHandler_WithPublicPath_ServesWhenPrefixPresent(t *testing.T
 // reaching this handler, while leaving RequestURI intact. The handler must
 // not redirect in that case, otherwise the rewrite + redirect loops.
 func TestBuildUIIndexHandler_WithPublicPath_HandlesMiddlewareRewrittenPath(t *testing.T) {
-	handler, err := buildUIIndexHandler("/temporal", newTestAssets(testIndexHTML))
+	handler, err := buildTestUIIndexHandler(t, "/temporal", newTestAssets(testIndexHTML))
 	assert.NoError(t, err)
 
 	tests := []struct {
@@ -254,8 +283,209 @@ func TestBuildUIIndexHandler_WithPublicPath_HandlesMiddlewareRewrittenPath(t *te
 
 func TestBuildUIIndexHandler_MissingIndexHTML(t *testing.T) {
 	emptyFS := fstest.MapFS{}
-	_, err := buildUIIndexHandler("", emptyFS)
+	_, err := buildTestUIIndexHandler(t, "", emptyFS)
 	assert.Error(t, err)
+}
+
+func TestBuildUIIndexHandler_SetsValidatedExtensionFrameSources(t *testing.T) {
+	cfg := &config.Config{
+		CustomUI: config.CustomUI{
+			Enabled: true,
+			IframeExtensions: []config.IframeExtension{
+				{ID: "self", Slot: "app.top-nav.actions.before", Src: "/extension", AllowedOrigin: "self"},
+				{ID: "remote-b", Slot: "app.top-nav.sub-nav", Src: "https://b.example.com/extension", AllowedOrigin: "https://b.example.com"},
+				{ID: "remote-a", Slot: "workflow.header.after-details", Src: "https://a.example.com/extension", AllowedOrigin: "https://A.EXAMPLE.COM:443/"},
+			},
+		},
+	}
+	provider := newRouteTestConfigProvider(t, cfg)
+	handler, err := buildUIIndexHandler("", newTestAssets(testIndexHTML), provider)
+	require.NoError(t, err)
+
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+
+	err = handler(c)
+	require.NoError(t, err)
+	assert.Equal(
+		t,
+		"frame-src 'self' https://a.example.com https://b.example.com;",
+		rec.Header().Get("Content-Security-Policy"),
+	)
+}
+
+func TestBuildUIIndexHandler_FailsClosedForInvalidExtensionConfiguration(t *testing.T) {
+	cfg := &config.Config{
+		CustomUI: config.CustomUI{
+			Enabled: true,
+			IframeExtensions: []config.IframeExtension{
+				{ID: "invalid", Slot: "app.top-nav.sub-nav", Src: "https://good.example.com/extension", AllowedOrigin: "https://bad.example.com"},
+			},
+		},
+	}
+	provider := newRouteTestConfigProvider(t, cfg)
+	handler, err := buildUIIndexHandler("", newTestAssets(testIndexHTML), provider)
+	require.NoError(t, err)
+
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+
+	err = handler(c)
+	var httpErr *echo.HTTPError
+	require.ErrorAs(t, err, &httpErr)
+	assert.Equal(t, http.StatusInternalServerError, httpErr.Code)
+	assert.Empty(t, rec.Header().Get("Content-Security-Policy"))
+}
+
+func TestBuildUIAssetsHandler_CacheControl(t *testing.T) {
+	handler := buildUIAssetsHandler(fstest.MapFS{
+		"_app/immutable/chunk.js":   &fstest.MapFile{Data: []byte("chunk")},
+		"_app/immutable/index.html": &fstest.MapFile{Data: []byte("index")},
+		"_app/styles.css":           &fstest.MapFile{Data: []byte("styles")},
+	})
+
+	tests := []struct {
+		name         string
+		path         string
+		rangeHeader  string
+		status       int
+		cacheControl string
+		location     string
+	}{
+		{
+			name:         "immutable asset is cached",
+			path:         "/_app/immutable/chunk.js",
+			status:       http.StatusOK,
+			cacheControl: "public, max-age=31536000, immutable",
+		},
+		{
+			name:         "immutable range response is cached",
+			path:         "/_app/immutable/chunk.js",
+			rangeHeader:  "bytes=0-1",
+			status:       http.StatusPartialContent,
+			cacheControl: "public, max-age=31536000, immutable",
+		},
+		{
+			name:   "non immutable asset is unchanged",
+			path:   "/_app/styles.css",
+			status: http.StatusOK,
+		},
+		{
+			name:     "immutable redirect is unchanged",
+			path:     "/_app/immutable/index.html",
+			status:   http.StatusMovedPermanently,
+			location: "./",
+		},
+		{
+			name:   "missing immutable asset is unchanged",
+			path:   "/_app/immutable/missing.js",
+			status: http.StatusNotFound,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			e := echo.New()
+			req := httptest.NewRequest(http.MethodGet, tt.path, nil)
+			if tt.rangeHeader != "" {
+				req.Header.Set("Range", tt.rangeHeader)
+			}
+			rec := httptest.NewRecorder()
+
+			err := handler(e.NewContext(req, rec))
+			require.NoError(t, err)
+			assert.Equal(t, tt.status, rec.Code)
+			assert.Equal(t, tt.cacheControl, rec.Header().Get("Cache-Control"))
+			assert.Equal(t, tt.location, rec.Header().Get("Location"))
+		})
+	}
+}
+
+func TestBuildUIAssetsHandler_CacheControlWithCSRFMiddleware(t *testing.T) {
+	modifiedAt := time.Date(2026, time.October, 20, 18, 0, 0, 0, time.UTC)
+	assets := fstest.MapFS{
+		"_app":                    &fstest.MapFile{Mode: os.ModeDir},
+		"_app/immutable":          &fstest.MapFile{Mode: os.ModeDir},
+		"_app/immutable/chunk.js": &fstest.MapFile{Data: []byte("chunk"), ModTime: modifiedAt},
+	}
+	provider := &routeTestConfigProvider{cfg: &config.Config{}}
+	e := echo.New()
+	e.Use(middleware.Gzip())
+	e.Use(csrf.EnsureTokenCookie(false))
+	e.Use(middleware.CSRFWithConfig(csrf.MiddlewareConfig(provider, false)))
+	e.GET("/_app/*", buildUIAssetsHandler(assets))
+
+	tests := []struct {
+		name            string
+		path            string
+		ifModifiedSince string
+		secFetchSite    string
+		status          int
+		cacheControl    string
+		setCookie       bool
+		lastModified    string
+	}{
+		{
+			name:         "immutable file is cacheable without a csrf cookie",
+			path:         "/_app/immutable/chunk.js",
+			status:       http.StatusOK,
+			cacheControl: "public, max-age=31536000, immutable",
+		},
+		{
+			name:            "not modified immutable asset is cacheable without a csrf cookie vary",
+			path:            "/_app/immutable/chunk.js",
+			ifModifiedSince: modifiedAt.Format(http.TimeFormat),
+			status:          http.StatusNotModified,
+			cacheControl:    "public, max-age=31536000, immutable",
+			lastModified:    modifiedAt.Format(http.TimeFormat),
+		},
+		{
+			name:            "not modified immutable browser asset is cacheable without a csrf cookie",
+			path:            "/_app/immutable/chunk.js",
+			ifModifiedSince: modifiedAt.Format(http.TimeFormat),
+			secFetchSite:    "same-origin",
+			status:          http.StatusNotModified,
+			cacheControl:    "public, max-age=31536000, immutable",
+			lastModified:    modifiedAt.Format(http.TimeFormat),
+		},
+		{
+			name:      "immutable directory is not cacheable",
+			path:      "/_app/immutable/",
+			status:    http.StatusOK,
+			setCookie: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req := httptest.NewRequest(http.MethodGet, tt.path, nil)
+			req.Header.Set("Accept-Encoding", "gzip")
+			if tt.ifModifiedSince != "" {
+				req.Header.Set("If-Modified-Since", tt.ifModifiedSince)
+			}
+			if tt.secFetchSite != "" {
+				req.Header.Set("Sec-Fetch-Site", tt.secFetchSite)
+			}
+			rec := httptest.NewRecorder()
+			e.ServeHTTP(rec, req)
+
+			assert.Equal(t, tt.status, rec.Code)
+			assert.Equal(t, tt.cacheControl, rec.Header().Get("Cache-Control"))
+			assert.Equal(t, tt.setCookie, len(rec.Result().Cookies()) > 0)
+			if tt.lastModified != "" {
+				assert.Equal(t, tt.lastModified, rec.Header().Get("Last-Modified"))
+			}
+			if tt.cacheControl != "" {
+				assert.Contains(t, rec.Header().Values("Vary"), "Accept-Encoding")
+				assert.NotContains(t, strings.Join(rec.Header().Values("Vary"), ","), "Cookie")
+				assert.Empty(t, rec.Header().Values("Set-Cookie"))
+			}
+		})
+	}
 }
 
 func renderRequest(t *testing.T, query string) string {
@@ -270,6 +500,24 @@ func renderRequest(t *testing.T, query string) string {
 
 	assert.Equal(t, http.StatusOK, rec.Code)
 	return rec.Body.String()
+}
+
+func TestSetRenderRoute_WithPublicPath(t *testing.T) {
+	e := echo.New()
+	e.Pre(PublicPath("/custom"))
+	SetRenderRoute(e, "/")
+
+	req := httptest.NewRequest(
+		http.MethodGet,
+		"/custom/render?content=Summary&theme=dark&overrideTheme=primary",
+		nil,
+	)
+	rec := httptest.NewRecorder()
+	e.ServeHTTP(rec, req)
+
+	assert.Equal(t, http.StatusOK, rec.Code)
+	assert.Contains(t, rec.Body.String(), "<p>Summary</p>")
+	assert.Contains(t, rec.Body.String(), `data-theme="dark-primary"`)
 }
 
 // The SvelteKit route and this one are separate implementations of the same
@@ -300,6 +548,16 @@ func TestSetRenderRoute_CompactBodyClass(t *testing.T) {
 			query: "content=hello&compact=TRUE",
 			want:  `class="prose"`,
 		},
+		{
+			name:  "inline opts into compact too",
+			query: "content=hello&inline=true",
+			want:  `class="prose compact inline"`,
+		},
+		{
+			name:  "only the exact string opts into inline",
+			query: "content=hello&inline=TRUE",
+			want:  `class="prose"`,
+		},
 	}
 
 	for _, tt := range tests {
@@ -319,6 +577,16 @@ func TestSetRenderRoute_StylesheetCarriesCompactRules(t *testing.T) {
 	assert.Contains(t, body, "body.compact code {")
 }
 
+func TestSetRenderRoute_StylesheetCarriesInlineRules(t *testing.T) {
+	body := renderRequest(t, "content=hello&inline=true")
+
+	// Without these a summary written as two paragraphs, or with a hard
+	// break, paints as stacked lines in a row that has height for one.
+	assert.Contains(t, body, "body.inline main {")
+	assert.Contains(t, body, "body.inline main * {")
+	assert.Contains(t, body, "body.inline :is(br, hr) {")
+}
+
 // Regression: a star selector reset with no strong rule renders bold at normal
 // weight. This route's reset does not set font-weight, so the pinned rule is
 // what keeps it at the same 600 the SvelteKit stylesheet uses.
@@ -334,13 +602,12 @@ func TestSetRenderRoute_BreaksLongWords(t *testing.T) {
 	assert.Contains(t, renderRequest(t, "content=hello"), "overflow-wrap: break-word;")
 }
 
-// This route's stylesheet is a hand-maintained copy of src/markdown.reset.css,
-// and the two have drifted before. A full comparison is not possible — the
-// SvelteKit copy resolves colors through Io theme variables this server cannot
-// read, so it hardcodes hex instead. The compact block carries no colors, so
-// that much can be held to parity here.
+// markdown.gen.css is generated from src/lib/utilities/markdown-reset.ts, so this is a
+// tripwire for a stale generated file that runs without needing node. The
+// authoritative check is scripts/generate-markdown-css.test.ts, which compares
+// the whole file against freshly generated content.
 func TestSetRenderRoute_CompactRulesMatchCanonicalStylesheet(t *testing.T) {
-	canonical, err := os.ReadFile(filepath.Join("..", "..", "..", "src", "markdown.reset.css"))
+	canonical, err := os.ReadFile(filepath.Join("..", "..", "..", "src", "lib", "utilities", "markdown-reset.ts"))
 	if err != nil {
 		t.Skip("canonical stylesheet not present; server module built standalone")
 	}
@@ -356,7 +623,7 @@ func TestSetRenderRoute_CompactRulesMatchCanonicalStylesheet(t *testing.T) {
 	body := renderRequest(t, "content=hello&compact=true")
 	for _, selector := range want {
 		assert.Contains(t, body, selector,
-			"src/markdown.reset.css has %q; this route's copy does not", selector)
+			"src/lib/utilities/markdown-reset.ts has %q; this route's copy does not", selector)
 	}
 }
 
@@ -369,4 +636,17 @@ func TestSetRenderRoute_CompactFrameIsTransparent(t *testing.T) {
 	assert.Contains(t, body, "background-color: transparent;")
 	assert.Contains(t, body, "color-scheme: light;")
 	assert.Contains(t, body, "html:has(body[data-theme^='dark'])")
+}
+
+// The stylesheet here used to be a copy that predated the Io design system, so
+// a packaged server rendered markdown in the old Holocene palette no matter
+// what theme the page was in. The colours now come from the same Io themes the
+// app uses, through the generator.
+func TestSetRenderRoute_ServesIoThemeColors(t *testing.T) {
+	body := renderRequest(t, "content=hello")
+
+	assert.Contains(t, body, "--color-surface-primary:")
+	assert.Contains(t, body, "--color-content-primary:")
+	assert.Contains(t, body, "body[data-theme^='dark']")
+	assert.NotContains(t, body, "#e8efff", "pre-Io Holocene blue is back")
 }

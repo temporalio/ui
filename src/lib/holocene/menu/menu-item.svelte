@@ -277,19 +277,19 @@
     }
 
     &.destructive {
-      @apply text-danger focus-visible:border-interactive-danger focus-visible:bg-interactive-danger focus-visible:text-white focus-visible:ring-interactive-danger active:bg-interactive-danger-press active:text-white;
+      @apply text-danger focus-visible:border-interactive-danger focus-visible:bg-interactive-danger focus-visible:text-primary focus-visible:ring-interactive-danger active:bg-interactive-danger-press active:text-primary;
 
       &.active {
-        @apply bg-interactive-danger text-white;
+        @apply bg-interactive-danger text-primary;
       }
 
       &.hoverable {
-        @apply hover:bg-interactive-danger-hover hover:text-white;
+        @apply hover:bg-interactive-danger-hover hover:text-primary;
       }
     }
 
     &.disabled {
-      @apply pointer-events-none cursor-not-allowed text-tertiary opacity-50;
+      @apply pointer-events-none cursor-not-allowed text-secondary opacity-80;
     }
   }
 
@@ -308,9 +308,12 @@
   .menu-item.active .menu-item-description,
   .menu-item.select.hoverable:hover .menu-item-description,
   .menu-item.select:focus-visible .menu-item-description,
-  .menu-item.select:active .menu-item-description,
+  .menu-item.select:active .menu-item-description {
+    @apply text-white;
+  }
+
   .menu-item.destructive.hoverable:hover .menu-item-description,
   .menu-item.destructive:focus-visible .menu-item-description {
-    @apply text-white;
+    @apply text-primary;
   }
 </style>

@@ -161,6 +161,9 @@
   onConfirm={onConfirmReset}
 />
 
+<!-- Remounts the drawer on every open so the form re-seeds from the current
+  activity; activity-options-form.svelte deliberately untracks its initial
+  values so a background refresh cannot clobber a mid-edit form. -->
 {#key optionsUpdateDrawerOpen}
   <ActivityOptionsUpdateDrawer
     bind:open={optionsUpdateDrawerOpen}

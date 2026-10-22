@@ -1,4 +1,4 @@
-import { existsSync, statSync } from 'node:fs';
+import * as fs from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -7,8 +7,6 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { createCatalogRegistry, generateCatalog } from './registry';
 import { startCatalogRunner } from './runner';
-
-vi.mock('node:fs', { spy: true });
 
 const createNexusHandler = (name: string) => {
   const definition = service(name, {
@@ -195,10 +193,9 @@ describe('catalog runner', () => {
       target: { ...binding.target, workflowsPath: './workflows.js' },
     }));
 
-    expect(statSync(sourceWorkflowsPath).isFile()).toBe(true);
-    vi.mocked(existsSync).mockImplementation(
-      (path) => path === sourceWorkflowsPath,
-    );
+    expect(fs.existsSync(packagedWorkflowsPath)).toBe(false);
+    expect(fs.statSync(sourceWorkflowsPath).isFile()).toBe(true);
+
     try {
       const sourceRunner = await startCatalogRunner({
         bindings,
@@ -211,7 +208,7 @@ describe('catalog runner', () => {
         expect.objectContaining({ workflowsPath: sourceWorkflowsPath }),
       );
 
-      vi.mocked(existsSync).mockReturnValue(true);
+      fs.closeSync(fs.openSync(packagedWorkflowsPath, 'wx'));
       const packagedRunner = await startCatalogRunner({
         bindings,
         connection,
@@ -223,7 +220,7 @@ describe('catalog runner', () => {
         expect.objectContaining({ workflowsPath: packagedWorkflowsPath }),
       );
     } finally {
-      vi.mocked(existsSync).mockRestore();
+      fs.rmSync(packagedWorkflowsPath, { force: true });
     }
   });
 

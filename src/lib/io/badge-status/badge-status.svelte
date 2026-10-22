@@ -1,5 +1,13 @@
 <script lang="ts" module>
-  import type { IconComponent } from '$lib/io/icon';
+  import type { I18nKey } from '$lib/i18n';
+  import {
+    Badge,
+    type BadgeColorScheme,
+    type BadgeExtension,
+    type BadgeExtensions,
+    type BadgeSize,
+  } from '$lib/io/badge';
+  import { type IconComponent, IconPause } from '$lib/io/icon';
   import type { ConditionalValue } from '$lib/io/types';
 
   export type BadgeStatusValue =
@@ -12,71 +20,75 @@
     | 'Terminated'
     | 'Canceled';
 
-  export type BadgeStatusColorScheme =
-    | 'neutral'
-    | 'info'
-    | 'success'
-    | 'warning'
-    | 'danger'
-    | 'error';
+  export type BadgeStatusColorScheme = BadgeColorScheme;
 
-  export type BadgeStatusSize = 'sm' | 'md';
+  export type BadgeStatusSize = BadgeSize;
 
-  export type BadgeStatusExtension = {
-    text?: string;
-    colorScheme?: BadgeStatusColorScheme;
-    LeadIcon?: ConditionalValue<IconComponent>;
-    TrailIcon?: ConditionalValue<IconComponent>;
-  };
+  export type BadgeStatusExtension = BadgeExtension;
 
-  export type BadgeStatusExtensions = ConditionalValue<BadgeStatusExtension>[];
-
-  const isBadgeStatusExtension = (
-    extension: ConditionalValue<BadgeStatusExtension>,
-  ): extension is BadgeStatusExtension =>
-    extension !== false && extension !== null && extension !== undefined;
-
-  const sharedClasses =
-    'inline-flex items-stretch overflow-hidden whitespace-nowrap rounded-full font-mono font-medium leading-none uppercase tracking-wide';
-  const segmentClasses =
-    'inline-flex flex-nowrap items-center justify-center gap-1 border';
-
-  const sizeClasses: Record<
-    BadgeStatusSize,
-    { badge: string; segment: string }
-  > = {
-    sm: { badge: 'text-2xs', segment: 'py-0.5 px-1' },
-    md: { badge: 'text-xs', segment: 'py-1 px-1.5' },
-  };
-
-  const colorSchemeClasses: Record<BadgeStatusColorScheme, string> = {
-    neutral: 'border-tertiary bg-surface-tertiary text-secondary',
-    info: 'border-information bg-surface-information text-information',
-    success: 'border-success bg-surface-success text-success',
-    warning: 'border-warning bg-surface-warning text-warning',
-    danger: 'border-danger bg-surface-danger text-danger',
-    error: 'border-error bg-surface-error text-error',
-  };
+  export type BadgeStatusExtensions = BadgeExtensions;
 
   const statusConfiguration: Record<
     BadgeStatusValue,
-    { text: string; colorScheme: BadgeStatusColorScheme }
+    {
+      translationId: I18nKey;
+      colorScheme: BadgeStatusColorScheme;
+      impliedExtensions: BadgeStatusExtensions;
+    }
   > = {
-    Running: { text: 'running', colorScheme: 'info' },
-    Paused: { text: 'paused', colorScheme: 'info' },
-    Completed: { text: 'complete', colorScheme: 'success' },
-    ContinuedAsNew: { text: 'continued as new', colorScheme: 'success' },
-    Failed: { text: 'failed', colorScheme: 'danger' },
-    TimedOut: { text: 'timed out', colorScheme: 'error' },
-    Terminated: { text: 'terminated', colorScheme: 'warning' },
-    Canceled: { text: 'cancelled', colorScheme: 'neutral' },
+    Running: {
+      translationId: 'workflows.running',
+      colorScheme: 'info',
+      impliedExtensions: [],
+    },
+    Paused: {
+      translationId: 'workflows.paused',
+      colorScheme: 'info',
+      impliedExtensions: [
+        {
+          colorScheme: 'warning',
+          TrailIcon: IconPause,
+          truncate: false,
+        },
+      ],
+    },
+    Completed: {
+      translationId: 'workflows.completed',
+      colorScheme: 'success',
+      impliedExtensions: [],
+    },
+    ContinuedAsNew: {
+      translationId: 'workflows.continued-as-new',
+      colorScheme: 'success',
+      impliedExtensions: [],
+    },
+    Failed: {
+      translationId: 'workflows.failed',
+      colorScheme: 'danger',
+      impliedExtensions: [],
+    },
+    TimedOut: {
+      translationId: 'workflows.timed-out',
+      colorScheme: 'error',
+      impliedExtensions: [],
+    },
+    Terminated: {
+      translationId: 'workflows.terminated',
+      colorScheme: 'warning',
+      impliedExtensions: [],
+    },
+    Canceled: {
+      translationId: 'workflows.canceled',
+      colorScheme: 'neutral',
+      impliedExtensions: [],
+    },
   };
 </script>
 
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
 
-  import { twMerge } from 'tailwind-merge';
+  import { translate } from '$lib/i18n/translate';
 
   interface Props extends Omit<
     HTMLAttributes<HTMLSpanElement>,
@@ -84,9 +96,14 @@
   > {
     status: BadgeStatusValue;
     size?: BadgeStatusSize;
+    truncate?: boolean;
     text?: string;
     count?: string | number;
     TrailIcon?: ConditionalValue<IconComponent>;
+    /** some statuses such as 'Paused' imply an extension (a pause icon)
+     *  this is an escape hatch for when you do not want those extensions.
+     */
+    showImpliedExtensions?: boolean;
     extensions?: ConditionalValue<BadgeStatusExtensions>;
     class?: string;
   }
@@ -94,63 +111,39 @@
   let {
     status,
     size = 'md',
+    truncate = true,
     text,
     count,
     TrailIcon,
+    showImpliedExtensions = true,
     extensions,
     class: className,
     ...rest
   }: Props = $props();
 
   const configuration = $derived(statusConfiguration[status]);
-  const visibleExtensions = $derived(
-    extensions ? extensions.filter(isBadgeStatusExtension) : [],
-  );
+  const label = $derived.by(() => {
+    const statusText = text ?? translate(configuration.translationId);
+    if (count == null) return statusText;
+
+    const displayCount =
+      typeof count === 'number' ? count.toLocaleString() : count;
+    return `${displayCount} ${statusText}`;
+  });
+
+  const badgeExtensions = $derived([
+    ...(showImpliedExtensions ? configuration.impliedExtensions : []),
+    ...(extensions || []),
+  ]);
 </script>
 
-<span
-  class={twMerge(sharedClasses, sizeClasses[size].badge, className)}
+<Badge
   {...rest}
->
-  <span
-    class={twMerge(
-      segmentClasses,
-      sizeClasses[size].segment,
-      colorSchemeClasses[configuration.colorScheme],
-      visibleExtensions.length ? 'rounded-l-full border-r-0' : 'rounded-full',
-    )}
-  >
-    <span>
-      {#if typeof count === 'number'}
-        {count.toLocaleString()} {text ?? configuration.text}
-      {:else if count != null}
-        {count} {text ?? configuration.text}
-      {:else}
-        {text ?? configuration.text}
-      {/if}
-    </span>
-    {#if TrailIcon}
-      <TrailIcon width="1em" height="1em" />
-    {/if}
-  </span>
-  {#each visibleExtensions as extension, index (index)}
-    <span
-      class={twMerge(
-        segmentClasses,
-        sizeClasses[size].segment,
-        colorSchemeClasses[extension.colorScheme ?? configuration.colorScheme],
-        index < visibleExtensions.length - 1 ? 'border-r-0' : 'rounded-r-full',
-      )}
-    >
-      {#if extension.LeadIcon}
-        <extension.LeadIcon width="1em" height="1em" />
-      {/if}
-      {#if extension.text}
-        <span>{extension.text}</span>
-      {/if}
-      {#if extension.TrailIcon}
-        <extension.TrailIcon width="1em" height="1em" />
-      {/if}
-    </span>
-  {/each}
-</span>
+  {size}
+  {truncate}
+  text={label}
+  colorScheme={configuration.colorScheme}
+  Icon={TrailIcon}
+  extensions={badgeExtensions}
+  class={className}
+/>

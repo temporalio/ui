@@ -129,10 +129,6 @@ export const routeForCatalogExample = ({
   });
 };
 
-export const routeForCommonErrors = (): ResolvedPathname => {
-  return withPrefix('/common-errors', {});
-};
-
 export const routeForNexusEndpoint = (id: string): ResolvedPathname => {
   return withPrefix('/nexus/[id]', { id });
 };
@@ -338,6 +334,21 @@ export const routeForSchedules = (
   parameters: NamespaceParameter,
 ): ResolvedPathname => {
   return `${routeForNamespace(parameters)}/schedules`;
+};
+
+export const routeForSchedulesWithQuery = ({
+  namespace,
+  query,
+  page,
+}: QueryParameters): ResolvedPathname | undefined => {
+  if (!BROWSER) {
+    return undefined;
+  }
+
+  return toURL(routeForSchedules({ namespace }), {
+    query: query ?? '',
+    ...(page && { page }),
+  });
 };
 
 export const routeForScheduleCreate = ({

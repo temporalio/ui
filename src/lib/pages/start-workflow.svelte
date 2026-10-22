@@ -239,13 +239,14 @@
   };
 
   const inputValid = $derived(!input || inputIsJSON(input));
+  const hasRequiredStartFields = $derived(
+    Boolean(workflowId && taskQueue && workflowType),
+  );
 
   const enableStart = $derived(
-    !!workflowId &&
-      !!taskQueue &&
-      !!workflowType &&
-      !!inputValid &&
-      !workflowCreateDisabled(page),
+    hasRequiredStartFields &&
+      inputValid &&
+      !workflowCreateDisabled(namespace, page.data.settings),
   );
 
   $effect(() => {
@@ -279,7 +280,7 @@
         onblur={(e) => onInputChange(e, 'workflowId')}
       />
       <RandomUuidButton
-        class="mt-0 md:mt-6"
+        class="mt-0 md:mt-7"
         bind:value={workflowId}
         onGenerate={syncWorkflowId}
       />

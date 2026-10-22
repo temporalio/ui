@@ -88,6 +88,19 @@ func ExchangeCode(ctx context.Context, r *http.Request, config *oauth2.Config, p
 		return nil, echo.NewHTTPError(http.StatusBadRequest, "State cookie did not match")
 	}
 
+	if providerErr := r.URL.Query().Get("error"); providerErr != "" {
+		message := "SSO provider returned an error: " + providerErr
+		if description := r.URL.Query().Get("error_description"); description != "" {
+			message += " - " + description
+		}
+		return nil, echo.NewHTTPError(http.StatusUnauthorized, message)
+	}
+
+	code := r.URL.Query().Get("code")
+	if code == "" {
+		return nil, echo.NewHTTPError(http.StatusBadRequest, "Authorization code is missing from the SSO callback")
+	}
+
 	var oauth2Token *oauth2.Token
 	if pkceEnabled {
 		codeVerifier, err := r.Cookie("code_verifier")
@@ -100,12 +113,12 @@ func ExchangeCode(ctx context.Context, r *http.Request, config *oauth2.Config, p
 		if verr := validatePKCEVerifier(codeVerifier.Value); verr != nil {
 			return nil, verr
 		}
-		oauth2Token, err = config.Exchange(ctx, r.URL.Query().Get("code"), oauth2.SetAuthURLParam("code_verifier", codeVerifier.Value))
+		oauth2Token, err = config.Exchange(ctx, code, oauth2.SetAuthURLParam("code_verifier", codeVerifier.Value))
 		if err != nil {
 			return nil, echo.NewHTTPError(http.StatusInternalServerError, "Unable to exchange token: "+err.Error())
 		}
 	} else {
-		oauth2Token, err = config.Exchange(ctx, r.URL.Query().Get("code"))
+		oauth2Token, err = config.Exchange(ctx, code)
 		if err != nil {
 			return nil, echo.NewHTTPError(http.StatusInternalServerError, "Unable to exchange token: "+err.Error())
 		}

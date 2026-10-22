@@ -96,7 +96,7 @@ func TestSetUser(t *testing.T) {
 
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
-			err := auth.SetUser(tt.ctx, &tt.user, true)
+			err := auth.SetUser(tt.ctx, &tt.user, auth.CookieOptions{Secure: true})
 			cookies := tt.ctx.Cookies()
 
 			if tt.wantErr {
@@ -123,7 +123,7 @@ func TestSetUserSecureFlag(t *testing.T) {
 			user := auth.User{OAuth2Token: &oauth2.Token{AccessToken: "AAA", RefreshToken: "RRR"}}
 
 			a := assert.New(t)
-			a.NoError(auth.SetUser(c, &user, secure))
+			a.NoError(auth.SetUser(c, &user, auth.CookieOptions{Secure: secure}))
 
 			for _, sc := range c.Response().Header()[echo.HeaderSetCookie] {
 				cookieName := strings.SplitN(sc, "=", 2)[0]

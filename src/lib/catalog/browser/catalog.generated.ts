@@ -2,7 +2,7 @@ import type { BrowserCatalogArtifact } from './types';
 
 export const catalogArtifact: BrowserCatalogArtifact = {
   sourceHash:
-    'd7f2464b31a33221a79aee1b28edb90c8bf32a6aaf8d0bd990a1cf6a95c984ee',
+    '78d83b078a21e69614890b3d5cd94804be41f98031865576fdab98c636a3b881',
   descriptors: [
     {
       id: 'activity-heartbeat',
@@ -494,6 +494,80 @@ export const catalogArtifact: BrowserCatalogArtifact = {
       source: { id: 'oss', label: 'OSS' },
     },
     {
+      id: 'satellite-launch-event-groups',
+      title: 'Event marker groups',
+      description:
+        'Launches a rocket and deploys satellites, grouping history events by mission phase and satellite.',
+      capabilityTags: ['event-groups', 'signals', 'updates', 'activities'],
+      expectedEvidence: [
+        'Events grouped under Pre-launch checks, Ascent, and Payload deployment, with deployment events also grouped by satellite.',
+        'Launch poll events grouped by the goForLaunch signal, and orbit burn events grouped by both the adjustOrbit update and their satellite.',
+      ],
+      input: {
+        defaultValue: [
+          {
+            missionName: 'Aurora-7',
+            satellites: ['SAT-A', 'SAT-B'],
+            launchPollTimeoutSeconds: 30,
+          },
+        ],
+        schema: {
+          type: 'array',
+          prefixItems: [
+            {
+              title: 'Mission',
+              type: 'object',
+              properties: {
+                missionName: { type: 'string', minLength: 1 },
+                satellites: {
+                  type: 'array',
+                  items: { type: 'string', minLength: 1 },
+                  minItems: 1,
+                  maxItems: 5,
+                  uniqueItems: true,
+                },
+                launchPollTimeoutSeconds: {
+                  type: 'integer',
+                  minimum: 5,
+                  maximum: 300,
+                },
+              },
+              required: [
+                'missionName',
+                'satellites',
+                'launchPollTimeoutSeconds',
+              ],
+              additionalProperties: false,
+            },
+          ],
+          items: false,
+          minItems: 1,
+          maxItems: 1,
+        },
+      },
+      startOptions: {
+        defaultValue: {},
+        schema: {
+          type: 'object',
+          properties: {
+            details: { type: 'string' },
+            searchAttributes: { type: 'object' },
+            summary: { type: 'string' },
+            workflowStartDelay: { type: 'string' },
+            workflowId: { type: 'string', minLength: 1 },
+          },
+        },
+      },
+      execution: {
+        kind: 'workflow',
+        targetId: 'shared-workflows',
+        namespace: 'default',
+        taskQueue: 'ui-catalog',
+        workflowType: 'satelliteLaunchEventGroups',
+      },
+      source: { id: 'oss', label: 'OSS' },
+    },
+    {
       id: 'sequential-activities',
       title: 'Sequential activities',
       description: 'Runs three activity commands one after another.',
@@ -529,6 +603,198 @@ export const catalogArtifact: BrowserCatalogArtifact = {
         namespace: 'default',
         taskQueue: 'ui-catalog',
         workflowType: 'sequentialActivities',
+      },
+      source: { id: 'oss', label: 'OSS' },
+    },
+    {
+      id: 'sequential-markdown-activities',
+      title: 'Sequential activities with Markdown summaries',
+      description:
+        'Runs 20 activities by default with Markdown summaries and retries one step three times.',
+      capabilityTags: ['activities', 'sequencing', 'retries'],
+      expectedEvidence: [
+        'The configured number of non-overlapping activity executions in deterministic order.',
+        'When included, logging step 10 fails three attempts and succeeds on attempt four.',
+        'Each activity summary displays a Logging System link.',
+      ],
+      input: {
+        defaultValue: [20],
+        schema: {
+          type: 'array',
+          prefixItems: [
+            {
+              title: 'Activity count',
+              type: 'integer',
+              minimum: 1,
+              maximum: 2000,
+            },
+          ],
+          items: false,
+          maxItems: 1,
+        },
+      },
+      startOptions: {
+        defaultValue: {},
+        schema: {
+          type: 'object',
+          properties: {
+            details: { type: 'string' },
+            searchAttributes: { type: 'object' },
+            summary: { type: 'string' },
+            workflowStartDelay: { type: 'string' },
+            workflowId: { type: 'string', minLength: 1 },
+          },
+        },
+      },
+      execution: {
+        kind: 'workflow',
+        targetId: 'shared-workflows',
+        namespace: 'default',
+        taskQueue: 'ui-catalog',
+        workflowType: 'sequentialMarkdownActivities',
+      },
+      source: { id: 'oss', label: 'OSS' },
+    },
+    {
+      id: 'sequential-multiline-summary-activities',
+      title: 'Sequential activities with multi-line Markdown summaries',
+      description:
+        'Runs 20 activities by default with Markdown summaries that alternate between a paragraph break and a hard break.',
+      capabilityTags: ['activities', 'sequencing'],
+      expectedEvidence: [
+        'The configured number of non-overlapping activity executions in deterministic order.',
+        'Each activity summary spans two Markdown blocks, and the timeline label stays on one line.',
+      ],
+      input: {
+        defaultValue: [20],
+        schema: {
+          type: 'array',
+          prefixItems: [
+            {
+              title: 'Activity count',
+              type: 'integer',
+              minimum: 1,
+              maximum: 2000,
+            },
+          ],
+          items: false,
+          maxItems: 1,
+        },
+      },
+      startOptions: {
+        defaultValue: {},
+        schema: {
+          type: 'object',
+          properties: {
+            details: { type: 'string' },
+            searchAttributes: { type: 'object' },
+            summary: { type: 'string' },
+            workflowStartDelay: { type: 'string' },
+            workflowId: { type: 'string', minLength: 1 },
+          },
+        },
+      },
+      execution: {
+        kind: 'workflow',
+        targetId: 'shared-workflows',
+        namespace: 'default',
+        taskQueue: 'ui-catalog',
+        workflowType: 'sequentialMultilineSummaryActivities',
+      },
+      source: { id: 'oss', label: 'OSS' },
+    },
+    {
+      id: 'sequential-no-summary-activities',
+      title: 'Sequential activities without summaries',
+      description: 'Runs 20 activities by default without summaries.',
+      capabilityTags: ['activities', 'sequencing'],
+      expectedEvidence: [
+        'The configured number of non-overlapping activity executions in deterministic order.',
+        'Activity timeline entries do not display summaries.',
+      ],
+      input: {
+        defaultValue: [20],
+        schema: {
+          type: 'array',
+          prefixItems: [
+            {
+              title: 'Activity count',
+              type: 'integer',
+              minimum: 1,
+              maximum: 2000,
+            },
+          ],
+          items: false,
+          maxItems: 1,
+        },
+      },
+      startOptions: {
+        defaultValue: {},
+        schema: {
+          type: 'object',
+          properties: {
+            details: { type: 'string' },
+            searchAttributes: { type: 'object' },
+            summary: { type: 'string' },
+            workflowStartDelay: { type: 'string' },
+            workflowId: { type: 'string', minLength: 1 },
+          },
+        },
+      },
+      execution: {
+        kind: 'workflow',
+        targetId: 'shared-workflows',
+        namespace: 'default',
+        taskQueue: 'ui-catalog',
+        workflowType: 'sequentialNoSummaryActivities',
+      },
+      source: { id: 'oss', label: 'OSS' },
+    },
+    {
+      id: 'sequential-plain-text-activities',
+      title: 'Sequential plain text activities',
+      description:
+        'Runs 20 activities by default with an indexed plain-text summary.',
+      capabilityTags: ['activities', 'sequencing'],
+      expectedEvidence: [
+        'The configured number of non-overlapping activity executions in deterministic order.',
+        'Activity summaries range from Activity 1 through the configured count.',
+      ],
+      input: {
+        defaultValue: [20],
+        schema: {
+          type: 'array',
+          prefixItems: [
+            {
+              title: 'Activity count',
+              type: 'integer',
+              minimum: 1,
+              maximum: 2000,
+            },
+          ],
+          items: false,
+          maxItems: 1,
+        },
+      },
+      startOptions: {
+        defaultValue: {},
+        schema: {
+          type: 'object',
+          properties: {
+            details: { type: 'string' },
+            searchAttributes: { type: 'object' },
+            summary: { type: 'string' },
+            workflowStartDelay: { type: 'string' },
+            workflowId: { type: 'string', minLength: 1 },
+          },
+        },
+      },
+      execution: {
+        kind: 'workflow',
+        targetId: 'shared-workflows',
+        namespace: 'default',
+        taskQueue: 'ui-catalog',
+        workflowType: 'sequentialPlainTextActivities',
       },
       source: { id: 'oss', label: 'OSS' },
     },
@@ -625,6 +891,53 @@ export const catalogArtifact: BrowserCatalogArtifact = {
         namespace: 'default',
         taskQueue: 'ui-catalog',
         workflowType: 'signalWorkflow',
+      },
+      source: { id: 'oss', label: 'OSS' },
+    },
+    {
+      id: 'slow-nexus-operation',
+      title: 'Slow standalone Nexus operation',
+      description:
+        'Runs a standalone Nexus operation that fails several retryable attempts before completing, so it stays running across multiple long-poll updates.',
+      capabilityTags: ['nexus', 'standalone', 'retries', 'terminal-outcome'],
+      expectedEvidence: [
+        'The operation stays running while the attempt count climbs, then completes with a greeting.',
+        'The operation input stays visible on the details page throughout.',
+      ],
+      setupMarkdown:
+        'Each failed attempt is a state change that the details page receives over its long poll while the operation is still running.\n\n- `failedAttempts` sets how many attempts fail before one succeeds. Server retry backoff grows with each attempt.\n- `completionDelaySeconds` delays the successful attempt. Keep it under 10 seconds, the server timeout for a synchronous Nexus request.',
+      input: {
+        defaultValue: {
+          name: 'Temporal',
+          failedAttempts: 6,
+          completionDelaySeconds: 5,
+          note: 'This input should stay visible on the details page until the operation completes.',
+        },
+        schema: {
+          type: 'object',
+          properties: {
+            name: { type: 'string', minLength: 1 },
+            failedAttempts: { type: 'integer', minimum: 0, maximum: 10 },
+            completionDelaySeconds: { type: 'integer', minimum: 0, maximum: 9 },
+            note: { type: 'string' },
+          },
+          required: ['name', 'failedAttempts', 'completionDelaySeconds'],
+          additionalProperties: false,
+        },
+      },
+      startOptions: {
+        defaultValue: {},
+        schema: { type: 'object', properties: {} },
+      },
+      execution: {
+        kind: 'standalone-nexus-operation',
+        targetId: 'shared-workflows',
+        namespace: 'default',
+        taskQueue: 'ui-catalog',
+        endpoint: 'ui-catalog-slow-nexus',
+        service: 'catalog-slow-nexus',
+        operation: 'slowGreeting',
+        policies: { scheduleToCloseTimeout: '300s' },
       },
       source: { id: 'oss', label: 'OSS' },
     },

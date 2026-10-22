@@ -4,6 +4,7 @@
   import WorkerStatus from '$lib/components/workers/worker-status.svelte';
   import type { WorkerHeartbeat, WorkerListInfo } from '$lib/types';
   import { formatSDKName } from '$lib/utilities/get-sdk-version';
+  import { getWorkerHostName } from '$lib/utilities/get-worker-host-name';
   import { createFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import {
     routeForWorkerDeployment,
@@ -24,9 +25,9 @@
 </script>
 
 <tr>
-  <td>
+  <WorkersTableCell attribute="WorkerStatus" value={status} {filterable}>
     <WorkerStatus {status} />
-  </td>
+  </WorkersTableCell>
   <WorkersTableCell
     attribute="WorkerInstanceKey"
     value={worker?.workerInstanceKey}
@@ -66,16 +67,14 @@
   />
   <WorkersTableCell
     attribute="HostName"
-    value={'hostName' in worker
-      ? worker?.hostName
-      : 'hostInfo' in worker
-        ? worker?.hostInfo?.hostName
-        : ''}
+    value={getWorkerHostName(worker) ?? ''}
     {filterable}
   />
   <WorkersTableCell
     attribute="StartTime"
     value={$timestamp(worker?.startTime)}
+    rawValue={worker?.startTime}
+    {filterable}
   />
   <WorkersTableCell
     {filterable}

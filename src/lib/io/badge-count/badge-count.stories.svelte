@@ -2,10 +2,12 @@
   import { defineMeta } from '@storybook/addon-svelte-csf';
   import type { ComponentProps } from 'svelte';
 
-  import type { BadgeCountSize } from './badge-count.svelte';
-  import BadgeCount from './badge-count.svelte';
+  import { BadgeCount, type BadgeCountSize } from '$lib/io/badge-count';
 
   const sizes: BadgeCountSize[] = ['sm', 'md'];
+  const colorSchemes: NonNullable<
+    ComponentProps<typeof BadgeCount>['colorScheme']
+  >[] = ['neutral', 'error'];
 
   const { Story } = defineMeta({
     title: 'IO/Design System/Badge Count',
@@ -13,11 +15,13 @@
     args: {
       value: '12',
       size: 'md',
+      colorScheme: 'neutral',
     },
     argTypes: {
       value: { control: 'text' },
       total: { control: 'text' },
       size: { control: 'select', options: sizes },
+      colorScheme: { control: 'select', options: colorSchemes },
       class: { table: { disable: true } },
     },
     parameters: {
@@ -34,6 +38,10 @@
 {/snippet}
 
 <Story name="Playground" />
+
+<Story name="Error" args={{ value: 12, colorScheme: 'error' }} />
+
+<Story name="Zero value and total" args={{ value: 0, total: 0 }} />
 
 <Story name="Sizes">
   {#snippet template()}

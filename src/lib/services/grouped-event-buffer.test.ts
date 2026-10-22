@@ -13,8 +13,11 @@ vi.mock('$lib/models/event-history', async (importOriginal) => {
 
 import {
   getEventArray,
+  getEventGroupMatcher,
+  getEventGroupOptions,
   getGroupArray,
   getLazyGroups,
+  getPendingActivityScheduledEvent,
   getWorkflowTaskFailedEvent,
   ingestHistoryEvent,
   isWorkflowTaskGroup,
@@ -1525,5 +1528,225 @@ describe('lazy and materialized group agreement', () => {
 
     const [lazy] = getLazyGroups();
     expect(materializeGroup(lazy)).toBe(materializeGroup(lazy));
+  });
+});
+
+describe('getPendingActivityScheduledEvent', () => {
+  const pending = (overrides: Record<string, unknown> = {}) =>
+    [
+      {
+        activityId: '1',
+        state: 'Started',
+        activityType: 'MyActivity',
+        ...overrides,
+      },
+    ] as Parameters<typeof setPendingMetadata>[0];
+
+  it('returns the head event of a pending activity group', () => {
+    reset(10);
+    ingestHistoryEvent(makeActivityScheduled(1, 'MyActivity'));
+    setPendingMetadata(pending(), []);
+
+    const scheduled = getPendingActivityScheduledEvent('1');
+    expect(scheduled?.id).toBe('1');
+    expect(scheduled?.eventType).toBe('ActivityTaskScheduled');
+  });
+
+  it('is undefined until the head event is ingested', () => {
+    reset(10);
+    setPendingMetadata(pending(), []);
+    expect(getPendingActivityScheduledEvent('1')).toBeUndefined();
+
+    ingestHistoryEvent(makeActivityScheduled(1, 'MyActivity'));
+    expect(getPendingActivityScheduledEvent('1')?.id).toBe('1');
+  });
+
+  it('is undefined for an activity the history has resolved', () => {
+    reset(10);
+    const [scheduled, timedOut] = makeActivityTimeoutGroup(1);
+    ingestHistoryEvent(scheduled);
+    setPendingMetadata(pending(), []);
+    expect(getPendingActivityScheduledEvent('1')).toBeDefined();
+
+    ingestHistoryEvent(timedOut);
+    expect(getPendingActivityScheduledEvent('1')).toBeUndefined();
+  });
+
+  it('is undefined once the activity is no longer pending', () => {
+    reset(10);
+    ingestHistoryEvent(makeActivityScheduled(1, 'MyActivity'));
+    setPendingMetadata(pending(), []);
+    setPendingMetadata([], []);
+
+    expect(getPendingActivityScheduledEvent('1')).toBeUndefined();
+  });
+
+  it('is cleared by reset', () => {
+    reset(10);
+    ingestHistoryEvent(makeActivityScheduled(1, 'MyActivity'));
+    setPendingMetadata(pending(), []);
+
+    reset(10);
+    expect(getPendingActivityScheduledEvent('1')).toBeUndefined();
+  });
+
+  it('bumps the lazy group version without changing its identity when only the options change', () => {
+    reset(10);
+    ingestHistoryEvent(makeActivityScheduled(1, 'MyActivity'));
+    setPendingMetadata(
+      pending({ activityOptions: { retryPolicy: { maximumAttempts: 3 } } }),
+      [],
+    );
+
+    const [lazyBefore] = getLazyGroups();
+    const versionBefore = lazyBefore.version;
+    const groupBefore = materializeGroup(lazyBefore);
+
+    setPendingMetadata(
+      pending({ activityOptions: { retryPolicy: { maximumAttempts: 10 } } }),
+      [],
+    );
+
+    const [lazyAfter] = getLazyGroups();
+    // The record identity is stable for the life of the run, so consumers that
+    // derive off the lazy group alone must compare version, not reference.
+    expect(lazyAfter).toBe(lazyBefore);
+    expect(lazyAfter.version).toBeGreaterThan(versionBefore);
+    expect(materializeGroup(lazyAfter)).not.toBe(groupBefore);
+    expect(
+      materializeGroup(lazyAfter).pendingActivity?.activityOptions?.retryPolicy
+        ?.maximumAttempts,
+    ).toBe(10);
+  });
+});
+
+describe('event group labels', () => {
+  const label = {
+    metadata: { encoding: btoa('json/plain') },
+    data: btoa(JSON.stringify('Checkout')),
+  };
+  const withMarker = (
+    event: HistoryEvent,
+    marker: { id: string; label?: typeof label },
+  ) =>
+    ({
+      ...event,
+      eventGroupMarkers: [{ label: marker }],
+    }) as unknown as HistoryEvent;
+
+  it('resolves a label from an event ingested later', () => {
+    const [started, fired] = makeTimerGroup(1);
+    ingestHistoryEvent(withMarker(fired, { id: 'group-1' }));
+    ingestHistoryEvent(withMarker(started, { id: 'group-1', label }));
+
+    expect(getEventArray().map((event) => event.eventGroups)).toEqual([
+      [{ key: 'label:group-1', kind: 'label', id: 'group-1', label }],
+      [{ key: 'label:group-1', kind: 'label', id: 'group-1', label }],
+    ]);
+  });
+
+  it('does not carry labels across a reset', () => {
+    const [started, fired] = makeTimerGroup(1);
+    ingestHistoryEvent(withMarker(started, { id: 'group-1', label }));
+
+    reset(0);
+    ingestHistoryEvent(withMarker(fired, { id: 'group-1' }));
+
+    expect(getEventArray()[0].eventGroups).toEqual([
+      { key: 'label:group-1', kind: 'label', id: 'group-1' },
+    ]);
+  });
+});
+
+describe('event group index', () => {
+  const marker = (id: string) => ({ label: { id } });
+  const withMarkers = (
+    event: HistoryEvent,
+    eventGroupMarkers: { label: { id: string } }[],
+  ) => ({ ...event, eventGroupMarkers }) as unknown as HistoryEvent;
+
+  it('lists event groups in order of their first event with event counts', () => {
+    const [scheduled, started, completed] = makeActivityGroup(5);
+    const [timerStarted, timerFired] = makeTimerGroup(1);
+    ingestHistoryEvent(withMarkers(scheduled, [marker('b'), marker('a')]));
+    ingestHistoryEvent(started);
+    ingestHistoryEvent(completed);
+    ingestHistoryEvent(withMarkers(timerStarted, [marker('a')]));
+    ingestHistoryEvent(timerFired);
+
+    expect(
+      getEventGroupOptions().map(({ group, eventCount, firstEventId }) => ({
+        key: group.key,
+        eventCount,
+        firstEventId,
+      })),
+    ).toEqual([
+      { key: 'label:a', eventCount: 2, firstEventId: 1 },
+      { key: 'label:b', eventCount: 1, firstEventId: 5 },
+    ]);
+  });
+
+  it('matches whole lifecycle groups that contain a marked event', () => {
+    const [scheduled, started, completed] = makeActivityGroup(1);
+    const [timerStarted, timerFired] = makeTimerGroup(4);
+    ingestHistoryEvent(withMarkers(scheduled, [marker('a')]));
+    ingestHistoryEvent(started);
+    ingestHistoryEvent(completed);
+    ingestHistoryEvent(timerStarted);
+    ingestHistoryEvent(timerFired);
+
+    const matcher = getEventGroupMatcher(['label:a'])!;
+
+    expect(matcher.hasGroup('1')).toBe(true);
+    expect(matcher.hasGroup('4')).toBe(false);
+    expect(
+      getEventArray()
+        .filter((event) => matcher.hasEvent(event))
+        .map(({ id }) => id),
+    ).toEqual(['1', '2', '3']);
+  });
+
+  it('matches any of the selected event groups', () => {
+    const [timerStarted, timerFired] = makeTimerGroup(1);
+    const [otherStarted, otherFired] = makeTimerGroup(3);
+    ingestHistoryEvent(withMarkers(timerStarted, [marker('a')]));
+    ingestHistoryEvent(timerFired);
+    ingestHistoryEvent(withMarkers(otherStarted, [marker('b')]));
+    ingestHistoryEvent(otherFired);
+
+    const matcher = getEventGroupMatcher(['label:a', 'label:b'])!;
+
+    expect(matcher.hasGroup('1')).toBe(true);
+    expect(matcher.hasGroup('3')).toBe(true);
+  });
+
+  it('ignores selected keys that are not in the run', () => {
+    const [timerStarted, timerFired] = makeTimerGroup(1);
+    ingestHistoryEvent(withMarkers(timerStarted, [marker('a')]));
+    ingestHistoryEvent(timerFired);
+
+    expect(getEventGroupMatcher(['label:missing'])).toBeUndefined();
+    expect(getEventGroupMatcher([])).toBeUndefined();
+    expect(
+      getEventGroupMatcher(['label:missing', 'label:a'])?.hasGroup('1'),
+    ).toBe(true);
+  });
+
+  it('indexes events that arrive before their lifecycle group head', () => {
+    const [timerStarted, timerFired] = makeTimerGroup(1);
+    ingestHistoryEvent(withMarkers(timerFired, [marker('a')]));
+    ingestHistoryEvent(timerStarted);
+
+    expect(getEventGroupMatcher(['label:a'])?.hasGroup('1')).toBe(true);
+  });
+
+  it('clears the index on reset', () => {
+    const [timerStarted] = makeTimerGroup(1);
+    ingestHistoryEvent(withMarkers(timerStarted, [marker('a')]));
+
+    reset(0);
+
+    expect(getEventGroupOptions()).toEqual([]);
+    expect(getEventGroupMatcher(['label:a'])).toBeUndefined();
   });
 });

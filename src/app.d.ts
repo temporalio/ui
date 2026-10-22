@@ -10,7 +10,7 @@ declare namespace App {
 
   interface PageData {
     workflow?: import('$types').WorkflowExecution;
-    settings?: import('$types').Settings;
+    settings: import('$types').Settings;
     cluster?: import('$types').ClusterInformation;
   }
 }

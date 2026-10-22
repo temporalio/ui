@@ -24,6 +24,7 @@ export type IoTheme = {
         warning: string;
         danger: string;
         neutral: string;
+        brand: string;
       };
     };
     surface: {
@@ -79,25 +80,26 @@ export type IoTheme = {
       'danger-press': string;
     };
     action: {
+      workflow: string;
+      'workflow-overlay': string;
+      activity: string;
+      'activity-overlay': string;
+      signal: string;
+      'signal-overlay': string;
+      timer: string;
+      'timer-overlay': string;
+      nexus: string;
+      'nexus-overlay': string;
+      query: string;
+      update: string;
+      capacity: string;
+      fairness: string;
+    };
+    extension: {
       info: string;
       success: string;
       warning: string;
       danger: string;
-      workflow: {
-        workflow: string;
-        'workflow-hover': string;
-        activity: string;
-        'activity-hover': string;
-        signal: string;
-        'signal-hover': string;
-        timer: string;
-        'timer-hover': string;
-        nexus: string;
-        'nexus-hover': string;
-        query: string;
-        capacity: string;
-        fairness: string;
-      };
     };
   };
   opacity: {

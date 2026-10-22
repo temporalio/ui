@@ -3,12 +3,15 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { base } from '$app/paths';
 
 import { fetchNamespaces } from './namespaces-service';
-import { namespaces } from '../stores/namespaces';
+import { namespaces, namespacesLoading } from '../stores/namespaces';
 import { toaster } from '../stores/toaster';
 import { getApiOrigin } from '../utilities/get-api-origin';
 
 vi.mock('../stores/toaster', () => ({ toaster: { push: vi.fn() } }));
-vi.mock('../stores/namespaces', () => ({ namespaces: { set: vi.fn() } }));
+vi.mock('../stores/namespaces', () => ({
+  namespaces: { set: vi.fn() },
+  namespacesLoading: { set: vi.fn() },
+}));
 
 const origin = getApiOrigin();
 
@@ -117,5 +120,31 @@ describe('fetchNamespaces', () => {
       { namespaceInfo: { name: 'temporal-system' } },
       { namespaceInfo: { name: 'default' } },
     ]);
+  });
+
+  it('should set namespacesLoading to true while fetching and false when done', async () => {
+    const request = createSuccessfulRequest();
+
+    await fetchNamespaces({ runtimeEnvironment: { isCloud: false } }, request);
+
+    expect(namespacesLoading.set).toHaveBeenNthCalledWith(1, true);
+    expect(namespacesLoading.set).toHaveBeenLastCalledWith(false);
+  });
+
+  it('should set namespacesLoading to false if the request fails', async () => {
+    const request = createUnsuccessfulRequest();
+
+    await fetchNamespaces({ runtimeEnvironment: { isCloud: false } }, request);
+
+    expect(namespacesLoading.set).toHaveBeenLastCalledWith(false);
+  });
+
+  it('should set namespacesLoading to false without fetching if the runtime environment is cloud', async () => {
+    const request = createSuccessfulRequest();
+
+    await fetchNamespaces({ runtimeEnvironment: { isCloud: true } }, request);
+
+    expect(namespacesLoading.set).toHaveBeenCalledTimes(1);
+    expect(namespacesLoading.set).toHaveBeenCalledWith(false);
   });
 });
