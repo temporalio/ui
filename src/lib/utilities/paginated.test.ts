@@ -82,6 +82,26 @@ describe('paginated', () => {
     });
   });
 
+  it('should call onError if a later page request throws', async () => {
+    const error = new Error('Boom!');
+    const fetchMock = vi.fn(async (token?: string | Uint8Array) => {
+      if (!token) {
+        return {
+          items: [1, 2, 3],
+          nextPageToken: '1',
+        };
+      }
+
+      throw error;
+    });
+    const onError = vi.fn();
+
+    await expect(paginated((token) => fetchMock(token), { onError })).resolves.toBeUndefined();
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(onError).toHaveBeenCalledTimes(1);
+    expect(onError).toHaveBeenCalledWith(error);
+  });
+
   it('should call onComplete if provided', () => {
     const fetchMock = vi.fn().mockImplementation(getPage);
     const onComplete = vi.fn();
