@@ -7,7 +7,7 @@ export const Strings = {
   'fix-form-errors': 'Please fix the following errors:',
   'fix-workflow-form-errors': 'Please fix the following workflow errors:',
   'unsupported-action-edit':
-    'This schedule cannot be edited because its action is missing or its action type is not supported.',
+    'This schedule cannot be edited because its execution is missing or its execution type is not supported.',
 
   editing: 'Editing Schedule...',
   creating: 'Creating Schedule...',
@@ -137,22 +137,22 @@ export const Strings = {
     'Every {{- interval}} {{- intervalUnit}} offset by {{- offset}} {{- offsetUnit}}',
   'overlap-skip-label': 'Skip',
   'overlap-skip-description':
-    'New Actions are not started when when an Action started by this Schedule is still running.',
+    'New Executions are not started when an Execution started by this Schedule is still running.',
   'overlap-buffer-one-label': 'Buffer One',
   'overlap-buffer-one-description':
-    'Starts the Action as soon as the current one completes. Limited to one.',
+    'Starts the Execution as soon as the current one completes. Limited to one.',
   'overlap-buffer-all-label': 'Buffer All',
   'overlap-buffer-all-description':
-    'Allows an unlimited number of Actions to buffer; Actions start in order they were added to buffer.',
+    'Allows an unlimited number of Executions to buffer; Executions start in the order they were added to the buffer.',
   'overlap-cancel-other-label': 'Cancel Other',
   'overlap-cancel-other-description':
-    'Cancels currently running Action, starts new one after cancellation completes.',
+    'Cancels currently running Execution, starts new one after cancellation completes.',
   'overlap-terminate-other-label': 'Terminate Other',
   'overlap-terminate-other-description':
-    'Terminates currently running Action, starts new one immediately.',
+    'Terminates currently running Execution, starts new one immediately.',
   'overlap-allow-all-label': 'Allow All',
   'overlap-allow-all-description':
-    'Starts any number of concurrent Actions; more than one Action can run simultaneously.',
+    'Starts any number of concurrent Executions; more than one Execution can run simultaneously.',
   'overlap-default-suffix': '(Default)',
   'overlap-schedule-policy-suffix': "(Schedule's current policy)",
   'recurrence-label': 'Recurrence',
@@ -172,7 +172,7 @@ export const Strings = {
   'policies-title': 'Edit Schedule Policies',
   'policies-drawer-close': 'Cancel policy edits',
   'overlap-policy-description':
-    'Define what to do when an Action started by this Schedule is running when the Schedule is triggered.',
+    'Define what to do when an Execution started by this Schedule is running when the Schedule is triggered.',
   'on-start-behavior': 'On Start Behavior',
   'on-start-behavior-description':
     'Define what happens when the Schedule starts.',
@@ -181,12 +181,12 @@ export const Strings = {
   'pause-schedule-description':
     'Schedule will not run if paused. Cannot be used in conjuction with trigger immediately or backfill all action at once policies.',
   'pause-on-failure-description':
-    'If true, pauses Schedule after any Action failure.',
+    'If true, pauses Schedule after any Execution failure.',
   'do-not-pause': 'Do not pause',
   'catchup-window-policy-description':
-    'Define what happens to actions missed during an outage when the service returns.',
+    'Define what happens to Executions missed during an outage when the service returns.',
   'catchup-window-policy-detail':
-    'Actions skipped due to an outage within the Catchup Window will be taken once the service returns. Minimum 10 seconds.',
+    'Executions skipped due to an outage within the Catchup Window will be scheduled once the service returns. Minimum 10 seconds.',
   'catchup-window-label': 'Window',
   'catchup-window-tooltip':
     'Selecting 1 month will default to 31 days. If you wish to select less than 31 days but remain near the month window, use the Day unit.',
@@ -273,7 +273,7 @@ export const Strings = {
   'timezone-label': 'Timezone',
   'timezone-placeholder': 'Search timezone…',
   'jitter-tooltip':
-    'A random offset between zero and this value added to each action time, bound by the next scheduled Action time, used to avoid load spikes.',
+    'A random offset between zero and this value added to each Execution time, bounded by the next scheduled Execution time, used to avoid load spikes.',
   'summary-title': 'Schedule Summary',
   'summary-start-date-label': 'Start date',
   'summary-end-label': 'End',
