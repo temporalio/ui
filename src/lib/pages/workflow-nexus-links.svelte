@@ -109,7 +109,7 @@
     {/snippet}
     {#snippet headers()}
       <TableHeaderRow>
-        <th class="w-24">{translate('nexus.caller-event')}</th>
+        <th>{translate('nexus.caller-event')}</th>
         <th>{translate('nexus.caller-link')}</th>
         <th>{translate('nexus.caller-namespace')}</th>
         <th>{translate('nexus.handler-event')}</th>
