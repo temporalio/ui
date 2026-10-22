@@ -37,6 +37,7 @@ go.work.sum
 
 /catalog.local/
 /.env.catalog.local
+/.env.ui-server-cloud.local
 /.catalog.lock
 /.catalog.lock.recovery
 /.catalog.journal.json

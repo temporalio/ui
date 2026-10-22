@@ -31,6 +31,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/backoff"
 	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/metadata"
 )
 
 const (
@@ -47,8 +48,8 @@ const (
 )
 
 // CreateGRPCConnection creates connection for gRPC calls
-func CreateGRPCConnection(hostName string, tls *tls.Config) *grpc.ClientConn {
-	connection, err := Dial(hostName, tls)
+func CreateGRPCConnection(hostName string, tls *tls.Config, apiKey string) *grpc.ClientConn {
+	connection, err := Dial(hostName, tls, apiKey)
 
 	if err != nil {
 		fmt.Println("Failed to create gRPC connection")
@@ -61,7 +62,7 @@ func CreateGRPCConnection(hostName string, tls *tls.Config) *grpc.ClientConn {
 // The hostName syntax is defined in
 // https://github.com/grpc/grpc/blob/master/doc/naming.md.
 // e.g. to use dns resolver, a "dns:///" prefix should be applied to the target.
-func Dial(hostName string, tlsConfig *tls.Config) (*grpc.ClientConn, error) {
+func Dial(hostName string, tlsConfig *tls.Config, apiKey string) (*grpc.ClientConn, error) {
 	// Default to insecure
 	grpcSecureOpt := grpc.WithInsecure()
 	if tlsConfig != nil {
@@ -85,7 +86,9 @@ func Dial(hostName string, tlsConfig *tls.Config) (*grpc.ClientConn, error) {
 	return grpc.Dial(hostName,
 		grpcSecureOpt,
 		grpc.WithChainUnaryInterceptor(
-			errorInterceptor),
+			errorInterceptor,
+			apiKeyInterceptor(apiKey),
+		),
 		grpc.WithDefaultServiceConfig(DefaultServiceConfig),
 		grpc.WithDisableServiceConfig(),
 		grpc.WithConnectParams(cp),
@@ -97,4 +100,28 @@ func errorInterceptor(ctx context.Context, method string, req, reply interface{}
 	err := invoker(ctx, method, req, reply, cc, opts...)
 	// err = serviceerrors.FromStatus(status.Convert(err))
 	return err
+}
+
+type namespaced interface {
+	GetNamespace() string
+}
+
+func apiKeyInterceptor(apiKey string) grpc.UnaryClientInterceptor {
+	return func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
+		// short circuit if no api key
+		if apiKey == "" {
+			return invoker(ctx, method, req, reply, cc, opts...)
+		}
+
+		// set the auth and namespace headers by cloning and setting the metadata
+		meta, _ := metadata.FromOutgoingContext(ctx)
+		meta = meta.Copy()
+		meta.Set("authorization", "Bearer "+apiKey)
+		if n, ok := req.(namespaced); ok && n.GetNamespace() != "" {
+			meta.Set("temporal-namespace", n.GetNamespace())
+		}
+		ctx = metadata.NewOutgoingContext(ctx, meta)
+
+		return invoker(ctx, method, req, reply, cc, opts...)
+	}
 }

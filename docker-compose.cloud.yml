@@ -1,0 +1,10 @@
+services:
+  ui:
+    build:
+      context: .
+      dockerfile: Dockerfile.cloud-diagnostic
+    env_file: .env.ui-server-cloud.local
+    environment:
+      TEMPORAL_UI_PORT: "8080"
+    ports:
+      - "8080:8080"

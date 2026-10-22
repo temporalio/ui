@@ -1,0 +1,40 @@
+FROM node:22-alpine AS ui-builder
+
+RUN corepack enable
+
+WORKDIR /home/ui-builder
+
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile --ignore-scripts
+
+COPY . ./
+RUN pnpm exec svelte-kit sync
+RUN VITE_TEMPORAL_UI_BUILD_TARGET=cloud VITE_API= BUILD_PATH=server/ui/assets/cloud pnpm exec vite build
+
+FROM golang:1.26.9-alpine3.23 AS server-builder
+
+WORKDIR /home/server-builder
+
+COPY server/go.mod server/go.sum ./
+RUN go mod download
+
+COPY server ./
+COPY --from=ui-builder /home/ui-builder/server/ui/assets ./ui/assets
+RUN go build -o ui-server ./cmd/server/main.go
+
+FROM alpine:3.23.3
+
+RUN apk upgrade --no-cache && apk add --no-cache ca-certificates tzdata
+
+RUN addgroup -g 1000 temporal && adduser -u 1000 -G temporal -D temporal
+
+WORKDIR /home/ui-server
+
+COPY --chown=temporal:temporal --from=server-builder /home/server-builder/ui-server ./
+COPY --chown=temporal:temporal server/config ./config
+
+USER temporal
+
+ENV TEMPORAL_CLOUD_UI=true
+EXPOSE 8080
+ENTRYPOINT ["./ui-server", "--env", "docker", "start"]

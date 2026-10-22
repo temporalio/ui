@@ -6,3 +6,9 @@ build
 e2e
 node_modules
 server/ui/assets
+.git
+bin
+.env*.local
+.catalog-tmp
+catalog.local
+server/ui-server

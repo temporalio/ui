@@ -12,6 +12,7 @@ export const fetchSearchAttributesForNamespace = async (
     const searchAttributesResponse =
       await requestFromAPI<SearchAttributesResponse>(route, {
         request,
+        notifyOnError: false,
       });
 
     const customAttributes = { ...searchAttributesResponse?.customAttributes };
