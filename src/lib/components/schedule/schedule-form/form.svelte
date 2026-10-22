@@ -235,7 +235,7 @@
           <SchedulesSearchAttributesCard
             bind:scheduleSearchAttributes
             bind:actionSearchAttributes
-            actionType={resolvedAction.type !== 'unknown' && actionForm
+            actionType={resolvedAction.type !== 'unknown'
               ? resolvedAction.type
               : null}
           />

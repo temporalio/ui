@@ -19,10 +19,14 @@ export function resolveScheduledAction(
   schedule: DescribeFullSchedule | null,
   selectedType: ScheduledActionType = DEFAULT_SCHEDULED_ACTION_TYPE,
 ): ResolvedScheduledAction {
-  if (!schedule) return getNewScheduledAction(selectedType);
+  if (!schedule) {
+    return getNewScheduledAction(selectedType);
+  }
 
   const workflowAction = resolveWorkflowAction(schedule);
-  if (workflowAction) return workflowAction;
+  if (workflowAction) {
+    return workflowAction;
+  }
 
   return { type: 'unknown', schedule };
 }

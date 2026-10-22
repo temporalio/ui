@@ -9,9 +9,8 @@ import {
 } from './get-form-schedule-defaults';
 import { resolveWorkflowAction } from '../scheduled-action-types/workflow/action';
 import {
-  DEFAULT_EXECUTION_TIMEOUT,
-  DEFAULT_RUN_TIMEOUT,
   DEFAULT_TASK_TIMEOUT,
+  MAX_TASK_TIMEOUT_SECONDS,
 } from '../scheduled-action-types/workflow/constants';
 import { getWorkflowDetailsDefaults } from '../scheduled-action-types/workflow/presentation/form/workflow-details-defaults';
 
@@ -69,8 +68,8 @@ describe('getFormScheduleDefaults', () => {
       expect(defaults.pauseSchedule).toBe(false);
       expect(defaults.catchupWindow).toBe(DEFAULT_CATCHUP_WINDOW);
       expect(workflowDefaults.taskTimeout).toBe(DEFAULT_TASK_TIMEOUT);
-      expect(workflowDefaults.runTimeout).toBe(DEFAULT_RUN_TIMEOUT);
-      expect(workflowDefaults.executionTimeout).toBe(DEFAULT_EXECUTION_TIMEOUT);
+      expect(workflowDefaults.runTimeout).toBe('');
+      expect(workflowDefaults.executionTimeout).toBe('');
     });
 
     it('starts with no search attributes', () => {
@@ -115,7 +114,9 @@ describe('getFormScheduleDefaults', () => {
       noAttributes,
     );
     const action = resolveWorkflowAction(describeFullSchedule);
-    if (!action) throw new Error('Expected a workflow schedule');
+    if (!action) {
+      throw new Error('Expected a workflow schedule');
+    }
 
     const workflowDefaults = getWorkflowDetailsDefaults(action.schedule, {});
 
@@ -170,12 +171,33 @@ describe('getFormScheduleDefaults', () => {
         },
       },
     } as unknown as DescribeFullSchedule);
-    if (!action) throw new Error('Expected a workflow schedule');
+    if (!action) {
+      throw new Error('Expected a workflow schedule');
+    }
 
     const defaults = getWorkflowDetailsDefaults(action.schedule, {});
 
     expect(defaults.runTimeout).toBe('');
     expect(defaults.executionTimeout).toBe('');
+  });
+
+  it('caps a stored task timeout above the max', () => {
+    const action = resolveWorkflowAction({
+      schedule: {
+        action: {
+          startWorkflow: {
+            workflowTaskTimeout: '300s',
+          },
+        },
+      },
+    } as unknown as DescribeFullSchedule);
+    if (!action) {
+      throw new Error('Expected a workflow schedule');
+    }
+
+    const defaults = getWorkflowDetailsDefaults(action.schedule, {});
+
+    expect(defaults.taskTimeout).toBe(`${MAX_TASK_TIMEOUT_SECONDS}s`);
   });
 
   it('prefills the end date with today in the schedule timezone', () => {

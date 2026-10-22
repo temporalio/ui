@@ -22,7 +22,9 @@ export function isWorkflowScheduleListEntry(
 export function resolveWorkflowAction(
   schedule: DescribeFullSchedule,
 ): ResolvedWorkflowAction | null {
-  if (!isWorkflowSchedule(schedule)) return null;
+  if (!isWorkflowSchedule(schedule)) {
+    return null;
+  }
 
   return { type: 'workflow', schedule };
 }

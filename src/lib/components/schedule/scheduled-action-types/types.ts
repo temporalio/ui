@@ -39,7 +39,7 @@ export type ResolvedScheduledActionListEntry =
 
 export type ScheduledActionRequest = {
   action: ScheduleActionRequest;
-  policies: Partial<SchedulePoliciesRequest>;
+  policies: Pick<SchedulePoliciesRequest, 'keepOriginalWorkflowId'>;
 };
 
 export type ScheduledActionForm = {

@@ -108,7 +108,9 @@
       [translate('common.workflow-type')]: {
         getValue: (schedule) => {
           const action = resolveScheduledActionListEntry(schedule);
-          if (action.type === 'unknown') return undefined;
+          if (action.type === 'unknown') {
+            return undefined;
+          }
 
           return scheduledActionPresentations[
             action.type

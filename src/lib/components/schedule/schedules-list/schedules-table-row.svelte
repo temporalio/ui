@@ -36,7 +36,9 @@
 
   const resolvedAction = $derived(resolveScheduledActionListEntry(schedule));
   const actionColumns = $derived.by(() => {
-    if (resolvedAction.type === 'unknown') return null;
+    if (resolvedAction.type === 'unknown') {
+      return null;
+    }
 
     const { TypeCell, RecentRunsCell } =
       scheduledActionPresentations[resolvedAction.type].schedulesList;

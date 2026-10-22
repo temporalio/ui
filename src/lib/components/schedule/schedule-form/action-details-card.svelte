@@ -33,7 +33,7 @@
     {translate('schedules.execution-details-heading')}
   </h2>
   <div class="mt-4 flex flex-col gap-4">
-    {#if registeredActionPresentations.length > 1 || !registeredActionPresentations.find((p) => p.type === actionType)}
+    {#if registeredActionPresentations.length > 1}
       <fieldset>
         <legend class="mb-2 text-sm font-medium text-primary">
           {translate('schedules.execution-type-question')}<span

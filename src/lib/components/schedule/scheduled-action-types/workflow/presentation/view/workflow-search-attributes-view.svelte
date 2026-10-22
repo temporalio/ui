@@ -26,8 +26,8 @@
   );
 </script>
 
-<div class="min-w-0">
-  <h4 class="mb-2 font-medium">
+<section aria-labelledby="workflow-attributes-heading" class="min-w-0">
+  <h4 id="workflow-attributes-heading" class="mb-2 font-medium">
     {translate('common.workflows-plural', { count: 1 })}
   </h4>
   <SearchAttributesList
@@ -35,4 +35,4 @@
     attributeTypes={$searchAttributes}
     getHref={(query) => routeForWorkflowsWithQuery({ namespace, query })}
   />
-</div>
+</section>

@@ -179,7 +179,7 @@ export const Strings = {
   'on-schedule-start': 'On Schedule Start',
   'pause-schedule-label': 'Pause Schedule',
   'pause-schedule-description':
-    'Schedule will not run if paused. Cannot be used in conjuction with trigger immediately or backfill all action at once policies.',
+    'Schedule will not run if paused. Cannot be used in conjunction with trigger immediately or backfill all actions at once policies.',
   'pause-on-failure-description':
     'If true, pauses Schedule after any Execution failure.',
   'do-not-pause': 'Do not pause',
@@ -190,9 +190,6 @@ export const Strings = {
   'catchup-window-label': 'Window',
   'catchup-window-tooltip':
     'Selecting 1 month will default to 31 days. If you wish to select less than 31 days but remain near the month window, use the Day unit.',
-  timeouts: 'Timeouts',
-  'timeouts-description':
-    'Define how long a scheduled task, run, or execution should continue before considering it failed.',
   'task-timeout': 'Task Timeout',
   'task-timeout-max-error': 'Task Timeout must be at most {{max}} seconds.',
   'task-timeout-description':
@@ -211,11 +208,6 @@ export const Strings = {
   'pause-on-start': 'Pause on start',
   'do-not-pause-on-start': 'Do not pause on start',
   'pause-on-failure-question': 'Pause on Failure?',
-  'timeout-task': 'Task: {{- duration}}',
-  'timeout-run': 'Run: {{- duration}}',
-  'timeout-execution': 'Execution: {{- duration}}',
-  'no-timeouts': 'No timeouts set',
-  'zero-duration': 'No timeout',
   'catchup-window-default': '1 year',
   'interval-label': 'Time Interval',
   'cron-shortcuts': 'Cron Shortcuts',
