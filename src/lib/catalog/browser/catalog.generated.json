@@ -1,5 +1,5 @@
 {
-  "sourceHash": "78d83b078a21e69614890b3d5cd94804be41f98031865576fdab98c636a3b881",
+  "sourceHash": "ab1d28559cd8149433f8505b38591843db129021116c4f63f3a2a9f5e2b9f690",
   "descriptors": [
     {
       "id": "activity-heartbeat",
@@ -141,6 +141,60 @@
       "source": { "id": "oss", "label": "OSS" }
     },
     {
+      "id": "child-fan-out",
+      "title": "Child workflow fan-out",
+      "description": "Starts 100 child workflows, each of which starts 10 child workflows of its own, for 1,101 workflows in total.",
+      "capabilityTags": ["child-workflows", "concurrency"],
+      "expectedEvidence": [
+        "A parent workflow with the configured number of child workflows, each with its own grandchild workflows.",
+        "Child workflow IDs extend the parent ID, for example `<parent>-3` and `<parent>-3-7`.",
+        "A parent result equal to the total number of workflows in the tree, 1,101 with the defaults."
+      ],
+      "input": {
+        "defaultValue": [100, 10],
+        "schema": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "title": "Child workflows",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200
+            },
+            {
+              "title": "Grandchild workflows per child",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 20
+            }
+          ],
+          "items": false,
+          "maxItems": 2
+        }
+      },
+      "startOptions": {
+        "defaultValue": {},
+        "schema": {
+          "type": "object",
+          "properties": {
+            "details": { "type": "string" },
+            "searchAttributes": { "type": "object" },
+            "summary": { "type": "string" },
+            "workflowStartDelay": { "type": "string" },
+            "workflowId": { "type": "string", "minLength": 1 }
+          }
+        }
+      },
+      "execution": {
+        "kind": "workflow",
+        "targetId": "shared-workflows",
+        "namespace": "default",
+        "taskQueue": "ui-catalog",
+        "workflowType": "childFanOut"
+      },
+      "source": { "id": "oss", "label": "OSS" }
+    },
+    {
       "id": "child-workflows",
       "title": "Child workflows",
       "description": "Starts and joins three child workflow executions.",
@@ -264,6 +318,60 @@
         "namespace": "default",
         "taskQueue": "ui-catalog",
         "workflowType": "highEventCountWorkflow"
+      },
+      "source": { "id": "oss", "label": "OSS" }
+    },
+    {
+      "id": "large-history",
+      "title": "Large event history",
+      "description": "Runs batches of instant activities until the workflow history approaches a target event count, for performance testing with 10k, 25k, or 50k events.",
+      "capabilityTags": ["event-history", "activities"],
+      "expectedEvidence": [
+        "A completed workflow whose history length is close to, and never above, the target event count.",
+        "The result reports how many activities ran and the final event count."
+      ],
+      "setupMarkdown": "Set **Target event count** to 10000, 25000, or 50000.\n\nA default Temporal server terminates a workflow once its history passes about 51,200 events, so the target is capped at 50,000. Larger histories need `limit.historyCount.error` raised in the server dynamic config.",
+      "input": {
+        "defaultValue": [10000, 100],
+        "schema": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "title": "Target event count",
+              "type": "integer",
+              "minimum": 1000,
+              "maximum": 50000
+            },
+            {
+              "title": "Activities per batch",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 500
+            }
+          ],
+          "items": false,
+          "maxItems": 2
+        }
+      },
+      "startOptions": {
+        "defaultValue": {},
+        "schema": {
+          "type": "object",
+          "properties": {
+            "details": { "type": "string" },
+            "searchAttributes": { "type": "object" },
+            "summary": { "type": "string" },
+            "workflowStartDelay": { "type": "string" },
+            "workflowId": { "type": "string", "minLength": 1 }
+          }
+        }
+      },
+      "execution": {
+        "kind": "workflow",
+        "targetId": "shared-workflows",
+        "namespace": "default",
+        "taskQueue": "ui-catalog",
+        "workflowType": "largeHistory"
       },
       "source": { "id": "oss", "label": "OSS" }
     },
@@ -435,6 +543,109 @@
         "namespace": "default",
         "taskQueue": "ui-catalog",
         "workflowType": "parallelActivities"
+      },
+      "source": { "id": "oss", "label": "OSS" }
+    },
+    {
+      "id": "pending-activities",
+      "title": "Pending activities",
+      "description": "Keeps several activities pending indefinitely for debugging: some fail and retry forever, others wait on a task queue no Worker polls. Runs until cancelled or terminated.",
+      "capabilityTags": ["activities", "retries"],
+      "expectedEvidence": [
+        "Retrying activities stay pending with a growing attempt count, a last failure, and a next retry time.",
+        "Unpolled activities stay pending on attempt 1 with no failure because no Worker polls their task queue.",
+        "The workflow keeps running until it is cancelled or terminated."
+      ],
+      "input": {
+        "defaultValue": [2, 2],
+        "schema": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "title": "Retrying activities",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10
+            },
+            {
+              "title": "Unpolled activities",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10
+            }
+          ],
+          "items": false,
+          "maxItems": 2
+        }
+      },
+      "startOptions": {
+        "defaultValue": {},
+        "schema": {
+          "type": "object",
+          "properties": {
+            "details": { "type": "string" },
+            "searchAttributes": { "type": "object" },
+            "summary": { "type": "string" },
+            "workflowStartDelay": { "type": "string" },
+            "workflowId": { "type": "string", "minLength": 1 }
+          }
+        }
+      },
+      "execution": {
+        "kind": "workflow",
+        "targetId": "shared-workflows",
+        "namespace": "default",
+        "taskQueue": "ui-catalog",
+        "workflowType": "pendingActivitiesWorkflow"
+      },
+      "source": { "id": "oss", "label": "OSS" }
+    },
+    {
+      "id": "pending-nexus",
+      "title": "Pending Nexus operations",
+      "description": "Starts several Nexus operations that keep retrying, so they stay pending on the workflow indefinitely. Runs until cancelled or terminated.",
+      "capabilityTags": ["nexus", "retries", "concurrency"],
+      "expectedEvidence": [
+        "A running workflow with one pending Nexus operation per requested operation, each showing retry attempts and a last failure.",
+        "The workflow keeps running until it is cancelled or terminated."
+      ],
+      "setupMarkdown": "The workflow calls the `hold` operation on the `catalog-pending` service through the `ui-catalog-pending-nexus` Nexus endpoint.\n\nThe handler always fails with a retryable error, so every operation stays pending until the workflow is cancelled or terminated.\n\n- **Local development:** the catalog worker creates the endpoint automatically when it starts.\n- **Other environments:** create the endpoint yourself before running:\n\n```\ntemporal operator nexus endpoint create --name ui-catalog-pending-nexus --target-namespace <namespace> --target-task-queue ui-catalog\n```",
+      "input": {
+        "defaultValue": [3],
+        "schema": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "title": "Pending operations",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10
+            }
+          ],
+          "items": false,
+          "maxItems": 1
+        }
+      },
+      "startOptions": {
+        "defaultValue": {},
+        "schema": {
+          "type": "object",
+          "properties": {
+            "details": { "type": "string" },
+            "searchAttributes": { "type": "object" },
+            "summary": { "type": "string" },
+            "workflowStartDelay": { "type": "string" },
+            "workflowId": { "type": "string", "minLength": 1 }
+          }
+        }
+      },
+      "execution": {
+        "kind": "workflow",
+        "targetId": "shared-workflows",
+        "namespace": "default",
+        "taskQueue": "ui-catalog",
+        "workflowType": "pendingNexus",
+        "nexusEndpoints": ["ui-catalog-pending-nexus"]
       },
       "source": { "id": "oss", "label": "OSS" }
     },
@@ -1032,6 +1243,63 @@
         "namespace": "default",
         "taskQueue": "ui-catalog",
         "workflowType": "scheduleWorkflow"
+      },
+      "source": { "id": "oss", "label": "OSS" }
+    },
+    {
+      "id": "workflow-feature-tour",
+      "title": "Workflow feature tour",
+      "description": "Runs an activity, a timer, a child workflow, and a Nexus operation, accepts updates, and stays open until a close signal arrives.",
+      "capabilityTags": [
+        "activities",
+        "timers",
+        "child-workflows",
+        "nexus",
+        "updates",
+        "signals"
+      ],
+      "expectedEvidence": [
+        "An activity, a fired timer, a completed child workflow, and a completed Nexus operation in workflow history.",
+        "Accepted and completed update events for each `add-note` update sent.",
+        "A `close` signal followed by workflow completion."
+      ],
+      "setupMarkdown": "The workflow runs every step on its own, then waits for a signal before it completes.\n\n1. Optionally send one or more **updates** named `add-note` with a non-empty string, for example `\"hello\"`. Updates are accepted at any point while the workflow is running.\n2. Send a **signal** named `close` with no input to complete the workflow.\n\nThe Nexus operation calls the `echo` operation on the `catalog-feature-tour` service through the `ui-catalog` endpoint, which the catalog worker creates automatically in local development. Elsewhere, create it first:\n\n```\ntemporal operator nexus endpoint create --name ui-catalog --target-namespace <namespace> --target-task-queue ui-catalog\n```",
+      "input": {
+        "defaultValue": [10],
+        "schema": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "title": "Timer duration in seconds",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 300
+            }
+          ],
+          "items": false,
+          "maxItems": 1
+        }
+      },
+      "startOptions": {
+        "defaultValue": {},
+        "schema": {
+          "type": "object",
+          "properties": {
+            "details": { "type": "string" },
+            "searchAttributes": { "type": "object" },
+            "summary": { "type": "string" },
+            "workflowStartDelay": { "type": "string" },
+            "workflowId": { "type": "string", "minLength": 1 }
+          }
+        }
+      },
+      "execution": {
+        "kind": "workflow",
+        "targetId": "shared-workflows",
+        "namespace": "default",
+        "taskQueue": "ui-catalog",
+        "workflowType": "featureTourWorkflow",
+        "nexusEndpoints": ["ui-catalog"]
       },
       "source": { "id": "oss", "label": "OSS" }
     },
