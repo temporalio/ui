@@ -37,11 +37,13 @@
   import type {
     ScheduledActionForm,
     ScheduledActionSummaryItem,
+    ScheduledActionType,
   } from '../scheduled-action-types/types';
   import { formScheduleSchema } from '../schema/form';
   import type { ScheduleFormData } from '../types';
   import { getFormScheduleDefaults } from '../utilities/get-form-schedule-defaults';
 
+  import ActionDetailsCard from './action-details-card.svelte';
   import ScheduleDetailsCard from './schedule-details-card.svelte';
   import SchedulePoliciesCard from './schedule-policies-card.svelte';
   import ScheduleSpecCard from './schedule-spec-card.svelte';
@@ -83,7 +85,7 @@
     }),
   );
 
-  const resolvedAction = $derived(resolveScheduledAction(schedule));
+  let resolvedAction = $derived(resolveScheduledAction(schedule));
 
   // svelte-ignore state_referenced_locally
   const superform = superForm(initialFormValues, {
@@ -159,6 +161,17 @@
     }
   };
 
+  function selectActionType(type: ScheduledActionType) {
+    if (schedule || submitting || type === resolvedAction.type) {
+      return;
+    }
+
+    actionSummary = [];
+    actionSearchAttributes = [];
+    resolvedAction = resolveScheduledAction(schedule, type);
+    onInput();
+  }
+
   const onInput = () => {
     if ($serverError) {
       $serverError = '';
@@ -198,15 +211,21 @@
           {#if resolvedAction.type !== 'unknown'}
             {@const presentation =
               scheduledActionPresentations[resolvedAction.type]}
-            {#key resolvedAction.type}
-              <presentation.form.Component
-                {resolvedAction}
-                customSearchAttributes={$customSearchAttributes}
-                bind:this={actionForm}
-                bind:searchAttributes={actionSearchAttributes}
-                onSummaryChange={(summary) => (actionSummary = summary)}
-              />
-            {/key}
+            <ActionDetailsCard
+              actionType={resolvedAction.type}
+              onActionTypeChange={selectActionType}
+              disabled={Boolean(schedule) || submitting}
+            >
+              {#key resolvedAction.type}
+                <presentation.form.Component
+                  {resolvedAction}
+                  customSearchAttributes={$customSearchAttributes}
+                  bind:this={actionForm}
+                  bind:searchAttributes={actionSearchAttributes}
+                  onSummaryChange={(summary) => (actionSummary = summary)}
+                />
+              {/key}
+            </ActionDetailsCard>
           {:else}
             <Alert
               intent="error"

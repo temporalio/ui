@@ -167,6 +167,7 @@ export const Strings = {
   'run-time-description':
     'Specify the time ({{- timezoneName }}) for this schedule to run. The schedule will run at 00:00 {{- timezoneName }} if left blank.',
   'execution-details-heading': 'Execution Details',
+  'execution-type-question': 'What type of execution will this Schedule start?',
 
   'policies-title': 'Edit Schedule Policies',
   'policies-drawer-close': 'Cancel policy edits',

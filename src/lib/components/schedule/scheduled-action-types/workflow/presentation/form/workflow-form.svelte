@@ -8,7 +8,6 @@
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributesSchema } from '$lib/stores/search-attributes';
 
-  import ActionDetailsCard from '../../../../schedule-form/action-details-card.svelte';
   import type {
     ScheduledActionFormData,
     ScheduledActionSummaryItem,
@@ -84,9 +83,7 @@
   }
 </script>
 
-<ActionDetailsCard>
-  <WorkflowDetailsForm {form} {errors} {validateField} {schedule} />
-</ActionDetailsCard>
+<WorkflowDetailsForm {form} {errors} {validateField} {schedule} />
 
 <Alert
   intent="error"

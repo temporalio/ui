@@ -37,6 +37,8 @@ type ActionSchedulesListProps<Type extends ScheduledActionType> = {
 };
 
 export type ScheduledActionPresentation<Type extends ScheduledActionType> = {
+  type: Type;
+  label: () => string;
   schedulesList: {
     TypeCell: Component<ActionSchedulesListProps<Type>>;
     RecentRunsCell: Component<ActionSchedulesListProps<Type>>;

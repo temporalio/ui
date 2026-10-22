@@ -14,6 +14,8 @@ import WorkflowRunsCard from './view/workflow-runs-card.svelte';
 import WorkflowSearchAttributesView from './view/workflow-search-attributes-view.svelte';
 
 export const workflowActionPresentation = {
+  type: 'workflow',
+  label: () => translate('common.workflows'),
   schedulesList: {
     TypeCell: WorkflowTypeCell,
     RecentRunsCell: WorkflowRecentRunsCell,
