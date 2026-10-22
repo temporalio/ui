@@ -15,6 +15,13 @@
 
   let { facts, recentKey, label }: Props = $props();
 
+  $effect.pre(function publishFacts() {
+    appPalette.facts = facts;
+    return () => {
+      appPalette.facts = undefined;
+    };
+  });
+
   const toolSets = $derived(
     sortToolSets(visibleToolSets(registeredToolSets(), facts)),
   );

@@ -7,6 +7,7 @@ import '$lib/test-utilities/jsdom-browser-apis';
 
 import type { PaletteToolSet } from './types';
 
+import { appPalette } from './app-palette-state.svelte';
 import AppPalette from './app-palette.svelte';
 import { registerToolSet } from './registry.svelte';
 
@@ -46,5 +47,31 @@ describe('AppPalette', () => {
 
     await fireEvent.keyDown(window, { key: 'k', ctrlKey: true });
     expect(screen.queryByRole('dialog')).toBeNull();
+  });
+
+  it('is available only while mounted with a matching set', () => {
+    unregister.push(registerToolSet(devSet));
+    expect(appPalette.available).toBe(false);
+
+    const { unmount } = render(AppPalette, {
+      props: { facts: { env: 'local' } },
+    });
+    expect(appPalette.available).toBe(true);
+
+    unmount();
+    expect(appPalette.available).toBe(false);
+  });
+
+  it('is not available when no registered set matches the facts', () => {
+    unregister.push(registerToolSet(devSet));
+    render(AppPalette, { props: { facts: { env: 'production' } } });
+
+    expect(appPalette.available).toBe(false);
+  });
+
+  it('is not available with no registered sets', () => {
+    render(AppPalette, { props: { facts: { env: 'local' } } });
+
+    expect(appPalette.available).toBe(false);
   });
 });
