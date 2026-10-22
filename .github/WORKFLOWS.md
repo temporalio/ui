@@ -14,7 +14,7 @@ The release management system enforces version bump PRs before any release can b
 
 The workflow enforces a meaningful PR description, warns when a PR changes more than 600 files, and reminds maintainers to release when `server/go.mod` updates `go.temporal.io/api`. Editing the description reruns the checks. Warnings do not block merging; description failures and API failures fail the job.
 
-The privileged workflow checks out only `.github/scripts/pr-metadata.mjs` from the base repository at the PR's immutable `base.sha`, with persisted checkout credentials disabled. It must never check out the PR head or merge ref, install dependencies, execute PR code, or interpolate contributor input into executable scripts. The script performs only GitHub API operations; PR descriptions, file patches, and comments are treated as data. Its colocated regression tests import the script directly, verify the workflow's trusted-checkout configuration, and run through `pnpm test:github-automation` in normal, unprivileged PR CI.
+The privileged workflow executes an inline script from the trusted base-side workflow. It performs no checkout, dependency installation, or execution of PR code. Contributor input must never be interpolated into executable scripts; PR descriptions, file patches, and comments are treated only as data.
 
 Strict TypeScript checking remains in the existing `check-types` job in `.github/workflows/lint-and-test.yml`, using `pnpm check` and `tsconfig.json`. The separate changed-file strict checker and redundant strict config have been removed.
 
