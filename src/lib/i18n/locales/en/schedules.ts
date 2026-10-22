@@ -99,7 +99,7 @@ export const Strings = {
     'Specify the time to offset when this schedule will run (for example 15 min past the hour).',
   'cron-view-title': 'Cron String',
   'cron-view-example-description':
-    'Temporal Workflow Schedule Cron strings follow this format:',
+    'Temporal Schedule cron strings follow this format:',
   'cron-view-description':
     'Write or paste in a cron string to generate a schedule.',
   'error-title': 'Error Message',
@@ -287,7 +287,7 @@ export const Strings = {
   'spec-type-interval': 'Interval',
   'explore-interval-examples': 'Explore interval examples',
   'spec-description':
-    'Define rules for when this Workflow should run. You can add as many Schedule Specifications as you need to comprehensively describe the schedule. Specs can be calendar-based, cron-based, or interval-based.',
+    'Define rules for when this schedule should run. You can add as many Schedule Specifications as you need to comprehensively describe the schedule. Specs can be calendar-based, cron-based, or interval-based.',
   'spec-learn-more': 'Learn more about the Schedule Spec',
   'add-another-spec': '+ Add another schedule spec',
   'run-time-based-on-timezone':
