@@ -80,14 +80,26 @@ describe('SegmentLink', () => {
     expect(count.classList.contains('border')).toBe(false);
   });
 
-  it('renders a selected count with brand colors', () => {
+  it('renders a selected count with brand text on the neutral overlay', () => {
     const link = mountSegmentLink({ count: 3, selected: true });
     const count = link.querySelector('[data-segment-count]') as HTMLElement;
 
-    expect(count.classList.contains('bg-interactive-secondary-hover')).toBe(
-      true,
-    );
+    expect(count.classList.contains('bg-surface-overlay-tertiary')).toBe(true);
     expect(count.classList.contains('text-brand')).toBe(true);
-    expect(count.classList.contains('bg-surface-overlay-tertiary')).toBe(false);
+    expect(count.classList.contains('text-secondary')).toBe(false);
+  });
+
+  it('switches a selected count to white on the hovered segment', () => {
+    const link = mountSegmentLink({ count: 3, selected: true });
+    const count = link.querySelector('[data-segment-count]') as HTMLElement;
+
+    expect(
+      count.classList.contains(
+        '[.group:not(:disabled):hover_&]:bg-surface-overlay-neutral',
+      ),
+    ).toBe(true);
+    expect(
+      count.classList.contains('[.group:not(:disabled):hover_&]:text-white'),
+    ).toBe(true);
   });
 });

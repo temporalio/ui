@@ -8,7 +8,7 @@
   import Segment from './segment.svelte';
   import SegmentedControl from './segmented-control.svelte';
 
-  const states = ['default', 'hover', 'active', 'disabled'];
+  const states = ['default', 'hover', 'focus', 'disabled'];
 
   const { Story } = defineMeta({
     title: 'IO/Design System/Segmented Control',

@@ -7,6 +7,7 @@
   import type { ConditionalValue } from '$lib/io/types';
 
   const wrapperClasses = twJoin(
+    'group',
     'relative',
     'inline-flex',
     'shrink-0',
@@ -15,31 +16,47 @@
     'gap-1',
     'whitespace-nowrap',
     'rounded',
-    'px-1',
-    'py-0.5',
+    'border',
+    'border-transparent',
+    'px-[3px]',
+    'py-px',
     'font-sans',
     'font-medium',
     'text-xs',
     'leading-4',
     'cursor-pointer',
     'focus-visible:outline-none',
+    'focus-visible:shadow-sm',
     'focus-visible:ring-2',
-    'focus-visible:ring-interactive-primary-press',
+    'focus-visible:ring-indigo-9',
     'focus-visible:ring-offset-2',
     'focus-visible:ring-offset-background-primary',
+    '[&[data-state=focus]]:shadow-sm',
+    '[&[data-state=focus]]:ring-2',
+    '[&[data-state=focus]]:ring-indigo-9',
+    '[&[data-state=focus]]:ring-offset-2',
+    '[&[data-state=focus]]:ring-offset-background-primary',
     'disabled:cursor-not-allowed',
     'disabled:[&:not([aria-busy=true])]:opacity-disabled',
   );
 
   const unselectedClasses = twJoin(
     'bg-transparent text-secondary',
-    '[&:not(:disabled)]:hover:bg-surface-overlay-primary',
-    '[&:not(:disabled)[data-state=hover]]:bg-surface-overlay-primary',
-    '[&:not(:disabled)]:active:bg-surface-overlay-secondary',
-    '[&:not(:disabled)[data-state=active]]:bg-surface-overlay-secondary',
+    '[&:not(:disabled)]:hover:bg-interactive-tertiary-hover',
+    '[&:not(:disabled)[data-state=hover]]:bg-interactive-tertiary-hover',
+    '[&:not(:disabled)]:focus-visible:bg-interactive-tertiary-hover',
+    '[&:not(:disabled)[data-state=focus]]:bg-interactive-tertiary-hover',
   );
 
-  const selectedClasses = twJoin('bg-interactive-secondary-hover text-brand');
+  const selectedClasses = twJoin(
+    'bg-interactive-secondary-hover text-brand',
+    '[&:not(:disabled)]:hover:border-brand',
+    '[&:not(:disabled)]:hover:bg-interactive-primary-hover',
+    '[&:not(:disabled)]:hover:text-white',
+    '[&:not(:disabled)[data-state=hover]]:border-brand',
+    '[&:not(:disabled)[data-state=hover]]:bg-interactive-primary-hover',
+    '[&:not(:disabled)[data-state=hover]]:text-white',
+  );
 
   export const segmentRecipe = ({
     selected,
@@ -69,9 +86,16 @@
   export const segmentCountRecipe = ({ selected }: { selected: boolean }) =>
     twJoin(
       countClasses,
+      'bg-surface-overlay-tertiary',
       selected
-        ? 'bg-interactive-secondary-hover text-brand'
-        : 'bg-surface-overlay-tertiary text-secondary',
+        ? twJoin(
+            'text-brand',
+            '[.group:not(:disabled):hover_&]:bg-surface-overlay-neutral',
+            '[.group:not(:disabled):hover_&]:text-white',
+            '[.group:not(:disabled)[data-state=hover]_&]:bg-surface-overlay-neutral',
+            '[.group:not(:disabled)[data-state=hover]_&]:text-white',
+          )
+        : 'text-secondary',
     );
 
   export interface SegmentProps extends Omit<HTMLButtonAttributes, 'class'> {
