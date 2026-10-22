@@ -40,6 +40,9 @@ export type ScheduledActionPresentation<Type extends ScheduledActionType> = {
   schedulesList: {
     TypeCell: Component<ActionSchedulesListProps<Type>>;
     RecentRunsCell: Component<ActionSchedulesListProps<Type>>;
+    getTypeSortValue: (
+      schedule: ActionSchedulesListProps<Type>['schedule'],
+    ) => string | null | undefined;
   };
   form: {
     Component: Component<

@@ -17,6 +17,7 @@ export const workflowActionPresentation = {
   schedulesList: {
     TypeCell: WorkflowTypeCell,
     RecentRunsCell: WorkflowRecentRunsCell,
+    getTypeSortValue: (schedule) => schedule.info.workflowType.name,
   },
   form: {
     Component: WorkflowFormAdapter,
