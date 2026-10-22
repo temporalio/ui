@@ -1,3 +1,4 @@
+import type { ScheduleListEntry } from '$lib/types';
 import type {
   DescribeFullSchedule,
   ScheduleActionRequest,
@@ -5,7 +6,10 @@ import type {
 } from '$lib/types/schedule';
 
 import type { FormWorkflowDetails } from './workflow/schema';
-import type { ResolvedWorkflowAction } from './workflow/types';
+import type {
+  ResolvedWorkflowAction,
+  WorkflowScheduleListEntry,
+} from './workflow/types';
 
 export type ScheduledActionFormData = {
   type: 'workflow';
@@ -23,6 +27,15 @@ export type ResolvedScheduledAction =
 
       schedule: DescribeFullSchedule;
     };
+
+export type SupportedScheduledActionListEntry = {
+  type: 'workflow';
+  schedule: WorkflowScheduleListEntry;
+};
+
+export type ResolvedScheduledActionListEntry =
+  | SupportedScheduledActionListEntry
+  | { type: 'unknown'; schedule: ScheduleListEntry };
 
 export type ScheduledActionRequest = {
   action: ScheduleActionRequest;

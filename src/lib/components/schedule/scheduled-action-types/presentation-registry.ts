@@ -8,6 +8,7 @@ import type {
   ScheduledActionSummaryItem,
   ScheduledActionType,
   SupportedScheduledAction,
+  SupportedScheduledActionListEntry,
 } from './types';
 import { workflowActionPresentation } from './workflow/presentation';
 
@@ -26,7 +27,20 @@ type ActionViewProps<Type extends ScheduledActionType> = {
   scheduleId: string;
 };
 
+type ActionSchedulesListProps<Type extends ScheduledActionType> = {
+  schedule: Extract<
+    SupportedScheduledActionListEntry,
+    { type: Type }
+  >['schedule'];
+  namespace: string;
+  width?: number;
+};
+
 export type ScheduledActionPresentation<Type extends ScheduledActionType> = {
+  schedulesList: {
+    TypeCell: Component<ActionSchedulesListProps<Type>>;
+    RecentRunsCell: Component<ActionSchedulesListProps<Type>>;
+  };
   form: {
     Component: Component<
       ActionFormProps<Type>,
