@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from '$app/state';
 
+  import EmptyState from '$lib/holocene/empty-state.svelte';
   import Link from '$lib/holocene/link.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/paginated.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
@@ -148,6 +149,9 @@
         </TableRow>
       {/each}
     {/snippet}
+    {#snippet empty()}
+      <EmptyState title={translate('nexus.inbound-links-empty-state')} />
+    {/snippet}
   </PaginatedTable>
 {/snippet}
 
@@ -231,6 +235,9 @@
         </TableRow>
       {/each}
     {/snippet}
+    {#snippet empty()}
+      <EmptyState title={translate('nexus.outbound-links-empty-state')} />
+    {/snippet}
   </PaginatedTable>
 {/snippet}
 
@@ -259,7 +266,6 @@
               {...getTabButtonProps()}
               id={`nexus-links-${view}`}
               selected={isSelected}
-              disabled={!counts[view]}
               count={counts[view]}
               data-testid={`nexus-links-${view}-segment`}
             >

@@ -21,12 +21,12 @@ describe('getNexusLinksView', () => {
     );
   });
 
-  it('falls back when the requested view has no links', () => {
+  it('selects the requested view even when it has no links', () => {
     expect(getNexusLinksView('inbound', { inbound: 0, outbound: 3 })).toBe(
-      'outbound',
+      'inbound',
     );
     expect(getNexusLinksView('outbound', { inbound: 2, outbound: 0 })).toBe(
-      'inbound',
+      'outbound',
     );
   });
 
