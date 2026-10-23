@@ -11,6 +11,7 @@
     root: RootNode;
     expandAll: boolean;
     generation?: number;
+    lastChild?: boolean;
     onNodeClick: (node: RootNode, generation: number) => void;
     activeWorkflow?: WorkflowExecution | undefined;
     openRuns: Map<number, string>;
@@ -20,6 +21,7 @@
     root,
     expandAll,
     generation = 0,
+    lastChild = false,
     onNodeClick,
     activeWorkflow = undefined,
     openRuns,
@@ -44,22 +46,23 @@
   };
 </script>
 
-<div class="w-full">
+<div class="relative w-full">
   <button
-    class="relative flex w-full select-text border-primary {isActive &&
+    class="relative flex w-full select-text {isActive &&
       'bg-interactive-primary text-white hover:bg-interactive-primary-hover focus-visible:bg-interactive-primary-hover active:bg-interactive-primary-press'} {isCurrent &&
       !isActive &&
       'bg-surface-tertiary text-primary'} items-center gap-1 px-2 py-1 lg:py-2 {!isActive &&
       'hover:bg-interactive-tertiary-hover'}"
-    class:border-l={!isRootWorkflow && !isActive}
     onclick={(e) => {
       e.stopPropagation();
       onClick();
     }}
   >
-    {#if !isRootWorkflow && !isActive}
+    {#if !isRootWorkflow}
       <div
-        class="absolute left-0 top-[25%] h-[1px] w-3 bg-border-primary lg:top-[50%] lg:w-6"
+        class="absolute left-0 top-0 h-[25%] w-2 border-b border-secondary lg:h-1/2"
+        class:border-l={lastChild}
+        class:rounded-bl={lastChild}
       ></div>
     {/if}
     <div class="flex w-full items-center gap-3 pr-2 text-sm">
@@ -70,6 +73,7 @@
         {isActive}
         childrenCount={root.children?.length ?? 0}
         {expanded}
+        indent={generation * 16}
       />
     </div>
   </button>
@@ -86,5 +90,8 @@
         />
       {/if}
     </div>
+  {/if}
+  {#if !isRootWorkflow && !lastChild}
+    <div class="absolute inset-y-0 left-0 border-l border-secondary"></div>
   {/if}
 </div>

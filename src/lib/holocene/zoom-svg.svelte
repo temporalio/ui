@@ -196,7 +196,7 @@
   </div>
   <div class="absolute bottom-4 right-4 z-20 flex items-center gap-2">
     {#if pannable}
-      <Tooltip text="Pan up" bottom>
+      <Tooltip text="Pan up" top>
         <Button
           variant="secondary"
           size="sm"
@@ -205,7 +205,7 @@
           onclick={() => panBy(0, -PAN_STEP_RATIO)}
         />
       </Tooltip>
-      <Tooltip text="Pan down" bottom>
+      <Tooltip text="Pan down" top>
         <Button
           variant="secondary"
           size="sm"
@@ -214,7 +214,7 @@
           onclick={() => panBy(0, PAN_STEP_RATIO)}
         />
       </Tooltip>
-      <Tooltip text="Pan left" bottom>
+      <Tooltip text="Pan left" top>
         <Button
           variant="secondary"
           size="sm"
@@ -223,7 +223,7 @@
           onclick={() => panBy(-PAN_STEP_RATIO, 0)}
         />
       </Tooltip>
-      <Tooltip text="Pan right" bottom>
+      <Tooltip text="Pan right" top>
         <Button
           variant="secondary"
           size="sm"
@@ -234,7 +234,7 @@
       </Tooltip>
     {/if}
     {#if zoomable}
-      <Tooltip text="Zoom in" bottom>
+      <Tooltip text="Zoom in" top>
         <Button
           variant="secondary"
           size="sm"
@@ -244,7 +244,7 @@
           onclick={() => zoomBy(-ZOOM_STEP)}
         />
       </Tooltip>
-      <Tooltip text="Zoom out" bottom>
+      <Tooltip text="Zoom out" top>
         <Button
           variant="secondary"
           size="sm"
@@ -255,7 +255,7 @@
         />
       </Tooltip>
     {/if}
-    <Tooltip text="Center" bottom>
+    <Tooltip text="Center" top>
       <Button
         class="cursor-pointer"
         variant="secondary"
