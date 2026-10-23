@@ -57,6 +57,7 @@ let readinessPresentation: (config: {
     | 'unavailable';
   taskQueue: string;
   workerStartCommand?: string;
+  serverless?: boolean;
 }) => {
   Icon: IconComponent;
   iconClass: string;
@@ -256,8 +257,26 @@ describe('CatalogDetail', () => {
       iconClass: 'text-success',
       iconLabel: 'Worker readiness is ready',
       label: 'A Worker is polling for Workflow Tasks',
+      tooltip: 'A Worker is polling.',
+    });
+  });
+
+  it('describes a sleeping serverless Worker Deployment as ready', () => {
+    expect(
+      readinessPresentation({
+        kind: 'worker',
+        executionKind: 'workflow',
+        state: 'ready',
+        taskQueue: 'catalog-tasks',
+        serverless: true,
+      }),
+    ).toEqual({
+      Icon: iconNamed(IconCheckCircle),
+      iconClass: 'text-success',
+      iconLabel: 'Worker readiness is ready',
+      label: 'A serverless Worker starts for Workflow Tasks',
       tooltip:
-        'A Worker is polling, or a serverless Worker Deployment will start one when a task arrives.',
+        'The catalog-tasks Task Queue is served by a serverless Worker Deployment that scales to zero when idle. A Worker starts when this run creates a task.',
     });
   });
 

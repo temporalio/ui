@@ -361,7 +361,10 @@ describe('createApiWorkbenchHost', () => {
       );
     const host = createApiWorkbenchHost({ descriptors: [descriptor], request });
 
-    expect((await host.checkReadiness(descriptor.id))[0].state).toBe('ready');
+    expect((await host.checkReadiness(descriptor.id))[0]).toMatchObject({
+      state: 'ready',
+      serverless: true,
+    });
     expect(request.mock.calls[1][0]).toMatch(
       /\/api\/v1\/namespaces\/catalog-demo\/worker-deployments\/catalog-deployment/,
     );

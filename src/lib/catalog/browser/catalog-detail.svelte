@@ -37,12 +37,14 @@
     state,
     taskQueue,
     workerStartCommand,
+    serverless = false,
   }: {
     kind: HostReadinessCheck['kind'];
     executionKind: CatalogExecutionKind;
     state: WorkerReadinessDisplayState | 'loading';
     taskQueue: string;
     workerStartCommand?: string;
+    serverless?: boolean;
   }): ReadinessPresentation => {
     const label =
       kind === 'worker'
@@ -64,6 +66,16 @@
       };
     }
 
+    if (kind === 'worker' && state === 'ready' && serverless) {
+      return {
+        Icon: IconCheckCircle,
+        iconClass: 'text-success',
+        iconLabel: `${iconSubject} is ready`,
+        label: catalogKinds[executionKind].serverlessWorkerLabel,
+        tooltip: `The ${taskQueue} Task Queue is served by a serverless Worker Deployment that scales to zero when idle. A Worker starts when this run creates a task.`,
+      };
+    }
+
     if (state === 'ready') {
       return {
         Icon: IconCheckCircle,
@@ -72,7 +84,7 @@
         label,
         tooltip:
           kind === 'worker'
-            ? 'A Worker is polling, or a serverless Worker Deployment will start one when a task arrives.'
+            ? 'A Worker is polling.'
             : 'Nexus Endpoint is ready.',
       };
     }
@@ -160,7 +172,11 @@
   import { declaredExecutionId, startFromEditors } from './start-example';
   import { catalogSharedStartOptionNames } from './start-options';
   import type { BrowserCatalogDescriptor, JsonValue } from './types';
-  import type { ReadinessCheck, WorkbenchHost } from './workbench-host';
+  import type {
+    ReadinessCheck,
+    WorkbenchHost,
+    WorkerReadinessCheck,
+  } from './workbench-host';
 
   type FixedExecutionField = {
     id: string;
@@ -306,11 +322,13 @@
   let loadedExampleId = $state('');
   let descriptorEpoch = 0;
   const readinessLoader = createReadinessLoader(() => host);
+  let workerCheck = $derived(
+    readiness.find(
+      (check): check is WorkerReadinessCheck => check.kind === 'worker',
+    ),
+  );
   let workerReadinessState: WorkerReadinessDisplayState = $derived(
-    readinessError
-      ? 'error'
-      : (readiness.find((check) => check.kind === 'worker')?.state ??
-          'missing'),
+    readinessError ? 'error' : (workerCheck?.state ?? 'missing'),
   );
   let workerPresentation = $derived(
     readinessPresentation({
@@ -319,6 +337,7 @@
       state: readinessLoading ? 'loading' : workerReadinessState,
       taskQueue: descriptor.execution.taskQueue,
       workerStartCommand,
+      serverless: Boolean(workerCheck?.serverless),
     }),
   );
   let prerequisiteReadiness = $derived(

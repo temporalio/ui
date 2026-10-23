@@ -181,9 +181,7 @@ describe('CatalogDetail client interactions', () => {
       ?.querySelector('[role="tooltip"]');
 
     expect(document.activeElement).toBe(readinessIcon);
-    expect(tooltip?.textContent).toContain(
-      'A Worker is polling, or a serverless Worker Deployment will start one when a task arrives.',
-    );
+    expect(tooltip?.textContent).toContain('A Worker is polling.');
     expect(tooltip?.classList).not.toContain('hidden');
   });
 });

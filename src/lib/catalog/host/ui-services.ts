@@ -28,6 +28,7 @@ import type {
   ExecutionObservation,
   LaunchReference,
   ObservationRequest,
+  WorkerAvailability,
 } from '../browser/workbench-host';
 
 type EncodeInput = (
@@ -420,7 +421,7 @@ export const createApiWorkbenchHost = ({
     checkWorker: async (
       { namespace, taskQueue, taskQueueType },
       signal,
-    ): Promise<boolean> => {
+    ): Promise<WorkerAvailability> => {
       const route = routeForApi('task-queue', {
         namespace,
         queue: taskQueue,
@@ -432,18 +433,20 @@ export const createApiWorkbenchHost = ({
         options: { signal },
       });
 
-      if (response?.pollers?.some(isActivePoller)) return true;
+      if (response?.pollers?.some(isActivePoller)) return 'polling';
 
       const deploymentName =
         response?.versioningInfo?.currentDeploymentVersion?.deploymentName;
-      if (!deploymentName) return false;
+      if (!deploymentName) return 'none';
 
       const deployment = await requestFromAPI<DescribeWorkerDeploymentResponse>(
         routeForApi('worker-deployment', { namespace, deploymentName }),
         { request, notifyOnError: false, options: { signal } },
       );
 
-      return deploymentHasComputeConfig(deployment?.workerDeploymentInfo);
+      return deploymentHasComputeConfig(deployment?.workerDeploymentInfo)
+        ? 'serverless'
+        : 'none';
     },
     checkNexusEndpoint: async ({ endpoint }, signal) => {
       const route = routeForApi('nexus-endpoints');
