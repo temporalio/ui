@@ -30,8 +30,7 @@ Import by file: `@temporalio/ui/holocene/<name>.svelte`,
 for example `@temporalio/ui/holocene/alert.svelte`.
 
 Prefer io `Button` and io icons over `holocene/button.svelte` in new work.
-Holocene components with no io equivalent (such as `icon-button.svelte`)
-are still fine.
+For icon-only buttons, use io Button with the icon-only variant and an aria-label.
 
 ## 2. Choose by content, not color
 
