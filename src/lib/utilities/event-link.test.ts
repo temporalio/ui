@@ -120,6 +120,40 @@ describe('toEventLinkView', () => {
     expect(view.event).toBeUndefined();
   });
 
+  it('shows decoded workflow IDs without changing navigation URLs', () => {
+    const view = toEventLinkView({
+      workflow: {
+        namespace: 'test-ns',
+        workflowId: 'orders/50% ready',
+        runId: 'test-run',
+      },
+    });
+
+    expect(view.value).toBe('orders/50% ready/test-run/timeline');
+    expect(view.href).toBe(
+      `${base}/namespaces/test-ns/workflows/orders%2F50%25%20ready/test-run/timeline`,
+    );
+  });
+
+  it('shows decoded workflow event IDs without changing navigation URLs', () => {
+    const view = toEventLinkView({
+      workflowEvent: {
+        namespace: 'test-ns',
+        workflowId: 'récap/東京',
+        runId: 'test-run',
+        eventRef: {
+          eventId: '42',
+          eventType: 'EVENT_TYPE_NEXUS_OPERATION_SCHEDULED',
+        },
+      },
+    });
+
+    expect(view.value).toBe('récap/東京/test-run/history/events/42');
+    expect(view.href).toBe(
+      `${base}/namespaces/test-ns/workflows/r%C3%A9cap%2F%E6%9D%B1%E4%BA%AC/test-run/history/events/42`,
+    );
+  });
+
   it('returns a standalone Nexus operation route', () => {
     const view = toEventLinkView({
       nexusOperation: {
