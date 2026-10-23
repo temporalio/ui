@@ -30,6 +30,7 @@
   import Button from '$lib/holocene/button.svelte';
 
   let updating = $state(false);
+  let runId = $state(0);
   let status = $state('Ready. Choose a timing scenario.');
   let timeouts: ReturnType<typeof setTimeout>[] = [];
 
@@ -49,6 +50,7 @@
 
   function reset() {
     clearTimers();
+    runId += 1;
     updating = false;
     status = 'Ready. Choose a timing scenario.';
   }
@@ -143,33 +145,35 @@
     <p role="status" aria-live="polite" class="text-sm text-secondary">
       {status}
     </p>
-    <Table
-      class="w-full"
-      {updating}
-      data-testid="table-updating-timing-harness"
-    >
-      {#snippet headers()}
+    {#key runId}
+      <Table
+        class="w-full"
+        {updating}
+        data-testid="table-updating-timing-harness"
+      >
+        {#snippet headers()}
+          <tr>
+            <th>Heading 1</th>
+            <th>Heading 2</th>
+            <th>Heading 3</th>
+          </tr>
+        {/snippet}
         <tr>
-          <th>Heading 1</th>
-          <th>Heading 2</th>
-          <th>Heading 3</th>
+          <td>Cell 1</td>
+          <td>Cell 2</td>
+          <td>Cell 3</td>
         </tr>
-      {/snippet}
-      <tr>
-        <td>Cell 1</td>
-        <td>Cell 2</td>
-        <td>Cell 3</td>
-      </tr>
-      <tr>
-        <td>Cell 1</td>
-        <td>Cell 2</td>
-        <td>Cell 3</td>
-      </tr>
-      <tr>
-        <td>Cell 1</td>
-        <td>Cell 2</td>
-        <td>Cell 3</td>
-      </tr>
-    </Table>
+        <tr>
+          <td>Cell 1</td>
+          <td>Cell 2</td>
+          <td>Cell 3</td>
+        </tr>
+        <tr>
+          <td>Cell 1</td>
+          <td>Cell 2</td>
+          <td>Cell 3</td>
+        </tr>
+      </Table>
+    {/key}
   </div>
 </Story>
