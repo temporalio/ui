@@ -2,7 +2,8 @@
 
 Guidance for agents building UI with this package. It holds two component
 layers: **io** (new) and **Holocene** (being replaced). Follow these rules
-before writing any markup.
+before writing any markup. If you are working inside the temporalio/ui repo
+itself, import via `$lib/...` and follow `io/AGENTS.md` instead.
 
 ## 1. Pick a component
 
@@ -28,13 +29,16 @@ before writing any markup.
 Import by file: `@temporalio/ui/holocene/<name>.svelte`,
 for example `@temporalio/ui/holocene/alert.svelte`.
 
-Do not use `holocene/button.svelte` or `holocene/icon` in new work.
-Use io `Button` and io icons.
+Prefer io `Button` and io icons over `holocene/button.svelte` in new work.
+Holocene components with no io equivalent (such as `icon-button.svelte`)
+are still fine.
 
 ## 2. Choose by content, not color
 
-- A standalone number → `BadgeCount`
-- A workflow, activity or Nexus operation status → `BadgeStatus`
+- A label, or content BadgeCount can't show → `Badge`
+- A non-interactive category label → `Tag` (no `error` scheme)
+- Something the user clicks → `Chip`. Badges are not interactive.
+- A clickable workflow status → `ChipStatus` (English labels only)
 - A label, or content BadgeCount can't show → `Badge`
 - Something the user clicks → `Chip`. Badges are not interactive.
 
@@ -86,7 +90,7 @@ Never use:
 - Inventing props or variants that aren't in the types.
 - Coloring a Badge, Chip or Tag through `class`. Use `colorScheme`.
 - Letting color or an icon carry meaning alone. Put the meaning in `text`;
-  icons are hidden from screen readers unless given a `title`.
+  icons inside io components are hidden from screen readers.
 - Passing an empty string to `text`. Leave the component out instead.
 - Adding `onclick` to a Badge. Use `Chip`.
 - Omitting `data-testid`. io components don't set one.
