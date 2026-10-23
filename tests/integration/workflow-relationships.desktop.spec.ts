@@ -8,7 +8,8 @@ import { WORKFLOWS_COUNT_API } from '~/test-utilities/mocks/workflows-count';
 
 const rootId = 'relationships-root';
 const rootRunId = 'relationships-root-run';
-const childAId = 'relationships-child-a-with-an-unbreakable-workflow-id';
+const childAId =
+  'relationshipschildawithanunbreakableworkflowid01234567890123456789';
 const childARunId = 'relationships-child-a-run';
 const grandchildId = 'relationships-grandchild-a1';
 const grandchildRunId = 'relationships-grandchild-a1-run';
@@ -162,6 +163,16 @@ test.describe('Relationships nested tree', () => {
     await expect(childBRow.locator(':scope > div').first()).toHaveClass(
       /rounded-bl/,
     );
+
+    const [childIdBox, childCountBox] = await Promise.all([
+      childARow.getByRole('link', { name: childAId }).boundingBox(),
+      childARow.locator('.relationship-id-column + div').boundingBox(),
+    ]);
+    expect(childIdBox).not.toBeNull();
+    expect(childCountBox).not.toBeNull();
+    expect(childIdBox!.x + childIdBox!.width).toBeLessThanOrEqual(
+      childCountBox!.x,
+    );
     await expectAlignedColumns(page);
 
     const zoomIn = page.getByRole('button', { name: 'Zoom in' });
@@ -205,18 +216,29 @@ test.describe('Relationships nested tree', () => {
         .locator('xpath=ancestor::button');
       await childARow.click();
       const activeTreeLine = childARow.locator(':scope > div').first();
-      const [borderColor, borderToken] = await activeTreeLine.evaluate(
-        (line) => {
-          const styles = getComputedStyle(line);
-          return [
-            styles.borderBottomColor,
-            styles.getPropertyValue('--color-border-secondary').trim(),
-          ];
-        },
+      const darkBorderToken = await activeTreeLine.evaluate((line) =>
+        getComputedStyle(line)
+          .getPropertyValue('--color-border-secondary')
+          .trim(),
       );
-      expect(borderToken).not.toBe('');
-      expect(borderColor).not.toBe('rgba(0, 0, 0, 0)');
       await expectAlignedColumns(page);
+
+      await page.emulateMedia({ colorScheme: 'light' });
+      await page.reload();
+      await expect(page.locator('body')).toHaveAttribute('data-theme', 'light');
+      const lightChildARow = page
+        .getByText(childAName)
+        .locator('xpath=ancestor::button');
+      await lightChildARow.click();
+      const lightBorderToken = await lightChildARow
+        .locator(':scope > div')
+        .first()
+        .evaluate((line) =>
+          getComputedStyle(line)
+            .getPropertyValue('--color-border-secondary')
+            .trim(),
+        );
+      expect(darkBorderToken).not.toBe(lightBorderToken);
     });
   });
 });
