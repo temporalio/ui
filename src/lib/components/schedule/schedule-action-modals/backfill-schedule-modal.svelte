@@ -74,7 +74,10 @@
   const invalidEndTime = $derived(endTimestamp <= startTimestamp);
 
   $effect(() => {
-    return () => clearConfirmationModalActionTimeout('backfill');
+    return () => {
+      clearConfirmationModalActionTimeout('backfill');
+      closeConfirmationModal('backfill');
+    };
   });
 </script>
 

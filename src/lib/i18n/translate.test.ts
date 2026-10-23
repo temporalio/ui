@@ -1,23 +1,21 @@
 import * as i18next from 'i18next';
-import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+import { afterEach, describe, expect, test, vi } from 'vitest';
 
 import { translate } from './translate';
 
-describe('translate', () => {
-  beforeEach(() => {
-    vi.mock('i18next', async (importOriginal) => {
-      const actual = (await importOriginal()) as i18next.i18n;
-      const mockT = vi.fn();
-      return {
-        default: {
-          ...actual,
-          t: mockT,
-        },
-        t: mockT,
-      };
-    });
-  });
+vi.mock('i18next', async (importOriginal) => {
+  const actual = (await importOriginal()) as i18next.i18n;
+  const mockT = vi.fn();
+  return {
+    default: {
+      ...actual,
+      t: mockT,
+    },
+    t: mockT,
+  };
+});
 
+describe('translate', () => {
   afterEach(() => {
     vi.clearAllMocks();
   });
