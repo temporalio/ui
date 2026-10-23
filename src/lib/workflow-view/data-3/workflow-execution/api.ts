@@ -1,0 +1,199 @@
+import type {
+  GetWorkflowExecutionHistoryResponse,
+  PendingActivityInfo,
+  PendingNexusOperation,
+} from '$lib/types/events';
+import type { WorkflowExecutionAPIResponse } from '$lib/types/workflows';
+import { requestFromAPI } from '$lib/utilities/request-from-api';
+import { routeForApi } from '$lib/utilities/route-for-api';
+
+import type {
+  WorkflowExecutionDetails,
+  WorkflowExecutionIdentity,
+} from './types';
+import { compareEventIds } from '../history-events/compare-event-ids';
+import { normalizeHistoryEvent } from '../history-events/normalize-history-event';
+import type {
+  HistoryEventId,
+  NormalizedHistoryEvent,
+} from '../history-events/types';
+import {
+  fetchBidirectionalPages,
+  type PageFetcherFn,
+} from '../network-utils/fetch-bidirectional-pages';
+import { retryableGet } from '../network-utils/retryable-get';
+
+/** Converts the execution details API response into lookup maps for pending membership and metadata access. */
+function toExecutionDetails(
+  response: WorkflowExecutionAPIResponse,
+): WorkflowExecutionDetails {
+  const { pendingActivities, pendingNexusOperations, ...details } = response;
+  const pendingActivitiesByActivityId = new Map<string, PendingActivityInfo>();
+  const pendingNexusOperationsByHeadEventId = new Map<
+    HistoryEventId,
+    PendingNexusOperation
+  >();
+
+  for (const activity of pendingActivities ?? []) {
+    if (!activity.activityId) {
+      throw new Error('Pending activity is missing its activity ID');
+    }
+    pendingActivitiesByActivityId.set(activity.activityId, activity);
+  }
+
+  for (const operation of pendingNexusOperations ?? []) {
+    if (operation.scheduledEventId == null) {
+      throw new Error(
+        'Pending Nexus operation is missing its scheduled event ID',
+      );
+    }
+    pendingNexusOperationsByHeadEventId.set(
+      String(operation.scheduledEventId),
+      operation,
+    );
+  }
+
+  return {
+    ...details,
+    pendingActivitiesByActivityId,
+    pendingNexusOperationsByHeadEventId,
+  };
+}
+
+/** Fetches current execution details, including pending activities and Nexus operations. */
+export async function fetchExecutionDetails(
+  identity: WorkflowExecutionIdentity,
+  signal?: AbortSignal,
+): Promise<WorkflowExecutionDetails> {
+  const response = await requestFromAPI<WorkflowExecutionAPIResponse>(
+    routeForApi('workflow', identity),
+    {
+      request: retryableGet,
+      params: { 'execution.runId': identity.runId },
+      notifyOnError: false,
+      options: { signal },
+    },
+  );
+
+  if (!response) {
+    throw new Error('Missing execution details response');
+  }
+
+  return toExecutionDetails(response);
+}
+
+/** Fetches and validates the execution's WorkflowExecutionStarted event. */
+export async function fetchStartEvent(
+  identity: WorkflowExecutionIdentity,
+  signal?: AbortSignal,
+): Promise<NormalizedHistoryEvent> {
+  const response = await requestFromAPI<GetWorkflowExecutionHistoryResponse>(
+    routeForApi('events.ascending', identity),
+    {
+      request: retryableGet,
+      params: {
+        'execution.runId': identity.runId,
+        waitNewEvent: 'false',
+        maximumPageSize: '1',
+      },
+      notifyOnError: false,
+      options: { signal },
+    },
+  );
+
+  const rawStartEvent = response?.history?.events?.[0];
+
+  if (!rawStartEvent) {
+    throw new Error('Execution history discovery is missing its first event');
+  }
+
+  const normalizedStartEvent = normalizeHistoryEvent(rawStartEvent);
+
+  if (
+    normalizedStartEvent.eventType !== 'WorkflowExecutionStarted' ||
+    normalizedStartEvent.eventId !== '1' ||
+    !normalizedStartEvent.workflowExecutionStartedEventAttributes
+  ) {
+    throw new Error(
+      'Execution history discovery requires WorkflowExecutionStarted event 1 with start attributes',
+    );
+  }
+
+  return normalizedStartEvent;
+}
+
+/** Fetches the latest recorded event, which may not be terminal. */
+export async function fetchLatestEvent(
+  identity: WorkflowExecutionIdentity,
+  signal?: AbortSignal,
+): Promise<NormalizedHistoryEvent> {
+  const response = await requestFromAPI<GetWorkflowExecutionHistoryResponse>(
+    routeForApi('events.descending', identity),
+    {
+      request: retryableGet,
+      params: {
+        'execution.runId': identity.runId,
+        waitNewEvent: 'false',
+        maximumPageSize: '1',
+      },
+      notifyOnError: false,
+      options: { signal },
+    },
+  );
+
+  const rawLatestEvent = response?.history?.events?.[0];
+
+  if (!rawLatestEvent) {
+    throw new Error('Execution history discovery is missing its latest event');
+  }
+
+  return normalizeHistoryEvent(rawLatestEvent);
+}
+
+function getHistoryPageFetcher(
+  identity: WorkflowExecutionIdentity,
+): PageFetcherFn<NormalizedHistoryEvent> {
+  return async (direction, token, signal) => {
+    const response = await requestFromAPI<GetWorkflowExecutionHistoryResponse>(
+      routeForApi(`events.${direction}`, identity),
+      {
+        token,
+        request: retryableGet,
+        params: {
+          'execution.runId': identity.runId,
+          waitNewEvent: 'false',
+          maximumPageSize: '1000',
+        },
+        options: { signal },
+        notifyOnError: false,
+      },
+    );
+
+    if (!response) {
+      throw new Error(`Missing ${direction} execution history response`);
+    }
+
+    const rawEvents = response?.history?.events ?? [];
+
+    return {
+      items: rawEvents.map(normalizeHistoryEvent),
+      nextPageToken: response?.nextPageToken ?? null,
+    };
+  };
+}
+
+/** Fetches history from both ends, delivering normalized pages as they arrive. */
+export async function fetchHistory(
+  identity: WorkflowExecutionIdentity,
+  onPage: (items: readonly NormalizedHistoryEvent[]) => void,
+  signal?: AbortSignal,
+) {
+  const pageFetcher = getHistoryPageFetcher(identity);
+
+  return fetchBidirectionalPages({
+    fetchPage: pageFetcher,
+    compare: (left, right) => compareEventIds(left.eventId, right.eventId),
+    onPage,
+    signal,
+  });
+}

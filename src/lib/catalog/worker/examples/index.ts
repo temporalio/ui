@@ -9,29 +9,34 @@ import { catalogExample as example1 } from './activity-retry/example.js';
 import { catalogExample as example2 } from './activity-timeout/example.js';
 import { catalogExample as example3 } from './child-fan-out/example.js';
 import { catalogExample as example4 } from './child-workflows/example.js';
-import { catalogExample as example5 } from './hello/example.js';
-import { catalogExample as example6 } from './high-event-count/example.js';
-import { catalogExample as example7 } from './large-history/example.js';
-import { catalogExample as example8 } from './local-activity/example.js';
-import { catalogExample as example9 } from './long-activity/example.js';
-import { catalogExample as example10 } from './nexus-greeting/example.js';
-import { catalogExample as example11 } from './parallel-activities/example.js';
-import { catalogExample as example12 } from './pending-activities/example.js';
-import { catalogExample as example13 } from './pending-nexus/example.js';
-import { catalogExample as example14 } from './priority-fairness/example.js';
-import { catalogExample as example15 } from './satellite-launch-event-groups/example.js';
-import { catalogExample as example16 } from './sequential-activities/example.js';
-import { catalogExample as example17 } from './sequential-markdown-activities/example.js';
-import { catalogExample as example18 } from './sequential-multiline-summary-activities/example.js';
-import { catalogExample as example19 } from './sequential-no-summary-activities/example.js';
-import { catalogExample as example20 } from './sequential-plain-text-activities/example.js';
-import { catalogExample as example21 } from './signal-collector/example.js';
-import { catalogExample as example22 } from './signal-handlers/example.js';
-import { catalogExample as example23 } from './slow-nexus-operation/example.js';
-import { catalogExample as example24 } from './standalone-activity/example.js';
-import { catalogExample as example25 } from './timer-driven-repetition/example.js';
-import { catalogExample as example26 } from './workflow-feature-tour/example.js';
-import { catalogExample as example27 } from './workflow-patching/example.js';
+import { catalogExample as example5 } from './continue-as-new/example.js';
+import { catalogExample as example6 } from './hello/example.js';
+import { catalogExample as example7 } from './high-event-count/example.js';
+import { catalogExample as example8 } from './large-history/example.js';
+import { catalogExample as example9 } from './local-activity/example.js';
+import { catalogExample as example10 } from './long-activity/example.js';
+import { catalogExample as example11 } from './nexus-greeting/example.js';
+import { catalogExample as example12 } from './parallel-activities/example.js';
+import { catalogExample as example13 } from './pending-activities/example.js';
+import { catalogExample as example14 } from './pending-nexus/example.js';
+import { catalogExample as example15 } from './priority-fairness/example.js';
+import { catalogExample as example16 } from './satellite-launch-event-groups/example.js';
+import { catalogExample as example17 } from './sequential-activities/example.js';
+import { catalogExample as example18 } from './sequential-markdown-activities/example.js';
+import { catalogExample as example19 } from './sequential-multiline-summary-activities/example.js';
+import { catalogExample as example20 } from './sequential-no-summary-activities/example.js';
+import { catalogExample as example21 } from './sequential-plain-text-activities/example.js';
+import { catalogExample as example22 } from './signal-collector/example.js';
+import { catalogExample as example23 } from './signal-handlers/example.js';
+import { catalogExample as example24 } from './slow-nexus-operation/example.js';
+import { catalogExample as example25 } from './standalone-activity/example.js';
+import { catalogExample as example26 } from './timeline-kitchen-sink/example.js';
+import { catalogExample as example27 } from './timeline-kitchen-sink-long-running/example.js';
+import { catalogExample as example28 } from './timeline-live/example.js';
+import { catalogExample as example29 } from './timeline-performance/example.js';
+import { catalogExample as example30 } from './timer-driven-repetition/example.js';
+import { catalogExample as example31 } from './workflow-feature-tour/example.js';
+import { catalogExample as example32 } from './workflow-patching/example.js';
 
 const sharedWorkflowDefinitions = [
   example0,
@@ -62,6 +67,11 @@ const sharedWorkflowDefinitions = [
   example25,
   example26,
   example27,
+  example28,
+  example29,
+  example30,
+  example31,
+  example32,
 ] satisfies readonly CatalogExampleDefinition[];
 
 export const sharedWorkflowExamples: readonly CatalogExampleRegistration[] =
@@ -116,6 +126,8 @@ export const sharedWorkflowSourceFiles = [
   'src/lib/catalog/worker/examples/child-fan-out/workflow.ts',
   'src/lib/catalog/worker/examples/child-workflows/example.ts',
   'src/lib/catalog/worker/examples/child-workflows/workflow.ts',
+  'src/lib/catalog/worker/examples/continue-as-new/example.ts',
+  'src/lib/catalog/worker/examples/continue-as-new/workflow.ts',
   'src/lib/catalog/worker/examples/hello/example.ts',
   'src/lib/catalog/worker/examples/hello/workflow.ts',
   'src/lib/catalog/worker/examples/high-event-count/example.ts',
@@ -171,6 +183,17 @@ export const sharedWorkflowSourceFiles = [
   'src/lib/catalog/worker/examples/slow-nexus-operation/service.ts',
   'src/lib/catalog/worker/examples/standalone-activity/activity.ts',
   'src/lib/catalog/worker/examples/standalone-activity/example.ts',
+  'src/lib/catalog/worker/examples/timeline-kitchen-sink/activity.ts',
+  'src/lib/catalog/worker/examples/timeline-kitchen-sink/example.ts',
+  'src/lib/catalog/worker/examples/timeline-kitchen-sink/workflow.ts',
+  'src/lib/catalog/worker/examples/timeline-kitchen-sink-long-running/example.ts',
+  'src/lib/catalog/worker/examples/timeline-kitchen-sink-long-running/workflow.ts',
+  'src/lib/catalog/worker/examples/timeline-live/activity.ts',
+  'src/lib/catalog/worker/examples/timeline-live/example.ts',
+  'src/lib/catalog/worker/examples/timeline-live/workflow.test.ts',
+  'src/lib/catalog/worker/examples/timeline-live/workflow.ts',
+  'src/lib/catalog/worker/examples/timeline-performance/example.ts',
+  'src/lib/catalog/worker/examples/timeline-performance/workflow.ts',
   'src/lib/catalog/worker/examples/timer-driven-repetition/example.ts',
   'src/lib/catalog/worker/examples/timer-driven-repetition/workflow.ts',
   'src/lib/catalog/worker/examples/workflow-feature-tour/activity.ts',
