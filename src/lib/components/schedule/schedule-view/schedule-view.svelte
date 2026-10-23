@@ -1,44 +1,33 @@
 <script lang="ts">
   import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
-  import CountRefreshButton from '$lib/components/count-refresh-button.svelte';
   import {
     DetailList,
     DetailListLabel,
     DetailListTimestampValue,
   } from '$lib/components/detail-list';
-  import DetailListLinkValue from '$lib/components/detail-list/detail-list-link-value.svelte';
-  import StatusCounts from '$lib/components/status-counts.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Link from '$lib/holocene/link.svelte';
   import MenuItem from '$lib/holocene/menu/menu-item.svelte';
   import SplitButton from '$lib/holocene/split-button.svelte';
   import { translate } from '$lib/i18n/translate';
   import { BadgeStatus } from '$lib/io/badge-status';
-  import { IconChevronLeft, IconFilter } from '$lib/io/icon';
+  import { IconChevronLeft } from '$lib/io/icon';
   import { coreUserStore } from '$lib/stores/core-user';
-  import {
-    openConfirmationModal,
-    refreshCurrentScheduleFetch,
-  } from '$lib/stores/schedules';
-  import {
-    workflowCount,
-    refresh as workflowRefresh,
-  } from '$lib/stores/workflows';
+  import { openConfirmationModal } from '$lib/stores/schedules';
   import type { DescribeFullSchedule } from '$lib/types/schedule';
   import {
     routeForScheduleEdit,
     routeForSchedules,
-    routeForWorkflowsWithQuery,
   } from '$lib/utilities/route-for';
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
   import ScheduleActionModals from '../schedule-action-modals/schedule-action-modals.svelte';
+  import { scheduledActionPresentations } from '../scheduled-action-types/presentation-registry';
+  import { resolveScheduledAction } from '../scheduled-action-types/resolve-scheduled-action';
 
   import AdvancedSettingsCard from './advanced-settings-card.svelte';
   import CustomSearchAttributesCard from './custom-search-attributes-card.svelte';
   import ScheduleSpecCard from './schedule-spec-card.svelte';
-  import WorkflowInputCard from './workflow-input-card.svelte';
-  import WorkflowRunsCard from './workflow-runs-card.svelte';
 
   interface Props {
     schedule: DescribeFullSchedule;
@@ -48,7 +37,7 @@
 
   let { schedule, namespace, scheduleId }: Props = $props();
 
-  const workflowQuery = $derived(`TemporalScheduledById="${scheduleId}"`);
+  const resolvedAction = $derived(resolveScheduledAction(schedule));
 
   const coreUser = coreUserStore();
   const editDisabled = $derived(
@@ -113,27 +102,14 @@
   </div>
 
   <DetailList rowCount={3}>
-    <DetailListLabel class="flex min-h-6 items-center"
-      >{translate('common.workflow-type')}</DetailListLabel
-    >
-    <DetailListLinkValue
-      href={routeForWorkflowsWithQuery({
-        namespace,
-        query: [
-          `WorkflowType="${
-            schedule?.schedule?.action?.startWorkflow?.workflowType?.name
-          }"`,
-          `TemporalScheduledById="${scheduleId}"`,
-        ].join(' AND '),
-      }) ?? ''}
-      text={schedule?.schedule?.action?.startWorkflow?.workflowType?.name ?? ''}
-      Icon={IconFilter}
-      copyable={Boolean(
-        schedule?.schedule?.action?.startWorkflow?.workflowType?.name,
-      )}
-      copyableText={schedule?.schedule?.action?.startWorkflow?.workflowType
-        ?.name ?? undefined}
-    />
+    {#if resolvedAction.type !== 'unknown' && resolvedAction.schedule}
+      {@const presentation = scheduledActionPresentations[resolvedAction.type]}
+      <presentation.view.Details
+        schedule={resolvedAction.schedule}
+        {namespace}
+        {scheduleId}
+      />
+    {/if}
 
     <DetailListLabel class="items-center">
       {translate('common.created-label')}
@@ -148,24 +124,14 @@
     {/if}
   </DetailList>
 
-  <dl class="-mt-2 flex flex-col gap-1">
-    <dt class="text-secondary">
-      {translate('schedules.total-workflows')}
-    </dt>
-    <dd class="flex flex-wrap items-center gap-2">
-      <span class="font-mono" data-testid="workflow-count"
-        >{$workflowCount.count.toLocaleString()}
-      </span>
-      <CountRefreshButton
-        refresh={workflowRefresh}
-        count={$workflowCount.newCount}
-        onRefresh={() => {
-          refreshCurrentScheduleFetch({ namespace, scheduleId });
-        }}
-      />
-      <StatusCounts class="p-0" staticQuery={workflowQuery} />
-    </dd>
-  </dl>
+  {#if resolvedAction.type !== 'unknown' && resolvedAction.schedule}
+    {@const presentation = scheduledActionPresentations[resolvedAction.type]}
+    <presentation.view.Header
+      schedule={resolvedAction.schedule}
+      {namespace}
+      {scheduleId}
+    />
+  {/if}
 </header>
 <CodecServerErrorBanner />
 <div class="flex flex-col gap-4 pb-24">
@@ -181,22 +147,42 @@
   {/if}
   <div class="flex flex-col gap-4 xl:flex-row">
     <div class="flex w-full flex-col items-start gap-4 xl:w-2/3">
-      <WorkflowRunsCard
-        {namespace}
-        {schedule}
-        {workflowQuery}
-        openTriggerConfirmationModal={() => openConfirmationModal('trigger')}
-        openBackfillConfirmationModal={() => openConfirmationModal('backfill')}
-      />
-      <AdvancedSettingsCard {schedule} />
-      <CustomSearchAttributesCard {schedule} />
+      {#if resolvedAction.type !== 'unknown' && resolvedAction.schedule}
+        {@const presentation =
+          scheduledActionPresentations[resolvedAction.type]}
+        <presentation.view.RunsCard
+          schedule={resolvedAction.schedule}
+          {namespace}
+          {scheduleId}
+          openTriggerConfirmationModal={() => openConfirmationModal('trigger')}
+          openBackfillConfirmationModal={() =>
+            openConfirmationModal('backfill')}
+        />
+      {/if}
+      <AdvancedSettingsCard {schedule}>
+        {#if resolvedAction.type !== 'unknown' && resolvedAction.schedule}
+          {@const presentation =
+            scheduledActionPresentations[resolvedAction.type]}
+          <presentation.view.AdvancedSettings
+            schedule={resolvedAction.schedule}
+            {namespace}
+            {scheduleId}
+          />
+        {/if}
+      </AdvancedSettingsCard>
+      <CustomSearchAttributesCard {schedule} {resolvedAction} />
     </div>
 
     <div class="flex w-full flex-col gap-4 xl:w-1/3">
-      <WorkflowInputCard
-        {scheduleId}
-        input={schedule?.schedule?.action?.startWorkflow?.input ?? undefined}
-      />
+      {#if resolvedAction.type !== 'unknown' && resolvedAction.schedule}
+        {@const presentation =
+          scheduledActionPresentations[resolvedAction.type]}
+        <presentation.view.InputCard
+          schedule={resolvedAction.schedule}
+          {namespace}
+          {scheduleId}
+        />
+      {/if}
       <ScheduleSpecCard {schedule} />
     </div>
   </div>

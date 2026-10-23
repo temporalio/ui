@@ -6,25 +6,36 @@ import {
 } from '$lib/stores/data-encoder-config';
 
 import { getRequestBody } from './get-request-body';
-import { DEFAULT_CATCHUP_WINDOW, DEFAULT_TASK_TIMEOUT } from '../constants';
-import { formScheduleSchema, type FormScheduleSchema } from '../schema/form';
+import { DEFAULT_CATCHUP_WINDOW } from '../constants';
+import { DEFAULT_TASK_TIMEOUT } from '../scheduled-action-types/workflow/constants';
+import { formWorkflowDetailsSchema } from '../scheduled-action-types/workflow/schema';
+import { formScheduleSchema } from '../schema/form';
+import type { ScheduleFormData } from '../types';
 
 import type { DescribeFullSchedule } from '$types/schedule';
 
 const buildForm = (
-  overrides: Record<string, unknown> = {},
-): FormScheduleSchema =>
-  formScheduleSchema.parse({
+  scheduleOverrides: Record<string, unknown> = {},
+  workflowOverrides: Record<string, unknown> = {},
+): ScheduleFormData => ({
+  schedule: formScheduleSchema.parse({
     name: 'my-schedule',
-    workflowType: 'MyWorkflow',
-    workflowId: 'my-workflow-id',
-    taskQueue: 'my-task-queue',
     specs: [{ kind: 'cron', cronString: '0 12 * * *' }],
     timezoneName: 'UTC',
     startTime: '2026-01-01',
     catchupWindow: '60s',
-    ...overrides,
-  });
+    ...scheduleOverrides,
+  }),
+  action: {
+    type: 'workflow',
+    details: formWorkflowDetailsSchema.parse({
+      workflowType: 'MyWorkflow',
+      workflowId: 'my-workflow-id',
+      taskQueue: 'my-task-queue',
+      ...workflowOverrides,
+    }),
+  },
+});
 
 describe('getRequestBody', () => {
   it('maps core action fields', async () => {
@@ -45,7 +56,7 @@ describe('getRequestBody', () => {
   it('prefers an existing schedule id over the form name', async () => {
     const body = await getRequestBody(buildForm(), {
       schedule_id: 'existing-id',
-      schedule: {},
+      schedule: { action: { startWorkflow: {} } },
     } as DescribeFullSchedule);
 
     expect(body.schedule_id).toBe('existing-id');
@@ -59,7 +70,9 @@ describe('getRequestBody', () => {
 
   it('drops invalid cron specs', async () => {
     const form = buildForm();
-    form.specs = [{ ...form.specs[0], cronString: 'not a valid cron' }];
+    form.schedule.specs = [
+      { ...form.schedule.specs[0], cronString: 'not a valid cron' },
+    ];
 
     const body = await getRequestBody(form);
 
@@ -162,7 +175,7 @@ describe('getRequestBody', () => {
 
   it('falls back to defaults for emptied duration fields', async () => {
     const body = await getRequestBody(
-      buildForm({ catchupWindow: '', taskTimeout: '' }),
+      buildForm({ catchupWindow: '' }, { taskTimeout: '' }),
     );
 
     expect(body.schedule.policies!.catchupWindow).toBe(DEFAULT_CATCHUP_WINDOW);
@@ -189,7 +202,7 @@ describe('getRequestBody', () => {
 
     const { startWorkflow } = (
       await getRequestBody(
-        buildForm({ runTimeout: '0s' }),
+        buildForm({}, { runTimeout: '0s' }),
         describeFullSchedule,
       )
     ).schedule.action!;
@@ -226,7 +239,7 @@ describe('getRequestBody', () => {
     const describeWithSpec = (spec: Record<string, unknown>) =>
       ({
         schedule_id: 'existing-id',
-        schedule: { spec },
+        schedule: { spec, action: { startWorkflow: {} } },
       }) as unknown as DescribeFullSchedule;
 
     it('preserves exclusion calendars and timezone data', async () => {
@@ -290,7 +303,7 @@ describe('getRequestBody', () => {
       }
 
       const body = await getRequestBody(
-        buildForm({ editInput: true, input: '"updated input"' }),
+        buildForm({}, { editInput: true, input: '"updated input"' }),
         schedule,
       );
 

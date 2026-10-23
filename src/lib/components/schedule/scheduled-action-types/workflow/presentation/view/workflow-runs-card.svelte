@@ -7,21 +7,20 @@
   import TabPanels from '$lib/holocene/tabs-primitive/tab-panels.svelte';
   import Tabs from '$lib/holocene/tabs-primitive/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
-  import {
-    toRecentScheduleRuns,
-    toUpcomingScheduleRuns,
-  } from '$lib/services/schedule-service';
+  import { toUpcomingScheduleRuns } from '$lib/services/schedule-service';
   import { workflowCount } from '$lib/stores/workflows';
-  import type { DescribeFullSchedule } from '$lib/types/schedule';
   import { routeForWorkflowsWithQuery } from '$lib/utilities/route-for';
+
+  import { toRecentWorkflowRuns } from './recent-runs';
+  import type { WorkflowSchedule } from '../../types';
 
   import WorkflowRunsRecent from './workflow-runs-recent.svelte';
   import WorkflowRunsUpcoming from './workflow-runs-upcoming.svelte';
 
   interface Props {
     namespace: string;
-    schedule: DescribeFullSchedule;
-    workflowQuery: string;
+    schedule: WorkflowSchedule;
+    scheduleId: string;
     openBackfillConfirmationModal: () => void;
     openTriggerConfirmationModal: () => void;
   }
@@ -29,14 +28,16 @@
   const {
     schedule,
     namespace,
-    workflowQuery,
+    scheduleId,
     openBackfillConfirmationModal,
     openTriggerConfirmationModal,
   }: Props = $props();
 
   const id = $props.id();
 
-  const recentRunCount = $derived(toRecentScheduleRuns(schedule).length);
+  const workflowQuery = $derived(`TemporalScheduledById="${scheduleId}"`);
+
+  const recentRunCount = $derived(toRecentWorkflowRuns(schedule).length);
   const upcomingRunCount = $derived(toUpcomingScheduleRuns(schedule).length);
 
   type View = 'recent' | 'upcoming';
