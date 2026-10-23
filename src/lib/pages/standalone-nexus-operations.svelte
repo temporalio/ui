@@ -9,8 +9,8 @@
   import NexusOperationsSummaryConfigurableTable from '$lib/components/standalone-nexus-operations/nexus-operations-summary-configurable-table.svelte';
   import FilterBar from '$lib/components/standalone-nexus-operations/nexus-operations-summary-filter-bar/filter-bar.svelte';
   import StatusCountFilters from '$lib/components/status-count-filters.svelte';
+  import ConfigurableTableHeadersDrawer from '$lib/components/table/configurable-table-headers-drawer.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
-  import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
   import MaximizableTableView from '$lib/holocene/table/paginated-table/maximizable-view.svelte';
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
@@ -144,6 +144,5 @@
   {availableColumns}
   bind:open={customizationDrawerOpen}
   table={TABLE_TYPE.NEXUS_OPERATIONS}
-  type={translate('common.columns')}
   title={translate('standalone-nexus-operations.nexus-operations-table')}
 />

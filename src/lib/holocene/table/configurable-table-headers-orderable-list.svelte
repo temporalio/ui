@@ -1,63 +1,47 @@
 <script lang="ts">
-  import type { Readable } from 'svelte/store';
-
-  import { page } from '$app/state';
-
   import OrderableListItem from '$lib/holocene/orderable-list/orderable-list-item.svelte';
   import OrderableList from '$lib/holocene/orderable-list/orderable-list.svelte';
   import { translate } from '$lib/i18n/translate';
-  import {
-    addColumn,
-    availableCustomSearchAttributeColumns,
-    configurableTableColumns,
-    type ConfigurableTableHeader,
-    type ConfigurableTableType,
-    moveColumn,
-    removeColumn,
-    TABLE_TYPE,
-  } from '$lib/stores/configurable-table-columns';
+
+  import type { ConfigurableTableHeadersModel } from './configurable-table-headers-model';
 
   interface Props {
-    table: ConfigurableTableType;
-    availableColumns: Readable<ConfigurableTableHeader[]>;
+    model: ConfigurableTableHeadersModel;
     type: string;
   }
 
-  let { table, availableColumns, type }: Props = $props();
-
-  const namespace = $derived(page.params.namespace);
-  const columnsInUse = $derived(
-    $configurableTableColumns?.[namespace]?.[table] ?? [],
-  );
-
-  const availableCustomColumns = $derived(
-    availableCustomSearchAttributeColumns(namespace, table),
-  );
+  let { model, type }: Props = $props();
+  const customAvailable = $derived(model.customAvailable);
 </script>
 
 <div class="flex flex-col gap-4">
   <OrderableList>
     {#snippet heading()}
-      {type} <span class="font-normal">(in view)</span>
+      {type}
+      <span class="font-normal">{translate('workflows.in-view')}</span>
     {/snippet}
-    {#each columnsInUse as { label }, index (`${label}:${index}`)}
+    {#each model.inView as { id, label, key }, index (key ?? id)}
       <OrderableListItem
         {index}
         {label}
-        totalItems={columnsInUse.length}
-        onMoveItem={({ from, to }) => moveColumn(from, to, namespace, table)}
-        onRemoveItem={() => removeColumn(label, namespace, table)}
+        totalItems={model.inView.length}
+        onMoveItem={({ from, to }) => model.onMove(from, to)}
+        onRemoveItem={() => model.onRemove(id)}
         addButtonLabel={translate('workflows.add-column-label', {
           column: label,
+          escapeValue: false,
         })}
         removeButtonLabel={translate('workflows.remove-column-label', {
           column: label,
+          escapeValue: false,
         })}
         moveUpButtonLabel={translate('workflows.move-column-up-label', {
           column: label,
+          escapeValue: false,
         })}
         moveDownButtonLabel={translate('workflows.move-column-down-label', {
           column: label,
+          escapeValue: false,
         })}
       />
     {:else}
@@ -69,16 +53,18 @@
   </OrderableList>
   <OrderableList>
     {#snippet heading()}
-      Available Columns <span class="font-normal">(not in view)</span>
+      {model.availableHeading ?? translate('workflows.available-columns')}
+      <span class="font-normal">{translate('workflows.not-in-view')}</span>
     {/snippet}
-    {#each $availableColumns as { label } (label)}
+    {#each model.available as { id, label } (id)}
       <OrderableListItem
         static
-        onAddItem={() => addColumn(label, namespace, table)}
+        {label}
+        onAddItem={() => model.onAdd(id)}
         addButtonLabel={translate('workflows.add-column-label', {
           column: label,
+          escapeValue: false,
         })}
-        {label}
       />
     {:else}
       <OrderableListItem
@@ -87,23 +73,24 @@
       />
     {/each}
   </OrderableList>
-  {#if table !== TABLE_TYPE.DEPLOYMENTS}
+  {#if customAvailable}
     <OrderableList>
       {#snippet heading()}
-        {translate('events.custom-search-attributes')}
-        <span class="font-normal">(not in view)</span>
+        {customAvailable.heading}
+        <span class="font-normal">{translate('workflows.not-in-view')}</span>
       {/snippet}
-      {#each $availableCustomColumns as { label } (label)}
+      {#each customAvailable.columns as { id, label } (id)}
         <OrderableListItem
           static
-          onAddItem={() => addColumn(label, namespace, table)}
+          {label}
+          onAddItem={() => model.onAdd(id)}
           addButtonLabel={translate('workflows.add-column-label', {
             column: label,
+            escapeValue: false,
           })}
-          {label}
         />
       {:else}
-        <OrderableListItem readonly label="No Custom Search Attributes" />
+        <OrderableListItem readonly label={customAvailable.emptyLabel} />
       {/each}
     </OrderableList>
   {/if}
