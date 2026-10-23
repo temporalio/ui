@@ -319,6 +319,84 @@ describe('createApiWorkbenchHost', () => {
     vi.useRealTimers();
   });
 
+  it('counts a serverless deployment with no pollers as ready', async () => {
+    const request = vi
+      .fn()
+      .mockResolvedValueOnce(
+        jsonResponse({
+          pollers: [],
+          versioningInfo: {
+            currentDeploymentVersion: {
+              deploymentName: 'catalog-deployment',
+              buildId: 'build-1',
+            },
+          },
+        }),
+      )
+      .mockResolvedValueOnce(
+        jsonResponse({
+          workerDeploymentInfo: {
+            name: 'catalog-deployment',
+            routingConfig: {
+              currentDeploymentVersion: {
+                deploymentName: 'catalog-deployment',
+                buildId: 'build-1',
+              },
+            },
+            versionSummaries: [
+              {
+                deploymentVersion: {
+                  deploymentName: 'catalog-deployment',
+                  buildId: 'build-1',
+                },
+                computeConfig: {
+                  scalingGroups: {
+                    default: { provider: { type: 'aws-lambda' } },
+                  },
+                },
+              },
+            ],
+          },
+        }),
+      );
+    const host = createApiWorkbenchHost({ descriptors: [descriptor], request });
+
+    expect((await host.checkReadiness(descriptor.id))[0].state).toBe('ready');
+    expect(request.mock.calls[1][0]).toMatch(
+      /\/api\/v1\/namespaces\/catalog-demo\/worker-deployments\/catalog-deployment/,
+    );
+  });
+
+  it('keeps a self-managed deployment with no pollers unavailable', async () => {
+    const request = vi
+      .fn()
+      .mockResolvedValueOnce(
+        jsonResponse({
+          pollers: [],
+          versioningInfo: {
+            currentDeploymentVersion: {
+              deploymentName: 'catalog-deployment',
+              buildId: 'build-1',
+            },
+          },
+        }),
+      )
+      .mockResolvedValueOnce(
+        jsonResponse({
+          workerDeploymentInfo: {
+            name: 'catalog-deployment',
+            routingConfig: {},
+            versionSummaries: [],
+          },
+        }),
+      );
+    const host = createApiWorkbenchHost({ descriptors: [descriptor], request });
+
+    expect((await host.checkReadiness(descriptor.id))[0].state).toBe(
+      'unavailable',
+    );
+  });
+
   it('checks activity readiness with task queue type 2', async () => {
     const request = vi.fn().mockResolvedValue(jsonResponse({ pollers: [] }));
     const host = createApiWorkbenchHost({

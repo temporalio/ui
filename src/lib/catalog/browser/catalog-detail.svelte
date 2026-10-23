@@ -36,11 +36,13 @@
     executionKind,
     state,
     taskQueue,
+    workerStartCommand,
   }: {
     kind: HostReadinessCheck['kind'];
     executionKind: CatalogExecutionKind;
     state: WorkerReadinessDisplayState | 'loading';
     taskQueue: string;
+    workerStartCommand?: string;
   }): ReadinessPresentation => {
     const label =
       kind === 'worker'
@@ -70,7 +72,7 @@
         label,
         tooltip:
           kind === 'worker'
-            ? 'A Worker is polling.'
+            ? 'A Worker is polling, or a serverless Worker Deployment will start one when a task arrives.'
             : 'Nexus Endpoint is ready.',
       };
     }
@@ -83,7 +85,7 @@
         label,
         tooltip:
           kind === 'worker'
-            ? `This run will wait for a Worker to poll the ${taskQueue} Task Queue. Run "pnpm catalog worker" to start one.`
+            ? `This run will wait for a Worker to poll the ${taskQueue} Task Queue.${workerStartCommand ? ` Run "${workerStartCommand}" to start one.` : ''}`
             : 'Nexus Endpoint is unavailable.',
       };
     }
@@ -172,9 +174,10 @@
     descriptor: BrowserCatalogDescriptor;
     host: WorkbenchHost;
     sessionStore: CatalogSessionStore;
+    workerStartCommand?: string;
   }
 
-  let { descriptor, host, sessionStore }: Props = $props();
+  let { descriptor, host, sessionStore, workerStartCommand }: Props = $props();
 
   let inputEditor = $state('');
   let startOptionsEditor = $state('');
@@ -315,6 +318,7 @@
       executionKind: descriptor.execution.kind,
       state: readinessLoading ? 'loading' : workerReadinessState,
       taskQueue: descriptor.execution.taskQueue,
+      workerStartCommand,
     }),
   );
   let prerequisiteReadiness = $derived(
@@ -796,14 +800,14 @@
               </Tooltip>
               <span>{workerPresentation.label}</span>
             </div>
-            {#if !readinessLoading && workerReadinessState === 'unavailable'}
+            {#if workerStartCommand && !readinessLoading && workerReadinessState === 'unavailable'}
               <p class="mt-2 text-xs text-secondary">
                 Start a catalog worker, then run the example:
               </p>
               <Copyable
                 visible
                 clickAllToCopy
-                content="pnpm catalog worker"
+                content={workerStartCommand}
                 copyIconTitle="Copy the worker start command"
                 copySuccessIconTitle="Copied the worker start command"
                 container-class="mt-1"
