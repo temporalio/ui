@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, type Page, test } from '@playwright/test';
 
 import type { WorkflowExecutionAPIResponse } from '$src/lib/types/workflows';
 import { mockWorkflowApis } from '~/test-utilities/mock-apis';
@@ -8,7 +8,7 @@ import { WORKFLOWS_COUNT_API } from '~/test-utilities/mocks/workflows-count';
 
 const rootId = 'relationships-root';
 const rootRunId = 'relationships-root-run';
-const childAId = 'relationships-child-a';
+const childAId = 'relationships-child-a-with-an-unbreakable-workflow-id';
 const childARunId = 'relationships-child-a-run';
 const grandchildId = 'relationships-grandchild-a1';
 const grandchildRunId = 'relationships-grandchild-a1-run';
@@ -72,6 +72,31 @@ const relationshipWorkflows = [
 
 const relationshipsUrl = `/namespaces/default/workflows/${rootId}/${rootRunId}/relationships`;
 
+const expectAlignedColumns = async (page: Page) => {
+  const ids = [rootId, childAId, grandchildId, childBId];
+  const idPositions = await Promise.all(
+    ids.map(async (id) => {
+      const box = await page.getByRole('link', { name: id }).boundingBox();
+      return box?.x;
+    }),
+  );
+  const timestampPositions = await page
+    .locator('.relationship-timestamps-column')
+    .evaluateAll((elements) => {
+      return elements.map((element) => element.getBoundingClientRect().x);
+    });
+  const positions = idPositions.filter(
+    (position): position is number => typeof position === 'number',
+  );
+
+  expect(positions).toHaveLength(ids.length);
+  expect(Math.max(...positions) - Math.min(...positions)).toBeLessThan(1);
+  expect(timestampPositions).toHaveLength(ids.length);
+  expect(
+    Math.max(...timestampPositions) - Math.min(...timestampPositions),
+  ).toBeLessThan(1);
+};
+
 test.describe('Relationships nested tree', () => {
   test.beforeEach(async ({ page }) => {
     await mockWorkflowApis(page, rootWorkflow);
@@ -94,6 +119,7 @@ test.describe('Relationships nested tree', () => {
     page,
   }) => {
     await page.setViewportSize({ width: 1100, height: 900 });
+    await expect(page.locator('body')).toHaveAttribute('data-theme', 'light');
     await expect(page.getByText(childBName)).toBeVisible();
 
     const expandAll = page.getByRole('switch', { name: 'Expand All' });
@@ -116,6 +142,9 @@ test.describe('Relationships nested tree', () => {
 
     const childAContainer = childARow.locator('..');
     await expect(childAContainer.locator(':scope > div').last()).toBeVisible();
+    await expect(childARow.locator(':scope > div').first()).not.toHaveClass(
+      /border-l|rounded-bl/,
+    );
 
     const grandchildRow = page
       .getByText(grandchildName)
@@ -124,18 +153,16 @@ test.describe('Relationships nested tree', () => {
       /rounded-bl/,
     );
 
-    const ids = [rootId, childAId, grandchildId, childBId];
-    const idPositions = await Promise.all(
-      ids.map(async (id) => {
-        const box = await page.getByRole('link', { name: id }).boundingBox();
-        return box?.x;
-      }),
+    const childBRow = page
+      .getByText(childBName)
+      .locator('xpath=ancestor::button');
+    await expect(childBRow.locator(':scope > div').first()).toHaveClass(
+      /border-l/,
     );
-    const positions = idPositions.filter(
-      (position): position is number => typeof position === 'number',
+    await expect(childBRow.locator(':scope > div').first()).toHaveClass(
+      /rounded-bl/,
     );
-    expect(positions).toHaveLength(ids.length);
-    expect(Math.max(...positions) - Math.min(...positions)).toBeLessThan(1);
+    await expectAlignedColumns(page);
 
     const zoomIn = page.getByRole('button', { name: 'Zoom in' });
     const graphHeader = zoomIn.locator(
@@ -144,12 +171,52 @@ test.describe('Relationships nested tree', () => {
     await expect(graphHeader).toHaveCSS('position', 'sticky');
 
     await page.setViewportSize({ width: 1440, height: 900 });
-    await page.emulateMedia({ colorScheme: 'dark' });
     await expect(page.getByText(grandchildName)).toBeVisible();
+    await expectAlignedColumns(page);
 
     await zoomIn.focus();
     await page.keyboard.press('Tab');
     await page.keyboard.press('Shift+Tab');
-    await expect(page.getByRole('tooltip', { name: 'Zoom in' })).toBeVisible();
+    const tooltip = page.getByRole('tooltip', { name: 'Zoom in' });
+    await expect(tooltip).toBeVisible();
+    const [tooltipBox, zoomInBox] = await Promise.all([
+      tooltip.boundingBox(),
+      zoomIn.boundingBox(),
+    ]);
+    expect(tooltipBox).not.toBeNull();
+    expect(zoomInBox).not.toBeNull();
+    expect(tooltipBox!.y + tooltipBox!.height).toBeLessThanOrEqual(
+      zoomInBox!.y,
+    );
+  });
+
+  test.describe('dark mode', () => {
+    test.use({ colorScheme: 'dark' });
+
+    test('uses dark relationship tree tokens', async ({ page }) => {
+      await page.setViewportSize({ width: 1440, height: 900 });
+      await expect(page.locator('body')).toHaveAttribute('data-theme', 'dark');
+      await expect(
+        page.locator('html:has(body[data-theme="dark"])'),
+      ).toHaveCount(1);
+
+      const childARow = page
+        .getByText(childAName)
+        .locator('xpath=ancestor::button');
+      await childARow.click();
+      const activeTreeLine = childARow.locator(':scope > div').first();
+      const [borderColor, borderToken] = await activeTreeLine.evaluate(
+        (line) => {
+          const styles = getComputedStyle(line);
+          return [
+            styles.borderBottomColor,
+            styles.getPropertyValue('--color-border-secondary').trim(),
+          ];
+        },
+      );
+      expect(borderToken).not.toBe('');
+      expect(borderColor).not.toBe('rgba(0, 0, 0, 0)');
+      await expectAlignedColumns(page);
+    });
   });
 });

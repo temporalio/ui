@@ -63,7 +63,9 @@
         <p>{workflow.name}</p>
       </div>
     </div>
-    <div class="relationship-id-column leading-4 lg:shrink-0">
+    <div
+      class="relationship-id-column min-w-0 break-words leading-4 lg:shrink-0"
+    >
       {#if isRootWorkflow}
         <p class="text-xs">{translate('common.id')}</p>
       {/if}
