@@ -56,6 +56,8 @@ let readinessPresentation: (config: {
     | 'skipped'
     | 'unavailable';
   taskQueue: string;
+  workerStartCommand?: string;
+  serverless?: boolean;
 }) => {
   Icon: IconComponent;
   iconClass: string;
@@ -259,6 +261,25 @@ describe('CatalogDetail', () => {
     });
   });
 
+  it('describes a sleeping serverless Worker Deployment as ready', () => {
+    expect(
+      readinessPresentation({
+        kind: 'worker',
+        executionKind: 'workflow',
+        state: 'ready',
+        taskQueue: 'catalog-tasks',
+        serverless: true,
+      }),
+    ).toEqual({
+      Icon: iconNamed(IconCheckCircle),
+      iconClass: 'text-success',
+      iconLabel: 'Worker readiness is ready',
+      label: 'A serverless Worker starts for Workflow Tasks',
+      tooltip:
+        'The catalog-tasks Task Queue is served by a serverless Worker Deployment that scales to zero when idle. A Worker starts when this run creates a task.',
+    });
+  });
+
   it('renders declared setup instructions and omits the section otherwise', () => {
     const { body } = renderComponent(catalogDetail, {
       props: {
@@ -330,6 +351,7 @@ describe('CatalogDetail', () => {
         executionKind: 'workflow',
         state: 'unavailable',
         taskQueue: 'catalog-tasks',
+        workerStartCommand: 'pnpm catalog worker',
       }),
     ).toEqual({
       Icon: iconNamed(IconWarning),
@@ -339,6 +361,16 @@ describe('CatalogDetail', () => {
       tooltip:
         'This run will wait for a Worker to poll the catalog-tasks Task Queue. Run "pnpm catalog worker" to start one.',
     });
+    expect(
+      readinessPresentation({
+        kind: 'worker',
+        executionKind: 'workflow',
+        state: 'unavailable',
+        taskQueue: 'catalog-tasks',
+      }).tooltip,
+    ).toBe(
+      'This run will wait for a Worker to poll the catalog-tasks Task Queue.',
+    );
     expect(body).toMatch(
       /<button(?=[^>]*data-variant="primary")(?![^>]*\sdisabled(?:=""|="true"|(?=\s|>)))[^>]*>[\s\S]*?Run/,
     );
@@ -450,9 +482,9 @@ describe('CatalogDetail', () => {
     );
 
     expect(source).toContain(
-      "{#if !readinessLoading && workerReadinessState === 'unavailable'}",
+      "{#if workerStartCommand && !readinessLoading && workerReadinessState === 'unavailable'}",
     );
-    expect(source).toContain('content="pnpm catalog worker"');
+    expect(source).toContain('content={workerStartCommand}');
     expect(source).toContain('Start a catalog worker');
   });
 
