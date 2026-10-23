@@ -10,7 +10,7 @@
   >[] = ['neutral', 'error'];
 
   const { Story } = defineMeta({
-    title: 'IO/Design System/Badge Count',
+    title: 'IO/Components/Badge Count',
     component: BadgeCount,
     args: {
       value: '12',

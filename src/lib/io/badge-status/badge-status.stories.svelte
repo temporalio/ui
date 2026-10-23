@@ -36,7 +36,7 @@
   ];
 
   const { Story } = defineMeta({
-    title: 'IO/Design System/Badge Status',
+    title: 'IO/Components/Badge Status',
     component: BadgeStatus,
     args: {
       status: 'Running',
