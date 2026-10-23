@@ -17,7 +17,7 @@
   ];
 
   const { Story } = defineMeta({
-    title: 'IO/Design System/Chip Status',
+    title: 'IO/Components/Chip Status',
     component: ChipStatus,
     args: {
       status: 'Running',

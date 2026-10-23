@@ -25,7 +25,7 @@
   }
 
   const { Story } = defineMeta({
-    title: 'IO/Design System/Theme',
+    title: 'IO/Theme',
     parameters: {
       layout: 'fullscreen',
     },
@@ -169,26 +169,26 @@
         <p class="mb-2 text-sm font-medium text-primary">{token.name}</p>
         <dl class="space-y-2 text-xs">
           <div>
-            <dt class="text-tertiary">Tailwind</dt>
+            <dt class="text-secondary">Tailwind</dt>
             <dd>
-              <code class="block break-all text-secondary">
+              <code class="block break-all text-primary">
                 {token.tailwindClass}
               </code>
             </dd>
           </div>
           <div>
-            <dt class="text-tertiary">CSS variable</dt>
+            <dt class="text-secondary">CSS variable</dt>
             <dd>
-              <code class="block break-all text-secondary">
+              <code class="block break-all text-primary">
                 {token.cssVariable}
               </code>
             </dd>
           </div>
           {#if !useThemeVariables}
             <div>
-              <dt class="text-tertiary">Value</dt>
+              <dt class="text-secondary">Value</dt>
               <dd>
-                <code class="block break-all text-secondary">
+                <code class="block break-all text-primary">
                   {token.value}
                 </code>
               </dd>
@@ -208,7 +208,8 @@
           <h2 class="text-lg font-semibold capitalize text-primary">
             {group.name}
           </h2>
-          <span class="text-xs text-tertiary">{group.tokens.length} tokens</span
+          <span class="text-xs text-secondary"
+            >{group.tokens.length} tokens</span
           >
         </div>
         {@render semanticTokenGrid(group.tokens, useThemeVariables)}
@@ -237,7 +238,7 @@
                 ></div>
                 <div class="space-y-1 p-2">
                   <p class="text-xs font-medium text-primary">{token.step}</p>
-                  <code class="block break-all text-[0.625rem] text-tertiary">
+                  <code class="block break-all text-[0.625rem] text-secondary">
                     {token.value}
                   </code>
                 </div>

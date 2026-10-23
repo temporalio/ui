@@ -21,7 +21,7 @@
   const states = ['default', 'hover', 'active', 'disabled'];
 
   const { Story } = defineMeta({
-    title: 'IO/Design System/Button',
+    title: 'IO/Components/Button',
     component: Button,
     args: {
       colorScheme: 'primary',

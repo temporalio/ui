@@ -36,7 +36,7 @@
   ];
 
   const { Story } = defineMeta({
-    title: 'IO/Structure/PageHeader',
+    title: 'IO/Layouts/PageHeader',
     component: PageHeader,
     args: { heading },
     argTypes: {
