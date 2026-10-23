@@ -264,7 +264,6 @@
             {@const view = tab as NexusLinksView}
             <Segment
               {...getTabButtonProps()}
-              id={`nexus-links-${view}`}
               selected={isSelected}
               count={counts[view]}
               data-testid={`nexus-links-${view}-segment`}
