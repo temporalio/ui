@@ -1,4 +1,6 @@
 import type { Payload, PollerInfo, TaskQueueResponse } from '$lib/types';
+import type { DescribeWorkerDeploymentResponse } from '$lib/types/deployments';
+import { deploymentHasComputeConfig } from '$lib/utilities/deployment-has-compute-config';
 import { encodePayloads } from '$lib/utilities/encode-payload';
 import { validTimeToDate } from '$lib/utilities/format-time';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
@@ -26,6 +28,7 @@ import type {
   ExecutionObservation,
   LaunchReference,
   ObservationRequest,
+  WorkerAvailability,
 } from '../browser/workbench-host';
 
 type EncodeInput = (
@@ -419,7 +422,7 @@ export const createApiWorkbenchHost = ({
     checkWorker: async (
       { namespace, taskQueue, taskQueueType },
       signal,
-    ): Promise<boolean> => {
+    ): Promise<WorkerAvailability> => {
       const route = routeForApi('task-queue', {
         namespace,
         queue: taskQueue,
@@ -431,7 +434,20 @@ export const createApiWorkbenchHost = ({
         options: { signal },
       });
 
-      return response?.pollers?.some(isActivePoller) ?? false;
+      if (response?.pollers?.some(isActivePoller)) return 'polling';
+
+      const deploymentName =
+        response?.versioningInfo?.currentDeploymentVersion?.deploymentName;
+      if (!deploymentName) return 'none';
+
+      const deployment = await requestFromAPI<DescribeWorkerDeploymentResponse>(
+        routeForApi('worker-deployment', { namespace, deploymentName }),
+        { request, notifyOnError: false, options: { signal } },
+      );
+
+      return deploymentHasComputeConfig(deployment?.workerDeploymentInfo)
+        ? 'serverless'
+        : 'none';
     },
     checkNexusEndpoint: async ({ endpoint }, signal) => {
       const route = routeForApi('nexus-endpoints');

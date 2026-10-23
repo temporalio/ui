@@ -2,8 +2,6 @@ import { expect, test } from '@playwright/test';
 
 import { WorkflowPausePage } from '~/pages/workflow-pause';
 import {
-  mockClusterApi,
-  mockEventHistoryApi,
   mockNamespaceApi,
   mockNamespaceWithPauseCapability,
   mockSettingsApi,
@@ -29,17 +27,14 @@ test.describe('Workflow Pause', () => {
   test.describe('When workflowPause capability is enabled', () => {
     let workflowPausePage: WorkflowPausePage;
 
-    test.beforeEach(async ({ page }) => {
+    test.beforeEach(({ page }) => {
       workflowPausePage = new WorkflowPausePage(page);
-      await workflowPausePage.goto({ workflowId, runId });
-      await mockClusterApi(page);
-      await mockSettingsApi(page);
-      await mockEventHistoryApi(page);
     });
 
     test('should show pause button for running workflow', async () => {
       await mockWorkflowApis(workflowPausePage.page, mockRunningWorkflow);
       await mockNamespaceWithPauseCapability(workflowPausePage.page);
+      await workflowPausePage.goto({ workflowId, runId });
 
       await expect(workflowPausePage.pauseButton).toBeVisible();
       await expect(workflowPausePage.pauseButton).toBeEnabled();
@@ -48,6 +43,7 @@ test.describe('Workflow Pause', () => {
     test('should disable the pause button when workflow is delayed', async () => {
       await mockWorkflowApis(workflowPausePage.page, mockDelayedWorkflow);
       await mockNamespaceWithPauseCapability(workflowPausePage.page);
+      await workflowPausePage.goto({ workflowId, runId });
 
       await expect(workflowPausePage.pauseButton).toBeDisabled();
     });
@@ -56,6 +52,7 @@ test.describe('Workflow Pause', () => {
       await mockWorkflowApis(workflowPausePage.page, mockRunningWorkflow);
       await mockNamespaceWithPauseCapability(workflowPausePage.page);
       await mockWorkflowPauseApi(workflowPausePage.page);
+      await workflowPausePage.goto({ workflowId, runId });
 
       const pauseRequestPromise =
         workflowPausePage.page.waitForRequest(WORKFLOW_PAUSE_API);
@@ -82,6 +79,7 @@ test.describe('Workflow Pause', () => {
     test('should show alert when workflow is paused', async () => {
       await mockWorkflowApis(workflowPausePage.page, mockPausedWorkflow);
       await mockNamespaceWithPauseCapability(workflowPausePage.page);
+      await workflowPausePage.goto({ workflowId, runId });
 
       await expect(workflowPausePage.pausedAlert).toBeVisible();
       await expect(workflowPausePage.pausedAlertReason).toBeVisible();
@@ -93,6 +91,7 @@ test.describe('Workflow Pause', () => {
     test('should display paused status', async () => {
       await mockWorkflowApis(workflowPausePage.page, mockPausedWorkflow);
       await mockNamespaceWithPauseCapability(workflowPausePage.page);
+      await workflowPausePage.goto({ workflowId, runId });
 
       await expect(workflowPausePage.workflowStatus).toBeVisible();
       await expect(workflowPausePage.workflowStatus).toContainText('Paused');
@@ -101,6 +100,7 @@ test.describe('Workflow Pause', () => {
     test('should show unpause button when workflow is paused', async () => {
       await mockWorkflowApis(workflowPausePage.page, mockPausedWorkflow);
       await mockNamespaceWithPauseCapability(workflowPausePage.page);
+      await workflowPausePage.goto({ workflowId, runId });
 
       await expect(workflowPausePage.unpauseButton).toBeVisible();
       await expect(workflowPausePage.unpauseButton).toBeEnabled();
@@ -110,6 +110,7 @@ test.describe('Workflow Pause', () => {
       await mockWorkflowApis(workflowPausePage.page, mockPausedWorkflow);
       await mockNamespaceWithPauseCapability(workflowPausePage.page);
       await mockWorkflowUnpauseApi(workflowPausePage.page);
+      await workflowPausePage.goto({ workflowId, runId });
 
       const unpauseRequestPromise =
         workflowPausePage.page.waitForRequest(WORKFLOW_UNPAUSE_API);
@@ -136,6 +137,7 @@ test.describe('Workflow Pause', () => {
     test('should disable update action when workflow is paused', async () => {
       await mockWorkflowApis(workflowPausePage.page, mockPausedWorkflow);
       await mockNamespaceWithPauseCapability(workflowPausePage.page);
+      await workflowPausePage.goto({ workflowId, runId });
 
       await workflowPausePage.openMoreActionsMenu();
 
@@ -149,6 +151,7 @@ test.describe('Workflow Pause', () => {
     test('should keep other actions enabled when workflow is paused', async () => {
       await mockWorkflowApis(workflowPausePage.page, mockPausedWorkflow);
       await mockNamespaceWithPauseCapability(workflowPausePage.page);
+      await workflowPausePage.goto({ workflowId, runId });
 
       await workflowPausePage.openMoreActionsMenu();
 
@@ -163,12 +166,12 @@ test.describe('Workflow Pause', () => {
 
     test.beforeEach(async ({ page }) => {
       workflowPausePage = new WorkflowPausePage(page);
-      await workflowPausePage.goto({ workflowId, runId });
       await mockWorkflowApis(page, mockRunningWorkflow);
     });
 
     test('should not show pause button', async () => {
       await mockNamespaceApi(workflowPausePage.page);
+      await workflowPausePage.goto({ workflowId, runId });
 
       await expect(workflowPausePage.pauseButton).toBeHidden();
       await expect(workflowPausePage.requestCancellationButton).toBeVisible();
@@ -180,10 +183,10 @@ test.describe('Workflow Pause', () => {
 
     test.beforeEach(async ({ page }) => {
       workflowPausePage = new WorkflowPausePage(page);
-      await workflowPausePage.goto({ workflowId, runId });
       await mockWorkflowApis(page, mockRunningWorkflow);
       await mockNamespaceWithPauseCapability(page);
       await mockSettingsApi(page, { DisableWriteActions: true });
+      await workflowPausePage.goto({ workflowId, runId });
     });
 
     test('should disabled the pause button', async () => {

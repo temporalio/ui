@@ -25,14 +25,18 @@ describe('CatalogDetail client interactions', () => {
     );
 
     expect(liveStatus?.textContent).toBe('Worker readiness is checking');
-    expect(readinessPanel?.textContent).toContain('Handler worker is polling');
+    expect(readinessPanel?.textContent).toContain(
+      'A Worker is polling for Workflow Tasks',
+    );
 
     await client.resolveReadiness([
       { kind: 'worker', required: false, state: 'ready', taskQueueType: 1 },
     ]);
 
     expect(liveStatus?.textContent).toBe('Worker readiness is ready');
-    expect(readinessPanel?.textContent).toContain('Handler worker is polling');
+    expect(readinessPanel?.textContent).toContain(
+      'A Worker is polling for Workflow Tasks',
+    );
   });
 
   it('announces prerequisite changes while readiness row labels remain stable', async () => {
@@ -71,11 +75,13 @@ describe('CatalogDetail client interactions', () => {
     );
 
     expect(liveStatus?.textContent).toBe(
-      'Worker readiness is ready. Nexus endpoint readiness is unavailable',
+      'Worker readiness is ready. Nexus Endpoint readiness is unavailable',
     );
-    expect(readinessPanel?.textContent).toContain('Handler worker is polling');
     expect(readinessPanel?.textContent).toContain(
-      'Endpoint matches the declared target and policy',
+      'A Worker is polling for Workflow Tasks',
+    );
+    expect(readinessPanel?.textContent).toContain(
+      'Nexus Endpoint matches the declared target and policy',
     );
 
     const refresh = Array.from(
@@ -85,11 +91,13 @@ describe('CatalogDetail client interactions', () => {
     await client.flush();
 
     expect(liveStatus?.textContent).toBe(
-      'Worker readiness is ready. Nexus endpoint readiness is ready',
+      'Worker readiness is ready. Nexus Endpoint readiness is ready',
     );
-    expect(readinessPanel?.textContent).toContain('Handler worker is polling');
     expect(readinessPanel?.textContent).toContain(
-      'Endpoint matches the declared target and policy',
+      'A Worker is polling for Workflow Tasks',
+    );
+    expect(readinessPanel?.textContent).toContain(
+      'Nexus Endpoint matches the declared target and policy',
     );
   });
 

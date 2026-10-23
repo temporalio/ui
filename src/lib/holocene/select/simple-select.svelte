@@ -6,25 +6,25 @@
   import Label from '$lib/holocene/label.svelte';
   import type { SelectOptionValue } from '$lib/types/global';
 
+  import NativeSelect from './native-select.svelte';
   import Option from './simple-option.svelte';
 
   export interface Props extends Omit<HTMLSelectAttributes, 'class'> {
     id: string;
     value: SelectOptionValue;
     label: string;
-    arrow?: boolean;
     name?: string;
     required?: boolean;
     options?: SelectOptionValue[];
     'data-testid'?: string;
     class?: ClassNameValue;
+    inlinePadding?: string;
   }
 
   let {
     id,
     value = $bindable(),
     label,
-    arrow = false,
     name = id,
     required = false,
     options = [],
@@ -36,10 +36,10 @@
 
 <div>
   <Label {required} {label} hidden for={id} />
-  <select
+  <NativeSelect
+    wrapperClass="text-primary"
     class={merge(
-      'inline h-10 w-full rounded border border-tertiary bg-background-primary px-2 text-base text-primary outline-none focus-visible:outline focus-visible:outline-interactive-primary disabled:bg-surface-tertiary',
-      arrow && 'h-8 appearance-none py-1 pl-3 text-sm',
+      'inline h-10 w-full rounded border border-tertiary bg-background-primary py-0 text-base text-primary outline-none focus-visible:outline focus-visible:outline-interactive-primary disabled:bg-surface-tertiary',
       className,
     )}
     {name}
@@ -54,5 +54,5 @@
         <Option value={option} />
       {/each}
     {/if}
-  </select>
+  </NativeSelect>
 </div>

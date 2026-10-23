@@ -42,6 +42,8 @@ body {
   padding: 1rem;
   white-space: pre-line;
   font-family: var(--markdown-font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* The frame is sandboxed with default-src 'none', so it cannot load the

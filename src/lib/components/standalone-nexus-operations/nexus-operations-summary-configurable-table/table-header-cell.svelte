@@ -1,5 +1,6 @@
 <script lang="ts">
   import ColumnResizeHandle from '$lib/holocene/table/column-resize-handle.svelte';
+  import SortableTableHeader from '$lib/holocene/table/sortable-table-header.svelte';
   import {
     type ConfigurableTableHeader,
     MIN_COLUMN_WIDTH,
@@ -17,13 +18,13 @@
   const width = $derived(column.width);
 </script>
 
-<th
+<SortableTableHeader
+  column={label}
   class="relative"
   style={columnWidthStyle(width)}
   data-testid="nexus-operations-summary-table-header-cell-{label}"
 >
-  <span class="block truncate">{label}</span>
   {#if onResize}
     <ColumnResizeHandle {label} {width} min={MIN_COLUMN_WIDTH} {onResize} />
   {/if}
-</th>
+</SortableTableHeader>

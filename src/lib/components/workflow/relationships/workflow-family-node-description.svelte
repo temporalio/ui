@@ -46,7 +46,7 @@
 
 <div class="w-full">
   <button
-    class="relative flex w-full select-none border-primary {isActive &&
+    class="relative flex w-full select-text border-primary {isActive &&
       'bg-interactive-primary text-white hover:bg-interactive-primary-hover focus-visible:bg-interactive-primary-hover active:bg-interactive-primary-press'} {isCurrent &&
       !isActive &&
       'bg-surface-tertiary text-primary'} items-center gap-1 px-2 py-1 lg:py-2 {!isActive &&

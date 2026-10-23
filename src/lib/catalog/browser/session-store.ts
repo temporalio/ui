@@ -120,6 +120,20 @@ const isAbortError = (error: unknown) =>
  * Keeps catalog launches alive for one catalog refresh. It deliberately
  * has no persistence: callers create a fresh store when the catalog host refreshes.
  */
+
+export const findLatestSession = (
+  sessions: readonly CatalogSession[],
+  exampleId: string,
+  target: Pick<LaunchTarget, 'targetId' | 'namespace' | 'taskQueue'>,
+): CatalogSession | undefined => {
+  const fingerprint = targetFingerprint(target);
+  return sessions.find(
+    (session) =>
+      session.exampleId === exampleId &&
+      session.targetFingerprint === fingerprint,
+  );
+};
+
 export const createCatalogSessionStore = (
   host: WorkbenchHost,
   {
@@ -373,14 +387,8 @@ export const createCatalogSessionStore = (
       drafts.set(exampleId, { ...draft });
     },
     getSessions: () => get(store).sessions,
-    latest: (exampleId, target) => {
-      const fingerprint = targetFingerprint(target);
-      return get(store).sessions.find(
-        (session) =>
-          session.exampleId === exampleId &&
-          session.targetFingerprint === fingerprint,
-      );
-    },
+    latest: (exampleId, target) =>
+      findLatestSession(get(store).sessions, exampleId, target),
     pause,
     resume,
     stop,

@@ -1,5 +1,10 @@
+import i18next from 'i18next';
 import { flushSync as flushSvelte, mount, tick, unmount } from 'svelte';
 
+import { i18nNamespaces } from '$lib/i18n/index';
+import resources from '$lib/i18n/locales/index';
+
+import type { CatalogFilters } from './catalog-list-state';
 import { createCatalogSessionStore } from './session-store';
 import type { BrowserCatalogDescriptor } from './types';
 import type {
@@ -10,6 +15,13 @@ import type {
 
 import CatalogDetail from './catalog-detail.svelte';
 import CatalogList from './catalog-list.svelte';
+
+i18next.init({
+  fallbackLng: 'en',
+  ns: i18nNamespaces,
+  defaultNS: 'common',
+  resources,
+});
 
 const descriptor: BrowserCatalogDescriptor = {
   id: 'order-lifecycle',
@@ -172,11 +184,19 @@ export async function resolveReadiness(checks: ReadinessCheck[]) {
 }
 
 export async function renderList({
+  descriptors = [descriptor, localDescriptor, cloudDescriptor],
   exampleHref = (exampleId: string) => `/examples/${exampleId}`,
   workerState = 'ready',
+  workerStartCommand,
+  initialFilters,
+  onfilterschange,
 }: {
+  descriptors?: BrowserCatalogDescriptor[];
   exampleHref?: (exampleId: string) => string;
   workerState?: ReadinessCheck['state'];
+  workerStartCommand?: string;
+  initialFilters?: CatalogFilters;
+  onfilterschange?: (filters: CatalogFilters) => void;
 } = {}) {
   readinessCallCount = 0;
   prepareStartPromise();
@@ -196,10 +216,13 @@ export async function renderList({
     mount(CatalogList, {
       target,
       props: {
-        descriptors: [descriptor, localDescriptor, cloudDescriptor],
+        descriptors,
+        initialFilters,
+        onfilterschange,
         host,
         sessionStore: createCatalogSessionStore(host),
         exampleHref,
+        workerStartCommand,
       },
     }),
   );

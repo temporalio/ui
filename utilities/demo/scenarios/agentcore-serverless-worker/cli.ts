@@ -3,8 +3,8 @@ import { join } from 'node:path';
 
 import { $ } from 'zx';
 
-import { failure } from '../../remedy';
-import { compareVersions } from '../../requirements';
+import { failure } from '../../../../src/lib/demo/remedy';
+import { compareVersions } from '../../../../src/lib/demo/requirements';
 
 /**
  * The CLI release that first carries the --aws-agentcore-* flags

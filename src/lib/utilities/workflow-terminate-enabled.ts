@@ -1,14 +1,10 @@
-import type { CoreUser } from '$lib/models/core-user';
 import type { Settings } from '$lib/types/global';
+import { corePermissions } from '$lib/utilities/core-provider';
 
 export const workflowTerminateEnabled = (
-  settings: Settings,
-  coreUser: CoreUser,
   namespace: string,
-): boolean => {
-  return (
-    !settings.disableWriteActions &&
-    !settings.workflowTerminateDisabled &&
-    !coreUser.namespaceWriteDisabled(namespace)
-  );
-};
+  settings: Partial<Settings> = {},
+): boolean =>
+  !settings.disableWriteActions &&
+  !settings.workflowTerminateDisabled &&
+  corePermissions.namespaces.canTerminateWorkflow(namespace);

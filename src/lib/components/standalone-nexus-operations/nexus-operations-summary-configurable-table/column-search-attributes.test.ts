@@ -1,8 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
 import type { NexusOperationExecutionListInfo } from '$lib/types/nexus-operation-execution';
+import { sortTableItems } from '$lib/utilities/table-sort';
 
-import { getNexusOperationColumnValue } from './column-search-attributes';
+import {
+  getNexusOperationColumnValue,
+  getNexusOperationSortColumns,
+} from './column-search-attributes';
 
 const operation = {
   operationId: 'my-operation',
@@ -23,6 +27,20 @@ const operation = {
 } as unknown as NexusOperationExecutionListInfo;
 
 describe('getNexusOperationColumnValue', () => {
+  it('sorts raw durations numerically rather than comparing query strings', () => {
+    const columns = getNexusOperationSortColumns(['Execution Duration'], {
+      ExecutionDuration: 'Int',
+    });
+    const items = ['100s', '20s', '0s'].map((executionDuration) => ({
+      ...operation,
+      executionDuration,
+    }));
+    expect(sortTableItems(items, columns['Execution Duration'])).toEqual([
+      items[2],
+      items[1],
+      items[0],
+    ]);
+  });
   it('reads the operation fields a mapped column filters on', () => {
     expect(getNexusOperationColumnValue('Operation ID', operation)).toBe(
       'my-operation',
