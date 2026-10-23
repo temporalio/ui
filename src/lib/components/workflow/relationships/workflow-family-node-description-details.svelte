@@ -17,6 +17,7 @@
     isActive?: boolean;
     childrenCount?: number;
     expanded?: boolean;
+    indent?: number;
   };
 
   let {
@@ -26,6 +27,7 @@
     isActive = false,
     childrenCount = 0,
     expanded = false,
+    indent = 0,
   }: Props = $props();
 
   const elapsedTime = $derived(
@@ -45,6 +47,7 @@
 
 <div
   class="flex w-full items-center justify-between gap-2 p-1 text-left text-sm lg:gap-4"
+  style={`--relationship-id-width: calc(18% + ${indent * 0.18}px); --relationship-timestamps-width: calc(28% + ${indent * 0.28}px); --relationship-timestamps-width-xl: calc(42% + ${indent * 0.42}px);`}
 >
   <div
     class="flex w-full flex-col gap-2 lg:min-w-0 lg:flex-row lg:items-start lg:gap-4"
@@ -60,7 +63,7 @@
         <p>{workflow.name}</p>
       </div>
     </div>
-    <div class="leading-4 lg:w-[18cqw] lg:shrink-0">
+    <div class="relationship-id-column leading-4 lg:shrink-0">
       {#if isRootWorkflow}
         <p class="text-xs">{translate('common.id')}</p>
       {/if}
@@ -86,7 +89,7 @@
       </div>
     {/if}
     <div
-      class="hidden items-start gap-4 lg:grid lg:w-[28cqw] lg:shrink-0 lg:grid-cols-[1fr_1fr_8rem] xl:w-[42cqw]"
+      class="relationship-timestamps-column hidden items-start gap-4 lg:grid lg:shrink-0"
     >
       <div class="leading-4">
         {#if isRootWorkflow}
@@ -110,3 +113,41 @@
   </div>
   <Glyph class={showExpandIcon ? 'shrink-0' : 'invisible shrink-0'} />
 </div>
+
+<style lang="postcss">
+  @screen lg {
+    .relationship-id-column {
+      width: var(--relationship-id-width);
+    }
+
+    .relationship-timestamps-column {
+      display: grid;
+      width: var(--relationship-timestamps-width);
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 8rem;
+    }
+  }
+
+  @screen xl {
+    .relationship-timestamps-column {
+      width: var(--relationship-timestamps-width-xl);
+    }
+  }
+
+  @supports (container-type: inline-size) and (width: 1cqw) {
+    @screen lg {
+      .relationship-id-column {
+        width: 18cqw;
+      }
+
+      .relationship-timestamps-column {
+        width: 28cqw;
+      }
+    }
+
+    @screen xl {
+      .relationship-timestamps-column {
+        width: 42cqw;
+      }
+    }
+  }
+</style>
