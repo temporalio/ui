@@ -1,5 +1,5 @@
 {
-  "sourceHash": "ab1d28559cd8149433f8505b38591843db129021116c4f63f3a2a9f5e2b9f690",
+  "sourceHash": "e82694c4bb425e797b2b99fb3669c400fde1a4bd291333504bf9fe823372bfb8",
   "descriptors": [
     {
       "id": "activity-heartbeat",
@@ -774,6 +774,67 @@
         "namespace": "default",
         "taskQueue": "ui-catalog",
         "workflowType": "satelliteLaunchEventGroups"
+      },
+      "source": { "id": "oss", "label": "OSS" }
+    },
+    {
+      "id": "scheduled-activity-timeline",
+      "title": "Scheduled activity timeline",
+      "description": "Waits before scheduling staggered activities on an unpolled queue, so you can watch pending timeline lines appear as scheduled events arrive.",
+      "capabilityTags": ["timers", "activities"],
+      "expectedEvidence": [
+        "An initial timer gives you time to open the live timeline before any activities are scheduled.",
+        "Each ActivityTaskScheduled event immediately shows a scheduled box and a pending line, even before the workflow refresh returns its pending activity.",
+        "Activities remain scheduled without started events because no Worker polls their task queue. The workflow runs until cancelled or terminated."
+      ],
+      "setupMarkdown": "1. Run with the default input `[15, 3, 5]`: a 15-second initial delay, a 3-second interval, and 5 activities.\n2. Open the workflow Timeline during the initial delay and keep live updates enabled.\n3. Watch each new activity row appear. Its pending line should appear with the scheduled box, without waiting for the next 10-second workflow refresh.\n4. Cancel or terminate the workflow when finished.\n\nLeave `catalog-scheduled-activity-timeline-unpolled` without a Worker. The catalog worker handles the workflow on its normal queue.\n\nThe staggered scheduling provides repeated opportunities to observe the refresh gap; an activity scheduled at the same time as a workflow refresh may already have pending metadata.",
+      "input": {
+        "defaultValue": [15, 3, 5],
+        "schema": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "title": "Initial delay in seconds",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 300
+            },
+            {
+              "title": "Scheduling interval in seconds",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 60
+            },
+            {
+              "title": "Activity count",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 25
+            }
+          ],
+          "items": false,
+          "maxItems": 3
+        }
+      },
+      "startOptions": {
+        "defaultValue": {},
+        "schema": {
+          "type": "object",
+          "properties": {
+            "details": { "type": "string" },
+            "searchAttributes": { "type": "object" },
+            "summary": { "type": "string" },
+            "workflowStartDelay": { "type": "string" },
+            "workflowId": { "type": "string", "minLength": 1 }
+          }
+        }
+      },
+      "execution": {
+        "kind": "workflow",
+        "targetId": "shared-workflows",
+        "namespace": "default",
+        "taskQueue": "ui-catalog",
+        "workflowType": "scheduledActivityTimeline"
       },
       "source": { "id": "oss", "label": "OSS" }
     },
