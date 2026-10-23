@@ -25,7 +25,10 @@
   let reason = $state('');
 
   $effect(() => {
-    return () => clearConfirmationModalActionTimeout('pause');
+    return () => {
+      clearConfirmationModalActionTimeout('pause');
+      closeConfirmationModal('pause');
+    };
   });
 </script>
 

@@ -15,6 +15,7 @@
     type ActivityBatchOperationContext,
     activityKey,
   } from '$lib/pages/standalone-activities.svelte';
+  import { createTableSort } from '$lib/runes/table-sort-state.svelte';
   import { fetchPaginatedActivities } from '$lib/services/standalone-activities';
   import { activityCount, activityRefresh } from '$lib/stores/activities';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
@@ -23,6 +24,7 @@
     resizeColumn,
     TABLE_TYPE,
   } from '$lib/stores/configurable-table-columns';
+  import { activitySearchAttributes } from '$lib/stores/search-attributes';
   import type { ActivityExecutionListInfo } from '$lib/types/activity-execution';
   import {
     getBatchSelectionTargets,
@@ -30,6 +32,8 @@
     type PageSelectionStatus,
   } from '$lib/utilities/batch-selection';
   import { standaloneActivityBulkActionsEnabled } from '$lib/utilities/standalone-activities-commands-disabled';
+
+  import { getActivitySortColumns } from './activities-summary-configurable-table/column-search-attributes';
 
   import TableBodyCell from './activities-summary-configurable-table/table-body-cell.svelte';
   import TableEmptyState from './activities-summary-configurable-table/table-empty-state.svelte';
@@ -52,13 +56,17 @@
   );
   const query = $derived(page.url.searchParams.get('query') ?? '');
 
+  const tableSort = createTableSort(() => [namespace, query]);
+
   const onFetch = $derived(() => fetchPaginatedActivities(namespace, query));
 
   const showBatchActions = $derived(
     standaloneActivityBulkActionsEnabled(page) && $supportsAdvancedVisibility,
   );
 
-  let visiblePaginatedItems: ActivityExecutionListInfo[] = $state([]);
+  // Pages are replaced, never mutated here. Preserve row identities when sorting
+  // so unchanged cells do not recompute through a fresh set of deep proxies.
+  let visiblePaginatedItems: ActivityExecutionListInfo[] = $state.raw([]);
 
   const pageSelectionStatus: PageSelectionStatus = $derived(
     getPageSelectionStatus(
@@ -100,11 +108,19 @@
     void $allSelected;
     prevClickedIndex = null;
   });
+  const sortColumns = $derived(
+    getActivitySortColumns(
+      columns.map((column) => column.label),
+      $activitySearchAttributes,
+    ),
+  );
 </script>
 
 {#key [namespace, query, $activityRefresh]}
   <PaginatedTable
     total={$activityCount.count}
+    bind:sort={tableSort.value}
+    {sortColumns}
     {onFetch}
     onItemsChange={(items) => {
       visiblePaginatedItems = items;

@@ -236,7 +236,7 @@
 
   const copyHarnessPrompt = (event: MouseEvent) => {
     const prompt =
-      'Follow the installation instructions at https://github.com/temporal-community/temporal-agent-harness to clone the project on the latest stable release and start running examples with your current agent.';
+      'Follow the installation instructions at https://github.com/temporal-community/temporal-agent-harness to clone the project on the latest stable release and help me get all of the examples up and running.';
     copyHarness(event, prompt);
   };
 

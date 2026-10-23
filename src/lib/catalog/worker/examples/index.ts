@@ -7,26 +7,31 @@ import type {
 import { catalogExample as example0 } from './activity-heartbeat/example.js';
 import { catalogExample as example1 } from './activity-retry/example.js';
 import { catalogExample as example2 } from './activity-timeout/example.js';
-import { catalogExample as example3 } from './child-workflows/example.js';
-import { catalogExample as example4 } from './hello/example.js';
-import { catalogExample as example5 } from './high-event-count/example.js';
-import { catalogExample as example6 } from './local-activity/example.js';
-import { catalogExample as example7 } from './long-activity/example.js';
-import { catalogExample as example8 } from './nexus-greeting/example.js';
-import { catalogExample as example9 } from './parallel-activities/example.js';
-import { catalogExample as example10 } from './priority-fairness/example.js';
-import { catalogExample as example11 } from './satellite-launch-event-groups/example.js';
-import { catalogExample as example12 } from './sequential-activities/example.js';
-import { catalogExample as example13 } from './sequential-markdown-activities/example.js';
-import { catalogExample as example14 } from './sequential-multiline-summary-activities/example.js';
-import { catalogExample as example15 } from './sequential-no-summary-activities/example.js';
-import { catalogExample as example16 } from './sequential-plain-text-activities/example.js';
-import { catalogExample as example17 } from './signal-collector/example.js';
-import { catalogExample as example18 } from './signal-handlers/example.js';
-import { catalogExample as example19 } from './slow-nexus-operation/example.js';
-import { catalogExample as example20 } from './standalone-activity/example.js';
-import { catalogExample as example21 } from './timer-driven-repetition/example.js';
-import { catalogExample as example22 } from './workflow-patching/example.js';
+import { catalogExample as example3 } from './child-fan-out/example.js';
+import { catalogExample as example4 } from './child-workflows/example.js';
+import { catalogExample as example5 } from './hello/example.js';
+import { catalogExample as example6 } from './high-event-count/example.js';
+import { catalogExample as example7 } from './large-history/example.js';
+import { catalogExample as example8 } from './local-activity/example.js';
+import { catalogExample as example9 } from './long-activity/example.js';
+import { catalogExample as example10 } from './nexus-greeting/example.js';
+import { catalogExample as example11 } from './parallel-activities/example.js';
+import { catalogExample as example12 } from './pending-activities/example.js';
+import { catalogExample as example13 } from './pending-nexus/example.js';
+import { catalogExample as example14 } from './priority-fairness/example.js';
+import { catalogExample as example15 } from './satellite-launch-event-groups/example.js';
+import { catalogExample as example16 } from './sequential-activities/example.js';
+import { catalogExample as example17 } from './sequential-markdown-activities/example.js';
+import { catalogExample as example18 } from './sequential-multiline-summary-activities/example.js';
+import { catalogExample as example19 } from './sequential-no-summary-activities/example.js';
+import { catalogExample as example20 } from './sequential-plain-text-activities/example.js';
+import { catalogExample as example21 } from './signal-collector/example.js';
+import { catalogExample as example22 } from './signal-handlers/example.js';
+import { catalogExample as example23 } from './slow-nexus-operation/example.js';
+import { catalogExample as example24 } from './standalone-activity/example.js';
+import { catalogExample as example25 } from './timer-driven-repetition/example.js';
+import { catalogExample as example26 } from './workflow-feature-tour/example.js';
+import { catalogExample as example27 } from './workflow-patching/example.js';
 
 const sharedWorkflowDefinitions = [
   example0,
@@ -52,6 +57,11 @@ const sharedWorkflowDefinitions = [
   example20,
   example21,
   example22,
+  example23,
+  example24,
+  example25,
+  example26,
+  example27,
 ] satisfies readonly CatalogExampleDefinition[];
 
 export const sharedWorkflowExamples: readonly CatalogExampleRegistration[] =
@@ -102,12 +112,17 @@ export const sharedWorkflowSourceFiles = [
   'src/lib/catalog/worker/examples/activity-timeout/activity.ts',
   'src/lib/catalog/worker/examples/activity-timeout/example.ts',
   'src/lib/catalog/worker/examples/activity-timeout/workflow.ts',
+  'src/lib/catalog/worker/examples/child-fan-out/example.ts',
+  'src/lib/catalog/worker/examples/child-fan-out/workflow.ts',
   'src/lib/catalog/worker/examples/child-workflows/example.ts',
   'src/lib/catalog/worker/examples/child-workflows/workflow.ts',
   'src/lib/catalog/worker/examples/hello/example.ts',
   'src/lib/catalog/worker/examples/hello/workflow.ts',
   'src/lib/catalog/worker/examples/high-event-count/example.ts',
   'src/lib/catalog/worker/examples/high-event-count/workflow.ts',
+  'src/lib/catalog/worker/examples/large-history/activity.ts',
+  'src/lib/catalog/worker/examples/large-history/example.ts',
+  'src/lib/catalog/worker/examples/large-history/workflow.ts',
   'src/lib/catalog/worker/examples/local-activity/example.ts',
   'src/lib/catalog/worker/examples/local-activity/workflow.ts',
   'src/lib/catalog/worker/examples/long-activity/activity.ts',
@@ -119,6 +134,13 @@ export const sharedWorkflowSourceFiles = [
   'src/lib/catalog/worker/examples/nexus-greeting/workflow.ts',
   'src/lib/catalog/worker/examples/parallel-activities/example.ts',
   'src/lib/catalog/worker/examples/parallel-activities/workflow.ts',
+  'src/lib/catalog/worker/examples/pending-activities/activity.ts',
+  'src/lib/catalog/worker/examples/pending-activities/example.ts',
+  'src/lib/catalog/worker/examples/pending-activities/workflow.ts',
+  'src/lib/catalog/worker/examples/pending-nexus/example.ts',
+  'src/lib/catalog/worker/examples/pending-nexus/handler.ts',
+  'src/lib/catalog/worker/examples/pending-nexus/service.ts',
+  'src/lib/catalog/worker/examples/pending-nexus/workflow.ts',
   'src/lib/catalog/worker/examples/priority-fairness/example.ts',
   'src/lib/catalog/worker/examples/priority-fairness/workflow.ts',
   'src/lib/catalog/worker/examples/satellite-launch-event-groups/activity.ts',
@@ -151,6 +173,11 @@ export const sharedWorkflowSourceFiles = [
   'src/lib/catalog/worker/examples/standalone-activity/example.ts',
   'src/lib/catalog/worker/examples/timer-driven-repetition/example.ts',
   'src/lib/catalog/worker/examples/timer-driven-repetition/workflow.ts',
+  'src/lib/catalog/worker/examples/workflow-feature-tour/activity.ts',
+  'src/lib/catalog/worker/examples/workflow-feature-tour/example.ts',
+  'src/lib/catalog/worker/examples/workflow-feature-tour/handler.ts',
+  'src/lib/catalog/worker/examples/workflow-feature-tour/service.ts',
+  'src/lib/catalog/worker/examples/workflow-feature-tour/workflow.ts',
   'src/lib/catalog/worker/examples/workflow-patching/example.ts',
   'src/lib/catalog/worker/examples/workflow-patching/workflow.ts',
 ] as const;

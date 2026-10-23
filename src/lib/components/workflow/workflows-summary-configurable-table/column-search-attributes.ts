@@ -1,4 +1,4 @@
-import type { WorkflowExecution } from '$lib/types/workflows';
+import type { SearchAttributes, WorkflowExecution } from '$lib/types/workflows';
 import {
   getMillisecondDuration,
   toQueryDuration,
@@ -9,6 +9,7 @@ import {
   getColumnAttribute,
   type QuickFilterColumns,
 } from '$lib/utilities/query/quick-filter-table';
+import { searchAttributeSortColumns } from '$lib/utilities/search-attribute-table-sort';
 
 export const WORKFLOW_COLUMN_ATTRIBUTE: Record<string, string> = {
   Status: 'ExecutionStatus',
@@ -102,3 +103,27 @@ export const WORKFLOW_QUICK_FILTER_COLUMNS: QuickFilterColumns<WorkflowExecution
     getValue: getWorkflowColumnValue,
     unfilterable: UNFILTERABLE_WORKFLOW_COLUMNS,
   };
+
+export const getWorkflowSortColumns = (
+  labels: string[],
+  attributes: SearchAttributes,
+) =>
+  searchAttributeSortColumns(
+    labels,
+    WORKFLOW_QUICK_FILTER_COLUMNS,
+    attributes,
+    {
+      'Parent Namespace': {
+        getValue: (workflow) => workflow.parentNamespaceId,
+        type: 'string',
+      },
+      'Execution Duration': {
+        getValue: (workflow) =>
+          workflow.startTime && workflow.endTime
+            ? new Date(workflow.endTime).getTime() -
+              new Date(workflow.startTime).getTime()
+            : undefined,
+        type: 'number',
+      },
+    },
+  );

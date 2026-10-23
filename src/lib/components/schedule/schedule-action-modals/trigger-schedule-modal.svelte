@@ -33,7 +33,10 @@
   let selectedOverlapPolicy = writable<OverlapPolicy>(scheduleOverlapPolicy);
 
   $effect(() => {
-    return () => clearConfirmationModalActionTimeout('trigger');
+    return () => {
+      clearConfirmationModalActionTimeout('trigger');
+      closeConfirmationModal('trigger');
+    };
   });
 </script>
 

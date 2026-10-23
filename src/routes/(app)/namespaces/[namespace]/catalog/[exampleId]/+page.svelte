@@ -14,7 +14,7 @@
     findRouteCatalogDescriptor,
     resolveCatalogForNamespace,
   } from '../catalog';
-  import { getCatalogServices } from '../services';
+  import { catalogWorkerStartCommand, getCatalogServices } from '../services';
 
   const coreUser = coreUserStore();
   const identity = getIdentity();
@@ -59,6 +59,7 @@
     {descriptor}
     host={services.host}
     sessionStore={services.sessionStore}
+    workerStartCommand={catalogWorkerStartCommand}
   />
 {:else}
   <PageTitle title="Catalog example not found" />

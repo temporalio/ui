@@ -13,6 +13,7 @@
   import { translate } from '$lib/i18n/translate';
   import { IconChevronLeft, IconTrash } from '$lib/io/icon';
   import {
+    confirmationModal,
     loading,
     openConfirmationModal,
     serverError,
@@ -77,6 +78,7 @@
     dataType: 'json',
     validators: zodClient(formScheduleSchema),
     resetForm: false,
+    invalidateAll: false,
     onUpdate: async ({ form }) => {
       if (!form.valid) return;
       await onSubmit(form.data);
@@ -172,6 +174,7 @@
         >
           <Button
             disabled={$submitting || !writeActionsAreAllowed()}
+            loading={$submitting}
             type="submit"
             class="max-sm:w-full"
             data-testid="create-schedule-button">{confirmText}</Button
@@ -202,7 +205,11 @@
       </div>
     </form>
 
-    <Alert intent="error" title={$serverError} hidden={!$serverError} />
+    <Alert
+      intent="error"
+      title={$serverError}
+      hidden={!$serverError || $confirmationModal !== 'none'}
+    />
     <CodecServerErrorBanner />
   {/if}
 </div>
