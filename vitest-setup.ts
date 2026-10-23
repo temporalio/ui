@@ -1,5 +1,5 @@
 import i18next from 'i18next';
-import { vi } from 'vitest';
+import { afterEach, beforeEach, vi } from 'vitest';
 
 import { i18nNamespaces } from './src/lib/i18n';
 import resources from './src/lib/i18n/locales';
@@ -31,20 +31,36 @@ const cryptoMock = {
 
 vi.stubGlobal('crypto', cryptoMock);
 
-if (typeof Element !== 'undefined') {
-  Element.prototype.animate = function () {
-    const animation = {
-      currentTime: 0,
-      effect: null,
-      playState: 'finished',
-      onfinish: null as (() => void) | null,
-      cancel: () => {
-        animation.onfinish = null;
-      },
-    };
-    queueMicrotask(() => animation.onfinish?.());
-    return animation as unknown as Animation;
+const animateShim = function () {
+  const animation = {
+    currentTime: 0,
+    effect: null,
+    playState: 'finished',
+    onfinish: null as (() => void) | null,
+    cancel: () => {
+      animation.onfinish = null;
+    },
   };
+  queueMicrotask(() => animation.onfinish?.());
+  return animation as unknown as Animation;
+};
+
+if (typeof Element !== 'undefined') {
+  beforeEach(() => {
+    if (typeof Element.prototype.animate !== 'function') {
+      Object.defineProperty(Element.prototype, 'animate', {
+        configurable: true,
+        writable: true,
+        value: animateShim,
+      });
+    }
+  });
+
+  afterEach(() => {
+    if (Element.prototype.animate === animateShim) {
+      delete (Element.prototype as { animate?: unknown }).animate;
+    }
+  });
 }
 
 vi.mock('esm-env', () => {
