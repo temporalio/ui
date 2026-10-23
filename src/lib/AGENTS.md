@@ -38,7 +38,7 @@ are still fine.
 - A label, or content BadgeCount can't show → `Badge`
 - A non-interactive category label → `Tag` (no `error` scheme)
 - Something the user clicks → `Chip`. Badges are not interactive.
-- A clickable workflow status → `ChipStatus` (English labels only)
+- A clickable workflow status → `ChipStatus` (English defaults; use `text` to localize)
 - A label, or content BadgeCount can't show → `Badge`
 - Something the user clicks → `Chip`. Badges are not interactive.
 
