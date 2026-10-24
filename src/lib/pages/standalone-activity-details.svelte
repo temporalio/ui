@@ -14,7 +14,9 @@
   import Card from '$lib/holocene/card.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { Badge } from '$lib/io/badge';
   import { BadgeCount } from '$lib/io/badge-count';
+  import type { Principal } from '$lib/types/activity-execution';
   import {
     formatAttemptsLeft,
     formatMaximumAttempts,
@@ -73,6 +75,28 @@
       </p>
     {/if}
   </DetailListValue>
+{/snippet}
+
+{#snippet principal(
+  label: string,
+  value: Principal | null | undefined,
+  identity: string | null = null,
+)}
+  <DetailListLabel>{label}</DetailListLabel>
+  {#if value?.nameAtWriteTime}
+    <DetailListValue class="min-w-0 items-center gap-1.5">
+      {#if identity}
+        <span class="truncate">{identity}</span>
+        <span class="text-secondary" aria-hidden="true">•</span>
+      {/if}
+      {#if value.type}
+        <Badge text={value.type} size="sm" />
+      {/if}
+      <span class="truncate">{value.nameAtWriteTime}</span>
+    </DetailListValue>
+  {:else}
+    <DetailListTextValue text="-" />
+  {/if}
 {/snippet}
 
 {#if $activityExecution}
@@ -314,6 +338,31 @@
             />
           </DetailList>
         </div>
+
+        <div class="space-y-2">
+          <h5>
+            {translate('standalone-activities.principals')}
+          </h5>
+          <DetailList
+            rowCount={3}
+            aria-label={translate('standalone-activities.principals')}
+          >
+            {@render principal(
+              translate('standalone-activities.started-by'),
+              $activityExecution.info.startedByPrincipal,
+            )}
+            {@render principal(
+              translate('standalone-activities.last-worker'),
+              $activityExecution.info.lastWorkerPrincipal,
+              $activityExecution.info.lastWorkerIdentity,
+            )}
+            {@render principal(
+              translate('standalone-activities.closed-by'),
+              $activityExecution.info.closedByPrincipal,
+            )}
+          </DetailList>
+        </div>
+
         <div class="space-y-2">
           <h5>
             {translate('standalone-activities.worker')}
