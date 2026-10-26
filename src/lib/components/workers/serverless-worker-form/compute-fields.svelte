@@ -59,7 +59,10 @@
      * adding a provider fails the consumer's type check until it supplies
      * templates for it.
      */
-    templates?: Record<ComputeProviderValue, ComputeProviderTemplates>;
+    templates?: Record<
+      ComputeProviderValue,
+      ComputeProviderTemplates | undefined
+    >;
     lambdaArnPlaceholder?: string;
     leadingDivider?: boolean;
     sections?: ('resource' | 'access' | 'scaling')[];
@@ -150,7 +153,7 @@
   // renders inside its own branch, where `provider` is already 'cloud-run'.
   const resolvedCloudRunTerraformTemplate = $derived(
     interpolateCloudRunTerraformTemplate(
-      templates['cloud-run'].terraform,
+      templates['cloud-run']?.terraform ?? '',
       gcpProject,
     ),
   );

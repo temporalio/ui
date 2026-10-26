@@ -216,6 +216,9 @@ export const Strings = {
   'provider-cloud-run': 'Google Cloud Run',
   'provider-cloud-run-description':
     'Run Workers as Cloud Run services in your GCP project.',
+  'provider-modal': 'Modal',
+  'provider-modal-description':
+    'Run Workers as Modal Functions in your Modal workspace.',
   'provider-vercel': 'Vercel Functions',
   'provider-vercel-description':
     'Run Workers as serverless functions on the Vercel platform.',

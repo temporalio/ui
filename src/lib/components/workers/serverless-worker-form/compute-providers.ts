@@ -1,5 +1,10 @@
 import type { I18nKey, I18nResources } from '$lib/i18n';
-import { IconAwsColor, type IconComponent, IconGcpColor } from '$lib/io/icon';
+import {
+  IconAwsColor,
+  type IconComponent,
+  IconGcpColor,
+  IconModalColor,
+} from '$lib/io/icon';
 
 import defaultAgentCoreTerraform from './serverless-worker-agentcore.tf?raw';
 import defaultCloudRunTerraform from './serverless-worker-cloud-run.tf?raw';
@@ -30,6 +35,7 @@ export const COMPUTE_PROVIDER_VALUES = [
   'lambda',
   'agentcore',
   'cloud-run',
+  'modal',
 ] as const;
 
 export type ComputeProviderValue = (typeof COMPUTE_PROVIDER_VALUES)[number];
@@ -38,7 +44,8 @@ export type ComputeProviderValue = (typeof COMPUTE_PROVIDER_VALUES)[number];
 export type ComputeProviderType =
   | 'aws-lambda'
   | 'aws-agentcore'
-  | 'gcp-cloud-run';
+  | 'gcp-cloud-run'
+  | 'modal-function';
 
 export type ComputeProviderReleaseStage =
   | 'public-preview'
@@ -82,7 +89,12 @@ export type ComputeProviderDefinition = {
   /** The compact label for compute-badge, where the full vendor name will not fit. */
   badgeLabel: string;
   releaseStage: ComputeProviderReleaseStage;
-  templates: ComputeProviderTemplates;
+  /**
+   * Absent for a provider that offers no infrastructure to copy. Modal is
+   * deployed with `modal deploy` from the customer's own project, so there is
+   * no Terraform or CloudFormation to hand them.
+   */
+  templates?: ComputeProviderTemplates;
   /** The published Terraform module, when one exists for the provider. */
   terraformModuleHref?: string;
 };
@@ -141,6 +153,18 @@ export const COMPUTE_PROVIDERS: Record<
       terraform: defaultCloudRunTerraform,
     },
   },
+  modal: {
+    value: 'modal',
+    // The API spells it `modal-function`. The CLI sent `modal` and every
+    // create failed with "invalid compute provider type", so the long name is
+    // the one that works.
+    providerType: 'modal-function',
+    icon: IconModalColor,
+    labelKey: 'workers.provider-modal',
+    descriptionKey: 'workers.provider-modal-description',
+    badgeLabel: 'Modal',
+    releaseStage: 'pre-release',
+  },
 };
 
 /**
@@ -153,11 +177,14 @@ export const COMPUTE_PROVIDERS: Record<
  */
 export const defaultComputeProviderTemplates: Record<
   ComputeProviderValue,
-  ComputeProviderTemplates
+  ComputeProviderTemplates | undefined
 > = {
   lambda: COMPUTE_PROVIDERS.lambda.templates,
   agentcore: COMPUTE_PROVIDERS.agentcore.templates,
   'cloud-run': COMPUTE_PROVIDERS['cloud-run'].templates,
+  // Modal has none. The key is still required, so a provider added later
+  // cannot be forgotten here.
+  modal: undefined,
 };
 
 // Both spellings appear in the wild: the API sends `aws-lambda`, while some

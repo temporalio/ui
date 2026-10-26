@@ -22,6 +22,7 @@ import type {
 } from '$lib/types/deployments';
 
 import {
+  COMPUTE_PROVIDER_VALUES,
   COMPUTE_PROVIDERS,
   type ComputeProviderReleaseStage,
   type ComputeProviderValue,
@@ -76,7 +77,7 @@ const AGENT_CORE_ENDPOINT_ARN =
   /^arn:aws:bedrock-agentcore:[a-z0-9-]+:\d{12}:runtime\/[^/]+\/runtime-endpoint\/[^/]+$/;
 
 const providerFields = {
-  provider: z.enum(['lambda', 'agentcore', 'cloud-run']).default('lambda'),
+  provider: z.enum(COMPUTE_PROVIDER_VALUES).default('lambda'),
   lambdaArn: z.string().default(''),
   agentCoreEndpointArn: z.string().default(''),
   iamRoleArn: z.string().default(''),
@@ -395,6 +396,7 @@ export const defaultReleaseStage: Record<
   lambda: COMPUTE_PROVIDERS.lambda.releaseStage,
   agentcore: COMPUTE_PROVIDERS.agentcore.releaseStage,
   'cloud-run': COMPUTE_PROVIDERS['cloud-run'].releaseStage,
+  modal: COMPUTE_PROVIDERS.modal.releaseStage,
 };
 
 interface InitialComputeProviderOptions {
