@@ -20,6 +20,7 @@ export type BrowserCatalogMetadata = {
   title: string;
   description: string;
   capabilityTags: string[];
+  patternTags?: string[];
   expectedEvidence: string[];
   input: RuntimeJsonDocument;
   startOptions: RuntimeJsonDocument;

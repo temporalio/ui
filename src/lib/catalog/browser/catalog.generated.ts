@@ -2,7 +2,7 @@ import type { BrowserCatalogArtifact } from './types';
 
 export const catalogArtifact: BrowserCatalogArtifact = {
   sourceHash:
-    'ab1d28559cd8149433f8505b38591843db129021116c4f63f3a2a9f5e2b9f690',
+    '6768dd294596c7da6c0e41222ff01df6f78a01d0563fef7e7b7c8a3cade96d9c',
   descriptors: [
     {
       id: 'activity-heartbeat',
@@ -150,6 +150,7 @@ export const catalogArtifact: BrowserCatalogArtifact = {
       description:
         'Starts 100 child workflows, each of which starts 10 child workflows of its own, for 1,101 workflows in total.',
       capabilityTags: ['child-workflows', 'concurrency'],
+      patternTags: ['batch-processing'],
       expectedEvidence: [
         'A parent workflow with the configured number of child workflows, each with its own grandchild workflows.',
         'Child workflow IDs extend the parent ID, for example `<parent>-3` and `<parent>-3-7`.',
