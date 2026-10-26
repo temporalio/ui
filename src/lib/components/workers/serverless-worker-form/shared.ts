@@ -518,6 +518,78 @@ export const interpolateTerraformTemplate = (
 };
 
 /** A form's starting values, as read from a saved scaling group. */
+/**
+ * The provider fields a compute form edits, as one object.
+ *
+ * ComputeFields binds this rather than twenty-odd separate props. Every
+ * consumer already holds an object with these keys -- a superforms store, or a
+ * per-region entry -- so one `bind:values` replaces the whole list, and a
+ * provider added later needs no new binding at any call site.
+ */
+export type ComputeFieldValues = {
+  lambdaArn: string;
+  agentCoreEndpointArn: string;
+  iamRoleArn: string;
+  roleExternalId: string;
+  gcpProject: string;
+  gcpRegion: string;
+  gcpWorkerPool: string;
+  gcpServiceAccount: string;
+  modalAppName: string;
+  modalFunctionName: string;
+  modalEnvironment: string;
+  modalWorkspaceId: string;
+  modalVersion: string;
+  minReplicas: number;
+  maxReplicas: number;
+  initialReplicas: number;
+  utilizationTarget: number;
+  scaleDownStabilization: string;
+  scaleUpCooloffMs?: number;
+  scaleUpBacklogThreshold?: number;
+  maxWorkerLifetimeMs?: number;
+  metricsPollIntervalMs?: number;
+};
+
+/** A read/write pair standing in for one field of a ComputeFieldValues. */
+export type FieldAccessor<T> = { get(): T; set(value: T): void };
+
+/**
+ * A values object that reads and writes `base`, except for the fields
+ * `overrides` names.
+ *
+ * The high availability form needs this: a replica inherits the primary's
+ * resource until someone edits it, so its ARN is derived rather than stored
+ * and a write has to land on the override instead. Expressing that as
+ * accessors keeps ComputeFields bound to a single object, rather than
+ * reopening a prop per overridden field.
+ */
+export const fieldValuesWith = (
+  base: ComputeFieldValues,
+  overrides: Partial<{
+    [K in keyof ComputeFieldValues]: FieldAccessor<ComputeFieldValues[K]>;
+  }>,
+): ComputeFieldValues => {
+  const target = {} as ComputeFieldValues;
+  const keys = Object.keys(base) as (keyof ComputeFieldValues)[];
+  const named = Object.keys(overrides) as (keyof ComputeFieldValues)[];
+  const record = base as Record<string, unknown>;
+  for (const key of new Set([...keys, ...named])) {
+    // Narrowed to one accessor: the mapped type makes `set` take the
+    // intersection of every field's type, which is never.
+    const override = overrides[key] as FieldAccessor<unknown> | undefined;
+    Object.defineProperty(target, key, {
+      enumerable: true,
+      get: () => (override ? override.get() : record[key]),
+      set: (value: unknown) => {
+        if (override) override.set(value);
+        else record[key] = value;
+      },
+    });
+  }
+  return target;
+};
+
 export type ComputeInitialValues = {
   provider?: ComputeProviderValue;
   lambdaArn: string;

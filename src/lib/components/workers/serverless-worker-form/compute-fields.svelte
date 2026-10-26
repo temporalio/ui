@@ -27,36 +27,16 @@
   } from './compute-providers';
   import { GCP_REGIONS } from './gcp-regions';
   import {
-    defaultScaleDownStabilization,
+    type ComputeFieldValues,
     interpolateTerraformTemplate,
     scaleDownStabilizationUnits,
   } from './shared';
 
   interface Props {
     provider?: string;
-    lambdaArn: string;
-    agentCoreEndpointArn?: string;
-    iamRoleArn: string;
-    roleExternalId: string;
-    gcpProject?: string;
-    gcpRegion?: string;
+    /** Every provider field, as one object. See ComputeFieldValues. */
+    values: ComputeFieldValues;
     gcpRegions?: string[];
-    gcpWorkerPool?: string;
-    gcpServiceAccount?: string;
-    modalAppName?: string;
-    modalFunctionName?: string;
-    modalEnvironment?: string;
-    modalWorkspaceId?: string;
-    modalVersion?: string;
-    minReplicas?: number;
-    maxReplicas?: number;
-    initialReplicas?: number;
-    utilizationTarget?: number;
-    scaleDownStabilization?: string;
-    scaleUpCooloffMs?: number;
-    scaleUpBacklogThreshold?: number;
-    maxWorkerLifetimeMs?: number;
-    metricsPollIntervalMs?: number;
     /**
      * The templates offered per provider. Defaults to the ones bundled here,
      * which is what a self-hosted deployment wants. A consumer overrides them
@@ -101,29 +81,8 @@
 
   let {
     provider = 'lambda',
-    lambdaArn = $bindable(),
-    agentCoreEndpointArn = $bindable(''),
-    iamRoleArn = $bindable(),
-    roleExternalId = $bindable(),
-    gcpProject = $bindable(''),
-    gcpRegion = $bindable(''),
+    values = $bindable(),
     gcpRegions = [...GCP_REGIONS],
-    gcpWorkerPool = $bindable(''),
-    gcpServiceAccount = $bindable(''),
-    modalAppName = $bindable(''),
-    modalFunctionName = $bindable(''),
-    modalEnvironment = $bindable(''),
-    modalWorkspaceId = $bindable(''),
-    modalVersion = $bindable(''),
-    minReplicas = $bindable(0),
-    maxReplicas = $bindable(30),
-    initialReplicas = $bindable(0),
-    utilizationTarget = $bindable(0.8),
-    scaleDownStabilization = $bindable(defaultScaleDownStabilization),
-    scaleUpCooloffMs = $bindable(),
-    scaleUpBacklogThreshold = $bindable(),
-    maxWorkerLifetimeMs = $bindable(),
-    metricsPollIntervalMs = $bindable(),
     templates = defaultComputeProviderTemplates,
     lambdaArnPlaceholder = translate('workers.lambda-arn-placeholder'),
     leadingDivider = true,
@@ -160,9 +119,9 @@
   // ARNs are passed and the absent one is a no-op.
   const resolvedTerraformTemplate = $derived(
     interpolateTerraformTemplate(providerTemplates?.terraform ?? '', {
-      externalId: roleExternalId,
-      lambdaArn,
-      agentCoreEndpointArn,
+      externalId: values.roleExternalId,
+      lambdaArn: values.lambdaArn,
+      agentCoreEndpointArn: values.agentCoreEndpointArn,
     }),
   );
   const terraformModuleHref = $derived(
@@ -174,7 +133,7 @@
   const resolvedCloudRunTerraformTemplate = $derived(
     interpolateCloudRunTerraformTemplate(
       templates['cloud-run']?.terraform ?? '',
-      gcpProject,
+      values.gcpProject,
     ),
   );
   const showCloudRunImpersonatorWarning = $derived(
@@ -188,12 +147,14 @@
       return 'https://console.aws.amazon.com/cloudformation/';
     }
     const params = [`templateURL=${encodeURIComponent(templateUrl)}`];
-    if (roleExternalId) {
+    if (values.roleExternalId) {
       params.push(
-        `param_AssumeRoleExternalId=${encodeURIComponent(roleExternalId)}`,
+        `param_AssumeRoleExternalId=${encodeURIComponent(values.roleExternalId)}`,
       );
     }
-    const resource = isAgentCore ? agentCoreEndpointArn : lambdaArn;
+    const resource = isAgentCore
+      ? values.agentCoreEndpointArn
+      : values.lambdaArn;
     if (resource) {
       params.push(
         `param_${isAgentCore ? 'AgentRuntimeArns' : 'LambdaFunctionARNs'}=${encodeURIComponent(resource)}`,
@@ -246,7 +207,7 @@
   {#if provider === 'lambda'}
     <div class="flex flex-wrap items-start gap-4 [&>:not(:first-child)]:mt-6">
       <Input
-        bind:value={lambdaArn}
+        bind:value={values.lambdaArn}
         id={fieldId('lambdaArn')}
         name={fieldId('lambdaArn')}
         spellcheck={false}
@@ -270,7 +231,7 @@
   {:else if provider === 'agentcore'}
     <div class="flex flex-wrap items-start gap-4 [&>:not(:first-child)]:mt-6">
       <Input
-        bind:value={agentCoreEndpointArn}
+        bind:value={values.agentCoreEndpointArn}
         id={fieldId('agentCoreEndpointArn')}
         name={fieldId('agentCoreEndpointArn')}
         spellcheck={false}
@@ -296,7 +257,7 @@
     <div class="flex flex-col gap-4">
       <div class="flex flex-wrap items-start gap-4 [&>:not(:first-child)]:mt-6">
         <Input
-          bind:value={modalAppName}
+          bind:value={values.modalAppName}
           id={fieldId('modalAppName')}
           name={fieldId('modalAppName')}
           spellcheck={false}
@@ -319,7 +280,7 @@
         </Button>
       </div>
       <Input
-        bind:value={modalFunctionName}
+        bind:value={values.modalFunctionName}
         id={fieldId('modalFunctionName')}
         name={fieldId('modalFunctionName')}
         spellcheck={false}
@@ -331,7 +292,7 @@
         required
       />
       <Input
-        bind:value={modalEnvironment}
+        bind:value={values.modalEnvironment}
         id={fieldId('modalEnvironment')}
         name={fieldId('modalEnvironment')}
         spellcheck={false}
@@ -343,7 +304,7 @@
         required
       />
       <Input
-        bind:value={modalWorkspaceId}
+        bind:value={values.modalWorkspaceId}
         id={fieldId('modalWorkspaceId')}
         name={fieldId('modalWorkspaceId')}
         spellcheck={false}
@@ -354,7 +315,7 @@
         placeholder={translate('workers.modal-workspace-id-placeholder')}
       />
       <Input
-        bind:value={modalVersion}
+        bind:value={values.modalVersion}
         id={fieldId('modalVersion')}
         name={fieldId('modalVersion')}
         spellcheck={false}
@@ -368,7 +329,7 @@
   {:else}
     <div class="flex flex-col gap-4">
       <Input
-        bind:value={gcpProject}
+        bind:value={values.gcpProject}
         id={fieldId('gcpProject')}
         name={fieldId('gcpProject')}
         label={translate('workers.gcp-project-label')}
@@ -378,7 +339,7 @@
         required
       />
       <Combobox
-        bind:value={gcpRegion}
+        bind:value={values.gcpRegion}
         id={fieldId('gcpRegion')}
         name={fieldId('gcpRegion')}
         label={translate('workers.gcp-region-label')}
@@ -394,7 +355,7 @@
       />
       <div class="flex flex-wrap items-start gap-4 [&>:not(:first-child)]:mt-6">
         <Input
-          bind:value={gcpWorkerPool}
+          bind:value={values.gcpWorkerPool}
           id={fieldId('gcpWorkerPool')}
           name={fieldId('gcpWorkerPool')}
           label={translate('workers.gcp-worker-pool-label')}
@@ -433,7 +394,7 @@
   {#if provider === 'lambda' || provider === 'agentcore'}
     <div class="flex flex-col gap-4">
       <Input
-        bind:value={iamRoleArn}
+        bind:value={values.iamRoleArn}
         id={fieldId('iamRoleArn')}
         name={fieldId('iamRoleArn')}
         spellcheck={false}
@@ -444,7 +405,7 @@
         required
       />
       <Input
-        bind:value={roleExternalId}
+        bind:value={values.roleExternalId}
         id={fieldId('roleExternalId')}
         name={fieldId('roleExternalId')}
         label={translate('workers.external-id-label')}
@@ -526,7 +487,7 @@
   {:else if provider === 'cloud-run'}
     <div class="flex flex-col gap-4">
       <Input
-        bind:value={gcpServiceAccount}
+        bind:value={values.gcpServiceAccount}
         id={fieldId('gcpServiceAccount')}
         name={fieldId('gcpServiceAccount')}
         label={translate('workers.gcp-service-account-label')}
@@ -605,10 +566,12 @@
   {#if showScaling && (provider === 'lambda' || provider === 'agentcore' || provider === 'modal')}
     <div class="mt-4 flex flex-col gap-4">
       <Input
-        value={scaleUpCooloffMs !== undefined ? String(scaleUpCooloffMs) : ''}
+        value={values.scaleUpCooloffMs !== undefined
+          ? String(values.scaleUpCooloffMs)
+          : ''}
         onchange={(e) => {
           const val = (e.target as HTMLInputElement).value;
-          scaleUpCooloffMs = val === '' ? undefined : Number(val);
+          values.scaleUpCooloffMs = val === '' ? undefined : Number(val);
         }}
         id={fieldId('scaleUpCooloffMs')}
         name={fieldId('scaleUpCooloffMs')}
@@ -619,12 +582,12 @@
         placeholder="100"
       />
       <Input
-        value={scaleUpBacklogThreshold !== undefined
-          ? String(scaleUpBacklogThreshold)
+        value={values.scaleUpBacklogThreshold !== undefined
+          ? String(values.scaleUpBacklogThreshold)
           : ''}
         onchange={(e) => {
           const val = (e.target as HTMLInputElement).value;
-          scaleUpBacklogThreshold = val === '' ? undefined : Number(val);
+          values.scaleUpBacklogThreshold = val === '' ? undefined : Number(val);
         }}
         id={fieldId('scaleUpBacklogThreshold')}
         name={fieldId('scaleUpBacklogThreshold')}
@@ -635,12 +598,12 @@
         placeholder="0"
       />
       <Input
-        value={maxWorkerLifetimeMs !== undefined
-          ? String(maxWorkerLifetimeMs)
+        value={values.maxWorkerLifetimeMs !== undefined
+          ? String(values.maxWorkerLifetimeMs)
           : ''}
         onchange={(e) => {
           const val = (e.target as HTMLInputElement).value;
-          maxWorkerLifetimeMs = val === '' ? undefined : Number(val);
+          values.maxWorkerLifetimeMs = val === '' ? undefined : Number(val);
         }}
         id={fieldId('maxWorkerLifetimeMs')}
         name={fieldId('maxWorkerLifetimeMs')}
@@ -651,12 +614,12 @@
         placeholder="600000"
       />
       <Input
-        value={metricsPollIntervalMs !== undefined
-          ? String(metricsPollIntervalMs)
+        value={values.metricsPollIntervalMs !== undefined
+          ? String(values.metricsPollIntervalMs)
           : ''}
         onchange={(e) => {
           const val = (e.target as HTMLInputElement).value;
-          metricsPollIntervalMs = val === '' ? undefined : Number(val);
+          values.metricsPollIntervalMs = val === '' ? undefined : Number(val);
         }}
         id={fieldId('metricsPollIntervalMs')}
         name={fieldId('metricsPollIntervalMs')}
@@ -670,9 +633,9 @@
   {:else if showScaling && provider === 'cloud-run'}
     <div class="mt-4 flex flex-col gap-4">
       <Input
-        value={String(minReplicas)}
+        value={String(values.minReplicas)}
         onchange={(e) => {
-          minReplicas = Number((e.target as HTMLInputElement).value);
+          values.minReplicas = Number((e.target as HTMLInputElement).value);
         }}
         id={fieldId('minReplicas')}
         name={fieldId('minReplicas')}
@@ -687,9 +650,9 @@
         required
       />
       <Input
-        value={String(maxReplicas)}
+        value={String(values.maxReplicas)}
         onchange={(e) => {
-          maxReplicas = Number((e.target as HTMLInputElement).value);
+          values.maxReplicas = Number((e.target as HTMLInputElement).value);
         }}
         id={fieldId('maxReplicas')}
         name={fieldId('maxReplicas')}
@@ -704,9 +667,9 @@
         required
       />
       <Input
-        value={String(initialReplicas)}
+        value={String(values.initialReplicas)}
         onchange={(e) => {
-          initialReplicas = Number((e.target as HTMLInputElement).value);
+          values.initialReplicas = Number((e.target as HTMLInputElement).value);
         }}
         id={fieldId('initialReplicas')}
         name={fieldId('initialReplicas')}
@@ -721,9 +684,11 @@
         required
       />
       <Input
-        value={String(utilizationTarget)}
+        value={String(values.utilizationTarget)}
         onchange={(e) => {
-          utilizationTarget = Number((e.target as HTMLInputElement).value);
+          values.utilizationTarget = Number(
+            (e.target as HTMLInputElement).value,
+          );
         }}
         id={fieldId('utilizationTarget')}
         name={fieldId('utilizationTarget')}
@@ -738,14 +703,14 @@
         required
       />
       <DurationInput
-        bind:value={scaleDownStabilization}
+        bind:value={values.scaleDownStabilization}
         id={fieldId('scaleDownStabilization')}
         name={fieldId('scaleDownStabilization')}
         inputmode="numeric"
         min={0}
         units={scaleDownStabilizationUnits}
         initialUnit={getFirstWholeNumberUnit(
-          scaleDownStabilization,
+          values.scaleDownStabilization,
           scaleDownStabilizationUnits,
           'second(s)',
         )}

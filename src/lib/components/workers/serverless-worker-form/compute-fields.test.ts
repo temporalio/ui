@@ -19,6 +19,7 @@ import { defaultComputeProviderTemplates } from './compute-providers';
 import defaultAgentCoreTerraformTemplate from './serverless-worker-agentcore.tf?raw';
 import defaultCloudRunTerraformTemplate from './serverless-worker-cloud-run.tf?raw';
 import defaultTerraformTemplate from './serverless-worker-lambda.tf?raw';
+import { defaultScaleDownStabilization } from './shared';
 import { interpolateTerraformTemplate } from './shared';
 import agentCoreCfnTemplate from './temporal-agentcore-role.yaml?raw';
 
@@ -131,12 +132,26 @@ const renderComputeFields = ({
   const { body } = renderComponent(computeFields, {
     props: {
       provider,
-      lambdaArn: '',
-      agentCoreEndpointArn,
-      iamRoleArn: '',
-      roleExternalId,
-      gcpProject,
-      gcpServiceAccount,
+      values: {
+        lambdaArn: '',
+        agentCoreEndpointArn,
+        iamRoleArn: '',
+        roleExternalId,
+        gcpProject,
+        gcpRegion: '',
+        gcpWorkerPool: '',
+        gcpServiceAccount,
+        modalAppName: '',
+        modalFunctionName: '',
+        modalEnvironment: '',
+        modalWorkspaceId: '',
+        modalVersion: '',
+        minReplicas: 0,
+        maxReplicas: 30,
+        initialReplicas: 0,
+        utilizationTarget: 0.8,
+        scaleDownStabilization: defaultScaleDownStabilization,
+      },
       templates,
     },
   });
