@@ -6,9 +6,6 @@
   import Deployment from '$lib/pages/deployment.svelte';
 
   const deployment = $derived(page.params.deployment);
-  // No providerConfig: a self-hosted server has no host region for a scaling
-  // group's region_ids to match, so it offers no high availability. A consumer
-  // such as Temporal Cloud passes its own.
 </script>
 
 <PageTitle

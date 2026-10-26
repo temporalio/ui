@@ -11,9 +11,6 @@
 
   const namespace = $derived(page.params.namespace);
   const deploymentsHref = $derived(routeForWorkerDeployments({ namespace }));
-  // No providerConfig: a self-hosted server has no host region for a scaling
-  // group's region_ids to match, so it offers no high availability. A consumer
-  // such as Temporal Cloud passes its own.
 </script>
 
 <PageTitle
