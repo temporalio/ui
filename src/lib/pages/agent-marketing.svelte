@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { twJoin } from 'tailwind-merge';
+
   import agentHarnessDemo from '$lib/assets/agents/agent-harness-demo.mp4';
   import agentHarnessPreview from '$lib/assets/agents/agent-harness-preview.jpg';
   import integrationBraintrust from '$lib/assets/agents/integration-braintrust.svg';
@@ -15,11 +17,16 @@
   import integrationTenuo from '$lib/assets/agents/integration-tenuo.svg';
   import integrationTuningEngines from '$lib/assets/agents/integration-tuning-engines.svg';
   import integrationVercel from '$lib/assets/agents/integration-vercel.svg';
+  import CopyPromptButton from '$lib/components/agents/copy-prompt-button.svelte';
+  import FeatureCardBackground from '$lib/components/agents/feature-card-background.svelte';
+  import McpExampleQuestions from '$lib/components/agents/mcp-example-questions.svelte';
+  import SkillsTerminal, {
+    type AgentSkill,
+  } from '$lib/components/agents/skills-terminal.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { Badge } from '$lib/io/badge';
-  import { IconCheckmark, IconCopy, IconPlay } from '$lib/io/icon';
-  import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
+  import { IconGithub, IconPlay } from '$lib/io/icon';
 
   type Language = 'Python' | 'TypeScript' | 'Java' | 'Go';
 
@@ -194,6 +201,43 @@
     },
   ];
 
+  const skills: AgentSkill[] = [
+    {
+      slug: 'temporal-developer',
+      repository: 'temporalio/skill-temporal-developer',
+      preview: false,
+    },
+    {
+      slug: 'temporal-ops',
+      repository: 'temporalio/skill-temporal-ops',
+      preview: true,
+    },
+    {
+      slug: 'temporal-serverless',
+      repository: 'temporalio/skill-temporal-serverless',
+      preview: true,
+    },
+    {
+      slug: 'temporal-cloud',
+      repository: 'temporalio/skill-temporal-cloud',
+      preview: false,
+    },
+  ];
+
+  const mcpQuestions = [
+    'Why is Workflow order-123 stuck?',
+    'How many Workflows failed in the last hour?',
+    'Is any Worker polling the orders Task Queue?',
+    'Which Namespaces can you read?',
+  ];
+
+  const harnessPrompt =
+    'Follow the installation instructions at https://github.com/temporal-community/temporal-agent-harness to clone the project on the latest stable release and help me get all of the examples up and running.';
+  const mcpPrompt =
+    'Follow the Get started instructions at https://github.com/temporalio/temporal-mcp to install temporal-mcp, connect it to my current agent over stdio, and check its connection to a local Temporal dev server.';
+  const skillsPrompt =
+    'Follow the instructions at https://docs.temporal.io/with-ai.md to install skills with your current agent.';
+
   const cookbooks: ResourceLink[] = [
     {
       name: 'AI Cookbooks',
@@ -217,8 +261,26 @@
     },
   ];
 
-  const { copy: copyHarness, copied: copiedHarness } = copyToClipboard();
-  const { copy: copySkill, copied: copiedSkill } = copyToClipboard();
+  const featureCardClasses = twJoin(
+    'relative isolate flex flex-col gap-6 rounded-lg border bg-surface-primary p-6 md:p-8',
+    'min-[1440px]:grid min-[1440px]:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] min-[1440px]:grid-rows-[1fr_auto_auto_1fr] min-[1440px]:gap-x-8 min-[1440px]:gap-y-0',
+    'min-[1800px]:row-span-3 min-[1800px]:grid-cols-1 min-[1800px]:grid-rows-subgrid min-[1800px]:gap-y-6',
+  );
+  const featureContentClasses =
+    'min-[1440px]:col-start-1 min-[1440px]:row-start-2 min-[1800px]:row-start-1';
+  const featureMediaClasses = twJoin(
+    'w-full min-w-0 rounded-lg bg-surface-secondary',
+    'min-[1440px]:col-start-2 min-[1440px]:row-span-4 min-[1440px]:row-start-1 min-[1440px]:self-center',
+    'min-[1800px]:col-start-1 min-[1800px]:row-span-1 min-[1800px]:row-start-2 min-[1800px]:self-stretch',
+  );
+  const featureMediaCenteredClasses = twJoin(
+    featureMediaClasses,
+    'min-[1800px]:flex min-[1800px]:flex-col min-[1800px]:justify-center',
+  );
+  const featureActionsClasses = twJoin(
+    'mt-auto flex flex-wrap items-center gap-2',
+    'min-[1440px]:col-start-1 min-[1440px]:row-start-3 min-[1440px]:mt-6 min-[1800px]:mt-0',
+  );
 
   let agentHarnessVideo: HTMLVideoElement;
   let agentHarnessDemoStarted = $state(false);
@@ -233,167 +295,163 @@
     agentHarnessDemoStarted = false;
     agentHarnessVideo.load();
   };
-
-  const copyHarnessPrompt = (event: MouseEvent) => {
-    const prompt =
-      'Follow the installation instructions at https://github.com/temporal-community/temporal-agent-harness to clone the project on the latest stable release and help me get all of the examples up and running.';
-    copyHarness(event, prompt);
-  };
-
-  const copySkillPrompt = (event: MouseEvent) => {
-    const prompt =
-      'Follow the instructions at https://docs.temporal.io/with-ai.md to install skills with your current agent.';
-    copySkill(event, prompt);
-  };
 </script>
 
 <div
-  class="agents-page surface-background min-h-full flex-none overflow-x-hidden"
+  class="agents-page min-h-full flex-none space-y-4 overflow-x-hidden md:space-y-8"
 >
-  <header class="pb-4 text-base font-medium"><p>Agents</p></header>
-  <div class="w-full">
-    <div
-      class="grid w-full items-start gap-5 min-[1400px]:grid-cols-[minmax(0,1fr)_18.4375rem]"
-    >
-      <div class="min-w-0 space-y-5">
-        <section
-          class="border-subtle overflow-hidden rounded-lg border bg-surface-primary p-6 md:p-8"
-          aria-labelledby="agents-heading"
-        >
-          <div class="mb-8 space-y-1 md:mb-12">
-            <h2 id="agents-heading">Build Durable AI Agents on Temporal</h2>
-            <p class="text-sm leading-5 text-secondary">
-              Orchestrate your workflows, AI apps, and agents across any models,
-              tools, systems, and length of time.
-            </p>
+  <header>
+    <h1>Agents</h1>
+    <p class="text-sm text-secondary">
+      Build durable AI agents on Temporal that survive failures and run for as
+      long as the work takes, with any model or tool.
+    </p>
+  </header>
+
+  <div
+    class="grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_20rem] min-[1800px]:grid-cols-1"
+  >
+    <div class="grid gap-5 min-[1800px]:grid-cols-3">
+      <section class={featureCardClasses} aria-labelledby="harness-heading">
+        <FeatureCardBackground stage="experimental" />
+        <div class={featureContentClasses}>
+          <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <h2 id="harness-heading">Agent Harness</h2>
+            <Badge colorScheme="warning" text="EXPERIMENTAL"></Badge>
           </div>
-
-          <div class="grid items-start gap-8 lg:grid-cols-2 lg:justify-between">
-            <div class="max-w-[25rem]">
-              <Badge colorScheme="warning" text="EXPERIMENTAL"></Badge>
-              <div class="mt-2 space-y-4">
-                <div class="space-y-1">
-                  <h3>Temporal Agent Harness</h3>
-                  <p class="text-base leading-6 text-secondary">
-                    A durable agent harness and a matching session UI in one
-                    repo. The harness adds durable turns, tool-approval
-                    policies, and a structured AgentEvents stream; the UI reads
-                    that stream and shows your agents in agent language, turns,
-                    messages, tool calls, sub-agents, and live operational
-                    state.
-                  </p>
-                </div>
-                <div class="flex flex-col gap-2 md:flex-row md:items-center">
-                  <Button
-                    href="https://github.com/temporal-community/temporal-agent-harness"
-                    target="_blank"
-                    size="xs"
-                    aria-label="Open Agent Harness"
-                  >
-                    Go to Github
-                  </Button>
-                  <Button
-                    class="font-mono text-primary"
-                    variant="secondary"
-                    size="xs"
-                    aria-label={$copiedHarness
-                      ? 'Harness prompt copied'
-                      : 'Copy harness prompt'}
-                    title={$copiedHarness
-                      ? 'Harness prompt copied'
-                      : 'Copy harness prompt'}
-                    onclick={copyHarnessPrompt}
-                  >
-                    Install harness with your coding agent
-                    {#if $copiedHarness}
-                      <IconCheckmark class="size-3" />
-                    {:else}
-                      <IconCopy class="size-3" />
-                    {/if}
-                  </Button>
-                </div>
-              </div>
-            </div>
-
-            <figure
-              class="border-subtle bg-code-block relative aspect-[812/480] min-w-0 overflow-hidden rounded-lg border"
+          <p class="mt-1 text-base text-secondary">
+            A durable agent harness and a matching session UI in one repo. The
+            harness adds durable turns, tool-approval policies, and a structured
+            AgentEvents stream; the UI reads that stream and shows your agents
+            in agent language, turns, messages, tool calls, sub-agents, and live
+            operational state.
+          </p>
+        </div>
+        <figure class={[featureMediaClasses, 'p-2']}>
+          <div
+            class="relative aspect-[812/480] overflow-hidden rounded min-[1800px]:aspect-auto min-[1800px]:h-full"
+          >
+            <video
+              id="agent-harness-demo"
+              bind:this={agentHarnessVideo}
+              class="absolute inset-0 size-full object-cover min-[1800px]:object-contain"
+              poster={agentHarnessPreview}
+              preload="metadata"
+              playsinline
+              controls={agentHarnessDemoStarted}
+              aria-label="Agent Harness session UI demo showing agent events and execution state"
+              onplay={() => (agentHarnessDemoStarted = true)}
+              onended={resetAgentHarnessDemo}
             >
-              <video
-                id="agent-harness-demo"
-                bind:this={agentHarnessVideo}
-                class="absolute inset-0 size-full object-cover"
-                poster={agentHarnessPreview}
-                preload="metadata"
-                playsinline
-                controls={agentHarnessDemoStarted}
-                aria-label="Temporal Agent Harness session UI demo showing agent events and execution state"
-                onplay={() => (agentHarnessDemoStarted = true)}
-                onended={resetAgentHarnessDemo}
+              <source src={agentHarnessDemo} type="video/mp4" />
+            </video>
+            {#if !agentHarnessDemoStarted}
+              <Button
+                class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white"
+                onclick={playAgentHarnessDemo}
+                variant="tertiary"
+                size="sm"
+                aria-controls="agent-harness-demo"
+                LeadingIcon={IconPlay}
               >
-                <source src={agentHarnessDemo} type="video/mp4" />
-              </video>
-              {#if !agentHarnessDemoStarted}
-                <Button
-                  class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white"
-                  onclick={playAgentHarnessDemo}
-                  variant="tertiary"
-                  size="md"
-                  aria-controls="agent-harness-demo"
-                  aria-label="Play the Temporal Agent Harness demo"
-                  LeadingIcon={IconPlay}
-                >
-                  Watch Demo
-                </Button>
-              {/if}
-            </figure>
+                Watch Demo <span class="sr-only">of the Agent Harness</span>
+              </Button>
+            {/if}
           </div>
-        </section>
-
-        <div class="grid gap-5 md:grid-cols-[1.049fr_1fr]">
-          <section
-            class="border-subtle flex min-h-[20.75rem] flex-col rounded-lg border bg-surface-primary p-6 md:p-8"
-            aria-labelledby="skills-heading"
-          >
-            <h2 id="skills-heading">Temporal Skills</h2>
-            <p class="my-4 text-base leading-6 text-secondary">
-              Install the Developer, Ops, Serverless, Cloud and Cloud Setup
-              skills in the assistant you already code with, and point it at the
-              knowledgebase for answers grounded in Temporal docs.
-            </p>
+        </figure>
+        <div class={featureActionsClasses}>
+          <CopyPromptButton
+            label="Install harness with your agent"
+            title="Copy harness prompt"
+            prompt={harnessPrompt}
+          />
+          <span class="inline-flex shrink-0 rounded bg-surface-primary">
             <Button
-              class="font-mono text-primary"
-              variant="secondary"
-              size="xs"
-              aria-label={$copiedSkill
-                ? 'Install skill prompt copied'
-                : 'Copy install skill prompt'}
-              title={$copiedSkill
-                ? 'Install skill prompt copied'
-                : 'Copy install skill prompt'}
-              onclick={copySkillPrompt}
+              href="https://github.com/temporal-community/temporal-agent-harness"
+              target="_blank"
+              variant="tertiary"
+              LeadingIcon={IconGithub}
+              size="sm"
             >
-              Install skills with your coding agent
-              {#if $copiedSkill}
-                <IconCheckmark class="size-3" />
-              {:else}
-                <IconCopy class="size-3" />
-              {/if}
+              GitHub <span class="sr-only">repository for Agent Harness</span>
             </Button>
-          </section>
+          </span>
+        </div>
+      </section>
 
-          <section
-            class="border-subtle min-h-[20.75rem] rounded-lg border bg-surface-primary p-6 md:p-8"
-            aria-labelledby="cookbooks-heading"
-          >
-            <h2 id="cookbooks-heading">Cookbooks and Demos</h2>
-            <p
-              class="mt-4 max-w-[25.125rem] text-base leading-6 text-secondary"
+      <section class={featureCardClasses} aria-labelledby="mcp-heading">
+        <FeatureCardBackground stage="pre-release" />
+        <div class={featureContentClasses}>
+          <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <h2 id="mcp-heading">MCP Server</h2>
+            <Badge colorScheme="info" text="PRE-RELEASE"></Badge>
+          </div>
+          <p class="mt-1 text-base text-secondary">
+            Ask your agent why a Workflow failed or is stuck, and let it find
+            out. It reads Event History, checks a Task Queue's pollers and
+            backlog, and searches runs with Visibility queries, with read-only
+            access to the Namespaces you choose.
+          </p>
+        </div>
+        <div class={[featureMediaCenteredClasses, 'p-2']}>
+          <McpExampleQuestions questions={mcpQuestions} />
+        </div>
+        <div class={featureActionsClasses}>
+          <CopyPromptButton
+            label="Install MCP server with your agent"
+            title="Copy MCP server prompt"
+            prompt={mcpPrompt}
+          />
+          <span class="inline-flex shrink-0 rounded bg-surface-primary">
+            <Button
+              href="https://github.com/temporalio/temporal-mcp"
+              target="_blank"
+              variant="tertiary"
+              LeadingIcon={IconGithub}
+              size="sm"
             >
-              Recipes for the pieces of an agent, and full demos you can clone
-              and run end to end.
-            </p>
-            <div class="mt-4 flex flex-col items-start gap-4">
-              {#each cookbooks as cookbook (cookbook.href)}
+              GitHub <span class="sr-only">repository for MCP Server</span>
+            </Button>
+          </span>
+        </div>
+      </section>
+
+      <section class={featureCardClasses} aria-labelledby="skills-heading">
+        <FeatureCardBackground />
+        <div class={featureContentClasses}>
+          <h2 id="skills-heading">Skills</h2>
+          <p class="mt-1 text-base text-secondary">
+            Install the Developer, Ops, Serverless, Cloud and Cloud Setup skills
+            in the assistant you already code with, and point it at the
+            knowledgebase for answers grounded in Temporal docs.
+          </p>
+        </div>
+        <SkillsTerminal class={featureMediaCenteredClasses} {skills} />
+        <div class={featureActionsClasses}>
+          <CopyPromptButton
+            label="Install skills with your agent"
+            title="Copy skills prompt"
+            prompt={skillsPrompt}
+          />
+        </div>
+      </section>
+    </div>
+
+    <section
+      class="rounded-lg border bg-surface-primary p-6 md:p-8"
+      aria-labelledby="resources-heading"
+    >
+      <h2 id="resources-heading">Resources</h2>
+      <div
+        class="mt-4 grid gap-8 min-[1800px]:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]"
+      >
+        <div>
+          <h3 class="text-base text-secondary">
+            Cookbooks, Demos and Articles
+          </h3>
+          <ul class="mt-3 flex flex-col items-start gap-3 leading-5">
+            {#each cookbooks as cookbook (cookbook.href)}
+              <li>
                 <Link
                   href={cookbook.href}
                   aria-label={'Open ' + cookbook.name + ' cookbook'}
@@ -401,65 +459,47 @@
                 >
                   {cookbook.name}
                 </Link>
-              {/each}
-            </div>
-          </section>
+              </li>
+            {/each}
+            <li>
+              <Link href="https://temporal.io/blog?query=agent" newTab>
+                Agent articles on the Temporal blog
+              </Link>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-base text-secondary">Integrations</h3>
+          <ul
+            class="mt-3 grid gap-x-6 gap-y-3 sm:grid-cols-2 xl:grid-cols-1 min-[1800px]:grid-cols-3"
+          >
+            {#each integrations as integration (integration.name)}
+              <li class="min-w-0">
+                <Link
+                  href={integration.links[0].href}
+                  class="flex gap-3"
+                  newTab
+                  aria-label={'Open ' + integration.name + ' integration'}
+                >
+                  <span
+                    class="relative size-5 shrink-0 overflow-hidden"
+                    aria-hidden="true"
+                  >
+                    <img
+                      class="absolute inset-0 size-5 object-contain invert dark:invert-0"
+                      src={integration.logo}
+                      alt=""
+                    />
+                  </span>
+                  <span class="min-w-0 break-words text-sm leading-5"
+                    >{integration.name}</span
+                  >
+                </Link>
+              </li>
+            {/each}
+          </ul>
         </div>
       </div>
-
-      <div class="space-y-5 self-start min-[1400px]:sticky">
-        <aside
-          id="integrations"
-          class="border-subtle rounded-lg border bg-surface-primary p-6 md:p-8"
-          aria-labelledby="integrations-heading"
-        >
-          <h2 id="integrations-heading">Integrations</h2>
-          <div class="mt-4 space-y-4">
-            {#each integrations as integration (integration.name)}
-              <Link
-                href={integration.links[0].href}
-                class="flex gap-4"
-                newTab
-                aria-label={'Open ' + integration.name + ' integration'}
-              >
-                <span
-                  class="relative size-5 shrink-0 overflow-hidden"
-                  aria-hidden="true"
-                >
-                  <img
-                    class="absolute inset-0 size-5 object-contain invert dark:invert-0"
-                    src={integration.logo}
-                    alt=""
-                  />
-                </span>
-                <span class="min-w-0 truncate text-sm leading-5"
-                  >{integration.name}</span
-                >
-              </Link>
-            {/each}
-          </div>
-        </aside>
-
-        <section
-          class="border-subtle rounded-lg border bg-surface-primary p-6 md:p-8"
-          aria-labelledby="blog-heading"
-        >
-          <h2 id="blog-heading">Blog</h2>
-          <article class="mt-4 flex flex-col items-start gap-4">
-            <p class="text-base leading-6 text-secondary">
-              Read practical guidance and ideas for building reliable agents
-              with durable execution.
-            </p>
-            <Link
-              href="https://temporal.io/blog?query=agent"
-              newTab
-              aria-label="Browse Temporal blog posts about AI agents"
-            >
-              Browse agent articles
-            </Link>
-          </article>
-        </section>
-      </div>
-    </div>
+    </section>
   </div>
 </div>
