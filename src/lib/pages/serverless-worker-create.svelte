@@ -25,6 +25,7 @@
   import {
     type ComputeProviderConfig,
     configuredRegions,
+    credentialOverrides,
     deployRegionsFor,
   } from '$lib/utilities/compute-provider-config';
   import { routeForWorkers } from '$lib/utilities/route-for';
@@ -49,6 +50,7 @@
 
   const computeProviders = $derived(providerConfig?.providers);
   const gcpRegions = $derived(deployRegionsFor(providerConfig, 'cloud-run'));
+  const credentials = $derived(credentialOverrides(providerConfig));
   const namespaceRegions = $derived(configuredRegions(providerConfig));
 
   const regions = $derived(
@@ -210,6 +212,7 @@
   {templates}
   {computeProviders}
   {gcpRegions}
+  {credentials}
   {regions}
   {namespace}
 />

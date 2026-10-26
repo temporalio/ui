@@ -14,6 +14,7 @@
     type ComputeProviderTemplates,
     type ComputeProviderValue,
   } from './compute-providers';
+  import type { ComputeSection } from './fields/types';
   import { revealFirstProblem } from './motion';
   import {
     type ComputeRegion,
@@ -53,6 +54,8 @@
     computeProviders?: readonly ComputeProviderOption[];
     initialProvider?: ComputeProviderOption['value'];
     gcpRegions?: string[];
+    /** Credential components supplied by the consumer, keyed by provider. */
+    credentials?: Partial<Record<ComputeProviderValue, ComputeSection>>;
     /**
      * The templates offered per provider. Defaults to the ones bundled here,
      * which is what a self-hosted deployment wants. A consumer overrides them
@@ -80,6 +83,7 @@
     computeProviders,
     initialProvider,
     gcpRegions,
+    credentials,
     templates,
     regions,
     namespace = '',
@@ -209,6 +213,7 @@
           {namespace}
           {regions}
           {computeProviders}
+          {credentials}
           {deploymentName}
           buildId={$form.buildId}
           bind:regionValues
@@ -242,6 +247,7 @@
               regions?.[0]?.providerRegion,
             )}
             {gcpRegions}
+            {credentials}
             {templates}
             errors={$errors}
           />

@@ -9,6 +9,7 @@
   import { translate } from '$lib/i18n/translate';
 
   import { type ComputeProviderTemplates } from './compute-providers';
+  import type { ComputeSection } from './fields/types';
   import { revealFirstProblem } from './motion';
   import {
     type ComputeRegion,
@@ -52,6 +53,8 @@
     error?: string;
     computeProviders?: readonly ComputeProviderOption[];
     gcpRegions?: string[];
+    /** Credential components supplied by the consumer, keyed by provider. */
+    credentials?: Partial<Record<ComputeProviderValue, ComputeSection>>;
     /**
      * The templates offered per provider. Defaults to the ones bundled here,
      * which is what a self-hosted deployment wants. A consumer overrides them
@@ -83,6 +86,7 @@
     error,
     computeProviders,
     gcpRegions,
+    credentials,
     templates,
     regions,
     namespace = '',
@@ -188,6 +192,7 @@
           {namespace}
           {regions}
           {computeProviders}
+          {credentials}
           {deploymentName}
           {buildId}
           bind:regionValues
@@ -223,6 +228,7 @@
               regions?.[0]?.providerRegion,
             )}
             {gcpRegions}
+            {credentials}
             {templates}
             errors={$errors}
           />
