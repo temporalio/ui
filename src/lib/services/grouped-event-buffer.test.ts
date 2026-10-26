@@ -1321,6 +1321,40 @@ describe('arrival-order independence', () => {
     { activityId: '1', state: 'Started', activityType: 'Act' },
   ] as Parameters<typeof setPendingMetadata>[0];
 
+  it('marks a scheduled activity pending before the workflow refresh supplies metadata', () => {
+    const [scheduled, started, completed] = makeActivityGroup(1);
+    ingestHistoryEvent(scheduled);
+    setPendingMetadata([], []);
+
+    const [lazy] = getLazyGroups();
+    const scheduledGroup = materializeGroup(lazy);
+    expect(lazy.isPending).toBe(true);
+    expect(scheduledGroup.isPending).toBe(true);
+    expect(scheduledGroup.pendingActivity).toBeUndefined();
+
+    setPendingMetadata(pending, []);
+    expect(lazy.isPending).toBe(true);
+    expect(materializeGroup(lazy).isPending).toBe(true);
+    expect(materializeGroup(lazy).pendingActivity).toBe(pending[0]);
+
+    ingestHistoryEvent(started);
+    ingestHistoryEvent(completed);
+    expect(lazy.isPending).toBe(false);
+    expect(materializeGroup(lazy).isPending).toBe(false);
+  });
+
+  it('clears inferred pending state when an activity times out before starting', () => {
+    ingestHistoryEvent(makeActivityScheduled(1));
+    const [lazy] = getLazyGroups();
+    const scheduledGroup = materializeGroup(lazy);
+    expect(scheduledGroup.isPending).toBe(true);
+
+    ingestHistoryEvent(makeActivityTimedOut(2, 1));
+    expect(lazy.isPending).toBe(false);
+    expect(materializeGroup(lazy).isPending).toBe(false);
+    expect(materializeGroup(lazy)).not.toBe(scheduledGroup);
+  });
+
   it('drops pending metadata when the completion arrives after enrich', () => {
     reset(10);
     const [scheduled, started, completed] = makeActivityGroup(1);

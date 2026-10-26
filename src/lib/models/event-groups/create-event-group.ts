@@ -47,6 +47,8 @@ export const groupIsPending = (
 ): boolean =>
   !!pendingActivity ||
   !!pendingNexusOperation ||
+  // History can deliver the scheduled event before the run's pending metadata.
+  (isActivityTaskScheduledEvent(head) && eventCount === 1) ||
   (isTimerStartedEvent(head) && eventCount === 1) ||
   (isStartChildWorkflowExecutionInitiatedEvent(head) && eventCount === 2);
 

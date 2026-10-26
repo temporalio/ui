@@ -20,18 +20,19 @@ import { catalogExample as example12 } from './pending-activities/example.js';
 import { catalogExample as example13 } from './pending-nexus/example.js';
 import { catalogExample as example14 } from './priority-fairness/example.js';
 import { catalogExample as example15 } from './satellite-launch-event-groups/example.js';
-import { catalogExample as example16 } from './sequential-activities/example.js';
-import { catalogExample as example17 } from './sequential-markdown-activities/example.js';
-import { catalogExample as example18 } from './sequential-multiline-summary-activities/example.js';
-import { catalogExample as example19 } from './sequential-no-summary-activities/example.js';
-import { catalogExample as example20 } from './sequential-plain-text-activities/example.js';
-import { catalogExample as example21 } from './signal-collector/example.js';
-import { catalogExample as example22 } from './signal-handlers/example.js';
-import { catalogExample as example23 } from './slow-nexus-operation/example.js';
-import { catalogExample as example24 } from './standalone-activity/example.js';
-import { catalogExample as example25 } from './timer-driven-repetition/example.js';
-import { catalogExample as example26 } from './workflow-feature-tour/example.js';
-import { catalogExample as example27 } from './workflow-patching/example.js';
+import { catalogExample as example16 } from './scheduled-activity-timeline/example.js';
+import { catalogExample as example17 } from './sequential-activities/example.js';
+import { catalogExample as example18 } from './sequential-markdown-activities/example.js';
+import { catalogExample as example19 } from './sequential-multiline-summary-activities/example.js';
+import { catalogExample as example20 } from './sequential-no-summary-activities/example.js';
+import { catalogExample as example21 } from './sequential-plain-text-activities/example.js';
+import { catalogExample as example22 } from './signal-collector/example.js';
+import { catalogExample as example23 } from './signal-handlers/example.js';
+import { catalogExample as example24 } from './slow-nexus-operation/example.js';
+import { catalogExample as example25 } from './standalone-activity/example.js';
+import { catalogExample as example26 } from './timer-driven-repetition/example.js';
+import { catalogExample as example27 } from './workflow-feature-tour/example.js';
+import { catalogExample as example28 } from './workflow-patching/example.js';
 
 const sharedWorkflowDefinitions = [
   example0,
@@ -62,6 +63,7 @@ const sharedWorkflowDefinitions = [
   example25,
   example26,
   example27,
+  example28,
 ] satisfies readonly CatalogExampleDefinition[];
 
 export const sharedWorkflowExamples: readonly CatalogExampleRegistration[] =
@@ -146,6 +148,9 @@ export const sharedWorkflowSourceFiles = [
   'src/lib/catalog/worker/examples/satellite-launch-event-groups/activity.ts',
   'src/lib/catalog/worker/examples/satellite-launch-event-groups/example.ts',
   'src/lib/catalog/worker/examples/satellite-launch-event-groups/workflow.ts',
+  'src/lib/catalog/worker/examples/scheduled-activity-timeline/activity.ts',
+  'src/lib/catalog/worker/examples/scheduled-activity-timeline/example.ts',
+  'src/lib/catalog/worker/examples/scheduled-activity-timeline/workflow.ts',
   'src/lib/catalog/worker/examples/sequential-activities/example.ts',
   'src/lib/catalog/worker/examples/sequential-activities/workflow.ts',
   'src/lib/catalog/worker/examples/sequential-markdown-activities/activities.ts',
