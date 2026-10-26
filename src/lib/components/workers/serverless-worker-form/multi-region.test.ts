@@ -6,6 +6,7 @@ import {
   regionServerErrors,
   replicaRegionFor,
   resourceRegion,
+  scalingGroupsToRemove,
   shortResourceName,
   splitHighAvailabilityGroups,
   suggestRegionalArn,
@@ -298,5 +299,42 @@ describe('splitHighAvailabilityGroups', () => {
     );
     expect(primary?.name).toBe('default');
     expect(replica).toBeUndefined();
+  });
+});
+
+describe('scalingGroupsToRemove', () => {
+  const config = (...names: string[]) => ({
+    scalingGroups: Object.fromEntries(names.map((name) => [name, {}])),
+  });
+
+  it("removes a third group, so the saved config has only the form's two", () => {
+    expect(
+      scalingGroupsToRemove(
+        config('default', 'aws-us-east-1', 'aws-us-west-2'),
+        config('default', 'aws-us-west-2'),
+      ),
+    ).toEqual(['aws-us-east-1']);
+  });
+
+  it('removes every scoped group when high availability is turned off', () => {
+    expect(
+      scalingGroupsToRemove(
+        config('default', 'aws-us-east-1', 'aws-us-west-2'),
+        config('default'),
+      ),
+    ).toEqual(['aws-us-east-1', 'aws-us-west-2']);
+  });
+
+  it('replaces a primary saved under a region name with default', () => {
+    expect(
+      scalingGroupsToRemove(
+        config('aws-us-east-1', 'aws-us-west-2'),
+        config('default', 'aws-us-west-2'),
+      ),
+    ).toEqual(['aws-us-east-1']);
+  });
+
+  it('removes nothing from a Version with no saved config', () => {
+    expect(scalingGroupsToRemove(undefined, config('default'))).toEqual([]);
   });
 });
