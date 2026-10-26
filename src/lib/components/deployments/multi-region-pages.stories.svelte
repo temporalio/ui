@@ -115,10 +115,10 @@
     regions:
       namespace === 'multi'
         ? [
-            { regionId: EAST, role: 'primary', label: 'us-east-1' },
-            { regionId: WEST, role: 'replica', label: 'us-west-2' },
+            { regionId: EAST, role: 'primary', providerRegion: 'us-east-1' },
+            { regionId: WEST, role: 'replica', providerRegion: 'us-west-2' },
           ]
-        : [{ regionId: EAST, role: 'primary', label: 'us-east-1' }],
+        : [{ regionId: EAST, role: 'primary', providerRegion: 'us-east-1' }],
   });
 
   /** What the deployment pages derive from the config. */

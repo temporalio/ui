@@ -29,12 +29,14 @@ export interface ComputeRegion {
    */
   id: string;
   role?: ComputeRegionRole;
-  /**
-   * What to show, and the Region segment of a regional resource like a Lambda
-   * ARN. Defaults to `id`. Whoever supplies the identifier owns its format and
-   * so supplies the short form; this repo does not split it.
-   */
+  /** What to show. Defaults to `id`. */
   label?: string;
+  /**
+   * The Region segment of a regional resource like a Lambda ARN. Whoever
+   * supplies the identifier owns its format and so supplies this; this repo
+   * does not split it.
+   */
+  providerRegion?: string;
   /** The compute provider for this region, derived from the region's cloud. */
   provider: ComputeProviderValue;
 }
@@ -50,10 +52,11 @@ export const computeRegionsFor = (
 ): ComputeRegion[] =>
   [...namespaceRegions]
     .sort((a, b) => Number(b.role === 'primary') - Number(a.role === 'primary'))
-    .map(({ regionId, role = 'replica', label }) => ({
+    .map(({ regionId, role = 'replica', label, providerRegion }) => ({
       id: regionId,
       role,
       label,
+      providerRegion,
       provider,
     }));
 
@@ -207,16 +210,16 @@ export const resourceRegion = (
 };
 
 /**
- * The offered replica region a resource runs in. Matched on the label, which
- * is the provider's own name for the region, so this repo never builds a
- * region id from a resource.
+ * The offered replica region a resource runs in. Matched on the provider's
+ * own name for the region, so this repo never builds a region id from a
+ * resource.
  */
 export const replicaRegionFor = (
   region: string | undefined,
   options: readonly ComputeRegion[],
 ): ComputeRegion | undefined =>
   region
-    ? options.find(({ label, id }) => (label ?? id) === region)
+    ? options.find(({ providerRegion }) => providerRegion === region)
     : undefined;
 
 /**

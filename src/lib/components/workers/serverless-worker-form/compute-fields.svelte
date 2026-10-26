@@ -221,7 +221,7 @@
   </p>
 
   {#if provider === 'lambda'}
-    <div class="flex flex-wrap items-start gap-4 [&>:not(:first-child)]:mt-6">
+    <div class="flex flex-wrap items-start gap-4 [&>:not(:first-child)]:mt-7">
       <Input
         bind:value={lambdaArn}
         id={fieldId('lambdaArn')}
@@ -245,7 +245,7 @@
       </Button>
     </div>
   {:else if provider === 'agentcore'}
-    <div class="flex flex-wrap items-start gap-4 [&>:not(:first-child)]:mt-6">
+    <div class="flex flex-wrap items-start gap-4 [&>:not(:first-child)]:mt-7">
       <Input
         bind:value={agentCoreEndpointArn}
         id={fieldId('agentCoreEndpointArn')}
@@ -296,7 +296,7 @@
         showChevron
         required
       />
-      <div class="flex flex-wrap items-start gap-4 [&>:not(:first-child)]:mt-6">
+      <div class="flex flex-wrap items-start gap-4 [&>:not(:first-child)]:mt-7">
         <Input
           bind:value={gcpWorkerPool}
           id={fieldId('gcpWorkerPool')}

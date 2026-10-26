@@ -249,7 +249,9 @@
           <ComputeFields
             provider={$form.provider}
             leadingDivider={false}
-            lambdaArnPlaceholder={lambdaArnPlaceholderFor(regions?.[0]?.label)}
+            lambdaArnPlaceholder={lambdaArnPlaceholderFor(
+              regions?.[0]?.providerRegion,
+            )}
             bind:lambdaArn={$form.lambdaArn}
             bind:agentCoreEndpointArn={$form.agentCoreEndpointArn}
             bind:iamRoleArn={$form.iamRoleArn}

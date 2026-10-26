@@ -59,17 +59,20 @@ export type ComputeRegionRole = 'primary' | 'replica';
 export interface NamespaceRegion {
   regionId: string;
   role?: ComputeRegionRole;
+  /** What to show for this region. Defaults to `regionId`. */
+  label?: string;
   /**
-   * What to show for this region. Defaults to `regionId`.
+   * The compute provider's own name for this region, such as `us-west-2` for
+   * Temporal Cloud's `aws-us-west-2`. The form puts it in suggested ARNs and
+   * suggests nothing without it.
    *
    * This repo does not parse a region identifier, because it does not own the
-   * format. Temporal Cloud spells one `aws-us-west-2` and would rather show
-   * `us-west-2`; a self-hosted cluster is named whatever its operator named
-   * it, and splitting that on a hyphen turns `us-east-1` into `east-1`.
-   * Whoever supplies the identifier knows how to shorten it, so they supply
-   * the label too.
+   * format: a self-hosted cluster is named whatever its operator named it, and
+   * splitting that on a hyphen turns `us-east-1` into `east-1`. Whoever
+   * supplies the identifier knows the provider's name for it, so they supply
+   * it too.
    */
-  label?: string;
+  providerRegion?: string;
 }
 
 /**
