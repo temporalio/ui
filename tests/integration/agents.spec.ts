@@ -46,7 +46,7 @@ test('shows the agents resource hub', async ({ page }) => {
   ).toBeVisible();
   await expect(
     page.getByRole('heading', {
-      name: 'Cookbooks, Demos and Articles',
+      name: 'Cookbooks and Demos',
       level: 3,
     }),
   ).toBeVisible();

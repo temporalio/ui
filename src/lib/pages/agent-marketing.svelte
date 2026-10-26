@@ -309,7 +309,7 @@
   </header>
 
   <div
-    class="grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_20rem] min-[1800px]:grid-cols-1"
+    class="grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_18rem] min-[1800px]:grid-cols-1"
   >
     <div class="grid gap-5 min-[1800px]:grid-cols-3">
       <section class={featureCardClasses} aria-labelledby="harness-heading">
@@ -443,12 +443,10 @@
     >
       <h2 id="resources-heading">Resources</h2>
       <div
-        class="mt-4 grid gap-8 min-[1800px]:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]"
+        class="mt-4 grid gap-8 min-[1800px]:grid-cols-[minmax(0,1fr)_minmax(0,2fr)_minmax(0,1fr)]"
       >
         <div>
-          <h3 class="text-base text-secondary">
-            Cookbooks, Demos and Articles
-          </h3>
+          <h3 class="text-base text-secondary">Cookbooks and Demos</h3>
           <ul class="mt-3 flex flex-col items-start gap-3 leading-5">
             {#each cookbooks as cookbook (cookbook.href)}
               <li>
@@ -461,11 +459,6 @@
                 </Link>
               </li>
             {/each}
-            <li>
-              <Link href="https://temporal.io/blog?query=agent" newTab>
-                Agent articles on the Temporal blog
-              </Link>
-            </li>
           </ul>
         </div>
         <div>
@@ -498,6 +491,14 @@
               </li>
             {/each}
           </ul>
+        </div>
+        <div>
+          <h3 class="text-base text-secondary">Blog</h3>
+          <p class="mt-3 leading-5">
+            <Link href="https://temporal.io/blog?query=agent" newTab>
+              Agents on Temporal Blog
+            </Link>
+          </p>
         </div>
       </div>
     </section>
