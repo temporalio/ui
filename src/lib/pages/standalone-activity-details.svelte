@@ -46,6 +46,14 @@
       ?.nextRetryDelay,
   );
 
+  const hasPrincipals = $derived(
+    [
+      $activityExecution?.info?.startedByPrincipal,
+      $activityExecution?.info?.lastWorkerPrincipal,
+      $activityExecution?.info?.closedByPrincipal,
+    ].some((principal) => principal?.nameAtWriteTime),
+  );
+
   const hasCodeBlocks = $derived(
     !!(
       $activityExecution?.info?.lastFailure ||
@@ -356,29 +364,31 @@
           </DetailList>
         </div>
 
-        <div class="space-y-2">
-          <h5>
-            {translate('standalone-activities.principals')}
-          </h5>
-          <DetailList
-            rowCount={3}
-            aria-label={translate('standalone-activities.principals')}
-          >
-            {@render principal(
-              translate('standalone-activities.started-by'),
-              $activityExecution.info.startedByPrincipal,
-            )}
-            {@render principal(
-              translate('standalone-activities.last-worker'),
-              $activityExecution.info.lastWorkerPrincipal,
-              $activityExecution.info.lastWorkerIdentity,
-            )}
-            {@render principal(
-              translate('standalone-activities.closed-by'),
-              $activityExecution.info.closedByPrincipal,
-            )}
-          </DetailList>
-        </div>
+        {#if hasPrincipals}
+          <div class="space-y-2">
+            <h5>
+              {translate('standalone-activities.principals')}
+            </h5>
+            <DetailList
+              rowCount={3}
+              aria-label={translate('standalone-activities.principals')}
+            >
+              {@render principal(
+                translate('standalone-activities.started-by'),
+                $activityExecution.info.startedByPrincipal,
+              )}
+              {@render principal(
+                translate('standalone-activities.last-worker'),
+                $activityExecution.info.lastWorkerPrincipal,
+                $activityExecution.info.lastWorkerIdentity,
+              )}
+              {@render principal(
+                translate('standalone-activities.closed-by'),
+                $activityExecution.info.closedByPrincipal,
+              )}
+            </DetailList>
+          </div>
+        {/if}
 
         <div class="space-y-2">
           <h5>
