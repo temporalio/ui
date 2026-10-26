@@ -43,6 +43,11 @@
     gcpRegions?: string[];
     gcpWorkerPool?: string;
     gcpServiceAccount?: string;
+    modalAppName?: string;
+    modalFunctionName?: string;
+    modalEnvironment?: string;
+    modalWorkspaceId?: string;
+    modalVersion?: string;
     minReplicas?: number;
     maxReplicas?: number;
     initialReplicas?: number;
@@ -77,6 +82,11 @@
       gcpRegion?: string[];
       gcpWorkerPool?: string[];
       gcpServiceAccount?: string[];
+      modalAppName?: string[];
+      modalFunctionName?: string[];
+      modalEnvironment?: string[];
+      modalWorkspaceId?: string[];
+      modalVersion?: string[];
       minReplicas?: string[];
       maxReplicas?: string[];
       initialReplicas?: string[];
@@ -100,6 +110,11 @@
     gcpRegions = [...GCP_REGIONS],
     gcpWorkerPool = $bindable(''),
     gcpServiceAccount = $bindable(''),
+    modalAppName = $bindable(''),
+    modalFunctionName = $bindable(''),
+    modalEnvironment = $bindable(''),
+    modalWorkspaceId = $bindable(''),
+    modalVersion = $bindable(''),
     minReplicas = $bindable(0),
     maxReplicas = $bindable(30),
     initialReplicas = $bindable(0),
@@ -126,6 +141,11 @@
   // produce a role that cannot invoke a runtime, so the templates follow the
   // selected provider rather than being shared.
   const isAgentCore = $derived(provider === 'agentcore');
+  // Modal names no identity. The worker controller resolves its credentials --
+  // a Cloud account's OAuth grant, or the Modal SDK's own token on a
+  // self-hosted install -- so the Access section has nothing to collect and is
+  // dropped rather than shown empty.
+  const hasAccessFields = $derived(provider !== 'modal');
   // `provider` arrives as a form field, so it is a string until proven one of
   // ours. Narrowing here rather than asserting keeps an unrecognised value from
   // reading as a provider that happens to have no entry.
@@ -272,6 +292,79 @@
         {translate('workers.open-agentcore-console')}
       </Button>
     </div>
+  {:else if provider === 'modal'}
+    <div class="flex flex-col gap-4">
+      <div class="flex flex-wrap items-start gap-4 [&>:not(:first-child)]:mt-6">
+        <Input
+          bind:value={modalAppName}
+          id={fieldId('modalAppName')}
+          name={fieldId('modalAppName')}
+          spellcheck={false}
+          label={translate('workers.modal-app-name-label')}
+          hintText={errors.modalAppName?.[0] ||
+            translate('workers.modal-app-name-hint')}
+          error={!!errors.modalAppName?.[0]}
+          placeholder={translate('workers.modal-app-name-placeholder')}
+          required
+          class="flex-1"
+        />
+        <Button
+          variant="tertiary"
+          type="button"
+          href="https://modal.com/apps"
+          target="_blank"
+          TrailingIcon={IconExternalLinkOptical}
+        >
+          {translate('workers.open-modal-dashboard')}
+        </Button>
+      </div>
+      <Input
+        bind:value={modalFunctionName}
+        id={fieldId('modalFunctionName')}
+        name={fieldId('modalFunctionName')}
+        spellcheck={false}
+        label={translate('workers.modal-function-name-label')}
+        hintText={errors.modalFunctionName?.[0] ||
+          translate('workers.modal-function-name-hint')}
+        error={!!errors.modalFunctionName?.[0]}
+        placeholder={translate('workers.modal-function-name-placeholder')}
+        required
+      />
+      <Input
+        bind:value={modalEnvironment}
+        id={fieldId('modalEnvironment')}
+        name={fieldId('modalEnvironment')}
+        spellcheck={false}
+        label={translate('workers.modal-environment-label')}
+        hintText={errors.modalEnvironment?.[0] ||
+          translate('workers.modal-environment-hint')}
+        error={!!errors.modalEnvironment?.[0]}
+        placeholder={translate('workers.modal-environment-placeholder')}
+        required
+      />
+      <Input
+        bind:value={modalWorkspaceId}
+        id={fieldId('modalWorkspaceId')}
+        name={fieldId('modalWorkspaceId')}
+        spellcheck={false}
+        label={translate('workers.modal-workspace-id-label')}
+        hintText={errors.modalWorkspaceId?.[0] ||
+          translate('workers.modal-workspace-id-hint')}
+        error={!!errors.modalWorkspaceId?.[0]}
+        placeholder={translate('workers.modal-workspace-id-placeholder')}
+      />
+      <Input
+        bind:value={modalVersion}
+        id={fieldId('modalVersion')}
+        name={fieldId('modalVersion')}
+        spellcheck={false}
+        label={translate('workers.modal-version-label')}
+        hintText={errors.modalVersion?.[0] ||
+          translate('workers.modal-version-hint')}
+        error={!!errors.modalVersion?.[0]}
+        placeholder="0"
+      />
+    </div>
   {:else}
     <div class="flex flex-col gap-4">
       <Input
@@ -325,11 +418,11 @@
   {/if}
 {/if}
 
-{#if sections.includes('resource') && sections.includes('access')}
+{#if sections.includes('resource') && sections.includes('access') && hasAccessFields}
   <hr class="my-5 border-primary" />
 {/if}
 
-{#if sections.includes('access')}
+{#if sections.includes('access') && hasAccessFields}
   <h2 class="text-base font-medium">
     {translate('workers.access-section')}
   </h2>
@@ -430,7 +523,7 @@
         </Accordion>
       {/if}
     </div>
-  {:else}
+  {:else if provider === 'cloud-run'}
     <div class="flex flex-col gap-4">
       <Input
         bind:value={gcpServiceAccount}
@@ -482,7 +575,7 @@
   {/if}
 {/if}
 
-{#if (sections.includes('resource') || sections.includes('access')) && sections.includes('scaling')}
+{#if (sections.includes('resource') || (sections.includes('access') && hasAccessFields)) && sections.includes('scaling')}
   <hr class="my-5 border-primary" />
 {/if}
 

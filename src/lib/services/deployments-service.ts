@@ -444,23 +444,17 @@ type InvokeScalingOptions = {
 // the same role/external-id details. They differ only in the provider type and
 // the key naming the resource to invoke: `arn` for Lambda, `endpoint_arn` for
 // AgentCore.
-const buildInvokeComputeConfig = (
-  providerType: 'aws-lambda' | 'aws-agentcore',
-  resourceKey: 'arn' | 'endpoint_arn',
-  resourceArn: string,
-  iamRoleArn: string,
-  scalingOptions: InvokeScalingOptions = {},
-): ComputeConfig => {
-  const providerPayload: Record<string, string> = {
-    [resourceKey]: resourceArn,
-    role: iamRoleArn,
-  };
-  if (scalingOptions.roleExternalId)
-    providerPayload['role_external_id'] = scalingOptions.roleExternalId;
-  const providerJson = JSON.stringify(providerPayload);
-  const providerData = btoa(providerJson);
-  const encoding = btoa('json/plain');
+const JSON_PLAIN = btoa('json/plain');
 
+const encodeDetails = (payload: Record<string, unknown>) => ({
+  metadata: { encoding: JSON_PLAIN },
+  data: btoa(JSON.stringify(payload)),
+});
+
+// `no-sync` leaves the worker count to the provider and says only when to scale
+// up and how long a worker may live. Lambda, AgentCore and Modal all pair with
+// it; Cloud Run is rate-based and builds its own.
+const noSyncScaler = (scalingOptions: InvokeScalingOptions) => {
   const scalerConfig: Record<string, number> = {};
   if (scalingOptions.scaleUpCooloffMs !== undefined)
     scalerConfig['scale_up_cooloff_ms'] = scalingOptions.scaleUpCooloffMs;
@@ -475,21 +469,74 @@ const buildInvokeComputeConfig = (
   if (scalingOptions.metricsPollIntervalMs !== undefined)
     scalerConfig['metrics_poll_interval_ms'] =
       scalingOptions.metricsPollIntervalMs;
+  return { type: 'no-sync', details: encodeDetails(scalerConfig) };
+};
 
+const buildInvokeComputeConfig = (
+  providerType: 'aws-lambda' | 'aws-agentcore',
+  resourceKey: 'arn' | 'endpoint_arn',
+  resourceArn: string,
+  iamRoleArn: string,
+  scalingOptions: InvokeScalingOptions = {},
+): ComputeConfig => {
+  const providerPayload: Record<string, string> = {
+    [resourceKey]: resourceArn,
+    role: iamRoleArn,
+  };
+  if (scalingOptions.roleExternalId)
+    providerPayload['role_external_id'] = scalingOptions.roleExternalId;
   return {
     scalingGroups: {
       default: {
         provider: {
           type: providerType,
-          details: { metadata: { encoding }, data: providerData },
+          details: encodeDetails(providerPayload),
         },
-        scaler: {
-          type: 'no-sync',
-          details: {
-            metadata: { encoding },
-            data: btoa(JSON.stringify(scalerConfig)),
-          },
+        scaler: noSyncScaler(scalingOptions),
+      },
+    },
+  };
+};
+
+/**
+ * Modal, where the worker runs as a deployed Modal Function.
+ *
+ * Nothing here authenticates. The worker controller resolves credentials
+ * itself: Temporal Cloud reads the OAuth grant for the account and workspace,
+ * and a self-hosted install leaves it to the Modal SDK, which reads
+ * MODAL_TOKEN_ID/MODAL_TOKEN_SECRET or ~/.modal.toml the way the AWS and GCP
+ * providers let their SDKs find credentials. A key must never be written here:
+ * a compute config is readable by anyone who can read the Version.
+ *
+ * Keys match temporal-auto-scaled-workers wci/workflow/compute_provider/modal.go.
+ * `workspace_id` and `version` are omitted when blank, because the controller
+ * treats an absent workspace as "whatever the credential owns" and an absent
+ * version as the App's current deployment.
+ */
+export const buildModalComputeConfig = (
+  appName: string,
+  functionName: string,
+  environment: string,
+  workspaceId: string,
+  version: string,
+  scalingOptions: InvokeScalingOptions = {},
+): ComputeConfig => {
+  const providerPayload: Record<string, string> = {
+    app_name: appName,
+    function_name: functionName,
+    environment,
+  };
+  if (workspaceId) providerPayload['workspace_id'] = workspaceId;
+  if (version) providerPayload['version'] = version;
+
+  return {
+    scalingGroups: {
+      default: {
+        provider: {
+          type: 'modal-function',
+          details: encodeDetails(providerPayload),
         },
+        scaler: noSyncScaler(scalingOptions),
       },
     },
   };

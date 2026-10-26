@@ -25,24 +25,37 @@ const openCreateForm = async (page: Page) => {
   await page.goto(createUrl);
 };
 
+/**
+ * The picker opens summarised, showing only the chosen provider, so every
+ * assertion about the others has to reveal the list first.
+ */
+const openProviderPicker = async (page: Page) => {
+  await page.getByRole('button', { name: 'Change' }).click();
+  await expect(page.locator('#provider-modal')).toBeVisible();
+};
+
+const chooseModal = async (page: Page) => {
+  await openProviderPicker(page);
+  await page.locator('label[for="provider-modal"]').click();
+};
+
 test('offers every compute provider, in registry order', async ({ page }) => {
   await openCreateForm(page);
-
-  // The card is one radio, so counting them counts the providers. A provider
-  // added to the registry and forgotten in the picker fails here, as does one
-  // listed twice.
-  await expect(page.getByRole('radio')).toHaveCount(4);
+  await openProviderPicker(page);
 
   const values = await page
-    .getByRole('radio')
+    .locator('input[id^="provider-"]')
     .evaluateAll((inputs) =>
       inputs.map((input) => (input as HTMLInputElement).value),
     );
+  // A provider added to the registry and forgotten in the picker fails here,
+  // as does one listed twice or offered out of order.
   expect(values).toEqual(['lambda', 'agentcore', 'cloud-run', 'modal']);
 });
 
 test('names Modal and says what it runs', async ({ page }) => {
   await openCreateForm(page);
+  await openProviderPicker(page);
 
   const label = page.locator('label[for="provider-modal"]');
   await expect(label).toContainText('Modal');
@@ -56,22 +69,64 @@ test('names Modal and says what it runs', async ({ page }) => {
   // Its own brand mark. A provider given no icon renders an empty box and
   // passes every text assertion above. The icon is a sibling of the label
   // rather than inside it, so the assertion is on the card around both.
-  const card = label.locator('..');
-  await expect(card.locator('svg')).toHaveCount(1);
+  // The card nests the mark beside the label; one svg inside that slot is the
+  // provider's own icon.
+  await expect(label.locator('..').locator('svg').first()).toBeVisible();
 });
 
-test('choosing Modal selects it and deselects the default', async ({
+test('choosing Modal summarises it and keeps the rest available', async ({
   page,
 }) => {
   await openCreateForm(page);
+  await chooseModal(page);
 
-  const modal = page.locator('#provider-modal');
-  const lambda = page.locator('#provider-lambda');
+  await expect(page.getByText('Also supports 3 other providers')).toBeVisible();
+});
 
-  await expect(lambda).toBeChecked();
+test('Modal asks for the coordinates of the Function to run', async ({
+  page,
+}) => {
+  await openCreateForm(page);
+  await chooseModal(page);
 
-  await page.locator('label', { has: modal }).click();
+  // app_name, function_name and environment are all required by the worker
+  // controller, which rejects a config missing any of them.
+  for (const id of ['modalAppName', 'modalFunctionName', 'modalEnvironment']) {
+    await expect(page.locator(`#${id}`)).toBeVisible();
+    await expect(page.locator(`#${id}`)).toHaveAttribute('required', '');
+  }
 
-  await expect(modal).toBeChecked();
-  await expect(lambda).not.toBeChecked();
+  // workspace_id and version are optional: blank means "whatever the
+  // credential owns" and "the App's current deployment".
+  for (const id of ['modalWorkspaceId', 'modalVersion']) {
+    await expect(page.locator(`#${id}`)).toBeVisible();
+    await expect(page.locator(`#${id}`)).not.toHaveAttribute('required', '');
+  }
+});
+
+test('Modal offers no access fields, because it holds no credential', async ({
+  page,
+}) => {
+  await openCreateForm(page);
+  await chooseModal(page);
+
+  // The worker controller resolves Modal credentials itself, so there is
+  // nothing for the form to collect. An IAM role field appearing here would
+  // mean the Lambda branch had leaked through.
+  await expect(page.locator('#iamRoleArn')).toHaveCount(0);
+  await expect(page.locator('#gcpServiceAccount')).toHaveCount(0);
+});
+
+test('switching away from Modal swaps the coordinates back', async ({
+  page,
+}) => {
+  await openCreateForm(page);
+  await chooseModal(page);
+  await expect(page.locator('#modalAppName')).toBeVisible();
+
+  await openProviderPicker(page);
+  await page.locator('label[for="provider-lambda"]').click();
+
+  await expect(page.locator('#modalAppName')).toHaveCount(0);
+  await expect(page.locator('#lambdaArn')).toBeVisible();
 });

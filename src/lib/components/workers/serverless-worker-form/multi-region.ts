@@ -121,6 +121,7 @@ interface PreviewFields {
   gcpWorkerPool: string;
   iamRoleArn: string;
   gcpServiceAccount: string;
+  modalFunctionName: string;
 }
 
 /** The field that names the resource Temporal invokes, per provider. */
@@ -132,14 +133,22 @@ export const resourceValue = (
     lambda: fields.lambdaArn,
     agentcore: fields.agentCoreEndpointArn,
     'cloud-run': fields.gcpWorkerPool,
+    modal: fields.modalFunctionName,
   })[provider];
 
 /** The identity Temporal uses to invoke it, per provider. */
 export const accessValue = (
   provider: ComputeProviderValue,
   fields: PreviewFields,
-): string =>
-  provider === 'cloud-run' ? fields.gcpServiceAccount : fields.iamRoleArn;
+): string => {
+  // Modal names no identity. The worker controller resolves credentials
+  // itself -- a Cloud account's OAuth grant, or the Modal SDK's own token on a
+  // self-hosted install -- so there is nothing the form could show here.
+  if (provider === 'modal') return '';
+  return provider === 'cloud-run'
+    ? fields.gcpServiceAccount
+    : fields.iamRoleArn;
+};
 
 export const regionPreview = (
   region: ComputeRegion,
