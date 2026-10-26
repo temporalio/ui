@@ -176,12 +176,13 @@
 
   /**
    * A regional resource name needs the provider's own name for the region,
-   * which is the label a consumer gives. A cluster or region id is not one:
-   * an ARN naming "aws-us-east-1" is invalid. Without a label, nothing is
-   * suggested.
+   * which the consumer gives. A cluster or region id is not one: an ARN naming
+   * "aws-us-east-1" is invalid. Without it, nothing is suggested.
    */
   const suggestFor = (arn: string): string =>
-    replicaRegion?.label ? suggestRegionalArn(arn, replicaRegion.label) : '';
+    replicaRegion?.providerRegion
+      ? suggestRegionalArn(arn, replicaRegion.providerRegion)
+      : '';
 
   const inheritsPrimary = $derived(!replica.customized);
 
@@ -430,7 +431,9 @@
             {provider}
             leadingDivider={false}
             idPrefix={primaryRegion.id}
-            lambdaArnPlaceholder={lambdaArnPlaceholderFor(primaryRegion.label)}
+            lambdaArnPlaceholder={lambdaArnPlaceholderFor(
+              primaryRegion.providerRegion,
+            )}
             bind:lambdaArn={primary.lambdaArn}
             bind:agentCoreEndpointArn={primary.agentCoreEndpointArn}
             bind:iamRoleArn={primary.iamRoleArn}
@@ -489,7 +492,7 @@
                   sections={['resource']}
                   idPrefix="replica"
                   lambdaArnPlaceholder={lambdaArnPlaceholderFor(
-                    replicaRegion?.label,
+                    replicaRegion?.providerRegion,
                   )}
                   bind:lambdaArn={
                     () => replicaLambdaArn,

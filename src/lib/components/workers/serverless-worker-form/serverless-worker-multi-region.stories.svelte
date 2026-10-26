@@ -33,8 +33,8 @@
     },
   });
 
-  const EAST = { regionId: 'aws-us-east-1', label: 'us-east-1' };
-  const WEST = { regionId: 'aws-us-west-2', label: 'us-west-2' };
+  const EAST = { regionId: 'aws-us-east-1', providerRegion: 'us-east-1' };
+  const WEST = { regionId: 'aws-us-west-2', providerRegion: 'us-west-2' };
 
   /**
    * The one prop a host passes to the worker deployment pages. Temporal Cloud

@@ -121,6 +121,23 @@ describe('computeRegionsFor', () => {
     );
     expect(region.label).toBe('us-east-1');
   });
+
+  it('keeps the provider region name a consumer supplied', () => {
+    const [region] = computeRegionsFor(
+      [
+        {
+          regionId: 'aws-us-east-1',
+          role: 'primary',
+          providerRegion: 'us-east-1',
+        },
+      ],
+      'lambda',
+    );
+    expect(region).toMatchObject({
+      label: undefined,
+      providerRegion: 'us-east-1',
+    });
+  });
 });
 
 describe('regionServerErrors', () => {
@@ -210,13 +227,21 @@ describe('resourceRegion', () => {
 describe('replicaRegionFor', () => {
   const options = computeRegionsFor(
     [
-      { regionId: 'aws-us-west-2', label: 'us-west-2', role: 'replica' },
-      { regionId: 'aws-us-west-1', label: 'us-west-1', role: 'replica' },
+      {
+        regionId: 'aws-us-west-2',
+        providerRegion: 'us-west-2',
+        role: 'replica',
+      },
+      {
+        regionId: 'aws-us-west-1',
+        providerRegion: 'us-west-1',
+        role: 'replica',
+      },
     ],
     'lambda',
   );
 
-  it('finds the offered region by its label', () => {
+  it('finds the offered region by its provider region name', () => {
     expect(replicaRegionFor('us-west-1', options)?.id).toBe('aws-us-west-1');
   });
 

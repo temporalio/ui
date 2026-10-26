@@ -8,7 +8,7 @@
     IconChevronRight,
     IconGcpColor,
     IconTemporalNamespaces,
-    IconTemporalVersioning,
+    IconTemporalWorker,
   } from '$lib/io/icon';
   import { colorScales } from '$lib/theme/io/themes';
 
@@ -334,7 +334,7 @@
             <span
               class="inline-flex size-5 shrink-0 items-center justify-center rounded border border-primary bg-surface-primary"
             >
-              <IconTemporalVersioning
+              <IconTemporalWorker
                 width={14}
                 height={14}
                 class="text-secondary"
