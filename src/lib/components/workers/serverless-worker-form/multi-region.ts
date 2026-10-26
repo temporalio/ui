@@ -223,6 +223,20 @@ export const replicaRegionFor = (
     : undefined;
 
 /**
+ * The saved groups a new config leaves out. The form writes at most two
+ * groups, `default` and the replica's, so an edit removes every other group:
+ * one saved under another name, or one made through the API. The saved config
+ * then matches what the form shows.
+ */
+export const scalingGroupsToRemove = (
+  saved: ComputeConfig | undefined,
+  next: ComputeConfig,
+): string[] =>
+  Object.keys(saved?.scalingGroups ?? {}).filter(
+    (name) => !(name in (next.scalingGroups ?? {})),
+  );
+
+/**
  * A saved config as the high availability form sees it: the primary is the
  * unscoped group, and the replica is the group scoped to the Namespace's
  * replica. A config saved another way still reads: a group scoped to some
