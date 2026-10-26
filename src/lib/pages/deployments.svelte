@@ -3,8 +3,8 @@
 
   import DeploymentTableRow from '$lib/components/deployments/deployment-table-row.svelte';
   import DeploymentsEmptyState from '$lib/components/deployments/deployments-empty-state.svelte';
+  import ConfigurableTableHeadersDrawer from '$lib/components/table/configurable-table-headers-drawer.svelte';
   import ResetColumnWidthsButton from '$lib/components/table/reset-column-widths-button.svelte';
-  import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
   import Button from '$lib/holocene/button.svelte';
   import ColumnResizeHandle from '$lib/holocene/table/column-resize-handle.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
@@ -207,6 +207,5 @@
   {availableColumns}
   bind:open={customizationDrawerOpen}
   table={TABLE_TYPE.DEPLOYMENTS}
-  type={translate('common.columns')}
   title={translate('deployments.deployments')}
 />
