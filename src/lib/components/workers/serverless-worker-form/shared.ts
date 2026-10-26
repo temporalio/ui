@@ -11,6 +11,7 @@ import {
   buildAgentCoreComputeConfig,
   buildGcpCloudRunComputeConfig,
   buildLambdaComputeConfig,
+  buildModalComputeConfig,
   decodeAgentCoreProviderDetails,
   decodeGcpCloudRunProviderDetails,
   decodeLambdaProviderDetails,
@@ -86,6 +87,11 @@ const providerFields = {
   gcpRegion: z.string().default(''),
   gcpWorkerPool: z.string().default(''),
   gcpServiceAccount: z.string().default(''),
+  modalAppName: z.string().default(''),
+  modalFunctionName: z.string().default(''),
+  modalEnvironment: z.string().default(''),
+  modalWorkspaceId: z.string().default(''),
+  modalVersion: z.string().default(''),
   minReplicas: z.number().int().min(0).max(2_147_483_647).default(0),
   maxReplicas: z.number().int().min(1).max(2_147_483_647).default(30),
   initialReplicas: z.number().int().min(0).max(2_147_483_647).default(0),
@@ -157,6 +163,35 @@ const validateProviderFields = (
       });
     }
     validateAwsAccessFields(data, ctx);
+  } else if (data.provider === 'modal') {
+    // app_name, function_name and environment are all required by the worker
+    // controller, which rejects a config missing any of them. workspace_id and
+    // version are optional: blank means "whatever the credential owns" and
+    // "the App's current deployment".
+    if (!data.modalAppName)
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['modalAppName'],
+        message: 'App Name is required',
+      });
+    if (!data.modalFunctionName)
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['modalFunctionName'],
+        message: 'Function Name is required',
+      });
+    if (!data.modalEnvironment)
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['modalEnvironment'],
+        message: 'Environment is required',
+      });
+    if (data.modalVersion && !/^\d+$/.test(data.modalVersion))
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['modalVersion'],
+        message: 'Version must be a non-negative whole number',
+      });
   } else if (data.provider === 'cloud-run') {
     if (!data.gcpProject)
       ctx.addIssue({
@@ -323,6 +358,17 @@ export const buildComputeConfigFromForm = (
     metricsPollIntervalMs: data.metricsPollIntervalMs,
   };
 
+  if (data.provider === 'modal') {
+    return buildModalComputeConfig(
+      data.modalAppName,
+      data.modalFunctionName,
+      data.modalEnvironment,
+      data.modalWorkspaceId,
+      data.modalVersion,
+      invokeScaling,
+    );
+  }
+
   if (data.provider === 'agentcore') {
     return buildAgentCoreComputeConfig(
       data.agentCoreEndpointArn,
@@ -396,6 +442,7 @@ export const defaultReleaseStage: Record<
   lambda: COMPUTE_PROVIDERS.lambda.releaseStage,
   agentcore: COMPUTE_PROVIDERS.agentcore.releaseStage,
   'cloud-run': COMPUTE_PROVIDERS['cloud-run'].releaseStage,
+  modal: COMPUTE_PROVIDERS.modal.releaseStage,
 };
 
 interface InitialComputeProviderOptions {
@@ -444,6 +491,11 @@ export type ComputeFieldValues = {
   gcpRegion: string;
   gcpWorkerPool: string;
   gcpServiceAccount: string;
+  modalAppName: string;
+  modalFunctionName: string;
+  modalEnvironment: string;
+  modalWorkspaceId: string;
+  modalVersion: string;
   minReplicas: number;
   maxReplicas: number;
   initialReplicas: number;
@@ -504,6 +556,11 @@ export type ComputeInitialValues = {
   gcpRegion?: string;
   gcpWorkerPool?: string;
   gcpServiceAccount?: string;
+  modalAppName?: string;
+  modalFunctionName?: string;
+  modalEnvironment?: string;
+  modalWorkspaceId?: string;
+  modalVersion?: string;
   minReplicas?: number;
   maxReplicas?: number;
   initialReplicas?: number;

@@ -42,6 +42,7 @@ describe('lockComputeProvider', () => {
         { value: 'lambda' },
         { value: 'agentcore', hidden: true },
         { value: 'cloud-run', hidden: true },
+        { value: 'modal', hidden: true },
       ],
     });
   });
@@ -53,6 +54,7 @@ describe('lockComputeProvider', () => {
         { value: 'lambda', hidden: true },
         { value: 'agentcore' },
         { value: 'cloud-run', hidden: true },
+        { value: 'modal', hidden: true },
       ],
     });
   });
@@ -181,6 +183,7 @@ describe('lockProvidersTo', () => {
       { value: 'lambda' },
       { value: 'agentcore', hidden: true },
       { value: 'cloud-run', hidden: true },
+      { value: 'modal', hidden: true },
     ]);
   });
 
