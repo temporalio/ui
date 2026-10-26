@@ -1,11 +1,19 @@
 import type { I18nKey, I18nResources } from '$lib/i18n';
 import { IconAwsColor, type IconComponent, IconGcpColor } from '$lib/io/icon';
 
+import type { ComputeSection } from './fields/types';
 import defaultAgentCoreTerraform from './serverless-worker-agentcore.tf?raw';
 import defaultCloudRunTerraform from './serverless-worker-cloud-run.tf?raw';
 import defaultLambdaTerraform from './serverless-worker-lambda.tf?raw';
 import defaultAgentCoreCloudFormation from './temporal-agentcore-role.yaml?raw';
 import defaultLambdaCloudFormation from './temporal-worker-role.yaml?raw';
+import { TERRAFORM_MODULES } from './terraform-modules';
+
+import AgentCoreResourceFields from './fields/agentcore-resource.svelte';
+import AwsRoleAccessFields from './fields/aws-role-access.svelte';
+import CloudRunAccessFields from './fields/cloud-run-access.svelte';
+import CloudRunResourceFields from './fields/cloud-run-resource.svelte';
+import LambdaResourceFields from './fields/lambda-resource.svelte';
 
 /**
  * Everything the UI knows about a compute provider, in one place.
@@ -85,10 +93,22 @@ export type ComputeProviderDefinition = {
   templates: ComputeProviderTemplates;
   /** The published Terraform module, when one exists for the provider. */
   terraformModuleHref?: string;
+  /**
+   * The provider's own fields, by section.
+   *
+   * Holding them here rather than branching inside ComputeFields is what makes
+   * the registry's promise true: adding a provider is adding an entry. It is
+   * also the seam a consumer overrides -- Temporal Cloud replaces Modal's
+   * credential UI with an OAuth connection picker, which it must own because
+   * the connection is a Cloud resource this repo cannot see.
+   */
+  fields: {
+    resource: ComputeSection;
+    access: ComputeSection;
+  };
 };
 
-export const TERRAFORM_MODULES =
-  'https://github.com/temporalio/terraform-modules/tree/main/modules/serverless-workers';
+export { TERRAFORM_MODULES } from './terraform-modules';
 
 export const COMPUTE_PROVIDERS: Record<
   ComputeProviderValue,
@@ -110,6 +130,7 @@ export const COMPUTE_PROVIDERS: Record<
       },
     },
     terraformModuleHref: `${TERRAFORM_MODULES}/aws/lambda`,
+    fields: { resource: LambdaResourceFields, access: AwsRoleAccessFields },
   },
   agentcore: {
     value: 'agentcore',
@@ -127,6 +148,7 @@ export const COMPUTE_PROVIDERS: Record<
       },
     },
     terraformModuleHref: `${TERRAFORM_MODULES}/aws/agentcore`,
+    fields: { resource: AgentCoreResourceFields, access: AwsRoleAccessFields },
   },
   'cloud-run': {
     value: 'cloud-run',
@@ -140,6 +162,7 @@ export const COMPUTE_PROVIDERS: Record<
       // CloudFormation is AWS-only, so Cloud Run offers Terraform alone.
       terraform: defaultCloudRunTerraform,
     },
+    fields: { resource: CloudRunResourceFields, access: CloudRunAccessFields },
   },
 };
 
