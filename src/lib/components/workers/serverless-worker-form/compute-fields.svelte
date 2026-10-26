@@ -100,15 +100,26 @@
   // produce a role that cannot invoke a runtime, so the templates follow the
   // selected provider rather than being shared.
   const isAgentCore = $derived(provider === 'agentcore');
-  // Modal names no identity. The worker controller resolves its credentials --
-  // a Cloud account's OAuth grant, or the Modal SDK's own token on a
-  // self-hosted install -- so the Access section has nothing to collect and is
-  // dropped rather than shown empty.
-  const hasAccessFields = $derived(provider !== 'modal');
   // `provider` arrives as a form field, so it is a string until proven one of
   // ours. Narrowing here rather than asserting keeps an unrecognised value from
   // reading as a provider that happens to have no entry.
   const providerValue = $derived(computeProviderFromType(provider));
+  // The provider's own fields, from the registry. Adding a provider needs no
+  // branch here.
+  const ResourceFields = $derived(
+    providerValue
+      ? COMPUTE_PROVIDERS[providerValue].fields.resource
+      : undefined,
+  );
+  // Absent for a provider that collects no credentials: the whole Access
+  // section, heading and dividers included, then goes with it.
+  const AccessFields = $derived(
+    providerValue ? COMPUTE_PROVIDERS[providerValue].fields.access : undefined,
+  );
+  // A provider that declares no Access section loses the heading and the
+  // dividers with it, rather than showing an empty one.
+  const hasAccessFields = $derived(!!AccessFields);
+
   const providerTemplates = $derived(
     providerValue ? templates[providerValue] : undefined,
   );
@@ -204,178 +215,14 @@
     {translate('workers.resource-section-description')}
   </p>
 
-  {#if provider === 'lambda'}
-    <div class="flex flex-wrap items-start gap-4 [&>:not(:first-child)]:mt-6">
-      <Input
-        bind:value={values.lambdaArn}
-        id={fieldId('lambdaArn')}
-        name={fieldId('lambdaArn')}
-        spellcheck={false}
-        label={translate('workers.lambda-arn-label')}
-        hintText={errors.lambdaArn?.[0]}
-        error={!!errors.lambdaArn?.[0]}
-        placeholder={lambdaArnPlaceholder}
-        required
-        class="flex-1"
-      />
-      <Button
-        variant="tertiary"
-        type="button"
-        href="https://console.aws.amazon.com/lambda"
-        target="_blank"
-        TrailingIcon={IconExternalLinkOptical}
-      >
-        {translate('workers.open-lambda-console')}
-      </Button>
-    </div>
-  {:else if provider === 'agentcore'}
-    <div class="flex flex-wrap items-start gap-4 [&>:not(:first-child)]:mt-6">
-      <Input
-        bind:value={values.agentCoreEndpointArn}
-        id={fieldId('agentCoreEndpointArn')}
-        name={fieldId('agentCoreEndpointArn')}
-        spellcheck={false}
-        label={translate('workers.agentcore-endpoint-arn-label')}
-        hintText={errors.agentCoreEndpointArn?.[0] ||
-          translate('workers.agentcore-endpoint-arn-hint')}
-        error={!!errors.agentCoreEndpointArn?.[0]}
-        placeholder={translate('workers.agentcore-endpoint-arn-placeholder')}
-        required
-        class="flex-1"
-      />
-      <Button
-        variant="tertiary"
-        type="button"
-        href="https://console.aws.amazon.com/bedrock-agentcore"
-        target="_blank"
-        TrailingIcon={IconExternalLinkOptical}
-      >
-        {translate('workers.open-agentcore-console')}
-      </Button>
-    </div>
-  {:else if provider === 'modal'}
-    <div class="flex flex-col gap-4">
-      <div class="flex flex-wrap items-start gap-4 [&>:not(:first-child)]:mt-6">
-        <Input
-          bind:value={values.modalAppName}
-          id={fieldId('modalAppName')}
-          name={fieldId('modalAppName')}
-          spellcheck={false}
-          label={translate('workers.modal-app-name-label')}
-          hintText={errors.modalAppName?.[0] ||
-            translate('workers.modal-app-name-hint')}
-          error={!!errors.modalAppName?.[0]}
-          placeholder={translate('workers.modal-app-name-placeholder')}
-          required
-          class="flex-1"
-        />
-        <Button
-          variant="tertiary"
-          type="button"
-          href="https://modal.com/apps"
-          target="_blank"
-          TrailingIcon={IconExternalLinkOptical}
-        >
-          {translate('workers.open-modal-dashboard')}
-        </Button>
-      </div>
-      <Input
-        bind:value={values.modalFunctionName}
-        id={fieldId('modalFunctionName')}
-        name={fieldId('modalFunctionName')}
-        spellcheck={false}
-        label={translate('workers.modal-function-name-label')}
-        hintText={errors.modalFunctionName?.[0] ||
-          translate('workers.modal-function-name-hint')}
-        error={!!errors.modalFunctionName?.[0]}
-        placeholder={translate('workers.modal-function-name-placeholder')}
-        required
-      />
-      <Input
-        bind:value={values.modalEnvironment}
-        id={fieldId('modalEnvironment')}
-        name={fieldId('modalEnvironment')}
-        spellcheck={false}
-        label={translate('workers.modal-environment-label')}
-        hintText={errors.modalEnvironment?.[0] ||
-          translate('workers.modal-environment-hint')}
-        error={!!errors.modalEnvironment?.[0]}
-        placeholder={translate('workers.modal-environment-placeholder')}
-        required
-      />
-      <Input
-        bind:value={values.modalWorkspaceId}
-        id={fieldId('modalWorkspaceId')}
-        name={fieldId('modalWorkspaceId')}
-        spellcheck={false}
-        label={translate('workers.modal-workspace-id-label')}
-        hintText={errors.modalWorkspaceId?.[0] ||
-          translate('workers.modal-workspace-id-hint')}
-        error={!!errors.modalWorkspaceId?.[0]}
-        placeholder={translate('workers.modal-workspace-id-placeholder')}
-      />
-      <Input
-        bind:value={values.modalVersion}
-        id={fieldId('modalVersion')}
-        name={fieldId('modalVersion')}
-        spellcheck={false}
-        label={translate('workers.modal-version-label')}
-        hintText={errors.modalVersion?.[0] ||
-          translate('workers.modal-version-hint')}
-        error={!!errors.modalVersion?.[0]}
-        placeholder="0"
-      />
-    </div>
-  {:else}
-    <div class="flex flex-col gap-4">
-      <Input
-        bind:value={values.gcpProject}
-        id={fieldId('gcpProject')}
-        name={fieldId('gcpProject')}
-        label={translate('workers.gcp-project-label')}
-        hintText={errors.gcpProject?.[0]}
-        error={!!errors.gcpProject?.[0]}
-        placeholder={translate('workers.gcp-project-placeholder')}
-        required
-      />
-      <Combobox
-        bind:value={values.gcpRegion}
-        id={fieldId('gcpRegion')}
-        name={fieldId('gcpRegion')}
-        label={translate('workers.gcp-region-label')}
-        hintText={translate('workers.gcp-region-hint')}
-        placeholder={translate('workers.gcp-region-placeholder')}
-        options={gcpRegions}
-        noResultsText={translate('common.no-results')}
-        valid={!errors.gcpRegion?.[0]}
-        error={errors.gcpRegion?.[0]}
-        allowCustomValue
-        showChevron
-        required
-      />
-      <div class="flex flex-wrap items-start gap-4 [&>:not(:first-child)]:mt-6">
-        <Input
-          bind:value={values.gcpWorkerPool}
-          id={fieldId('gcpWorkerPool')}
-          name={fieldId('gcpWorkerPool')}
-          label={translate('workers.gcp-worker-pool-label')}
-          hintText={errors.gcpWorkerPool?.[0]}
-          error={!!errors.gcpWorkerPool?.[0]}
-          placeholder={translate('workers.gcp-worker-pool-placeholder')}
-          required
-          class="flex-1"
-        />
-        <Button
-          variant="tertiary"
-          type="button"
-          href="https://console.cloud.google.com/run/worker-pools"
-          target="_blank"
-          TrailingIcon={IconExternalLinkOptical}
-        >
-          {translate('workers.open-cloud-run-console')}
-        </Button>
-      </div>
-    </div>
+  {#if ResourceFields}
+    <ResourceFields
+      bind:values
+      {errors}
+      {fieldId}
+      resourcePlaceholder={lambdaArnPlaceholder}
+      deployRegions={gcpRegions}
+    />
   {/if}
 {/if}
 
@@ -391,148 +238,15 @@
     {translate('workers.access-section-description')}
   </p>
 
-  {#if provider === 'lambda' || provider === 'agentcore'}
-    <div class="flex flex-col gap-4">
-      <Input
-        bind:value={values.iamRoleArn}
-        id={fieldId('iamRoleArn')}
-        name={fieldId('iamRoleArn')}
-        spellcheck={false}
-        label={translate('workers.iam-role-label')}
-        hintText={errors.iamRoleArn?.[0] || translate('workers.iam-role-hint')}
-        error={!!errors.iamRoleArn?.[0]}
-        placeholder={translate('workers.iam-role-placeholder')}
-        required
-      />
-      <Input
-        bind:value={values.roleExternalId}
-        id={fieldId('roleExternalId')}
-        name={fieldId('roleExternalId')}
-        label={translate('workers.external-id-label')}
-        hintText={errors.roleExternalId?.[0] ||
-          translate('workers.external-id-hint')}
-        error={!!errors.roleExternalId?.[0]}
-        placeholder={translate('workers.external-id-placeholder')}
-        required
-      />
-      {#if provider === 'lambda' || provider === 'agentcore'}
-        <Accordion
-          Icon={IconInfo}
-          title={translate('workers.no-role-prompt')}
-          bind:open={showRoleHelp}
-          class={ACCORDION_CLASS}
-        >
-          <div class="-mt-8 flex flex-col gap-3 pt-3">
-            <ToggleButtons>
-              <ToggleButton
-                variant="tertiary"
-                size="sm"
-                active={activeRoleHelpTab === 'cloudformation'}
-                onclick={() => (activeRoleHelpTab = 'cloudformation')}
-              >
-                {translate('workers.cfn-tab')}
-              </ToggleButton>
-              <ToggleButton
-                variant="tertiary"
-                size="sm"
-                active={activeRoleHelpTab === 'terraform'}
-                onclick={() => (activeRoleHelpTab = 'terraform')}
-              >
-                {translate('workers.terraform-tab')}
-              </ToggleButton>
-            </ToggleButtons>
-            {#if activeRoleHelpTab === 'cloudformation'}
-              <p class="text-sm text-secondary">
-                {translate('workers.launch-stack-description')}
-              </p>
-              <div class="flex flex-wrap items-center gap-4">
-                <Button
-                  variant="tertiary"
-                  size="sm"
-                  href={launchStackHref}
-                  target="_blank"
-                  TrailingIcon={IconExternalLinkOptical}
-                >
-                  {translate('workers.launch-stack')}
-                </Button>
-                <Button
-                  variant="tertiary"
-                  size="sm"
-                  onclick={downloadCfnTemplate}
-                >
-                  {translate('workers.download-template')}
-                </Button>
-              </div>
-            {:else}
-              <p class="text-sm text-secondary">
-                {translate('workers.terraform-description-before')}<Link
-                  href={terraformModuleHref}
-                  newTab>{translate('workers.terraform-iam-module-link')}</Link
-                >{translate('workers.terraform-description-after')}
-              </p>
-              <CodeBlock
-                content={resolvedTerraformTemplate}
-                language="text"
-                maxHeight={300}
-                copyable
-                label={translate('workers.terraform-iam-module-link')}
-                copyIconTitle={translate('workers.copy-snippet')}
-                copySuccessIconTitle={translate('workers.copied')}
-              />
-            {/if}
-          </div>
-        </Accordion>
-      {/if}
-    </div>
-  {:else if provider === 'cloud-run'}
-    <div class="flex flex-col gap-4">
-      <Input
-        bind:value={values.gcpServiceAccount}
-        id={fieldId('gcpServiceAccount')}
-        name={fieldId('gcpServiceAccount')}
-        label={translate('workers.gcp-service-account-label')}
-        hintText={errors.gcpServiceAccount?.[0] ||
-          translate('workers.gcp-service-account-hint')}
-        error={!!errors.gcpServiceAccount?.[0]}
-        placeholder={translate('workers.gcp-service-account-placeholder')}
-        required
-      />
-      {#if provider === 'cloud-run'}
-        <Accordion
-          Icon={IconInfo}
-          title={translate('workers.cloud-run-setup-prompt')}
-          bind:open={showCloudRunHelp}
-          class={ACCORDION_CLASS}
-        >
-          <div class="-mt-8 flex flex-col gap-3 pt-3">
-            <p class="text-sm text-secondary">
-              {translate('workers.cloud-run-terraform-description-before')}<Link
-                href="https://github.com/temporalio/terraform-modules/tree/main/modules/serverless-workers/gcp/cloud-run"
-                newTab
-                >{translate('workers.cloud-run-terraform-module-link')}</Link
-              >{translate('workers.cloud-run-terraform-description-after')}
-            </p>
-            {#if showCloudRunImpersonatorWarning}
-              <p class="text-sm text-warning">
-                {translate('workers.cloud-run-impersonator-warning')}
-              </p>
-            {/if}
-            <CodeBlock
-              content={resolvedCloudRunTerraformTemplate}
-              language="text"
-              maxHeight={300}
-              copyable
-              label={translate('workers.cloud-run-terraform-module-link')}
-              copyIconTitle={translate('workers.copy-snippet')}
-              copySuccessIconTitle={translate('workers.copied')}
-            />
-            <p class="text-sm text-secondary">
-              {translate('workers.cloud-run-invoker-handoff')}
-            </p>
-          </div>
-        </Accordion>
-      {/if}
-    </div>
+  {#if AccessFields}
+    <AccessFields
+      bind:values
+      {errors}
+      {fieldId}
+      {provider}
+      templates={providerTemplates}
+      {terraformModuleHref}
+    />
   {/if}
 {/if}
 
