@@ -25,6 +25,10 @@
   import { refresh } from '$lib/stores/workers';
   import type { ListWorkerDeployment } from '$lib/types/deployments';
   import { columnWidthStyle } from '$lib/utilities/column-width';
+  import {
+    type ComputeProviderConfig,
+    configuredRegions,
+  } from '$lib/utilities/compute-provider-config';
   import { has } from '$lib/utilities/has';
   import { routeForWorkerDeploymentCreate } from '$lib/utilities/route-for';
   import type { TableSortColumn } from '$lib/utilities/table-sort';
@@ -32,12 +36,20 @@
   interface Props {
     canCreateServerlessDeployment?: boolean;
     showConnectionStatus?: boolean;
+    /**
+     * The providers this Namespace may use and the regions it lives in. With
+     * two or more regions, each Version shows the regions it covers.
+     */
+    providerConfig?: ComputeProviderConfig;
   }
 
   let {
     canCreateServerlessDeployment = true,
     showConnectionStatus = true,
+    providerConfig,
   }: Props = $props();
+
+  const namespaceRegions = $derived(configuredRegions(providerConfig));
 
   let error = $state('');
 
@@ -166,6 +178,7 @@
             {deployment}
             {columns}
             {showConnectionStatus}
+            {namespaceRegions}
             onChange={() => refresh.update((n) => n + 1)}
           />
         {/each}

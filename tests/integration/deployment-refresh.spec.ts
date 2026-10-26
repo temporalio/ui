@@ -98,9 +98,9 @@ test('shows the persisted connection status and refreshes it after validation', 
   });
 
   await page.goto(deploymentUrl);
-  await expect(
-    page.getByRole('columnheader', { name: 'Connection', exact: true }),
-  ).toHaveCount(1);
+  await expect(page.getByRole('columnheader', { name: 'Region' })).toHaveCount(
+    1,
+  );
   await expect(page.getByText('Pending', { exact: true })).toBeVisible();
 
   await page.getByRole('button', { name: 'Actions', exact: true }).click();
@@ -177,7 +177,7 @@ test('does not call a gateway timeout an invalid connection', async ({
   await expect(page.getByText('Pending', { exact: true })).toBeVisible();
 });
 
-test('hides the connection column for a deployment with no compute config', async ({
+test('empties the region cells for a deployment with no compute config', async ({
   page,
 }) => {
   await Promise.all([
@@ -202,13 +202,13 @@ test('hides the connection column for a deployment with no compute config', asyn
   await expect(
     page.getByRole('columnheader', { name: 'Build ID' }),
   ).toBeVisible();
-  await expect(
-    page.getByRole('columnheader', { name: 'Connection', exact: true }),
-  ).toHaveCount(0);
+  await expect(page.getByRole('columnheader', { name: 'Region' })).toHaveCount(
+    1,
+  );
   await expect(page.getByText('Connected', { exact: true })).toHaveCount(0);
 });
 
-test('keeps the connection column and empties the cell for a version with no compute config', async ({
+test('keeps the region column and empties the cell for a version with no compute config', async ({
   page,
 }) => {
   await Promise.all([
@@ -236,11 +236,11 @@ test('keeps the connection column and empties the cell for a version with no com
   });
 
   await page.goto(deploymentUrl);
-  await expect(
-    page.getByRole('columnheader', { name: 'Connection', exact: true }),
-  ).toHaveCount(1);
+  await expect(page.getByRole('columnheader', { name: 'Region' })).toHaveCount(
+    1,
+  );
   await expect(page.getByText('Connected', { exact: true })).toBeVisible();
 
   const inactiveRow = page.getByRole('row', { name: /build-2/ });
-  await expect(inactiveRow.getByRole('cell').nth(3)).toHaveText('—');
+  await expect(inactiveRow.getByRole('cell').nth(2)).toHaveText('—');
 });

@@ -13,17 +13,32 @@
     type ComputeProviderTemplates,
     type ComputeProviderValue,
   } from './compute-providers';
+  import { revealFirstProblem } from './motion';
   import {
+    type ComputeRegion,
+    lambdaArnPlaceholderFor,
+    regionPreview,
+    regionServerErrors,
+  } from './multi-region';
+  import {
+    type ComputeFieldErrors,
     type ComputeProviderOption,
     type CreateDeploymentFormData,
     createDeploymentSchema,
     defaultScaleDownStabilization,
     getInitialComputeProvider,
+    multiRegionCreateDeploymentSchema,
+    type RegionComputeValues,
+    validateRegionValues,
   } from './shared';
 
   import CloudRunLatencyNotice from './cloud-run-latency-notice.svelte';
   import ComputeFields from './compute-fields.svelte';
+  import ComputeProviderPerRegion from './compute-provider-per-region.svelte';
   import ComputeProviderPicker from './compute-provider-picker.svelte';
+  import FailoverPreview from './failover-preview.svelte';
+  import RegionBlock from './region-block.svelte';
+  import RegionsHeading from './regions-heading.svelte';
 
   interface SubmitFieldErrors {
     lambdaArn?: string[];
@@ -34,12 +49,20 @@
   interface Props {
     onSubmit: (
       data: CreateDeploymentFormData,
+      regions?: RegionComputeValues[],
     ) => Promise<SubmitFieldErrors | void>;
     onSuccess: () => void;
     cancelHref: string;
     templates?: Record<ComputeProviderValue, ComputeProviderTemplates>;
     computeProviders?: readonly ComputeProviderOption[];
     gcpRegions?: string[];
+    /**
+     * Regions this namespace runs in. When more than one is provided (a highly
+     * available namespace), the form collects a compute provider per region.
+     */
+    regions?: readonly ComputeRegion[];
+    /** Namespace name, shown in the multi-region heading. */
+    namespace?: string;
   }
 
   let {
@@ -49,9 +72,30 @@
     templates,
     computeProviders,
     gcpRegions,
+    regions,
+    namespace = '',
   }: Props = $props();
 
   let error = $state<string | undefined>();
+
+  /** High availability is offered when the Namespace has a replica. */
+  const offersHighAvailability = $derived(
+    !!regions?.some(({ role }) => role === 'replica'),
+  );
+
+  let regionValues = $state<RegionComputeValues[]>([]);
+  let regionErrors = $state<Record<string, ComputeFieldErrors>>({});
+
+  /** A server error that names a region shows in that region's block. */
+  const errorsByRegion = $derived(regionServerErrors(error, regions));
+
+  let formRoot = $state<HTMLElement>();
+
+  // A server error can land in a region card far above the submit button.
+  $effect(() => {
+    if (error) untrack(() => revealFirstProblem(formRoot));
+  });
+  const errorInRegion = $derived(Object.keys(errorsByRegion).length > 0);
 
   const superform = superForm(
     {
@@ -80,14 +124,33 @@
     },
     {
       SPA: true,
-      validators: zodClient(createDeploymentSchema),
+      validators: zodClient(
+        untrack(() => offersHighAvailability)
+          ? multiRegionCreateDeploymentSchema
+          : createDeploymentSchema,
+      ),
       resetForm: false,
       dataType: 'json',
       onUpdate: async ({ form }) => {
         if (!form.valid) return;
         error = undefined;
+        if (offersHighAvailability) {
+          regionErrors = validateRegionValues(regionValues);
+          if (Object.keys(regionErrors).length) {
+            revealFirstProblem(formRoot);
+            return;
+          }
+        }
         try {
-          const fieldErrors = await onSubmit(form.data);
+          // Without high availability the one region saves what a
+          // single-region Version saves.
+          const replicated = offersHighAvailability && regionValues.length > 1;
+          const fieldErrors = await onSubmit(
+            offersHighAvailability && !replicated
+              ? { ...form.data, ...regionValues[0]?.values }
+              : form.data,
+            replicated ? regionValues : undefined,
+          );
           if (fieldErrors) {
             if (fieldErrors.lambdaArn)
               form.errors.lambdaArn = fieldErrors.lambdaArn;
@@ -113,10 +176,10 @@
   const { form, errors, enhance, submitting } = superform;
 </script>
 
-<div class="flex max-w-[45rem] flex-col gap-4">
+<div class="relative flex max-w-[45rem] flex-col gap-4" bind:this={formRoot}>
   <form class="flex flex-col gap-4" use:enhance novalidate>
     <Card class="p-5">
-      <h2 class="mb-1 text-base font-medium">
+      <h2 class="text-base font-medium">
         {translate('workers.configuration-section')}
       </h2>
       <p class="mb-4 text-sm text-secondary">
@@ -147,43 +210,72 @@
     </Card>
 
     <Card class="p-5">
-      <h2 class="mb-1 text-base font-medium">
+      <h2 class="text-base font-medium">
         {translate('workers.compute-provider')}
       </h2>
       <p class="mb-4 text-sm text-secondary">
         {translate('workers.compute-description')}
       </p>
-      <ComputeProviderPicker
-        bind:provider={$form.provider}
-        providers={computeProviders}
-      />
-      <CloudRunLatencyNotice provider={$form.provider} class="mt-4" />
-      <ComputeFields
-        provider={$form.provider}
-        bind:lambdaArn={$form.lambdaArn}
-        bind:agentCoreEndpointArn={$form.agentCoreEndpointArn}
-        bind:iamRoleArn={$form.iamRoleArn}
-        bind:roleExternalId={$form.roleExternalId}
-        bind:gcpProject={$form.gcpProject}
-        bind:gcpRegion={$form.gcpRegion}
-        {gcpRegions}
-        bind:gcpWorkerPool={$form.gcpWorkerPool}
-        bind:gcpServiceAccount={$form.gcpServiceAccount}
-        bind:minReplicas={$form.minReplicas}
-        bind:maxReplicas={$form.maxReplicas}
-        bind:initialReplicas={$form.initialReplicas}
-        bind:utilizationTarget={$form.utilizationTarget}
-        bind:scaleDownStabilization={$form.scaleDownStabilization}
-        bind:scaleUpCooloffMs={$form.scaleUpCooloffMs}
-        bind:scaleUpBacklogThreshold={$form.scaleUpBacklogThreshold}
-        bind:maxWorkerLifetimeMs={$form.maxWorkerLifetimeMs}
-        bind:metricsPollIntervalMs={$form.metricsPollIntervalMs}
-        {templates}
-        errors={$errors}
-      />
+      {#if offersHighAvailability && regions}
+        <ComputeProviderPerRegion
+          {namespace}
+          {regions}
+          {computeProviders}
+          deploymentName={$form.name}
+          buildId={$form.buildId}
+          bind:regionValues
+          {regionErrors}
+          regionServerErrors={errorsByRegion}
+        />
+      {:else}
+        <ComputeProviderPicker
+          layout="summary"
+          bind:provider={$form.provider}
+          providers={computeProviders}
+        />
+        <hr class="my-5 border-primary" />
+        {#if regions?.[0]}
+          <RegionsHeading regions={regions.slice(0, 1)} />
+          <FailoverPreview
+            {namespace}
+            provider={$form.provider}
+            regions={[regionPreview(regions[0], $form.provider, $form)]}
+            deploymentName={$form.name}
+            buildId={$form.buildId}
+          />
+        {/if}
+        <CloudRunLatencyNotice provider={$form.provider} class="mb-4" />
+        <RegionBlock region={regions?.[0]}>
+          <ComputeFields
+            provider={$form.provider}
+            leadingDivider={false}
+            lambdaArnPlaceholder={lambdaArnPlaceholderFor(regions?.[0]?.label)}
+            bind:lambdaArn={$form.lambdaArn}
+            bind:agentCoreEndpointArn={$form.agentCoreEndpointArn}
+            bind:iamRoleArn={$form.iamRoleArn}
+            bind:roleExternalId={$form.roleExternalId}
+            bind:gcpProject={$form.gcpProject}
+            bind:gcpRegion={$form.gcpRegion}
+            {gcpRegions}
+            bind:gcpWorkerPool={$form.gcpWorkerPool}
+            bind:gcpServiceAccount={$form.gcpServiceAccount}
+            bind:minReplicas={$form.minReplicas}
+            bind:maxReplicas={$form.maxReplicas}
+            bind:initialReplicas={$form.initialReplicas}
+            bind:utilizationTarget={$form.utilizationTarget}
+            bind:scaleDownStabilization={$form.scaleDownStabilization}
+            bind:scaleUpCooloffMs={$form.scaleUpCooloffMs}
+            bind:scaleUpBacklogThreshold={$form.scaleUpBacklogThreshold}
+            bind:maxWorkerLifetimeMs={$form.maxWorkerLifetimeMs}
+            bind:metricsPollIntervalMs={$form.metricsPollIntervalMs}
+            {templates}
+            errors={$errors}
+          />
+        </RegionBlock>
+      {/if}
     </Card>
 
-    {#if error}
+    {#if error && !errorInRegion}
       <Alert intent="error" title={translate('common.error-occurred')}
         >{error}</Alert
       >
