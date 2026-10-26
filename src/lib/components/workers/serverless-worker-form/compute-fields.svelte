@@ -600,7 +600,9 @@
         : translate('workers.show-defaults')}
     </Button>
   </div>
-  {#if showScaling && (provider === 'lambda' || provider === 'agentcore')}
+  <!-- Modal joins the invoke-based providers: it pairs with the same `no-sync`
+  scaler, and these are the four knobs the Modal demo tuned. -->
+  {#if showScaling && (provider === 'lambda' || provider === 'agentcore' || provider === 'modal')}
     <div class="mt-4 flex flex-col gap-4">
       <Input
         value={scaleUpCooloffMs !== undefined ? String(scaleUpCooloffMs) : ''}

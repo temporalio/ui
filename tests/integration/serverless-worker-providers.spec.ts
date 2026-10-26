@@ -117,6 +117,28 @@ test('Modal offers no access fields, because it holds no credential', async ({
   await expect(page.locator('#gcpServiceAccount')).toHaveCount(0);
 });
 
+test('Modal offers the invoke scaling knobs its scaler reads', async ({
+  page,
+}) => {
+  await openCreateForm(page);
+  await chooseModal(page);
+  await page.getByRole('button', { name: 'Show Defaults' }).click();
+
+  // Modal pairs with the same `no-sync` scaler as Lambda and AgentCore, and
+  // buildModalComputeConfig sends these four. A form that cannot set them
+  // would leave every one undefined.
+  for (const id of [
+    'scaleUpCooloffMs',
+    'scaleUpBacklogThreshold',
+    'maxWorkerLifetimeMs',
+    'metricsPollIntervalMs',
+  ]) {
+    await expect(page.locator(`#${id}`)).toBeVisible();
+  }
+  // Those are replica controls, which belong to the rate-based scaler.
+  await expect(page.locator('#minReplicas')).toHaveCount(0);
+});
+
 test('switching away from Modal swaps the coordinates back', async ({
   page,
 }) => {
