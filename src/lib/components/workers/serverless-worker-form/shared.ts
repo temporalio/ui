@@ -22,6 +22,7 @@ import type {
 } from '$lib/types/deployments';
 
 import {
+  COMPUTE_PROVIDER_VALUES,
   COMPUTE_PROVIDERS,
   type ComputeProviderReleaseStage,
   type ComputeProviderValue,
@@ -76,7 +77,7 @@ const AGENT_CORE_ENDPOINT_ARN =
   /^arn:aws:bedrock-agentcore:[a-z0-9-]+:\d{12}:runtime\/[^/]+\/runtime-endpoint\/[^/]+$/;
 
 const providerFields = {
-  provider: z.enum(['lambda', 'agentcore', 'cloud-run']).default('lambda'),
+  provider: z.enum(COMPUTE_PROVIDER_VALUES).default('lambda'),
   lambdaArn: z.string().default(''),
   agentCoreEndpointArn: z.string().default(''),
   iamRoleArn: z.string().default(''),
@@ -423,53 +424,76 @@ export const getInitialComputeProvider = ({
   );
 };
 
-interface TerraformTemplateValues {
-  externalId?: string;
-  lambdaArn?: string;
-  /** The Runtime Endpoint ARN, for the AgentCore module's list. */
-  agentCoreEndpointArn?: string;
-}
-
-/** Rewrites a `key = [...]` list in an HCL snippet with the ARNs given. */
-const replaceArnList = (template: string, key: string, value?: string) => {
-  const arns = (value ?? '')
-    .split(',')
-    .map((arn) => arn.trim())
-    .filter(Boolean);
-
-  if (!arns.length) return template;
-
-  const entries = arns.map((arn) => `    "${arn}",`).join('\n');
-
-  return template.replace(
-    new RegExp(`(${key}\\s*=\\s*\\[)[^\\]]*(\\])`),
-    (_, open: string, close: string) => `${open}\n${entries}\n  ${close}`,
-  );
-};
-
-export const interpolateTerraformTemplate = (
-  template: string,
-  { externalId, lambdaArn, agentCoreEndpointArn }: TerraformTemplateValues,
-): string => {
-  let result = template;
-
-  if (externalId) {
-    result = result.replace(
-      /(external_id\s*=\s*)"[^"]*"/,
-      (_, assignment: string) => `${assignment}"${externalId}"`,
-    );
-  }
-
-  // Only one of these keys exists in a given snippet, so both run and the
-  // absent one is a no-op rather than the caller having to say which provider
-  // this template belongs to.
-  result = replaceArnList(result, 'lambda_function_arns', lambdaArn);
-  result = replaceArnList(result, 'agent_runtime_arns', agentCoreEndpointArn);
-
-  return result;
-};
+export { interpolateTerraformTemplate } from './terraform-template';
 
 /** A form's starting values, as read from a saved scaling group. */
+/**
+ * The provider fields a compute form edits, as one object.
+ *
+ * ComputeFields binds this rather than twenty-odd separate props. Every
+ * consumer already holds an object with these keys -- a superforms store, or a
+ * per-region entry -- so one `bind:values` replaces the whole list, and a
+ * provider added later needs no new binding at any call site.
+ */
+export type ComputeFieldValues = {
+  lambdaArn: string;
+  agentCoreEndpointArn: string;
+  iamRoleArn: string;
+  roleExternalId: string;
+  gcpProject: string;
+  gcpRegion: string;
+  gcpWorkerPool: string;
+  gcpServiceAccount: string;
+  minReplicas: number;
+  maxReplicas: number;
+  initialReplicas: number;
+  utilizationTarget: number;
+  scaleDownStabilization: string;
+  scaleUpCooloffMs?: number;
+  scaleUpBacklogThreshold?: number;
+  maxWorkerLifetimeMs?: number;
+  metricsPollIntervalMs?: number;
+};
+
+/** A read/write pair standing in for one field of a ComputeFieldValues. */
+export type FieldAccessor<T> = { get(): T; set(value: T): void };
+
+/**
+ * A values object that reads and writes `base`, except for the fields
+ * `overrides` names.
+ *
+ * The high availability form needs this: a replica inherits the primary's
+ * resource until someone edits it, so its ARN is derived rather than stored
+ * and a write has to land on the override instead. Expressing that as
+ * accessors keeps ComputeFields bound to a single object, rather than
+ * reopening a prop per overridden field.
+ */
+export const fieldValuesWith = (
+  base: ComputeFieldValues,
+  overrides: Partial<{
+    [K in keyof ComputeFieldValues]: FieldAccessor<ComputeFieldValues[K]>;
+  }>,
+): ComputeFieldValues => {
+  const target = {} as ComputeFieldValues;
+  const keys = Object.keys(base) as (keyof ComputeFieldValues)[];
+  const named = Object.keys(overrides) as (keyof ComputeFieldValues)[];
+  const record = base as Record<string, unknown>;
+  for (const key of new Set([...keys, ...named])) {
+    // Narrowed to one accessor: the mapped type makes `set` take the
+    // intersection of every field's type, which is never.
+    const override = overrides[key] as FieldAccessor<unknown> | undefined;
+    Object.defineProperty(target, key, {
+      enumerable: true,
+      get: () => (override ? override.get() : record[key]),
+      set: (value: unknown) => {
+        if (override) override.set(value);
+        else record[key] = value;
+      },
+    });
+  }
+  return target;
+};
+
 export type ComputeInitialValues = {
   provider?: ComputeProviderValue;
   lambdaArn: string;

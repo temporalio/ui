@@ -230,29 +230,13 @@
         <CloudRunLatencyNotice provider={$form.provider} class="mb-4" />
         <RegionBlock region={regions?.[0]}>
           <ComputeFields
+            bind:values={$form}
             provider={$form.provider}
             leadingDivider={false}
             lambdaArnPlaceholder={lambdaArnPlaceholderFor(
               regions?.[0]?.providerRegion,
             )}
-            bind:lambdaArn={$form.lambdaArn}
-            bind:agentCoreEndpointArn={$form.agentCoreEndpointArn}
-            bind:iamRoleArn={$form.iamRoleArn}
-            bind:roleExternalId={$form.roleExternalId}
-            bind:gcpProject={$form.gcpProject}
-            bind:gcpRegion={$form.gcpRegion}
             {gcpRegions}
-            bind:gcpWorkerPool={$form.gcpWorkerPool}
-            bind:gcpServiceAccount={$form.gcpServiceAccount}
-            bind:minReplicas={$form.minReplicas}
-            bind:maxReplicas={$form.maxReplicas}
-            bind:initialReplicas={$form.initialReplicas}
-            bind:utilizationTarget={$form.utilizationTarget}
-            bind:scaleDownStabilization={$form.scaleDownStabilization}
-            bind:scaleUpCooloffMs={$form.scaleUpCooloffMs}
-            bind:scaleUpBacklogThreshold={$form.scaleUpBacklogThreshold}
-            bind:maxWorkerLifetimeMs={$form.maxWorkerLifetimeMs}
-            bind:metricsPollIntervalMs={$form.metricsPollIntervalMs}
             {templates}
             errors={$errors}
           />

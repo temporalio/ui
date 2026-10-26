@@ -26,6 +26,7 @@
     type ComputeProviderOption,
     type ComputeProviderValue,
     defaultScaleDownStabilization,
+    fieldValuesWith,
     type RegionComputeValues,
   } from './shared';
 
@@ -285,6 +286,21 @@
     replica.gcpProject = value;
   };
 
+  // The replica edits the same fields as the primary, except for the three it
+  // derives: its ARN is suggested from the primary's until someone types one,
+  // and a write has to land on the override rather than the derived value.
+  const replicaValues = fieldValuesWith(replica, {
+    lambdaArn: {
+      get: () => replicaLambdaArn,
+      set: (value) => (replica.lambdaArnOverride = value),
+    },
+    agentCoreEndpointArn: {
+      get: () => replicaAgentCoreArn,
+      set: (value) => (replica.agentCoreEndpointArnOverride = value),
+    },
+    gcpProject: { get: () => replicaProject, set: setReplicaProject },
+  });
+
   /** Suggested until the user edits it; previewSlot handles an empty value. */
   const replicaResourceState = $derived.by((): 'set' | 'suggested' => {
     const edited =
@@ -431,26 +447,10 @@
             {provider}
             leadingDivider={false}
             idPrefix={primaryRegion.id}
+            bind:values={primary}
             lambdaArnPlaceholder={lambdaArnPlaceholderFor(
               primaryRegion.providerRegion,
             )}
-            bind:lambdaArn={primary.lambdaArn}
-            bind:agentCoreEndpointArn={primary.agentCoreEndpointArn}
-            bind:iamRoleArn={primary.iamRoleArn}
-            bind:roleExternalId={primary.roleExternalId}
-            bind:gcpProject={primary.gcpProject}
-            bind:gcpRegion={primary.gcpRegion}
-            bind:gcpWorkerPool={primary.gcpWorkerPool}
-            bind:gcpServiceAccount={primary.gcpServiceAccount}
-            bind:minReplicas={primary.minReplicas}
-            bind:maxReplicas={primary.maxReplicas}
-            bind:initialReplicas={primary.initialReplicas}
-            bind:utilizationTarget={primary.utilizationTarget}
-            bind:scaleDownStabilization={primary.scaleDownStabilization}
-            bind:scaleUpCooloffMs={primary.scaleUpCooloffMs}
-            bind:scaleUpBacklogThreshold={primary.scaleUpBacklogThreshold}
-            bind:maxWorkerLifetimeMs={primary.maxWorkerLifetimeMs}
-            bind:metricsPollIntervalMs={primary.metricsPollIntervalMs}
             errors={regionErrors[primaryRegion.id]}
           />
         </div>
@@ -491,32 +491,10 @@
                   leadingDivider={false}
                   sections={['resource']}
                   idPrefix="replica"
+                  bind:values={() => replicaValues, () => {}}
                   lambdaArnPlaceholder={lambdaArnPlaceholderFor(
                     replicaRegion?.providerRegion,
                   )}
-                  bind:lambdaArn={
-                    () => replicaLambdaArn,
-                    (value) => (replica.lambdaArnOverride = value)
-                  }
-                  bind:agentCoreEndpointArn={
-                    () => replicaAgentCoreArn,
-                    (value) => (replica.agentCoreEndpointArnOverride = value)
-                  }
-                  bind:iamRoleArn={replica.iamRoleArn}
-                  bind:roleExternalId={replica.roleExternalId}
-                  bind:gcpProject={() => replicaProject, setReplicaProject}
-                  bind:gcpRegion={replica.gcpRegion}
-                  bind:gcpWorkerPool={replica.gcpWorkerPool}
-                  bind:gcpServiceAccount={replica.gcpServiceAccount}
-                  bind:minReplicas={replica.minReplicas}
-                  bind:maxReplicas={replica.maxReplicas}
-                  bind:initialReplicas={replica.initialReplicas}
-                  bind:utilizationTarget={replica.utilizationTarget}
-                  bind:scaleDownStabilization={replica.scaleDownStabilization}
-                  bind:scaleUpCooloffMs={replica.scaleUpCooloffMs}
-                  bind:scaleUpBacklogThreshold={replica.scaleUpBacklogThreshold}
-                  bind:maxWorkerLifetimeMs={replica.maxWorkerLifetimeMs}
-                  bind:metricsPollIntervalMs={replica.metricsPollIntervalMs}
                   errors={replicaErrors}
                 />
                 <!-- Mounted while the replica shows, so a screen reader announces
@@ -567,34 +545,7 @@
                       {provider}
                       sections={['access', 'scaling']}
                       idPrefix="replica"
-                      bind:lambdaArn={
-                        () => replicaLambdaArn,
-                        (value) => (replica.lambdaArnOverride = value)
-                      }
-                      bind:agentCoreEndpointArn={
-                        () => replicaAgentCoreArn,
-                        (value) =>
-                          (replica.agentCoreEndpointArnOverride = value)
-                      }
-                      bind:iamRoleArn={replica.iamRoleArn}
-                      bind:roleExternalId={replica.roleExternalId}
-                      bind:gcpProject={replica.gcpProject}
-                      bind:gcpRegion={replica.gcpRegion}
-                      bind:gcpWorkerPool={replica.gcpWorkerPool}
-                      bind:gcpServiceAccount={replica.gcpServiceAccount}
-                      bind:minReplicas={replica.minReplicas}
-                      bind:maxReplicas={replica.maxReplicas}
-                      bind:initialReplicas={replica.initialReplicas}
-                      bind:utilizationTarget={replica.utilizationTarget}
-                      bind:scaleDownStabilization={
-                        replica.scaleDownStabilization
-                      }
-                      bind:scaleUpCooloffMs={replica.scaleUpCooloffMs}
-                      bind:scaleUpBacklogThreshold={
-                        replica.scaleUpBacklogThreshold
-                      }
-                      bind:maxWorkerLifetimeMs={replica.maxWorkerLifetimeMs}
-                      bind:metricsPollIntervalMs={replica.metricsPollIntervalMs}
+                      bind:values={() => replicaValues, () => {}}
                       errors={replicaErrors}
                     />
                   </div>
