@@ -8,6 +8,7 @@
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
 
+  import type { ComputeSection } from './fields/types';
   import { motion } from './motion';
   import {
     type ComputeRegion,
@@ -44,6 +45,8 @@
      */
     regions: readonly ComputeRegion[];
     computeProviders?: readonly ComputeProviderOption[];
+    /** Credential components supplied by the consumer, keyed by provider. */
+    credentials?: Partial<Record<ComputeProviderValue, ComputeSection>>;
     deploymentName?: string;
     buildId?: string;
     /**
@@ -71,6 +74,7 @@
     namespace,
     regions,
     computeProviders,
+    credentials,
     deploymentName,
     buildId,
     regionValues = $bindable([]),
@@ -460,6 +464,7 @@
             leadingDivider={false}
             idPrefix={primaryRegion.id}
             bind:values={primary}
+            {credentials}
             lambdaArnPlaceholder={lambdaArnPlaceholderFor(
               primaryRegion.providerRegion,
             )}

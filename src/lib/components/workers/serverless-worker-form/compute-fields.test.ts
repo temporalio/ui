@@ -25,6 +25,7 @@ import agentCoreCfnTemplate from './temporal-agentcore-role.yaml?raw';
 
 let computeFields: Component<Record<string, unknown>>;
 let renderComponent: typeof render;
+let cloudRunAccessFields: Component;
 let closeViteServer: (() => Promise<void>) | undefined;
 
 beforeAll(async () => {
@@ -67,11 +68,19 @@ beforeAll(async () => {
           '/src/lib/components/workers/serverless-worker-form/compute-fields.svelte',
         )
       ).default,
+      // Loaded to stand in as a consumer-supplied credentials component. Using
+      // a real one rather than a stub keeps the test honest about what a
+      // consumer actually passes.
+      cloudRunAccessFields: (
+        await server.ssrLoadModule(
+          '/src/lib/components/workers/serverless-worker-form/fields/cloud-run-access.svelte',
+        )
+      ).default,
       renderComponent: (await server.ssrLoadModule('svelte/server')).render,
     }),
   );
   closeViteServer = lifecycle.close;
-  ({ computeFields, renderComponent } = lifecycle.value);
+  ({ computeFields, cloudRunAccessFields, renderComponent } = lifecycle.value);
 });
 
 afterAll(async () => {
@@ -95,6 +104,7 @@ interface ComputeFieldsOptions {
   cloudRunTerraformTemplate?: string;
   terraformTemplate?: string;
   roleExternalId?: string;
+  credentials?: Record<string, unknown>;
 }
 
 const AGENT_CORE_ENDPOINT_ARN =
@@ -108,6 +118,7 @@ const renderComputeFields = ({
   cloudRunTerraformTemplate,
   terraformTemplate,
   roleExternalId = '',
+  credentials,
 }: ComputeFieldsOptions): string => {
   // The component takes one exhaustive map now, so an override for a single
   // provider is layered onto the defaults rather than passed as its own prop.
@@ -153,6 +164,7 @@ const renderComputeFields = ({
         scaleDownStabilization: defaultScaleDownStabilization,
       },
       templates,
+      credentials,
     },
   });
   return body;
@@ -402,5 +414,36 @@ describe('AgentCore compute fields', () => {
     expect(body).toContain('Scaling and Lifecycle');
     expect(body).not.toContain('name="minReplicas"');
     expect(body).not.toContain('name="utilizationTarget"');
+  });
+});
+
+describe("a consumer replacing a provider's credential fields", () => {
+  it("renders its component in place of the provider's own", () => {
+    // Cloud Run's Access section standing in for Lambda's is not a real
+    // pairing; it is the cheapest way to prove the override is honoured,
+    // because the two sections ask for visibly different things.
+    const body = renderComputeFields({
+      provider: 'lambda',
+      credentials: { lambda: cloudRunAccessFields },
+    });
+
+    expect(body).toContain('Service Account');
+    expect(body).not.toContain('IAM Role ARN');
+  });
+
+  it('leaves a provider alone when the consumer names another', () => {
+    const body = renderComputeFields({
+      provider: 'lambda',
+      credentials: { modal: cloudRunAccessFields },
+    });
+
+    expect(body).toContain('IAM Role ARN');
+    expect(body).not.toContain('Service Account');
+  });
+
+  it('falls back to the provider when the consumer supplies none', () => {
+    const body = renderComputeFields({ provider: 'lambda' });
+
+    expect(body).toContain('IAM Role ARN');
   });
 });
