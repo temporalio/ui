@@ -32,15 +32,20 @@ export type BrowserExecutionTarget = {
   taskQueue: string;
 };
 
-export type BrowserWorkflowExecution = BrowserExecutionTarget & {
+export type BrowserWorkflowAction = {
   kind: 'workflow';
   workflowType: string;
   nexusEndpoints?: string[];
 };
 
+export type BrowserWorkflowExecution = BrowserExecutionTarget &
+  BrowserWorkflowAction;
+
+export type BrowserScheduleAction = BrowserWorkflowAction;
+
 export type BrowserScheduleExecution = BrowserExecutionTarget & {
   kind: 'schedule';
-  workflowType: string;
+  action: BrowserScheduleAction;
   spec: JsonObject;
   policies: JsonObject;
   state: JsonObject;

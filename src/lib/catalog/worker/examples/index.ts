@@ -1,8 +1,9 @@
 // GENERATED FILE. DO NOT EDIT.
-import type {
-  CatalogExampleDefinition,
-  CatalogExampleRegistration,
-  WorkflowImplementation,
+import {
+  type CatalogExampleDefinition,
+  type CatalogExampleRegistration,
+  resolveCatalogWorkflowExecution,
+  type WorkflowImplementation,
 } from '../registry.js';
 import { catalogExample as example0 } from './activity-heartbeat/example.js';
 import { catalogExample as example1 } from './activity-retry/example.js';
@@ -90,21 +91,17 @@ export const sharedWorkflowExports: Readonly<
   const workflowExports: Record<string, WorkflowImplementation> = {};
 
   for (const example of sharedWorkflowExamples) {
-    if (
-      example.execution.kind !== 'workflow' &&
-      example.execution.kind !== 'schedule'
-    )
-      continue;
-    const existing = workflowExports[example.execution.workflowType];
+    const workflow = resolveCatalogWorkflowExecution(example.execution);
+    if (!workflow) continue;
+    const existing = workflowExports[workflow.workflowType];
 
-    if (existing && existing !== example.execution.workflow) {
+    if (existing && existing !== workflow.workflow) {
       throw new Error(
-        `Workflow type "${example.execution.workflowType}" maps to different workflow implementations`,
+        `Workflow type "${workflow.workflowType}" maps to different workflow implementations`,
       );
     }
 
-    workflowExports[example.execution.workflowType] =
-      example.execution.workflow;
+    workflowExports[workflow.workflowType] = workflow.workflow;
   }
 
   return workflowExports;

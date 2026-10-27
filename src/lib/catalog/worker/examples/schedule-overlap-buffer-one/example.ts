@@ -38,9 +38,6 @@ For cleanup, manually delete the Schedule in the UI, including after its allowan
   },
   execution: {
     kind: 'schedule' as const,
-    workflowType: 'scheduleOverlapBufferOne',
-    workflow: scheduleOverlapBufferOne,
-    activities: {},
     spec: { interval: [{ interval: '10s' }] },
     policies: {
       overlapPolicy: 'SCHEDULE_OVERLAP_POLICY_BUFFER_ONE',
@@ -48,5 +45,11 @@ For cleanup, manually delete the Schedule in the UI, including after its allowan
       catchupWindow: '60s',
     },
     state: { paused: false, limitedActions: true, remainingActions: '3' },
+    action: {
+      kind: 'workflow' as const,
+      workflowType: 'scheduleOverlapBufferOne',
+      workflow: scheduleOverlapBufferOne,
+      activities: {},
+    },
   },
 };

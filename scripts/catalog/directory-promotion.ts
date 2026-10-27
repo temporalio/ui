@@ -17,6 +17,7 @@ import {
   SyntaxKind,
 } from 'typescript';
 
+import { resolveCatalogSourceExecution } from './canonical-assemblies.js';
 import { validateExampleId } from './scaffold.js';
 
 const localExamplesPath = 'catalog.local/examples';
@@ -123,13 +124,12 @@ const validateAuthoredTree = async (
     );
   }
 
-  const kind = /\bkind\s*:\s*['"]([^'"]+)['"]/.exec(example)?.[1];
-  const workflowType =
-    kind === 'workflow' || kind === 'schedule'
-      ? /\bworkflowType\s*:\s*['"]([^'"]+)['"]/.exec(example)?.[1]
-      : undefined;
+  const { kind, workflowType } = resolveCatalogSourceExecution(
+    example,
+    relative(rootDirectory, examplePath),
+  );
 
-  if (kind === 'workflow' || kind === 'schedule') {
+  if (workflowType) {
     const workflowPath = join(sourcePath, 'workflow.ts');
 
     if (!(await pathExists(workflowPath))) {
@@ -161,9 +161,15 @@ const validateAuthoredTree = async (
         join(sharedDirectory, entry.name, 'example.ts'),
         'utf8',
       ).catch(() => '');
-      const existingWorkflowType = /\bworkflowType\s*:\s*['"]([^'"]+)['"]/.exec(
-        sharedExample,
-      )?.[1];
+      const existingWorkflowType = sharedExample
+        ? resolveCatalogSourceExecution(
+            sharedExample,
+            relative(
+              rootDirectory,
+              join(sharedDirectory, entry.name, 'example.ts'),
+            ),
+          ).workflowType
+        : undefined;
 
       if (existingWorkflowType === workflowType) {
         throw new Error(

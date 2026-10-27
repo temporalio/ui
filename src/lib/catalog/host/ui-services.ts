@@ -1,4 +1,4 @@
-import type { Payload, PollerInfo, TaskQueueResponse } from '$lib/types';
+import type { PollerInfo, TaskQueueResponse } from '$lib/types';
 import type { DescribeWorkerDeploymentResponse } from '$lib/types/deployments';
 import { deploymentHasComputeConfig } from '$lib/utilities/deployment-has-compute-config';
 import { encodePayloads } from '$lib/utilities/encode-payload';
@@ -20,6 +20,10 @@ import {
   toWorkflowObservation,
 } from './observation';
 import {
+  type EncodeCatalogInput,
+  encodeScheduleAction,
+} from './schedule-action';
+import {
   type ApiLaunchRequest,
   type ApiLaunchResult,
   assembleWorkbenchHost,
@@ -32,15 +36,10 @@ import type {
   WorkerAvailability,
 } from '../browser/workbench-host';
 
-type EncodeInput = (
-  input: JsonValue,
-  positional: boolean,
-) => Promise<Payload[]>;
-
 type ApiWorkbenchHostOptions = {
   descriptors: readonly BrowserCatalogDescriptor[];
   request?: typeof fetch;
-  encodeInput?: EncodeInput;
+  encodeInput?: EncodeCatalogInput;
   getIdentity?: () => string | undefined;
   createRequestId?: () => string;
 };
@@ -52,7 +51,7 @@ const isActivePoller = (poller: PollerInfo) =>
   Date.now() - validTimeToDate(poller.lastAccessTime).getTime() <=
     ACTIVE_POLLER_WINDOW_MS;
 
-const defaultEncodeInput: EncodeInput = async (input, positional) => {
+const defaultEncodeInput: EncodeCatalogInput = async (input, positional) => {
   const values = positional && Array.isArray(input) ? input : [input];
   const encoded = await Promise.all(
     values.map((value) =>
@@ -257,7 +256,13 @@ export const createApiWorkbenchHost = ({
           return { status: 'rejected', reason: 'invalid-request' };
         }
 
-        const payloads = await encodeInput(launchRequest.input, true);
+        const action = await encodeScheduleAction({
+          action: launchRequest.action,
+          input: launchRequest.input,
+          scheduleId: launchRequest.scheduleId,
+          taskQueue: launchRequest.target.taskQueue,
+          encodeInput,
+        });
         route = routeForApi('schedule', {
           namespace: launchRequest.target.namespace,
           scheduleId: launchRequest.scheduleId,
@@ -268,14 +273,7 @@ export const createApiWorkbenchHost = ({
             spec,
             policies,
             state,
-            action: {
-              startWorkflow: {
-                workflowId: `catalog-${launchRequest.scheduleId}`,
-                workflowType: { name: launchRequest.workflowType },
-                taskQueue: { name: launchRequest.target.taskQueue },
-                input: { payloads },
-              },
-            },
+            action,
           },
         });
       } else if (launchRequest.kind === 'workflow') {

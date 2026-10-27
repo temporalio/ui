@@ -1,8 +1,10 @@
 import { ApiObservationError } from './observation';
+import { getCatalogExecutionAction } from '../browser/execution-action';
 import { declaredExecutionId } from '../browser/start-example';
 import type {
   BrowserCatalogDescriptor,
   BrowserCatalogExecution,
+  BrowserScheduleAction,
   JsonValue,
 } from '../browser/types';
 import type {
@@ -27,7 +29,7 @@ type LaunchRequestBase = {
 export type ApiLaunchRequest =
   | (LaunchRequestBase & {
       kind: 'schedule';
-      workflowType: string;
+      action: BrowserScheduleAction;
       scheduleId: string;
       spec: JsonValue;
       policies: JsonValue;
@@ -107,7 +109,7 @@ const launchRequestFor = (
     return {
       ...base,
       kind: execution.kind,
-      workflowType: execution.workflowType,
+      action: execution.action,
       scheduleId: executionId,
       spec: execution.spec,
       policies: execution.policies,
@@ -254,11 +256,11 @@ export const assembleWorkbenchHost = ({
         throw new Error(`Unknown catalog example: ${exampleId}`);
       }
 
+      const action = getCatalogExecutionAction(descriptor.execution);
       const taskQueueType =
-        descriptor.execution.kind === 'workflow' ||
-        descriptor.execution.kind === 'schedule'
+        action.kind === 'workflow'
           ? 1
-          : descriptor.execution.kind === 'standalone-activity'
+          : action.kind === 'standalone-activity'
             ? 2
             : 3;
       let workerCheck: WorkerReadinessCheck;
@@ -291,10 +293,10 @@ export const assembleWorkbenchHost = ({
       const checks: ReadinessCheck[] = [workerCheck];
 
       const declaredEndpoints =
-        descriptor.execution.kind === 'standalone-nexus-operation'
-          ? [descriptor.execution.endpoint]
-          : descriptor.execution.kind === 'workflow'
-            ? (descriptor.execution.nexusEndpoints ?? [])
+        action.kind === 'standalone-nexus-operation'
+          ? [action.endpoint]
+          : action.kind === 'workflow'
+            ? (action.nexusEndpoints ?? [])
             : [];
 
       for (const endpoint of declaredEndpoints) {

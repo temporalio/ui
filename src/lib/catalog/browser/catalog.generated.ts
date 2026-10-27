@@ -2,7 +2,7 @@ import type { BrowserCatalogArtifact } from './types';
 
 export const catalogArtifact: BrowserCatalogArtifact = {
   sourceHash:
-    'eb46e84ec7c34a5067a561b3174b31adc709210ac85166feeb7d552ed4cbdada',
+    '7591556b58f23da0ff532ce7e343082f50b15296d60d92b10cff8c54810ad34c',
   descriptors: [
     {
       id: 'activity-heartbeat',
@@ -826,7 +826,7 @@ export const catalogArtifact: BrowserCatalogArtifact = {
         targetId: 'shared-workflows',
         namespace: 'default',
         taskQueue: 'ui-catalog',
-        workflowType: 'scheduleOverlapBufferOne',
+        action: { kind: 'workflow', workflowType: 'scheduleOverlapBufferOne' },
         spec: { interval: [{ interval: '10s' }] },
         policies: {
           overlapPolicy: 'SCHEDULE_OVERLAP_POLICY_BUFFER_ONE',
@@ -877,7 +877,7 @@ export const catalogArtifact: BrowserCatalogArtifact = {
         targetId: 'shared-workflows',
         namespace: 'default',
         taskQueue: 'ui-catalog',
-        workflowType: 'schedulePauseOnFailure',
+        action: { kind: 'workflow', workflowType: 'schedulePauseOnFailure' },
         spec: { interval: [{ interval: '30s' }] },
         policies: {
           overlapPolicy: 'SCHEDULE_OVERLAP_POLICY_SKIP',
@@ -928,7 +928,7 @@ export const catalogArtifact: BrowserCatalogArtifact = {
         targetId: 'shared-workflows',
         namespace: 'default',
         taskQueue: 'ui-catalog',
-        workflowType: 'scheduleRecurringSuccess',
+        action: { kind: 'workflow', workflowType: 'scheduleRecurringSuccess' },
         spec: { interval: [{ interval: '30s' }] },
         policies: {
           overlapPolicy: 'SCHEDULE_OVERLAP_POLICY_SKIP',

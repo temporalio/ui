@@ -4,9 +4,28 @@ import { join, relative, sep } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 import { format, resolveConfig } from 'prettier';
+import {
+  createSourceFile,
+  type Expression,
+  isAsExpression,
+  isIdentifier,
+  isObjectLiteralExpression,
+  isParenthesizedExpression,
+  isPropertyAssignment,
+  isSatisfiesExpression,
+  isShorthandPropertyAssignment,
+  isStringLiteral,
+  isVariableStatement,
+  NodeFlags,
+  ScriptKind,
+  ScriptTarget,
+} from 'typescript';
 
 import type { CatalogRegistrationSource } from '../../src/lib/catalog/worker/registration-source.js';
-import type { CatalogExampleDefinition } from '../../src/lib/catalog/worker/registry.js';
+import {
+  type CatalogExampleDefinition,
+  resolveCatalogWorkflowExecution,
+} from '../../src/lib/catalog/worker/registry.js';
 
 const examplesPath = 'src/lib/catalog/worker/examples';
 const indexPath = `${examplesPath}/index.ts`;
@@ -26,6 +45,105 @@ type CanonicalExample = {
 type CatalogAssembly = {
   content: string;
   path: string;
+};
+
+const unwrapExpression = (expression: Expression): Expression => {
+  if (
+    isAsExpression(expression) ||
+    isSatisfiesExpression(expression) ||
+    isParenthesizedExpression(expression)
+  )
+    return unwrapExpression(expression.expression);
+  return expression;
+};
+
+const resolveExpression = (
+  expression: Expression | undefined,
+  constants: ReadonlyMap<string, Expression>,
+  ancestors = new Set<string>(),
+): Expression | undefined => {
+  if (!expression) return;
+  const value = unwrapExpression(expression);
+  if (!isIdentifier(value)) return value;
+  if (ancestors.has(value.text)) return;
+  ancestors.add(value.text);
+  return resolveExpression(constants.get(value.text), constants, ancestors);
+};
+
+const objectField = (
+  expression: Expression | undefined,
+  name: string,
+  constants: ReadonlyMap<string, Expression>,
+): Expression | undefined => {
+  const object = resolveExpression(expression, constants);
+  if (!object || !isObjectLiteralExpression(object)) return;
+  for (const property of [...object.properties].reverse()) {
+    if (
+      (isPropertyAssignment(property) ||
+        isShorthandPropertyAssignment(property)) &&
+      (isIdentifier(property.name) || isStringLiteral(property.name)) &&
+      property.name.text === name
+    ) {
+      return resolveExpression(
+        isPropertyAssignment(property) ? property.initializer : property.name,
+        constants,
+      );
+    }
+  }
+};
+
+export const resolveCatalogSourceExecution = (
+  source: string,
+  filePath: string,
+) => {
+  const sourceFile = createSourceFile(
+    filePath,
+    source,
+    ScriptTarget.Latest,
+    true,
+    ScriptKind.TS,
+  );
+  const constants = new Map<string, Expression>();
+  for (const statement of sourceFile.statements) {
+    if (
+      !isVariableStatement(statement) ||
+      !(statement.declarationList.flags & NodeFlags.Const)
+    )
+      continue;
+    for (const declaration of statement.declarationList.declarations) {
+      if (isIdentifier(declaration.name) && declaration.initializer) {
+        constants.set(declaration.name.text, declaration.initializer);
+      }
+    }
+  }
+  const definition = constants.get('catalogExample');
+  const execution = objectField(definition, 'execution', constants);
+  const kindField = objectField(execution, 'kind', constants);
+  const kind =
+    kindField && isStringLiteral(kindField) ? kindField.text : undefined;
+  if (!kind) throw new Error(`${filePath} must declare an execution kind`);
+  let workflow = execution;
+  if (kind === 'schedule') {
+    workflow = objectField(execution, 'action', constants);
+    const actionKind = objectField(workflow, 'kind', constants);
+    if (
+      !actionKind ||
+      !isStringLiteral(actionKind) ||
+      actionKind.text !== 'workflow'
+    ) {
+      throw new Error(`${filePath} must declare a workflow schedule action`);
+    }
+  }
+  if (kind !== 'workflow' && kind !== 'schedule') return { kind };
+  const workflowTypeField = objectField(workflow, 'workflowType', constants);
+  const workflowType =
+    workflowTypeField && isStringLiteral(workflowTypeField)
+      ? workflowTypeField.text
+      : undefined;
+  if (!workflowType || !identifierPattern.test(workflowType)) {
+    throw new Error(`${filePath} must declare a valid workflowType`);
+  }
+  return { kind, workflowType };
 };
 
 const regularFilesRecursively = async (
@@ -78,25 +196,12 @@ const readCanonicalExamples = async (
       );
     }
 
-    const kind = /\bkind\s*:\s*['"]([^'"]+)['"]/.exec(source)?.[1];
-    if (!kind) {
-      throw new Error(
-        `${relative(rootDirectory, examplePath)} must declare an execution kind`,
-      );
-    }
+    const { kind, workflowType } = resolveCatalogSourceExecution(
+      source,
+      relative(rootDirectory, examplePath),
+    );
 
-    const workflowType =
-      kind === 'workflow' || kind === 'schedule'
-        ? /\bworkflowType\s*:\s*['"]([^'"]+)['"]/.exec(source)?.[1]
-        : undefined;
-
-    if (kind === 'workflow' || kind === 'schedule') {
-      if (!workflowType || !identifierPattern.test(workflowType)) {
-        throw new Error(
-          `${relative(rootDirectory, examplePath)} must declare a valid workflowType`,
-        );
-      }
-
+    if (workflowType) {
       const workflowPath = join(exampleDirectory, 'workflow.ts');
       const workflow = await readFile(workflowPath, 'utf8');
       const exportedWorkflow = new RegExp(
@@ -142,20 +247,19 @@ export const renderCanonicalCatalogAssemblies = async (
     .map((path) => `  '${path}',`)
     .join('\n');
   const workflowExports = examples
-    .filter(
-      (example): example is CanonicalExample & { workflowType: string } =>
-        (example.kind === 'workflow' || example.kind === 'schedule') &&
-        Boolean(example.workflowType),
+    .filter((example): example is CanonicalExample & { workflowType: string } =>
+      Boolean(example.workflowType),
     )
     .map(
       ({ id, workflowType }) =>
         `export { ${workflowType} } from './examples/${id}/workflow.js';`,
     )
     .join('\n');
-  const index = `${generatedHeader}import type {
-  CatalogExampleDefinition,
-  CatalogExampleRegistration,
-  WorkflowImplementation,
+  const index = `${generatedHeader}import {
+  type CatalogExampleDefinition,
+  type CatalogExampleRegistration,
+  resolveCatalogWorkflowExecution,
+  type WorkflowImplementation,
 } from '../registry.js';
 ${imports}
 
@@ -183,19 +287,17 @@ export const sharedWorkflowExports: Readonly<
   const workflowExports: Record<string, WorkflowImplementation> = {};
 
   for (const example of sharedWorkflowExamples) {
-    if (
-      example.execution.kind !== 'workflow' &&
-      example.execution.kind !== 'schedule'
-    ) continue;
-    const existing = workflowExports[example.execution.workflowType];
+    const workflow = resolveCatalogWorkflowExecution(example.execution);
+    if (!workflow) continue;
+    const existing = workflowExports[workflow.workflowType];
 
-    if (existing && existing !== example.execution.workflow) {
+    if (existing && existing !== workflow.workflow) {
       throw new Error(
-        \`Workflow type "\${example.execution.workflowType}" maps to different workflow implementations\`,
+        \`Workflow type "\${workflow.workflowType}" maps to different workflow implementations\`,
       );
     }
 
-    workflowExports[example.execution.workflowType] = example.execution.workflow;
+    workflowExports[workflow.workflowType] = workflow.workflow;
   }
 
   return workflowExports;
@@ -251,12 +353,10 @@ export const loadCanonicalCatalogRegistrationSource = async (
     }),
   );
   const workflowExports = Object.fromEntries(
-    definitions.flatMap((definition) =>
-      definition.execution.kind === 'workflow' ||
-      definition.execution.kind === 'schedule'
-        ? [[definition.execution.workflowType, definition.execution.workflow]]
-        : [],
-    ),
+    definitions.flatMap((definition) => {
+      const workflow = resolveCatalogWorkflowExecution(definition.execution);
+      return workflow ? [[workflow.workflowType, workflow.workflow]] : [];
+    }),
   );
   return {
     source: { id: 'oss', label: 'OSS' },

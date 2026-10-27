@@ -1,4 +1,9 @@
-import type { BrowserCatalogExecution, JsonValue } from './types';
+import { getCatalogExecutionAction } from './execution-action';
+import type {
+  BrowserCatalogDescriptor,
+  BrowserCatalogExecution,
+  JsonValue,
+} from './types';
 
 export type AttemptIdentity = {
   attemptId: string;
@@ -150,16 +155,13 @@ export type CatalogStartPolicy = {
 };
 
 export const catalogStartAllowed = (
-  descriptor: {
-    execution: Pick<BrowserCatalogExecution, 'kind' | 'namespace'>;
-  },
+  descriptor: Pick<BrowserCatalogDescriptor, 'execution'>,
   policy: CatalogStartPolicy,
 ): boolean =>
   !policy.disableWriteActions &&
   !policy.namespaceWriteDisabled(descriptor.execution.namespace) &&
   !(
-    (descriptor.execution.kind === 'workflow' ||
-      descriptor.execution.kind === 'schedule') &&
+    getCatalogExecutionAction(descriptor.execution).kind === 'workflow' &&
     policy.workflowStartsDisabled
   );
 

@@ -74,11 +74,18 @@ On a plaintext local connection, the worker creates any Nexus endpoints its exam
 
 ## Schedule examples
 
-Schedule entries use execution kind `schedule`. They register a Workflow implementation
-and its activities alongside `spec`, `policies`, and `state` in Temporal's Schedule
-API JSON format. The registered target supplies the namespace and task queue; the
-catalog encodes the example input as Workflow arguments. Start options may declare
-an optional `scheduleId`. Otherwise, each launch creates a new Schedule ID.
+Schedule entries use execution kind `schedule`. The Schedule owns `spec`,
+`policies`, and `state` in Temporal's Schedule API JSON format. Its nested `action`
+owns `kind: 'workflow'`, `workflowType`, the Workflow implementation (`workflow`),
+and `activities`. Only Workflow actions are supported today. This is the catalog's
+worker execution contract.
+
+The registered target supplies the namespace and task queue. The catalog encodes
+the example input as arguments for the nested Workflow action. Worker readiness
+checks use that action's Workflow type and activities, and generated action metadata
+identifies the Workflow type without exposing its implementation to the browser.
+Start options may declare an optional `scheduleId`. Otherwise, each launch creates
+a new Schedule ID.
 
 Pressing **Run** creates an actual Schedule rather than starting a single Workflow.
 After confirming the Schedule exists, the launch displays **Created** and provides

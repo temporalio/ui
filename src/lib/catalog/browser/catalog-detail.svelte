@@ -162,6 +162,7 @@
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
 
   import { featureLabel } from './catalog-features';
+  import { getCatalogExecutionAction } from './execution-action';
   import { launchOutcomeExplanation } from './launch-outcome-presentation';
   import { createReadinessLoader } from './readiness-loader';
   import { sessionStatusPresentation } from './session-presentation';
@@ -194,6 +195,10 @@
   }
 
   let { descriptor, host, sessionStore, workerStartCommand }: Props = $props();
+
+  let executionAction = $derived(
+    getCatalogExecutionAction(descriptor.execution),
+  );
 
   let inputEditor = $state('');
   let startOptionsEditor = $state('');
@@ -282,26 +287,28 @@
       value: execution.taskQueue,
     };
 
-    if (execution.kind === 'workflow' || execution.kind === 'schedule') {
+    const action = executionAction;
+
+    if (action.kind === 'workflow') {
       return [
         identity,
         taskQueue,
         {
           id: 'catalog-workflow-type',
           label: 'Workflow Type',
-          value: execution.workflowType,
+          value: action.workflowType,
         },
       ];
     }
 
-    if (execution.kind === 'standalone-activity') {
+    if (action.kind === 'standalone-activity') {
       return [
         identity,
         taskQueue,
         {
           id: 'catalog-activity-type',
           label: 'Activity Type',
-          value: execution.activityType,
+          value: action.activityType,
         },
       ];
     }
@@ -312,17 +319,17 @@
       {
         id: 'catalog-endpoint',
         label: 'Nexus Endpoint',
-        value: execution.endpoint,
+        value: action.endpoint,
       },
       {
         id: 'catalog-service',
         label: 'Service',
-        value: execution.service,
+        value: action.service,
       },
       {
         id: 'catalog-operation',
         label: 'Operation',
-        value: execution.operation,
+        value: action.operation,
       },
     ];
   });
@@ -345,7 +352,7 @@
   let workerPresentation = $derived(
     readinessPresentation({
       kind: 'worker',
-      executionKind: descriptor.execution.kind,
+      executionKind: executionAction.kind,
       state: readinessLoading ? 'loading' : workerReadinessState,
       taskQueue: descriptor.execution.taskQueue,
       workerStartCommand,
@@ -364,7 +371,7 @@
             (check) =>
               readinessPresentation({
                 kind: check.kind,
-                executionKind: descriptor.execution.kind,
+                executionKind: executionAction.kind,
                 state: check.state,
                 taskQueue: descriptor.execution.taskQueue,
               }).iconLabel,
@@ -853,7 +860,7 @@
             {#each prerequisiteReadiness as check, index (`${check.kind}-${index}`)}
               {@const presentation = readinessPresentation({
                 kind: check.kind,
-                executionKind: descriptor.execution.kind,
+                executionKind: executionAction.kind,
                 state: check.state,
                 taskQueue: descriptor.execution.taskQueue,
               })}

@@ -42,9 +42,6 @@ For cleanup, manually delete the Schedule in the UI, including after its allowan
   },
   execution: {
     kind: 'schedule' as const,
-    workflowType: 'scheduleRecurringSuccess',
-    workflow: scheduleRecurringSuccess,
-    activities: {},
     spec: { interval: [{ interval: '30s' }] },
     policies: {
       overlapPolicy: 'SCHEDULE_OVERLAP_POLICY_SKIP',
@@ -52,5 +49,11 @@ For cleanup, manually delete the Schedule in the UI, including after its allowan
       catchupWindow: '60s',
     },
     state: { paused: false, limitedActions: true, remainingActions: '3' },
+    action: {
+      kind: 'workflow' as const,
+      workflowType: 'scheduleRecurringSuccess',
+      workflow: scheduleRecurringSuccess,
+      activities: {},
+    },
   },
 };
