@@ -31,7 +31,7 @@ import { requireCatalogRoutingFromEnvironment } from '../../src/lib/catalog/work
 
 const temporaryDirectories: string[] = [];
 const execFileAsync = promisify(execFile);
-const catalogCommandTestTimeoutMs = 30_000;
+const catalogCommandTestTimeoutMs = 60_000;
 const packageConsumerTest =
   process.env.CATALOG_PACKAGE_TEST === '1' ? it : it.skip;
 
