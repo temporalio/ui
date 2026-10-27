@@ -60,3 +60,7 @@ go.work.sum
 # Feature demo runner output and machine-local paths (scripts/feature-demo.ts)
 /.feature-demo/
 /.env.feature-demo.local
+
+# Standalone component documentation
+/docs/.svelte-kit/
+/docs/build/
