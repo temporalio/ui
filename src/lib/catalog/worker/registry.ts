@@ -40,6 +40,16 @@ type WorkflowExecution = {
   nexusServices?: readonly ServiceHandler[];
 };
 
+type ScheduleExecution = Pick<
+  WorkflowExecution,
+  'workflowType' | 'workflow' | 'activities'
+> & {
+  kind: 'schedule';
+  spec: JsonObject;
+  policies: JsonObject;
+  state: JsonObject;
+};
+
 type StandaloneActivityExecution = {
   kind: 'standalone-activity';
   activityType: string;
@@ -61,6 +71,10 @@ export type WorkflowExampleRegistration = ExampleMetadata & {
   execution: WorkflowExecution;
 };
 
+export type ScheduleExampleRegistration = ExampleMetadata & {
+  execution: ScheduleExecution;
+};
+
 export type StandaloneActivityExampleRegistration = ExampleMetadata & {
   execution: StandaloneActivityExecution;
 };
@@ -70,6 +84,7 @@ export type StandaloneNexusOperationExampleRegistration = ExampleMetadata & {
 };
 
 export type CatalogExampleRegistration =
+  | ScheduleExampleRegistration
   | StandaloneActivityExampleRegistration
   | StandaloneNexusOperationExampleRegistration
   | WorkflowExampleRegistration;
@@ -282,6 +297,16 @@ const workflowExecutionFields = new Set([
   'nexusServices',
 ]);
 
+const scheduleExecutionFields = new Set([
+  'kind',
+  'workflowType',
+  'workflow',
+  'activities',
+  'spec',
+  'policies',
+  'state',
+]);
+
 const standaloneActivityExecutionFields = new Set([
   'kind',
   'activityType',
@@ -301,6 +326,7 @@ const standaloneNexusExecutionFields = new Set([
 
 const executionKinds = new Set([
   'workflow',
+  'schedule',
   'standalone-activity',
   'standalone-nexus-operation',
 ]);
@@ -418,6 +444,15 @@ export const generateCatalog = (registry: CatalogRegistry) => {
     }
 
     if (
+      example.execution.kind === 'schedule' &&
+      !hasOnlyKnownFields(example.execution, scheduleExecutionFields)
+    ) {
+      throw new Error(
+        `Catalog schedule execution for example "${example.id}" contains unknown fields`,
+      );
+    }
+
+    if (
       example.execution.kind === 'standalone-activity' &&
       !hasOnlyKnownFields(example.execution, standaloneActivityExecutionFields)
     ) {
@@ -477,13 +512,25 @@ export const generateCatalog = (registry: CatalogRegistry) => {
     }
 
     if (
-      example.execution.kind === 'workflow' &&
+      (example.execution.kind === 'workflow' ||
+        example.execution.kind === 'schedule') &&
       (!isNonEmptyString(example.execution.workflowType) ||
         typeof example.execution.workflow !== 'function' ||
         !isFunctionRecord(example.execution.activities))
     ) {
       throw new Error(
-        `Catalog workflow execution for example "${example.id}" has invalid field types`,
+        `Catalog ${example.execution.kind} execution for example "${example.id}" has invalid field types`,
+      );
+    }
+
+    if (
+      example.execution.kind === 'schedule' &&
+      (!isJsonObject(example.execution.spec) ||
+        !isJsonObject(example.execution.policies) ||
+        !isJsonObject(example.execution.state))
+    ) {
+      throw new Error(
+        `Catalog schedule execution for example "${example.id}" has invalid field types`,
       );
     }
 
@@ -512,7 +559,8 @@ export const generateCatalog = (registry: CatalogRegistry) => {
     }
 
     if (
-      example.execution.kind === 'workflow' &&
+      (example.execution.kind === 'workflow' ||
+        example.execution.kind === 'schedule') &&
       !hasOnlyEnumerableDataProperties(example.execution.activities)
     ) {
       throw new Error(
@@ -549,7 +597,7 @@ export const generateCatalog = (registry: CatalogRegistry) => {
     }
 
     if (
-      execution.kind === 'workflow' &&
+      (execution.kind === 'workflow' || execution.kind === 'schedule') &&
       !Object.hasOwn(target.workflowExports, execution.workflowType)
     ) {
       throw new Error(
@@ -558,7 +606,7 @@ export const generateCatalog = (registry: CatalogRegistry) => {
     }
 
     if (
-      execution.kind === 'workflow' &&
+      (execution.kind === 'workflow' || execution.kind === 'schedule') &&
       target.workflowExports[execution.workflowType] !== execution.workflow
     ) {
       throw new Error(
@@ -610,15 +658,17 @@ export const generateCatalog = (registry: CatalogRegistry) => {
       };
 
       for (const { execution } of examples) {
-        if (execution.kind === 'workflow') {
+        if (execution.kind === 'workflow' || execution.kind === 'schedule') {
           for (const [activityType, implementation] of Object.entries(
             execution.activities,
           )) {
             addActivity(activityType, implementation);
           }
 
-          for (const handler of execution.nexusServices ?? []) {
-            addNexusService(handler);
+          if (execution.kind === 'workflow') {
+            for (const handler of execution.nexusServices ?? []) {
+              addNexusService(handler);
+            }
           }
         } else if (execution.kind === 'standalone-activity') {
           addActivity(execution.activityType, execution.activity);
@@ -666,6 +716,22 @@ export const generateCatalog = (registry: CatalogRegistry) => {
             service: execution.service,
             operation: execution.operation,
             policies: execution.policies,
+          },
+        };
+      }
+
+      if (execution.kind === 'schedule') {
+        return {
+          ...metadata,
+          execution: {
+            kind: execution.kind,
+            targetId: target.id,
+            namespace: target.namespace,
+            taskQueue: target.taskQueue,
+            workflowType: execution.workflowType,
+            spec: execution.spec,
+            policies: execution.policies,
+            state: execution.state,
           },
         };
       }

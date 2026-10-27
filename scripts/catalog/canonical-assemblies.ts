@@ -86,11 +86,11 @@ const readCanonicalExamples = async (
     }
 
     const workflowType =
-      kind === 'workflow'
+      kind === 'workflow' || kind === 'schedule'
         ? /\bworkflowType\s*:\s*['"]([^'"]+)['"]/.exec(source)?.[1]
         : undefined;
 
-    if (kind === 'workflow') {
+    if (kind === 'workflow' || kind === 'schedule') {
       if (!workflowType || !identifierPattern.test(workflowType)) {
         throw new Error(
           `${relative(rootDirectory, examplePath)} must declare a valid workflowType`,
@@ -144,7 +144,8 @@ export const renderCanonicalCatalogAssemblies = async (
   const workflowExports = examples
     .filter(
       (example): example is CanonicalExample & { workflowType: string } =>
-        example.kind === 'workflow' && Boolean(example.workflowType),
+        (example.kind === 'workflow' || example.kind === 'schedule') &&
+        Boolean(example.workflowType),
     )
     .map(
       ({ id, workflowType }) =>
@@ -182,7 +183,10 @@ export const sharedWorkflowExports: Readonly<
   const workflowExports: Record<string, WorkflowImplementation> = {};
 
   for (const example of sharedWorkflowExamples) {
-    if (example.execution.kind !== 'workflow') continue;
+    if (
+      example.execution.kind !== 'workflow' &&
+      example.execution.kind !== 'schedule'
+    ) continue;
     const existing = workflowExports[example.execution.workflowType];
 
     if (existing && existing !== example.execution.workflow) {
@@ -248,7 +252,8 @@ export const loadCanonicalCatalogRegistrationSource = async (
   );
   const workflowExports = Object.fromEntries(
     definitions.flatMap((definition) =>
-      definition.execution.kind === 'workflow'
+      definition.execution.kind === 'workflow' ||
+      definition.execution.kind === 'schedule'
         ? [[definition.execution.workflowType, definition.execution.workflow]]
         : [],
     ),

@@ -72,6 +72,28 @@ The worker waits for the server rather than exiting if it starts first, printing
 
 On a plaintext local connection, the worker creates any Nexus endpoints its examples declare. When it lacks the authority to do so — any credentialed connection, including Temporal Cloud — it prints the exact `temporal operator nexus endpoint create` command instead, and the catalog page shows the same command as copyable text.
 
+## Schedule examples
+
+Schedule entries use execution kind `schedule`. They register a Workflow implementation
+and its activities alongside `spec`, `policies`, and `state` in Temporal's Schedule
+API JSON format. The registered target supplies the namespace and task queue; the
+catalog encodes the example input as Workflow arguments. Start options may declare
+an optional `scheduleId`. Otherwise, each launch creates a new Schedule ID.
+
+Pressing **Run** creates an actual Schedule rather than starting a single Workflow.
+After confirming the Schedule exists, the launch displays **Created** and provides
+an **Open Schedule** link for inspecting settings and Workflow runs. Catalog status
+checks stop at creation; they do not report scheduled Workflow outcomes or stop the
+Schedule when you leave the catalog. Workflow start restrictions also apply to
+Schedule creation.
+
+The shared examples cover three successful recurring runs, Buffer One overlap,
+and pause on failure. Each has a three-action allowance to bound automatic starts.
+Keep the catalog worker running to execute the scheduled Workflows. Delete the
+Schedule through its detail page when finished; deleting it does not stop or delete
+Workflows it has already started. Explicitly triggering, backfilling, or editing a
+Schedule can change the example's original limits.
+
 ## Generated artifacts
 
 The browser reads generated artifacts rather than importing worker code. `catalog.generated.json`, `catalog.generated.ts`, and the local assemblies under `catalog.local/` are all generated: never edit them by hand.

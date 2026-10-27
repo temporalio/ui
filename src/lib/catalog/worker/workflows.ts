@@ -15,6 +15,9 @@ export { pendingActivitiesWorkflow } from './examples/pending-activities/workflo
 export { pendingNexus } from './examples/pending-nexus/workflow.js';
 export { priorityFairnessWorkflow } from './examples/priority-fairness/workflow.js';
 export { satelliteLaunchEventGroups } from './examples/satellite-launch-event-groups/workflow.js';
+export { scheduleOverlapBufferOne } from './examples/schedule-overlap-buffer-one/workflow.js';
+export { schedulePauseOnFailure } from './examples/schedule-pause-on-failure/workflow.js';
+export { scheduleRecurringSuccess } from './examples/schedule-recurring-success/workflow.js';
 export { sequentialActivities } from './examples/sequential-activities/workflow.js';
 export { sequentialMarkdownActivities } from './examples/sequential-markdown-activities/workflow.js';
 export { sequentialMultilineSummaryActivities } from './examples/sequential-multiline-summary-activities/workflow.js';

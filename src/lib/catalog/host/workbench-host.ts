@@ -6,6 +6,7 @@ import type {
   JsonValue,
 } from '../browser/types';
 import type {
+  AcceptedLaunchReference,
   EvidenceLink,
   LaunchOutcome,
   LaunchReference,
@@ -24,6 +25,14 @@ type LaunchRequestBase = {
 };
 
 export type ApiLaunchRequest =
+  | (LaunchRequestBase & {
+      kind: 'schedule';
+      workflowType: string;
+      scheduleId: string;
+      spec: JsonValue;
+      policies: JsonValue;
+      state: JsonValue;
+    })
   | (LaunchRequestBase & {
       kind: 'workflow';
       workflowType: string;
@@ -71,9 +80,7 @@ export type WorkbenchHostDependencies = {
     request: { namespace: string; endpoint: string },
     signal?: AbortSignal,
   ) => Promise<boolean>;
-  createEvidenceHref: (
-    reference: LaunchReference & { runId: string },
-  ) => string;
+  createEvidenceHref: (reference: AcceptedLaunchReference) => string;
 };
 
 const targetFor = (execution: BrowserCatalogExecution): LaunchTarget => ({
@@ -95,6 +102,18 @@ const launchRequestFor = (
     input: command.input,
     startOptions: command.startOptions,
   };
+
+  if (execution.kind === 'schedule') {
+    return {
+      ...base,
+      kind: execution.kind,
+      workflowType: execution.workflowType,
+      scheduleId: executionId,
+      spec: execution.spec,
+      policies: execution.policies,
+      state: execution.state,
+    };
+  }
 
   if (execution.kind === 'workflow') {
     return {
@@ -195,8 +214,16 @@ export const assembleWorkbenchHost = ({
         };
       }
 
+      if (result.status === 'accepted' && reference.kind === 'schedule') {
+        return {
+          status: 'accepted',
+          reference: { ...reference, kind: 'schedule' },
+        };
+      }
+
       if (
         result.status === 'accepted' &&
+        reference.kind !== 'schedule' &&
         typeof result.runId === 'string' &&
         result.runId
       ) {
@@ -228,7 +255,8 @@ export const assembleWorkbenchHost = ({
       }
 
       const taskQueueType =
-        descriptor.execution.kind === 'workflow'
+        descriptor.execution.kind === 'workflow' ||
+        descriptor.execution.kind === 'schedule'
           ? 1
           : descriptor.execution.kind === 'standalone-activity'
             ? 2
@@ -310,7 +338,7 @@ export const assembleWorkbenchHost = ({
         request.reference.kind !== descriptor.execution.kind ||
         !request.reference.attempt.attemptId ||
         !request.reference.attempt.executionId ||
-        !request.reference.runId ||
+        (request.reference.kind !== 'schedule' && !request.reference.runId) ||
         target.targetId !== expectedTarget?.targetId ||
         target.namespace !== expectedTarget?.namespace ||
         target.taskQueue !== expectedTarget?.taskQueue
@@ -322,7 +350,10 @@ export const assembleWorkbenchHost = ({
     },
     evidenceLink: (outcome): EvidenceLink => ({
       href: createEvidenceHref(outcome.reference),
-      label: 'Open details',
+      label:
+        outcome.reference.kind === 'schedule'
+          ? 'Open Schedule'
+          : 'Open details',
     }),
   };
 };

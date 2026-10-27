@@ -26,9 +26,18 @@ export type LaunchReference = {
   runId?: string;
 };
 
+export type AcceptedLaunchReference = Omit<LaunchReference, 'kind'> &
+  (
+    | { kind: 'schedule' }
+    | {
+        kind: Exclude<BrowserCatalogExecution['kind'], 'schedule'>;
+        runId: string;
+      }
+  );
+
 export type AcceptedLaunchOutcome = {
   status: 'accepted';
-  reference: LaunchReference & { runId: string };
+  reference: AcceptedLaunchReference;
 };
 
 export type RejectedLaunchOutcome = {
@@ -62,7 +71,7 @@ export type ExecutionTerminalStatus =
   | 'timed-out';
 
 export type ObservationRequest = {
-  reference: AcceptedLaunchOutcome['reference'];
+  reference: AcceptedLaunchReference;
   continuation?: JsonValue;
 };
 
@@ -78,7 +87,15 @@ export type TerminalObservation = {
   snapshot: JsonValue;
 };
 
-export type ExecutionObservation = RunningObservation | TerminalObservation;
+export type ResourceReadyObservation = {
+  state: 'ready';
+  snapshot: JsonValue;
+};
+
+export type ExecutionObservation =
+  | RunningObservation
+  | TerminalObservation
+  | ResourceReadyObservation;
 
 export type ReadinessState =
   | 'indeterminate'
@@ -140,7 +157,11 @@ export const catalogStartAllowed = (
 ): boolean =>
   !policy.disableWriteActions &&
   !policy.namespaceWriteDisabled(descriptor.execution.namespace) &&
-  !(descriptor.execution.kind === 'workflow' && policy.workflowStartsDisabled);
+  !(
+    (descriptor.execution.kind === 'workflow' ||
+      descriptor.execution.kind === 'schedule') &&
+    policy.workflowStartsDisabled
+  );
 
 export const createAttemptIdentity = (
   createId: () => string = () => crypto.randomUUID(),

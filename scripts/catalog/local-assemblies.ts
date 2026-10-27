@@ -72,11 +72,11 @@ const readLocalExamples = async (
 
     const kind = /\bkind\s*:\s*['"]([^'"]+)['"]/.exec(source)?.[1];
     const workflowType =
-      kind === 'workflow'
+      kind === 'workflow' || kind === 'schedule'
         ? /\bworkflowType\s*:\s*['"]([^'"]+)['"]/.exec(source)?.[1]
         : undefined;
 
-    if (kind === 'workflow' && !workflowType) {
+    if ((kind === 'workflow' || kind === 'schedule') && !workflowType) {
       throw new Error(
         `${relative(rootDirectory, examplePath)} must declare a valid workflowType`,
       );
@@ -188,7 +188,8 @@ export const loadLocalCatalogRegistrationSource = async (
   );
   const workflowExports = Object.fromEntries(
     definitions.flatMap((definition) =>
-      definition.execution.kind === 'workflow'
+      definition.execution.kind === 'workflow' ||
+      definition.execution.kind === 'schedule'
         ? [[definition.execution.workflowType, definition.execution.workflow]]
         : [],
     ),

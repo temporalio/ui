@@ -38,6 +38,14 @@ export type BrowserWorkflowExecution = BrowserExecutionTarget & {
   nexusEndpoints?: string[];
 };
 
+export type BrowserScheduleExecution = BrowserExecutionTarget & {
+  kind: 'schedule';
+  workflowType: string;
+  spec: JsonObject;
+  policies: JsonObject;
+  state: JsonObject;
+};
+
 export type BrowserStandaloneActivityExecution = BrowserExecutionTarget & {
   kind: 'standalone-activity';
   activityType: string;
@@ -55,6 +63,7 @@ export type BrowserStandaloneNexusOperationExecution =
   };
 
 export type BrowserCatalogExecution =
+  | BrowserScheduleExecution
   | BrowserStandaloneActivityExecution
   | BrowserStandaloneNexusOperationExecution
   | BrowserWorkflowExecution;

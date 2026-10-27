@@ -125,16 +125,16 @@ const validateAuthoredTree = async (
 
   const kind = /\bkind\s*:\s*['"]([^'"]+)['"]/.exec(example)?.[1];
   const workflowType =
-    kind === 'workflow'
+    kind === 'workflow' || kind === 'schedule'
       ? /\bworkflowType\s*:\s*['"]([^'"]+)['"]/.exec(example)?.[1]
       : undefined;
 
-  if (kind === 'workflow') {
+  if (kind === 'workflow' || kind === 'schedule') {
     const workflowPath = join(sourcePath, 'workflow.ts');
 
     if (!(await pathExists(workflowPath))) {
       throw new Error(
-        `${relative(rootDirectory, sourcePath)} must contain workflow.ts for a workflow example`,
+        `${relative(rootDirectory, sourcePath)} must contain workflow.ts for a ${kind} example`,
       );
     }
 

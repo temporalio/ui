@@ -59,6 +59,9 @@ const proofExampleIds = [
   'large-history',
   'workflow-feature-tour',
   'child-fan-out',
+  'schedule-recurring-success',
+  'schedule-overlap-buffer-one',
+  'schedule-pause-on-failure',
 ] as const;
 
 const activitySummaryExamples = [
@@ -187,6 +190,9 @@ describe('shared workflow corpus', () => {
         'largeHistory',
         'featureTourWorkflow',
         'childFanOut',
+        'scheduleRecurringSuccess',
+        'scheduleOverlapBufferOne',
+        'schedulePauseOnFailure',
         ...activitySummaryExamples.map(({ workflowType }) => workflowType),
       ].sort(),
     );
@@ -679,6 +685,12 @@ describe('shared workflow corpus', () => {
         'src/lib/catalog/worker/examples/workflow-feature-tour/handler.ts',
         'src/lib/catalog/worker/examples/child-fan-out/example.ts',
         'src/lib/catalog/worker/examples/child-fan-out/workflow.ts',
+        'src/lib/catalog/worker/examples/schedule-recurring-success/example.ts',
+        'src/lib/catalog/worker/examples/schedule-recurring-success/workflow.ts',
+        'src/lib/catalog/worker/examples/schedule-overlap-buffer-one/example.ts',
+        'src/lib/catalog/worker/examples/schedule-overlap-buffer-one/workflow.ts',
+        'src/lib/catalog/worker/examples/schedule-pause-on-failure/example.ts',
+        'src/lib/catalog/worker/examples/schedule-pause-on-failure/workflow.ts',
         'src/lib/catalog/worker/examples/slow-nexus-operation/example.ts',
         'src/lib/catalog/worker/examples/slow-nexus-operation/handler.ts',
         'src/lib/catalog/worker/examples/slow-nexus-operation/service.ts',
