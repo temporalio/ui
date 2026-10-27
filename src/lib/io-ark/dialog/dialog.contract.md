@@ -1,6 +1,7 @@
 ---
 component: Dialog
 source: ./dialog.svelte
+sourceCommit: 40ba43dab
 usedBy: []
 status: draft
 lastReviewed: 2026-10-27
@@ -59,3 +60,4 @@ None found by reading the code.
 ## Reconciliation log
 
 - 2026-10-27: First written against the uncommitted working tree, so there is no `sourceCommit` yet. Set it to the commit that adds this component. Product code does not use the component yet; docs examples are its only consumers.
+- 2026-10-27: Set `sourceCommit` to `40ba43dab`. The rules above were reconciled against the source at that commit; no rule changes.
