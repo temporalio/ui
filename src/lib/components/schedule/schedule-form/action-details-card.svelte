@@ -2,9 +2,9 @@
   import type { Snippet } from 'svelte';
 
   import Card from '$lib/holocene/card.svelte';
-  import PillContainer from '$lib/holocene/pill-container/pill-container.svelte';
-  import Pill from '$lib/holocene/pill-container/pill.svelte';
   import { translate } from '$lib/i18n/translate';
+  import Segment from '$lib/io/segmented-control/segment.svelte';
+  import SegmentedControl from '$lib/io/segmented-control/segmented-control.svelte';
 
   import { scheduledActionPresentations } from '../scheduled-action-types/presentation-registry';
   import type { ScheduledActionType } from '../scheduled-action-types/types';
@@ -41,20 +41,20 @@
             class="ml-1 font-mono leading-none text-static-danger">*</span
           >
         </legend>
-        <PillContainer class="flex-row rounded-full p-1">
+        <SegmentedControl>
           {#each registeredActionPresentations as presentation (presentation.type)}
-            <Pill
+            <Segment
               id={`${presentation.type}-execution`}
               type="button"
-              active={presentation.type === actionType}
+              selected={presentation.type === actionType}
               aria-pressed={presentation.type === actionType}
               {disabled}
               onclick={() => onActionTypeChange(presentation.type)}
             >
               {presentation.label()}
-            </Pill>
+            </Segment>
           {/each}
-        </PillContainer>
+        </SegmentedControl>
       </fieldset>
     {/if}
     {@render children()}
