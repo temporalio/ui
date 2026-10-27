@@ -32,7 +32,9 @@ describe('registered IO themes', () => {
 
     const maxWidthValues: string[] = [];
     result.root.walkRules('.max-w-lg', (rule) => {
-      rule.walkDecls('max-width', ({ value }) => maxWidthValues.push(value));
+      rule.walkDecls('max-width', ({ value }) => {
+        maxWidthValues.push(value);
+      });
     });
     expect(maxWidthValues.at(-1)).toBe('var(--container-lg)');
   });
