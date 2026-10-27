@@ -2,6 +2,15 @@
 
 Trigger an action with Button or navigate with ButtonLink.
 
+## Anatomy
+
+A button is a native element with an optional icon on either side of its label.
+
+- **Root**: The native button or link element.
+  - **Leading icon** `button > svg:first-child` (left): Optional icon before the label. Replaced by the spinner while loading.
+  - **Label** `button span > span` (top): The visible text and accessible name.
+  - **Trailing icon** `button > svg:last-child` (right): Optional icon after the label, or the spinner when there is no leading icon.
+
 ## Examples
 
 Use one primary action per group. Use secondary styles for other actions.
@@ -14,14 +23,14 @@ Sizes are `xs`, `sm`, and `md`.
 
 ```svelte
 <script lang="ts">
-  import { Button, ButtonLink } from '$lib/io-ark/button';
+  import { Button, ButtonLink } from '$lib/io-poc/button';
 </script>
 
 <Button>Create workflow</Button>
 <ButtonLink href="/namespaces">View namespaces</ButtonLink>
 ```
 
-Package consumers can import from `@temporalio/ui/io-ark/button`.
+Package consumers can import from `@temporalio/ui/io-poc/button`.
 
 ### Labels
 
@@ -44,6 +53,10 @@ Use `isLoading` and a label such as “Creating workflow” to communicate an ac
 progress. Loading shows a spinner and sets `aria-busy`; it does not disable the
 button. Add `disabled` when repeated activation should be prevented, and announce
 the result when the action completes.
+
+### Contract
+
+The rules reviewers check this component against live in `src/lib/io-poc/button/button.contract.md`, next to the source. The Contract section of this page shows them.
 
 ## API reference
 

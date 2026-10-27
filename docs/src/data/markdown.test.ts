@@ -1,8 +1,9 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
-import { parseComponentMarkdown } from './markdown';
+import { parseComponentMarkdown, parseContractMarkdown } from './markdown';
 
 const parse = (usage: string, api = '') =>
   parseComponentMarkdown(`# Example
@@ -91,5 +92,89 @@ describe('component Markdown', () => {
     expect(() =>
       parse('', '| Prop | Description |\n| --- | --- |\n| open | Expanded |'),
     ).toThrow('API tables must have');
+  });
+});
+
+describe('component contracts', () => {
+  const contractFiles = readdirSync('src/lib/io-poc', { recursive: true })
+    .map(String)
+    .filter((file) => file.endsWith('.contract.md'))
+    .map((file) => join('src/lib/io-poc', file));
+  const docSlugs = readdirSync('docs/static/components').map((file) =>
+    file.replace(/\.md$/, ''),
+  );
+
+  it('has one parseable contract per documented component, pointing at real source', () => {
+    const slugs = contractFiles.map((file) =>
+      file
+        .split('/')
+        .pop()!
+        .replace(/\.contract\.md$/, ''),
+    );
+    expect(slugs.sort()).toEqual([...docSlugs].sort());
+    for (const file of contractFiles) {
+      const contract = parseContractMarkdown(readFileSync(file, 'utf8'));
+      expect(existsSync(join(dirname(file), contract.meta.source))).toBe(true);
+      expect(contract.title).toBe(
+        `${readFileSync(
+          `docs/static/components/${file
+            .split('/')
+            .pop()!
+            .replace(/\.contract\.md$/, '')}.md`,
+          'utf8',
+        )
+          .match(/^# (.+)$/m)![1]
+          .trim()} contract`,
+      );
+      expect(contract.sections.map((section) => section.id)).toContain(
+        'reconciliation-log',
+      );
+    }
+  });
+
+  it('keeps contracts out of the docs Markdown', () => {
+    for (const slug of docSlugs) {
+      const markdown = readFileSync(
+        `docs/static/components/${slug}.md`,
+        'utf8',
+      );
+      expect(markdown).not.toMatch(/^## Contract$/m);
+    }
+  });
+
+  it('reads frontmatter and groups sections under level-two headings', () => {
+    const contract = parseContractMarkdown(`---
+component: Example
+source: ./example.svelte
+status: draft
+---
+
+# Example contract
+
+Intro.
+
+## Input
+
+- **IN-1** Example MUST work.
+
+## Known gaps
+
+None.
+`);
+    expect(contract.meta).toMatchObject({
+      component: 'Example',
+      status: 'draft',
+    });
+    expect(contract.intro.blocks).toHaveLength(1);
+    expect(contract.sections.map((section) => section.id)).toEqual([
+      'input',
+      'known-gaps',
+    ]);
+  });
+
+  it('rejects contracts without frontmatter', () => {
+    expect(() => parseContractMarkdown('# Example contract')).toThrow(
+      'YAML frontmatter',
+    );
   });
 });

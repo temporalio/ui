@@ -1,27 +1,57 @@
 <script lang="ts">
   import { Toc } from '@ark-ui/svelte/toc';
-  import type { Snippet } from 'svelte';
+  import type { Component, Snippet } from 'svelte';
 
-  import type { ComponentDocumentation } from '../data/components';
+  import {
+    type ComponentDocumentation,
+    getComponentContent,
+  } from '../data/components';
+  import { getContract } from '../data/contracts';
 
+  import AnatomySection from './anatomy-section.svelte';
+  import ContractSection from './contract-section.svelte';
+  import DocSection from './doc-section.svelte';
+  import MarkdownContent from './markdown-content.svelte';
   import PageActions from './page-actions.svelte';
+  import SourceCode from './source-code.svelte';
 
   interface Props {
     component: ComponentDocumentation;
+    examples: Component;
+    examplesSource: string;
+    framed?: boolean;
     sections?: { id: string; label: string }[];
+    anatomy?: Snippet;
+    extraExamples?: Snippet;
     children: Snippet;
   }
 
   let {
     component,
-    sections = [
-      { id: 'playground', label: 'Playground' },
-      { id: 'examples', label: 'Examples' },
-      { id: 'usage', label: 'Usage' },
-      { id: 'api', label: 'API reference' },
-    ],
+    examples: Examples,
+    examplesSource,
+    framed = false,
+    sections: customSections,
+    anatomy,
+    extraExamples,
     children,
   }: Props = $props();
+
+  const componentSections = $derived(
+    getComponentContent(component.slug).sections,
+  );
+  const hasAnatomy = $derived(!!componentSections.anatomy);
+  const hasContract = $derived(!!getContract(component.slug));
+  const sections = $derived(
+    customSections ?? [
+      { id: 'playground', label: 'Playground' },
+      ...(hasAnatomy ? [{ id: 'anatomy', label: 'Anatomy' }] : []),
+      { id: 'examples', label: 'Examples' },
+      { id: 'usage', label: 'Usage' },
+      ...(hasContract ? [{ id: 'contract', label: 'Contract' }] : []),
+      { id: 'api', label: 'API reference' },
+    ],
+  );
 
   const tocItems = $derived(
     sections.map((section) => ({
@@ -33,7 +63,7 @@
 </script>
 
 <svelte:head>
-  <title>{component.name} · Temporal Design System</title>
+  <title>{component.name} · io Design System</title>
   <meta name="description" content={component.description} />
 </svelte:head>
 
@@ -74,10 +104,36 @@
       {/each}
     </Toc.List>
   </Toc.Nav>
-  <div class="min-w-0 xl:col-start-1">{@render children()}</div>
+  <div class="min-w-0 xl:col-start-1">
+    {@render children()}
+    <AnatomySection slug={component.slug} preview={anatomy} />
+    <DocSection id="examples" title={componentSections.examples.title}>
+      <MarkdownContent section={componentSections.examples} />
+      <div class="mt-5">
+        {#if framed}
+          <div class="rounded-lg border border-primary p-6"><Examples /></div>
+        {:else}
+          <Examples />
+        {/if}
+        <SourceCode
+          code={examplesSource}
+          filename="{component.slug}-examples.svelte"
+          collapsible
+        />
+        {@render extraExamples?.()}
+      </div>
+    </DocSection>
+    <DocSection id="usage" title={componentSections.usage.title}>
+      <MarkdownContent section={componentSections.usage} />
+    </DocSection>
+    <ContractSection slug={component.slug} />
+    <DocSection id="api" title={componentSections.api.title}>
+      <MarkdownContent section={componentSections.api} />
+    </DocSection>
+  </div>
   <footer
     class="mt-14 border-t border-primary py-6 text-xs text-secondary xl:col-start-1"
   >
-    Temporal Design System · {component.name}
+    io Design System · {component.name}
   </footer>
 </div>

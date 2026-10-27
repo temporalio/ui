@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Button } from '$lib/io-ark/button';
+  import { Button } from '$lib/io-poc/button';
 </script>
 
 <div class="flex flex-wrap items-center gap-3">

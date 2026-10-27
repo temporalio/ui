@@ -144,6 +144,7 @@
     "@bufbuild/protobuf": "^2.12.0",
     "@chromatic-com/storybook": "^5.2.1",
     "@eslint/js": "^9.39.2",
+    "@modelcontextprotocol/sdk": "^1.32.2",
     "@playwright/test": "^1.55.1",
     "@storybook/addon-a11y": "^10.5.5",
     "@storybook/addon-docs": "^10.5.5",
@@ -352,13 +353,141 @@
       "types": "./dist/*.d.ts",
       "import": "./dist/*.js"
     },
-    "./io-ark/button": {
-      "types": "./dist/io-ark/button/index.d.ts",
-      "import": "./dist/io-ark/button/index.js"
+    "./io-poc/button": {
+      "types": "./dist/io-poc/button/index.d.ts",
+      "import": "./dist/io-poc/button/index.js"
     },
-    "./io-ark/accordion": {
-      "types": "./dist/io-ark/accordion/index.d.ts",
-      "import": "./dist/io-ark/accordion/index.js"
+    "./io-poc/accordion": {
+      "types": "./dist/io-poc/accordion/index.d.ts",
+      "import": "./dist/io-poc/accordion/index.js"
+    },
+    "./io-poc/checkbox": {
+      "types": "./dist/io-poc/checkbox/index.d.ts",
+      "import": "./dist/io-poc/checkbox/index.js"
+    },
+    "./io-poc/collapsible": {
+      "types": "./dist/io-poc/collapsible/index.d.ts",
+      "import": "./dist/io-poc/collapsible/index.js"
+    },
+    "./io-poc/combobox": {
+      "types": "./dist/io-poc/combobox/index.d.ts",
+      "import": "./dist/io-poc/combobox/index.js"
+    },
+    "./io-poc/date-input": {
+      "types": "./dist/io-poc/date-input/index.d.ts",
+      "import": "./dist/io-poc/date-input/index.js"
+    },
+    "./io-poc/date-picker": {
+      "types": "./dist/io-poc/date-picker/index.d.ts",
+      "import": "./dist/io-poc/date-picker/index.js"
+    },
+    "./io-poc/dialog": {
+      "types": "./dist/io-poc/dialog/index.d.ts",
+      "import": "./dist/io-poc/dialog/index.js"
+    },
+    "./io-poc/drawer": {
+      "types": "./dist/io-poc/drawer/index.d.ts",
+      "import": "./dist/io-poc/drawer/index.js"
+    },
+    "./io-poc/field": {
+      "types": "./dist/io-poc/field/index.d.ts",
+      "import": "./dist/io-poc/field/index.js"
+    },
+    "./io-poc/fieldset": {
+      "types": "./dist/io-poc/fieldset/index.d.ts",
+      "import": "./dist/io-poc/fieldset/index.js"
+    },
+    "./io-poc/file-upload": {
+      "types": "./dist/io-poc/file-upload/index.d.ts",
+      "import": "./dist/io-poc/file-upload/index.js"
+    },
+    "./io-poc/listbox": {
+      "types": "./dist/io-poc/listbox/index.d.ts",
+      "import": "./dist/io-poc/listbox/index.js"
+    },
+    "./io-poc/menu": {
+      "types": "./dist/io-poc/menu/index.d.ts",
+      "import": "./dist/io-poc/menu/index.js"
+    },
+    "./io-poc/navigation-menu": {
+      "types": "./dist/io-poc/navigation-menu/index.d.ts",
+      "import": "./dist/io-poc/navigation-menu/index.js"
+    },
+    "./io-poc/number-input": {
+      "types": "./dist/io-poc/number-input/index.d.ts",
+      "import": "./dist/io-poc/number-input/index.js"
+    },
+    "./io-poc/pagination": {
+      "types": "./dist/io-poc/pagination/index.d.ts",
+      "import": "./dist/io-poc/pagination/index.js"
+    },
+    "./io-poc/popover": {
+      "types": "./dist/io-poc/popover/index.d.ts",
+      "import": "./dist/io-poc/popover/index.js"
+    },
+    "./io-poc/progress": {
+      "types": "./dist/io-poc/progress/index.d.ts",
+      "import": "./dist/io-poc/progress/index.js"
+    },
+    "./io-poc/radio-group": {
+      "types": "./dist/io-poc/radio-group/index.d.ts",
+      "import": "./dist/io-poc/radio-group/index.js"
+    },
+    "./io-poc/segment-group": {
+      "types": "./dist/io-poc/segment-group/index.d.ts",
+      "import": "./dist/io-poc/segment-group/index.js"
+    },
+    "./io-poc/select": {
+      "types": "./dist/io-poc/select/index.d.ts",
+      "import": "./dist/io-poc/select/index.js"
+    },
+    "./io-poc/slider": {
+      "types": "./dist/io-poc/slider/index.d.ts",
+      "import": "./dist/io-poc/slider/index.js"
+    },
+    "./io-poc/steps": {
+      "types": "./dist/io-poc/steps/index.d.ts",
+      "import": "./dist/io-poc/steps/index.js"
+    },
+    "./io-poc/switch": {
+      "types": "./dist/io-poc/switch/index.d.ts",
+      "import": "./dist/io-poc/switch/index.js"
+    },
+    "./io-poc/tabs": {
+      "types": "./dist/io-poc/tabs/index.d.ts",
+      "import": "./dist/io-poc/tabs/index.js"
+    },
+    "./io-poc/tags-input": {
+      "types": "./dist/io-poc/tags-input/index.d.ts",
+      "import": "./dist/io-poc/tags-input/index.js"
+    },
+    "./io-poc/toast": {
+      "types": "./dist/io-poc/toast/index.d.ts",
+      "import": "./dist/io-poc/toast/index.js"
+    },
+    "./io-poc/toggle": {
+      "types": "./dist/io-poc/toggle/index.d.ts",
+      "import": "./dist/io-poc/toggle/index.js"
+    },
+    "./io-poc/toggle-group": {
+      "types": "./dist/io-poc/toggle-group/index.d.ts",
+      "import": "./dist/io-poc/toggle-group/index.js"
+    },
+    "./io-poc/tooltip": {
+      "types": "./dist/io-poc/tooltip/index.d.ts",
+      "import": "./dist/io-poc/tooltip/index.js"
+    },
+    "./io-poc/tour": {
+      "types": "./dist/io-poc/tour/index.d.ts",
+      "import": "./dist/io-poc/tour/index.js"
+    },
+    "./io-poc/tree-view": {
+      "types": "./dist/io-poc/tree-view/index.d.ts",
+      "import": "./dist/io-poc/tree-view/index.js"
+    },
+    "./io-poc/scroll-area": {
+      "types": "./dist/io-poc/scroll-area/index.d.ts",
+      "import": "./dist/io-poc/scroll-area/index.js"
     }
   }
 }

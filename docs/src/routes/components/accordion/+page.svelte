@@ -1,20 +1,14 @@
 <script lang="ts">
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import { Accordion } from '$lib/io-ark/accordion';
+  import { Accordion, AccordionGroup } from '$lib/io-poc/accordion';
 
   import AccordionExamples from '../../../examples/accordion-examples.svelte';
   import examplesSource from '../../../examples/accordion-examples.svelte?raw';
 
   import ComponentPage from '$docs/components/component-page.svelte';
-  import DocSection from '$docs/components/doc-section.svelte';
-  import MarkdownContent from '$docs/components/markdown-content.svelte';
   import Playground from '$docs/components/playground.svelte';
-  import SourceCode from '$docs/components/source-code.svelte';
-  import {
-    accordionContent,
-    accordionDocumentation,
-  } from '$docs/data/components';
+  import { getComponentDocumentation } from '$docs/data/components';
 
   let title = $state('Workflow details');
   let subtitle = $state('Configuration and execution information');
@@ -22,10 +16,9 @@
   let open = $state(false);
   let disabled = $state(false);
   let expandable = $state(true);
-  let toggles = $state(0);
   const source = $derived(
     `<script lang="ts">
-  import { Accordion } from '$lib/io-ark/accordion';
+  import { Accordion } from '$lib/io-poc/accordion';
   let open = $state(${open});
 </` +
       `script>
@@ -38,9 +31,15 @@
   <p>Choose the details you want to show here.</p>
 </Accordion>`,
   );
+
+  const documentation = getComponentDocumentation('accordion');
 </script>
 
-<ComponentPage component={accordionDocumentation}>
+<ComponentPage
+  component={documentation}
+  examples={AccordionExamples}
+  {examplesSource}
+>
   <Playground {source} filename="Accordion.svelte">
     {#snippet preview()}
       <div class="w-full">
@@ -52,13 +51,9 @@
           {disabled}
           {expandable}
           bind:open
-          onToggle={() => toggles++}
         >
           <p>Choose the details you want to show here.</p>
         </Accordion>
-        <p role="status" class="mt-4 text-xs text-secondary">
-          Toggled {toggles} times
-        </p>
       </div>
     {/snippet}
     {#snippet controls()}
@@ -78,21 +73,14 @@
       />
     {/snippet}
   </Playground>
-  <DocSection id="examples" title={accordionContent.sections.examples.title}>
-    <MarkdownContent section={accordionContent.sections.examples} />
-    <div class="mt-5">
-      <AccordionExamples />
-      <SourceCode
-        code={examplesSource}
-        filename="accordion-examples.svelte"
-        collapsible
-      />
-    </div>
-  </DocSection>
-  <DocSection id="usage" title={accordionContent.sections.usage.title}>
-    <MarkdownContent section={accordionContent.sections.usage} />
-  </DocSection>
-  <DocSection id="api" title={accordionContent.sections.api.title}>
-    <MarkdownContent section={accordionContent.sections.api} />
-  </DocSection>
+  {#snippet anatomy()}
+    <AccordionGroup class="w-full">
+      <Accordion id="accordion-anatomy-1" title="Section 1" open>
+        <p>Content for Section 1</p>
+      </Accordion>
+      <Accordion id="accordion-anatomy-2" title="Section 2">
+        <p>Content for Section 2</p>
+      </Accordion>
+    </AccordionGroup>
+  {/snippet}
 </ComponentPage>

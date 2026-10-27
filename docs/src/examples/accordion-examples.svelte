@@ -1,6 +1,6 @@
 <script lang="ts">
   import Input from '$lib/holocene/input/input.svelte';
-  import { Accordion, AccordionGroup } from '$lib/io-ark/accordion';
+  import { Accordion, AccordionGroup } from '$lib/io-poc/accordion';
 
   let note = $state('Investigate retry behavior');
 </script>

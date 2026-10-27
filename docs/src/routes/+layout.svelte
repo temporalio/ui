@@ -1,22 +1,63 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
 
+  import { afterNavigate } from '$app/navigation';
   import { page } from '$app/state';
 
-  import { Button } from '$lib/io-ark/button';
+  import { Badge } from '$lib/io/badge';
+  import { IconMoon, IconSun, IconTemporal } from '$lib/io/icon';
+  import { Button } from '$lib/io-poc/button';
 
   import { components } from '$docs/data/components';
+  import { llmsPaths } from '$docs/data/llms';
 
   import '../../../src/app.css';
 
   let { children }: { children: Snippet } = $props();
-  let theme = $state<'light' | 'dark'>('light');
+  let theme = $state<'light' | 'dark'>('dark');
+  let main = $state<HTMLElement>();
+
+  afterNavigate(({ from, to }) => {
+    if (from && !to?.url.hash) main?.scrollTo({ top: 0 });
+  });
+
+  const foundations: { label: string; href?: string }[] = [
+    { label: 'Colors', href: '/foundations/colors' },
+    { label: 'Typography', href: '/foundations/typography' },
+    { label: 'Spacing' },
+    { label: 'Icons', href: '/foundations/icons' },
+  ];
+
+  const agentPages = [
+    { label: 'LLMs.txt', href: llmsPaths.llmsPage },
+    { label: 'MCP server', href: llmsPaths.mcpServerPage },
+  ];
+
+  const navLinkClass =
+    'flex items-center justify-between gap-2 rounded px-3 py-2 font-medium hover:bg-interactive-tertiary-hover';
+  const navHeadingClass =
+    'sticky top-0 z-10 -mx-6 bg-background-primary px-6 pb-3 pt-7 text-xs font-medium uppercase tracking-widest text-secondary lg:-mx-8 lg:px-8';
+
+  $effect(() => {
+    document.body.dataset.theme = theme;
+  });
 </script>
+
+{#snippet navLink(label: string, href: string)}
+  {@const selected = page.url.pathname === href}
+  <a
+    {href}
+    aria-current={selected ? 'page' : undefined}
+    class={navLinkClass}
+    class:bg-interactive-secondary-hover={selected}
+    class:text-brand={selected}>{label}</a
+  >
+{/snippet}
 
 <div
   data-theme={theme}
   style:color-scheme={theme}
-  class="min-h-screen bg-background-primary text-primary"
+  class="flex min-h-screen flex-col bg-background-primary text-primary lg:h-screen lg:overflow-hidden"
 >
   <a
     href="#main"
@@ -24,51 +65,59 @@
     >Skip to content</a
   >
   <header
-    class="flex h-16 items-center justify-between border-b border-primary px-6 lg:px-10"
+    class="sticky top-0 z-20 flex h-16 shrink-0 items-center justify-between border-b border-primary bg-background-primary px-6 lg:static lg:px-8"
   >
     <a
       href="/"
-      class="flex items-center gap-3 font-semibold tracking-tight"
-      aria-label="Temporal Design System home"
+      class="flex items-center gap-3 text-xl font-normal tracking-tight"
+      aria-label="io Design System home"
     >
-      <span
-        class="flex h-8 w-8 items-center justify-center rounded bg-interactive-primary font-mono text-white"
-        aria-hidden="true">T</span
-      >
-      Temporal
-      <span class="hidden font-normal text-secondary sm:inline"
-        >/ Design System</span
-      >
+      <IconTemporal width={24} height={24} />
+      <span>io Design System</span>
     </a>
     <Button
-      colorScheme="tertiary"
+      colorScheme="ghost"
       size="sm"
       tracking={false}
-      aria-pressed={theme === 'dark'}
-      onclick={() => (theme = theme === 'light' ? 'dark' : 'light')}
-      >Dark mode</Button
-    >
+      LeadingIcon={theme === 'dark' ? IconSun : IconMoon}
+      aria-label={theme === 'dark'
+        ? 'Switch to light mode'
+        : 'Switch to dark mode'}
+      onclick={() => (theme = theme === 'dark' ? 'light' : 'dark')}
+    />
   </header>
-  <div class="mx-auto grid max-w-[1600px] lg:grid-cols-[230px_minmax(0,1fr)]">
+  <div
+    class="grid min-h-0 flex-1 lg:grid-cols-[248px_minmax(0,1fr)] lg:overflow-hidden"
+  >
     <aside
-      class="border-b border-primary px-6 py-7 lg:min-h-[calc(100vh-4rem)] lg:border-b-0 lg:border-r lg:px-8"
+      class="min-h-0 border-b border-primary px-6 pb-7 lg:overflow-y-auto lg:overscroll-contain lg:border-b-0 lg:border-r lg:px-8"
     >
-      <p
-        class="mb-6 text-xs font-medium uppercase tracking-widest text-secondary"
-      >
-        Components
-      </p>
-      <nav aria-label="Components" class="space-y-1">
+      <h2 id="foundations-heading" class={navHeadingClass}>Foundations</h2>
+      <nav aria-labelledby="foundations-heading" class="space-y-1">
+        {#each foundations as item (item.label)}
+          {#if item.href}
+            {@render navLink(item.label, item.href)}
+          {:else}
+            <span
+              class="{navLinkClass} cursor-default text-secondary hover:bg-transparent"
+              aria-disabled="true"
+            >
+              {item.label}
+              <Badge text="Coming soon" size="sm" />
+            </span>
+          {/if}
+        {/each}
+      </nav>
+      <h2 id="agents-heading" class="{navHeadingClass} mt-4">For agents</h2>
+      <nav aria-labelledby="agents-heading" class="space-y-1">
+        {#each agentPages as item (item.href)}
+          {@render navLink(item.label, item.href)}
+        {/each}
+      </nav>
+      <h2 id="components-heading" class="{navHeadingClass} mt-4">Components</h2>
+      <nav aria-labelledby="components-heading" class="space-y-1">
         {#each components as component (component.slug)}
-          {@const href = `/components/${component.slug}`}
-          {@const selected = page.url.pathname === href}
-          <a
-            {href}
-            aria-current={selected ? 'page' : undefined}
-            class="block rounded px-3 py-2 font-medium hover:bg-interactive-tertiary-hover"
-            class:bg-interactive-secondary-hover={selected}
-            class:text-brand={selected}>{component.name}</a
-          >
+          {@render navLink(component.name, `/components/${component.slug}`)}
         {/each}
       </nav>
       <div
@@ -86,7 +135,12 @@
         >
       </div>
     </aside>
-    <main id="main" class="min-w-0 px-6 py-10 lg:px-14 lg:py-12">
+    <main
+      id="main"
+      bind:this={main}
+      tabindex="-1"
+      class="min-h-0 min-w-0 px-6 py-10 focus:outline-none lg:overflow-y-auto lg:overscroll-contain lg:px-14 lg:py-12"
+    >
       {@render children()}
     </main>
   </div>
