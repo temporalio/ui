@@ -3,8 +3,8 @@
 
   import DeploymentTableRow from '$lib/components/deployments/deployment-table-row.svelte';
   import DeploymentsEmptyState from '$lib/components/deployments/deployments-empty-state.svelte';
+  import ConfigurableTableHeadersDrawer from '$lib/components/table/configurable-table-headers-drawer.svelte';
   import ResetColumnWidthsButton from '$lib/components/table/reset-column-widths-button.svelte';
-  import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
   import Button from '$lib/holocene/button.svelte';
   import ColumnResizeHandle from '$lib/holocene/table/column-resize-handle.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
@@ -25,6 +25,10 @@
   import { refresh } from '$lib/stores/workers';
   import type { ListWorkerDeployment } from '$lib/types/deployments';
   import { columnWidthStyle } from '$lib/utilities/column-width';
+  import {
+    type ComputeProviderConfig,
+    configuredRegions,
+  } from '$lib/utilities/compute-provider-config';
   import { has } from '$lib/utilities/has';
   import { routeForWorkerDeploymentCreate } from '$lib/utilities/route-for';
   import type { TableSortColumn } from '$lib/utilities/table-sort';
@@ -32,12 +36,20 @@
   interface Props {
     canCreateServerlessDeployment?: boolean;
     showConnectionStatus?: boolean;
+    /**
+     * The providers this Namespace may use and the regions it lives in. With
+     * two or more regions, each Version shows the regions it covers.
+     */
+    providerConfig?: ComputeProviderConfig;
   }
 
   let {
     canCreateServerlessDeployment = true,
     showConnectionStatus = true,
+    providerConfig,
   }: Props = $props();
+
+  const namespaceRegions = $derived(configuredRegions(providerConfig));
 
   let error = $state('');
 
@@ -166,6 +178,7 @@
             {deployment}
             {columns}
             {showConnectionStatus}
+            {namespaceRegions}
             onChange={() => refresh.update((n) => n + 1)}
           />
         {/each}
@@ -207,6 +220,5 @@
   {availableColumns}
   bind:open={customizationDrawerOpen}
   table={TABLE_TYPE.DEPLOYMENTS}
-  type={translate('common.columns')}
   title={translate('deployments.deployments')}
 />

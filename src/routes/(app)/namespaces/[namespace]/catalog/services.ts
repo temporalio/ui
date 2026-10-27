@@ -12,6 +12,8 @@ import { createApiWorkbenchHost } from '$lib/catalog/host/ui-services';
 
 import { resolveCatalogForNamespace } from './catalog';
 
+export const catalogWorkerStartCommand = 'pnpm catalog worker';
+
 export type CatalogServices = {
   host: WorkbenchHost;
   sessionStore: CatalogSessionStore;

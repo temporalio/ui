@@ -16,13 +16,28 @@ export type DecodedPayloadState =
   | { status: 'success'; results: DecodedPayloadResult }
   | { status: 'error'; error: unknown; retry: () => void };
 
+type DecodedPayloadOptions = {
+  onDecode?: (results: DecodedPayloadResult) => void;
+};
+
 export function createDecodedPayload(
   getValue: () => DecodableValue | null | undefined,
+  { onDecode }: DecodedPayloadOptions = {},
 ) {
   let state = $state<DecodedPayloadState>({ status: 'idle' });
   let stateValueJson = $state<string>();
   let request = 0;
-  const valueJson = $derived(stringifyWithBigInt(getValue()));
+  let lastValue: DecodableValue | null | undefined;
+  let lastValueJson: string | undefined;
+  const valueJson = $derived.by(() => {
+    const value = getValue();
+    if (value !== lastValue) {
+      lastValue = value;
+      lastValueJson = stringifyWithBigInt(value);
+    }
+    return lastValueJson;
+  });
+  const hasValue = $derived(Boolean(getValue()));
 
   const decode = async () => {
     const id = ++request;
@@ -34,9 +49,9 @@ export function createDecodedPayload(
     }
 
     state = { status: 'loading' };
+    let results: DecodedPayloadResult;
     try {
-      const results = await decodePayloadResult(value);
-      if (id === request) state = { status: 'success', results };
+      results = await decodePayloadResult(value);
     } catch (error) {
       if (id === request) {
         state = {
@@ -47,6 +62,15 @@ export function createDecodedPayload(
           },
         };
       }
+      return;
+    }
+
+    if (id !== request) return;
+    state = { status: 'success', results };
+    try {
+      onDecode?.(results);
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -61,7 +85,7 @@ export function createDecodedPayload(
   return {
     get current(): DecodedPayloadState {
       if (stateValueJson === valueJson) return state;
-      return getValue() ? { status: 'loading' } : { status: 'idle' };
+      return hasValue ? { status: 'loading' } : { status: 'idle' };
     },
   };
 }

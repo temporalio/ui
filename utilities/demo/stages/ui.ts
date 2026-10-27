@@ -179,6 +179,7 @@ const startWeb = async (
         VITE_API: `http://localhost:${ui.apiPort}`,
         VITE_MODE: 'development',
         VITE_TEMPORAL_UI_BUILD_TARGET: 'local',
+        ...ui.env,
       },
       logFile: join(runDirFor(runName), 'ui.log'),
     },

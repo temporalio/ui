@@ -14,28 +14,62 @@
     type ComputeProviderTemplates,
     type ComputeProviderValue,
   } from './compute-providers';
+  import { revealFirstProblem } from './motion';
   import {
+    type ComputeRegion,
+    lambdaArnPlaceholderFor,
+    regionPreview,
+    regionServerErrors,
+  } from './multi-region';
+  import {
+    type ComputeFieldErrors,
     type ComputeProviderOption,
     type CreateVersionFormData,
     createVersionSchema,
     defaultScaleDownStabilization,
     getInitialComputeProvider,
+    multiRegionCreateVersionSchema,
+    type RegionComputeValues,
+    validateRegionValues,
   } from './shared';
 
   import CloudRunLatencyNotice from './cloud-run-latency-notice.svelte';
   import ComputeFields from './compute-fields.svelte';
+  import ComputeProviderPerRegion from './compute-provider-per-region.svelte';
   import ComputeProviderPicker from './compute-provider-picker.svelte';
+  import FailoverPreview from './failover-preview.svelte';
   import RecentVersions from './recent-versions.svelte';
+  import RegionBlock from './region-block.svelte';
+  import RegionsHeading from './regions-heading.svelte';
 
   interface Props {
-    onSubmit: (data: CreateVersionFormData) => Promise<void>;
+    onSubmit: (
+      data: CreateVersionFormData,
+      regions?: RegionComputeValues[],
+    ) => Promise<void>;
     cancelHref: string;
     error?: string;
     versions?: VersionSummary[];
     computeProviders?: readonly ComputeProviderOption[];
     initialProvider?: ComputeProviderOption['value'];
     gcpRegions?: string[];
+    /**
+     * The templates offered per provider. Defaults to the ones bundled here,
+     * which is what a self-hosted deployment wants. A consumer overrides them
+     * by passing a full map: it is exhaustive over ComputeProviderValue, so
+     * adding a provider fails the consumer's type check until it supplies
+     * templates for it.
+     */
     templates?: Record<ComputeProviderValue, ComputeProviderTemplates>;
+    /**
+     * Regions this namespace runs in. When more than one is provided (a highly
+     * available namespace), the form collects a compute provider per region.
+     */
+    regions?: readonly ComputeRegion[];
+    /** Namespace name, shown in the multi-region heading. */
+    namespace?: string;
+    /** The Worker Deployment this version belongs to, shown in the preview. */
+    deploymentName?: string;
   }
 
   let {
@@ -47,7 +81,29 @@
     initialProvider,
     gcpRegions,
     templates,
+    regions,
+    namespace = '',
+    deploymentName,
   }: Props = $props();
+
+  /** High availability is offered when the Namespace has a replica. */
+  const offersHighAvailability = $derived(
+    !!regions?.some(({ role }) => role === 'replica'),
+  );
+
+  let regionValues = $state<RegionComputeValues[]>([]);
+  let regionErrors = $state<Record<string, ComputeFieldErrors>>({});
+
+  /** A server error that names a region shows in that region's block. */
+  const errorsByRegion = $derived(regionServerErrors(error, regions));
+
+  let formRoot = $state<HTMLElement>();
+
+  // A server error can land in a region card far above the submit button.
+  $effect(() => {
+    if (error) untrack(() => revealFirstProblem(formRoot));
+  });
+  const errorInRegion = $derived(Object.keys(errorsByRegion).length > 0);
 
   const superform = superForm(
     {
@@ -76,11 +132,30 @@
     },
     {
       SPA: true,
-      validators: zodClient(createVersionSchema),
+      validators: zodClient(
+        untrack(() => offersHighAvailability)
+          ? multiRegionCreateVersionSchema
+          : createVersionSchema,
+      ),
       resetForm: false,
       dataType: 'json',
       onUpdate: async ({ form }) => {
         if (!form.valid) return;
+        if (offersHighAvailability) {
+          regionErrors = validateRegionValues(regionValues);
+          if (Object.keys(regionErrors).length) {
+            revealFirstProblem(formRoot);
+            return;
+          }
+          // Without high availability the one region saves what a
+          // single-region Version saves.
+          if (regionValues.length > 1) {
+            await onSubmit(form.data, regionValues);
+          } else {
+            await onSubmit({ ...form.data, ...regionValues[0]?.values });
+          }
+          return;
+        }
         await onSubmit(form.data);
       },
     },
@@ -89,8 +164,8 @@
   const { form, errors, enhance, submitting } = superform;
 </script>
 
-<div class="flex flex-col gap-6">
-  {#if error}
+<div class="relative flex max-w-[45rem] flex-col gap-6" bind:this={formRoot}>
+  {#if error && !errorInRegion}
     <Alert intent="error" title={translate('common.error-occurred')}
       >{error}</Alert
     >
@@ -124,35 +199,65 @@
       <p class="mb-4 text-sm text-secondary">
         {translate('workers.compute-description')}
       </p>
-      <ComputeProviderPicker
-        bind:provider={$form.provider}
-        providers={computeProviders}
-      >
-        <CloudRunLatencyNotice provider={$form.provider} />
-        <ComputeFields
-          provider={$form.provider}
-          bind:lambdaArn={$form.lambdaArn}
-          bind:agentCoreEndpointArn={$form.agentCoreEndpointArn}
-          bind:iamRoleArn={$form.iamRoleArn}
-          bind:roleExternalId={$form.roleExternalId}
-          bind:gcpProject={$form.gcpProject}
-          bind:gcpRegion={$form.gcpRegion}
-          {gcpRegions}
-          bind:gcpWorkerPool={$form.gcpWorkerPool}
-          bind:gcpServiceAccount={$form.gcpServiceAccount}
-          bind:minReplicas={$form.minReplicas}
-          bind:maxReplicas={$form.maxReplicas}
-          bind:initialReplicas={$form.initialReplicas}
-          bind:utilizationTarget={$form.utilizationTarget}
-          bind:scaleDownStabilization={$form.scaleDownStabilization}
-          bind:scaleUpCooloffMs={$form.scaleUpCooloffMs}
-          bind:scaleUpBacklogThreshold={$form.scaleUpBacklogThreshold}
-          bind:maxWorkerLifetimeMs={$form.maxWorkerLifetimeMs}
-          bind:metricsPollIntervalMs={$form.metricsPollIntervalMs}
-          {templates}
-          errors={$errors}
+      {#if offersHighAvailability && regions}
+        <ComputeProviderPerRegion
+          {namespace}
+          {regions}
+          {computeProviders}
+          {deploymentName}
+          buildId={$form.buildId}
+          bind:regionValues
+          {regionErrors}
+          regionServerErrors={errorsByRegion}
         />
-      </ComputeProviderPicker>
+      {:else}
+        <ComputeProviderPicker
+          layout="summary"
+          bind:provider={$form.provider}
+          providers={computeProviders}
+        />
+        <hr class="my-5 border-primary" />
+        {#if regions?.[0]}
+          <RegionsHeading regions={regions.slice(0, 1)} />
+          <FailoverPreview
+            {namespace}
+            provider={$form.provider}
+            regions={[regionPreview(regions[0], $form.provider, $form)]}
+            {deploymentName}
+            buildId={$form.buildId}
+          />
+        {/if}
+        <CloudRunLatencyNotice provider={$form.provider} class="mb-4" />
+        <RegionBlock region={regions?.[0]}>
+          <ComputeFields
+            provider={$form.provider}
+            leadingDivider={false}
+            lambdaArnPlaceholder={lambdaArnPlaceholderFor(
+              regions?.[0]?.providerRegion,
+            )}
+            bind:lambdaArn={$form.lambdaArn}
+            bind:agentCoreEndpointArn={$form.agentCoreEndpointArn}
+            bind:iamRoleArn={$form.iamRoleArn}
+            bind:roleExternalId={$form.roleExternalId}
+            bind:gcpProject={$form.gcpProject}
+            bind:gcpRegion={$form.gcpRegion}
+            {gcpRegions}
+            bind:gcpWorkerPool={$form.gcpWorkerPool}
+            bind:gcpServiceAccount={$form.gcpServiceAccount}
+            bind:minReplicas={$form.minReplicas}
+            bind:maxReplicas={$form.maxReplicas}
+            bind:initialReplicas={$form.initialReplicas}
+            bind:utilizationTarget={$form.utilizationTarget}
+            bind:scaleDownStabilization={$form.scaleDownStabilization}
+            bind:scaleUpCooloffMs={$form.scaleUpCooloffMs}
+            bind:scaleUpBacklogThreshold={$form.scaleUpBacklogThreshold}
+            bind:maxWorkerLifetimeMs={$form.maxWorkerLifetimeMs}
+            bind:metricsPollIntervalMs={$form.metricsPollIntervalMs}
+            {templates}
+            errors={$errors}
+          />
+        </RegionBlock>
+      {/if}
     </Card>
 
     <div class="flex gap-4">
