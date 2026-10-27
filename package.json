@@ -92,6 +92,7 @@
     "generate:markdown-css": "esno scripts/generate-markdown-css.ts"
   },
   "dependencies": {
+    "@ark-ui/svelte": "^5.24.3",
     "@codemirror/autocomplete": "^6.18.7",
     "@codemirror/commands": "^6.8.1",
     "@codemirror/lang-go": "^6.0.1",
@@ -346,6 +347,14 @@
     "./*": {
       "types": "./dist/*.d.ts",
       "import": "./dist/*.js"
+    },
+    "./io-ark/button": {
+      "types": "./dist/io-ark/button/index.d.ts",
+      "import": "./dist/io-ark/button/index.js"
+    },
+    "./io-ark/accordion": {
+      "types": "./dist/io-ark/accordion/index.d.ts",
+      "import": "./dist/io-ark/accordion/index.js"
     }
   }
 }
