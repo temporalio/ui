@@ -22,7 +22,7 @@ const overlayClasses = twJoin(
 );
 
 const focusClasses = twJoin(
-  'focus-visible:outline-none',
+  'focus-visible:outline-hidden',
   'focus-visible:ring-2',
   'focus-visible:ring-interactive-primary',
   'focus-visible:ring-offset-2',

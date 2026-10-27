@@ -212,7 +212,7 @@
     {#each groups as group (group.name)}
       <section>
         <div class="mb-4 flex items-baseline justify-between gap-4">
-          <h2 class="text-lg font-semibold capitalize text-primary">
+          <h2 class="text-lg font-semibold text-primary capitalize">
             {group.name}
           </h2>
           <span class="text-xs text-secondary"
@@ -245,7 +245,7 @@
                 ></div>
                 <div class="space-y-1 p-2">
                   <p class="text-xs font-medium text-primary">{token.step}</p>
-                  <code class="block break-all text-[0.625rem] text-secondary">
+                  <code class="block text-[0.625rem] break-all text-secondary">
                     {token.value}
                   </code>
                 </div>
@@ -336,7 +336,7 @@
         {#each registeredThemes as theme (theme.name)}
           <section
             data-theme={theme.name}
-            class="rounded-xl border border-primary bg-background-primary p-6 text-primary shadow-sm"
+            class="rounded-xl border border-primary bg-background-primary p-6 text-primary shadow-xs"
           >
             <div class="mb-8 flex items-center justify-between gap-4">
               <h2 class="text-xl font-semibold capitalize">{theme.name}</h2>

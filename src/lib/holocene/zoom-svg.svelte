@@ -191,10 +191,10 @@
   bind:clientHeight={height}
   style="height: min({containerHeight}px, calc(100dvh - 8rem));"
 >
-  <div class="absolute right-4 top-4 z-20 flex items-center gap-2">
+  <div class="absolute top-4 right-4 z-20 flex items-center gap-2">
     {@render controls?.()}
   </div>
-  <div class="absolute bottom-4 right-4 z-20 flex items-center gap-2">
+  <div class="absolute right-4 bottom-4 z-20 flex items-center gap-2">
     {#if pannable}
       <Tooltip text="Pan up" bottom>
         <Button

@@ -20,10 +20,10 @@
   <div class="flex items-start justify-between">
     <div class="flex flex-col gap-2">
       <h1
-        class="flex select-all flex-wrap items-center gap-2 text-3xl"
+        class="flex flex-wrap items-center gap-2 text-3xl select-all"
         data-testid="schedule-name"
       >
-        <Skeleton class="h-6 w-20 rounded-sm" />
+        <Skeleton class="h-6 w-20 rounded-xs" />
         {scheduleId}
       </h1>
 
@@ -33,7 +33,7 @@
       </div>
     </div>
 
-    <Skeleton class="h-8 w-28 rounded-sm" />
+    <Skeleton class="h-8 w-28 rounded-xs" />
   </div>
 
   <dl class="flex flex-col gap-2">
@@ -41,22 +41,22 @@
       {translate('workflows.total-workflows')}
     </dt>
     <dd class="flex flex-wrap items-center gap-2">
-      <Skeleton class="h-6 w-16 rounded-sm" />
-      <Skeleton class="h-6 w-24 rounded-sm" />
+      <Skeleton class="h-6 w-16 rounded-xs" />
+      <Skeleton class="h-6 w-24 rounded-xs" />
     </dd>
   </dl>
 </header>
 <div class="flex flex-col gap-4 pb-24">
   <div class="flex flex-col gap-4 xl:flex-row">
     <div class="flex w-full flex-col items-start gap-4 xl:w-2/3">
-      <Skeleton class="h-96 w-full rounded-sm" />
-      <Skeleton class="h-48 w-full rounded-sm" />
-      <Skeleton class="h-48 w-full rounded-sm" />
+      <Skeleton class="h-96 w-full rounded-xs" />
+      <Skeleton class="h-48 w-full rounded-xs" />
+      <Skeleton class="h-48 w-full rounded-xs" />
     </div>
 
     <div class="flex w-full flex-col gap-4 xl:w-1/3">
-      <Skeleton class="h-64 w-full rounded-sm" />
-      <Skeleton class="h-64 w-full rounded-sm" />
+      <Skeleton class="h-64 w-full rounded-xs" />
+      <Skeleton class="h-64 w-full rounded-xs" />
     </div>
   </div>
 </div>

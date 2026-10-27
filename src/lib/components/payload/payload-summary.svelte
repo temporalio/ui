@@ -68,7 +68,7 @@
   <span class={className}>{decodedValue || fallback}</span>
 {:else}
   <span
-    class="inline-block max-w-full truncate rounded-sm border border-primary bg-surface-secondary px-1.5 py-0.5 text-secondary"
+    class="inline-block max-w-full truncate rounded-xs border border-primary bg-surface-secondary px-1.5 py-0.5 text-secondary"
   >
     {decodedValue || fallback}
   </span>

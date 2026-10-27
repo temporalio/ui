@@ -124,12 +124,12 @@
   });
 </script>
 
-<MenuContainer {open} class="min-w-0 max-w-full">
+<MenuContainer {open} class="max-w-full min-w-0">
   <MenuButton
     size="xs"
     controls={controlsId}
     hasIndicator
-    class="h-auto min-h-8 min-w-0 max-w-full whitespace-normal bg-surface-secondary"
+    class="h-auto min-h-8 max-w-full min-w-0 bg-surface-secondary whitespace-normal"
     title="{attribute} = {statusValues}"
   >
     <div class="min-w-0 text-left">

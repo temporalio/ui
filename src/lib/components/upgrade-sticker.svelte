@@ -227,7 +227,7 @@
           aria-label={label}
           inert={!peeled}
         >
-          <span class="text-[10px] font-bold uppercase tracking-widest">
+          <span class="text-[10px] font-bold tracking-widest uppercase">
             {newVersionLabel}
           </span>
           <span class="reveal-version">{latest}</span>
@@ -251,11 +251,11 @@
               >
                 <span class="text-[11px]">{current}</span>
                 <span class="flex flex-col">
-                  <span class="text-[14px] font-extrabold leading-tight">
+                  <span class="text-[14px] leading-tight font-extrabold">
                     {translate('common.upgrade-ready')}
                   </span>
                   <span
-                    class="text-[10px] font-bold uppercase leading-tight tracking-widest"
+                    class="text-[10px] leading-tight font-bold tracking-widest uppercase"
                   >
                     {availableLabel}
                   </span>

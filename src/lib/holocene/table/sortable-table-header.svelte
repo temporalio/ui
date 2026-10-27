@@ -44,7 +44,7 @@
   {#if sortable}
     <button
       type="button"
-      class="group flex min-h-9 w-full items-center gap-2 rounded-sm text-left font-medium hover:text-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary"
+      class="group flex min-h-9 w-full items-center gap-2 rounded-xs text-left font-medium hover:text-brand focus-visible:ring-2 focus-visible:ring-interactive-primary focus-visible:outline-hidden"
       title={translate(`common.sort-page-${nextDirection}`, { column: label })}
       onclick={() => sorting?.toggle(column)}
       onkeydown={(event) => event.stopPropagation()}

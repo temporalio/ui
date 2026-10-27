@@ -313,7 +313,7 @@
       />
     {/key}
 
-    <div class="ml-auto mt-2 flex gap-4">
+    <div class="mt-2 ml-auto flex gap-4">
       <Button variant="secondary" onclick={onCancel}
         >{translate('common.cancel')}</Button
       >

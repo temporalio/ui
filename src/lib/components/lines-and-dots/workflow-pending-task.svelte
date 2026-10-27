@@ -14,7 +14,7 @@
 {#snippet metadata(value: string | undefined)}
   {#if value}
     <span
-      class="rounded-sm border border-primary bg-surface-secondary px-1.5 py-0.5 text-secondary"
+      class="rounded-xs border border-primary bg-surface-secondary px-1.5 py-0.5 text-secondary"
     >
       {value}
     </span>

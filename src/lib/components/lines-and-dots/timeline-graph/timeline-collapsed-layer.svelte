@@ -124,7 +124,7 @@
     {@render marker(labelX, ROW_HEIGHT)}
     {@render marker(labelX, timelineHeight)}
     <div
-      class="pointer-events-none absolute origin-left rotate-45 whitespace-nowrap text-[10px] leading-none text-secondary"
+      class="pointer-events-none absolute origin-left rotate-45 text-[10px] leading-none whitespace-nowrap text-secondary"
       style:left="{labelX}px"
       style:top="{labelY}px"
     >
@@ -138,7 +138,7 @@
       aria-label={seg.isCollapsed
         ? translate('workflows.show-idle-time-segment', { distance })
         : translate('workflows.hide-idle-time-segment', { distance })}
-      class="absolute top-0 m-0 cursor-pointer border-0 bg-current p-0 opacity-0 outline-none transition-opacity duration-100 ease-in-out hover:opacity-20 focus-visible:opacity-20"
+      class="absolute top-0 m-0 cursor-pointer border-0 bg-current p-0 opacity-0 outline-hidden transition-opacity duration-100 ease-in-out hover:opacity-20 focus-visible:opacity-20"
       style:left="{seg.isCollapsed ? labelX - HIT_HALF_WIDTH : seg.startPx}px"
       style:width="{seg.isCollapsed ? HIT_WIDTH : seg.endPx - seg.startPx}px"
       style:height="{timelineHeight}px"

@@ -86,7 +86,7 @@
       <Button
         id="top-button"
         onclick={() => (args.open = !args.open)}
-        class="absolute left-1/2 top-4"
+        class="absolute top-4 left-1/2"
       >
         Top
       </Button>
@@ -144,7 +144,7 @@
       <Button
         id="left-button"
         onclick={() => (args.open = !args.open)}
-        class="absolute left-4 top-1/2"
+        class="absolute top-1/2 left-4"
       >
         Left
       </Button>
@@ -172,7 +172,7 @@
       <Button
         id="right-button"
         onclick={() => (args.open = !args.open)}
-        class="absolute right-4 top-1/2"
+        class="absolute top-1/2 right-4"
       >
         Right
       </Button>
@@ -204,7 +204,7 @@
           Scroll in any direction. The portal will hide when out of view and
           flip when near edges.
         </p>
-        <div class="ml-[200px] mt-[300px]">
+        <div class="mt-[300px] ml-[200px]">
           <Button id="combined-button" onclick={() => (args.open = !args.open)}>
             Toggle Portal
           </Button>

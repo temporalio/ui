@@ -210,7 +210,7 @@
       </span>
     {:else}
       <span
-        class="text-primary [overflow-wrap:anywhere]"
+        class="[overflow-wrap:anywhere] text-primary"
         title={value.full ?? value.value}
       >
         {value.value}
@@ -266,12 +266,12 @@
     </p>
 
     <div
-      class="mt-4 h-px bg-gradient-to-r from-transparent via-[var(--color-border-primary)] to-transparent"
+      class="mt-4 h-px bg-linear-to-r from-transparent via-[var(--color-border-primary)] to-transparent"
       aria-hidden="true"
     ></div>
 
     <div
-      class="diagram-grid relative -mx-4 px-[13px] pb-6 pt-[19px] text-sm {multiRegion
+      class="diagram-grid relative -mx-4 px-[13px] pt-[19px] pb-6 text-sm {multiRegion
         ? ''
         : '-mb-4'}"
       style:--green-2={colorScales.green[2]}
@@ -282,7 +282,7 @@
     >
       <div class="flex justify-center">
         <div
-          class="neon-box flex w-[168px] min-w-0 max-w-full flex-col items-stretch rounded-lg border border-primary bg-surface-primary"
+          class="neon-box flex w-[168px] max-w-full min-w-0 flex-col items-stretch rounded-lg border border-primary bg-surface-primary"
         >
           <span
             class="inline-flex h-[41px] w-full items-center gap-1.5 border-b border-primary px-2.5 font-medium text-primary"
@@ -325,7 +325,7 @@
 
       <div class="flex justify-center">
         <div
-          class="flex w-72 min-w-0 max-w-full flex-col items-stretch rounded-lg border border-primary bg-surface-primary transition-[border-color,box-shadow]"
+          class="flex w-72 max-w-full min-w-0 flex-col items-stretch rounded-lg border border-primary bg-surface-primary transition-[border-color,box-shadow]"
           class:neon-box={deploymentReady}
         >
           <span
@@ -344,7 +344,7 @@
           </span>
           {#if displayName || buildId}
             <span
-              class="flex h-[41px] min-w-0 max-w-full items-center gap-1 px-2.5 text-secondary"
+              class="flex h-[41px] max-w-full min-w-0 items-center gap-1 px-2.5 text-secondary"
             >
               {#if displayName}
                 <span class="truncate" class:italic={!deploymentName}
@@ -418,7 +418,7 @@
                 >
                   <CloudIcon width={16} height={16} />
                 </span>
-                <span class="whitespace-nowrap font-medium text-primary">
+                <span class="font-medium whitespace-nowrap text-primary">
                   {region.label}
                 </span>
               </span>

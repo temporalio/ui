@@ -120,7 +120,7 @@
 </tr>
 {#if expanded}
   <tr class="w-full px-2 text-sm no-underline">
-    <td class="!p-0" colspan={$isCloud ? 5 : 4}>
+    <td class="p-0!" colspan={$isCloud ? 5 : 4}>
       <EventDetailsFull {group} />
     </td>
   </tr>

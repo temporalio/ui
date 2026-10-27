@@ -130,7 +130,7 @@
         <Tooltip text={tooltip} hide={!tooltip} topLeft width={260} usePortal>
           {@const tone = regionTone(uncovered)}
           <span
-            class="inline-flex whitespace-nowrap rounded-full border font-mono text-xs font-medium uppercase leading-none {tone}"
+            class="inline-flex rounded-full border font-mono text-xs leading-none font-medium whitespace-nowrap uppercase {tone}"
             data-region-role={isMultiRegion ? row.role : undefined}
             data-region-match={isMultiRegion ? row.match : undefined}
           >

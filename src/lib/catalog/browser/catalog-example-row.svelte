@@ -44,7 +44,7 @@
 >
   <div class="min-w-0">
     <Link
-      class="table-link block break-words text-sm font-medium text-primary"
+      class="table-link block text-sm font-medium break-words text-primary"
       {href}
     >
       {descriptor.title}
@@ -55,7 +55,7 @@
       <CatalogKindBadge kind={descriptor.execution.kind} />
       <span data-testid="catalog-location">
         {kind.locationLabel}
-        <span class="break-all font-mono">{kind.location(descriptor)}</span>
+        <span class="font-mono break-all">{kind.location(descriptor)}</span>
       </span>
       <span data-testid="catalog-source">{descriptor.source.label}</span>
     </div>
@@ -103,7 +103,7 @@
       >
       {#if pendingRuns}
         <span
-          class="pointer-events-none absolute -right-1 -top-1 min-w-4 rounded-full border border-primary bg-surface-primary px-1 text-center text-[10px] leading-4 text-primary"
+          class="pointer-events-none absolute -top-1 -right-1 min-w-4 rounded-full border border-primary bg-surface-primary px-1 text-center text-[10px] leading-4 text-primary"
           aria-hidden="true">{pendingRuns}</span
         >
       {/if}
@@ -112,6 +112,8 @@
 </li>
 
 <style lang="postcss">
+  @reference '../../../app.css';
+
   .catalog-feature {
     @apply h-[22px] rounded border border-primary px-1.5 text-xs text-secondary hover:border-brand hover:text-primary;
 

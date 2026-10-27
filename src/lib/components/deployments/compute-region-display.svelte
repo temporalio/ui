@@ -66,7 +66,7 @@
 
 {#if coverage.length}
   <div
-    class="-ml-px inline-flex items-center gap-1 text-nowrap border border-primary px-1"
+    class="-ml-px inline-flex items-center gap-1 border border-primary px-1 text-nowrap"
   >
     {#each covered as region, index (region.regionId)}
       {@const isLast = index === covered.length - 1}

@@ -1,6 +1,7 @@
 import path from 'path';
 
 import { sveltekit } from '@sveltejs/kit/vite';
+import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'vite';
 
 import { catalogLocalPlugin } from './plugins/vite-plugin-catalog-local';
@@ -11,6 +12,7 @@ import { uiServerPlugin } from './plugins/vite-plugin-ui-server';
 export default defineConfig({
   plugins: [
     catalogLocalPlugin(),
+    tailwindcss(),
     sveltekit(),
     oidcServerPlugin(),
     temporalServer(),
@@ -21,7 +23,7 @@ export default defineConfig({
   },
   build: {
     // Keep JS transforms aligned with package.json browserslist; Vite 8 defaults to newer browsers.
-    target: ['chrome87', 'edge88', 'firefox78', 'safari14'],
+    target: ['chrome111', 'edge111', 'firefox128', 'safari16.4'],
   },
   resolve: {
     alias: {

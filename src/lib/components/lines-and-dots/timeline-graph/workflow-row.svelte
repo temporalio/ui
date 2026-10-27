@@ -42,7 +42,7 @@
 <div
   role="img"
   aria-label={accessibleName}
-  class="pointer-events-none absolute inset-x-0 outline-none"
+  class="pointer-events-none absolute inset-x-0 outline-hidden"
   style:top="{y - centerY}px"
   style:height="{ROW_HEIGHT}px"
 >
@@ -66,7 +66,7 @@
       style:background={colors.fill}
     >
       <svg
-        class="absolute left-1/2 top-1/2 h-[var(--dot-icon)] w-[var(--dot-icon)] -translate-x-1/2 -translate-y-1/2 text-black"
+        class="absolute top-1/2 left-1/2 h-[var(--dot-icon)] w-[var(--dot-icon)] -translate-x-1/2 -translate-y-1/2 text-black"
         viewBox="0 0 16 16"
       >
         <use href="#ti-workflow" />

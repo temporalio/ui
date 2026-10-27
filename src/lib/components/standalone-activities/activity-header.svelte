@@ -71,7 +71,7 @@
           content={activityExecutionInfo.activityId ?? ''}
           clickAllToCopy
           container-class="w-full"
-          class="overflow-hidden text-ellipsis text-left"
+          class="overflow-hidden text-left text-ellipsis"
         />
       </h1>
     </div>

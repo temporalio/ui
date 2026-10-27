@@ -12,6 +12,8 @@
 </button>
 
 <style lang="postcss">
+  @reference '../../app.css';
+
   .login-button {
     @apply flex items-center justify-center px-4 py-2 text-sm text-white;
   }

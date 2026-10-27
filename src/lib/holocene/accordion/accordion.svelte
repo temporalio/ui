@@ -73,7 +73,7 @@
         aria-expanded={open}
         aria-controls="{id}-content"
         class={merge(
-          'flex grow flex-col rounded-tl-[inherit] p-4 hover:bg-interactive-secondary-hover focus-visible:bg-surface-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background-primary disabled:cursor-not-allowed disabled:opacity-disabled disabled:hover:bg-transparent',
+          'flex grow flex-col rounded-tl-[inherit] p-4 hover:bg-interactive-secondary-hover focus-visible:bg-surface-primary focus-visible:ring-2 focus-visible:ring-interactive-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background-primary focus-visible:outline-hidden disabled:cursor-not-allowed disabled:opacity-disabled disabled:hover:bg-transparent',
           !action && 'rounded-tr-[inherit]',
           !open && 'rounded-bl-[inherit]',
           !open && !action && 'rounded-br-[inherit]',
@@ -114,7 +114,12 @@
       {/if}
     </div>
 
-    <div id="{id}-content" class="mt-4 block w-full p-4" class:hidden={!open}>
+    <div
+      id="{id}-content"
+      class="mt-4 w-full p-4"
+      class:block={open}
+      class:hidden={!open}
+    >
       {@render children?.(open)}
     </div>
   </div>
@@ -153,7 +158,7 @@
       </p>
     </div>
 
-    <div class="mt-6 block w-full" class:hidden={!open}>
+    <div class="mt-6 w-full" class:block={open} class:hidden={!open}>
       {@render children?.(open)}
     </div>
   </div>

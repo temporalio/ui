@@ -134,7 +134,7 @@
 
     <form novalidate use:enhance oninput={onInput}>
       <div
-        class="relative grid grid-cols-1 gap-6 xl:grid-cols-[minmax(min-content,54rem),minmax(19rem,23rem)]"
+        class="relative grid grid-cols-1 gap-6 xl:grid-cols-[minmax(min-content,54rem)_minmax(19rem,23rem)]"
       >
         <div class="flex w-full flex-col gap-6">
           <ScheduleDetailsCard {form} errors={formErrors} {schedule} />

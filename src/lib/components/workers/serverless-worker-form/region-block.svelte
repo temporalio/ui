@@ -61,7 +61,7 @@ existed. Otherwise every single-region form would gain a border it never had. --
               <Tooltip text={roleTooltip} top width={260}>
                 <button
                   type="button"
-                  class="rounded-sm text-sm text-secondary underline decoration-dotted underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary"
+                  class="rounded-xs text-sm text-secondary underline decoration-dotted underline-offset-4 focus-visible:ring-2 focus-visible:ring-interactive-primary focus-visible:outline-hidden"
                 >
                   {roleLabel}
                 </button>
@@ -76,7 +76,7 @@ existed. Otherwise every single-region form would gain a border it never had. --
         <div class="ml-auto">{@render action()}</div>
       {/if}
     </div>
-    <div class={merge('px-4 pb-4 pt-5', bodyClass)}>
+    <div class={merge('px-4 pt-5 pb-4', bodyClass)}>
       {@render children()}
     </div>
   </div>

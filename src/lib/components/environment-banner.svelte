@@ -39,7 +39,7 @@
 {#if text}
   <div
     bind:offsetHeight={height}
-    class="fixed inset-x-0 top-0 z-30 break-words border-b px-4 py-1 text-center text-base font-semibold tracking-wide {colorClasses[
+    class="fixed inset-x-0 top-0 z-30 border-b px-4 py-1 text-center text-base font-semibold tracking-wide break-words {colorClasses[
       color
     ]}"
     data-testid="environment-banner"

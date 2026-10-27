@@ -215,7 +215,7 @@
           name="description"
           id="description"
           rows="4"
-          class="w-full rounded-md border border-primary bg-background-primary px-3 py-2 text-primary focus:outline-none focus:ring-2 focus:ring-interactive-primary focus:ring-offset-2 focus:ring-offset-background-primary"
+          class="w-full rounded-md border border-primary bg-background-primary px-3 py-2 text-primary focus:ring-2 focus:ring-interactive-primary focus:ring-offset-2 focus:ring-offset-background-primary focus:outline-hidden"
         ></textarea>
         {#if $loadingErrors.description}
           <span class="text-sm text-error">{$loadingErrors.description[0]}</span

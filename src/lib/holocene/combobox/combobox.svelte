@@ -14,7 +14,7 @@
       'border',
       'text-sm',
       'text-primary',
-      'focus-within:outline-none',
+      'focus-within:outline-hidden',
       'focus-within:ring-2',
       'focus-within:ring-interactive-primary',
       'rounded',
@@ -656,7 +656,7 @@
       {#if showChevron}
         <button
           type="button"
-          class="flex h-full items-center rounded pr-2 hover:bg-interactive-tertiary-hover focus:outline-none"
+          class="flex h-full items-center rounded pr-2 hover:bg-interactive-tertiary-hover focus:outline-hidden"
           onclick={handleChevronClick}
           aria-label={$open ? 'Close options' : 'Open options'}
           tabindex="-1"
@@ -671,7 +671,10 @@
         </button>
       {/if}
     </div>
-    <div class="inline-flex" class:hidden={!hintText && !showError}>
+    <div
+      class:inline-flex={hintText || showError}
+      class:hidden={!hintText && !showError}
+    >
       <span
         id={errorId}
         role="alert"
@@ -748,6 +751,8 @@
 </MenuContainer>
 
 <style lang="postcss">
+  @reference '../../../app.css';
+
   .hint-text {
     @apply text-xs text-secondary;
 
@@ -761,6 +766,6 @@
   }
 
   .combobox-input {
-    @apply flex grow bg-transparent text-primary placeholder:text-tertiary focus:outline-none disabled:text-tertiary;
+    @apply flex grow bg-transparent text-primary placeholder:text-tertiary focus:outline-hidden disabled:text-tertiary;
   }
 </style>

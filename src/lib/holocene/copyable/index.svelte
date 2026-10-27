@@ -38,7 +38,7 @@
   {#if clickAllToCopy}
     <button
       type="button"
-      class="break-all text-left"
+      class="text-left break-all"
       onclick={handleOnClick}
       aria-label={children ? undefined : `Copy ${content}`}
     >
@@ -56,10 +56,23 @@
   <CopyButton
     {copyIconTitle}
     {copySuccessIconTitle}
-    class={visible
-      ? 'visible'
-      : 'invisible group-focus-within:visible group-hover:visible'}
+    class={visible ? 'visible' : 'copy-action'}
     onclick={handleOnClick}
     copied={$copied}
   />
 </div>
+
+<style>
+  @media (hover: hover) {
+    :global(.copy-action) {
+      pointer-events: none;
+      opacity: 0;
+    }
+
+    .group:hover :global(.copy-action),
+    .group:focus-within :global(.copy-action) {
+      pointer-events: auto;
+      opacity: 1;
+    }
+  }
+</style>

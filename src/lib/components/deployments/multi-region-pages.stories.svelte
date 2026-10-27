@@ -249,7 +249,7 @@
             <tr class="text-left align-bottom">
               <th class="px-3 py-2 font-medium">Build ID</th>
               <th class="px-3 py-2 font-medium">Lifecycle</th>
-              <th class="whitespace-nowrap px-3 py-2 font-medium">
+              <th class="px-3 py-2 font-medium whitespace-nowrap">
                 Region
                 <span class="font-normal text-secondary"
                   >(Primary, Replica)</span

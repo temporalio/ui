@@ -70,6 +70,8 @@
 </div>
 
 <style lang="postcss">
+  @reference '../../../app.css';
+
   .description {
     @apply ml-8 text-sm font-normal text-secondary;
   }

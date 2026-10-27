@@ -95,6 +95,8 @@
 </dialog>
 
 <style lang="postcss">
+  @reference '../../../app.css';
+
   .body {
     @apply z-50 w-full overflow-y-auto rounded-lg border border-secondary bg-surface-primary p-0 text-primary shadow-xl md:h-max lg:max-w-4xl;
   }
@@ -104,11 +106,11 @@
   }
 
   .body.hightlightNav::backdrop {
-    @apply left-[60px] top-[40px];
+    @apply top-[40px] left-[60px];
   }
 
   .title {
-    @apply bg-surface-primary px-8 pb-0 pt-8 text-2xl text-primary;
+    @apply bg-surface-primary px-8 pt-8 pb-0 text-2xl text-primary;
   }
 
   .content {

@@ -7,5 +7,6 @@
   "trailingComma": "all",
   "bracketSpacing": true,
   "bracketSameLine": false,
-  "plugins": ["prettier-plugin-svelte", "prettier-plugin-tailwindcss"]
+  "plugins": ["prettier-plugin-svelte", "prettier-plugin-tailwindcss"],
+  "tailwindStylesheet": "./src/app.css"
 }

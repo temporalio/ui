@@ -52,7 +52,7 @@
     title,
     escapeValue: false,
   })}
-  class="w-[35vw] min-w-min max-w-fit"
+  class="w-[35vw] max-w-fit min-w-min"
 >
   <DrawerContent
     title={translate('workflows.configure-headers', {

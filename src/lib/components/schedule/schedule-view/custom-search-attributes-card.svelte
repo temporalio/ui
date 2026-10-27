@@ -74,13 +74,13 @@
                   query,
                 })
             : undefined}
-          class="flex flex-wrap items-center gap-2 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary"
+          class="flex flex-wrap items-center gap-2 rounded-xs focus-visible:ring-2 focus-visible:ring-interactive-primary focus-visible:outline-hidden"
         >
           <span class={twMerge('break-all', query && 'underline')}
             >{searchAttrName}</span
           >
           <span
-            class="select-all rounded-sm bg-surface-tertiary p-1 leading-4 text-primary"
+            class="rounded-xs bg-surface-tertiary p-1 leading-4 text-primary select-all"
           >
             {payloadToString(searchAttrValue)}
           </span>

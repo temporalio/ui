@@ -122,7 +122,7 @@
     <div
       class={merge(
         'input-container',
-        'relative box-border inline-flex h-10 w-full items-center rounded border border-primary bg-background-primary text-sm text-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-interactive-primary focus-within:ring-offset-2 focus-within:ring-offset-background-primary',
+        'relative box-border inline-flex h-10 w-full items-center rounded border border-primary bg-background-primary text-sm text-primary focus-within:ring-2 focus-within:ring-interactive-primary focus-within:ring-offset-2 focus-within:ring-offset-background-primary focus-within:outline-hidden',
         !isDisabled &&
           !readonly &&
           !showError &&
@@ -214,18 +214,25 @@
   </div>
 
   <div
-    class="inline-flex justify-between gap-2"
+    class="justify-between gap-2"
+    class:inline-flex={hintText || (maxLength && !isDisabled && !hideCount)}
     class:hidden={!hintText && (!maxLength || isDisabled || hideCount)}
   >
     <span
       id={errorId}
       role="alert"
-      class="hint-text error inline-block"
+      class="hint-text error"
+      class:inline-block={showError}
       class:hidden={!showError}
     >
       {#if showError}{hintText}{/if}
     </span>
-    <span id={hintId} class="hint-text inline-block" class:hidden={showError}>
+    <span
+      id={hintId}
+      class="hint-text"
+      class:inline-block={!showError}
+      class:hidden={showError}
+    >
       {#if !showError}{hintText}{/if}
     </span>
     {#if maxLength && !isDisabled && !hideCount}
@@ -247,6 +254,8 @@
 </div>
 
 <style lang="postcss">
+  @reference '../../../app.css';
+
   /* Base styles */
   .input-container {
     &.error,
@@ -256,7 +265,7 @@
   }
 
   .input {
-    @apply m-2 h-full w-full bg-transparent text-primary placeholder:text-tertiary focus:outline-none disabled:text-tertiary;
+    @apply m-2 h-full w-full bg-transparent text-primary placeholder:text-tertiary focus:outline-hidden disabled:text-tertiary;
   }
 
   .prefix {

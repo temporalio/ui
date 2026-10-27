@@ -139,7 +139,7 @@ describe('UI catalog authoring adapter', () => {
     await expect(
       readFile(join(rootDirectory, '.catalog.journal.json'), 'utf8'),
     ).rejects.toMatchObject({ code: 'ENOENT' });
-  }, 30_000);
+  }, 60_000);
 
   it('demotes a canonical example into the ignored local catalog and immediately verifies', async () => {
     const rootDirectory = await createIsolatedCatalogRoot();

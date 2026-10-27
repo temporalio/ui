@@ -201,6 +201,8 @@
 </MenuContainer>
 
 <style lang="postcss">
+  @reference '../../../app.css';
+
   input {
     @apply pointer-events-none w-full grow bg-transparent text-sm;
   }

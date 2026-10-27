@@ -219,13 +219,16 @@ test.describe('Payload Decoder', () => {
     }) => {
       const workflowDetail = new WorkflowDetailPage(page);
 
-      await page.route('http://localhost:8888/decode*', async (route) => {
-        route.fulfill({
-          status: 500,
-          contentType: 'application/json',
-          body: JSON.stringify({}),
-        });
-      });
+      await page.route(
+        /^http:\/\/(?:localhost|127\.0\.0\.1):8888\/decode/,
+        async (route) => {
+          route.fulfill({
+            status: 500,
+            contentType: 'application/json',
+            body: JSON.stringify({}),
+          });
+        },
+      );
 
       await workflowDetail.openUserMetadata();
       await expect(

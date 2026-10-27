@@ -237,7 +237,7 @@
             <tr>
               <th
                 scope="row"
-                class="py-1.5 pl-2 pr-4 text-left font-normal text-secondary"
+                class="py-1.5 pr-4 pl-2 text-left font-normal text-secondary"
                 class:w-48={labelWidth === undefined}
                 style:width={labelWidth === undefined
                   ? undefined
@@ -246,7 +246,7 @@
                 {row.label}
               </th>
               {#each row.cells as cell, index (index)}
-                <td class="py-1.5 pl-2 pr-4 text-primary">
+                <td class="py-1.5 pr-4 pl-2 text-primary">
                   {@render value(cell)}
                 </td>
               {/each}

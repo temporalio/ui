@@ -56,7 +56,7 @@
   };
 </script>
 
-<div class="grid grid-cols-[1fr,200px,2rem] items-center gap-3">
+<div class="grid grid-cols-[1fr_200px_2rem] items-center gap-3">
   <Input
     id={`attribute-name-${index}`}
     value={name}

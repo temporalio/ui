@@ -128,7 +128,7 @@
     variant="tertiary"
     class="rounded-none border-l-0"
   >
-    <span class="whitespace-nowrap text-sm">
+    <span class="text-sm whitespace-nowrap">
       {translate('events.event-groups')}
     </span>
   </MenuButton>
@@ -136,7 +136,7 @@
     id="event-group-filter-menu"
     keepOpen
     position="right"
-    class="w-[280px] min-w-0 max-w-[calc(100dvw-1rem)] md:w-[380px]"
+    class="w-[280px] max-w-[calc(100dvw-1rem)] min-w-0 md:w-[380px]"
   >
     {#if $open}
       <li role="none" class="p-2">
@@ -171,7 +171,7 @@
               />
             {/snippet}
             <div class="flex min-w-0 flex-1 items-center gap-2">
-              <span class="min-w-0 flex-1 whitespace-normal break-words"
+              <span class="min-w-0 flex-1 break-words whitespace-normal"
                 >{label}</span
               >
               <span class="shrink-0 text-xs text-secondary">
