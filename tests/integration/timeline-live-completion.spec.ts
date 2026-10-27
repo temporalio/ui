@@ -87,6 +87,9 @@ test.describe('Timeline live completion', () => {
     );
 
     await page.goto(timelineUrl);
+    await page
+      .getByRole('img', { name: `Workflow ${workflowId}: Running` })
+      .scrollIntoViewIfNeeded();
 
     // Row renders in progress first (Started, not Completed)...
     const completedButton = page.getByRole('button', {
