@@ -20,6 +20,8 @@ export const llmsPaths = {
   component: (slug: string) => `/components/${slug}.md`,
   contract: (slug: string) => `/contracts/${slug}.md`,
   example: (slug: string) => `/examples/${slug}.svelte`,
+  llmsPage: '/for-agents/llms-txt',
+  mcpServerPage: '/for-agents/mcp-server',
 };
 
 const title = '# io Design System';
@@ -54,6 +56,11 @@ export function buildLlmsIndex({ origin, components }: LlmsInput): string {
     [
       `- [Using io-poc components](${url(llmsPaths.guide)}): Setup, which component to use when, the shared form API, overlays, and common mistakes.`,
       `- [Full documentation](${url(llmsPaths.full)}): The usage guide and every component's docs and contract in one file.`,
+    ].join('\n'),
+    '## For agents',
+    [
+      `- [LLMs.txt](${url(llmsPaths.llmsPage)}): The files on this site written for AI tools, and how to point an assistant at them.`,
+      `- [MCP server](${url(llmsPaths.mcpServerPage)}): A local MCP server that answers with component lists, docs, contracts, examples and the usage guide. From a temporalio/ui checkout, run \`node docs/mcp/server.mjs\`; the page has setup for Claude Code, VS Code and Cursor.`,
     ].join('\n'),
     '## Components',
     componentLines.join('\n'),

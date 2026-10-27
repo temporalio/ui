@@ -40,6 +40,24 @@ describe('llms.txt', () => {
     );
   });
 
+  it('links the For agents pages, including the MCP server, before the components', () => {
+    const index = buildLlmsIndex(input);
+    const section = index.slice(
+      index.indexOf('## For agents'),
+      index.indexOf('## Components'),
+    );
+    expect(section).toContain(
+      '- [LLMs.txt](https://io.example/for-agents/llms-txt):',
+    );
+    expect(section).toContain(
+      '- [MCP server](https://io.example/for-agents/mcp-server):',
+    );
+    expect(section).toContain('`node docs/mcp/server.mjs`');
+    expect(index.indexOf('## For agents')).toBeGreaterThan(
+      index.indexOf('## Guides'),
+    );
+  });
+
   it('uses root-relative links without an origin', () => {
     expect(buildLlmsIndex({ ...input, origin: '' })).toContain(
       '- [Select](/components/select.md)',

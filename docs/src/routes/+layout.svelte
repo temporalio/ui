@@ -9,6 +9,7 @@
   import { Button } from '$lib/io-poc/button';
 
   import { components } from '$docs/data/components';
+  import { llmsPaths } from '$docs/data/llms';
 
   import '../../../src/app.css';
 
@@ -28,8 +29,8 @@
   ];
 
   const agentPages = [
-    { label: 'LLMs.txt', href: '/for-agents/llms-txt' },
-    { label: 'MCP server', href: '/for-agents/mcp-server' },
+    { label: 'LLMs.txt', href: llmsPaths.llmsPage },
+    { label: 'MCP server', href: llmsPaths.mcpServerPage },
   ];
 
   const navLinkClass =
