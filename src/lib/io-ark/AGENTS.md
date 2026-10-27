@@ -18,6 +18,13 @@
 - Add consumer examples and API guidance to the documentation app, following `docs/AGENTS.md`. Keep migration procedures and implementation rationale out of the component's usage page.
 - Keep legacy APIs available during incremental adoption. Do not rewrite consumers or remove legacy components unless requested.
 
+## Contracts
+
+- Every component has a contract beside its source: `<folder>/<slug>.contract.md`, named after its docs slug (`progress/` holds `progress-circular.contract.md` and `progress-linear.contract.md`). The design-contract-review skill and the docs Contract section both read these files.
+- Use the iO contract format: YAML frontmatter (`component`, `source` relative to the contract, `sourceCommit` once the component is committed, `usedBy`, `status`, `lastReviewed`), a `# <Name> contract` title, a note on what the types already express, then `## Input`, `## Behavior`, `## Display`, `## Accessibility`, `## Test hooks`, `## Known gaps`, `## Review candidates` and `## Decisions` as needed, and a `## Reconciliation log`.
+- Each rule is a bullet starting with a bold ID (`IN-1`, `BEH-1`, `DIS-1`, `A11Y-1`, `TEST-1`, `GAP-1`, `RC-1`, `DEC-1`) and uses MUST, SHOULD or MAY. State only what the code or a recorded decision supports, cite files, and do not use tables.
+- When a component changes, reconcile its contract in the same change: update or retire affected rules, close fixed gaps, and add a Reconciliation log entry with the new `sourceCommit`.
+
 ## Validation
 
 - After implementation changes, run the main type check (`pnpm check`) and package build (`pnpm package`), plus targeted ESLint and Prettier checks.

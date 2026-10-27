@@ -16,8 +16,19 @@ interface TextNode {
 const text = (node: TextNode): string =>
   node.value ?? node.children?.map(text).join('') ?? '';
 
+export type AnatomySide = 'top' | 'right' | 'bottom' | 'left';
+
+export interface AnatomyPart {
+  name: string;
+  description: string;
+  selector?: string;
+  side?: AnatomySide;
+  children: AnatomyPart[];
+}
+
 export type DocumentationBlock =
   | { type: 'html'; html: string }
+  | { type: 'anatomy'; parts: AnatomyPart[] }
   | { type: 'code'; code: string; filename: string }
   | { type: 'props'; componentName: string; rows: PropDefinition[] };
 
@@ -64,6 +75,10 @@ export function parseComponentMarkdown(markdown: string) {
         'Component Markdown content must belong to a level-two section.',
       );
     if (node.type === 'heading' && node.depth === 3) componentName = text(node);
+    if (section.id === 'anatomy' && node.type === 'list') {
+      section.blocks.push({ type: 'anatomy', parts: toAnatomyParts(node) });
+      continue;
+    }
     section.blocks.push(toBlock(node, componentName));
   }
   for (const id of ['examples', 'usage', 'api']) {
@@ -72,7 +87,44 @@ export function parseComponentMarkdown(markdown: string) {
   return { name: text(heading), description: text(description), sections };
 }
 
-function toBlock(
+type ListNode = Extract<MarkdownNode, { type: 'list' }>;
+
+function toAnatomyParts(list: ListNode): AnatomyPart[] {
+  return list.children.map((item) => {
+    const [summary, ...rest] = item.children;
+    const strong =
+      summary?.type === 'paragraph'
+        ? summary.children.find((child) => child.type === 'strong')
+        : undefined;
+    if (!strong || summary?.type !== 'paragraph') {
+      throw new Error('Anatomy items must start with a bold part name.');
+    }
+    const name = text(strong);
+    const after = summary.children.slice(summary.children.indexOf(strong) + 1);
+    const code = after.find((child) => child.type === 'inlineCode');
+    const remainder = after
+      .filter((child) => child !== code)
+      .map(text)
+      .join('');
+    const side = remainder.match(/^\s*\((top|right|bottom|left)\)/)?.[1] as
+      | AnatomySide
+      | undefined;
+    const description = remainder
+      .replace(/^\s*\((top|right|bottom|left)\)/, '')
+      .replace(/^[\s:—–-]+/, '')
+      .trim();
+    const nested = rest.find((child) => child.type === 'list');
+    return {
+      name,
+      description,
+      ...(code ? { selector: code.value } : {}),
+      ...(side ? { side } : {}),
+      children: nested ? toAnatomyParts(nested) : [],
+    };
+  });
+}
+
+export function toBlock(
   node: MarkdownNode,
   componentName: string,
 ): DocumentationBlock {
@@ -107,4 +159,53 @@ function toBlock(
     type: 'html',
     html: toHtml(sanitize(toHast({ type: 'root', children: [node] }))),
   };
+}
+
+export interface ContractDocument {
+  meta: Record<string, string>;
+  title: string;
+  intro: MarkdownSection;
+  sections: MarkdownSection[];
+}
+
+export function parseContractMarkdown(markdown: string): ContractDocument {
+  const frontmatter = markdown.match(/^---\n([\s\S]*?)\n---\n/);
+  if (!frontmatter) {
+    throw new Error('Contracts must start with YAML frontmatter.');
+  }
+  const meta = Object.fromEntries(
+    frontmatter[1]
+      .split('\n')
+      .map((line) => line.match(/^([A-Za-z]+):\s*(.*)$/))
+      .filter((match): match is RegExpMatchArray => !!match)
+      .map(([, key, value]) => [key, value.trim()]),
+  );
+  for (const key of ['component', 'source', 'status']) {
+    if (!meta[key]) throw new Error(`Contract frontmatter is missing ${key}.`);
+  }
+  const root = fromMarkdown(markdown.slice(frontmatter[0].length), {
+    extensions: [gfmTable()],
+    mdastExtensions: [gfmTableFromMarkdown()],
+  });
+  const [heading, ...nodes] = root.children;
+  if (heading?.type !== 'heading' || heading.depth !== 1) {
+    throw new Error('Contracts must have a level-one title.');
+  }
+  const intro: MarkdownSection = { id: 'intro', title: '', blocks: [] };
+  const sections: MarkdownSection[] = [];
+  let current = intro;
+  for (const node of nodes) {
+    if (node.type === 'heading' && node.depth === 2) {
+      const title = text(node);
+      current = {
+        id: title.toLowerCase().replace(/\s+/g, '-'),
+        title,
+        blocks: [],
+      };
+      sections.push(current);
+      continue;
+    }
+    current.blocks.push(toBlock(node, meta.component));
+  }
+  return { meta, title: text(heading), intro, sections };
 }

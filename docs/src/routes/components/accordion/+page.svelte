@@ -1,12 +1,14 @@
 <script lang="ts">
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import { Accordion } from '$lib/io-ark/accordion';
+  import { Accordion, AccordionGroup } from '$lib/io-ark/accordion';
 
   import AccordionExamples from '../../../examples/accordion-examples.svelte';
   import examplesSource from '../../../examples/accordion-examples.svelte?raw';
 
+  import AnatomySection from '$docs/components/anatomy-section.svelte';
   import ComponentPage from '$docs/components/component-page.svelte';
+  import ContractSection from '$docs/components/contract-section.svelte';
   import DocSection from '$docs/components/doc-section.svelte';
   import MarkdownContent from '$docs/components/markdown-content.svelte';
   import Playground from '$docs/components/playground.svelte';
@@ -22,7 +24,6 @@
   let open = $state(false);
   let disabled = $state(false);
   let expandable = $state(true);
-  let toggles = $state(0);
   const source = $derived(
     `<script lang="ts">
   import { Accordion } from '$lib/io-ark/accordion';
@@ -52,13 +53,9 @@
           {disabled}
           {expandable}
           bind:open
-          onToggle={() => toggles++}
         >
           <p>Choose the details you want to show here.</p>
         </Accordion>
-        <p role="status" class="mt-4 text-xs text-secondary">
-          Toggled {toggles} times
-        </p>
       </div>
     {/snippet}
     {#snippet controls()}
@@ -78,6 +75,18 @@
       />
     {/snippet}
   </Playground>
+  <AnatomySection slug="accordion">
+    {#snippet preview()}
+      <AccordionGroup class="w-full">
+        <Accordion id="accordion-anatomy-1" title="Section 1" open>
+          <p>Content for Section 1</p>
+        </Accordion>
+        <Accordion id="accordion-anatomy-2" title="Section 2">
+          <p>Content for Section 2</p>
+        </Accordion>
+      </AccordionGroup>
+    {/snippet}
+  </AnatomySection>
   <DocSection id="examples" title={accordionContent.sections.examples.title}>
     <MarkdownContent section={accordionContent.sections.examples} />
     <div class="mt-5">
@@ -92,6 +101,7 @@
   <DocSection id="usage" title={accordionContent.sections.usage.title}>
     <MarkdownContent section={accordionContent.sections.usage} />
   </DocSection>
+  <ContractSection slug="accordion" />
   <DocSection id="api" title={accordionContent.sections.api.title}>
     <MarkdownContent section={accordionContent.sections.api} />
   </DocSection>

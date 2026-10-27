@@ -2,6 +2,16 @@
 
 Show and hide content in expandable panels.
 
+## Anatomy
+
+An accordion group stacks items. Each item has a trigger and a collapsible panel.
+
+- **Root**: The AccordionGroup that joins adjacent items.
+  - **Item** `[data-scope="accordion"][data-part="root"]` (left): One Accordion card with its own open state.
+    - **Item trigger** `item-trigger` (top): The heading button that toggles the panel. Holds the title, summary, and subtitle.
+    - **Item content** `item-content` (right): The panel content. Stays mounted while collapsed.
+    - **Item indicator** `[data-scope="accordion"][data-part="root"]:nth-child(2) [data-part="item-indicator"]` (bottom): The chevron that shows whether the panel is open.
+
 ## Examples
 
 Group panels to create a compact list. Each panel opens independently.
@@ -49,6 +59,10 @@ cannot be activated. Separate action buttons retain their own focus and behavior
 
 Set `expandable` to false to hide the toggle. Use `open` to control whether the
 content is visible.
+
+### Contract
+
+The rules reviewers check this component against live in `src/lib/io-ark/accordion/accordion.contract.md`, next to the source. The Contract section of this page shows them.
 
 ## API reference
 

@@ -1,9 +1,6 @@
 import { parseComponentMarkdown } from './markdown';
-import accordionMarkdown from '../../static/components/accordion.md?raw';
-import buttonMarkdown from '../../static/components/button.md?raw';
 
-export const buttonContent = parseComponentMarkdown(buttonMarkdown);
-export const accordionContent = parseComponentMarkdown(accordionMarkdown);
+export type ComponentContent = ReturnType<typeof parseComponentMarkdown>;
 
 export interface ComponentDocumentation {
   slug: string;
@@ -12,22 +9,45 @@ export interface ComponentDocumentation {
   markdown: string;
 }
 
-export const buttonDocumentation: ComponentDocumentation = {
-  slug: 'button',
-  markdown: buttonMarkdown,
-  name: buttonContent.name,
-  description: buttonContent.description,
+const markdownFiles = import.meta.glob<string>('../../static/components/*.md', {
+  query: '?raw',
+  import: 'default',
+  eager: true,
+});
+
+const entries = Object.entries(markdownFiles).map(([path, markdown]) => {
+  const slug = path.split('/').pop()!.replace(/\.md$/, '');
+  const content = parseComponentMarkdown(markdown);
+  const documentation: ComponentDocumentation = {
+    slug,
+    markdown,
+    name: content.name,
+    description: content.description,
+  };
+  return { slug, content, documentation };
+});
+
+const bySlug = new Map(entries.map((entry) => [entry.slug, entry]));
+
+const getEntry = (slug: string) => {
+  const entry = bySlug.get(slug);
+  if (!entry) throw new Error(`Missing documentation for ${slug}`);
+  return entry;
 };
 
-export const accordionDocumentation: ComponentDocumentation = {
-  slug: 'accordion',
-  markdown: accordionMarkdown,
-  name: accordionContent.name,
-  description: accordionContent.description,
-};
+export const getComponentContent = (slug: string): ComponentContent =>
+  getEntry(slug).content;
 
-/** Register a component once to add it to the documentation navigation. */
-export const components: ComponentDocumentation[] = [
-  buttonDocumentation,
-  accordionDocumentation,
-];
+export const getComponentDocumentation = (
+  slug: string,
+): ComponentDocumentation => getEntry(slug).documentation;
+
+export const buttonContent = getComponentContent('button');
+export const buttonDocumentation = getComponentDocumentation('button');
+export const accordionContent = getComponentContent('accordion');
+export const accordionDocumentation = getComponentDocumentation('accordion');
+
+/** Add `static/components/<slug>.md` and its page to list a component here. */
+export const components: ComponentDocumentation[] = entries
+  .map((entry) => entry.documentation)
+  .sort((a, b) => a.name.localeCompare(b.name));

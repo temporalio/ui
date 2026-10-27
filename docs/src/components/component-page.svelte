@@ -2,7 +2,11 @@
   import { Toc } from '@ark-ui/svelte/toc';
   import type { Snippet } from 'svelte';
 
-  import type { ComponentDocumentation } from '../data/components';
+  import {
+    type ComponentDocumentation,
+    getComponentContent,
+  } from '../data/components';
+  import { getContract } from '../data/contracts';
 
   import PageActions from './page-actions.svelte';
 
@@ -12,16 +16,23 @@
     children: Snippet;
   }
 
-  let {
-    component,
-    sections = [
+  let { component, sections: customSections, children }: Props = $props();
+
+  const componentSections = $derived(
+    getComponentContent(component.slug).sections,
+  );
+  const hasAnatomy = $derived(!!componentSections.anatomy);
+  const hasContract = $derived(!!getContract(component.slug));
+  const sections = $derived(
+    customSections ?? [
       { id: 'playground', label: 'Playground' },
+      ...(hasAnatomy ? [{ id: 'anatomy', label: 'Anatomy' }] : []),
       { id: 'examples', label: 'Examples' },
       { id: 'usage', label: 'Usage' },
+      ...(hasContract ? [{ id: 'contract', label: 'Contract' }] : []),
       { id: 'api', label: 'API reference' },
     ],
-    children,
-  }: Props = $props();
+  );
 
   const tocItems = $derived(
     sections.map((section) => ({
@@ -33,7 +44,7 @@
 </script>
 
 <svelte:head>
-  <title>{component.name} · Temporal Design System</title>
+  <title>{component.name} · io Design System</title>
   <meta name="description" content={component.description} />
 </svelte:head>
 
@@ -78,6 +89,6 @@
   <footer
     class="mt-14 border-t border-primary py-6 text-xs text-secondary xl:col-start-1"
   >
-    Temporal Design System · {component.name}
+    io Design System · {component.name}
   </footer>
 </div>

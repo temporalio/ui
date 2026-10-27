@@ -75,7 +75,11 @@
       >
       <span class="text-secondary max-sm:hidden">{@render summary?.()}</span>
     </span>
-    {#if expandable}<Glyph class="shrink-0" />{/if}
+    {#if expandable}<span
+        data-scope="accordion"
+        data-part="item-indicator"
+        class="flex shrink-0"><Glyph /></span
+      >{/if}
   </span>
   <span class="text-secondary sm:hidden">{@render summary?.()}</span>
   <span class="flex items-center">

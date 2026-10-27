@@ -1,0 +1,162 @@
+<script lang="ts">
+  import Checkbox from '$lib/holocene/checkbox.svelte';
+  import Input from '$lib/holocene/input/input.svelte';
+  import {
+    DatePicker,
+    type DateValue,
+    parseDate,
+  } from '$lib/io-ark/date-picker';
+
+  import DatePickerExamples from '../../../examples/date-picker-examples.svelte';
+  import examplesSource from '../../../examples/date-picker-examples.svelte?raw';
+
+  import AnatomySection from '$docs/components/anatomy-section.svelte';
+  import ComponentPage from '$docs/components/component-page.svelte';
+  import ContractSection from '$docs/components/contract-section.svelte';
+  import DocSection from '$docs/components/doc-section.svelte';
+  import MarkdownContent from '$docs/components/markdown-content.svelte';
+  import Playground from '$docs/components/playground.svelte';
+  import SelectControl from '$docs/components/select-control.svelte';
+  import SourceCode from '$docs/components/source-code.svelte';
+  import {
+    getComponentContent,
+    getComponentDocumentation,
+  } from '$docs/data/components';
+
+  const content = getComponentContent('date-picker');
+  const documentation = getComponentDocumentation('date-picker');
+
+  const selectionModes = ['single', 'range'] as const;
+  let selectionMode = $state<(typeof selectionModes)[number]>('single');
+  let label = $state('Schedule start date');
+  let helperText = $state('The first action runs on this date.');
+  let error = $state('');
+  let closeOnSelect = $state(true);
+  let showToday = $state(true);
+  let required = $state(false);
+  let disabled = $state(false);
+  let readOnly = $state(false);
+  let value = $state<DateValue[]>([]);
+
+  const isRange = $derived(selectionMode === 'range');
+  const source = $derived(
+    `<script lang="ts">
+  import { DatePicker, type DateValue } from '$lib/io-ark/date-picker';
+  let value = $state<DateValue[]>([]);
+</` +
+      `script>
+
+<DatePicker
+  label={${JSON.stringify(label)}}${isRange ? '\n  selectionMode="range"' : ''}${helperText ? `\n  helperText={${JSON.stringify(helperText)}}` : ''}${error ? `\n  error={${JSON.stringify(error)}}` : ''}${!closeOnSelect ? '\n  closeOnSelect={false}' : ''}${!isRange && !showToday ? '\n  showToday={false}' : ''}${required ? '\n  required' : ''}${disabled ? '\n  disabled' : ''}${readOnly ? '\n  readOnly' : ''}
+  bind:value
+/>`,
+  );
+
+  $effect(() => {
+    void selectionMode;
+    value = [];
+  });
+</script>
+
+<ComponentPage component={documentation}>
+  <Playground {source} filename="DatePicker.svelte">
+    {#snippet preview()}
+      <div class="w-full max-w-sm">
+        {#key selectionMode}
+          <DatePicker
+            id="date-picker-preview"
+            {label}
+            {selectionMode}
+            {helperText}
+            {error}
+            {closeOnSelect}
+            {showToday}
+            {required}
+            {disabled}
+            {readOnly}
+            bind:value
+          />
+        {/key}
+        <p role="status" class="mt-4 text-xs text-secondary">
+          {value.length
+            ? value.map((date) => date.toString()).join(' – ')
+            : 'No date selected'}
+        </p>
+      </div>
+    {/snippet}
+    {#snippet controls()}
+      <SelectControl
+        id="date-picker-selection-mode"
+        label="Selection mode"
+        options={selectionModes}
+        bind:value={selectionMode}
+      />
+      <Input id="date-picker-label" label="Label" bind:value={label} />
+      <Input
+        id="date-picker-helper"
+        label="Helper text"
+        bind:value={helperText}
+      />
+      <Input id="date-picker-error" label="Error" bind:value={error} />
+      <Checkbox
+        id="date-picker-close-on-select"
+        label="Close on select"
+        bind:checked={closeOnSelect}
+      />
+      {#if !isRange}
+        <Checkbox
+          id="date-picker-show-today"
+          label="Show today"
+          bind:checked={showToday}
+        />
+      {/if}
+      <Checkbox
+        id="date-picker-required"
+        label="Required"
+        bind:checked={required}
+      />
+      <Checkbox
+        id="date-picker-disabled"
+        label="Disabled"
+        bind:checked={disabled}
+      />
+      <Checkbox
+        id="date-picker-read-only"
+        label="Read only"
+        bind:checked={readOnly}
+      />
+    {/snippet}
+  </Playground>
+  <AnatomySection slug="date-picker">
+    {#snippet preview()}
+      <div class="w-[320px]">
+        <DatePicker
+          id="date-picker-anatomy"
+          label="Schedule start date"
+          value={[parseDate('2026-10-14')]}
+          inline
+        />
+      </div>
+    {/snippet}
+  </AnatomySection>
+  <DocSection id="examples" title={content.sections.examples.title}>
+    <MarkdownContent section={content.sections.examples} />
+    <div class="mt-5">
+      <div class="rounded-lg border border-primary p-6">
+        <DatePickerExamples />
+      </div>
+      <SourceCode
+        code={examplesSource}
+        filename="date-picker-examples.svelte"
+        collapsible
+      />
+    </div>
+  </DocSection>
+  <DocSection id="usage" title={content.sections.usage.title}>
+    <MarkdownContent section={content.sections.usage} />
+  </DocSection>
+  <ContractSection slug="date-picker" />
+  <DocSection id="api" title={content.sections.api.title}>
+    <MarkdownContent section={content.sections.api} />
+  </DocSection>
+</ComponentPage>

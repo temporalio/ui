@@ -359,6 +359,134 @@
     "./io-ark/accordion": {
       "types": "./dist/io-ark/accordion/index.d.ts",
       "import": "./dist/io-ark/accordion/index.js"
+    },
+    "./io-ark/checkbox": {
+      "types": "./dist/io-ark/checkbox/index.d.ts",
+      "import": "./dist/io-ark/checkbox/index.js"
+    },
+    "./io-ark/collapsible": {
+      "types": "./dist/io-ark/collapsible/index.d.ts",
+      "import": "./dist/io-ark/collapsible/index.js"
+    },
+    "./io-ark/combobox": {
+      "types": "./dist/io-ark/combobox/index.d.ts",
+      "import": "./dist/io-ark/combobox/index.js"
+    },
+    "./io-ark/date-input": {
+      "types": "./dist/io-ark/date-input/index.d.ts",
+      "import": "./dist/io-ark/date-input/index.js"
+    },
+    "./io-ark/date-picker": {
+      "types": "./dist/io-ark/date-picker/index.d.ts",
+      "import": "./dist/io-ark/date-picker/index.js"
+    },
+    "./io-ark/dialog": {
+      "types": "./dist/io-ark/dialog/index.d.ts",
+      "import": "./dist/io-ark/dialog/index.js"
+    },
+    "./io-ark/drawer": {
+      "types": "./dist/io-ark/drawer/index.d.ts",
+      "import": "./dist/io-ark/drawer/index.js"
+    },
+    "./io-ark/field": {
+      "types": "./dist/io-ark/field/index.d.ts",
+      "import": "./dist/io-ark/field/index.js"
+    },
+    "./io-ark/fieldset": {
+      "types": "./dist/io-ark/fieldset/index.d.ts",
+      "import": "./dist/io-ark/fieldset/index.js"
+    },
+    "./io-ark/file-upload": {
+      "types": "./dist/io-ark/file-upload/index.d.ts",
+      "import": "./dist/io-ark/file-upload/index.js"
+    },
+    "./io-ark/listbox": {
+      "types": "./dist/io-ark/listbox/index.d.ts",
+      "import": "./dist/io-ark/listbox/index.js"
+    },
+    "./io-ark/menu": {
+      "types": "./dist/io-ark/menu/index.d.ts",
+      "import": "./dist/io-ark/menu/index.js"
+    },
+    "./io-ark/navigation-menu": {
+      "types": "./dist/io-ark/navigation-menu/index.d.ts",
+      "import": "./dist/io-ark/navigation-menu/index.js"
+    },
+    "./io-ark/number-input": {
+      "types": "./dist/io-ark/number-input/index.d.ts",
+      "import": "./dist/io-ark/number-input/index.js"
+    },
+    "./io-ark/pagination": {
+      "types": "./dist/io-ark/pagination/index.d.ts",
+      "import": "./dist/io-ark/pagination/index.js"
+    },
+    "./io-ark/popover": {
+      "types": "./dist/io-ark/popover/index.d.ts",
+      "import": "./dist/io-ark/popover/index.js"
+    },
+    "./io-ark/progress": {
+      "types": "./dist/io-ark/progress/index.d.ts",
+      "import": "./dist/io-ark/progress/index.js"
+    },
+    "./io-ark/radio-group": {
+      "types": "./dist/io-ark/radio-group/index.d.ts",
+      "import": "./dist/io-ark/radio-group/index.js"
+    },
+    "./io-ark/segment-group": {
+      "types": "./dist/io-ark/segment-group/index.d.ts",
+      "import": "./dist/io-ark/segment-group/index.js"
+    },
+    "./io-ark/select": {
+      "types": "./dist/io-ark/select/index.d.ts",
+      "import": "./dist/io-ark/select/index.js"
+    },
+    "./io-ark/slider": {
+      "types": "./dist/io-ark/slider/index.d.ts",
+      "import": "./dist/io-ark/slider/index.js"
+    },
+    "./io-ark/steps": {
+      "types": "./dist/io-ark/steps/index.d.ts",
+      "import": "./dist/io-ark/steps/index.js"
+    },
+    "./io-ark/switch": {
+      "types": "./dist/io-ark/switch/index.d.ts",
+      "import": "./dist/io-ark/switch/index.js"
+    },
+    "./io-ark/tabs": {
+      "types": "./dist/io-ark/tabs/index.d.ts",
+      "import": "./dist/io-ark/tabs/index.js"
+    },
+    "./io-ark/tags-input": {
+      "types": "./dist/io-ark/tags-input/index.d.ts",
+      "import": "./dist/io-ark/tags-input/index.js"
+    },
+    "./io-ark/toast": {
+      "types": "./dist/io-ark/toast/index.d.ts",
+      "import": "./dist/io-ark/toast/index.js"
+    },
+    "./io-ark/toggle": {
+      "types": "./dist/io-ark/toggle/index.d.ts",
+      "import": "./dist/io-ark/toggle/index.js"
+    },
+    "./io-ark/toggle-group": {
+      "types": "./dist/io-ark/toggle-group/index.d.ts",
+      "import": "./dist/io-ark/toggle-group/index.js"
+    },
+    "./io-ark/tooltip": {
+      "types": "./dist/io-ark/tooltip/index.d.ts",
+      "import": "./dist/io-ark/tooltip/index.js"
+    },
+    "./io-ark/tour": {
+      "types": "./dist/io-ark/tour/index.d.ts",
+      "import": "./dist/io-ark/tour/index.js"
+    },
+    "./io-ark/tree-view": {
+      "types": "./dist/io-ark/tree-view/index.d.ts",
+      "import": "./dist/io-ark/tree-view/index.js"
+    },
+    "./io-ark/scroll-area": {
+      "types": "./dist/io-ark/scroll-area/index.d.ts",
+      "import": "./dist/io-ark/scroll-area/index.js"
     }
   }
 }

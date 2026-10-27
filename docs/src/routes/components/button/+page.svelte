@@ -12,7 +12,9 @@
   import ButtonExamples from '../../../examples/button-examples.svelte';
   import examplesSource from '../../../examples/button-examples.svelte?raw';
 
+  import AnatomySection from '$docs/components/anatomy-section.svelte';
   import ComponentPage from '$docs/components/component-page.svelte';
+  import ContractSection from '$docs/components/contract-section.svelte';
   import DocSection from '$docs/components/doc-section.svelte';
   import MarkdownContent from '$docs/components/markdown-content.svelte';
   import Playground from '$docs/components/playground.svelte';
@@ -37,7 +39,6 @@
   let disabled = $state(false);
   let isLoading = $state(false);
   let leadingIcon = $state(true);
-  let presses = $state(0);
 
   const source = $derived(
     `<script lang="ts">
@@ -73,13 +74,8 @@
           {size}
           {disabled}
           {isLoading}
-          LeadingIcon={leadingIcon ? IconAdd : undefined}
-          onclick={() => (presses += 1)}>{label}</Button
+          LeadingIcon={leadingIcon ? IconAdd : undefined}>{label}</Button
         >
-        <p role="status" class="text-xs text-secondary">
-          Activated {presses}
-          {presses === 1 ? 'time' : 'times'}
-        </p>
       {/if}
     {/snippet}
     {#snippet controls()}
@@ -124,6 +120,16 @@
       {/if}
     {/snippet}
   </Playground>
+
+  <AnatomySection slug="button">
+    {#snippet preview()}
+      <Button
+        LeadingIcon={IconAdd}
+        TrailingIcon={IconArrowRight}
+        tracking={false}><span>Label</span></Button
+      >
+    {/snippet}
+  </AnatomySection>
 
   <DocSection id="examples" title={buttonContent.sections.examples.title}>
     <MarkdownContent section={buttonContent.sections.examples} />
@@ -174,6 +180,7 @@
   <DocSection id="usage" title={buttonContent.sections.usage.title}>
     <MarkdownContent section={buttonContent.sections.usage} />
   </DocSection>
+  <ContractSection slug="button" />
   <DocSection id="api" title={buttonContent.sections.api.title}>
     <MarkdownContent section={buttonContent.sections.api} />
   </DocSection>
