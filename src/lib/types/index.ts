@@ -73,8 +73,22 @@ export type StartNexusOperationExecutionRequest =
   temporal.api.workflowservice.v1.IStartNexusOperationExecutionRequest;
 export type StartNexusOperationExecutionResponse =
   temporal.api.workflowservice.v1.IStartNexusOperationExecutionResponse;
+// temporal.api.callback.v1.CallbackInfo
+export type NexusOperationCallbackInfoDetails =
+  temporal.api.callback.v1.ICallbackInfo & {
+    requestId?: string | null;
+  };
+// temporal.api.nexusoperation.v1.CallbackInfo
+export interface NexusOperationCallbackInfo {
+  trigger?: {
+    operationCompleted?: Record<string, never> | null;
+  } | null;
+  info?: NexusOperationCallbackInfoDetails | null;
+}
 export type DescribeNexusOperationResponse =
-  temporal.api.workflowservice.v1.IDescribeNexusOperationExecutionResponse;
+  temporal.api.workflowservice.v1.IDescribeNexusOperationExecutionResponse & {
+    completionCallbacks?: NexusOperationCallbackInfo[] | null;
+  };
 // api.history
 
 export type History = temporal.api.history.v1.IHistory;
@@ -242,8 +256,19 @@ export type PendingChildrenInfo =
   temporal.api.workflow.v1.IPendingChildExecutionInfo;
 export type PendingNexusInfo =
   temporal.api.workflow.v1.IPendingNexusOperationInfo;
-export type CallbackInfo = temporal.api.workflow.v1.ICallbackInfo;
-export type Callback = temporal.api.common.v1.ICallback;
+export type CallbackInfo = temporal.api.workflow.v1.ICallbackInfo & {
+  requestId?: string | null;
+};
+// temporal.api.common.v1.Callback.NexusHandler
+export interface NexusHandlerCallback {
+  taskQueueName?: string | null;
+  service?: string | null;
+  operation?: string | null;
+  sourceContext?: temporal.api.common.v1.IPayload | null;
+}
+export type Callback = temporal.api.common.v1.ICallback & {
+  nexusHandler?: NexusHandlerCallback | null;
+};
 export type WorkflowExecutionConfig =
   temporal.api.workflow.v1.IWorkflowExecutionConfig;
 export type WorkflowExecutionInfo =
@@ -307,7 +332,25 @@ export type BatchTerminateOperation =
 // api.nexus
 export type Endpoint = temporal.api.nexus.v1.IEndpoint;
 export type EndpointSpec = temporal.api.nexus.v1.IEndpointSpec;
-export type EventLink = temporal.api.common.v1.ILink;
+export type CallbackLinkExecutionType =
+  | keyof typeof ExecutionType
+  | 'EXECUTION_TYPE_NEXUS_OPERATION';
+// temporal.api.common.v1.Execution
+export interface CallbackLinkExecution {
+  type?: CallbackLinkExecutionType | null;
+  businessId?: string | null;
+  runId?: string | null;
+}
+// temporal.api.common.v1.Link.Callback
+export interface CallbackLink {
+  namespace?: string | null;
+  execution?: CallbackLinkExecution | null;
+  componentPath?: string[] | null;
+  requestId?: string | null;
+}
+export type EventLink = temporal.api.common.v1.ILink & {
+  callback?: CallbackLink | null;
+};
 
 // api.failure
 export type Failure = temporal.api.failure.v1.IFailure;
