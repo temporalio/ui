@@ -7,9 +7,9 @@
   import SavedQueryViews from '$lib/components/saved-query-views/saved-views.svelte';
   import SchedulesTableRow from '$lib/components/schedule/schedules-list/schedules-table-row.svelte';
   import FilterBar from '$lib/components/search-attribute-filter/filter-bar.svelte';
+  import ConfigurableTableHeadersDrawer from '$lib/components/table/configurable-table-headers-drawer.svelte';
   import ResetColumnWidthsButton from '$lib/components/table/reset-column-widths-button.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
-  import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
@@ -319,6 +319,5 @@
   {availableColumns}
   bind:open={customizationDrawerOpen}
   table={TABLE_TYPE.SCHEDULES}
-  type={translate('common.columns')}
   title={translate('common.schedules-table')}
 />

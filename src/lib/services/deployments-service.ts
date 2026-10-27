@@ -199,12 +199,25 @@ const toScalingGroupsPayload = (
   Object.fromEntries(
     Object.entries(computeConfig.scalingGroups ?? {}).map(([name, group]) => [
       name,
-      { scalingGroup: group, updateMask: 'provider,scaler' },
+      {
+        scalingGroup: group,
+        // An existing group changes only in the masked fields, so a group's
+        // regions must be masked to change. Only when it sets them: a server
+        // older than region_ids rejects the path, and single-region edits must
+        // keep working there. A mask in JSON names fields in lowerCamelCase.
+        updateMask: group.regionIds?.length
+          ? 'provider,scaler,regionIds'
+          : 'provider,scaler',
+      },
     ]),
   );
 
 export const updateWorkerDeploymentVersionComputeConfig = async (
-  parameters: DeploymentVersionParameters & { computeConfig: ComputeConfig },
+  parameters: DeploymentVersionParameters & {
+    computeConfig: ComputeConfig;
+    /** Groups the Version has that the new config drops. */
+    removeScalingGroups?: readonly string[];
+  },
   onError?: ErrorCallback,
 ): Promise<void> => {
   const route = routeForApi(
@@ -217,7 +230,14 @@ export const updateWorkerDeploymentVersionComputeConfig = async (
   return requestFromAPI<void>(route, {
     options: {
       method: 'POST',
-      body: stringifyWithBigInt({ computeConfigScalingGroups }),
+      body: stringifyWithBigInt({
+        computeConfigScalingGroups,
+        ...(parameters.removeScalingGroups?.length
+          ? {
+              removeComputeConfigScalingGroups: parameters.removeScalingGroups,
+            }
+          : {}),
+      }),
     },
     onError,
     notifyOnError: false,
@@ -225,7 +245,11 @@ export const updateWorkerDeploymentVersionComputeConfig = async (
 };
 
 export const validateWorkerDeploymentVersionComputeConfig = async (
-  parameters: DeploymentVersionParameters & { computeConfig: ComputeConfig },
+  parameters: DeploymentVersionParameters & {
+    computeConfig: ComputeConfig;
+    /** Groups the Version has that the new config drops. */
+    removeScalingGroups?: readonly string[];
+  },
   onError?: ErrorCallback,
 ): Promise<{ valid: boolean; message?: string }> => {
   const route = routeForApi(
@@ -238,7 +262,14 @@ export const validateWorkerDeploymentVersionComputeConfig = async (
   return requestFromAPI<{ valid: boolean; message?: string }>(route, {
     options: {
       method: 'POST',
-      body: stringifyWithBigInt({ computeConfigScalingGroups }),
+      body: stringifyWithBigInt({
+        computeConfigScalingGroups,
+        ...(parameters.removeScalingGroups?.length
+          ? {
+              removeComputeConfigScalingGroups: parameters.removeScalingGroups,
+            }
+          : {}),
+      }),
     },
     onError,
     notifyOnError: false,

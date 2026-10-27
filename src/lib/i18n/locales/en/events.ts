@@ -55,6 +55,7 @@ export const Strings = {
     workflow: 'Workflow',
   },
   'custom-search-attributes': 'Custom Search Attributes',
+  'no-custom-search-attributes': 'No Custom Search Attributes',
   'custom-search': 'custom search',
   attribute: 'attribute',
   'event-group': 'Events related to {{eventName}}',
