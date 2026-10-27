@@ -69,11 +69,11 @@ test('workflow timeline on a narrow dark viewport', async ({ page }) => {
   await setTheme(page, true);
   await page.goto(timelineUrl);
 
-  const eventNode = page.getByRole('button', {
-    name: 'Event LongActivity: Scheduled',
+  const timelineGraph = page.getByRole('img', {
+    name: /^Workflow /,
   });
-  await expect(eventNode).toBeVisible();
-  await eventNode.scrollIntoViewIfNeeded();
+  await expect(timelineGraph).toBeVisible();
+  await timelineGraph.scrollIntoViewIfNeeded();
   await waitForImages(page);
   await expect(page).toHaveScreenshot('workflow-timeline-mobile-dark.png');
 });
