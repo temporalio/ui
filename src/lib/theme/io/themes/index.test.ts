@@ -1,9 +1,10 @@
+import path from 'node:path';
+
+import tailwindcss from '@tailwindcss/postcss';
 import postcss from 'postcss';
-import tailwindcss from 'tailwindcss';
 import { describe, expect, it } from 'vitest';
 
 import { ioThemeToCssVariables, themes, toCssVariables } from './index';
-import temporal from '../../plugin';
 
 const registeredThemes = Object.entries(themes);
 
@@ -15,19 +16,18 @@ describe('registered IO themes', () => {
   });
 
   it('generates semantic spacing utilities without replacing numeric spacing', async () => {
-    const result = await postcss([
-      tailwindcss({
-        content: [{ raw: 'px-page-margin mx-page-margin gap-page-margin p-4' }],
-        plugins: [temporal],
-      }),
-    ]).process('@tailwind utilities;', { from: undefined });
+    const result = await postcss([tailwindcss()]).process(
+      `@import 'tailwindcss' source(none);
+       @config '../tailwind.config.ts';
+       @source inline("px-page-margin mx-page-margin gap-page-margin p-4");`,
+      { from: path.resolve('src/app.css') },
+    );
 
     expect(result.css).toContain('.px-page-margin');
-    expect(result.css).toContain('padding-left: var(--spacing-page-margin)');
-    expect(result.css).toContain('padding-right: var(--spacing-page-margin)');
-    expect(result.css).toContain('margin-left: var(--spacing-page-margin)');
+    expect(result.css).toContain('padding-inline: var(--spacing-page-margin)');
+    expect(result.css).toContain('margin-inline: var(--spacing-page-margin)');
     expect(result.css).toContain('gap: var(--spacing-page-margin)');
-    expect(result.css).toContain('padding: 1rem');
+    expect(result.css).toContain('padding: calc(var(--spacing) * 4)');
   });
   it('light and dark themes expose the same color variables', () => {
     expect(
