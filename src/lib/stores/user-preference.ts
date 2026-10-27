@@ -4,6 +4,10 @@ import { getUserPreferenceFactory } from '$lib/utilities/core-provider';
 
 import { persistStore } from './persist-store';
 
+export const USER_PREFERENCE_KEYS = [] as const satisfies readonly string[];
+
+export type UserPreferenceKey = (typeof USER_PREFERENCE_KEYS)[number];
+
 export type UserPreference<T> = Readable<T> & {
   set(value: T): void;
   update(updater: (value: T) => T): void;
@@ -21,13 +25,13 @@ export type UserPreferenceOptions<T> = {
 };
 
 export type CreateUserPreference = <T>(
-  key: string,
+  key: UserPreferenceKey,
   defaultValue: T,
   options?: UserPreferenceOptions<T>,
 ) => UserPreference<T>;
 
 function localUserPreference<T>(
-  key: string,
+  key: UserPreferenceKey,
   defaultValue: T,
   options: UserPreferenceOptions<T>,
 ): UserPreference<T> {

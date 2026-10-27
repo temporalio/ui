@@ -5,12 +5,22 @@ import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { initCoreProvider } from '$lib/utilities/core-provider';
 
 import {
-  createUserPreference,
   type CreateUserPreference,
+  createUserPreference,
+  USER_PREFERENCE_KEYS,
   type UserPreference,
+  type UserPreferenceKey,
 } from './user-preference';
 
 const baseProvider = { getAccessToken: async () => '' };
+const theme = 'theme' as UserPreferenceKey;
+
+test('user preference keys match the snapshot', () => {
+  expect(
+    [...USER_PREFERENCE_KEYS].sort(),
+    'Changing or removing a user preference key orphans values users already saved. Verify the change is accounted for before updating this snapshot.',
+  ).toMatchInlineSnapshot('[]');
+});
 
 describe('createUserPreference', () => {
   beforeEach(() => {
@@ -19,7 +29,7 @@ describe('createUserPreference', () => {
   });
 
   test('uses the existing localStorage store when no preference provider is set', async () => {
-    const preference = createUserPreference('theme', false);
+    const preference = createUserPreference(theme, false);
 
     expect(get(preference.ready)).toBe(true);
     preference.set(true);
@@ -27,12 +37,12 @@ describe('createUserPreference', () => {
     await preference.save(false);
     expect(localStorage.getItem('theme')).toBe('false');
 
-    const later = createUserPreference('theme', true);
+    const later = createUserPreference(theme, true);
     expect(get(later)).toBe(false);
   });
 
   test('selects a provider on first use, even when the store was created earlier', async () => {
-    const preference = createUserPreference('theme', false);
+    const preference = createUserPreference(theme, false);
     const create = vi.fn(
       <T>(_key: string, initialValue: T): UserPreference<T> => {
         const store = writable(initialValue);
