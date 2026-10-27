@@ -11,7 +11,6 @@
     hasCloudRunImpersonatorPlaceholder,
     interpolateCloudRunTerraformTemplate,
   } from '../cloud-run-terraform';
-  import { TERRAFORM_MODULES } from '../terraform-modules';
   import { ACCORDION_CLASS } from './accordion-class';
   import type { ComputeSectionProps } from './types';
 
