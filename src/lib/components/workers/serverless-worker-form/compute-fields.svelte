@@ -1,22 +1,11 @@
 <script lang="ts">
-  import Accordion from '$lib/holocene/accordion/accordion.svelte';
   import Button from '$lib/holocene/button.svelte';
-  import CodeBlock from '$lib/holocene/code-block.svelte';
-  import Combobox from '$lib/holocene/combobox/combobox.svelte';
   import DurationInput, {
     getFirstWholeNumberUnit,
   } from '$lib/holocene/duration-input/duration-input.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import Link from '$lib/holocene/link.svelte';
-  import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
-  import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { IconExternalLinkOptical, IconInfo } from '$lib/io/icon';
 
-  import {
-    hasCloudRunImpersonatorPlaceholder,
-    interpolateCloudRunTerraformTemplate,
-  } from './cloud-run-terraform';
   import {
     COMPUTE_PROVIDERS,
     computeProviderFromType,
@@ -27,31 +16,15 @@
   } from './compute-providers';
   import { GCP_REGIONS } from './gcp-regions';
   import {
-    defaultScaleDownStabilization,
-    interpolateTerraformTemplate,
+    type ComputeFieldValues,
     scaleDownStabilizationUnits,
   } from './shared';
 
   interface Props {
     provider?: string;
-    lambdaArn: string;
-    agentCoreEndpointArn?: string;
-    iamRoleArn: string;
-    roleExternalId: string;
-    gcpProject?: string;
-    gcpRegion?: string;
+    /** Every provider field, as one object. See ComputeFieldValues. */
+    values: ComputeFieldValues;
     gcpRegions?: string[];
-    gcpWorkerPool?: string;
-    gcpServiceAccount?: string;
-    minReplicas?: number;
-    maxReplicas?: number;
-    initialReplicas?: number;
-    utilizationTarget?: number;
-    scaleDownStabilization?: string;
-    scaleUpCooloffMs?: number;
-    scaleUpBacklogThreshold?: number;
-    maxWorkerLifetimeMs?: number;
-    metricsPollIntervalMs?: number;
     /**
      * The templates offered per provider. Defaults to the ones bundled here,
      * which is what a self-hosted deployment wants. A consumer overrides them
@@ -59,7 +32,10 @@
      * adding a provider fails the consumer's type check until it supplies
      * templates for it.
      */
-    templates?: Record<ComputeProviderValue, ComputeProviderTemplates>;
+    templates?: Record<
+      ComputeProviderValue,
+      ComputeProviderTemplates | undefined
+    >;
     lambdaArnPlaceholder?: string;
     leadingDivider?: boolean;
     sections?: ('resource' | 'access' | 'scaling')[];
@@ -74,6 +50,11 @@
       gcpRegion?: string[];
       gcpWorkerPool?: string[];
       gcpServiceAccount?: string[];
+      modalAppName?: string[];
+      modalFunctionName?: string[];
+      modalEnvironment?: string[];
+      modalWorkspaceId?: string[];
+      modalVersion?: string[];
       minReplicas?: string[];
       maxReplicas?: string[];
       initialReplicas?: string[];
@@ -88,24 +69,8 @@
 
   let {
     provider = 'lambda',
-    lambdaArn = $bindable(),
-    agentCoreEndpointArn = $bindable(''),
-    iamRoleArn = $bindable(),
-    roleExternalId = $bindable(),
-    gcpProject = $bindable(''),
-    gcpRegion = $bindable(''),
+    values = $bindable(),
     gcpRegions = [...GCP_REGIONS],
-    gcpWorkerPool = $bindable(''),
-    gcpServiceAccount = $bindable(''),
-    minReplicas = $bindable(0),
-    maxReplicas = $bindable(30),
-    initialReplicas = $bindable(0),
-    utilizationTarget = $bindable(0.8),
-    scaleDownStabilization = $bindable(defaultScaleDownStabilization),
-    scaleUpCooloffMs = $bindable(),
-    scaleUpBacklogThreshold = $bindable(),
-    maxWorkerLifetimeMs = $bindable(),
-    metricsPollIntervalMs = $bindable(),
     templates = defaultComputeProviderTemplates,
     lambdaArnPlaceholder = translate('workers.lambda-arn-placeholder'),
     leadingDivider = true,
@@ -117,95 +82,32 @@
   const fieldId = (base: string): string =>
     idPrefix ? `${idPrefix}-${base}` : base;
 
-  // Both AWS providers assume a role, and the role each needs is different:
-  // one grants lambda:InvokeFunction, the other bedrock-agentcore:
-  // InvokeAgentRuntime. Handing out the Lambda role for AgentCore would
-  // produce a role that cannot invoke a runtime, so the templates follow the
-  // selected provider rather than being shared.
-  const isAgentCore = $derived(provider === 'agentcore');
   // `provider` arrives as a form field, so it is a string until proven one of
   // ours. Narrowing here rather than asserting keeps an unrecognised value from
   // reading as a provider that happens to have no entry.
   const providerValue = $derived(computeProviderFromType(provider));
+  // The provider's own fields, from the registry. Adding a provider needs no
+  // branch here.
+  const ResourceFields = $derived(
+    providerValue
+      ? COMPUTE_PROVIDERS[providerValue].fields.resource
+      : undefined,
+  );
+  // Absent for a provider that collects no credentials: the whole Access
+  // section, heading and dividers included, then goes with it.
+  const AccessFields = $derived(
+    providerValue ? COMPUTE_PROVIDERS[providerValue].fields.access : undefined,
+  );
+
   const providerTemplates = $derived(
     providerValue ? templates[providerValue] : undefined,
-  );
-  const cloudFormation = $derived(providerTemplates?.cloudFormation);
-
-  const resolvedCfnTemplate = $derived(cloudFormation?.template ?? '');
-  // Only the key belonging to this provider's template is present, so both
-  // ARNs are passed and the absent one is a no-op.
-  const resolvedTerraformTemplate = $derived(
-    interpolateTerraformTemplate(providerTemplates?.terraform ?? '', {
-      externalId: roleExternalId,
-      lambdaArn,
-      agentCoreEndpointArn,
-    }),
   );
   const terraformModuleHref = $derived(
     (providerValue && COMPUTE_PROVIDERS[providerValue].terraformModuleHref) ||
       TERRAFORM_MODULES,
   );
-  // Read from the map rather than the selected provider: the Cloud Run block
-  // renders inside its own branch, where `provider` is already 'cloud-run'.
-  const resolvedCloudRunTerraformTemplate = $derived(
-    interpolateCloudRunTerraformTemplate(
-      templates['cloud-run'].terraform,
-      gcpProject,
-    ),
-  );
-  const showCloudRunImpersonatorWarning = $derived(
-    hasCloudRunImpersonatorPlaceholder(resolvedCloudRunTerraformTemplate),
-  );
 
-  const launchStackHref = $derived.by(() => {
-    const templateUrl = cloudFormation?.url;
-
-    if (!templateUrl) {
-      return 'https://console.aws.amazon.com/cloudformation/';
-    }
-    const params = [`templateURL=${encodeURIComponent(templateUrl)}`];
-    if (roleExternalId) {
-      params.push(
-        `param_AssumeRoleExternalId=${encodeURIComponent(roleExternalId)}`,
-      );
-    }
-    const resource = isAgentCore ? agentCoreEndpointArn : lambdaArn;
-    if (resource) {
-      params.push(
-        `param_${isAgentCore ? 'AgentRuntimeArns' : 'LambdaFunctionARNs'}=${encodeURIComponent(resource)}`,
-      );
-    }
-    return `https://console.aws.amazon.com/cloudformation/home#/stacks/create/review?${params.join('&')}`;
-  });
-
-  let showRoleHelp = $state(false);
-  let showCloudRunHelp = $state(false);
   let showScaling = $state(false);
-  let activeRoleHelpTab = $state<'cloudformation' | 'terraform'>(
-    'cloudformation',
-  );
-
-  function downloadCfnTemplate() {
-    const blob = new Blob([resolvedCfnTemplate], { type: 'text/yaml' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = cloudFormation?.fileName ?? 'temporal-worker-role.yaml';
-    a.click();
-    URL.revokeObjectURL(url);
-  }
-
-  /**
-   * The whole row toggles, but only the chevron shows hover, so the row reads
-   * as content rather than as a button.
-   */
-  const ACCORDION_CLASS = [
-    'rounded-lg border-0 bg-surface-secondary [&_h3]:text-sm',
-    '[&>div>button:hover]:bg-transparent',
-    '[&>div>button>div>svg:last-child]:-m-1 [&>div>button>div>svg:last-child]:box-content [&>div>button>div>svg:last-child]:rounded [&>div>button>div>svg:last-child]:p-1',
-    '[&>div>button:hover>div>svg:last-child]:bg-interactive-tertiary-hover',
-  ].join(' ');
 </script>
 
 {#if leadingDivider}
@@ -220,105 +122,14 @@
     {translate('workers.resource-section-description')}
   </p>
 
-  {#if provider === 'lambda'}
-    <div class="flex flex-wrap items-start gap-4 [&>:not(:first-child)]:mt-7">
-      <Input
-        bind:value={lambdaArn}
-        id={fieldId('lambdaArn')}
-        name={fieldId('lambdaArn')}
-        spellcheck={false}
-        label={translate('workers.lambda-arn-label')}
-        hintText={errors.lambdaArn?.[0]}
-        error={!!errors.lambdaArn?.[0]}
-        placeholder={lambdaArnPlaceholder}
-        required
-        class="flex-1"
-      />
-      <Button
-        variant="tertiary"
-        type="button"
-        href="https://console.aws.amazon.com/lambda"
-        target="_blank"
-        TrailingIcon={IconExternalLinkOptical}
-      >
-        {translate('workers.open-lambda-console')}
-      </Button>
-    </div>
-  {:else if provider === 'agentcore'}
-    <div class="flex flex-wrap items-start gap-4 [&>:not(:first-child)]:mt-7">
-      <Input
-        bind:value={agentCoreEndpointArn}
-        id={fieldId('agentCoreEndpointArn')}
-        name={fieldId('agentCoreEndpointArn')}
-        spellcheck={false}
-        label={translate('workers.agentcore-endpoint-arn-label')}
-        hintText={errors.agentCoreEndpointArn?.[0] ||
-          translate('workers.agentcore-endpoint-arn-hint')}
-        error={!!errors.agentCoreEndpointArn?.[0]}
-        placeholder={translate('workers.agentcore-endpoint-arn-placeholder')}
-        required
-        class="flex-1"
-      />
-      <Button
-        variant="tertiary"
-        type="button"
-        href="https://console.aws.amazon.com/bedrock-agentcore"
-        target="_blank"
-        TrailingIcon={IconExternalLinkOptical}
-      >
-        {translate('workers.open-agentcore-console')}
-      </Button>
-    </div>
-  {:else}
-    <div class="flex flex-col gap-4">
-      <Input
-        bind:value={gcpProject}
-        id={fieldId('gcpProject')}
-        name={fieldId('gcpProject')}
-        label={translate('workers.gcp-project-label')}
-        hintText={errors.gcpProject?.[0]}
-        error={!!errors.gcpProject?.[0]}
-        placeholder={translate('workers.gcp-project-placeholder')}
-        required
-      />
-      <Combobox
-        bind:value={gcpRegion}
-        id={fieldId('gcpRegion')}
-        name={fieldId('gcpRegion')}
-        label={translate('workers.gcp-region-label')}
-        hintText={translate('workers.gcp-region-hint')}
-        placeholder={translate('workers.gcp-region-placeholder')}
-        options={gcpRegions}
-        noResultsText={translate('common.no-results')}
-        valid={!errors.gcpRegion?.[0]}
-        error={errors.gcpRegion?.[0]}
-        allowCustomValue
-        showChevron
-        required
-      />
-      <div class="flex flex-wrap items-start gap-4 [&>:not(:first-child)]:mt-7">
-        <Input
-          bind:value={gcpWorkerPool}
-          id={fieldId('gcpWorkerPool')}
-          name={fieldId('gcpWorkerPool')}
-          label={translate('workers.gcp-worker-pool-label')}
-          hintText={errors.gcpWorkerPool?.[0]}
-          error={!!errors.gcpWorkerPool?.[0]}
-          placeholder={translate('workers.gcp-worker-pool-placeholder')}
-          required
-          class="flex-1"
-        />
-        <Button
-          variant="tertiary"
-          type="button"
-          href="https://console.cloud.google.com/run/worker-pools"
-          target="_blank"
-          TrailingIcon={IconExternalLinkOptical}
-        >
-          {translate('workers.open-cloud-run-console')}
-        </Button>
-      </div>
-    </div>
+  {#if ResourceFields}
+    <ResourceFields
+      bind:values
+      {errors}
+      {fieldId}
+      resourcePlaceholder={lambdaArnPlaceholder}
+      deployRegions={gcpRegions}
+    />
   {/if}
 {/if}
 
@@ -334,148 +145,15 @@
     {translate('workers.access-section-description')}
   </p>
 
-  {#if provider === 'lambda' || provider === 'agentcore'}
-    <div class="flex flex-col gap-4">
-      <Input
-        bind:value={iamRoleArn}
-        id={fieldId('iamRoleArn')}
-        name={fieldId('iamRoleArn')}
-        spellcheck={false}
-        label={translate('workers.iam-role-label')}
-        hintText={errors.iamRoleArn?.[0] || translate('workers.iam-role-hint')}
-        error={!!errors.iamRoleArn?.[0]}
-        placeholder={translate('workers.iam-role-placeholder')}
-        required
-      />
-      <Input
-        bind:value={roleExternalId}
-        id={fieldId('roleExternalId')}
-        name={fieldId('roleExternalId')}
-        label={translate('workers.external-id-label')}
-        hintText={errors.roleExternalId?.[0] ||
-          translate('workers.external-id-hint')}
-        error={!!errors.roleExternalId?.[0]}
-        placeholder={translate('workers.external-id-placeholder')}
-        required
-      />
-      {#if provider === 'lambda' || provider === 'agentcore'}
-        <Accordion
-          Icon={IconInfo}
-          title={translate('workers.no-role-prompt')}
-          bind:open={showRoleHelp}
-          class={ACCORDION_CLASS}
-        >
-          <div class="-mt-8 flex flex-col gap-3 pt-3">
-            <ToggleButtons>
-              <ToggleButton
-                variant="tertiary"
-                size="sm"
-                active={activeRoleHelpTab === 'cloudformation'}
-                onclick={() => (activeRoleHelpTab = 'cloudformation')}
-              >
-                {translate('workers.cfn-tab')}
-              </ToggleButton>
-              <ToggleButton
-                variant="tertiary"
-                size="sm"
-                active={activeRoleHelpTab === 'terraform'}
-                onclick={() => (activeRoleHelpTab = 'terraform')}
-              >
-                {translate('workers.terraform-tab')}
-              </ToggleButton>
-            </ToggleButtons>
-            {#if activeRoleHelpTab === 'cloudformation'}
-              <p class="text-sm text-secondary">
-                {translate('workers.launch-stack-description')}
-              </p>
-              <div class="flex flex-wrap items-center gap-4">
-                <Button
-                  variant="tertiary"
-                  size="sm"
-                  href={launchStackHref}
-                  target="_blank"
-                  TrailingIcon={IconExternalLinkOptical}
-                >
-                  {translate('workers.launch-stack')}
-                </Button>
-                <Button
-                  variant="tertiary"
-                  size="sm"
-                  onclick={downloadCfnTemplate}
-                >
-                  {translate('workers.download-template')}
-                </Button>
-              </div>
-            {:else}
-              <p class="text-sm text-secondary">
-                {translate('workers.terraform-description-before')}<Link
-                  href={terraformModuleHref}
-                  newTab>{translate('workers.terraform-iam-module-link')}</Link
-                >{translate('workers.terraform-description-after')}
-              </p>
-              <CodeBlock
-                content={resolvedTerraformTemplate}
-                language="text"
-                maxHeight={300}
-                copyable
-                label={translate('workers.terraform-iam-module-link')}
-                copyIconTitle={translate('workers.copy-snippet')}
-                copySuccessIconTitle={translate('workers.copied')}
-              />
-            {/if}
-          </div>
-        </Accordion>
-      {/if}
-    </div>
-  {:else}
-    <div class="flex flex-col gap-4">
-      <Input
-        bind:value={gcpServiceAccount}
-        id={fieldId('gcpServiceAccount')}
-        name={fieldId('gcpServiceAccount')}
-        label={translate('workers.gcp-service-account-label')}
-        hintText={errors.gcpServiceAccount?.[0] ||
-          translate('workers.gcp-service-account-hint')}
-        error={!!errors.gcpServiceAccount?.[0]}
-        placeholder={translate('workers.gcp-service-account-placeholder')}
-        required
-      />
-      {#if provider === 'cloud-run'}
-        <Accordion
-          Icon={IconInfo}
-          title={translate('workers.cloud-run-setup-prompt')}
-          bind:open={showCloudRunHelp}
-          class={ACCORDION_CLASS}
-        >
-          <div class="-mt-8 flex flex-col gap-3 pt-3">
-            <p class="text-sm text-secondary">
-              {translate('workers.cloud-run-terraform-description-before')}<Link
-                href="https://github.com/temporalio/terraform-modules/tree/main/modules/serverless-workers/gcp/cloud-run"
-                newTab
-                >{translate('workers.cloud-run-terraform-module-link')}</Link
-              >{translate('workers.cloud-run-terraform-description-after')}
-            </p>
-            {#if showCloudRunImpersonatorWarning}
-              <p class="text-sm text-warning">
-                {translate('workers.cloud-run-impersonator-warning')}
-              </p>
-            {/if}
-            <CodeBlock
-              content={resolvedCloudRunTerraformTemplate}
-              language="text"
-              maxHeight={300}
-              copyable
-              label={translate('workers.cloud-run-terraform-module-link')}
-              copyIconTitle={translate('workers.copy-snippet')}
-              copySuccessIconTitle={translate('workers.copied')}
-            />
-            <p class="text-sm text-secondary">
-              {translate('workers.cloud-run-invoker-handoff')}
-            </p>
-          </div>
-        </Accordion>
-      {/if}
-    </div>
+  {#if AccessFields}
+    <AccessFields
+      bind:values
+      {errors}
+      {fieldId}
+      {provider}
+      templates={providerTemplates}
+      {terraformModuleHref}
+    />
   {/if}
 {/if}
 
@@ -504,13 +182,17 @@
         : translate('workers.show-defaults')}
     </Button>
   </div>
-  {#if showScaling && (provider === 'lambda' || provider === 'agentcore')}
+  <!-- Modal joins the invoke-based providers: it pairs with the same `no-sync`
+  scaler, and these are the four knobs the Modal demo tuned. -->
+  {#if showScaling && (provider === 'lambda' || provider === 'agentcore' || provider === 'modal')}
     <div class="mt-4 flex flex-col gap-4">
       <Input
-        value={scaleUpCooloffMs !== undefined ? String(scaleUpCooloffMs) : ''}
+        value={values.scaleUpCooloffMs !== undefined
+          ? String(values.scaleUpCooloffMs)
+          : ''}
         onchange={(e) => {
           const val = (e.target as HTMLInputElement).value;
-          scaleUpCooloffMs = val === '' ? undefined : Number(val);
+          values.scaleUpCooloffMs = val === '' ? undefined : Number(val);
         }}
         id={fieldId('scaleUpCooloffMs')}
         name={fieldId('scaleUpCooloffMs')}
@@ -521,12 +203,12 @@
         placeholder="100"
       />
       <Input
-        value={scaleUpBacklogThreshold !== undefined
-          ? String(scaleUpBacklogThreshold)
+        value={values.scaleUpBacklogThreshold !== undefined
+          ? String(values.scaleUpBacklogThreshold)
           : ''}
         onchange={(e) => {
           const val = (e.target as HTMLInputElement).value;
-          scaleUpBacklogThreshold = val === '' ? undefined : Number(val);
+          values.scaleUpBacklogThreshold = val === '' ? undefined : Number(val);
         }}
         id={fieldId('scaleUpBacklogThreshold')}
         name={fieldId('scaleUpBacklogThreshold')}
@@ -537,12 +219,12 @@
         placeholder="0"
       />
       <Input
-        value={maxWorkerLifetimeMs !== undefined
-          ? String(maxWorkerLifetimeMs)
+        value={values.maxWorkerLifetimeMs !== undefined
+          ? String(values.maxWorkerLifetimeMs)
           : ''}
         onchange={(e) => {
           const val = (e.target as HTMLInputElement).value;
-          maxWorkerLifetimeMs = val === '' ? undefined : Number(val);
+          values.maxWorkerLifetimeMs = val === '' ? undefined : Number(val);
         }}
         id={fieldId('maxWorkerLifetimeMs')}
         name={fieldId('maxWorkerLifetimeMs')}
@@ -553,12 +235,12 @@
         placeholder="600000"
       />
       <Input
-        value={metricsPollIntervalMs !== undefined
-          ? String(metricsPollIntervalMs)
+        value={values.metricsPollIntervalMs !== undefined
+          ? String(values.metricsPollIntervalMs)
           : ''}
         onchange={(e) => {
           const val = (e.target as HTMLInputElement).value;
-          metricsPollIntervalMs = val === '' ? undefined : Number(val);
+          values.metricsPollIntervalMs = val === '' ? undefined : Number(val);
         }}
         id={fieldId('metricsPollIntervalMs')}
         name={fieldId('metricsPollIntervalMs')}
@@ -572,9 +254,9 @@
   {:else if showScaling && provider === 'cloud-run'}
     <div class="mt-4 flex flex-col gap-4">
       <Input
-        value={String(minReplicas)}
+        value={String(values.minReplicas)}
         onchange={(e) => {
-          minReplicas = Number((e.target as HTMLInputElement).value);
+          values.minReplicas = Number((e.target as HTMLInputElement).value);
         }}
         id={fieldId('minReplicas')}
         name={fieldId('minReplicas')}
@@ -589,9 +271,9 @@
         required
       />
       <Input
-        value={String(maxReplicas)}
+        value={String(values.maxReplicas)}
         onchange={(e) => {
-          maxReplicas = Number((e.target as HTMLInputElement).value);
+          values.maxReplicas = Number((e.target as HTMLInputElement).value);
         }}
         id={fieldId('maxReplicas')}
         name={fieldId('maxReplicas')}
@@ -606,9 +288,9 @@
         required
       />
       <Input
-        value={String(initialReplicas)}
+        value={String(values.initialReplicas)}
         onchange={(e) => {
-          initialReplicas = Number((e.target as HTMLInputElement).value);
+          values.initialReplicas = Number((e.target as HTMLInputElement).value);
         }}
         id={fieldId('initialReplicas')}
         name={fieldId('initialReplicas')}
@@ -623,9 +305,11 @@
         required
       />
       <Input
-        value={String(utilizationTarget)}
+        value={String(values.utilizationTarget)}
         onchange={(e) => {
-          utilizationTarget = Number((e.target as HTMLInputElement).value);
+          values.utilizationTarget = Number(
+            (e.target as HTMLInputElement).value,
+          );
         }}
         id={fieldId('utilizationTarget')}
         name={fieldId('utilizationTarget')}
@@ -640,14 +324,14 @@
         required
       />
       <DurationInput
-        bind:value={scaleDownStabilization}
+        bind:value={values.scaleDownStabilization}
         id={fieldId('scaleDownStabilization')}
         name={fieldId('scaleDownStabilization')}
         inputmode="numeric"
         min={0}
         units={scaleDownStabilizationUnits}
         initialUnit={getFirstWholeNumberUnit(
-          scaleDownStabilization,
+          values.scaleDownStabilization,
           scaleDownStabilizationUnits,
           'second(s)',
         )}

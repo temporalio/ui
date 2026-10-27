@@ -141,8 +141,11 @@ export const resourceValue = (
 export const accessValue = (
   provider: ComputeProviderValue,
   fields: PreviewFields,
-): string =>
-  provider === 'cloud-run' ? fields.gcpServiceAccount : fields.iamRoleArn;
+): string => {
+  return provider === 'cloud-run'
+    ? fields.gcpServiceAccount
+    : fields.iamRoleArn;
+};
 
 export const regionPreview = (
   region: ComputeRegion,
