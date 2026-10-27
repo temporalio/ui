@@ -110,10 +110,10 @@ NavigationMenu forwards native attributes to its `nav` element.
 
 ### NavigationMenuLinkItem
 
-| Prop          | Type      | Default    | Description                         |
-| ------------- | --------- | ---------- | ----------------------------------- |
-| `label`       | `string`  | `Required` | Visible link text.                  |
-| `href`        | `string`  | `Required` | Link destination.                   |
-| `description` | `string`  | `—`        | Short text below the label.         |
-| `current`     | `boolean` | `false`    | Marks the link as the current page. |
-| `disabled`    | `boolean` | `false`    | Marks the link as unavailable.      |
+| Prop          | Type      | Default    | Description                                                                             |
+| ------------- | --------- | ---------- | --------------------------------------------------------------------------------------- |
+| `label`       | `string`  | `Required` | Visible link text.                                                                      |
+| `href`        | `string`  | `Required` | Link destination.                                                                       |
+| `description` | `string`  | `—`        | Short text below the label.                                                             |
+| `current`     | `boolean` | `false`    | Marks the link as the current page.                                                     |
+| `disabled`    | `boolean` | `false`    | Shows the link as unavailable. It renders without a destination and cannot be followed. |

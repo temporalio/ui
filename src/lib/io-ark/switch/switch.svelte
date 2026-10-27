@@ -116,7 +116,10 @@
         <span aria-hidden="true" class={fieldRequiredIndicatorRecipe()}>*</span>
       {/if}
     </ArkSwitch.Label>
-    <ArkSwitch.HiddenInput aria-describedby={messageIds.describedBy} />
+    <ArkSwitch.HiddenInput
+      role="switch"
+      aria-describedby={messageIds.describedBy}
+    />
   </ArkSwitch.Root>
   <FieldMessages
     ids={messageIds}

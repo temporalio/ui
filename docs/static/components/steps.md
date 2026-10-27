@@ -85,23 +85,24 @@ The rules reviewers check this component against live in `src/lib/io-ark/steps/s
 
 Steps forwards native div attributes to its root.
 
-| Prop             | Type                           | Default      | Description                                             |
-| ---------------- | ------------------------------ | ------------ | ------------------------------------------------------- |
-| `items`          | `StepsItem[]`                  | `Required`   | Steps to show, in order.                                |
-| `step`           | `number (bindable)`            | `0`          | Zero-based index of the current step.                   |
-| `orientation`    | `horizontal \| vertical`       | `horizontal` | Steps above the content, or beside it.                  |
-| `linear`         | `boolean`                      | `false`      | Requires completing steps in order.                     |
-| `isStepValid`    | `(index: number) => boolean`   | `—`          | Blocks moving past a step that is not valid.            |
-| `showControls`   | `boolean`                      | `true`       | Shows the Back and Next buttons.                        |
-| `prevLabel`      | `string`                       | `Back`       | Label for the previous button.                          |
-| `nextLabel`      | `string`                       | `Next`       | Label for the next button.                              |
-| `onStepChange`   | `(step: number) => void`       | `—`          | Called when the current step changes.                   |
-| `onStepComplete` | `() => void`                   | `—`          | Called when the last step is completed.                 |
-| `content`        | `Snippet<[StepsItem, number]>` | `—`          | Content for each step; receives the item and its index. |
-| `completed`      | `Snippet`                      | `—`          | Content shown after every step is complete.             |
-| `id`             | `string`                       | `Generated`  | Base for internal IDs.                                  |
-| `class`          | `string`                       | `—`          | Additional Tailwind classes on the root.                |
-| `contentClass`   | `string`                       | `—`          | Additional Tailwind classes on each content panel.      |
+| Prop             | Type                           | Default      | Description                                                   |
+| ---------------- | ------------------------------ | ------------ | ------------------------------------------------------------- |
+| `items`          | `StepsItem[]`                  | `Required`   | Steps to show, in order.                                      |
+| `step`           | `number (bindable)`            | `0`          | Zero-based index of the current step.                         |
+| `orientation`    | `horizontal \| vertical`       | `horizontal` | Steps above the content, or beside it.                        |
+| `linear`         | `boolean`                      | `false`      | Requires completing steps in order.                           |
+| `isStepValid`    | `(index: number) => boolean`   | `—`          | Blocks moving past a step that is not valid.                  |
+| `showControls`   | `boolean`                      | `true`       | Shows the Back and Next buttons.                              |
+| `prevLabel`      | `string`                       | `Back`       | Label for the previous button.                                |
+| `nextLabel`      | `string`                       | `Next`       | Label for the next button.                                    |
+| `completedLabel` | `string`                       | `Completed`  | Screen reader text added after the title of a completed step. |
+| `onStepChange`   | `(step: number) => void`       | `—`          | Called when the current step changes.                         |
+| `onStepComplete` | `() => void`                   | `—`          | Called when the last step is completed.                       |
+| `content`        | `Snippet<[StepsItem, number]>` | `—`          | Content for each step; receives the item and its index.       |
+| `completed`      | `Snippet`                      | `—`          | Content shown after every step is complete.                   |
+| `id`             | `string`                       | `Generated`  | Base for internal IDs.                                        |
+| `class`          | `string`                       | `—`          | Additional Tailwind classes on the root.                      |
+| `contentClass`   | `string`                       | `—`          | Additional Tailwind classes on each content panel.            |
 
 ### StepsItem
 

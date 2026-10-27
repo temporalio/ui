@@ -72,6 +72,7 @@ export const navigationMenuSubLinkRecipe = () =>
     'hover:bg-interactive-secondary-hover',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary',
     'data-[current]:bg-interactive-secondary-hover data-[current]:text-brand',
+    'aria-disabled:cursor-not-allowed aria-disabled:opacity-disabled aria-disabled:hover:bg-transparent',
   );
 
 export const navigationMenuSubLinkDescriptionRecipe = () =>

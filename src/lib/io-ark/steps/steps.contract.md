@@ -38,7 +38,7 @@ Rules below cover only what the types do not express. Already expressed by `Step
 
 - **A11Y-1** The step list is a tablist and each title a tab that controls its panel. Arrow keys move between titles, and the current step has `aria-current="step"`.
 - **A11Y-2** Indicators are hidden from assistive technology, so the title MUST carry the meaning of each step.
-- **A11Y-3** Completion MUST NOT be shown by the check mark alone.
+- **A11Y-3** Completion MUST NOT be shown by the check mark alone. A completed step adds visually hidden text after its title, `completedLabel` (default "Completed"), which SHOULD be translated.
 
 ## Test hooks
 
@@ -46,8 +46,9 @@ Rules below cover only what the types do not express. Already expressed by `Step
 
 ## Known gaps
 
-- **GAP-1** Violates A11Y-3. The completed state is shown only by the check mark inside the indicator, which is `aria-hidden` (`steps.svelte`, the `ItemContext` snippet in `Steps.Indicator`). A screen reader hears the title of a completed step with no completion state.
+None found by reading the code.
 
 ## Reconciliation log
 
 - 2026-10-27: First written against the uncommitted working tree, so there is no `sourceCommit` yet. Set it to the commit that adds this component. Product code does not use the component yet; docs examples are its only consumers.
+- 2026-10-27: Fixed GAP-1. Completed steps now announce `completedLabel` after the title, and A11Y-3 describes it. Covered by `steps.svelte.test.ts`.

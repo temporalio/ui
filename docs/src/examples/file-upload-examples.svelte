@@ -14,7 +14,6 @@
     dropzoneLabel="Drop a history export here"
     dropzoneHint="JSON, up to 10 MB"
     triggerLabel="Choose file"
-    helperText="Export a history from the workflow page or the Temporal CLI."
   />
   <FileUpload
     label="TLS certificates"
@@ -33,7 +32,7 @@
     label="CA bundle"
     disabled
     dropzoneLabel="Uploads are turned off"
-    helperText="Your account owner manages the CA bundle for this namespace."
+    dropzoneHint="Your account owner manages the CA bundle for this namespace."
     class="md:col-span-2"
   />
 </div>

@@ -118,7 +118,7 @@
               {#each item.children as child (child.href)}
                 <li>
                   <ArkNavigationMenu.Link
-                    href={child.href}
+                    href={child.disabled ? undefined : child.href}
                     current={child.current}
                     aria-disabled={child.disabled || undefined}
                     class={navigationMenuSubLinkRecipe()}

@@ -19,7 +19,7 @@ Rules below cover only what the types do not express. Already expressed by `Date
 - **IN-3** `value` MUST match `granularity`: a `CalendarDate` for `day`, and a `CalendarDateTime` or `ZonedDateTime` for `hour`, `minute` and `second`. Create values with `parseDate` and the `@ark-ui/svelte/date-picker` helpers re-exported from `$lib/io-ark/date-input`.
 - **IN-4** `locale` SHOULD come from the app's locale setting. The default is `en-US`. **Needs decision: DEC-1.**
 - **IN-5** `min` and `max` MUST use the same calendar type as `value`.
-- **IN-6** DateInput does not read Field or Fieldset context. Inside a disabled Fieldset, callers MUST also pass `disabled`. It MUST NOT be wrapped in Field; it renders its own label and messages.
+- **IN-6** DateInput reads Fieldset context, so a disabled Fieldset disables it. It does not read Field context: it MUST NOT be wrapped in Field, because it renders its own label and messages.
 - **IN-7** `class` is merged onto the root. It MUST NOT restyle the control border or the segments.
 
 ## Behavior
@@ -45,7 +45,7 @@ Rules below cover only what the types do not express. Already expressed by `Date
 
 ## Known gaps
 
-- **GAP-1** Violates the Fieldset contract's promise that a disabled Fieldset disables every control inside it. The segments are `<span role="spinbutton">` elements, not native form controls, and DateInput does not read Fieldset context (`date-input.svelte`), so a disabled Fieldset leaves them editable. Until fixed, callers follow IN-6.
+None found by reading the code.
 
 ## Decisions
 
@@ -54,3 +54,4 @@ Rules below cover only what the types do not express. Already expressed by `Date
 ## Reconciliation log
 
 - 2026-10-27: First written against the uncommitted working tree, so there is no `sourceCommit` yet. Set it to the commit that adds this component. Product code does not use the component yet; docs examples are its only consumers.
+- 2026-10-27: Fixed GAP-1. DateInput now reads Fieldset context and is disabled by a disabled Fieldset; IN-6 updated. Covered by `date-input.svelte.test.ts`.

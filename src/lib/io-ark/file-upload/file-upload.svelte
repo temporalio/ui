@@ -25,7 +25,6 @@
     files?: File[];
     label: string;
     labelHidden?: boolean;
-    helperText?: string;
     error?: string;
     invalid?: boolean;
     required?: boolean;
@@ -79,7 +78,6 @@
     files = $bindable([]),
     label,
     labelHidden = false,
-    helperText = '',
     error = '',
     invalid,
     required = false,
@@ -147,10 +145,15 @@
   );
   const messageIds = $derived(
     getFieldMessageIds(id, {
-      helperText,
       showError: hasErrorText,
       errorFirst: true,
     }),
+  );
+  const hintId = $derived(`${id}-dropzone-hint`);
+  const dropzoneDescribedBy = $derived(
+    [(dropzone || dropzoneHint) && hintId, messageIds.describedBy]
+      .filter(Boolean)
+      .join(' ') || undefined,
   );
   const isInteractive = $derived(!disabled && !readOnly);
 
@@ -187,17 +190,18 @@
   </ArkFileUpload.Label>
   <ArkFileUpload.Dropzone
     class={fileUploadDropzoneRecipe()}
-    aria-describedby={messageIds.describedBy}
+    aria-describedby={dropzoneDescribedBy}
     data-track-name="file-upload"
     data-track-intent="upload"
     data-track-text={label}
   >
     {#if dropzone}
-      {@render dropzone()}
+      <span id={hintId} class="contents">{@render dropzone()}</span>
     {:else}
       <IconUpload width={24} height={24} class="text-secondary" />
       <span class="font-medium text-primary">{dropzoneLabel}</span>
-      {#if dropzoneHint}<span class="text-xs">{dropzoneHint}</span>{/if}
+      {#if dropzoneHint}<span id={hintId} class="text-xs">{dropzoneHint}</span
+        >{/if}
     {/if}
   </ArkFileUpload.Dropzone>
   {#if isInteractive}
@@ -245,7 +249,7 @@
       </ArkFileUpload.Item>
     {/each}
   </ArkFileUpload.ItemGroup>
-  <FieldMessages ids={messageIds} {helperText} showError={hasErrorText}>
+  <FieldMessages ids={messageIds} showError={hasErrorText}>
     {#snippet errorContent()}
       {#if error}<p>{error}</p>{/if}
       {#each rejectionErrors as message, index (index)}<p>{message}</p>{/each}

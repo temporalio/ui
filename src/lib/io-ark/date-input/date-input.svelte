@@ -36,6 +36,7 @@
     DateInput as ArkDateInput,
     type DateInputValueChangeDetails,
   } from '@ark-ui/svelte/date-input';
+  import { useFieldsetContext } from '@ark-ui/svelte/fieldset';
 
   import {
     fieldLabelRecipe,
@@ -75,6 +76,8 @@
     ...rest
   }: DateInputProps = $props();
 
+  const fieldset = useFieldsetContext();
+  const isDisabled = $derived(disabled || !!fieldset?.().disabled);
   const isInvalid = $derived(invalid ?? !!error);
   const showError = $derived(!!(isInvalid && error));
   const messageIds = $derived(
@@ -99,7 +102,7 @@
   {hourCycle}
   {name}
   {required}
-  {disabled}
+  disabled={isDisabled}
   {readOnly}
   invalid={isInvalid}
   onValueChange={handleValueChange}

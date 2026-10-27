@@ -22,6 +22,7 @@
     showControls?: boolean;
     prevLabel?: string;
     nextLabel?: string;
+    completedLabel?: string;
     onStepChange?: (step: number) => void;
     onStepComplete?: () => void;
     id?: string;
@@ -64,6 +65,7 @@
     showControls = true,
     prevLabel = 'Back',
     nextLabel = 'Next',
+    completedLabel = 'Completed',
     onStepChange,
     onStepComplete,
     id = generatedId,
@@ -121,6 +123,13 @@
           </ArkSteps.Indicator>
           <span class="min-w-0 pt-1.5">
             <span class={stepsTitleRecipe()}>{item.title}</span>
+            <ArkSteps.ItemContext>
+              {#snippet render(itemState)}
+                {#if itemState().completed}
+                  <span class="sr-only">, {completedLabel}</span>
+                {/if}
+              {/snippet}
+            </ArkSteps.ItemContext>
             {#if item.description}
               <span class={stepsDescriptionRecipe()}>{item.description}</span>
             {/if}

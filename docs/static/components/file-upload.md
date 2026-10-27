@@ -67,8 +67,8 @@ error text with a message for its error code. Override the messages with
 ### Accessibility
 
 The dropzone is a button with the accessible name from `dropzoneLabel`, so keyboard
-and screen reader users can open the file dialog without dragging. Helper and error
-text are linked to it. Each remove button has an accessible label from
+and screen reader users can open the file dialog without dragging. The dropzone hint and any
+error text are linked to it. Each remove button has an accessible label from
 `removeLabel`.
 
 ### Contract
@@ -98,7 +98,6 @@ FileUpload forwards native div attributes to its wrapper.
 | `removeLabel`       | `(file: File) => string`                          | `Remove {file.name}`       | Accessible label for each remove button.                                     |
 | `rejectionMessages` | `Partial<Record<FileUploadFileError, string>>`    | `{}`                       | Messages for rejected files by error code.                                   |
 | `labelHidden`       | `boolean`                                         | `false`                    | Visually hides the label while keeping it accessible.                        |
-| `helperText`        | `string`                                          | `''`                       | Supporting text below the file list.                                         |
 | `error`             | `string`                                          | `''`                       | Error message. A non-empty value marks the upload invalid.                   |
 | `invalid`           | `boolean`                                         | `—`                        | Marks the upload invalid. Defaults to true with an error or a rejected file. |
 | `required`          | `boolean`                                         | `false`                    | Shows the required indicator and requires a file.                            |

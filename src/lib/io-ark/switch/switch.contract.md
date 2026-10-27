@@ -36,7 +36,7 @@ Rules below cover only what the types do not express. Already expressed by `Swit
 ## Accessibility
 
 - **A11Y-1** The switch is one tab stop. Space toggles it. Disabled switches are skipped.
-- **A11Y-2** The switch SHOULD be exposed with switch semantics (`role="switch"`), so assistive technology announces it as on or off rather than as a checkbox.
+- **A11Y-2** The focusable input has `role="switch"`, so assistive technology announces it as a switch that is on or off, not as a checkbox. `class` and spread attributes MUST NOT override that role.
 - **A11Y-3** Helper and error text are linked to the hidden input through `aria-describedby`. The required indicator is `aria-hidden`.
 - **A11Y-4** The state MUST NOT rely on the track color alone. The thumb position also changes.
 
@@ -46,8 +46,9 @@ Rules below cover only what the types do not express. Already expressed by `Swit
 
 ## Known gaps
 
-- **GAP-1** Violates A11Y-2. `Switch.HiddenInput` renders `type="checkbox"` with no `role="switch"`, and neither `switch.svelte` nor Ark's switch connect adds one. Screen readers announce the switch as a checkbox.
+None found by reading the code.
 
 ## Reconciliation log
 
 - 2026-10-27: First written against the uncommitted working tree, so there is no `sourceCommit` yet. Set it to the commit that adds this component. Product code does not use the component yet; docs examples are its only consumers.
+- 2026-10-27: Fixed GAP-1. The hidden input now has `role="switch"`, and A11Y-2 describes it. Covered by `switch.svelte.test.ts`.

@@ -19,7 +19,7 @@ Rules below cover only what the types do not express. Already expressed by `Navi
 - **IN-3** Each item's `value` defaults to its `label`. Values MUST be unique in a menu, so items with the same label MUST set `value`. Child `href` values MUST be unique within a group.
 - **IN-4** The caller sets `current`; the component does not read the URL. Exactly one link on the page SHOULD be current, and it MUST be the page being shown.
 - **IN-5** `label` names the landmark. When a page has more than one navigation menu, each MUST have a distinct `label`, such as "Product" and "Namespace" in the docs examples. Labels SHOULD be translated.
-- **IN-6** An unavailable destination SHOULD be left out. A link marked `disabled` MUST NOT navigate and MUST look unavailable. On a top-level item, `disabled` applies only to groups and prevents opening them.
+- **IN-6** An unavailable destination SHOULD be left out. A link marked `disabled` MUST NOT navigate and MUST look unavailable: a disabled child link renders without `href`, so it cannot be followed or focused, with `aria-disabled` and reduced opacity. On a top-level item, `disabled` applies only to groups and prevents opening them.
 - **IN-7** A horizontal menu's group panels are positioned absolutely below the list and are not portalled. Containers around a horizontal menu MUST NOT clip overflow.
 - **IN-8** `class` is merged last onto the `<nav>` root through `twMerge` in `navigationMenuRecipe`. It does not reach links or panels, so it MUST NOT be used to restyle them.
 
@@ -48,10 +48,9 @@ Rules below cover only what the types do not express. Already expressed by `Navi
 
 ## Known gaps
 
-Found by reading the code; not run. Fixes MUST satisfy the cited rule.
-
-- **GAP-1** Violates IN-6. A child link with `disabled` gets only `aria-disabled` (`navigation-menu.svelte`). It keeps its `href`, so clicking it still navigates, and `navigationMenuSubLinkRecipe` has no disabled style, so it looks available.
+None found by reading the code.
 
 ## Reconciliation log
 
 - 2026-10-27: First written against the uncommitted working tree, so there is no `sourceCommit` yet. Set it to the commit that adds this component. Product code does not use the component yet; docs examples are its only consumers.
+- 2026-10-27: Fixed GAP-1. A disabled child link renders without `href` and with a disabled style; IN-6 describes it. Covered by `navigation-menu.svelte.test.ts`.

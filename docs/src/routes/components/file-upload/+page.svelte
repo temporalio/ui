@@ -18,7 +18,6 @@
   let label = $state('Workflow inputs');
   let dropzoneLabel = $state('Drag and drop files here');
   let dropzoneHint = $state('JSON, up to 1 MB each');
-  let helperText = $state('');
   let error = $state('');
   let accept = $state<(typeof acceptOptions)[number]>('application/json');
   let maxFiles = $state('3');
@@ -44,7 +43,7 @@
 
 <FileUpload
   label={${JSON.stringify(label)}}
-  bind:files${acceptValue ? `\n  accept="${acceptValue}"` : ''}${maxFilesValue !== 1 ? `\n  maxFiles={${maxFilesValue}}` : ''}${limitSize ? '\n  maxFileSize={1024 * 1024}' : ''}${attribute('dropzoneLabel', dropzoneLabel)}${attribute('dropzoneHint', dropzoneHint)}${attribute('helperText', helperText)}${attribute('error', error)}${flag('required', required)}${flag('disabled', disabled)}
+  bind:files${acceptValue ? `\n  accept="${acceptValue}"` : ''}${maxFilesValue !== 1 ? `\n  maxFiles={${maxFilesValue}}` : ''}${limitSize ? '\n  maxFileSize={1024 * 1024}' : ''}${attribute('dropzoneLabel', dropzoneLabel)}${attribute('dropzoneHint', dropzoneHint)}${attribute('error', error)}${flag('required', required)}${flag('disabled', disabled)}
 />`,
   );
 
@@ -70,7 +69,6 @@
           maxFileSize={limitSize ? 1024 * 1024 : undefined}
           {dropzoneLabel}
           {dropzoneHint}
-          {helperText}
           {error}
           {required}
           {disabled}
@@ -92,11 +90,6 @@
         id="file-upload-dropzone-hint"
         label="Dropzone hint"
         bind:value={dropzoneHint}
-      />
-      <Input
-        id="file-upload-helper-text"
-        label="Helper text"
-        bind:value={helperText}
       />
       <Input id="file-upload-error" label="Error" bind:value={error} />
       <SelectControl

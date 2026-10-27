@@ -95,7 +95,7 @@ DateInput forwards native div attributes and event handlers to its wrapper.
 | `error`         | `string`                                  | `''`        | Error message shown below the input. Marks the input invalid. |
 | `invalid`       | `boolean`                                 | `—`         | Overrides the invalid state derived from `error`.             |
 | `required`      | `boolean`                                 | `false`     | Marks the input as required and shows an indicator.           |
-| `disabled`      | `boolean`                                 | `false`     | Prevents interaction.                                         |
+| `disabled`      | `boolean`                                 | `false`     | Prevents interaction. A disabled Fieldset also disables it.   |
 | `readOnly`      | `boolean`                                 | `false`     | Shows the value without allowing changes.                     |
 | `name`          | `string`                                  | `—`         | Name of the hidden input submitted with a form.               |
 | `id`            | `string`                                  | `Generated` | Base for the generated element IDs.                           |
