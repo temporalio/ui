@@ -18,7 +18,7 @@
 
 <dl
   class={twMerge(
-    'grid auto-cols-[max-content_minmax(0,max-content)] grid-flow-col gap-x-4 gap-y-1',
+    'grid auto-cols-[max-content_minmax(0,max-content)] grid-flow-col gap-x-4 gap-y-1 max-md:grid-flow-row max-md:grid-cols-[minmax(0,1fr)]',
     className,
   )}
   style={`--row-count: ${rowCount}`}
