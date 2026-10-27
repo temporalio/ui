@@ -1,22 +1,11 @@
 <script lang="ts">
-  import Accordion from '$lib/holocene/accordion/accordion.svelte';
   import Button from '$lib/holocene/button.svelte';
-  import CodeBlock from '$lib/holocene/code-block.svelte';
-  import Combobox from '$lib/holocene/combobox/combobox.svelte';
   import DurationInput, {
     getFirstWholeNumberUnit,
   } from '$lib/holocene/duration-input/duration-input.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import Link from '$lib/holocene/link.svelte';
-  import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
-  import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { IconExternalLinkOptical, IconInfo } from '$lib/io/icon';
 
-  import {
-    hasCloudRunImpersonatorPlaceholder,
-    interpolateCloudRunTerraformTemplate,
-  } from './cloud-run-terraform';
   import {
     COMPUTE_PROVIDERS,
     computeProviderFromType,
@@ -28,7 +17,6 @@
   import { GCP_REGIONS } from './gcp-regions';
   import {
     type ComputeFieldValues,
-    interpolateTerraformTemplate,
     scaleDownStabilizationUnits,
   } from './shared';
 
@@ -94,12 +82,6 @@
   const fieldId = (base: string): string =>
     idPrefix ? `${idPrefix}-${base}` : base;
 
-  // Both AWS providers assume a role, and the role each needs is different:
-  // one grants lambda:InvokeFunction, the other bedrock-agentcore:
-  // InvokeAgentRuntime. Handing out the Lambda role for AgentCore would
-  // produce a role that cannot invoke a runtime, so the templates follow the
-  // selected provider rather than being shared.
-  const isAgentCore = $derived(provider === 'agentcore');
   // `provider` arrives as a form field, so it is a string until proven one of
   // ours. Narrowing here rather than asserting keeps an unrecognised value from
   // reading as a provider that happens to have no entry.
@@ -120,84 +102,12 @@
   const providerTemplates = $derived(
     providerValue ? templates[providerValue] : undefined,
   );
-  const cloudFormation = $derived(providerTemplates?.cloudFormation);
-
-  const resolvedCfnTemplate = $derived(cloudFormation?.template ?? '');
-  // Only the key belonging to this provider's template is present, so both
-  // ARNs are passed and the absent one is a no-op.
-  const resolvedTerraformTemplate = $derived(
-    interpolateTerraformTemplate(providerTemplates?.terraform ?? '', {
-      externalId: values.roleExternalId,
-      lambdaArn: values.lambdaArn,
-      agentCoreEndpointArn: values.agentCoreEndpointArn,
-    }),
-  );
   const terraformModuleHref = $derived(
     (providerValue && COMPUTE_PROVIDERS[providerValue].terraformModuleHref) ||
       TERRAFORM_MODULES,
   );
-  // Read from the map rather than the selected provider: the Cloud Run block
-  // renders inside its own branch, where `provider` is already 'cloud-run'.
-  const resolvedCloudRunTerraformTemplate = $derived(
-    interpolateCloudRunTerraformTemplate(
-      templates['cloud-run']?.terraform ?? '',
-      values.gcpProject,
-    ),
-  );
-  const showCloudRunImpersonatorWarning = $derived(
-    hasCloudRunImpersonatorPlaceholder(resolvedCloudRunTerraformTemplate),
-  );
 
-  const launchStackHref = $derived.by(() => {
-    const templateUrl = cloudFormation?.url;
-
-    if (!templateUrl) {
-      return 'https://console.aws.amazon.com/cloudformation/';
-    }
-    const params = [`templateURL=${encodeURIComponent(templateUrl)}`];
-    if (values.roleExternalId) {
-      params.push(
-        `param_AssumeRoleExternalId=${encodeURIComponent(values.roleExternalId)}`,
-      );
-    }
-    const resource = isAgentCore
-      ? values.agentCoreEndpointArn
-      : values.lambdaArn;
-    if (resource) {
-      params.push(
-        `param_${isAgentCore ? 'AgentRuntimeArns' : 'LambdaFunctionARNs'}=${encodeURIComponent(resource)}`,
-      );
-    }
-    return `https://console.aws.amazon.com/cloudformation/home#/stacks/create/review?${params.join('&')}`;
-  });
-
-  let showRoleHelp = $state(false);
-  let showCloudRunHelp = $state(false);
   let showScaling = $state(false);
-  let activeRoleHelpTab = $state<'cloudformation' | 'terraform'>(
-    'cloudformation',
-  );
-
-  function downloadCfnTemplate() {
-    const blob = new Blob([resolvedCfnTemplate], { type: 'text/yaml' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = cloudFormation?.fileName ?? 'temporal-worker-role.yaml';
-    a.click();
-    URL.revokeObjectURL(url);
-  }
-
-  /**
-   * The whole row toggles, but only the chevron shows hover, so the row reads
-   * as content rather than as a button.
-   */
-  const ACCORDION_CLASS = [
-    'rounded-lg border-0 bg-surface-secondary [&_h3]:text-sm',
-    '[&>div>button:hover]:bg-transparent',
-    '[&>div>button>div>svg:last-child]:-m-1 [&>div>button>div>svg:last-child]:box-content [&>div>button>div>svg:last-child]:rounded [&>div>button>div>svg:last-child]:p-1',
-    '[&>div>button:hover>div>svg:last-child]:bg-interactive-tertiary-hover',
-  ].join(' ');
 </script>
 
 {#if leadingDivider}
