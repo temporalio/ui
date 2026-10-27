@@ -20,7 +20,7 @@
       href: 'https://github.com/temporalio/sdk-python/releases',
     },
     {
-      sdk: 'TypeScript',
+      sdk: 'Typescript',
       version: '1.14.0',
       href: 'https://github.com/temporalio/sdk-typescript/releases',
     },

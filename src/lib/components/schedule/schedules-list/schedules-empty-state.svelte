@@ -23,7 +23,7 @@
       href: 'https://docs.temporal.io/develop/python/workflows/schedules',
     },
     {
-      sdk: 'TypeScript',
+      sdk: 'Typescript',
       href: 'https://docs.temporal.io/develop/typescript/workflows/schedules',
     },
     {

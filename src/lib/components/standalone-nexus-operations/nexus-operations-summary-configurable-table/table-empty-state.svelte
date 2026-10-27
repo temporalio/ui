@@ -22,7 +22,7 @@
       href: 'https://github.com/temporalio/samples-java',
     },
     {
-      sdk: 'TypeScript',
+      sdk: 'Typescript',
       href: 'https://github.com/temporalio/samples-typescript',
     },
     {

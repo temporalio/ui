@@ -29,7 +29,7 @@
       href: 'https://docs.temporal.io/develop/dotnet/activities/standalone-activities',
     },
     {
-      sdk: 'TypeScript',
+      sdk: 'Typescript',
       href: 'https://docs.temporal.io/develop/typescript/activities/standalone-activities',
     },
     {

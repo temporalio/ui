@@ -28,7 +28,7 @@
     { sdk: 'Go', href: 'https://github.com/temporalio/samples-go' },
     { sdk: 'Java', href: 'https://github.com/temporalio/samples-java' },
     {
-      sdk: 'TypeScript',
+      sdk: 'Typescript',
       href: 'https://github.com/temporalio/samples-typescript',
     },
     { sdk: 'Python', href: 'https://github.com/temporalio/samples-python' },
