@@ -25,6 +25,7 @@
     defaultComputeProviderTemplates,
     TERRAFORM_MODULES,
   } from './compute-providers';
+  import type { ComputeSection } from './fields/types';
   import { GCP_REGIONS } from './gcp-regions';
   import {
     type ComputeFieldValues,
@@ -37,6 +38,11 @@
     /** Every provider field, as one object. See ComputeFieldValues. */
     values: ComputeFieldValues;
     gcpRegions?: string[];
+    /**
+     * Credential components supplied by the consumer, keyed by provider. One
+     * here takes the place of that provider's own Access section.
+     */
+    credentials?: Partial<Record<ComputeProviderValue, ComputeSection>>;
     /**
      * The templates offered per provider. Defaults to the ones bundled here,
      * which is what a self-hosted deployment wants. A consumer overrides them
@@ -83,6 +89,7 @@
     provider = 'lambda',
     values = $bindable(),
     gcpRegions = [...GCP_REGIONS],
+    credentials,
     templates = defaultComputeProviderTemplates,
     lambdaArnPlaceholder = translate('workers.lambda-arn-placeholder'),
     leadingDivider = true,
@@ -113,8 +120,14 @@
   );
   // Absent for a provider that collects no credentials: the whole Access
   // section, heading and dividers included, then goes with it.
+  // A consumer's component wins over the provider's own. Temporal Cloud
+  // swaps Modal's credential fields for an OAuth connection picker; a
+  // self-hosted install passes none and gets what the provider declares.
   const AccessFields = $derived(
-    providerValue ? COMPUTE_PROVIDERS[providerValue].fields.access : undefined,
+    providerValue
+      ? (credentials?.[providerValue] ??
+          COMPUTE_PROVIDERS[providerValue].fields.access)
+      : undefined,
   );
   // A provider that declares no Access section loses the heading and the
   // dividers with it, rather than showing an empty one.

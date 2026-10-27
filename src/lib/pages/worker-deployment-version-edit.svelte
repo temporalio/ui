@@ -30,6 +30,7 @@
   import {
     type ComputeProviderConfig,
     configuredRegions,
+    credentialOverrides,
     deployRegionsFor,
   } from '$lib/utilities/compute-provider-config';
   import { lockProvidersTo } from '$lib/utilities/lock-compute-provider';
@@ -52,6 +53,7 @@
 
   const computeProviders = $derived(providerConfig?.providers);
   const gcpRegions = $derived(deployRegionsFor(providerConfig, 'cloud-run'));
+  const credentials = $derived(credentialOverrides(providerConfig));
   const namespaceRegions = $derived(configuredRegions(providerConfig));
 
   const replicaRegionId = $derived(
@@ -94,6 +96,7 @@
       {error}
       computeProviders={lockProvidersTo(configuredProvider, computeProviders)}
       {gcpRegions}
+      {credentials}
       {templates}
       initialData={primaryValues}
       initialReplicaData={groups.replica
