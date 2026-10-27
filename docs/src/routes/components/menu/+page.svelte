@@ -7,20 +7,11 @@
   import MenuExamples from '../../../examples/menu-examples.svelte';
   import examplesSource from '../../../examples/menu-examples.svelte?raw';
 
-  import AnatomySection from '$docs/components/anatomy-section.svelte';
   import ComponentPage from '$docs/components/component-page.svelte';
-  import ContractSection from '$docs/components/contract-section.svelte';
-  import DocSection from '$docs/components/doc-section.svelte';
-  import MarkdownContent from '$docs/components/markdown-content.svelte';
   import Playground from '$docs/components/playground.svelte';
   import SelectControl from '$docs/components/select-control.svelte';
-  import SourceCode from '$docs/components/source-code.svelte';
-  import {
-    getComponentContent,
-    getComponentDocumentation,
-  } from '$docs/data/components';
+  import { getComponentDocumentation } from '$docs/data/components';
 
-  const content = getComponentContent('menu');
   const documentation = getComponentDocumentation('menu');
 
   const anatomyItems: MenuEntry[] = [
@@ -92,7 +83,12 @@
   );
 </script>
 
-<ComponentPage component={documentation}>
+<ComponentPage
+  component={documentation}
+  examples={MenuExamples}
+  {examplesSource}
+  framed
+>
   <Playground {source} filename="Menu.svelte">
     {#snippet preview()}
       <Menu
@@ -134,39 +130,17 @@
       <Checkbox id="menu-disabled" label="Disabled" bind:checked={disabled} />
     {/snippet}
   </Playground>
-  <AnatomySection slug="menu">
-    {#snippet preview()}
-      <div class="h-64 w-[320px]">
-        <Menu
-          id="menu-anatomy"
-          label="Actions"
-          items={anatomyItems}
-          open
-          portalled={false}
-          closeOnInteractOutside={false}
-          closeOnEscape={false}
-        />
-      </div>
-    {/snippet}
-  </AnatomySection>
-  <DocSection id="examples" title={content.sections.examples.title}>
-    <MarkdownContent section={content.sections.examples} />
-    <div class="mt-5">
-      <div class="rounded-lg border border-primary p-6">
-        <MenuExamples />
-      </div>
-      <SourceCode
-        code={examplesSource}
-        filename="menu-examples.svelte"
-        collapsible
+  {#snippet anatomy()}
+    <div class="h-64 w-[320px]">
+      <Menu
+        id="menu-anatomy"
+        label="Actions"
+        items={anatomyItems}
+        open
+        portalled={false}
+        closeOnInteractOutside={false}
+        closeOnEscape={false}
       />
     </div>
-  </DocSection>
-  <DocSection id="usage" title={content.sections.usage.title}>
-    <MarkdownContent section={content.sections.usage} />
-  </DocSection>
-  <ContractSection slug="menu" />
-  <DocSection id="api" title={content.sections.api.title}>
-    <MarkdownContent section={content.sections.api} />
-  </DocSection>
+  {/snippet}
 </ComponentPage>

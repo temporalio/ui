@@ -50,10 +50,10 @@
 
   import { IconCheckmark, IconChevronDown, IconClose } from '$lib/io/icon';
   import {
-    fieldErrorTextRecipe,
-    fieldHelperTextRecipe,
     fieldLabelRecipe,
+    FieldMessages,
     fieldRequiredIndicatorRecipe,
+    getFieldMessageIds,
   } from '$lib/io-ark/field';
 
   import {
@@ -113,12 +113,9 @@
   );
 
   const isInvalid = $derived(invalid ?? !!error);
-  const helperTextId = $derived(`${id}-helper-text`);
-  const errorTextId = $derived(`${id}-error-text`);
-  const describedBy = $derived(
-    [isInvalid && error && errorTextId, helperText && helperTextId]
-      .filter(Boolean)
-      .join(' ') || undefined,
+  const showError = $derived(!!(isInvalid && error));
+  const messageIds = $derived(
+    getFieldMessageIds(id, { helperText, showError, errorFirst: true }),
   );
   const isInteractive = $derived(!disabled && !readOnly);
 </script>
@@ -162,7 +159,7 @@
   <ArkSelect.Control class={selectControlRecipe()}>
     <ArkSelect.Trigger
       class={selectTriggerRecipe()}
-      aria-describedby={describedBy}
+      aria-describedby={messageIds.describedBy}
       data-track-name="select"
       data-track-intent="select"
       data-track-text={label}
@@ -181,14 +178,7 @@
       </ArkSelect.ClearTrigger>
     {/if}
   </ArkSelect.Control>
-  {#if helperText}
-    <p id={helperTextId} class={fieldHelperTextRecipe()}>{helperText}</p>
-  {/if}
-  {#if isInvalid && error}
-    <p id={errorTextId} class={fieldErrorTextRecipe()} aria-live="polite">
-      {error}
-    </p>
-  {/if}
+  <FieldMessages ids={messageIds} {helperText} {error} {showError} />
   <Portal disabled={!portalled}>
     <ArkSelect.Positioner class="z-50">
       <ArkSelect.Content class={selectContentRecipe()}>

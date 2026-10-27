@@ -9,20 +9,11 @@
   import RadioGroupExamples from '../../../examples/radio-group-examples.svelte';
   import examplesSource from '../../../examples/radio-group-examples.svelte?raw';
 
-  import AnatomySection from '$docs/components/anatomy-section.svelte';
   import ComponentPage from '$docs/components/component-page.svelte';
-  import ContractSection from '$docs/components/contract-section.svelte';
-  import DocSection from '$docs/components/doc-section.svelte';
-  import MarkdownContent from '$docs/components/markdown-content.svelte';
   import Playground from '$docs/components/playground.svelte';
   import SelectControl from '$docs/components/select-control.svelte';
-  import SourceCode from '$docs/components/source-code.svelte';
-  import {
-    getComponentContent,
-    getComponentDocumentation,
-  } from '$docs/data/components';
+  import { getComponentDocumentation } from '$docs/data/components';
 
-  const content = getComponentContent('radio-group');
   const documentation = getComponentDocumentation('radio-group');
 
   const items = [
@@ -64,7 +55,12 @@ ${items.map((item) => `    { value: '${item.value}', label: '${item.label}' },`)
   );
 </script>
 
-<ComponentPage component={documentation}>
+<ComponentPage
+  component={documentation}
+  examples={RadioGroupExamples}
+  {examplesSource}
+  framed
+>
   <Playground {source} filename="RadioGroup.svelte">
     {#snippet preview()}
       <div class="w-full max-w-sm">
@@ -122,39 +118,17 @@ ${items.map((item) => `    { value: '${item.value}', label: '${item.label}' },`)
       />
     {/snippet}
   </Playground>
-  <AnatomySection slug="radio-group">
-    {#snippet preview()}
-      <RadioGroup
-        id="radio-group-anatomy"
-        label="Label"
-        helperText="Helper text"
-        value="one"
-        items={[
-          { value: 'one', label: 'Option one' },
-          { value: 'two', label: 'Option two' },
-          { value: 'three', label: 'Option three' },
-        ]}
-      />
-    {/snippet}
-  </AnatomySection>
-  <DocSection id="examples" title={content.sections.examples.title}>
-    <MarkdownContent section={content.sections.examples} />
-    <div class="mt-5">
-      <div class="rounded-lg border border-primary p-6">
-        <RadioGroupExamples />
-      </div>
-      <SourceCode
-        code={examplesSource}
-        filename="radio-group-examples.svelte"
-        collapsible
-      />
-    </div>
-  </DocSection>
-  <DocSection id="usage" title={content.sections.usage.title}>
-    <MarkdownContent section={content.sections.usage} />
-  </DocSection>
-  <ContractSection slug="radio-group" />
-  <DocSection id="api" title={content.sections.api.title}>
-    <MarkdownContent section={content.sections.api} />
-  </DocSection>
+  {#snippet anatomy()}
+    <RadioGroup
+      id="radio-group-anatomy"
+      label="Label"
+      helperText="Helper text"
+      value="one"
+      items={[
+        { value: 'one', label: 'Option one' },
+        { value: 'two', label: 'Option two' },
+        { value: 'three', label: 'Option three' },
+      ]}
+    />
+  {/snippet}
 </ComponentPage>

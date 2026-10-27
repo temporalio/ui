@@ -1,5 +1,7 @@
 import { twJoin, twMerge } from 'tailwind-merge';
 
+import { floatingSurfaceClasses } from '../shared/recipe';
+
 export type MenuPlacement =
   | 'top'
   | 'top-start'
@@ -16,10 +18,11 @@ export type MenuPlacement =
 
 export const menuContentRecipe = (className?: string) =>
   twMerge(
-    'z-50 min-w-48 max-w-xs overflow-y-auto rounded border border-primary bg-background-primary p-1',
-    'max-h-[min(24rem,var(--available-height))] text-sm text-primary shadow-lg focus:outline-none',
-    'data-[state=open]:animate-[io-ark-menu-fade-in_100ms_ease-out]',
-    'data-[state=closed]:animate-[io-ark-menu-fade-out_75ms_ease-in]',
+    floatingSurfaceClasses,
+    'z-50 min-w-48 max-w-xs overflow-y-auto p-1',
+    'max-h-[min(24rem,var(--available-height))] text-sm text-primary focus:outline-none',
+    'data-[state=open]:animate-[io-ark-float-in_100ms_ease-out]',
+    'data-[state=closed]:animate-[io-ark-fade-out_75ms_ease-in]',
     'motion-reduce:animate-none',
     className,
   );

@@ -6,20 +6,11 @@
   import SliderExamples from '../../../examples/slider-examples.svelte';
   import examplesSource from '../../../examples/slider-examples.svelte?raw';
 
-  import AnatomySection from '$docs/components/anatomy-section.svelte';
   import ComponentPage from '$docs/components/component-page.svelte';
-  import ContractSection from '$docs/components/contract-section.svelte';
-  import DocSection from '$docs/components/doc-section.svelte';
-  import MarkdownContent from '$docs/components/markdown-content.svelte';
   import Playground from '$docs/components/playground.svelte';
   import SelectControl from '$docs/components/select-control.svelte';
-  import SourceCode from '$docs/components/source-code.svelte';
-  import {
-    getComponentContent,
-    getComponentDocumentation,
-  } from '$docs/data/components';
+  import { getComponentDocumentation } from '$docs/data/components';
 
-  const content = getComponentContent('slider');
   const documentation = getComponentDocumentation('slider');
 
   const orientations: SliderOrientation[] = ['horizontal', 'vertical'];
@@ -86,7 +77,12 @@
   );
 </script>
 
-<ComponentPage component={documentation}>
+<ComponentPage
+  component={documentation}
+  examples={SliderExamples}
+  {examplesSource}
+  framed
+>
   <Playground {source} filename="Slider.svelte">
     {#snippet preview()}
       <div class="w-full max-w-sm" class:flex={orientation === 'vertical'}>
@@ -148,40 +144,18 @@
       <Checkbox id="slider-disabled" label="Disabled" bind:checked={disabled} />
     {/snippet}
   </Playground>
-  <AnatomySection slug="slider">
-    {#snippet preview()}
-      <Slider
-        id="slider-anatomy"
-        label="Label"
-        value={[20, 70]}
-        marks={[
-          { value: 0, label: '0' },
-          { value: 50, label: '50' },
-          { value: 100, label: '100' },
-        ]}
-        showValue
-        class="w-80"
-      />
-    {/snippet}
-  </AnatomySection>
-  <DocSection id="examples" title={content.sections.examples.title}>
-    <MarkdownContent section={content.sections.examples} />
-    <div class="mt-5">
-      <div class="rounded-lg border border-primary p-6">
-        <SliderExamples />
-      </div>
-      <SourceCode
-        code={examplesSource}
-        filename="slider-examples.svelte"
-        collapsible
-      />
-    </div>
-  </DocSection>
-  <DocSection id="usage" title={content.sections.usage.title}>
-    <MarkdownContent section={content.sections.usage} />
-  </DocSection>
-  <ContractSection slug="slider" />
-  <DocSection id="api" title={content.sections.api.title}>
-    <MarkdownContent section={content.sections.api} />
-  </DocSection>
+  {#snippet anatomy()}
+    <Slider
+      id="slider-anatomy"
+      label="Label"
+      value={[20, 70]}
+      marks={[
+        { value: 0, label: '0' },
+        { value: 50, label: '50' },
+        { value: 100, label: '100' },
+      ]}
+      showValue
+      class="w-80"
+    />
+  {/snippet}
 </ComponentPage>

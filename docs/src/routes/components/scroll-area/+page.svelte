@@ -9,20 +9,11 @@
   import ScrollAreaExamples from '../../../examples/scroll-area-examples.svelte';
   import examplesSource from '../../../examples/scroll-area-examples.svelte?raw';
 
-  import AnatomySection from '$docs/components/anatomy-section.svelte';
   import ComponentPage from '$docs/components/component-page.svelte';
-  import ContractSection from '$docs/components/contract-section.svelte';
-  import DocSection from '$docs/components/doc-section.svelte';
-  import MarkdownContent from '$docs/components/markdown-content.svelte';
   import Playground from '$docs/components/playground.svelte';
   import SelectControl from '$docs/components/select-control.svelte';
-  import SourceCode from '$docs/components/source-code.svelte';
-  import {
-    getComponentContent,
-    getComponentDocumentation,
-  } from '$docs/data/components';
+  import { getComponentDocumentation } from '$docs/data/components';
 
-  const content = getComponentContent('scroll-area');
   const documentation = getComponentDocumentation('scroll-area');
 
   const orientations: ScrollAreaOrientation[] = [
@@ -61,7 +52,12 @@
   );
 </script>
 
-<ComponentPage component={documentation}>
+<ComponentPage
+  component={documentation}
+  examples={ScrollAreaExamples}
+  {examplesSource}
+  framed
+>
   <Playground {source} filename="ScrollArea.svelte">
     {#snippet preview()}
       <div class="w-full max-w-md">
@@ -109,44 +105,22 @@
       />
     {/snippet}
   </Playground>
-  <AnatomySection slug="scroll-area">
-    {#snippet preview()}
-      <ScrollArea
-        id="scroll-area-anatomy"
-        label="Task queue pollers"
-        orientation="both"
-        scrollbars="always"
-        maxHeight="9rem"
-        class="w-full rounded border border-primary"
-      >
-        <ul class="w-[560px] divide-y divide-primary text-sm">
-          {#each Array.from({ length: 12 }, (_, index) => index + 1) as poller (poller)}
-            <li class="px-3 py-1.5 font-mono">
-              worker-{poller}@orders-host-{poller}.internal.temporal.example
-            </li>
-          {/each}
-        </ul>
-      </ScrollArea>
-    {/snippet}
-  </AnatomySection>
-  <DocSection id="examples" title={content.sections.examples.title}>
-    <MarkdownContent section={content.sections.examples} />
-    <div class="mt-5">
-      <div class="rounded-lg border border-primary p-6">
-        <ScrollAreaExamples />
-      </div>
-      <SourceCode
-        code={examplesSource}
-        filename="scroll-area-examples.svelte"
-        collapsible
-      />
-    </div>
-  </DocSection>
-  <DocSection id="usage" title={content.sections.usage.title}>
-    <MarkdownContent section={content.sections.usage} />
-  </DocSection>
-  <ContractSection slug="scroll-area" />
-  <DocSection id="api" title={content.sections.api.title}>
-    <MarkdownContent section={content.sections.api} />
-  </DocSection>
+  {#snippet anatomy()}
+    <ScrollArea
+      id="scroll-area-anatomy"
+      label="Task queue pollers"
+      orientation="both"
+      scrollbars="always"
+      maxHeight="9rem"
+      class="w-full rounded border border-primary"
+    >
+      <ul class="w-[560px] divide-y divide-primary text-sm">
+        {#each Array.from({ length: 12 }, (_, index) => index + 1) as poller (poller)}
+          <li class="px-3 py-1.5 font-mono">
+            worker-{poller}@orders-host-{poller}.internal.temporal.example
+          </li>
+        {/each}
+      </ul>
+    </ScrollArea>
+  {/snippet}
 </ComponentPage>

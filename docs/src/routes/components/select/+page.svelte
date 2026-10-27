@@ -6,19 +6,10 @@
   import SelectExamples from '../../../examples/select-examples.svelte';
   import examplesSource from '../../../examples/select-examples.svelte?raw';
 
-  import AnatomySection from '$docs/components/anatomy-section.svelte';
   import ComponentPage from '$docs/components/component-page.svelte';
-  import ContractSection from '$docs/components/contract-section.svelte';
-  import DocSection from '$docs/components/doc-section.svelte';
-  import MarkdownContent from '$docs/components/markdown-content.svelte';
   import Playground from '$docs/components/playground.svelte';
-  import SourceCode from '$docs/components/source-code.svelte';
-  import {
-    getComponentContent,
-    getComponentDocumentation,
-  } from '$docs/data/components';
+  import { getComponentDocumentation } from '$docs/data/components';
 
-  const content = getComponentContent('select');
   const documentation = getComponentDocumentation('select');
 
   const statuses = ['Running', 'Completed', 'Failed', 'Canceled', 'Terminated'];
@@ -64,7 +55,11 @@
   });
 </script>
 
-<ComponentPage component={documentation}>
+<ComponentPage
+  component={documentation}
+  examples={SelectExamples}
+  {examplesSource}
+>
   <Playground {source} filename="Select.svelte">
     {#snippet preview()}
       <div class="w-full max-w-sm">
@@ -115,37 +110,17 @@
       />
     {/snippet}
   </Playground>
-  <AnatomySection slug="select">
-    {#snippet preview()}
-      <div class="h-72 w-[320px]">
-        <Select
-          id="select-anatomy"
-          label="Execution status"
-          items={['Running', 'Completed', 'Failed', 'Terminated']}
-          value={['Completed']}
-          bind:open={anatomyOpen}
-          portalled={false}
-          onInteractOutside={(event) => event.preventDefault()}
-        />
-      </div>
-    {/snippet}
-  </AnatomySection>
-  <DocSection id="examples" title={content.sections.examples.title}>
-    <MarkdownContent section={content.sections.examples} />
-    <div class="mt-5">
-      <SelectExamples />
-      <SourceCode
-        code={examplesSource}
-        filename="select-examples.svelte"
-        collapsible
+  {#snippet anatomy()}
+    <div class="h-72 w-[320px]">
+      <Select
+        id="select-anatomy"
+        label="Execution status"
+        items={['Running', 'Completed', 'Failed', 'Terminated']}
+        value={['Completed']}
+        bind:open={anatomyOpen}
+        portalled={false}
+        onInteractOutside={(event) => event.preventDefault()}
       />
     </div>
-  </DocSection>
-  <DocSection id="usage" title={content.sections.usage.title}>
-    <MarkdownContent section={content.sections.usage} />
-  </DocSection>
-  <ContractSection slug="select" />
-  <DocSection id="api" title={content.sections.api.title}>
-    <MarkdownContent section={content.sections.api} />
-  </DocSection>
+  {/snippet}
 </ComponentPage>

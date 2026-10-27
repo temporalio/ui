@@ -7,20 +7,11 @@
   import PopoverExamples from '../../../examples/popover-examples.svelte';
   import examplesSource from '../../../examples/popover-examples.svelte?raw';
 
-  import AnatomySection from '$docs/components/anatomy-section.svelte';
   import ComponentPage from '$docs/components/component-page.svelte';
-  import ContractSection from '$docs/components/contract-section.svelte';
-  import DocSection from '$docs/components/doc-section.svelte';
-  import MarkdownContent from '$docs/components/markdown-content.svelte';
   import Playground from '$docs/components/playground.svelte';
   import SelectControl from '$docs/components/select-control.svelte';
-  import SourceCode from '$docs/components/source-code.svelte';
-  import {
-    getComponentContent,
-    getComponentDocumentation,
-  } from '$docs/data/components';
+  import { getComponentDocumentation } from '$docs/data/components';
 
-  const content = getComponentContent('popover');
   const documentation = getComponentDocumentation('popover');
 
   const placements: PopoverPlacement[] = [
@@ -62,7 +53,12 @@
   );
 </script>
 
-<ComponentPage component={documentation}>
+<ComponentPage
+  component={documentation}
+  examples={PopoverExamples}
+  {examplesSource}
+  framed
+>
   <Playground {source} filename="Popover.svelte">
     {#snippet preview()}
       <Popover
@@ -102,50 +98,25 @@
       <Checkbox id="popover-open" label="Open" bind:checked={open} />
     {/snippet}
   </Playground>
-  <AnatomySection slug="popover">
-    {#snippet preview()}
-      <div class="flex h-64 w-[360px] items-start justify-center pt-1">
-        <Popover
-          id="popover-anatomy"
-          title="Retry policy"
-          description="Applies to every activity in this workflow."
-          showArrow
-          open
-          portalled={false}
-          closeOnInteractOutside={false}
-          closeOnEscape={false}
-        >
-          {#snippet trigger(props)}
-            <Button
-              {...props}
-              colorScheme="secondary"
-              size="sm"
-              tracking={false}>Retry policy</Button
-            >
-          {/snippet}
-          <p class="mt-2 text-secondary">Maximum attempts: 5</p>
-        </Popover>
-      </div>
-    {/snippet}
-  </AnatomySection>
-  <DocSection id="examples" title={content.sections.examples.title}>
-    <MarkdownContent section={content.sections.examples} />
-    <div class="mt-5">
-      <div class="rounded-lg border border-primary p-6">
-        <PopoverExamples />
-      </div>
-      <SourceCode
-        code={examplesSource}
-        filename="popover-examples.svelte"
-        collapsible
-      />
+  {#snippet anatomy()}
+    <div class="flex h-64 w-[360px] items-start justify-center pt-1">
+      <Popover
+        id="popover-anatomy"
+        title="Retry policy"
+        description="Applies to every activity in this workflow."
+        showArrow
+        open
+        portalled={false}
+        closeOnInteractOutside={false}
+        closeOnEscape={false}
+      >
+        {#snippet trigger(props)}
+          <Button {...props} colorScheme="secondary" size="sm" tracking={false}
+            >Retry policy</Button
+          >
+        {/snippet}
+        <p class="mt-2 text-secondary">Maximum attempts: 5</p>
+      </Popover>
     </div>
-  </DocSection>
-  <DocSection id="usage" title={content.sections.usage.title}>
-    <MarkdownContent section={content.sections.usage} />
-  </DocSection>
-  <ContractSection slug="popover" />
-  <DocSection id="api" title={content.sections.api.title}>
-    <MarkdownContent section={content.sections.api} />
-  </DocSection>
+  {/snippet}
 </ComponentPage>

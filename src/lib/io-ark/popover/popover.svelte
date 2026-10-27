@@ -46,6 +46,8 @@
     popoverTitleRecipe,
   } from './recipe';
 
+  import '../shared/animations.css';
+
   let {
     title = '',
     description = '',
@@ -147,18 +149,3 @@
     </ArkPopover.Positioner>
   </Portal>
 </ArkPopover.Root>
-
-<style>
-  @keyframes -global-io-ark-popover-fade-in {
-    from {
-      opacity: 0;
-      transform: translateY(-2px);
-    }
-  }
-
-  @keyframes -global-io-ark-popover-fade-out {
-    to {
-      opacity: 0;
-    }
-  }
-</style>

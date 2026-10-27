@@ -39,10 +39,11 @@
   import { RadioGroup as ArkRadioGroup } from '@ark-ui/svelte/radio-group';
 
   import {
-    fieldErrorTextRecipe,
     fieldHelperTextRecipe,
     fieldLabelRecipe,
+    FieldMessages,
     fieldRequiredIndicatorRecipe,
+    getFieldMessageIds,
   } from '$lib/io-ark/field';
 
   import { radioGroupItemsRecipe, radioGroupRecipe } from './recipe';
@@ -70,14 +71,10 @@
     ...rest
   }: RadioGroupProps = $props();
 
-  const helperTextId = $derived(`${id}-helper-text`);
-  const errorTextId = $derived(`${id}-error-text`);
   const isInvalid = $derived(invalid ?? !!error);
   const showError = $derived(isInvalid && !!error);
-  const describedBy = $derived(
-    [helperText && helperTextId, showError && errorTextId]
-      .filter(Boolean)
-      .join(' ') || undefined,
+  const messageIds = $derived(
+    getFieldMessageIds(id, { helperText, showError }),
   );
 </script>
 
@@ -91,7 +88,7 @@
   {readOnly}
   invalid={isInvalid}
   onValueChange={(details) => onValueChange?.(details.value)}
-  aria-describedby={describedBy}
+  aria-describedby={messageIds.describedBy}
   aria-invalid={isInvalid || undefined}
   aria-required={required || undefined}
   class={radioGroupRecipe(className)}
@@ -103,20 +100,16 @@
       <span aria-hidden="true" class={fieldRequiredIndicatorRecipe()}>*</span>
     {/if}
   </ArkRadioGroup.Label>
-  {#if helperText}
-    <p id={helperTextId} class={fieldHelperTextRecipe('-mt-1')}>
-      {helperText}
-    </p>
-  {/if}
+  <FieldMessages
+    ids={messageIds}
+    {helperText}
+    helperClass={fieldHelperTextRecipe('-mt-1')}
+  />
   <div class={radioGroupItemsRecipe(orientation)}>
     {#each items as item (item.value)}
       <RadioGroupItem {...item} />
     {/each}
     {@render children?.()}
   </div>
-  {#if showError}
-    <p id={errorTextId} aria-live="polite" class={fieldErrorTextRecipe()}>
-      {error}
-    </p>
-  {/if}
+  <FieldMessages ids={messageIds} {error} {showError} />
 </ArkRadioGroup.Root>

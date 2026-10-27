@@ -1,12 +1,14 @@
 import { twJoin, twMerge } from 'tailwind-merge';
 
+import { overlayBackdropClasses } from '../shared/recipe';
+
 export type DialogSize = 'sm' | 'md' | 'lg';
 
 export const dialogBackdropRecipe = () =>
   twJoin(
-    'fixed inset-0 z-50 bg-surface-overlay-neutral backdrop-blur-[8px]',
-    'data-[state=open]:animate-[io-ark-dialog-fade-in_150ms_ease-out]',
-    'data-[state=closed]:animate-[io-ark-dialog-fade-out_100ms_ease-in]',
+    overlayBackdropClasses,
+    'data-[state=open]:animate-[io-ark-fade-in_150ms_ease-out]',
+    'data-[state=closed]:animate-[io-ark-fade-out_100ms_ease-in]',
     'motion-reduce:animate-none',
   );
 
@@ -26,8 +28,8 @@ export const dialogContentRecipe = ({
   twMerge(
     'flex max-h-[85vh] w-full flex-col overflow-hidden rounded-lg border border-primary',
     'bg-background-primary text-primary shadow-xl outline-none',
-    'data-[state=open]:animate-[io-ark-dialog-scale-in_150ms_ease-out]',
-    'data-[state=closed]:animate-[io-ark-dialog-fade-out_100ms_ease-in]',
+    'data-[state=open]:animate-[io-ark-scale-in_150ms_ease-out]',
+    'data-[state=closed]:animate-[io-ark-fade-out_100ms_ease-in]',
     'motion-reduce:animate-none',
     sizeClasses[size],
     className,

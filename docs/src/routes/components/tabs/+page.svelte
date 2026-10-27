@@ -11,20 +11,11 @@
   import TabsExamples from '../../../examples/tabs-examples.svelte';
   import examplesSource from '../../../examples/tabs-examples.svelte?raw';
 
-  import AnatomySection from '$docs/components/anatomy-section.svelte';
   import ComponentPage from '$docs/components/component-page.svelte';
-  import ContractSection from '$docs/components/contract-section.svelte';
-  import DocSection from '$docs/components/doc-section.svelte';
-  import MarkdownContent from '$docs/components/markdown-content.svelte';
   import Playground from '$docs/components/playground.svelte';
   import SelectControl from '$docs/components/select-control.svelte';
-  import SourceCode from '$docs/components/source-code.svelte';
-  import {
-    getComponentContent,
-    getComponentDocumentation,
-  } from '$docs/data/components';
+  import { getComponentDocumentation } from '$docs/data/components';
 
-  const content = getComponentContent('tabs');
   const documentation = getComponentDocumentation('tabs');
 
   const variants: TabsVariant[] = ['line', 'enclosed'];
@@ -75,7 +66,12 @@
   );
 </script>
 
-<ComponentPage component={documentation}>
+<ComponentPage
+  component={documentation}
+  examples={TabsExamples}
+  {examplesSource}
+  framed
+>
   <Playground {source} filename="Tabs.svelte">
     {#snippet preview()}
       <div class="w-full">
@@ -127,45 +123,23 @@
       />
     {/snippet}
   </Playground>
-  <AnatomySection slug="tabs">
-    {#snippet preview()}
-      <Tabs
-        id="tabs-anatomy"
-        label="Workflow details"
-        value="history"
-        items={[
-          { value: 'history', label: 'History' },
-          { value: 'workers', label: 'Workers' },
-          { value: 'pending', label: 'Pending', badge: 3 },
-        ]}
-        class="w-full"
-      >
-        {#snippet content(item)}
-          <p class="text-sm text-secondary">
-            {item.label} for order-fulfillment-7f3a.
-          </p>
-        {/snippet}
-      </Tabs>
-    {/snippet}
-  </AnatomySection>
-  <DocSection id="examples" title={content.sections.examples.title}>
-    <MarkdownContent section={content.sections.examples} />
-    <div class="mt-5">
-      <div class="rounded-lg border border-primary p-6">
-        <TabsExamples />
-      </div>
-      <SourceCode
-        code={examplesSource}
-        filename="tabs-examples.svelte"
-        collapsible
-      />
-    </div>
-  </DocSection>
-  <DocSection id="usage" title={content.sections.usage.title}>
-    <MarkdownContent section={content.sections.usage} />
-  </DocSection>
-  <ContractSection slug="tabs" />
-  <DocSection id="api" title={content.sections.api.title}>
-    <MarkdownContent section={content.sections.api} />
-  </DocSection>
+  {#snippet anatomy()}
+    <Tabs
+      id="tabs-anatomy"
+      label="Workflow details"
+      value="history"
+      items={[
+        { value: 'history', label: 'History' },
+        { value: 'workers', label: 'Workers' },
+        { value: 'pending', label: 'Pending', badge: 3 },
+      ]}
+      class="w-full"
+    >
+      {#snippet content(item)}
+        <p class="text-sm text-secondary">
+          {item.label} for order-fulfillment-7f3a.
+        </p>
+      {/snippet}
+    </Tabs>
+  {/snippet}
 </ComponentPage>

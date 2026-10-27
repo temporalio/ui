@@ -41,6 +41,8 @@
     tooltipTriggerRecipe,
   } from './recipe';
 
+  import '../shared/animations.css';
+
   let {
     content,
     placement = 'top',
@@ -117,18 +119,3 @@
     </ArkTooltip.Positioner>
   </Portal>
 </ArkTooltip.Root>
-
-<style>
-  @keyframes -global-io-ark-tooltip-fade-in {
-    from {
-      opacity: 0;
-      transform: scale(0.97);
-    }
-  }
-
-  @keyframes -global-io-ark-tooltip-fade-out {
-    to {
-      opacity: 0;
-    }
-  }
-</style>

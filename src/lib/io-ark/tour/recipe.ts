@@ -1,9 +1,11 @@
 import { twJoin, twMerge } from 'tailwind-merge';
 
+import { floatingSurfaceClasses } from '../shared/recipe';
+
 export const tourBackdropRecipe = () =>
   twJoin(
     'z-50 bg-surface-overlay-neutral [&[hidden]]:hidden',
-    'data-[state=open]:animate-[io-ark-tour-fade-in_150ms_ease-out]',
+    'data-[state=open]:animate-[io-ark-fade-in_150ms_ease-out]',
     'motion-reduce:animate-none',
   );
 
@@ -23,10 +25,11 @@ export const tourPositionerRecipe = () =>
 
 export const tourContentRecipe = (className?: string) =>
   twMerge(
-    'pointer-events-auto flex w-80 max-w-[calc(100vw-2rem)] flex-col gap-3 rounded border border-primary',
-    'bg-background-primary p-4 text-sm text-primary shadow-lg focus:outline-none',
+    floatingSurfaceClasses,
+    'pointer-events-auto flex w-80 max-w-[calc(100vw-2rem)] flex-col gap-3',
+    'p-4 text-sm text-primary focus:outline-none',
     'data-[type=dialog]:w-[28rem] data-[type=dialog]:rounded-lg data-[type=dialog]:p-6',
-    'data-[state=open]:animate-[io-ark-tour-fade-in_150ms_ease-out] motion-reduce:animate-none',
+    'data-[state=open]:animate-[io-ark-fade-in_150ms_ease-out] motion-reduce:animate-none',
     '[&[hidden]]:hidden',
     className,
   );

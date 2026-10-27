@@ -6,20 +6,11 @@
   import FieldExamples from '../../../examples/field-examples.svelte';
   import examplesSource from '../../../examples/field-examples.svelte?raw';
 
-  import AnatomySection from '$docs/components/anatomy-section.svelte';
   import ComponentPage from '$docs/components/component-page.svelte';
-  import ContractSection from '$docs/components/contract-section.svelte';
-  import DocSection from '$docs/components/doc-section.svelte';
-  import MarkdownContent from '$docs/components/markdown-content.svelte';
   import Playground from '$docs/components/playground.svelte';
   import SelectControl from '$docs/components/select-control.svelte';
-  import SourceCode from '$docs/components/source-code.svelte';
-  import {
-    getComponentContent,
-    getComponentDocumentation,
-  } from '$docs/data/components';
+  import { getComponentDocumentation } from '$docs/data/components';
 
-  const content = getComponentContent('field');
   const documentation = getComponentDocumentation('field');
 
   const controlTypes = ['FieldInput', 'FieldTextarea'] as const;
@@ -54,7 +45,12 @@
   );
 </script>
 
-<ComponentPage component={documentation}>
+<ComponentPage
+  component={documentation}
+  examples={FieldExamples}
+  {examplesSource}
+  framed
+>
   <Playground {source} filename="Field.svelte">
     {#snippet preview()}
       <div class="w-full max-w-sm">
@@ -109,38 +105,16 @@
       />
     {/snippet}
   </Playground>
-  <AnatomySection slug="field">
-    {#snippet preview()}
-      <Field
-        id="field-anatomy"
-        label="Label"
-        helperText="Helper text"
-        error="Error text"
-        required
-        class="w-64"
-      >
-        <FieldInput placeholder="Value" />
-      </Field>
-    {/snippet}
-  </AnatomySection>
-  <DocSection id="examples" title={content.sections.examples.title}>
-    <MarkdownContent section={content.sections.examples} />
-    <div class="mt-5">
-      <div class="rounded-lg border border-primary p-6">
-        <FieldExamples />
-      </div>
-      <SourceCode
-        code={examplesSource}
-        filename="field-examples.svelte"
-        collapsible
-      />
-    </div>
-  </DocSection>
-  <DocSection id="usage" title={content.sections.usage.title}>
-    <MarkdownContent section={content.sections.usage} />
-  </DocSection>
-  <ContractSection slug="field" />
-  <DocSection id="api" title={content.sections.api.title}>
-    <MarkdownContent section={content.sections.api} />
-  </DocSection>
+  {#snippet anatomy()}
+    <Field
+      id="field-anatomy"
+      label="Label"
+      helperText="Helper text"
+      error="Error text"
+      required
+      class="w-64"
+    >
+      <FieldInput placeholder="Value" />
+    </Field>
+  {/snippet}
 </ComponentPage>

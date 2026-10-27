@@ -11,20 +11,11 @@
   import ToggleGroupExamples from '../../../examples/toggle-group-examples.svelte';
   import examplesSource from '../../../examples/toggle-group-examples.svelte?raw';
 
-  import AnatomySection from '$docs/components/anatomy-section.svelte';
   import ComponentPage from '$docs/components/component-page.svelte';
-  import ContractSection from '$docs/components/contract-section.svelte';
-  import DocSection from '$docs/components/doc-section.svelte';
-  import MarkdownContent from '$docs/components/markdown-content.svelte';
   import Playground from '$docs/components/playground.svelte';
   import SelectControl from '$docs/components/select-control.svelte';
-  import SourceCode from '$docs/components/source-code.svelte';
-  import {
-    getComponentContent,
-    getComponentDocumentation,
-  } from '$docs/data/components';
+  import { getComponentDocumentation } from '$docs/data/components';
 
-  const content = getComponentContent('toggle-group');
   const documentation = getComponentDocumentation('toggle-group');
 
   const items = [
@@ -62,7 +53,12 @@
   );
 </script>
 
-<ComponentPage component={documentation}>
+<ComponentPage
+  component={documentation}
+  examples={ToggleGroupExamples}
+  {examplesSource}
+  framed
+>
   <Playground {source} filename="ToggleGroup.svelte">
     {#snippet preview()}
       {#key multiple}
@@ -112,38 +108,16 @@
       />
     {/snippet}
   </Playground>
-  <AnatomySection slug="toggle-group">
-    {#snippet preview()}
-      <ToggleGroup
-        id="toggle-group-anatomy"
-        label="History view"
-        value={['timeline']}
-        items={[
-          { value: 'compact', label: 'Compact', Icon: IconCompact },
-          { value: 'timeline', label: 'Timeline', Icon: IconTable },
-          { value: 'json', label: 'JSON', Icon: IconCode },
-        ]}
-      />
-    {/snippet}
-  </AnatomySection>
-  <DocSection id="examples" title={content.sections.examples.title}>
-    <MarkdownContent section={content.sections.examples} />
-    <div class="mt-5">
-      <div class="rounded-lg border border-primary p-6">
-        <ToggleGroupExamples />
-      </div>
-      <SourceCode
-        code={examplesSource}
-        filename="toggle-group-examples.svelte"
-        collapsible
-      />
-    </div>
-  </DocSection>
-  <DocSection id="usage" title={content.sections.usage.title}>
-    <MarkdownContent section={content.sections.usage} />
-  </DocSection>
-  <ContractSection slug="toggle-group" />
-  <DocSection id="api" title={content.sections.api.title}>
-    <MarkdownContent section={content.sections.api} />
-  </DocSection>
+  {#snippet anatomy()}
+    <ToggleGroup
+      id="toggle-group-anatomy"
+      label="History view"
+      value={['timeline']}
+      items={[
+        { value: 'compact', label: 'Compact', Icon: IconCompact },
+        { value: 'timeline', label: 'Timeline', Icon: IconTable },
+        { value: 'json', label: 'JSON', Icon: IconCode },
+      ]}
+    />
+  {/snippet}
 </ComponentPage>

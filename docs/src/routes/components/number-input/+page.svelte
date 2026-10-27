@@ -6,19 +6,10 @@
   import NumberInputExamples from '../../../examples/number-input-examples.svelte';
   import examplesSource from '../../../examples/number-input-examples.svelte?raw';
 
-  import AnatomySection from '$docs/components/anatomy-section.svelte';
   import ComponentPage from '$docs/components/component-page.svelte';
-  import ContractSection from '$docs/components/contract-section.svelte';
-  import DocSection from '$docs/components/doc-section.svelte';
-  import MarkdownContent from '$docs/components/markdown-content.svelte';
   import Playground from '$docs/components/playground.svelte';
-  import SourceCode from '$docs/components/source-code.svelte';
-  import {
-    getComponentContent,
-    getComponentDocumentation,
-  } from '$docs/data/components';
+  import { getComponentDocumentation } from '$docs/data/components';
 
-  const content = getComponentContent('number-input');
   const documentation = getComponentDocumentation('number-input');
 
   let label = $state('Maximum attempts');
@@ -64,7 +55,12 @@
   );
 </script>
 
-<ComponentPage component={documentation}>
+<ComponentPage
+  component={documentation}
+  examples={NumberInputExamples}
+  {examplesSource}
+  framed
+>
   <Playground {source} filename="NumberInput.svelte">
     {#snippet preview()}
       <div class="w-full max-w-xs">
@@ -123,35 +119,13 @@
       />
     {/snippet}
   </Playground>
-  <AnatomySection slug="number-input">
-    {#snippet preview()}
-      <NumberInput
-        id="number-input-anatomy"
-        label="Label"
-        helperText="Helper text"
-        value="5"
-        class="w-64"
-      />
-    {/snippet}
-  </AnatomySection>
-  <DocSection id="examples" title={content.sections.examples.title}>
-    <MarkdownContent section={content.sections.examples} />
-    <div class="mt-5">
-      <div class="rounded-lg border border-primary p-6">
-        <NumberInputExamples />
-      </div>
-      <SourceCode
-        code={examplesSource}
-        filename="number-input-examples.svelte"
-        collapsible
-      />
-    </div>
-  </DocSection>
-  <DocSection id="usage" title={content.sections.usage.title}>
-    <MarkdownContent section={content.sections.usage} />
-  </DocSection>
-  <ContractSection slug="number-input" />
-  <DocSection id="api" title={content.sections.api.title}>
-    <MarkdownContent section={content.sections.api} />
-  </DocSection>
+  {#snippet anatomy()}
+    <NumberInput
+      id="number-input-anatomy"
+      label="Label"
+      helperText="Helper text"
+      value="5"
+      class="w-64"
+    />
+  {/snippet}
 </ComponentPage>

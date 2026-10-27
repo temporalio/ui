@@ -56,6 +56,8 @@
     navigationMenuTriggerRecipe,
   } from './recipe';
 
+  import '../shared/animations.css';
+
   const generatedId = $props.id();
   let {
     items,
@@ -145,12 +147,3 @@
     {/each}
   </ArkNavigationMenu.List>
 </ArkNavigationMenu.Root>
-
-<style>
-  @keyframes -global-io-ark-navigation-menu-in {
-    from {
-      opacity: 0;
-      translate: 0 -4px;
-    }
-  }
-</style>

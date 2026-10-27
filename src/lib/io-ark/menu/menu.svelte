@@ -45,6 +45,8 @@
 
   import MenuItems from './menu-items.svelte';
 
+  import '../shared/animations.css';
+
   let {
     items,
     label = '',
@@ -120,18 +122,3 @@
     </ArkMenu.Positioner>
   </Portal>
 </ArkMenu.Root>
-
-<style>
-  @keyframes -global-io-ark-menu-fade-in {
-    from {
-      opacity: 0;
-      transform: translateY(-2px);
-    }
-  }
-
-  @keyframes -global-io-ark-menu-fade-out {
-    to {
-      opacity: 0;
-    }
-  }
-</style>

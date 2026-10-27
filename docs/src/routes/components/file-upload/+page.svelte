@@ -6,20 +6,11 @@
   import FileUploadExamples from '../../../examples/file-upload-examples.svelte';
   import examplesSource from '../../../examples/file-upload-examples.svelte?raw';
 
-  import AnatomySection from '$docs/components/anatomy-section.svelte';
   import ComponentPage from '$docs/components/component-page.svelte';
-  import ContractSection from '$docs/components/contract-section.svelte';
-  import DocSection from '$docs/components/doc-section.svelte';
-  import MarkdownContent from '$docs/components/markdown-content.svelte';
   import Playground from '$docs/components/playground.svelte';
   import SelectControl from '$docs/components/select-control.svelte';
-  import SourceCode from '$docs/components/source-code.svelte';
-  import {
-    getComponentContent,
-    getComponentDocumentation,
-  } from '$docs/data/components';
+  import { getComponentDocumentation } from '$docs/data/components';
 
-  const content = getComponentContent('file-upload');
   const documentation = getComponentDocumentation('file-upload');
 
   const acceptOptions = ['any', 'application/json', 'text/csv'] as const;
@@ -62,7 +53,11 @@
   ];
 </script>
 
-<ComponentPage component={documentation}>
+<ComponentPage
+  component={documentation}
+  examples={FileUploadExamples}
+  {examplesSource}
+>
   <Playground {source} filename="FileUpload.svelte">
     {#snippet preview()}
       <div class="w-full max-w-md">
@@ -132,37 +127,17 @@
       />
     {/snippet}
   </Playground>
-  <AnatomySection slug="file-upload">
-    {#snippet preview()}
-      <div class="w-[360px]">
-        <FileUpload
-          id="file-upload-anatomy"
-          label="Workflow history"
-          accept="application/json"
-          files={anatomyFiles}
-          dropzoneLabel="Drop a history export here"
-          dropzoneHint="JSON, up to 10 MB"
-          triggerLabel="Choose file"
-        />
-      </div>
-    {/snippet}
-  </AnatomySection>
-  <DocSection id="examples" title={content.sections.examples.title}>
-    <MarkdownContent section={content.sections.examples} />
-    <div class="mt-5">
-      <FileUploadExamples />
-      <SourceCode
-        code={examplesSource}
-        filename="file-upload-examples.svelte"
-        collapsible
+  {#snippet anatomy()}
+    <div class="w-[360px]">
+      <FileUpload
+        id="file-upload-anatomy"
+        label="Workflow history"
+        accept="application/json"
+        files={anatomyFiles}
+        dropzoneLabel="Drop a history export here"
+        dropzoneHint="JSON, up to 10 MB"
+        triggerLabel="Choose file"
       />
     </div>
-  </DocSection>
-  <DocSection id="usage" title={content.sections.usage.title}>
-    <MarkdownContent section={content.sections.usage} />
-  </DocSection>
-  <ContractSection slug="file-upload" />
-  <DocSection id="api" title={content.sections.api.title}>
-    <MarkdownContent section={content.sections.api} />
-  </DocSection>
+  {/snippet}
 </ComponentPage>

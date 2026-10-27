@@ -38,7 +38,9 @@
   import {
     fieldErrorTextRecipe,
     fieldHelperTextRecipe,
+    FieldMessages,
     fieldRequiredIndicatorRecipe,
+    getFieldMessageIds,
   } from '$lib/io-ark/field';
 
   import {
@@ -73,14 +75,10 @@
   const group = useCheckboxGroupContext();
   const inGroup = $derived(!!group && value !== undefined);
   const baseId = $derived(id ?? generatedId);
-  const helperTextId = $derived(`${baseId}-helper-text`);
-  const errorTextId = $derived(`${baseId}-error-text`);
   const isInvalid = $derived(invalid ?? (error ? true : undefined));
   const showError = $derived(!!error && isInvalid !== false);
-  const describedBy = $derived(
-    [helperText && helperTextId, showError && errorTextId]
-      .filter(Boolean)
-      .join(' ') || undefined,
+  const messageIds = $derived(
+    getFieldMessageIds(baseId, { helperText, showError }),
   );
 
   const checkedProps: Pick<CheckboxRootBaseProps, 'checked'> = $derived(
@@ -133,23 +131,14 @@
         <span aria-hidden="true" class={fieldRequiredIndicatorRecipe()}>*</span>
       {/if}
     </ArkCheckbox.Label>
-    <ArkCheckbox.HiddenInput aria-describedby={describedBy} />
+    <ArkCheckbox.HiddenInput aria-describedby={messageIds.describedBy} />
   </ArkCheckbox.Root>
-  {#if helperText}
-    <p
-      id={helperTextId}
-      class={checkboxDescriptionRecipe(fieldHelperTextRecipe())}
-    >
-      {helperText}
-    </p>
-  {/if}
-  {#if showError}
-    <p
-      id={errorTextId}
-      aria-live="polite"
-      class={checkboxDescriptionRecipe(fieldErrorTextRecipe())}
-    >
-      {error}
-    </p>
-  {/if}
+  <FieldMessages
+    ids={messageIds}
+    {helperText}
+    {error}
+    {showError}
+    helperClass={checkboxDescriptionRecipe(fieldHelperTextRecipe())}
+    errorClass={checkboxDescriptionRecipe(fieldErrorTextRecipe())}
+  />
 </div>

@@ -7,6 +7,8 @@
 - Export components and types explicitly. Export recipes directly from `recipe.ts`.
 - Keep props, state, and markup in Svelte. Put substantial reusable styling in pure recipes using theme tokens, `twJoin`, and `twMerge` for caller overrides.
 - Keep Ark-specific details inside the Temporal wrapper. Preserve native attributes, event handlers, accessible names, and appropriate button/link semantics.
+- Reuse the shared pieces instead of copying them. `shared/recipe.ts` holds the floating panel, backdrop, list panel, list item, group label, empty state and in-control icon button classes; compose them in your own `recipe.ts`. `shared/animations.css` defines every io-ark keyframe once; import it from a component that animates and reference the existing names. `shared/` is internal and not a package export.
+- Form controls that render their own helper and error text use `FieldMessages` and `getFieldMessageIds` from `$lib/io-ark/field`, so ids, `aria-describedby` order and styles stay consistent. Controls that read Ark field context can wrap themselves in `Field` instead.
 
 ## Migrating an existing component
 

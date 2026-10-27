@@ -10,20 +10,11 @@
   import ProgressCircularExamples from '../../../examples/progress-circular-examples.svelte';
   import examplesSource from '../../../examples/progress-circular-examples.svelte?raw';
 
-  import AnatomySection from '$docs/components/anatomy-section.svelte';
   import ComponentPage from '$docs/components/component-page.svelte';
-  import ContractSection from '$docs/components/contract-section.svelte';
-  import DocSection from '$docs/components/doc-section.svelte';
-  import MarkdownContent from '$docs/components/markdown-content.svelte';
   import Playground from '$docs/components/playground.svelte';
   import SelectControl from '$docs/components/select-control.svelte';
-  import SourceCode from '$docs/components/source-code.svelte';
-  import {
-    getComponentContent,
-    getComponentDocumentation,
-  } from '$docs/data/components';
+  import { getComponentDocumentation } from '$docs/data/components';
 
-  const content = getComponentContent('progress-circular');
   const documentation = getComponentDocumentation('progress-circular');
 
   const colorSchemes: ProgressColorScheme[] = [
@@ -60,7 +51,12 @@
   );
 </script>
 
-<ComponentPage component={documentation}>
+<ComponentPage
+  component={documentation}
+  examples={ProgressCircularExamples}
+  {examplesSource}
+  framed
+>
   <Playground {source} filename="ProgressCircular.svelte">
     {#snippet preview()}
       <ProgressCircular
@@ -109,35 +105,13 @@
       />
     {/snippet}
   </Playground>
-  <AnatomySection slug="progress-circular">
-    {#snippet preview()}
-      <ProgressCircular
-        id="progress-circular-anatomy"
-        label="Workers upgraded"
-        value={65}
-        size="lg"
-        showValue
-      />
-    {/snippet}
-  </AnatomySection>
-  <DocSection id="examples" title={content.sections.examples.title}>
-    <MarkdownContent section={content.sections.examples} />
-    <div class="mt-5">
-      <div class="rounded-lg border border-primary p-6">
-        <ProgressCircularExamples />
-      </div>
-      <SourceCode
-        code={examplesSource}
-        filename="progress-circular-examples.svelte"
-        collapsible
-      />
-    </div>
-  </DocSection>
-  <DocSection id="usage" title={content.sections.usage.title}>
-    <MarkdownContent section={content.sections.usage} />
-  </DocSection>
-  <ContractSection slug="progress-circular" />
-  <DocSection id="api" title={content.sections.api.title}>
-    <MarkdownContent section={content.sections.api} />
-  </DocSection>
+  {#snippet anatomy()}
+    <ProgressCircular
+      id="progress-circular-anatomy"
+      label="Workers upgraded"
+      value={65}
+      size="lg"
+      showValue
+    />
+  {/snippet}
 </ComponentPage>

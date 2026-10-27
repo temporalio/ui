@@ -42,10 +42,11 @@
   import { Slider as ArkSlider } from '@ark-ui/svelte/slider';
 
   import {
-    fieldErrorTextRecipe,
     fieldHelperTextRecipe,
     fieldLabelRecipe,
+    FieldMessages,
     fieldRequiredIndicatorRecipe,
+    getFieldMessageIds,
   } from '$lib/io-ark/field';
 
   import {
@@ -88,14 +89,10 @@
     ...rest
   }: SliderProps = $props();
 
-  const helperTextId = $derived(`${id}-helper-text`);
-  const errorTextId = $derived(`${id}-error-text`);
   const isInvalid = $derived(invalid ?? !!error);
   const showError = $derived(isInvalid && !!error);
-  const describedBy = $derived(
-    [helperText && helperTextId, showError && errorTextId]
-      .filter(Boolean)
-      .join(' ') || undefined,
+  const messageIds = $derived(
+    getFieldMessageIds(id, { helperText, showError }),
   );
   const valueText = $derived(value.map(formatValue).join(' – '));
 </script>
@@ -132,11 +129,11 @@
       >
     {/if}
   </div>
-  {#if helperText}
-    <p id={helperTextId} class={fieldHelperTextRecipe('-mt-1')}>
-      {helperText}
-    </p>
-  {/if}
+  <FieldMessages
+    ids={messageIds}
+    {helperText}
+    helperClass={fieldHelperTextRecipe('-mt-1')}
+  />
   <ArkSlider.Control class={sliderControlRecipe()}>
     <ArkSlider.Track class={sliderTrackRecipe()}>
       <ArkSlider.Range class={sliderRangeRecipe()} />
@@ -144,7 +141,7 @@
     {#each value as _, index (index)}
       <ArkSlider.Thumb
         {index}
-        aria-describedby={describedBy}
+        aria-describedby={messageIds.describedBy}
         {...thumbLabels[index] ? { 'aria-label': thumbLabels[index] } : {}}
         class={sliderThumbRecipe()}
       >
@@ -161,9 +158,5 @@
       {/each}
     </ArkSlider.MarkerGroup>
   {/if}
-  {#if showError}
-    <p id={errorTextId} aria-live="polite" class={fieldErrorTextRecipe()}>
-      {error}
-    </p>
-  {/if}
+  <FieldMessages ids={messageIds} {error} {showError} />
 </ArkSlider.Root>

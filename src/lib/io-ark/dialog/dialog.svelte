@@ -49,6 +49,8 @@
     dialogTitleRecipe,
   } from './recipe';
 
+  import '../shared/animations.css';
+
   let {
     title,
     description = '',
@@ -143,24 +145,3 @@
     </ArkDialog.Positioner>
   </Portal>
 </ArkDialog.Root>
-
-<style>
-  @keyframes -global-io-ark-dialog-fade-in {
-    from {
-      opacity: 0;
-    }
-  }
-
-  @keyframes -global-io-ark-dialog-fade-out {
-    to {
-      opacity: 0;
-    }
-  }
-
-  @keyframes -global-io-ark-dialog-scale-in {
-    from {
-      opacity: 0;
-      transform: scale(0.96);
-    }
-  }
-</style>

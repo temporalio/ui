@@ -12,15 +12,10 @@
   import ButtonExamples from '../../../examples/button-examples.svelte';
   import examplesSource from '../../../examples/button-examples.svelte?raw';
 
-  import AnatomySection from '$docs/components/anatomy-section.svelte';
   import ComponentPage from '$docs/components/component-page.svelte';
-  import ContractSection from '$docs/components/contract-section.svelte';
-  import DocSection from '$docs/components/doc-section.svelte';
-  import MarkdownContent from '$docs/components/markdown-content.svelte';
   import Playground from '$docs/components/playground.svelte';
   import SelectControl from '$docs/components/select-control.svelte';
-  import SourceCode from '$docs/components/source-code.svelte';
-  import { buttonContent, buttonDocumentation } from '$docs/data/components';
+  import { getComponentDocumentation } from '$docs/data/components';
 
   const colorSchemes: ButtonColorScheme[] = [
     'primary',
@@ -53,9 +48,16 @@
   {${JSON.stringify(label)}}
 </${componentType}>`,
   );
+
+  const documentation = getComponentDocumentation('button');
 </script>
 
-<ComponentPage component={buttonDocumentation}>
+<ComponentPage
+  component={documentation}
+  examples={ButtonExamples}
+  {examplesSource}
+  framed
+>
   <Playground {source} filename="{componentType}.svelte">
     {#snippet preview()}
       {#if componentType === 'ButtonLink'}
@@ -120,68 +122,41 @@
       {/if}
     {/snippet}
   </Playground>
-
-  <AnatomySection slug="button">
-    {#snippet preview()}
-      <Button
-        LeadingIcon={IconAdd}
-        TrailingIcon={IconArrowRight}
-        tracking={false}><span>Label</span></Button
-      >
-    {/snippet}
-  </AnatomySection>
-
-  <DocSection id="examples" title={buttonContent.sections.examples.title}>
-    <MarkdownContent section={buttonContent.sections.examples} />
-    <div class="mt-5">
+  {#snippet anatomy()}
+    <Button LeadingIcon={IconAdd} TrailingIcon={IconArrowRight} tracking={false}
+      ><span>Label</span></Button
+    >
+  {/snippet}
+  {#snippet extraExamples()}
+    <div class="mt-6 grid gap-5 sm:grid-cols-2">
       <div class="rounded-lg border border-primary p-6">
-        <ButtonExamples />
-      </div>
-      <SourceCode
-        code={examplesSource}
-        filename="button-examples.svelte"
-        collapsible
-      />
-      <div class="mt-6 grid gap-5 sm:grid-cols-2">
-        <div class="rounded-lg border border-primary p-6">
-          <h3 class="mb-5 text-sm font-medium">Sizes</h3>
-          <div class="flex flex-wrap items-center gap-4">
-            {#each sizes as buttonSize (buttonSize)}<Button
-                size={buttonSize}
-                colorScheme="secondary">{buttonSize}</Button
-              >{/each}
-          </div>
-        </div>
-        <div class="rounded-lg border border-primary p-6">
-          <h3 class="mb-5 text-sm font-medium">Icon and link actions</h3>
-          <div class="flex flex-wrap items-center gap-4">
-            <Button
-              LeadingIcon={IconAdd}
-              aria-label="Add workflow"
-            /><ButtonLink
-              href="#usage"
-              colorScheme="ghost"
-              TrailingIcon={IconArrowRight}>Usage guidance</ButtonLink
-            >
-          </div>
-        </div>
-      </div>
-      <div class="mt-5 rounded-lg border border-primary p-6">
-        <h3 class="mb-5 text-sm font-medium">States</h3>
+        <h3 class="mb-5 text-sm font-medium">Sizes</h3>
         <div class="flex flex-wrap items-center gap-4">
-          <Button>Ready</Button><Button disabled>Unavailable</Button><Button
-            isLoading
-            disabled>Creating workflow</Button
+          {#each sizes as buttonSize (buttonSize)}<Button
+              size={buttonSize}
+              colorScheme="secondary">{buttonSize}</Button
+            >{/each}
+        </div>
+      </div>
+      <div class="rounded-lg border border-primary p-6">
+        <h3 class="mb-5 text-sm font-medium">Icon and link actions</h3>
+        <div class="flex flex-wrap items-center gap-4">
+          <Button LeadingIcon={IconAdd} aria-label="Add workflow" /><ButtonLink
+            href="#usage"
+            colorScheme="ghost"
+            TrailingIcon={IconArrowRight}>Usage guidance</ButtonLink
           >
         </div>
       </div>
     </div>
-  </DocSection>
-  <DocSection id="usage" title={buttonContent.sections.usage.title}>
-    <MarkdownContent section={buttonContent.sections.usage} />
-  </DocSection>
-  <ContractSection slug="button" />
-  <DocSection id="api" title={buttonContent.sections.api.title}>
-    <MarkdownContent section={buttonContent.sections.api} />
-  </DocSection>
+    <div class="mt-5 rounded-lg border border-primary p-6">
+      <h3 class="mb-5 text-sm font-medium">States</h3>
+      <div class="flex flex-wrap items-center gap-4">
+        <Button>Ready</Button><Button disabled>Unavailable</Button><Button
+          isLoading
+          disabled>Creating workflow</Button
+        >
+      </div>
+    </div>
+  {/snippet}
 </ComponentPage>

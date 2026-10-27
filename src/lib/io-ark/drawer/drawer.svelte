@@ -52,6 +52,8 @@
     drawerTitleRecipe,
   } from './recipe';
 
+  import '../shared/animations.css';
+
   let {
     title,
     description = '',
@@ -156,53 +158,3 @@
     </ArkDrawer.Positioner>
   </Portal>
 </ArkDrawer.Root>
-
-<style>
-  @keyframes -global-io-ark-drawer-fade-in {
-    from {
-      opacity: 0;
-    }
-  }
-
-  @keyframes -global-io-ark-drawer-fade-out {
-    to {
-      opacity: 0;
-    }
-  }
-
-  @keyframes -global-io-ark-drawer-in-right {
-    from {
-      translate: 100% 0;
-    }
-  }
-
-  @keyframes -global-io-ark-drawer-out-right {
-    to {
-      translate: 100% 0;
-    }
-  }
-
-  @keyframes -global-io-ark-drawer-in-left {
-    from {
-      translate: -100% 0;
-    }
-  }
-
-  @keyframes -global-io-ark-drawer-out-left {
-    to {
-      translate: -100% 0;
-    }
-  }
-
-  @keyframes -global-io-ark-drawer-in-bottom {
-    from {
-      translate: 0 100%;
-    }
-  }
-
-  @keyframes -global-io-ark-drawer-out-bottom {
-    to {
-      translate: 0 100%;
-    }
-  }
-</style>

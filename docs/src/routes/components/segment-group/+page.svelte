@@ -10,20 +10,11 @@
   import SegmentGroupExamples from '../../../examples/segment-group-examples.svelte';
   import examplesSource from '../../../examples/segment-group-examples.svelte?raw';
 
-  import AnatomySection from '$docs/components/anatomy-section.svelte';
   import ComponentPage from '$docs/components/component-page.svelte';
-  import ContractSection from '$docs/components/contract-section.svelte';
-  import DocSection from '$docs/components/doc-section.svelte';
-  import MarkdownContent from '$docs/components/markdown-content.svelte';
   import Playground from '$docs/components/playground.svelte';
   import SelectControl from '$docs/components/select-control.svelte';
-  import SourceCode from '$docs/components/source-code.svelte';
-  import {
-    getComponentContent,
-    getComponentDocumentation,
-  } from '$docs/data/components';
+  import { getComponentDocumentation } from '$docs/data/components';
 
-  const content = getComponentContent('segment-group');
   const documentation = getComponentDocumentation('segment-group');
 
   const items = [
@@ -62,7 +53,12 @@
   );
 </script>
 
-<ComponentPage component={documentation}>
+<ComponentPage
+  component={documentation}
+  examples={SegmentGroupExamples}
+  {examplesSource}
+  framed
+>
   <Playground {source} filename="SegmentGroup.svelte">
     {#snippet preview()}
       <SegmentGroup
@@ -104,39 +100,17 @@
       />
     {/snippet}
   </Playground>
-  <AnatomySection slug="segment-group">
-    {#snippet preview()}
-      <SegmentGroup
-        id="segment-group-anatomy"
-        label="Time range"
-        value="24h"
-        items={[
-          { value: '1h', label: '1h' },
-          { value: '24h', label: '24h' },
-          { value: '7d', label: '7d' },
-          { value: '30d', label: '30d' },
-        ]}
-      />
-    {/snippet}
-  </AnatomySection>
-  <DocSection id="examples" title={content.sections.examples.title}>
-    <MarkdownContent section={content.sections.examples} />
-    <div class="mt-5">
-      <div class="rounded-lg border border-primary p-6">
-        <SegmentGroupExamples />
-      </div>
-      <SourceCode
-        code={examplesSource}
-        filename="segment-group-examples.svelte"
-        collapsible
-      />
-    </div>
-  </DocSection>
-  <DocSection id="usage" title={content.sections.usage.title}>
-    <MarkdownContent section={content.sections.usage} />
-  </DocSection>
-  <ContractSection slug="segment-group" />
-  <DocSection id="api" title={content.sections.api.title}>
-    <MarkdownContent section={content.sections.api} />
-  </DocSection>
+  {#snippet anatomy()}
+    <SegmentGroup
+      id="segment-group-anatomy"
+      label="Time range"
+      value="24h"
+      items={[
+        { value: '1h', label: '1h' },
+        { value: '24h', label: '24h' },
+        { value: '7d', label: '7d' },
+        { value: '30d', label: '30d' },
+      ]}
+    />
+  {/snippet}
 </ComponentPage>

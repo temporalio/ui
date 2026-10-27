@@ -65,6 +65,8 @@
     tourTitleRecipe,
   } from './recipe';
 
+  import '../shared/animations.css';
+
   const generatedId = $props.id();
   let {
     steps,
@@ -206,11 +208,3 @@
     </ArkTour.Positioner>
   </Portal>
 </ArkTour.Root>
-
-<style>
-  @keyframes -global-io-ark-tour-fade-in {
-    from {
-      opacity: 0;
-    }
-  }
-</style>

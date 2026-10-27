@@ -6,19 +6,10 @@
   import CollapsibleExamples from '../../../examples/collapsible-examples.svelte';
   import examplesSource from '../../../examples/collapsible-examples.svelte?raw';
 
-  import AnatomySection from '$docs/components/anatomy-section.svelte';
   import ComponentPage from '$docs/components/component-page.svelte';
-  import ContractSection from '$docs/components/contract-section.svelte';
-  import DocSection from '$docs/components/doc-section.svelte';
-  import MarkdownContent from '$docs/components/markdown-content.svelte';
   import Playground from '$docs/components/playground.svelte';
-  import SourceCode from '$docs/components/source-code.svelte';
-  import {
-    getComponentContent,
-    getComponentDocumentation,
-  } from '$docs/data/components';
+  import { getComponentDocumentation } from '$docs/data/components';
 
-  const content = getComponentContent('collapsible');
   const documentation = getComponentDocumentation('collapsible');
 
   let label = $state('Advanced options');
@@ -43,7 +34,12 @@
   );
 </script>
 
-<ComponentPage component={documentation}>
+<ComponentPage
+  component={documentation}
+  examples={CollapsibleExamples}
+  {examplesSource}
+  framed
+>
   <Playground {source} filename="Collapsible.svelte">
     {#snippet preview()}
       <div class="w-full max-w-md">
@@ -81,36 +77,14 @@
       />
     {/snippet}
   </Playground>
-  <AnatomySection slug="collapsible">
-    {#snippet preview()}
-      <Collapsible
-        id="collapsible-anatomy"
-        label="Advanced options"
-        open
-        class="w-72"
-      >
-        <p class="text-sm text-secondary">Content shown when open.</p>
-      </Collapsible>
-    {/snippet}
-  </AnatomySection>
-  <DocSection id="examples" title={content.sections.examples.title}>
-    <MarkdownContent section={content.sections.examples} />
-    <div class="mt-5">
-      <div class="rounded-lg border border-primary p-6">
-        <CollapsibleExamples />
-      </div>
-      <SourceCode
-        code={examplesSource}
-        filename="collapsible-examples.svelte"
-        collapsible
-      />
-    </div>
-  </DocSection>
-  <DocSection id="usage" title={content.sections.usage.title}>
-    <MarkdownContent section={content.sections.usage} />
-  </DocSection>
-  <ContractSection slug="collapsible" />
-  <DocSection id="api" title={content.sections.api.title}>
-    <MarkdownContent section={content.sections.api} />
-  </DocSection>
+  {#snippet anatomy()}
+    <Collapsible
+      id="collapsible-anatomy"
+      label="Advanced options"
+      open
+      class="w-72"
+    >
+      <p class="text-sm text-secondary">Content shown when open.</p>
+    </Collapsible>
+  {/snippet}
 </ComponentPage>

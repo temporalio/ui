@@ -6,20 +6,11 @@
   import ListboxExamples from '../../../examples/listbox-examples.svelte';
   import examplesSource from '../../../examples/listbox-examples.svelte?raw';
 
-  import AnatomySection from '$docs/components/anatomy-section.svelte';
   import ComponentPage from '$docs/components/component-page.svelte';
-  import ContractSection from '$docs/components/contract-section.svelte';
-  import DocSection from '$docs/components/doc-section.svelte';
-  import MarkdownContent from '$docs/components/markdown-content.svelte';
   import Playground from '$docs/components/playground.svelte';
   import SelectControl from '$docs/components/select-control.svelte';
-  import SourceCode from '$docs/components/source-code.svelte';
-  import {
-    getComponentContent,
-    getComponentDocumentation,
-  } from '$docs/data/components';
+  import { getComponentDocumentation } from '$docs/data/components';
 
-  const content = getComponentContent('listbox');
   const documentation = getComponentDocumentation('listbox');
 
   const taskQueues = [
@@ -71,7 +62,11 @@
   );
 </script>
 
-<ComponentPage component={documentation}>
+<ComponentPage
+  component={documentation}
+  examples={ListboxExamples}
+  {examplesSource}
+>
   <Playground {source} filename="Listbox.svelte">
     {#snippet preview()}
       <div class="w-full max-w-md">
@@ -124,39 +119,19 @@
       />
     {/snippet}
   </Playground>
-  <AnatomySection slug="listbox">
-    {#snippet preview()}
-      <div class="w-[320px]">
-        <Listbox
-          id="listbox-anatomy"
-          label="Workers"
-          filterable
-          items={[
-            { label: 'worker-orders-1', value: 'worker-orders-1' },
-            { label: 'worker-orders-2', value: 'worker-orders-2' },
-            { label: 'worker-billing-1', value: 'worker-billing-1' },
-          ]}
-          value={['worker-orders-2']}
-        />
-      </div>
-    {/snippet}
-  </AnatomySection>
-  <DocSection id="examples" title={content.sections.examples.title}>
-    <MarkdownContent section={content.sections.examples} />
-    <div class="mt-5">
-      <ListboxExamples />
-      <SourceCode
-        code={examplesSource}
-        filename="listbox-examples.svelte"
-        collapsible
+  {#snippet anatomy()}
+    <div class="w-[320px]">
+      <Listbox
+        id="listbox-anatomy"
+        label="Workers"
+        filterable
+        items={[
+          { label: 'worker-orders-1', value: 'worker-orders-1' },
+          { label: 'worker-orders-2', value: 'worker-orders-2' },
+          { label: 'worker-billing-1', value: 'worker-billing-1' },
+        ]}
+        value={['worker-orders-2']}
       />
     </div>
-  </DocSection>
-  <DocSection id="usage" title={content.sections.usage.title}>
-    <MarkdownContent section={content.sections.usage} />
-  </DocSection>
-  <ContractSection slug="listbox" />
-  <DocSection id="api" title={content.sections.api.title}>
-    <MarkdownContent section={content.sections.api} />
-  </DocSection>
+  {/snippet}
 </ComponentPage>

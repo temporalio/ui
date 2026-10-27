@@ -11,20 +11,11 @@
   import DrawerExamples from '../../../examples/drawer-examples.svelte';
   import examplesSource from '../../../examples/drawer-examples.svelte?raw';
 
-  import AnatomySection from '$docs/components/anatomy-section.svelte';
   import ComponentPage from '$docs/components/component-page.svelte';
-  import ContractSection from '$docs/components/contract-section.svelte';
-  import DocSection from '$docs/components/doc-section.svelte';
-  import MarkdownContent from '$docs/components/markdown-content.svelte';
   import Playground from '$docs/components/playground.svelte';
   import SelectControl from '$docs/components/select-control.svelte';
-  import SourceCode from '$docs/components/source-code.svelte';
-  import {
-    getComponentContent,
-    getComponentDocumentation,
-  } from '$docs/data/components';
+  import { getComponentDocumentation } from '$docs/data/components';
 
-  const content = getComponentContent('drawer');
   const documentation = getComponentDocumentation('drawer');
 
   const placements: DrawerPlacement[] = ['right', 'left', 'bottom'];
@@ -69,7 +60,11 @@
   <Button onclick={() => (open = false)}>Done</Button>
 {/snippet}
 
-<ComponentPage component={documentation}>
+<ComponentPage
+  component={documentation}
+  examples={DrawerExamples}
+  {examplesSource}
+>
   <Playground {source} filename="Drawer.svelte">
     {#snippet preview()}
       <Drawer
@@ -114,48 +109,28 @@
       <Checkbox id="drawer-footer" label="Footer" bind:checked={footer} />
     {/snippet}
   </Playground>
-  <AnatomySection slug="drawer">
-    {#snippet preview()}
-      <div class="h-80 w-full space-y-3 p-4 text-sm text-secondary">
-        <p>order-fulfillment-7f3a · Running</p>
-        <p>payment-processing-19c2 · Completed</p>
-        <p>inventory-sync-4b8e · Failed</p>
-        <Drawer
-          id="drawer-anatomy"
-          title="Filter workflows"
-          description="Show workflows in payments-prod with these statuses."
-          placement="bottom"
-          open
-          portalled={false}
-          modal={false}
-          closeOnInteractOutside={false}
-          closeOnEscape={false}
-        >
-          <p>Running, Failed</p>
-          {#snippet footer()}
-            <Button colorScheme="tertiary" tracking={false}>Clear</Button>
-            <Button tracking={false}>Apply filters</Button>
-          {/snippet}
-        </Drawer>
-      </div>
-    {/snippet}
-  </AnatomySection>
-  <DocSection id="examples" title={content.sections.examples.title}>
-    <MarkdownContent section={content.sections.examples} />
-    <div class="mt-5">
-      <DrawerExamples />
-      <SourceCode
-        code={examplesSource}
-        filename="drawer-examples.svelte"
-        collapsible
-      />
+  {#snippet anatomy()}
+    <div class="h-80 w-full space-y-3 p-4 text-sm text-secondary">
+      <p>order-fulfillment-7f3a · Running</p>
+      <p>payment-processing-19c2 · Completed</p>
+      <p>inventory-sync-4b8e · Failed</p>
+      <Drawer
+        id="drawer-anatomy"
+        title="Filter workflows"
+        description="Show workflows in payments-prod with these statuses."
+        placement="bottom"
+        open
+        portalled={false}
+        modal={false}
+        closeOnInteractOutside={false}
+        closeOnEscape={false}
+      >
+        <p>Running, Failed</p>
+        {#snippet footer()}
+          <Button colorScheme="tertiary" tracking={false}>Clear</Button>
+          <Button tracking={false}>Apply filters</Button>
+        {/snippet}
+      </Drawer>
     </div>
-  </DocSection>
-  <DocSection id="usage" title={content.sections.usage.title}>
-    <MarkdownContent section={content.sections.usage} />
-  </DocSection>
-  <ContractSection slug="drawer" />
-  <DocSection id="api" title={content.sections.api.title}>
-    <MarkdownContent section={content.sections.api} />
-  </DocSection>
+  {/snippet}
 </ComponentPage>

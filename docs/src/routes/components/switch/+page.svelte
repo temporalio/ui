@@ -6,20 +6,11 @@
   import SwitchExamples from '../../../examples/switch-examples.svelte';
   import examplesSource from '../../../examples/switch-examples.svelte?raw';
 
-  import AnatomySection from '$docs/components/anatomy-section.svelte';
   import ComponentPage from '$docs/components/component-page.svelte';
-  import ContractSection from '$docs/components/contract-section.svelte';
-  import DocSection from '$docs/components/doc-section.svelte';
-  import MarkdownContent from '$docs/components/markdown-content.svelte';
   import Playground from '$docs/components/playground.svelte';
   import SelectControl from '$docs/components/select-control.svelte';
-  import SourceCode from '$docs/components/source-code.svelte';
-  import {
-    getComponentContent,
-    getComponentDocumentation,
-  } from '$docs/data/components';
+  import { getComponentDocumentation } from '$docs/data/components';
 
-  const content = getComponentContent('switch');
   const documentation = getComponentDocumentation('switch');
 
   const sizes: SwitchSize[] = ['md', 'sm'];
@@ -53,7 +44,12 @@
   );
 </script>
 
-<ComponentPage component={documentation}>
+<ComponentPage
+  component={documentation}
+  examples={SwitchExamples}
+  {examplesSource}
+  framed
+>
   <Playground {source} filename="Switch.svelte">
     {#snippet preview()}
       <div class="w-full max-w-sm">
@@ -103,34 +99,12 @@
       <Checkbox id="switch-disabled" label="Disabled" bind:checked={disabled} />
     {/snippet}
   </Playground>
-  <AnatomySection slug="switch">
-    {#snippet preview()}
-      <Switch
-        id="switch-anatomy"
-        label="Label"
-        helperText="Helper text"
-        checked
-      />
-    {/snippet}
-  </AnatomySection>
-  <DocSection id="examples" title={content.sections.examples.title}>
-    <MarkdownContent section={content.sections.examples} />
-    <div class="mt-5">
-      <div class="rounded-lg border border-primary p-6">
-        <SwitchExamples />
-      </div>
-      <SourceCode
-        code={examplesSource}
-        filename="switch-examples.svelte"
-        collapsible
-      />
-    </div>
-  </DocSection>
-  <DocSection id="usage" title={content.sections.usage.title}>
-    <MarkdownContent section={content.sections.usage} />
-  </DocSection>
-  <ContractSection slug="switch" />
-  <DocSection id="api" title={content.sections.api.title}>
-    <MarkdownContent section={content.sections.api} />
-  </DocSection>
+  {#snippet anatomy()}
+    <Switch
+      id="switch-anatomy"
+      label="Label"
+      helperText="Helper text"
+      checked
+    />
+  {/snippet}
 </ComponentPage>

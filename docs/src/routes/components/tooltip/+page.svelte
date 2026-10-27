@@ -8,20 +8,11 @@
   import TooltipExamples from '../../../examples/tooltip-examples.svelte';
   import examplesSource from '../../../examples/tooltip-examples.svelte?raw';
 
-  import AnatomySection from '$docs/components/anatomy-section.svelte';
   import ComponentPage from '$docs/components/component-page.svelte';
-  import ContractSection from '$docs/components/contract-section.svelte';
-  import DocSection from '$docs/components/doc-section.svelte';
-  import MarkdownContent from '$docs/components/markdown-content.svelte';
   import Playground from '$docs/components/playground.svelte';
   import SelectControl from '$docs/components/select-control.svelte';
-  import SourceCode from '$docs/components/source-code.svelte';
-  import {
-    getComponentContent,
-    getComponentDocumentation,
-  } from '$docs/data/components';
+  import { getComponentDocumentation } from '$docs/data/components';
 
-  const content = getComponentContent('tooltip');
   const documentation = getComponentDocumentation('tooltip');
 
   const placements: TooltipPlacement[] = [
@@ -63,7 +54,12 @@
   );
 </script>
 
-<ComponentPage component={documentation}>
+<ComponentPage
+  component={documentation}
+  examples={TooltipExamples}
+  {examplesSource}
+  framed
+>
   <Playground {source} filename="Tooltip.svelte">
     {#snippet preview()}
       <Tooltip
@@ -108,50 +104,28 @@
       />
     {/snippet}
   </Playground>
-  <AnatomySection slug="tooltip">
-    {#snippet preview()}
-      <div class="flex h-28 w-[300px] items-end justify-center pb-3">
-        <Tooltip
-          id="tooltip-anatomy"
-          content="Copy workflow ID"
-          open
-          portalled={false}
-          closeOnEscape={false}
-          closeOnScroll={false}
-          closeOnPointerDown={false}
-        >
-          {#snippet trigger(props)}
-            <Button
-              {...props}
-              colorScheme="tertiary"
-              size="sm"
-              LeadingIcon={IconCopy}
-              aria-label="Copy workflow ID"
-              tracking={false}
-            />
-          {/snippet}
-        </Tooltip>
-      </div>
-    {/snippet}
-  </AnatomySection>
-  <DocSection id="examples" title={content.sections.examples.title}>
-    <MarkdownContent section={content.sections.examples} />
-    <div class="mt-5">
-      <div class="rounded-lg border border-primary p-6">
-        <TooltipExamples />
-      </div>
-      <SourceCode
-        code={examplesSource}
-        filename="tooltip-examples.svelte"
-        collapsible
-      />
+  {#snippet anatomy()}
+    <div class="flex h-28 w-[300px] items-end justify-center pb-3">
+      <Tooltip
+        id="tooltip-anatomy"
+        content="Copy workflow ID"
+        open
+        portalled={false}
+        closeOnEscape={false}
+        closeOnScroll={false}
+        closeOnPointerDown={false}
+      >
+        {#snippet trigger(props)}
+          <Button
+            {...props}
+            colorScheme="tertiary"
+            size="sm"
+            LeadingIcon={IconCopy}
+            aria-label="Copy workflow ID"
+            tracking={false}
+          />
+        {/snippet}
+      </Tooltip>
     </div>
-  </DocSection>
-  <DocSection id="usage" title={content.sections.usage.title}>
-    <MarkdownContent section={content.sections.usage} />
-  </DocSection>
-  <ContractSection slug="tooltip" />
-  <DocSection id="api" title={content.sections.api.title}>
-    <MarkdownContent section={content.sections.api} />
-  </DocSection>
+  {/snippet}
 </ComponentPage>

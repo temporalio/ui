@@ -2,6 +2,12 @@ import { twJoin, twMerge } from 'tailwind-merge';
 
 import { fieldRecipe } from '$lib/io-ark/field';
 
+import {
+  listEmptyClasses,
+  listGroupLabelClasses,
+  listItemClasses,
+} from '../shared/recipe';
+
 export const listboxRecipe = (className?: string) => fieldRecipe(className);
 
 export const listboxPanelRecipe = (className?: string) =>
@@ -29,16 +35,12 @@ export const listboxContentRecipe = (
       : 'max-h-72 flex-col overflow-y-auto',
   );
 
-export const listboxItemGroupLabelRecipe = () =>
-  'px-2 pb-1 pt-2 text-xs font-medium uppercase tracking-wide text-secondary';
+export const listboxItemGroupLabelRecipe = () => listGroupLabelClasses;
 
 export const listboxItemRecipe = () =>
   twJoin(
-    'flex cursor-pointer select-none items-center justify-between gap-2 rounded-sm px-2 py-2',
-    'hover:bg-interactive-tertiary-hover',
-    'data-[highlighted]:bg-interactive-secondary-hover',
-    'data-[state=checked]:font-medium',
-    'data-[disabled]:cursor-not-allowed data-[disabled]:opacity-disabled data-[disabled]:hover:bg-transparent',
+    listItemClasses,
+    'hover:bg-interactive-tertiary-hover data-[disabled]:hover:bg-transparent',
   );
 
-export const listboxEmptyRecipe = () => 'px-2 py-2 text-secondary';
+export const listboxEmptyRecipe = () => listEmptyClasses;

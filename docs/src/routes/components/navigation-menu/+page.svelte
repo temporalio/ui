@@ -10,20 +10,11 @@
   import NavigationMenuExamples from '../../../examples/navigation-menu-examples.svelte';
   import examplesSource from '../../../examples/navigation-menu-examples.svelte?raw';
 
-  import AnatomySection from '$docs/components/anatomy-section.svelte';
   import ComponentPage from '$docs/components/component-page.svelte';
-  import ContractSection from '$docs/components/contract-section.svelte';
-  import DocSection from '$docs/components/doc-section.svelte';
-  import MarkdownContent from '$docs/components/markdown-content.svelte';
   import Playground from '$docs/components/playground.svelte';
   import SelectControl from '$docs/components/select-control.svelte';
-  import SourceCode from '$docs/components/source-code.svelte';
-  import {
-    getComponentContent,
-    getComponentDocumentation,
-  } from '$docs/data/components';
+  import { getComponentDocumentation } from '$docs/data/components';
 
-  const content = getComponentContent('navigation-menu');
   const documentation = getComponentDocumentation('navigation-menu');
 
   const orientations: NavigationMenuOrientation[] = ['horizontal', 'vertical'];
@@ -102,7 +93,12 @@
   });
 </script>
 
-<ComponentPage component={documentation}>
+<ComponentPage
+  component={documentation}
+  examples={NavigationMenuExamples}
+  {examplesSource}
+  framed
+>
   <Playground {source} filename="NavigationMenu.svelte">
     {#snippet preview()}
       <div class="flex min-h-48 w-full items-start justify-center">
@@ -139,50 +135,28 @@
       />
     {/snippet}
   </Playground>
-  <AnatomySection slug="navigation-menu">
-    {#snippet preview()}
-      <div class="h-52 w-full">
-        <NavigationMenu
-          id="navigation-menu-anatomy"
-          label="Product"
-          bind:value={navigationAnatomyValue}
-          items={[
-            { label: 'Workflows', href: '#workflows', current: true },
-            {
-              label: 'Deployments',
-              children: [
-                {
-                  label: 'Worker deployments',
-                  href: '#worker-deployments',
-                  description: 'Versions and ramping',
-                },
-                { label: 'Build IDs', href: '#build-ids' },
-              ],
-            },
-            { label: 'Schedules', href: '#schedules' },
-          ]}
-        />
-      </div>
-    {/snippet}
-  </AnatomySection>
-  <DocSection id="examples" title={content.sections.examples.title}>
-    <MarkdownContent section={content.sections.examples} />
-    <div class="mt-5">
-      <div class="rounded-lg border border-primary p-6">
-        <NavigationMenuExamples />
-      </div>
-      <SourceCode
-        code={examplesSource}
-        filename="navigation-menu-examples.svelte"
-        collapsible
+  {#snippet anatomy()}
+    <div class="h-52 w-full">
+      <NavigationMenu
+        id="navigation-menu-anatomy"
+        label="Product"
+        bind:value={navigationAnatomyValue}
+        items={[
+          { label: 'Workflows', href: '#workflows', current: true },
+          {
+            label: 'Deployments',
+            children: [
+              {
+                label: 'Worker deployments',
+                href: '#worker-deployments',
+                description: 'Versions and ramping',
+              },
+              { label: 'Build IDs', href: '#build-ids' },
+            ],
+          },
+          { label: 'Schedules', href: '#schedules' },
+        ]}
       />
     </div>
-  </DocSection>
-  <DocSection id="usage" title={content.sections.usage.title}>
-    <MarkdownContent section={content.sections.usage} />
-  </DocSection>
-  <ContractSection slug="navigation-menu" />
-  <DocSection id="api" title={content.sections.api.title}>
-    <MarkdownContent section={content.sections.api} />
-  </DocSection>
+  {/snippet}
 </ComponentPage>

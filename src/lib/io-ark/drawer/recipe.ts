@@ -1,5 +1,7 @@
 import { twJoin, twMerge } from 'tailwind-merge';
 
+import { overlayBackdropClasses } from '../shared/recipe';
+
 export type DrawerPlacement = 'right' | 'left' | 'bottom';
 export type DrawerSize = 'sm' | 'md' | 'lg';
 
@@ -11,10 +13,10 @@ export const drawerSwipeDirection = {
 
 export const drawerBackdropRecipe = () =>
   twJoin(
-    'fixed inset-0 z-50 bg-surface-overlay-neutral backdrop-blur-[8px]',
+    overlayBackdropClasses,
     'opacity-[calc(1-var(--drawer-swipe-progress,0))]',
-    'data-[state=open]:animate-[io-ark-drawer-fade-in_200ms_ease-out]',
-    'data-[state=closed]:animate-[io-ark-drawer-fade-out_150ms_ease-in]',
+    'data-[state=open]:animate-[io-ark-fade-in_200ms_ease-out]',
+    'data-[state=closed]:animate-[io-ark-fade-out_150ms_ease-in]',
     'motion-reduce:animate-none',
   );
 
@@ -30,18 +32,18 @@ export const drawerPositionerRecipe = (placement: DrawerPlacement) =>
 const placementClasses: Record<DrawerPlacement, string> = {
   right: twJoin(
     'h-full border-l',
-    'data-[state=open]:animate-[io-ark-drawer-in-right_250ms_ease-out]',
-    'data-[state=closed]:animate-[io-ark-drawer-out-right_200ms_ease-in]',
+    'data-[state=open]:animate-[io-ark-slide-in-right_250ms_ease-out]',
+    'data-[state=closed]:animate-[io-ark-slide-out-right_200ms_ease-in]',
   ),
   left: twJoin(
     'h-full border-r',
-    'data-[state=open]:animate-[io-ark-drawer-in-left_250ms_ease-out]',
-    'data-[state=closed]:animate-[io-ark-drawer-out-left_200ms_ease-in]',
+    'data-[state=open]:animate-[io-ark-slide-in-left_250ms_ease-out]',
+    'data-[state=closed]:animate-[io-ark-slide-out-left_200ms_ease-in]',
   ),
   bottom: twJoin(
     'max-h-[85vh] rounded-t-lg border-t',
-    'data-[state=open]:animate-[io-ark-drawer-in-bottom_250ms_ease-out]',
-    'data-[state=closed]:animate-[io-ark-drawer-out-bottom_200ms_ease-in]',
+    'data-[state=open]:animate-[io-ark-slide-in-bottom_250ms_ease-out]',
+    'data-[state=closed]:animate-[io-ark-slide-out-bottom_200ms_ease-in]',
   ),
 };
 

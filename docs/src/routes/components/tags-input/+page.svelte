@@ -6,19 +6,10 @@
   import TagsInputExamples from '../../../examples/tags-input-examples.svelte';
   import examplesSource from '../../../examples/tags-input-examples.svelte?raw';
 
-  import AnatomySection from '$docs/components/anatomy-section.svelte';
   import ComponentPage from '$docs/components/component-page.svelte';
-  import ContractSection from '$docs/components/contract-section.svelte';
-  import DocSection from '$docs/components/doc-section.svelte';
-  import MarkdownContent from '$docs/components/markdown-content.svelte';
   import Playground from '$docs/components/playground.svelte';
-  import SourceCode from '$docs/components/source-code.svelte';
-  import {
-    getComponentContent,
-    getComponentDocumentation,
-  } from '$docs/data/components';
+  import { getComponentDocumentation } from '$docs/data/components';
 
-  const content = getComponentContent('tags-input');
   const documentation = getComponentDocumentation('tags-input');
 
   let label = $state('Task queues');
@@ -54,7 +45,11 @@
   );
 </script>
 
-<ComponentPage component={documentation}>
+<ComponentPage
+  component={documentation}
+  examples={TagsInputExamples}
+  {examplesSource}
+>
   <Playground {source} filename="TagsInput.svelte">
     {#snippet preview()}
       <div class="w-full max-w-sm">
@@ -118,35 +113,15 @@
       />
     {/snippet}
   </Playground>
-  <AnatomySection slug="tags-input">
-    {#snippet preview()}
-      <div class="w-[360px]">
-        <TagsInput
-          id="tags-input-anatomy"
-          label="Task queues"
-          value={['orders', 'billing']}
-          placeholder="Add a task queue"
-          clearable
-        />
-      </div>
-    {/snippet}
-  </AnatomySection>
-  <DocSection id="examples" title={content.sections.examples.title}>
-    <MarkdownContent section={content.sections.examples} />
-    <div class="mt-5">
-      <TagsInputExamples />
-      <SourceCode
-        code={examplesSource}
-        filename="tags-input-examples.svelte"
-        collapsible
+  {#snippet anatomy()}
+    <div class="w-[360px]">
+      <TagsInput
+        id="tags-input-anatomy"
+        label="Task queues"
+        value={['orders', 'billing']}
+        placeholder="Add a task queue"
+        clearable
       />
     </div>
-  </DocSection>
-  <DocSection id="usage" title={content.sections.usage.title}>
-    <MarkdownContent section={content.sections.usage} />
-  </DocSection>
-  <ContractSection slug="tags-input" />
-  <DocSection id="api" title={content.sections.api.title}>
-    <MarkdownContent section={content.sections.api} />
-  </DocSection>
+  {/snippet}
 </ComponentPage>

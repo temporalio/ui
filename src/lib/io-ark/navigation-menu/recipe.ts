@@ -1,5 +1,7 @@
 import { twJoin, twMerge } from 'tailwind-merge';
 
+import { floatingSurfaceClasses } from '../shared/recipe';
+
 export type NavigationMenuOrientation = 'horizontal' | 'vertical';
 
 export const navigationMenuRecipe = (className?: string) =>
@@ -59,8 +61,8 @@ export const navigationMenuContentRecipe = ({
       ? 'pl-3 pt-1'
       : twJoin(
           'absolute left-0 top-full z-50 mt-2 w-max min-w-64 max-w-[min(24rem,calc(100vw-2rem))]',
-          'rounded border border-primary bg-background-primary p-1 shadow-lg',
-          'data-[state=open]:animate-[io-ark-navigation-menu-in_120ms_ease-out] motion-reduce:animate-none',
+          floatingSurfaceClasses,
+          'p-1 data-[state=open]:animate-[io-ark-drop-in_120ms_ease-out] motion-reduce:animate-none',
         ),
   );
 

@@ -7,20 +7,11 @@
   import ToggleExamples from '../../../examples/toggle-examples.svelte';
   import examplesSource from '../../../examples/toggle-examples.svelte?raw';
 
-  import AnatomySection from '$docs/components/anatomy-section.svelte';
   import ComponentPage from '$docs/components/component-page.svelte';
-  import ContractSection from '$docs/components/contract-section.svelte';
-  import DocSection from '$docs/components/doc-section.svelte';
-  import MarkdownContent from '$docs/components/markdown-content.svelte';
   import Playground from '$docs/components/playground.svelte';
   import SelectControl from '$docs/components/select-control.svelte';
-  import SourceCode from '$docs/components/source-code.svelte';
-  import {
-    getComponentContent,
-    getComponentDocumentation,
-  } from '$docs/data/components';
+  import { getComponentDocumentation } from '$docs/data/components';
 
-  const content = getComponentContent('toggle');
   const documentation = getComponentDocumentation('toggle');
 
   const sizes: ToggleSize[] = ['sm', 'md'];
@@ -46,7 +37,12 @@
   );
 </script>
 
-<ComponentPage component={documentation}>
+<ComponentPage
+  component={documentation}
+  examples={ToggleExamples}
+  {examplesSource}
+  framed
+>
   <Playground {source} filename="Toggle.svelte">
     {#snippet preview()}
       {#if iconOnly}
@@ -90,35 +86,13 @@
       <Checkbox id="toggle-disabled" label="Disabled" bind:checked={disabled} />
     {/snippet}
   </Playground>
-  <AnatomySection slug="toggle">
-    {#snippet preview()}
-      <Toggle
-        id="toggle-anatomy"
-        label="Pin workflow"
-        Icon={IconPin}
-        PressedIcon={IconPinSolid}
-        pressed
-      />
-    {/snippet}
-  </AnatomySection>
-  <DocSection id="examples" title={content.sections.examples.title}>
-    <MarkdownContent section={content.sections.examples} />
-    <div class="mt-5">
-      <div class="rounded-lg border border-primary p-6">
-        <ToggleExamples />
-      </div>
-      <SourceCode
-        code={examplesSource}
-        filename="toggle-examples.svelte"
-        collapsible
-      />
-    </div>
-  </DocSection>
-  <DocSection id="usage" title={content.sections.usage.title}>
-    <MarkdownContent section={content.sections.usage} />
-  </DocSection>
-  <ContractSection slug="toggle" />
-  <DocSection id="api" title={content.sections.api.title}>
-    <MarkdownContent section={content.sections.api} />
-  </DocSection>
+  {#snippet anatomy()}
+    <Toggle
+      id="toggle-anatomy"
+      label="Pin workflow"
+      Icon={IconPin}
+      PressedIcon={IconPinSolid}
+      pressed
+    />
+  {/snippet}
 </ComponentPage>

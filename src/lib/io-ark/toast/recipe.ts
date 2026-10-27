@@ -1,5 +1,7 @@
 import { twJoin, twMerge } from 'tailwind-merge';
 
+import { floatingSurfaceClasses } from '../shared/recipe';
+
 export type ToastStatusType =
   | 'info'
   | 'success'
@@ -28,8 +30,9 @@ export const toastRecipe = ({
   className,
 }: { type?: ToastStatusType; className?: string } = {}) =>
   twMerge(
-    'io-ark-toast flex w-[min(24rem,calc(100vw-2rem))] items-start gap-3 rounded border border-l-4 border-primary',
-    'bg-background-primary p-3 pr-2 text-sm text-primary shadow-lg',
+    floatingSurfaceClasses,
+    'io-ark-toast flex w-[min(24rem,calc(100vw-2rem))] items-start gap-3 border-l-4',
+    'p-3 pr-2 text-sm text-primary',
     accentClasses[type],
     className,
   );

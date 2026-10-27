@@ -32,10 +32,11 @@
   import { Checkbox as ArkCheckbox } from '@ark-ui/svelte/checkbox';
 
   import {
-    fieldErrorTextRecipe,
     fieldHelperTextRecipe,
     fieldLabelRecipe,
+    FieldMessages,
     fieldRequiredIndicatorRecipe,
+    getFieldMessageIds,
   } from '$lib/io-ark/field';
 
   import { checkboxGroupItemsRecipe, checkboxGroupRecipe } from './recipe';
@@ -62,14 +63,10 @@
   }: CheckboxGroupProps = $props();
 
   const labelId = $derived(`${id}-label`);
-  const helperTextId = $derived(`${id}-helper-text`);
-  const errorTextId = $derived(`${id}-error-text`);
   const isInvalid = $derived(invalid ?? !!error);
   const showError = $derived(isInvalid && !!error);
-  const describedBy = $derived(
-    [helperText && helperTextId, showError && errorTextId]
-      .filter(Boolean)
-      .join(' ') || undefined,
+  const messageIds = $derived(
+    getFieldMessageIds(id, { helperText, showError }),
   );
 </script>
 
@@ -84,11 +81,11 @@
       <span aria-hidden="true" class={fieldRequiredIndicatorRecipe()}>*</span>
     {/if}
   </span>
-  {#if helperText}
-    <p id={helperTextId} class={fieldHelperTextRecipe('-mt-1')}>
-      {helperText}
-    </p>
-  {/if}
+  <FieldMessages
+    ids={messageIds}
+    {helperText}
+    helperClass={fieldHelperTextRecipe('-mt-1')}
+  />
   <ArkCheckbox.Group
     {id}
     bind:value
@@ -99,7 +96,7 @@
     invalid={isInvalid}
     {onValueChange}
     aria-labelledby={labelId}
-    aria-describedby={describedBy}
+    aria-describedby={messageIds.describedBy}
     aria-invalid={isInvalid || undefined}
     aria-required={required || undefined}
     data-orientation={orientation}
@@ -108,9 +105,5 @@
   >
     {@render children?.()}
   </ArkCheckbox.Group>
-  {#if showError}
-    <p id={errorTextId} aria-live="polite" class={fieldErrorTextRecipe()}>
-      {error}
-    </p>
-  {/if}
+  <FieldMessages ids={messageIds} {error} {showError} />
 </div>

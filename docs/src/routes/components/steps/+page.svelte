@@ -5,20 +5,11 @@
   import StepsExamples from '../../../examples/steps-examples.svelte';
   import examplesSource from '../../../examples/steps-examples.svelte?raw';
 
-  import AnatomySection from '$docs/components/anatomy-section.svelte';
   import ComponentPage from '$docs/components/component-page.svelte';
-  import ContractSection from '$docs/components/contract-section.svelte';
-  import DocSection from '$docs/components/doc-section.svelte';
-  import MarkdownContent from '$docs/components/markdown-content.svelte';
   import Playground from '$docs/components/playground.svelte';
   import SelectControl from '$docs/components/select-control.svelte';
-  import SourceCode from '$docs/components/source-code.svelte';
-  import {
-    getComponentContent,
-    getComponentDocumentation,
-  } from '$docs/data/components';
+  import { getComponentDocumentation } from '$docs/data/components';
 
-  const content = getComponentContent('steps');
   const documentation = getComponentDocumentation('steps');
 
   const orientations: StepsOrientation[] = ['horizontal', 'vertical'];
@@ -69,7 +60,12 @@ ${previewItems.map((item) => `    ${JSON.stringify(item).replace(/"(\w+)":/g, '$
   );
 </script>
 
-<ComponentPage component={documentation}>
+<ComponentPage
+  component={documentation}
+  examples={StepsExamples}
+  {examplesSource}
+  framed
+>
   <Playground {source} filename="Steps.svelte">
     {#snippet preview()}
       <div class="w-full">
@@ -113,44 +109,22 @@ ${previewItems.map((item) => `    ${JSON.stringify(item).replace(/"(\w+)":/g, '$
       />
     {/snippet}
   </Playground>
-  <AnatomySection slug="steps">
-    {#snippet preview()}
-      <Steps
-        id="steps-anatomy"
-        step={1}
-        items={[
-          { title: 'Details' },
-          { title: 'Retention' },
-          { title: 'Review' },
-        ]}
-        class="w-full"
-      >
-        {#snippet content(item)}
-          <p class="text-sm text-secondary">
-            Set the {item.title.toLowerCase()} for the new namespace.
-          </p>
-        {/snippet}
-      </Steps>
-    {/snippet}
-  </AnatomySection>
-  <DocSection id="examples" title={content.sections.examples.title}>
-    <MarkdownContent section={content.sections.examples} />
-    <div class="mt-5">
-      <div class="rounded-lg border border-primary p-6">
-        <StepsExamples />
-      </div>
-      <SourceCode
-        code={examplesSource}
-        filename="steps-examples.svelte"
-        collapsible
-      />
-    </div>
-  </DocSection>
-  <DocSection id="usage" title={content.sections.usage.title}>
-    <MarkdownContent section={content.sections.usage} />
-  </DocSection>
-  <ContractSection slug="steps" />
-  <DocSection id="api" title={content.sections.api.title}>
-    <MarkdownContent section={content.sections.api} />
-  </DocSection>
+  {#snippet anatomy()}
+    <Steps
+      id="steps-anatomy"
+      step={1}
+      items={[
+        { title: 'Details' },
+        { title: 'Retention' },
+        { title: 'Review' },
+      ]}
+      class="w-full"
+    >
+      {#snippet content(item)}
+        <p class="text-sm text-secondary">
+          Set the {item.title.toLowerCase()} for the new namespace.
+        </p>
+      {/snippet}
+    </Steps>
+  {/snippet}
 </ComponentPage>

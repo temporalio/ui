@@ -45,10 +45,10 @@
 
   import { IconClose } from '$lib/io/icon';
   import {
-    fieldErrorTextRecipe,
-    fieldHelperTextRecipe,
     fieldLabelRecipe,
+    FieldMessages,
     fieldRequiredIndicatorRecipe,
+    getFieldMessageIds,
   } from '$lib/io-ark/field';
 
   import {
@@ -93,12 +93,9 @@
   }: TagsInputProps = $props();
 
   const isInvalid = $derived(invalid ?? !!error);
-  const helperTextId = $derived(`${id}-helper-text`);
-  const errorTextId = $derived(`${id}-error-text`);
-  const describedBy = $derived(
-    [isInvalid && error && errorTextId, helperText && helperTextId]
-      .filter(Boolean)
-      .join(' ') || undefined,
+  const showError = $derived(!!(isInvalid && error));
+  const messageIds = $derived(
+    getFieldMessageIds(id, { helperText, showError, errorFirst: true }),
   );
   const isInteractive = $derived(!disabled && !readOnly);
   const atMax = $derived(max !== undefined && value.length >= max);
@@ -151,7 +148,7 @@
     {/each}
     <ArkTagsInput.Input
       placeholder={atMax ? undefined : placeholder}
-      aria-describedby={describedBy}
+      aria-describedby={messageIds.describedBy}
       class={tagsInputInputRecipe()}
       data-track-name="tags-input"
       data-track-intent="add"
@@ -166,13 +163,6 @@
       </ArkTagsInput.ClearTrigger>
     {/if}
   </ArkTagsInput.Control>
-  {#if helperText}
-    <p id={helperTextId} class={fieldHelperTextRecipe()}>{helperText}</p>
-  {/if}
-  {#if isInvalid && error}
-    <p id={errorTextId} class={fieldErrorTextRecipe()} aria-live="polite">
-      {error}
-    </p>
-  {/if}
+  <FieldMessages ids={messageIds} {helperText} {error} {showError} />
   <ArkTagsInput.HiddenInput />
 </ArkTagsInput.Root>

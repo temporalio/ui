@@ -2,6 +2,13 @@ import { twJoin, twMerge } from 'tailwind-merge';
 
 import { fieldControlRecipe, fieldRecipe } from '$lib/io-ark/field';
 
+import {
+  controlIconButtonClasses,
+  listGroupLabelClasses,
+  listItemClasses,
+  listPanelClasses,
+} from '../shared/recipe';
+
 export const selectRecipe = (className?: string) => fieldRecipe(className);
 
 export const selectControlRecipe = (className?: string) =>
@@ -27,28 +34,11 @@ export const selectIndicatorRecipe = () =>
   );
 
 export const selectIconButtonRecipe = () =>
-  twJoin(
-    'flex h-7 w-7 shrink-0 items-center justify-center rounded-sm text-secondary',
-    'hover:bg-interactive-tertiary-hover hover:text-primary',
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary',
-    'disabled:cursor-not-allowed disabled:hover:bg-transparent',
-    '[&[hidden]]:hidden',
-  );
+  twJoin(controlIconButtonClasses, '[&[hidden]]:hidden');
 
 export const selectContentRecipe = (className?: string) =>
-  twMerge(
-    'z-50 max-h-72 overflow-y-auto rounded border border-primary bg-background-primary p-1',
-    'text-sm text-primary shadow-lg focus:outline-none',
-    className,
-  );
+  twMerge(listPanelClasses, className);
 
-export const selectItemGroupLabelRecipe = () =>
-  'px-2 pb-1 pt-2 text-xs font-medium uppercase tracking-wide text-secondary';
+export const selectItemGroupLabelRecipe = () => listGroupLabelClasses;
 
-export const selectItemRecipe = () =>
-  twJoin(
-    'flex cursor-pointer select-none items-center justify-between gap-2 rounded-sm px-2 py-2',
-    'data-[highlighted]:bg-interactive-secondary-hover',
-    'data-[state=checked]:font-medium',
-    'data-[disabled]:cursor-not-allowed data-[disabled]:opacity-disabled',
-  );
+export const selectItemRecipe = () => listItemClasses;

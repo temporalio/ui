@@ -2,6 +2,13 @@ import { twJoin, twMerge } from 'tailwind-merge';
 
 import { fieldControlRecipe } from '$lib/io-ark/field';
 
+import {
+  controlIconButtonClasses,
+  listEmptyClasses,
+  listItemClasses,
+  listPanelClasses,
+} from '../shared/recipe';
+
 export const comboboxControlRecipe = (className?: string) =>
   fieldControlRecipe(
     twMerge(
@@ -17,13 +24,7 @@ export const comboboxInputRecipe = () =>
     'disabled:cursor-not-allowed',
   );
 
-export const comboboxIconButtonRecipe = () =>
-  twJoin(
-    'flex h-7 w-7 shrink-0 items-center justify-center rounded-sm text-secondary',
-    'hover:bg-interactive-tertiary-hover hover:text-primary',
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary',
-    'disabled:cursor-not-allowed disabled:hover:bg-transparent',
-  );
+export const comboboxIconButtonRecipe = () => controlIconButtonClasses;
 
 export const comboboxTagRecipe = () =>
   twJoin(
@@ -39,18 +40,8 @@ export const comboboxTagRemoveRecipe = () =>
   );
 
 export const comboboxContentRecipe = (className?: string) =>
-  twMerge(
-    'z-50 max-h-72 overflow-y-auto rounded border border-primary bg-background-primary p-1',
-    'text-sm text-primary shadow-lg focus:outline-none',
-    className,
-  );
+  twMerge(listPanelClasses, className);
 
-export const comboboxItemRecipe = () =>
-  twJoin(
-    'flex cursor-pointer select-none items-center justify-between gap-2 rounded-sm px-2 py-2',
-    'data-[highlighted]:bg-interactive-secondary-hover',
-    'data-[state=checked]:font-medium',
-    'data-[disabled]:cursor-not-allowed data-[disabled]:opacity-disabled',
-  );
+export const comboboxItemRecipe = () => listItemClasses;
 
-export const comboboxEmptyRecipe = () => 'px-2 py-2 text-secondary';
+export const comboboxEmptyRecipe = () => listEmptyClasses;

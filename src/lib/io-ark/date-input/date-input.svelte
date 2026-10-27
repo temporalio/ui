@@ -38,17 +38,18 @@
   } from '@ark-ui/svelte/date-input';
 
   import {
+    fieldLabelRecipe,
+    FieldMessages,
+    fieldRequiredIndicatorRecipe,
+    getFieldMessageIds,
+  } from '$lib/io-ark/field';
+
+  import {
     dateInputControlRecipe,
     dateInputRecipe,
     dateInputSegmentGroupRecipe,
     dateInputSegmentRecipe,
   } from './recipe';
-  import {
-    fieldErrorTextRecipe,
-    fieldHelperTextRecipe,
-    fieldLabelRecipe,
-    fieldRequiredIndicatorRecipe,
-  } from '../field/recipe';
 
   const generatedId = $props.id();
   let {
@@ -75,12 +76,9 @@
   }: DateInputProps = $props();
 
   const isInvalid = $derived(invalid ?? !!error);
-  const helperTextId = $derived(`${id}-helper-text`);
-  const errorTextId = $derived(`${id}-error-text`);
-  const describedBy = $derived(
-    [isInvalid && error && errorTextId, helperText && helperTextId]
-      .filter(Boolean)
-      .join(' ') || undefined,
+  const showError = $derived(!!(isInvalid && error));
+  const messageIds = $derived(
+    getFieldMessageIds(id, { helperText, showError, errorFirst: true }),
   );
   const arkValue = $derived(value ? [value] : []);
 
@@ -117,7 +115,7 @@
   <ArkDateInput.Control class={dateInputControlRecipe()}>
     <ArkDateInput.SegmentGroup
       class={dateInputSegmentGroupRecipe()}
-      aria-describedby={describedBy}
+      aria-describedby={messageIds.describedBy}
       aria-invalid={isInvalid || undefined}
     >
       <ArkDateInput.SegmentContext>
@@ -128,12 +126,5 @@
     </ArkDateInput.SegmentGroup>
   </ArkDateInput.Control>
   <ArkDateInput.HiddenInput />
-  {#if helperText}
-    <p id={helperTextId} class={fieldHelperTextRecipe()}>{helperText}</p>
-  {/if}
-  {#if isInvalid && error}
-    <p id={errorTextId} class={fieldErrorTextRecipe()} aria-live="polite">
-      {error}
-    </p>
-  {/if}
+  <FieldMessages ids={messageIds} {helperText} {error} {showError} />
 </ArkDateInput.Root>

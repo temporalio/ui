@@ -39,6 +39,8 @@
     progressValueTextRecipe,
   } from './recipe';
 
+  import '../shared/animations.css';
+
   const generatedId = $props.id();
   let {
     label,
@@ -92,15 +94,3 @@
     <ArkProgress.Range class={progressRangeRecipe(colorScheme)} />
   </ArkProgress.Track>
 </ArkProgress.Root>
-
-<style>
-  @keyframes -global-io-ark-progress-indeterminate {
-    from {
-      transform: translateX(-100%);
-    }
-
-    to {
-      transform: translateX(250%);
-    }
-  }
-</style>

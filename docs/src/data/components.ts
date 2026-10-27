@@ -42,11 +42,6 @@ export const getComponentDocumentation = (
   slug: string,
 ): ComponentDocumentation => getEntry(slug).documentation;
 
-export const buttonContent = getComponentContent('button');
-export const buttonDocumentation = getComponentDocumentation('button');
-export const accordionContent = getComponentContent('accordion');
-export const accordionDocumentation = getComponentDocumentation('accordion');
-
 /** Add `static/components/<slug>.md` and its page to list a component here. */
 export const components: ComponentDocumentation[] = entries
   .map((entry) => entry.documentation)

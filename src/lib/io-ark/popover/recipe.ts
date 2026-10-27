@@ -1,5 +1,7 @@
 import { twJoin, twMerge } from 'tailwind-merge';
 
+import { floatingSurfaceClasses } from '../shared/recipe';
+
 export type PopoverPlacement =
   | 'top'
   | 'top-start'
@@ -16,11 +18,11 @@ export type PopoverPlacement =
 
 export const popoverContentRecipe = (className?: string) =>
   twMerge(
-    'z-50 w-80 max-w-[calc(100vw-2rem)] rounded border border-primary bg-background-primary p-4',
-    'text-sm text-primary shadow-lg focus:outline-none',
+    floatingSurfaceClasses,
+    'z-50 w-80 max-w-[calc(100vw-2rem)] p-4 text-sm text-primary focus:outline-none',
     '[--arrow-background:var(--color-background-primary)] [--arrow-size:10px]',
-    'data-[state=open]:animate-[io-ark-popover-fade-in_120ms_ease-out]',
-    'data-[state=closed]:animate-[io-ark-popover-fade-out_100ms_ease-in]',
+    'data-[state=open]:animate-[io-ark-float-in_120ms_ease-out]',
+    'data-[state=closed]:animate-[io-ark-fade-out_100ms_ease-in]',
     'motion-reduce:animate-none',
     className,
   );

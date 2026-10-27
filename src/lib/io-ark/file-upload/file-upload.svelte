@@ -57,10 +57,10 @@
   import { IconClose, IconFileImport, IconUpload } from '$lib/io/icon';
   import { Button } from '$lib/io-ark/button';
   import {
-    fieldErrorTextRecipe,
-    fieldHelperTextRecipe,
     fieldLabelRecipe,
+    FieldMessages,
     fieldRequiredIndicatorRecipe,
+    getFieldMessageIds,
   } from '$lib/io-ark/field';
 
   import {
@@ -142,15 +142,15 @@
   const isInvalid = $derived(
     invalid ?? (!!error || rejectionErrors.length > 0),
   );
-  const helperTextId = $derived(`${id}-helper-text`);
-  const errorTextId = $derived(`${id}-error-text`);
   const hasErrorText = $derived(
     isInvalid && (!!error || rejectionErrors.length > 0),
   );
-  const describedBy = $derived(
-    [hasErrorText && errorTextId, helperText && helperTextId]
-      .filter(Boolean)
-      .join(' ') || undefined,
+  const messageIds = $derived(
+    getFieldMessageIds(id, {
+      helperText,
+      showError: hasErrorText,
+      errorFirst: true,
+    }),
   );
   const isInteractive = $derived(!disabled && !readOnly);
 
@@ -187,7 +187,7 @@
   </ArkFileUpload.Label>
   <ArkFileUpload.Dropzone
     class={fileUploadDropzoneRecipe()}
-    aria-describedby={describedBy}
+    aria-describedby={messageIds.describedBy}
     data-track-name="file-upload"
     data-track-intent="upload"
     data-track-text={label}
@@ -245,14 +245,11 @@
       </ArkFileUpload.Item>
     {/each}
   </ArkFileUpload.ItemGroup>
-  {#if helperText}
-    <p id={helperTextId} class={fieldHelperTextRecipe()}>{helperText}</p>
-  {/if}
-  {#if hasErrorText}
-    <div id={errorTextId} class={fieldErrorTextRecipe()} aria-live="polite">
+  <FieldMessages ids={messageIds} {helperText} showError={hasErrorText}>
+    {#snippet errorContent()}
       {#if error}<p>{error}</p>{/if}
       {#each rejectionErrors as message, index (index)}<p>{message}</p>{/each}
-    </div>
-  {/if}
+    {/snippet}
+  </FieldMessages>
   <ArkFileUpload.HiddenInput />
 </ArkFileUpload.Root>

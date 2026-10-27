@@ -48,9 +48,9 @@
 
   import { IconCheckmark } from '$lib/io/icon';
   import {
-    fieldErrorTextRecipe,
-    fieldHelperTextRecipe,
     fieldLabelRecipe,
+    FieldMessages,
+    getFieldMessageIds,
   } from '$lib/io-ark/field';
 
   import {
@@ -112,12 +112,9 @@
   );
 
   const isInvalid = $derived(invalid ?? !!error);
-  const helperTextId = $derived(`${id}-helper-text`);
-  const errorTextId = $derived(`${id}-error-text`);
-  const describedBy = $derived(
-    [isInvalid && error && errorTextId, helperText && helperTextId]
-      .filter(Boolean)
-      .join(' ') || undefined,
+  const showError = $derived(!!(isInvalid && error));
+  const messageIds = $derived(
+    getFieldMessageIds(id, { helperText, showError, errorFirst: true }),
   );
 </script>
 
@@ -168,7 +165,7 @@
     {/if}
     <ArkListbox.Content
       class={listboxContentRecipe(orientation)}
-      aria-describedby={describedBy}
+      aria-describedby={messageIds.describedBy}
       aria-invalid={isInvalid ? 'true' : undefined}
       data-track-name="listbox"
       data-track-intent="select"
@@ -197,12 +194,5 @@
       {/if}
     </ArkListbox.Content>
   </div>
-  {#if helperText}
-    <p id={helperTextId} class={fieldHelperTextRecipe()}>{helperText}</p>
-  {/if}
-  {#if isInvalid && error}
-    <p id={errorTextId} class={fieldErrorTextRecipe()} aria-live="polite">
-      {error}
-    </p>
-  {/if}
+  <FieldMessages ids={messageIds} {helperText} {error} {showError} />
 </ArkListbox.Root>

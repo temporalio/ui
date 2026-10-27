@@ -6,17 +6,9 @@
   import AccordionExamples from '../../../examples/accordion-examples.svelte';
   import examplesSource from '../../../examples/accordion-examples.svelte?raw';
 
-  import AnatomySection from '$docs/components/anatomy-section.svelte';
   import ComponentPage from '$docs/components/component-page.svelte';
-  import ContractSection from '$docs/components/contract-section.svelte';
-  import DocSection from '$docs/components/doc-section.svelte';
-  import MarkdownContent from '$docs/components/markdown-content.svelte';
   import Playground from '$docs/components/playground.svelte';
-  import SourceCode from '$docs/components/source-code.svelte';
-  import {
-    accordionContent,
-    accordionDocumentation,
-  } from '$docs/data/components';
+  import { getComponentDocumentation } from '$docs/data/components';
 
   let title = $state('Workflow details');
   let subtitle = $state('Configuration and execution information');
@@ -39,9 +31,15 @@
   <p>Choose the details you want to show here.</p>
 </Accordion>`,
   );
+
+  const documentation = getComponentDocumentation('accordion');
 </script>
 
-<ComponentPage component={accordionDocumentation}>
+<ComponentPage
+  component={documentation}
+  examples={AccordionExamples}
+  {examplesSource}
+>
   <Playground {source} filename="Accordion.svelte">
     {#snippet preview()}
       <div class="w-full">
@@ -75,34 +73,14 @@
       />
     {/snippet}
   </Playground>
-  <AnatomySection slug="accordion">
-    {#snippet preview()}
-      <AccordionGroup class="w-full">
-        <Accordion id="accordion-anatomy-1" title="Section 1" open>
-          <p>Content for Section 1</p>
-        </Accordion>
-        <Accordion id="accordion-anatomy-2" title="Section 2">
-          <p>Content for Section 2</p>
-        </Accordion>
-      </AccordionGroup>
-    {/snippet}
-  </AnatomySection>
-  <DocSection id="examples" title={accordionContent.sections.examples.title}>
-    <MarkdownContent section={accordionContent.sections.examples} />
-    <div class="mt-5">
-      <AccordionExamples />
-      <SourceCode
-        code={examplesSource}
-        filename="accordion-examples.svelte"
-        collapsible
-      />
-    </div>
-  </DocSection>
-  <DocSection id="usage" title={accordionContent.sections.usage.title}>
-    <MarkdownContent section={accordionContent.sections.usage} />
-  </DocSection>
-  <ContractSection slug="accordion" />
-  <DocSection id="api" title={accordionContent.sections.api.title}>
-    <MarkdownContent section={accordionContent.sections.api} />
-  </DocSection>
+  {#snippet anatomy()}
+    <AccordionGroup class="w-full">
+      <Accordion id="accordion-anatomy-1" title="Section 1" open>
+        <p>Content for Section 1</p>
+      </Accordion>
+      <Accordion id="accordion-anatomy-2" title="Section 2">
+        <p>Content for Section 2</p>
+      </Accordion>
+    </AccordionGroup>
+  {/snippet}
 </ComponentPage>

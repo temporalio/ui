@@ -6,19 +6,10 @@
   import CheckboxExamples from '../../../examples/checkbox-examples.svelte';
   import examplesSource from '../../../examples/checkbox-examples.svelte?raw';
 
-  import AnatomySection from '$docs/components/anatomy-section.svelte';
   import ComponentPage from '$docs/components/component-page.svelte';
-  import ContractSection from '$docs/components/contract-section.svelte';
-  import DocSection from '$docs/components/doc-section.svelte';
-  import MarkdownContent from '$docs/components/markdown-content.svelte';
   import Playground from '$docs/components/playground.svelte';
-  import SourceCode from '$docs/components/source-code.svelte';
-  import {
-    getComponentContent,
-    getComponentDocumentation,
-  } from '$docs/data/components';
+  import { getComponentDocumentation } from '$docs/data/components';
 
-  const content = getComponentContent('checkbox');
   const documentation = getComponentDocumentation('checkbox');
 
   let label = $state('Retry failed activities');
@@ -45,7 +36,12 @@
   );
 </script>
 
-<ComponentPage component={documentation}>
+<ComponentPage
+  component={documentation}
+  examples={CheckboxExamples}
+  {examplesSource}
+  framed
+>
   <Playground {source} filename="Checkbox.svelte">
     {#snippet preview()}
       <div class="w-full max-w-sm">
@@ -102,29 +98,7 @@
       />
     {/snippet}
   </Playground>
-  <AnatomySection slug="checkbox">
-    {#snippet preview()}
-      <Checkbox id="checkbox-anatomy" label="Label" required />
-    {/snippet}
-  </AnatomySection>
-  <DocSection id="examples" title={content.sections.examples.title}>
-    <MarkdownContent section={content.sections.examples} />
-    <div class="mt-5">
-      <div class="rounded-lg border border-primary p-6">
-        <CheckboxExamples />
-      </div>
-      <SourceCode
-        code={examplesSource}
-        filename="checkbox-examples.svelte"
-        collapsible
-      />
-    </div>
-  </DocSection>
-  <DocSection id="usage" title={content.sections.usage.title}>
-    <MarkdownContent section={content.sections.usage} />
-  </DocSection>
-  <ContractSection slug="checkbox" />
-  <DocSection id="api" title={content.sections.api.title}>
-    <MarkdownContent section={content.sections.api} />
-  </DocSection>
+  {#snippet anatomy()}
+    <Checkbox id="checkbox-anatomy" label="Label" required />
+  {/snippet}
 </ComponentPage>

@@ -37,6 +37,8 @@
     collapsibleTriggerRecipe,
   } from './recipe';
 
+  import '../shared/animations.css';
+
   const generatedId = $props.id();
   let {
     label = '',
@@ -90,39 +92,3 @@
     <div class="pt-3">{@render children?.(open)}</div>
   </ArkCollapsible.Content>
 </ArkCollapsible.Root>
-
-<style>
-  @keyframes -global-io-ark-collapsible-expand {
-    from {
-      height: var(--collapsed-height, 0);
-    }
-
-    to {
-      height: var(--height);
-    }
-  }
-
-  @keyframes -global-io-ark-collapsible-collapse {
-    from {
-      height: var(--height);
-    }
-
-    to {
-      height: var(--collapsed-height, 0);
-    }
-  }
-
-  :global(.io-ark-collapsible-content[data-state='open']) {
-    animation: io-ark-collapsible-expand 150ms ease-out;
-  }
-
-  :global(.io-ark-collapsible-content[data-state='closed']) {
-    animation: io-ark-collapsible-collapse 150ms ease-out;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    :global(.io-ark-collapsible-content) {
-      animation: none !important;
-    }
-  }
-</style>

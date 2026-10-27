@@ -57,6 +57,12 @@
     IconChevronRight,
     IconClose,
   } from '$lib/io/icon';
+  import {
+    fieldLabelRecipe,
+    FieldMessages,
+    fieldRequiredIndicatorRecipe,
+    getFieldMessageIds,
+  } from '$lib/io-ark/field';
 
   import {
     datePickerCellTriggerRecipe,
@@ -72,12 +78,6 @@
     datePickerViewControlRecipe,
     datePickerViewTriggerRecipe,
   } from './recipe';
-  import {
-    fieldErrorTextRecipe,
-    fieldHelperTextRecipe,
-    fieldLabelRecipe,
-    fieldRequiredIndicatorRecipe,
-  } from '../field/recipe';
 
   const generatedId = $props.id();
   let {
@@ -116,12 +116,9 @@
 
   const isInvalid = $derived(invalid ?? !!error);
   const isRange = $derived(selectionMode === 'range');
-  const helperTextId = $derived(`${id}-helper-text`);
-  const errorTextId = $derived(`${id}-error-text`);
-  const describedBy = $derived(
-    [isInvalid && error && errorTextId, helperText && helperTextId]
-      .filter(Boolean)
-      .join(' ') || undefined,
+  const showError = $derived(!!(isInvalid && error));
+  const messageIds = $derived(
+    getFieldMessageIds(id, { helperText, showError, errorFirst: true }),
   );
   const inputPlaceholder = $derived(
     placeholder ?? (isRange ? 'Start date' : 'Select a date'),
@@ -285,7 +282,7 @@
     <ArkDatePicker.Input
       index={0}
       placeholder={inputPlaceholder}
-      aria-describedby={describedBy}
+      aria-describedby={messageIds.describedBy}
       class={datePickerInputRecipe()}
     />
     {#if isRange}
@@ -293,7 +290,7 @@
       <ArkDatePicker.Input
         index={1}
         placeholder="End date"
-        aria-describedby={describedBy}
+        aria-describedby={messageIds.describedBy}
         class={datePickerInputRecipe()}
       />
     {/if}
@@ -312,14 +309,7 @@
       <IconCalendar width={16} height={16} />
     </ArkDatePicker.Trigger>
   </ArkDatePicker.Control>
-  {#if helperText}
-    <p id={helperTextId} class={fieldHelperTextRecipe()}>{helperText}</p>
-  {/if}
-  {#if isInvalid && error}
-    <p id={errorTextId} class={fieldErrorTextRecipe()} aria-live="polite">
-      {error}
-    </p>
-  {/if}
+  <FieldMessages ids={messageIds} {helperText} {error} {showError} />
   {#if inline}
     {@render calendar()}
   {:else}

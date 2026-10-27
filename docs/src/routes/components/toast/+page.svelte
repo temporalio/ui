@@ -13,20 +13,11 @@
   import ToastExamples from '../../../examples/toast-examples.svelte';
   import examplesSource from '../../../examples/toast-examples.svelte?raw';
 
-  import AnatomySection from '$docs/components/anatomy-section.svelte';
   import ComponentPage from '$docs/components/component-page.svelte';
-  import ContractSection from '$docs/components/contract-section.svelte';
-  import DocSection from '$docs/components/doc-section.svelte';
-  import MarkdownContent from '$docs/components/markdown-content.svelte';
   import Playground from '$docs/components/playground.svelte';
   import SelectControl from '$docs/components/select-control.svelte';
-  import SourceCode from '$docs/components/source-code.svelte';
-  import {
-    getComponentContent,
-    getComponentDocumentation,
-  } from '$docs/data/components';
+  import { getComponentDocumentation } from '$docs/data/components';
 
-  const content = getComponentContent('toast');
   const documentation = getComponentDocumentation('toast');
 
   const toaster = createIoToaster();
@@ -94,7 +85,12 @@
 
 <Toaster {toaster} />
 
-<ComponentPage component={documentation}>
+<ComponentPage
+  component={documentation}
+  examples={ToastExamples}
+  {examplesSource}
+  framed
+>
   <Playground {source} filename="Toast.svelte">
     {#snippet preview()}
       <Button onclick={show}>Show toast</Button>
@@ -123,35 +119,13 @@
       <Checkbox id="toast-closable" label="Closable" bind:checked={closable} />
     {/snippet}
   </Playground>
-  <AnatomySection slug="toast">
-    {#snippet preview()}
-      <div class="h-36 w-full">
-        <Toaster
-          toaster={anatomyToaster}
-          label="Anatomy notifications"
-          class="!transition-none"
-        />
-      </div>
-    {/snippet}
-  </AnatomySection>
-  <DocSection id="examples" title={content.sections.examples.title}>
-    <MarkdownContent section={content.sections.examples} />
-    <div class="mt-5">
-      <div class="rounded-lg border border-primary p-6">
-        <ToastExamples />
-      </div>
-      <SourceCode
-        code={examplesSource}
-        filename="toast-examples.svelte"
-        collapsible
+  {#snippet anatomy()}
+    <div class="h-36 w-full">
+      <Toaster
+        toaster={anatomyToaster}
+        label="Anatomy notifications"
+        class="!transition-none"
       />
     </div>
-  </DocSection>
-  <DocSection id="usage" title={content.sections.usage.title}>
-    <MarkdownContent section={content.sections.usage} />
-  </DocSection>
-  <ContractSection slug="toast" />
-  <DocSection id="api" title={content.sections.api.title}>
-    <MarkdownContent section={content.sections.api} />
-  </DocSection>
+  {/snippet}
 </ComponentPage>

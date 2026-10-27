@@ -20,19 +20,10 @@
   import TourExamples from '../../../examples/tour-examples.svelte';
   import examplesSource from '../../../examples/tour-examples.svelte?raw';
 
-  import AnatomySection from '$docs/components/anatomy-section.svelte';
   import ComponentPage from '$docs/components/component-page.svelte';
-  import ContractSection from '$docs/components/contract-section.svelte';
-  import DocSection from '$docs/components/doc-section.svelte';
-  import MarkdownContent from '$docs/components/markdown-content.svelte';
   import Playground from '$docs/components/playground.svelte';
-  import SourceCode from '$docs/components/source-code.svelte';
-  import {
-    getComponentContent,
-    getComponentDocumentation,
-  } from '$docs/data/components';
+  import { getComponentDocumentation } from '$docs/data/components';
 
-  const content = getComponentContent('tour');
   const documentation = getComponentDocumentation('tour');
 
   let open = $state(false);
@@ -117,7 +108,12 @@
   );
 </script>
 
-<ComponentPage component={documentation}>
+<ComponentPage
+  component={documentation}
+  examples={TourExamples}
+  {examplesSource}
+  framed
+>
   <Playground {source} filename="Tour.svelte">
     {#snippet preview()}
       <div
@@ -168,96 +164,74 @@
       />
     {/snippet}
   </Playground>
-  <AnatomySection slug="tour">
-    {#snippet preview()}
-      <div class="relative h-64 w-full overflow-hidden rounded">
-        <div class="space-y-3 p-4 pt-16 text-sm text-secondary">
-          <p>order-fulfillment-7f3a · Running</p>
-          <p>payment-processing-19c2 · Completed</p>
-        </div>
+  {#snippet anatomy()}
+    <div class="relative h-64 w-full overflow-hidden rounded">
+      <div class="space-y-3 p-4 pt-16 text-sm text-secondary">
+        <p>order-fulfillment-7f3a · Running</p>
+        <p>payment-processing-19c2 · Completed</p>
+      </div>
+      <div
+        data-scope="tour"
+        data-part="backdrop"
+        class="{tourBackdropRecipe()} absolute inset-0"
+      ></div>
+      <div class="absolute left-4 top-4 z-50 flex flex-col items-start gap-3">
+        <span
+          data-scope="tour"
+          data-part="spotlight"
+          class="{tourSpotlightRecipe()} inline-flex rounded"
+        >
+          <Button size="sm" tracking={false}>Start workflow</Button>
+        </span>
         <div
           data-scope="tour"
-          data-part="backdrop"
-          class="{tourBackdropRecipe()} absolute inset-0"
-        ></div>
-        <div class="absolute left-4 top-4 z-50 flex flex-col items-start gap-3">
-          <span
-            data-scope="tour"
-            data-part="spotlight"
-            class="{tourSpotlightRecipe()} inline-flex rounded"
-          >
-            <Button size="sm" tracking={false}>Start workflow</Button>
-          </span>
-          <div
-            data-scope="tour"
-            data-part="content"
-            data-type="tooltip"
-            class={tourContentRecipe()}
-          >
-            <div class={tourHeaderRecipe()}>
-              <p data-scope="tour" data-part="title" class={tourTitleRecipe()}>
-                Start a workflow
-              </p>
-              <Button
-                data-scope="tour"
-                data-part="close-trigger"
-                colorScheme="ghost"
-                size="xs"
-                LeadingIcon={IconClose}
-                aria-label="Close tour"
-                tracking={false}
-              />
-            </div>
-            <p
-              data-scope="tour"
-              data-part="description"
-              class={tourDescriptionRecipe()}
-            >
-              Run a new execution on any task queue.
+          data-part="content"
+          data-type="tooltip"
+          class={tourContentRecipe()}
+        >
+          <div class={tourHeaderRecipe()}>
+            <p data-scope="tour" data-part="title" class={tourTitleRecipe()}>
+              Start a workflow
             </p>
-            <div class={tourFooterRecipe()}>
-              <span
-                data-scope="tour"
-                data-part="progress-text"
-                class={tourProgressTextRecipe()}>2 of 3</span
+            <Button
+              data-scope="tour"
+              data-part="close-trigger"
+              colorScheme="ghost"
+              size="xs"
+              LeadingIcon={IconClose}
+              aria-label="Close tour"
+              tracking={false}
+            />
+          </div>
+          <p
+            data-scope="tour"
+            data-part="description"
+            class={tourDescriptionRecipe()}
+          >
+            Run a new execution on any task queue.
+          </p>
+          <div class={tourFooterRecipe()}>
+            <span
+              data-scope="tour"
+              data-part="progress-text"
+              class={tourProgressTextRecipe()}>2 of 3</span
+            >
+            <div
+              data-scope="tour"
+              data-part="actions"
+              class={tourActionsRecipe()}
+            >
+              <Button colorScheme="ghost" size="sm" tracking={false}
+                >Skip tour</Button
               >
-              <div
-                data-scope="tour"
-                data-part="actions"
-                class={tourActionsRecipe()}
+              <Button colorScheme="tertiary" size="sm" tracking={false}
+                >Back</Button
               >
-                <Button colorScheme="ghost" size="sm" tracking={false}
-                  >Skip tour</Button
-                >
-                <Button colorScheme="tertiary" size="sm" tracking={false}
-                  >Back</Button
-                >
-                <Button size="sm" tracking={false}>Next</Button>
-              </div>
+              <Button size="sm" tracking={false}>Next</Button>
             </div>
           </div>
         </div>
       </div>
-    {/snippet}
-  </AnatomySection>
-  <DocSection id="examples" title={content.sections.examples.title}>
-    <MarkdownContent section={content.sections.examples} />
-    <div class="mt-5">
-      <div class="rounded-lg border border-primary p-6">
-        <TourExamples />
-      </div>
-      <SourceCode
-        code={examplesSource}
-        filename="tour-examples.svelte"
-        collapsible
-      />
     </div>
-  </DocSection>
-  <DocSection id="usage" title={content.sections.usage.title}>
-    <MarkdownContent section={content.sections.usage} />
-  </DocSection>
-  <ContractSection slug="tour" />
-  <DocSection id="api" title={content.sections.api.title}>
-    <MarkdownContent section={content.sections.api} />
-  </DocSection>
+  {/snippet}
 </ComponentPage>

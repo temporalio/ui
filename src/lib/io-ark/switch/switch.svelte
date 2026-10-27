@@ -35,7 +35,9 @@
   import {
     fieldErrorTextRecipe,
     fieldHelperTextRecipe,
+    FieldMessages,
     fieldRequiredIndicatorRecipe,
+    getFieldMessageIds,
   } from '$lib/io-ark/field';
 
   import {
@@ -68,14 +70,10 @@
   }: SwitchProps = $props();
 
   const baseId = $derived(id ?? generatedId);
-  const helperTextId = $derived(`${baseId}-helper-text`);
-  const errorTextId = $derived(`${baseId}-error-text`);
   const isInvalid = $derived(invalid ?? (error ? true : undefined));
   const showError = $derived(!!error && isInvalid !== false);
-  const describedBy = $derived(
-    [helperText && helperTextId, showError && errorTextId]
-      .filter(Boolean)
-      .join(' ') || undefined,
+  const messageIds = $derived(
+    getFieldMessageIds(baseId, { helperText, showError }),
   );
 
   const machineProps: Partial<SwitchRootBaseProps> = $derived(
@@ -118,23 +116,14 @@
         <span aria-hidden="true" class={fieldRequiredIndicatorRecipe()}>*</span>
       {/if}
     </ArkSwitch.Label>
-    <ArkSwitch.HiddenInput aria-describedby={describedBy} />
+    <ArkSwitch.HiddenInput aria-describedby={messageIds.describedBy} />
   </ArkSwitch.Root>
-  {#if helperText}
-    <p
-      id={helperTextId}
-      class={switchDescriptionRecipe(size, fieldHelperTextRecipe())}
-    >
-      {helperText}
-    </p>
-  {/if}
-  {#if showError}
-    <p
-      id={errorTextId}
-      aria-live="polite"
-      class={switchDescriptionRecipe(size, fieldErrorTextRecipe())}
-    >
-      {error}
-    </p>
-  {/if}
+  <FieldMessages
+    ids={messageIds}
+    {helperText}
+    {error}
+    {showError}
+    helperClass={switchDescriptionRecipe(size, fieldHelperTextRecipe())}
+    errorClass={switchDescriptionRecipe(size, fieldErrorTextRecipe())}
+  />
 </div>

@@ -7,20 +7,11 @@
   import DialogExamples from '../../../examples/dialog-examples.svelte';
   import examplesSource from '../../../examples/dialog-examples.svelte?raw';
 
-  import AnatomySection from '$docs/components/anatomy-section.svelte';
   import ComponentPage from '$docs/components/component-page.svelte';
-  import ContractSection from '$docs/components/contract-section.svelte';
-  import DocSection from '$docs/components/doc-section.svelte';
-  import MarkdownContent from '$docs/components/markdown-content.svelte';
   import Playground from '$docs/components/playground.svelte';
   import SelectControl from '$docs/components/select-control.svelte';
-  import SourceCode from '$docs/components/source-code.svelte';
-  import {
-    getComponentContent,
-    getComponentDocumentation,
-  } from '$docs/data/components';
+  import { getComponentDocumentation } from '$docs/data/components';
 
-  const content = getComponentContent('dialog');
   const documentation = getComponentDocumentation('dialog');
 
   const sizes: DialogSize[] = ['sm', 'md', 'lg'];
@@ -70,7 +61,11 @@
   <Button onclick={() => (open = false)}>Cancel workflow</Button>
 {/snippet}
 
-<ComponentPage component={documentation}>
+<ComponentPage
+  component={documentation}
+  examples={DialogExamples}
+  {examplesSource}
+>
   <Playground {source} filename="Dialog.svelte">
     {#snippet preview()}
       <Dialog
@@ -113,44 +108,24 @@
       <Checkbox id="dialog-footer" label="Footer" bind:checked={footer} />
     {/snippet}
   </Playground>
-  <AnatomySection slug="dialog">
-    {#snippet preview()}
-      <div class="h-80 w-full">
-        <Dialog
-          id="dialog-anatomy"
-          title="Terminate workflow?"
-          description="order-fulfillment-7f3a will stop immediately."
-          open
-          portalled={false}
-          modal={false}
-          closeOnInteractOutside={false}
-          closeOnEscape={false}
-        >
-          <p>Pending activities will not run.</p>
-          {#snippet footer()}
-            <Button colorScheme="tertiary" tracking={false}>Cancel</Button>
-            <Button colorScheme="danger" tracking={false}>Terminate</Button>
-          {/snippet}
-        </Dialog>
-      </div>
-    {/snippet}
-  </AnatomySection>
-  <DocSection id="examples" title={content.sections.examples.title}>
-    <MarkdownContent section={content.sections.examples} />
-    <div class="mt-5">
-      <DialogExamples />
-      <SourceCode
-        code={examplesSource}
-        filename="dialog-examples.svelte"
-        collapsible
-      />
+  {#snippet anatomy()}
+    <div class="h-80 w-full">
+      <Dialog
+        id="dialog-anatomy"
+        title="Terminate workflow?"
+        description="order-fulfillment-7f3a will stop immediately."
+        open
+        portalled={false}
+        modal={false}
+        closeOnInteractOutside={false}
+        closeOnEscape={false}
+      >
+        <p>Pending activities will not run.</p>
+        {#snippet footer()}
+          <Button colorScheme="tertiary" tracking={false}>Cancel</Button>
+          <Button colorScheme="danger" tracking={false}>Terminate</Button>
+        {/snippet}
+      </Dialog>
     </div>
-  </DocSection>
-  <DocSection id="usage" title={content.sections.usage.title}>
-    <MarkdownContent section={content.sections.usage} />
-  </DocSection>
-  <ContractSection slug="dialog" />
-  <DocSection id="api" title={content.sections.api.title}>
-    <MarkdownContent section={content.sections.api} />
-  </DocSection>
+  {/snippet}
 </ComponentPage>

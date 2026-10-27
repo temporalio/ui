@@ -26,8 +26,8 @@ export const tooltipContentRecipe = (className?: string) =>
   twMerge(
     'z-50 max-w-xs rounded bg-content-primary px-2 py-1.5 text-xs leading-4 text-inverse-primary shadow-md',
     '[--arrow-background:var(--color-content-primary)] [--arrow-size:8px]',
-    'data-[state=open]:animate-[io-ark-tooltip-fade-in_100ms_ease-out]',
-    'data-[state=closed]:animate-[io-ark-tooltip-fade-out_75ms_ease-in]',
+    'data-[state=open]:animate-[io-ark-zoom-in_100ms_ease-out]',
+    'data-[state=closed]:animate-[io-ark-fade-out_75ms_ease-in]',
     'motion-reduce:animate-none',
     className,
   );

@@ -6,20 +6,11 @@
   import TreeViewExamples from '../../../examples/tree-view-examples.svelte';
   import examplesSource from '../../../examples/tree-view-examples.svelte?raw';
 
-  import AnatomySection from '$docs/components/anatomy-section.svelte';
   import ComponentPage from '$docs/components/component-page.svelte';
-  import ContractSection from '$docs/components/contract-section.svelte';
-  import DocSection from '$docs/components/doc-section.svelte';
-  import MarkdownContent from '$docs/components/markdown-content.svelte';
   import Playground from '$docs/components/playground.svelte';
   import SelectControl from '$docs/components/select-control.svelte';
-  import SourceCode from '$docs/components/source-code.svelte';
-  import {
-    getComponentContent,
-    getComponentDocumentation,
-  } from '$docs/data/components';
+  import { getComponentDocumentation } from '$docs/data/components';
 
-  const content = getComponentContent('tree-view');
   const documentation = getComponentDocumentation('tree-view');
 
   const nodes: TreeViewNode[] = [
@@ -86,7 +77,12 @@
   );
 </script>
 
-<ComponentPage component={documentation}>
+<ComponentPage
+  component={documentation}
+  examples={TreeViewExamples}
+  {examplesSource}
+  framed
+>
   <Playground {source} filename="TreeView.svelte">
     {#snippet preview()}
       <div class="w-full max-w-xs">
@@ -131,51 +127,29 @@
       />
     {/snippet}
   </Playground>
-  <AnatomySection slug="tree-view">
-    {#snippet preview()}
-      <TreeView
-        id="tree-view-anatomy"
-        label="Workflows"
-        expandedValue={['orders']}
-        selectedValue={['charge']}
-        nodes={[
-          {
-            id: 'orders',
-            label: 'order-fulfillment',
-            children: [
-              { id: 'charge', label: 'charge-payment' },
-              { id: 'ship', label: 'ship-order' },
-            ],
-          },
-          {
-            id: 'billing',
-            label: 'billing-sync',
-            children: [{ id: 'invoice', label: 'send-invoice' }],
-          },
-          { id: 'audit', label: 'audit-log' },
-        ]}
-        class="w-full"
-      />
-    {/snippet}
-  </AnatomySection>
-  <DocSection id="examples" title={content.sections.examples.title}>
-    <MarkdownContent section={content.sections.examples} />
-    <div class="mt-5">
-      <div class="rounded-lg border border-primary p-6">
-        <TreeViewExamples />
-      </div>
-      <SourceCode
-        code={examplesSource}
-        filename="tree-view-examples.svelte"
-        collapsible
-      />
-    </div>
-  </DocSection>
-  <DocSection id="usage" title={content.sections.usage.title}>
-    <MarkdownContent section={content.sections.usage} />
-  </DocSection>
-  <ContractSection slug="tree-view" />
-  <DocSection id="api" title={content.sections.api.title}>
-    <MarkdownContent section={content.sections.api} />
-  </DocSection>
+  {#snippet anatomy()}
+    <TreeView
+      id="tree-view-anatomy"
+      label="Workflows"
+      expandedValue={['orders']}
+      selectedValue={['charge']}
+      nodes={[
+        {
+          id: 'orders',
+          label: 'order-fulfillment',
+          children: [
+            { id: 'charge', label: 'charge-payment' },
+            { id: 'ship', label: 'ship-order' },
+          ],
+        },
+        {
+          id: 'billing',
+          label: 'billing-sync',
+          children: [{ id: 'invoice', label: 'send-invoice' }],
+        },
+        { id: 'audit', label: 'audit-log' },
+      ]}
+      class="w-full"
+    />
+  {/snippet}
 </ComponentPage>
