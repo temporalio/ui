@@ -49,7 +49,7 @@
           </div>
         {/if}
         <h1
-          class="min-w-0 text-base font-medium leading-6 text-primary [overflow-wrap:anywhere]"
+          class="min-w-0 text-base leading-6 font-medium [overflow-wrap:anywhere] text-primary"
         >
           {@render heading()}
         </h1>
@@ -66,7 +66,7 @@
       </div>
       {#if description}
         <div
-          class="min-w-0 text-xs leading-4 text-primary [overflow-wrap:anywhere]"
+          class="min-w-0 text-xs leading-4 [overflow-wrap:anywhere] text-primary"
         >
           {@render description()}
         </div>

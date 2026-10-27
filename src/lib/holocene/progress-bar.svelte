@@ -11,7 +11,7 @@
 
 <div
   class={merge(
-    'absolute left-0 right-0 z-[5]',
+    'absolute right-0 left-0 z-[5]',
     subtle
       ? 'h-0.5 overflow-x-clip bg-transparent'
       : 'h-1.5 overflow-hidden rounded-lg bg-surface-tertiary',

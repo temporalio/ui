@@ -245,7 +245,7 @@
                 ></div>
                 <div class="space-y-1 p-2">
                   <p class="text-xs font-medium text-primary">{token.step}</p>
-                  <code class="block break-all text-[0.625rem] text-secondary">
+                  <code class="block text-[0.625rem] break-all text-secondary">
                     {token.value}
                   </code>
                 </div>
