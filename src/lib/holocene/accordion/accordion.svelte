@@ -114,7 +114,12 @@
       {/if}
     </div>
 
-    <div id="{id}-content" class="mt-4 block w-full p-4" class:hidden={!open}>
+    <div
+      id="{id}-content"
+      class="mt-4 w-full p-4"
+      class:block={open}
+      class:hidden={!open}
+    >
       {@render children?.(open)}
     </div>
   </div>
@@ -153,7 +158,7 @@
       </p>
     </div>
 
-    <div class="mt-6 block w-full" class:hidden={!open}>
+    <div class="mt-6 w-full" class:block={open} class:hidden={!open}>
       {@render children?.(open)}
     </div>
   </div>

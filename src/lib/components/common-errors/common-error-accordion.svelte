@@ -53,7 +53,8 @@
   <div
     id="{id}-content"
     aria-labelledby="{id}-trigger"
-    class="flex flex-col items-start gap-2 py-4 pr-4 pl-11 text-sm"
+    class="flex-col items-start gap-2 py-4 pr-4 pl-11 text-sm"
+    class:flex={open}
     class:hidden={!open}
   >
     <p>{error.description}</p>

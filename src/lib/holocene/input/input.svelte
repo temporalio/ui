@@ -214,18 +214,25 @@
   </div>
 
   <div
-    class="inline-flex justify-between gap-2"
+    class="justify-between gap-2"
+    class:inline-flex={hintText || (maxLength && !isDisabled && !hideCount)}
     class:hidden={!hintText && (!maxLength || isDisabled || hideCount)}
   >
     <span
       id={errorId}
       role="alert"
-      class="hint-text error inline-block"
+      class="hint-text error"
+      class:inline-block={showError}
       class:hidden={!showError}
     >
       {#if showError}{hintText}{/if}
     </span>
-    <span id={hintId} class="hint-text inline-block" class:hidden={showError}>
+    <span
+      id={hintId}
+      class="hint-text"
+      class:inline-block={!showError}
+      class:hidden={showError}
+    >
       {#if !showError}{hintText}{/if}
     </span>
     {#if maxLength && !isDisabled && !hideCount}

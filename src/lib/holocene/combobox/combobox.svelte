@@ -671,7 +671,10 @@
         </button>
       {/if}
     </div>
-    <div class="inline-flex" class:hidden={!hintText && !showError}>
+    <div
+      class:inline-flex={hintText || showError}
+      class:hidden={!hintText && !showError}
+    >
       <span
         id={errorId}
         role="alert"

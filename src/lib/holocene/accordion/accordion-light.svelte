@@ -73,7 +73,8 @@
   </div>
   <div
     id="{id}-content"
-    class="block w-full bg-background-primary p-2"
+    class="w-full bg-background-primary p-2"
+    class:block={open}
     class:hidden={!open}
   >
     {@render children?.(open)}

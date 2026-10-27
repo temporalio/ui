@@ -189,7 +189,8 @@
 
       <div class="space-y-3 pb-3">
         <div
-          class="grid grid-cols-[1fr_200px_auto] gap-3 text-sm font-medium"
+          class="grid-cols-[1fr_200px_auto] gap-3 text-sm font-medium"
+          class:grid={$formData.attributes.length > 0}
           class:hidden={$formData.attributes.length === 0}
         >
           <div>{translate('search-attributes.column-attribute')}</div>

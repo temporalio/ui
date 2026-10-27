@@ -77,8 +77,7 @@
 </script>
 
 <div
-  class={merge('alert flex', intent, className)}
-  class:hidden
+  class={merge('alert flex', intent, className, hidden && 'hidden')}
   {role}
   {...rest}
 >
