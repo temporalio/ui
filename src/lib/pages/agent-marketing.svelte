@@ -225,9 +225,9 @@
   ];
 
   const mcpQuestions = [
-    'Why is Workflow order-123 stuck?',
+    'Which Workflows are stuck, and why?',
     'How many Workflows failed in the last hour?',
-    'Is any Worker polling the orders Task Queue?',
+    'Do my running Workflows have Workers polling?',
     'Which Namespaces can you read?',
   ];
 
