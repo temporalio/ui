@@ -60,6 +60,8 @@
     if (group === 'border') return ['border', name].join('-');
     if (group === 'interactive') return ['bg', 'interactive', name].join('-');
     if (group === 'action') return ['text', 'action', name].join('-');
+    if (group === 'spacing')
+      return ['p', 'm', 'gap'].map((prefix) => `${prefix}-${name}`).join(' ');
 
     return ['opacity', name].join('-');
   };
@@ -136,6 +138,11 @@
 
   const defaultTheme = themes[defaultThemeName];
   const semanticGroups = getThemeTokenGroups(defaultTheme);
+  const spacingTokens = tokensWithPrefix(
+    ioThemeToCssVariables(defaultTheme),
+    '--spacing-',
+    'spacing',
+  );
   const registeredThemes = Object.entries(themes).map(([name, theme]) => ({
     name,
     groups: getThemeTokenGroups(theme),
@@ -259,6 +266,61 @@
         'These swatches use the active Storybook theme and the same CSS custom properties consumed by the application.',
       )}
       {@render semanticSections(semanticGroups)}
+    </main>
+  {/snippet}
+</Story>
+
+<Story name="Semantic Spacing">
+  {#snippet template()}
+    <main class="min-h-screen bg-background-primary p-6 text-primary">
+      {@render pageHeader(
+        'Semantic spacing',
+        'These spacing tokens use the active Storybook theme and are available as padding, margin, and gap utilities.',
+      )}
+      <ul
+        class="grid list-none grid-cols-[repeat(auto-fill,minmax(12rem,1fr))] gap-3 p-0"
+      >
+        {#each spacingTokens as token (token.cssVariable)}
+          <li
+            class="min-w-0 rounded-lg border border-primary bg-surface-primary p-3"
+          >
+            <div
+              class="mb-3 flex h-16 items-center rounded bg-surface-secondary p-2"
+            >
+              <div
+                class="h-8 rounded bg-interactive-primary"
+                style:width={`var(${token.cssVariable})`}
+              ></div>
+            </div>
+            <p class="mb-2 text-sm font-medium text-primary">{token.name}</p>
+            <dl class="space-y-2 text-xs">
+              <div>
+                <dt class="text-secondary">Tailwind</dt>
+                <dd>
+                  <code class="block break-all text-primary">
+                    {token.tailwindClass}
+                  </code>
+                </dd>
+              </div>
+              <div>
+                <dt class="text-secondary">CSS variable</dt>
+                <dd>
+                  <code class="block break-all text-primary">
+                    {token.cssVariable}
+                  </code>
+                </dd>
+              </div>
+              <div>
+                <dt class="text-secondary">Default value</dt>
+                <dd>
+                  <code class="block break-all text-primary">{token.value}</code
+                  >
+                </dd>
+              </div>
+            </dl>
+          </li>
+        {/each}
+      </ul>
     </main>
   {/snippet}
 </Story>
