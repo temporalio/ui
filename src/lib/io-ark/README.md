@@ -16,4 +16,5 @@ Import components from their public entry points:
 Package consumers use `@temporalio/ui/io-ark/button`.
 Run `pnpm docs:dev` for interactive examples and the API reference. See the
 [documentation README](../../../docs/README.md) for build commands and
-[AGENTS.md](AGENTS.md) for implementation conventions.
+[CONTRIBUTING.md](CONTRIBUTING.md) for implementation conventions. Teams using
+the components in an app, and their agents, should read [AGENTS.md](AGENTS.md).
