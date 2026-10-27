@@ -5,14 +5,17 @@ import {
 import { nexusOperationError } from '$lib/stores/nexus-operations';
 import type { SearchAttributesSchema } from '$lib/stores/search-attributes';
 import type {
+  NexusOperationCallbackInfo,
   NexusOperationIdConflictPolicy,
   NexusOperationIdReusePolicy,
   Payload,
   SearchAttribute,
   StartNexusOperationExecutionResponse,
 } from '$lib/types';
+import type { Callback } from '$lib/types/nexus';
 import type {
   NexusOperationExecution,
+  NexusOperationExecutionAPIResponse,
   NexusOperationExecutionInfo,
   NexusOperationExecutionListInfo,
   NexusOperationExecutionListInfoAPIResponse,
@@ -26,12 +29,14 @@ import {
   encodePayloads,
   setSearchAttributes,
 } from '$lib/utilities/encode-payload';
+import { isEmptyObject } from '$lib/utilities/is';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import {
   type ErrorCallback,
   requestFromAPI,
 } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
+import { toCallbackStateReadable } from '$lib/utilities/screaming-enums';
 
 export type ListNexusOperationsResponse = {
   operations: NexusOperationExecutionListInfoAPIResponse[];
@@ -56,6 +61,30 @@ const emptyNexusOperationExecutionInfo: NexusOperationExecutionInfo = {
 const emptyNexusOperationExecution: NexusOperationExecution = {
   info: emptyNexusOperationExecutionInfo,
 };
+
+export const toNexusOperationCallbacks = (
+  callbacks?: NexusOperationCallbackInfo[] | null,
+): Callback[] => {
+  if (!callbacks) return [];
+  return callbacks.reduce<Callback[]>((acc, { info }) => {
+    if (!info) return acc;
+    acc.push({
+      ...info,
+      blockedReason: info.blockedReason ?? undefined,
+      callback: (info.callback ?? undefined) as Callback['callback'],
+      state: toCallbackStateReadable(info.state ?? undefined),
+    });
+    return acc;
+  }, []);
+};
+
+const toNexusOperationExecution = ({
+  completionCallbacks,
+  ...rest
+}: NexusOperationExecutionAPIResponse): NexusOperationExecution => ({
+  ...rest,
+  completionCallbacks: toNexusOperationCallbacks(completionCallbacks),
+});
 
 const toNexusOperationExecutionListInfo = (
   operation: NexusOperationExecutionListInfoAPIResponse,
@@ -272,8 +301,12 @@ export const getNexusOperationExecution = (
     includeOutcome: String(includeOutcome),
   });
 
-  return requestFromAPI<NexusOperationExecution>(route, { params }).then(
-    (response) => response ?? emptyNexusOperationExecution,
+  return requestFromAPI<NexusOperationExecutionAPIResponse>(route, {
+    params,
+  }).then((response) =>
+    response
+      ? toNexusOperationExecution(response)
+      : emptyNexusOperationExecution,
   );
 };
 
@@ -381,10 +414,13 @@ export const pollNexusOperationExecution = (
     longPollToken: token,
   });
 
-  return requestFromAPI<NexusOperationExecution>(route, {
+  return requestFromAPI<NexusOperationExecutionAPIResponse>(route, {
     params,
     notifyOnError: false,
     options: { signal },
+  }).then((response) => {
+    if (!response || isEmptyObject(response)) return undefined;
+    return toNexusOperationExecution(response);
   });
 };
 

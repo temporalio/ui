@@ -19,6 +19,7 @@ export class StandaloneNexusOperationPoller {
   private runId: string;
   private token: string = '';
   private input: NexusOperationExecution['input'];
+  private completionCallbacks: NexusOperationExecution['completionCallbacks'];
   private onUpdate: (nexusOperationExecution: NexusOperationExecution) => void;
   private onError: (error: Error) => void;
 
@@ -53,6 +54,7 @@ export class StandaloneNexusOperationPoller {
     }
 
     this.input = nexusOperationExecution.input;
+    this.completionCallbacks = nexusOperationExecution.completionCallbacks;
     this.onUpdate(nexusOperationExecution);
 
     if (
@@ -77,9 +79,14 @@ export class StandaloneNexusOperationPoller {
             !isEmptyObject(polledNexusOperationExecution)
           ) {
             this.token = polledNexusOperationExecution.longPollToken ?? '';
+            if (polledNexusOperationExecution.completionCallbacks?.length) {
+              this.completionCallbacks =
+                polledNexusOperationExecution.completionCallbacks;
+            }
             this.onUpdate({
               ...polledNexusOperationExecution,
               input: polledNexusOperationExecution.input ?? this.input,
+              completionCallbacks: this.completionCallbacks,
             });
           }
         } catch (error) {
@@ -101,6 +108,7 @@ export class StandaloneNexusOperationPoller {
       this.runId,
     );
     this.input = nexusOperationExecution.input;
+    this.completionCallbacks = nexusOperationExecution.completionCallbacks;
     this.onUpdate(nexusOperationExecution);
   }
 
