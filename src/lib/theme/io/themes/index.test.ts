@@ -19,7 +19,7 @@ describe('registered IO themes', () => {
     const result = await postcss([tailwindcss()]).process(
       `@import 'tailwindcss' source(none);
        @config '../tailwind.config.ts';
-       @source inline("px-page-margin mx-page-margin gap-page-margin p-4");`,
+       @source inline("px-page-margin mx-page-margin gap-page-margin gap-io-lg p-4 max-w-lg");`,
       { from: path.resolve('src/app.css') },
     );
 
@@ -27,7 +27,14 @@ describe('registered IO themes', () => {
     expect(result.css).toContain('padding-inline: var(--spacing-page-margin)');
     expect(result.css).toContain('margin-inline: var(--spacing-page-margin)');
     expect(result.css).toContain('gap: var(--spacing-page-margin)');
+    expect(result.css).toContain('gap: var(--spacing-lg)');
     expect(result.css).toContain('padding: calc(var(--spacing) * 4)');
+
+    const maxWidthValues: string[] = [];
+    result.root.walkRules('.max-w-lg', (rule) => {
+      rule.walkDecls('max-width', ({ value }) => maxWidthValues.push(value));
+    });
+    expect(maxWidthValues.at(-1)).toBe('var(--container-lg)');
   });
   it('light and dark themes expose the same color variables', () => {
     expect(

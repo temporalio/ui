@@ -8,6 +8,17 @@ import {
 } from './io/themes';
 import { colorTheme, opacityTheme } from './tailwind-colors';
 
+const spacingTheme = toCssVariableReferences(
+  themes[defaultThemeName].spacing,
+  'spacing',
+);
+const spacingUtilities = Object.fromEntries(
+  Object.entries(spacingTheme).map(([name, value]) => [
+    name.startsWith('page-') ? name : `io-${name}`,
+    value,
+  ]),
+);
+
 type FontSizeThemeValue =
   | string
   | [string, { lineHeight?: string }]
@@ -80,10 +91,7 @@ const temporal = plugin(
     theme: {
       ...colorTheme,
       extend: {
-        spacing: toCssVariableReferences(
-          themes[defaultThemeName].spacing,
-          'spacing',
-        ),
+        spacing: spacingUtilities,
         opacity: opacityTheme,
         transitionProperty: {
           width: 'width',
