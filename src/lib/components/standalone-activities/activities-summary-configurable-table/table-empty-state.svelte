@@ -2,13 +2,13 @@
   import { page } from '$app/state';
 
   import NoQueryResults from '$lib/components/empty-states/no-query-results.svelte';
-  import SdkLogo from '$lib/components/lines-and-dots/sdk-logo.svelte';
+  import ResourceEmptyState from '$lib/components/empty-states/resource-empty-state.svelte';
+  import SdkLinks from '$lib/components/empty-states/sdk-links.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { IconWarning } from '$lib/io/icon';
+  import { IconTemporalActivity, IconWarning } from '$lib/io/icon';
   import { activityError } from '$lib/stores/activities';
-  import noResultsImages from '$lib/vendor/empty-state.svg';
 
   let query = $derived(page.url.searchParams.get('query'));
   const SDK_LINKS = [
@@ -29,12 +29,16 @@
       href: 'https://docs.temporal.io/develop/dotnet/activities/standalone-activities',
     },
     {
-      sdk: 'Typescript',
+      sdk: 'TypeScript',
       href: 'https://docs.temporal.io/develop/typescript/activities/standalone-activities',
     },
     {
       sdk: 'Ruby',
       href: 'https://docs.temporal.io/develop/ruby/activities/standalone-activities',
+    },
+    {
+      sdk: 'Rust',
+      href: 'https://docs.temporal.io/develop/rust/activities/standalone-activities-quickstart',
     },
   ];
 </script>
@@ -63,29 +67,16 @@
     </div>
   </div>
 {:else}
-  <div
-    class="h-full w-full overflow-y-auto xl:flex xl:flex-row xl:overflow-hidden"
-    aria-live="polite"
+  <ResourceEmptyState
+    title={translate(
+      $activityError
+        ? 'standalone-activities.empty-state-title'
+        : 'standalone-activities.no-activities-title',
+    )}
+    Icon={IconTemporalActivity}
   >
-    <div
-      class="flex w-auto min-w-[280px] flex-col gap-4 bg-surface-primary p-8 text-primary xl:min-w-[520px] xl:flex-1"
-    >
-      {#if $activityError}
-        <h2>
-          {translate('standalone-activities.empty-state-title')}
-        </h2>
-        <Alert
-          intent="warning"
-          Icon={IconWarning}
-          title={translate('common.error-occurred')}
-          style="overflow-wrap: anywhere"
-        >
-          {$activityError}
-        </Alert>
-      {:else}
-        <h2>
-          {translate('standalone-activities.no-activities-title')}
-        </h2>
+    {#snippet description()}
+      {#if !$activityError}
         <p>
           <Link href="https://docs.temporal.io/standalone-activity" newTab
             >{translate('standalone-activities.standalone-activities')}</Link
@@ -98,27 +89,24 @@
             'standalone-activities.no-activities-description-part-1-postface',
           )}
         </p>
-        <p>
-          {translate('standalone-activities.no-activities-description-part-2')}
-        </p>
-        <p>
-          {translate('standalone-activities.no-activities-description-part-3')}
-        </p>
-        <h3>
-          {translate('standalone-activities.get-started-title')}
-        </h3>
-        {#each SDK_LINKS as { sdk, href } (sdk)}
-          <Link newTab {href}>
-            <SdkLogo {sdk} version="" hideDocsLink />
-          </Link>
-        {/each}
       {/if}
-    </div>
-    <div class="flex flex-col max-xl:hidden">
-      <div class="bg-surface-primary">
-        <img src={noResultsImages} alt="" class="w-full" />
+    {/snippet}
+    {#if $activityError}
+      <Alert
+        intent="warning"
+        Icon={IconWarning}
+        title={translate('common.error-occurred')}
+        style="overflow-wrap: anywhere"
+      >
+        {$activityError}
+      </Alert>
+    {:else}
+      <div class="flex flex-col items-center gap-2">
+        <p class="text-sm text-secondary">
+          {translate('standalone-activities.get-started-title')}
+        </p>
+        <SdkLinks links={SDK_LINKS} />
       </div>
-      <div class="flex-1 bg-[#8da4ef]"></div>
-    </div>
-  </div>
+    {/if}
+  </ResourceEmptyState>
 {/if}

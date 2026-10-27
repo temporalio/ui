@@ -17,7 +17,9 @@ export const Strings = {
   'schedule-spec': 'Schedule Spec',
   'cron-string': 'Cron String',
   'workflow-input': 'Workflow Input',
-  'empty-state-title': 'No Schedules Found',
+  'empty-state-title': 'No Schedules',
+  'no-schedules-description':
+    'Schedules automatically start Workflows at recurring times or intervals. Pause and resume a Schedule, backfill missed runs, and control how overlapping runs are handled.',
   'empty-state-description':
     'Try adjusting or clearing the filters to see the Schedules running on this Namespace.',
   'error-message-fetching': 'Error fetching schedules',

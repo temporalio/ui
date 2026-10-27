@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from '$app/state';
 
-  import EmptyState from '$lib/holocene/empty-state.svelte';
+  import EmptyState from '$lib/components/empty-states/resource-empty-state.svelte';
   import PaginatedTable, {
     type PaginatedRequest,
   } from '$lib/holocene/table/paginated-table/api-paginated.svelte';

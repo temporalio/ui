@@ -5,22 +5,20 @@
 
   import CountRefreshButton from '$lib/components/count-refresh-button.svelte';
   import SavedQueryViews from '$lib/components/saved-query-views/saved-views.svelte';
+  import SchedulesEmptyState from '$lib/components/schedule/schedules-list/schedules-empty-state.svelte';
   import SchedulesTableRow from '$lib/components/schedule/schedules-list/schedules-table-row.svelte';
   import FilterBar from '$lib/components/search-attribute-filter/filter-bar.svelte';
   import ConfigurableTableHeadersDrawer from '$lib/components/table/configurable-table-headers-drawer.svelte';
   import ResetColumnWidthsButton from '$lib/components/table/reset-column-widths-button.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
-  import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
-  import EmptyState from '$lib/holocene/empty-state.svelte';
-  import Link from '$lib/holocene/link.svelte';
   import ColumnResizeHandle from '$lib/holocene/table/column-resize-handle.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
   import MaximizableTableView from '$lib/holocene/table/paginated-table/maximizable-view.svelte';
   import SortableTableHeader from '$lib/holocene/table/sortable-table-header.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { IconTemporalSettings, IconWarning } from '$lib/io/icon';
+  import { IconTemporalSettings } from '$lib/io/icon';
   import { createCountPoller } from '$lib/runes/count-poller.svelte';
   import { createTableSort } from '$lib/runes/table-sort-state.svelte';
   import { fetchPaginatedSchedules } from '$lib/services/schedule-service';
@@ -263,31 +261,7 @@
 
       {#snippet empty()}
         <div class="flex h-full flex-col items-center justify-center">
-          {#if error}
-            <EmptyState title={translate('schedules.empty-state-title')}>
-              <Alert intent="warning" Icon={IconWarning} class="mx-12">
-                {error}
-              </Alert>
-            </EmptyState>
-          {:else if query}
-            <EmptyState
-              title={translate('schedules.empty-state-title')}
-              content={translate('schedules.empty-state-description')}
-            />
-          {:else}
-            <EmptyState title={translate('schedules.empty-state-title')}>
-              <p>
-                {translate('schedules.getting-started-docs-link-preface')}
-                <Link newTab href="https://docs.temporal.io/workflows/#schedule"
-                  >{translate('schedules.getting-started-docs-link')}</Link
-                >
-                {translate('schedules.getting-started-cli-link-preface')}
-                <Link newTab href="https://docs.temporal.io/cli/schedule"
-                  >Temporal CLI</Link
-                >.
-              </p>
-            </EmptyState>
-          {/if}
+          <SchedulesEmptyState {error} {query} />
         </div>
       {/snippet}
       {#snippet actionsEndAdditional()}

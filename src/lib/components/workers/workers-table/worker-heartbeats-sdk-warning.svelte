@@ -1,4 +1,6 @@
 <script lang="ts">
+  import ResourceEmptyState from '$lib/components/empty-states/resource-empty-state.svelte';
+  import SdkLinks from '$lib/components/empty-states/sdk-links.svelte';
   import SdkLogo from '$lib/components/lines-and-dots/sdk-logo.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -50,40 +52,28 @@
   );
 </script>
 
-<div
-  class="my-12 flex w-full flex-col items-center justify-start gap-4"
-  data-testid="worker-heartbeats-sdk-warning"
-  aria-live="polite"
+<ResourceEmptyState
+  title={translate('workers.no-worker-heartbeats')}
+  Icon={IconHeartbeat}
+  testId="worker-heartbeats-sdk-warning"
 >
-  <span class="flex h-20 w-20 items-center justify-center rounded-full">
-    <IconHeartbeat class="block h-full w-full text-information" />
-  </span>
-  <div class="text-center">
-    <h5>{translate('workers.no-worker-heartbeats')}</h5>
+  {#snippet description()}
     {#if currentSdk}
       {@const { href, sdk, version } = currentSdk}
       {#if !minimumVersionRequired(version, $sdkInfo.version)}
-        <p class="flex flex-row gap-1 text-secondary">
+        <div class="flex flex-wrap items-center justify-center gap-1">
           {translate('workers.worker-heartbeats-sdk-link-preface')}
           <Link newTab {href}>
             <SdkLogo {sdk} {version} hideDocsLink />
           </Link>
           {translate('workers.worker-heartbeats-sdk-link-postface')}
-        </p>
+        </div>
       {/if}
     {:else}
-      <p class="text-secondary">
-        {translate('workers.worker-heartbeats-sdk-list-preface')}
-      </p>
-      <div
-        class="mt-4 flex flex-row flex-wrap items-center justify-center gap-4"
-      >
-        {#each supportedVersions as { href, sdk, version } (`${sdk}:${version}`)}
-          <Link newTab {href}>
-            <SdkLogo {sdk} {version} hideDocsLink />
-          </Link>
-        {/each}
-      </div>
+      <p>{translate('workers.worker-heartbeats-sdk-list-preface')}</p>
     {/if}
-  </div>
-</div>
+  {/snippet}
+  {#if !currentSdk}
+    <SdkLinks links={supportedVersions} />
+  {/if}
+</ResourceEmptyState>
