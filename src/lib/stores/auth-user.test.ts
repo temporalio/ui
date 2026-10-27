@@ -11,11 +11,7 @@ const fakeLocation = {
 };
 
 describe('auth-user logout', () => {
-  let fetchSpy: ReturnType<typeof vi.fn>;
-
   beforeEach(() => {
-    fetchSpy = vi.fn().mockResolvedValue({ ok: true });
-    vi.stubGlobal('fetch', fetchSpy);
     Object.defineProperty(window, 'location', { value: fakeLocation });
     setAuthUser({ accessToken: 'token' });
   });
@@ -27,27 +23,12 @@ describe('auth-user logout', () => {
     vi.clearAllMocks();
   });
 
-  it('should call the backend logout endpoint and clear local auth state', async () => {
+  it('should clear local auth state and navigate to the backend logout endpoint', async () => {
     await logout();
 
-    expect(fetchSpy).toHaveBeenCalledWith(
+    expect(getAuthUser()).toEqual({});
+    expect(window.location.assign).toHaveBeenCalledWith(
       `http://localhost:8233${base}/auth/logout`,
-      {
-        method: 'GET',
-        credentials: 'include',
-        redirect: 'manual',
-      },
     );
-    expect(getAuthUser()).toEqual({});
-    expect(window.location.assign).toHaveBeenCalledWith(`${base}/`);
-  });
-
-  it('should clear local auth state even when the logout request fails', async () => {
-    fetchSpy.mockRejectedValue(new Error('logout failed'));
-
-    await logout();
-
-    expect(getAuthUser()).toEqual({});
-    expect(window.location.assign).toHaveBeenCalledWith(`${base}/`);
   });
 });
