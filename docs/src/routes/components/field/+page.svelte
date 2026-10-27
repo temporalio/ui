@@ -1,7 +1,7 @@
 <script lang="ts">
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import { Field, FieldInput, FieldTextarea } from '$lib/io-ark/field';
+  import { Field, FieldInput, FieldTextarea } from '$lib/io-poc/field';
 
   import FieldExamples from '../../../examples/field-examples.svelte';
   import examplesSource from '../../../examples/field-examples.svelte?raw';
@@ -32,7 +32,7 @@
 
   const source = $derived(
     `<script lang="ts">
-  import { Field, ${control} } from '$lib/io-ark/field';
+  import { Field, ${control} } from '$lib/io-poc/field';
   let value = $state('');
 </` +
       `script>

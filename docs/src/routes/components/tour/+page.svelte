@@ -2,7 +2,7 @@
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import { IconClose } from '$lib/io/icon';
-  import { Button } from '$lib/io-ark/button';
+  import { Button } from '$lib/io-poc/button';
   import {
     Tour,
     tourActionsRecipe,
@@ -15,7 +15,7 @@
     tourSpotlightRecipe,
     type TourStep,
     tourTitleRecipe,
-  } from '$lib/io-ark/tour';
+  } from '$lib/io-poc/tour';
 
   import TourExamples from '../../../examples/tour-examples.svelte';
   import examplesSource from '../../../examples/tour-examples.svelte?raw';
@@ -64,8 +64,8 @@
 
   const source = $derived(
     `<script lang="ts">
-  import { Button } from '$lib/io-ark/button';
-  import { Tour, type TourStep } from '$lib/io-ark/tour';
+  import { Button } from '$lib/io-poc/button';
+  import { Tour, type TourStep } from '$lib/io-poc/tour';
 
   let open = $state(false);
   let namespace = $state<HTMLElement | null>(null);

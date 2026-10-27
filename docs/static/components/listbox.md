@@ -25,7 +25,7 @@ filtering for longer lists.
 
 ```svelte
 <script lang="ts">
-  import { Listbox } from '$lib/io-ark/listbox';
+  import { Listbox } from '$lib/io-poc/listbox';
   let value = $state<string[]>([]);
 </script>
 
@@ -36,7 +36,7 @@ filtering for longer lists.
 />
 ```
 
-Package consumers can import from `@temporalio/ui/io-ark/listbox`.
+Package consumers can import from `@temporalio/ui/io-poc/listbox`.
 
 ### When to use
 
@@ -77,7 +77,7 @@ row of options navigated with the left and right arrow keys.
 
 ### Contract
 
-The rules reviewers check this component against live in `src/lib/io-ark/listbox/listbox.contract.md`, next to the source. The Contract section of this page shows them.
+The rules reviewers check this component against live in `src/lib/io-poc/listbox/listbox.contract.md`, next to the source. The Contract section of this page shows them.
 
 ## API reference
 

@@ -22,7 +22,7 @@ Group panels to create a compact list. Each panel opens independently.
 
 ```svelte
 <script lang="ts">
-  import { Accordion, AccordionGroup } from '$lib/io-ark/accordion';
+  import { Accordion, AccordionGroup } from '$lib/io-poc/accordion';
   let open = $state(false);
 </script>
 
@@ -36,7 +36,7 @@ Group panels to create a compact list. Each panel opens independently.
 </AccordionGroup>
 ```
 
-Package consumers can import from `@temporalio/ui/io-ark/accordion`.
+Package consumers can import from `@temporalio/ui/io-poc/accordion`.
 
 ### Title and header content
 
@@ -62,7 +62,7 @@ content is visible.
 
 ### Contract
 
-The rules reviewers check this component against live in `src/lib/io-ark/accordion/accordion.contract.md`, next to the source. The Contract section of this page shows them.
+The rules reviewers check this component against live in `src/lib/io-poc/accordion/accordion.contract.md`, next to the source. The Contract section of this page shows them.
 
 ## API reference
 

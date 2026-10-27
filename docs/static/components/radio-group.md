@@ -24,7 +24,7 @@ description to an option when its label alone does not explain the consequence.
 
 ```svelte
 <script lang="ts">
-  import { RadioGroup } from '$lib/io-ark/radio-group';
+  import { RadioGroup } from '$lib/io-poc/radio-group';
   let policy = $state<string | null>('terminate');
 </script>
 
@@ -39,7 +39,7 @@ description to an option when its label alone does not explain the consequence.
 />
 ```
 
-Package consumers can import from `@temporalio/ui/io-ark/radio-group`.
+Package consumers can import from `@temporalio/ui/io-poc/radio-group`.
 
 ### Options
 
@@ -65,7 +65,7 @@ keys move between options and select them. Disabled options are skipped.
 
 ### Contract
 
-The rules reviewers check this component against live in `src/lib/io-ark/radio-group/radio-group.contract.md`, next to the source. The Contract section of this page shows them.
+The rules reviewers check this component against live in `src/lib/io-poc/radio-group/radio-group.contract.md`, next to the source. The Contract section of this page shows them.
 
 ## API reference
 

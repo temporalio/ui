@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { Field, FieldInput } from '$lib/io-ark/field';
-  import { Fieldset } from '$lib/io-ark/fieldset';
+  import { Field, FieldInput } from '$lib/io-poc/field';
+  import { Fieldset } from '$lib/io-poc/fieldset';
 
   let initialInterval = $state('1');
   let maximumInterval = $state('100');

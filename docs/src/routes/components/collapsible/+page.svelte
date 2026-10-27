@@ -1,7 +1,7 @@
 <script lang="ts">
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import { Collapsible } from '$lib/io-ark/collapsible';
+  import { Collapsible } from '$lib/io-poc/collapsible';
 
   import CollapsibleExamples from '../../../examples/collapsible-examples.svelte';
   import examplesSource from '../../../examples/collapsible-examples.svelte?raw';
@@ -20,7 +20,7 @@
 
   const source = $derived(
     `<script lang="ts">
-  import { Collapsible } from '$lib/io-ark/collapsible';
+  import { Collapsible } from '$lib/io-poc/collapsible';
   let open = $state(${open});
 </` +
       `script>

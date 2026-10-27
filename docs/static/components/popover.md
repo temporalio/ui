@@ -24,8 +24,8 @@ as filters, without leaving the page.
 
 ```svelte
 <script lang="ts">
-  import { Button } from '$lib/io-ark/button';
-  import { Popover } from '$lib/io-ark/popover';
+  import { Button } from '$lib/io-poc/button';
+  import { Popover } from '$lib/io-poc/popover';
 </script>
 
 <Popover title="Retry policy">
@@ -36,7 +36,7 @@ as filters, without leaving the page.
 </Popover>
 ```
 
-Package consumers can import from `@temporalio/ui/io-ark/popover`.
+Package consumers can import from `@temporalio/ui/io-poc/popover`.
 
 ### Content
 
@@ -63,7 +63,7 @@ block interaction with the rest of the page while it is open.
 
 ### Contract
 
-The rules reviewers check this component against live in `src/lib/io-ark/popover/popover.contract.md`, next to the source. The Contract section of this page shows them.
+The rules reviewers check this component against live in `src/lib/io-poc/popover/popover.contract.md`, next to the source. The Contract section of this page shows them.
 
 ## API reference
 

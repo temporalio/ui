@@ -1,8 +1,8 @@
 <script lang="ts">
   import { IconFilter, IconInfo } from '$lib/io/icon';
-  import { Button } from '$lib/io-ark/button';
-  import { Checkbox, CheckboxGroup } from '$lib/io-ark/checkbox';
-  import { Popover } from '$lib/io-ark/popover';
+  import { Button } from '$lib/io-poc/button';
+  import { Checkbox, CheckboxGroup } from '$lib/io-poc/checkbox';
+  import { Popover } from '$lib/io-poc/popover';
 
   let open = $state(false);
   let draft = $state<string[]>(['Running', 'Failed']);

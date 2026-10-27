@@ -1,12 +1,12 @@
 <script lang="ts">
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import { Button } from '$lib/io-ark/button';
+  import { Button } from '$lib/io-poc/button';
   import {
     Drawer,
     type DrawerPlacement,
     type DrawerSize,
-  } from '$lib/io-ark/drawer';
+  } from '$lib/io-poc/drawer';
 
   import DrawerExamples from '../../../examples/drawer-examples.svelte';
   import examplesSource from '../../../examples/drawer-examples.svelte?raw';
@@ -31,8 +31,8 @@
 
   const source = $derived(
     `<script lang="ts">
-  import { Button } from '$lib/io-ark/button';
-  import { Drawer } from '$lib/io-ark/drawer';
+  import { Button } from '$lib/io-poc/button';
+  import { Drawer } from '$lib/io-poc/drawer';
   let open = $state(false);
 </` +
       `script>

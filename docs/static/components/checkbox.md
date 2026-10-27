@@ -22,7 +22,7 @@ that controls a partially selected list.
 
 ```svelte
 <script lang="ts">
-  import { Checkbox, CheckboxGroup } from '$lib/io-ark/checkbox';
+  import { Checkbox, CheckboxGroup } from '$lib/io-poc/checkbox';
   let archived = $state(false);
   let statuses = $state(['running']);
 </script>
@@ -36,7 +36,7 @@ that controls a partially selected list.
 </CheckboxGroup>
 ```
 
-Package consumers can import from `@temporalio/ui/io-ark/checkbox`.
+Package consumers can import from `@temporalio/ui/io-poc/checkbox`.
 
 ### Labels
 
@@ -79,7 +79,7 @@ selected value under the group `name`.
 
 ### Contract
 
-The rules reviewers check this component against live in `src/lib/io-ark/checkbox/checkbox.contract.md`, next to the source. The Contract section of this page shows them.
+The rules reviewers check this component against live in `src/lib/io-poc/checkbox/checkbox.contract.md`, next to the source. The Contract section of this page shows them.
 
 ## API reference
 

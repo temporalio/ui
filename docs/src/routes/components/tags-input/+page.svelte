@@ -1,7 +1,7 @@
 <script lang="ts">
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import { TagsInput } from '$lib/io-ark/tags-input';
+  import { TagsInput } from '$lib/io-poc/tags-input';
 
   import TagsInputExamples from '../../../examples/tags-input-examples.svelte';
   import examplesSource from '../../../examples/tags-input-examples.svelte?raw';
@@ -33,7 +33,7 @@
 
   const source = $derived(
     `<script lang="ts">
-  import { TagsInput } from '$lib/io-ark/tags-input';
+  import { TagsInput } from '$lib/io-poc/tags-input';
   let value = $state<string[]>(${JSON.stringify(value)});
 </` +
       `script>

@@ -24,7 +24,7 @@ like a file explorer. Use the `item` snippet to add status or counts beside each
 
 ```svelte
 <script lang="ts">
-  import { TreeView, type TreeViewNode } from '$lib/io-ark/tree-view';
+  import { TreeView, type TreeViewNode } from '$lib/io-poc/tree-view';
 
   const nodes: TreeViewNode[] = [
     {
@@ -42,7 +42,7 @@ like a file explorer. Use the `item` snippet to add status or counts beside each
 <TreeView label="Workflows" {nodes} bind:selectedValue />
 ```
 
-Package consumers can import from `@temporalio/ui/io-ark/tree-view`.
+Package consumers can import from `@temporalio/ui/io-poc/tree-view`.
 
 ### Nodes
 
@@ -78,7 +78,7 @@ node that starts with it.
 
 ### Contract
 
-The rules reviewers check this component against live in `src/lib/io-ark/tree-view/tree-view.contract.md`, next to the source. The Contract section of this page shows them.
+The rules reviewers check this component against live in `src/lib/io-poc/tree-view/tree-view.contract.md`, next to the source. The Contract section of this page shows them.
 
 ## API reference
 

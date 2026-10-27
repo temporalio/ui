@@ -23,7 +23,7 @@ selection for independent options that belong together, such as display options.
 
 ```svelte
 <script lang="ts">
-  import { ToggleGroup } from '$lib/io-ark/toggle-group';
+  import { ToggleGroup } from '$lib/io-poc/toggle-group';
   let view = $state(['compact']);
 </script>
 
@@ -38,7 +38,7 @@ selection for independent options that belong together, such as display options.
 />
 ```
 
-Package consumers can import from `@temporalio/ui/io-ark/toggle-group`.
+Package consumers can import from `@temporalio/ui/io-poc/toggle-group`.
 
 ### Value
 
@@ -66,7 +66,7 @@ Focus loops from the last item to the first unless `loopFocus` is false.
 
 ### Contract
 
-The rules reviewers check this component against live in `src/lib/io-ark/toggle-group/toggle-group.contract.md`, next to the source. The Contract section of this page shows them.
+The rules reviewers check this component against live in `src/lib/io-poc/toggle-group/toggle-group.contract.md`, next to the source. The Contract section of this page shows them.
 
 ## API reference
 

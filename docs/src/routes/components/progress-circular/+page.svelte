@@ -5,7 +5,7 @@
     ProgressCircular,
     type ProgressCircularSize,
     type ProgressColorScheme,
-  } from '$lib/io-ark/progress';
+  } from '$lib/io-poc/progress';
 
   import ProgressCircularExamples from '../../../examples/progress-circular-examples.svelte';
   import examplesSource from '../../../examples/progress-circular-examples.svelte?raw';
@@ -38,7 +38,7 @@
 
   const source = $derived(
     `<script lang="ts">
-  import { ProgressCircular } from '$lib/io-ark/progress';
+  import { ProgressCircular } from '$lib/io-poc/progress';
 </` +
       `script>
 

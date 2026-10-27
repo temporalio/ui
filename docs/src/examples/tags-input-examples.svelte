@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { TagsInput } from '$lib/io-ark/tags-input';
+  import { TagsInput } from '$lib/io-poc/tags-input';
 
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 

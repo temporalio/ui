@@ -1,6 +1,6 @@
 <script lang="ts">
   import { IconCode, IconTable } from '$lib/io/icon';
-  import { Tabs, TabsContent, type TabsItem } from '$lib/io-ark/tabs';
+  import { Tabs, TabsContent, type TabsItem } from '$lib/io-poc/tabs';
 
   const workflowTabs: TabsItem[] = [
     { value: 'history', label: 'History' },

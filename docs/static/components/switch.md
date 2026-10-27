@@ -24,14 +24,14 @@ obvious from the label.
 
 ```svelte
 <script lang="ts">
-  import { Switch } from '$lib/io-ark/switch';
+  import { Switch } from '$lib/io-poc/switch';
   let paused = $state(false);
 </script>
 
 <Switch label="Pause schedule" bind:checked={paused} />
 ```
 
-Package consumers can import from `@temporalio/ui/io-ark/switch`.
+Package consumers can import from `@temporalio/ui/io-poc/switch`.
 
 ### Switch or Checkbox
 
@@ -55,7 +55,7 @@ Tab moves focus to the switch. Space toggles it. Disabled switches are skipped.
 
 ### Contract
 
-The rules reviewers check this component against live in `src/lib/io-ark/switch/switch.contract.md`, next to the source. The Contract section of this page shows them.
+The rules reviewers check this component against live in `src/lib/io-poc/switch/switch.contract.md`, next to the source. The Contract section of this page shows them.
 
 ## API reference
 

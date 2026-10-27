@@ -1,8 +1,8 @@
 <script lang="ts">
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import type { ButtonColorScheme } from '$lib/io-ark/button';
-  import { Menu, type MenuEntry, type MenuPlacement } from '$lib/io-ark/menu';
+  import type { ButtonColorScheme } from '$lib/io-poc/button';
+  import { Menu, type MenuEntry, type MenuPlacement } from '$lib/io-poc/menu';
 
   import MenuExamples from '../../../examples/menu-examples.svelte';
   import examplesSource from '../../../examples/menu-examples.svelte?raw';
@@ -65,7 +65,7 @@
 
   const source = $derived(
     `<script lang="ts">
-  import { Menu, type MenuEntry } from '$lib/io-ark/menu';
+  import { Menu, type MenuEntry } from '$lib/io-poc/menu';
 
   const items: MenuEntry[] = [
     { value: 'signal', label: 'Send signal' },

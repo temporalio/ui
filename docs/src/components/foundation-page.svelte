@@ -3,13 +3,20 @@
   import type { Snippet } from 'svelte';
 
   interface Props {
+    category?: string;
     title: string;
     description: string;
     sections: { id: string; label: string }[];
     children: Snippet;
   }
 
-  let { title, description, sections, children }: Props = $props();
+  let {
+    category = 'Foundations',
+    title,
+    description,
+    sections,
+    children,
+  }: Props = $props();
 
   const tocItems = $derived(
     sections.map((section) => ({
@@ -29,7 +36,7 @@
   class="grid min-w-0 max-w-[1240px] grid-cols-1 gap-x-10 xl:grid-cols-[minmax(0,1fr)_176px]"
 >
   <div class="mb-8 min-w-0 xl:col-start-1 xl:mb-10">
-    <p class="mb-5 text-xs text-secondary">Foundations</p>
+    <p class="mb-5 text-xs text-secondary">{category}</p>
     <h1 class="text-4xl font-semibold tracking-tight">{title}</h1>
     <p class="mt-4 max-w-2xl text-base leading-relaxed text-secondary">
       {description}

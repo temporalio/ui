@@ -1,7 +1,7 @@
 <script lang="ts">
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import { Accordion, AccordionGroup } from '$lib/io-ark/accordion';
+  import { Accordion, AccordionGroup } from '$lib/io-poc/accordion';
 
   import AccordionExamples from '../../../examples/accordion-examples.svelte';
   import examplesSource from '../../../examples/accordion-examples.svelte?raw';
@@ -18,7 +18,7 @@
   let expandable = $state(true);
   const source = $derived(
     `<script lang="ts">
-  import { Accordion } from '$lib/io-ark/accordion';
+  import { Accordion } from '$lib/io-poc/accordion';
   let open = $state(${open});
 </` +
       `script>

@@ -1,7 +1,7 @@
 <script lang="ts">
   import HoloceneCheckbox from '$lib/holocene/checkbox.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import { Checkbox } from '$lib/io-ark/checkbox';
+  import { Checkbox } from '$lib/io-poc/checkbox';
 
   import CheckboxExamples from '../../../examples/checkbox-examples.svelte';
   import examplesSource from '../../../examples/checkbox-examples.svelte?raw';
@@ -24,7 +24,7 @@
 
   const source = $derived(
     `<script lang="ts">
-  import { Checkbox } from '$lib/io-ark/checkbox';
+  import { Checkbox } from '$lib/io-poc/checkbox';
   let checked = $state(${checked});
 </` +
       `script>

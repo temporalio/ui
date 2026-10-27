@@ -1,8 +1,8 @@
 <script lang="ts">
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import { IconFilter } from '$lib/io/icon';
-  import { Button } from '$lib/io-ark/button';
-  import { Drawer } from '$lib/io-ark/drawer';
+  import { Button } from '$lib/io-poc/button';
+  import { Drawer } from '$lib/io-poc/drawer';
 
   const events = [
     {

@@ -1,7 +1,7 @@
 <script lang="ts">
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import { Combobox } from '$lib/io-ark/combobox';
+  import { Combobox } from '$lib/io-poc/combobox';
 
   import ComboboxExamples from '../../../examples/combobox-examples.svelte';
   import examplesSource from '../../../examples/combobox-examples.svelte?raw';
@@ -37,7 +37,7 @@
 
   const source = $derived(
     `<script lang="ts">
-  import { Combobox } from '$lib/io-ark/combobox';
+  import { Combobox } from '$lib/io-poc/combobox';
   const workflowTypes = ${JSON.stringify(workflowTypes, null, 2).replace(/\n/g, '\n  ')};
   let value = $state<string[]>(${JSON.stringify(value)});
 </` +

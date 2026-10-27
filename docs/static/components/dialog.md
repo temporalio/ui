@@ -24,8 +24,8 @@ and control `open` directly when something other than a trigger opens the dialog
 
 ```svelte
 <script lang="ts">
-  import { Button } from '$lib/io-ark/button';
-  import { Dialog } from '$lib/io-ark/dialog';
+  import { Button } from '$lib/io-poc/button';
+  import { Dialog } from '$lib/io-poc/dialog';
   let open = $state(false);
 </script>
 
@@ -42,7 +42,7 @@ and control `open` directly when something other than a trigger opens the dialog
 </Dialog>
 ```
 
-Package consumers can import from `@temporalio/ui/io-ark/dialog`.
+Package consumers can import from `@temporalio/ui/io-poc/dialog`.
 
 ### When to use
 
@@ -77,7 +77,7 @@ inside the dialog. Put actions in the `footer` snippet, with the primary action 
 
 ### Contract
 
-The rules reviewers check this component against live in `src/lib/io-ark/dialog/dialog.contract.md`, next to the source. The Contract section of this page shows them.
+The rules reviewers check this component against live in `src/lib/io-poc/dialog/dialog.contract.md`, next to the source. The Contract section of this page shows them.
 
 ## API reference
 

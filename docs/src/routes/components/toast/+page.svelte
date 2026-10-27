@@ -3,12 +3,12 @@
 
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import { Button } from '$lib/io-ark/button';
+  import { Button } from '$lib/io-poc/button';
   import {
     createIoToaster,
     Toaster,
     type ToastStatusType,
-  } from '$lib/io-ark/toast';
+  } from '$lib/io-poc/toast';
 
   import ToastExamples from '../../../examples/toast-examples.svelte';
   import examplesSource from '../../../examples/toast-examples.svelte?raw';
@@ -64,8 +64,8 @@
 
   const source = $derived(
     `<script lang="ts">
-  import { Button } from '$lib/io-ark/button';
-  import { Toaster, toaster } from '$lib/io-ark/toast';
+  import { Button } from '$lib/io-poc/button';
+  import { Toaster, toaster } from '$lib/io-poc/toast';
 </` +
       `script>
 

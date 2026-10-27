@@ -24,7 +24,7 @@ both directions while the rest of the page stays in place.
 
 ```svelte
 <script lang="ts">
-  import { ScrollArea } from '$lib/io-ark/scroll-area';
+  import { ScrollArea } from '$lib/io-poc/scroll-area';
 </script>
 
 <ScrollArea label="Event history" maxHeight="20rem">
@@ -35,7 +35,7 @@ both directions while the rest of the page stays in place.
 </ScrollArea>
 ```
 
-Package consumers can import from `@temporalio/ui/io-ark/scroll-area`.
+Package consumers can import from `@temporalio/ui/io-poc/scroll-area`.
 
 ### When to use
 
@@ -68,7 +68,7 @@ trackpad gestures keep working.
 
 ### Contract
 
-The rules reviewers check this component against live in `src/lib/io-ark/scroll-area/scroll-area.contract.md`, next to the source. The Contract section of this page shows them.
+The rules reviewers check this component against live in `src/lib/io-poc/scroll-area/scroll-area.contract.md`, next to the source. The Contract section of this page shows them.
 
 ## API reference
 

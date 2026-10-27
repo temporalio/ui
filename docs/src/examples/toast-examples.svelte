@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { Button } from '$lib/io-ark/button';
-  import { createIoToaster, Toaster } from '$lib/io-ark/toast';
+  import { Button } from '$lib/io-poc/button';
+  import { createIoToaster, Toaster } from '$lib/io-poc/toast';
 
   const toaster = createIoToaster({ placement: 'top-end' });
 

@@ -12,6 +12,7 @@ const config = {
   },
   kit: {
     adapter: adapter(),
+    prerender: { handleMissingId: 'warn' },
     alias: {
       $docs: fileURLToPath(new URL('./src', import.meta.url)),
       $types: fileURLToPath(new URL('../src/lib/types', import.meta.url)),

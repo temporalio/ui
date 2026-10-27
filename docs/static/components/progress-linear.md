@@ -23,13 +23,13 @@ and the indeterminate state when the amount is not known yet.
 
 ```svelte
 <script lang="ts">
-  import { ProgressLinear } from '$lib/io-ark/progress';
+  import { ProgressLinear } from '$lib/io-poc/progress';
 </script>
 
 <ProgressLinear label="Terminating workflows" value={342} max={1000} />
 ```
 
-Package consumers can import from `@temporalio/ui/io-ark/progress`.
+Package consumers can import from `@temporalio/ui/io-poc/progress`.
 
 ### Value
 
@@ -61,7 +61,7 @@ when the purpose is clear from nearby content.
 
 ### Contract
 
-The rules reviewers check this component against live in `src/lib/io-ark/progress/progress-linear.contract.md`, next to the source. The Contract section of this page shows them.
+The rules reviewers check this component against live in `src/lib/io-poc/progress/progress-linear.contract.md`, next to the source. The Contract section of this page shows them.
 
 ## API reference
 

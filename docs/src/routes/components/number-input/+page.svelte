@@ -1,7 +1,7 @@
 <script lang="ts">
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import { NumberInput } from '$lib/io-ark/number-input';
+  import { NumberInput } from '$lib/io-poc/number-input';
 
   import NumberInputExamples from '../../../examples/number-input-examples.svelte';
   import examplesSource from '../../../examples/number-input-examples.svelte?raw';
@@ -41,7 +41,7 @@
 
   const source = $derived(
     `<script lang="ts">
-  import { NumberInput } from '$lib/io-ark/number-input';
+  import { NumberInput } from '$lib/io-poc/number-input';
   let value = $state(${JSON.stringify(value)});
 </` +
       `script>

@@ -1,7 +1,7 @@
 <script lang="ts">
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import { Slider, type SliderOrientation } from '$lib/io-ark/slider';
+  import { Slider, type SliderOrientation } from '$lib/io-poc/slider';
 
   import SliderExamples from '../../../examples/slider-examples.svelte';
   import examplesSource from '../../../examples/slider-examples.svelte?raw';
@@ -63,7 +63,7 @@
 
   const source = $derived(
     `<script lang="ts">
-  import { Slider } from '$lib/io-ark/slider';
+  import { Slider } from '$lib/io-poc/slider';
   let value = $state([${value.join(', ')}]);
 </` +
       `script>

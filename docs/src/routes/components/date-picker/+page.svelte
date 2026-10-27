@@ -5,7 +5,7 @@
     DatePicker,
     type DateValue,
     parseDate,
-  } from '$lib/io-ark/date-picker';
+  } from '$lib/io-poc/date-picker';
 
   import DatePickerExamples from '../../../examples/date-picker-examples.svelte';
   import examplesSource from '../../../examples/date-picker-examples.svelte?raw';
@@ -32,7 +32,7 @@
   const isRange = $derived(selectionMode === 'range');
   const source = $derived(
     `<script lang="ts">
-  import { DatePicker, type DateValue } from '$lib/io-ark/date-picker';
+  import { DatePicker, type DateValue } from '$lib/io-poc/date-picker';
   let value = $state<DateValue[]>([]);
 </` +
       `script>

@@ -1,7 +1,7 @@
 <script lang="ts">
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import { Pagination, type PaginationVariant } from '$lib/io-ark/pagination';
+  import { Pagination, type PaginationVariant } from '$lib/io-poc/pagination';
 
   import PaginationExamples from '../../../examples/pagination-examples.svelte';
   import examplesSource from '../../../examples/pagination-examples.svelte?raw';
@@ -29,7 +29,7 @@
 
   const source = $derived(
     `<script lang="ts">
-  import { Pagination } from '$lib/io-ark/pagination';
+  import { Pagination } from '$lib/io-poc/pagination';
   let page = $state(1);
   let pageSize = $state(25);
 </` +

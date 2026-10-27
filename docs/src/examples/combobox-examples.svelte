@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Combobox, type ComboboxItem } from '$lib/io-ark/combobox';
+  import { Combobox, type ComboboxItem } from '$lib/io-poc/combobox';
 
   const namespaces: ComboboxItem[] = [
     { label: 'default', value: 'default' },

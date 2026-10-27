@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Listbox, type ListboxItem } from '$lib/io-ark/listbox';
+  import { Listbox, type ListboxItem } from '$lib/io-poc/listbox';
 
   const workers: ListboxItem[] = [
     {

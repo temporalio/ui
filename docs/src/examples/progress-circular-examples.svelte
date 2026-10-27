@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { ProgressCircular } from '$lib/io-ark/progress';
+  import { ProgressCircular } from '$lib/io-poc/progress';
 
   const formatWorkers = ({ value }: { value: number | null }) => `${value}/8`;
 </script>

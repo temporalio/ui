@@ -25,8 +25,8 @@ filters and other short tasks on small screens.
 
 ```svelte
 <script lang="ts">
-  import { Button } from '$lib/io-ark/button';
-  import { Drawer } from '$lib/io-ark/drawer';
+  import { Button } from '$lib/io-poc/button';
+  import { Drawer } from '$lib/io-poc/drawer';
   let open = $state(false);
 </script>
 
@@ -42,7 +42,7 @@ filters and other short tasks on small screens.
 </Drawer>
 ```
 
-Package consumers can import from `@temporalio/ui/io-ark/drawer`.
+Package consumers can import from `@temporalio/ui/io-poc/drawer`.
 
 ### When to use
 
@@ -79,7 +79,7 @@ and Shift+Tab cycle through its controls, and Escape closes it unless
 
 ### Contract
 
-The rules reviewers check this component against live in `src/lib/io-ark/drawer/drawer.contract.md`, next to the source. The Contract section of this page shows them.
+The rules reviewers check this component against live in `src/lib/io-poc/drawer/drawer.contract.md`, next to the source. The Contract section of this page shows them.
 
 ## API reference
 

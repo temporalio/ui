@@ -2,7 +2,7 @@
   import {
     NavigationMenu,
     type NavigationMenuItem,
-  } from '$lib/io-ark/navigation-menu';
+  } from '$lib/io-poc/navigation-menu';
 
   const topNavigation: NavigationMenuItem[] = [
     { label: 'Workflows', href: '#workflows', current: true },

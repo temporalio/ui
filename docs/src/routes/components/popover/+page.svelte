@@ -1,8 +1,8 @@
 <script lang="ts">
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import { Button } from '$lib/io-ark/button';
-  import { Popover, type PopoverPlacement } from '$lib/io-ark/popover';
+  import { Button } from '$lib/io-poc/button';
+  import { Popover, type PopoverPlacement } from '$lib/io-poc/popover';
 
   import PopoverExamples from '../../../examples/popover-examples.svelte';
   import examplesSource from '../../../examples/popover-examples.svelte?raw';
@@ -36,8 +36,8 @@
 
   const source = $derived(
     `<script lang="ts">
-  import { Button } from '$lib/io-ark/button';
-  import { Popover } from '$lib/io-ark/popover';
+  import { Button } from '$lib/io-poc/button';
+  import { Popover } from '$lib/io-poc/popover';
   let open = $state(false);
 </` +
       `script>

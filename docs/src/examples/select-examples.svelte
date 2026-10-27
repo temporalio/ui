@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Select, type SelectItem } from '$lib/io-ark/select';
+  import { Select, type SelectItem } from '$lib/io-poc/select';
 
   const retentionPeriods: SelectItem[] = [
     { label: '1 day', value: '1', group: 'Standard' },

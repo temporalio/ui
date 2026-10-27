@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { SegmentGroup } from '$lib/io-ark/segment-group';
+  import { SegmentGroup } from '$lib/io-poc/segment-group';
 
   let range = $state<string | null>('24h');
   let status = $state<string | null>('all');

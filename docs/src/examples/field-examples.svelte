@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Field, FieldInput, FieldTextarea } from '$lib/io-ark/field';
+  import { Field, FieldInput, FieldTextarea } from '$lib/io-poc/field';
 
   let workflowId = $state('order-processing-1042');
   let taskQueue = $state('');

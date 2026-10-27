@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { ScrollArea } from '$lib/io-ark/scroll-area';
+  import { ScrollArea } from '$lib/io-poc/scroll-area';
 
   const eventTypes = [
     'WorkflowExecutionStarted',

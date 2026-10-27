@@ -4,7 +4,7 @@
     ScrollArea,
     type ScrollAreaOrientation,
     type ScrollAreaScrollbars,
-  } from '$lib/io-ark/scroll-area';
+  } from '$lib/io-poc/scroll-area';
 
   import ScrollAreaExamples from '../../../examples/scroll-area-examples.svelte';
   import examplesSource from '../../../examples/scroll-area-examples.svelte?raw';
@@ -35,7 +35,7 @@
 
   const source = $derived(
     `<script lang="ts">
-  import { ScrollArea } from '$lib/io-ark/scroll-area';
+  import { ScrollArea } from '$lib/io-poc/scroll-area';
 </` +
       `script>
 

@@ -23,24 +23,24 @@ history or a scheduled start time. Add time segments with `granularity`.
 
 ```svelte
 <script lang="ts">
-  import { DateInput, type DateValue } from '$lib/io-ark/date-input';
+  import { DateInput, type DateValue } from '$lib/io-poc/date-input';
   let value = $state<DateValue | undefined>();
 </script>
 
 <DateInput label="Started after" bind:value />
 ```
 
-Package consumers can import from `@temporalio/ui/io-ark/date-input`.
+Package consumers can import from `@temporalio/ui/io-poc/date-input`.
 
 ### Value
 
 `value` is a single `DateValue` from `@internationalized/date`, or `undefined` while
 the date is incomplete. Use `parseDate` to create one from an ISO string or a
-`Date`. It is exported from `$lib/io-ark/date-input`.
+`Date`. It is exported from `$lib/io-poc/date-input`.
 
 ```svelte
 <script lang="ts">
-  import { DateInput, parseDate } from '$lib/io-ark/date-input';
+  import { DateInput, parseDate } from '$lib/io-poc/date-input';
   let value = $state(parseDate('2026-10-27'));
 </script>
 
@@ -72,7 +72,7 @@ Arrow Left and Arrow Right move between segments, and Backspace clears it.
 
 ### Contract
 
-The rules reviewers check this component against live in `src/lib/io-ark/date-input/date-input.contract.md`, next to the source. The Contract section of this page shows them.
+The rules reviewers check this component against live in `src/lib/io-poc/date-input/date-input.contract.md`, next to the source. The Contract section of this page shows them.
 
 ## API reference
 

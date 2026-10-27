@@ -1,7 +1,7 @@
 <script lang="ts">
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import { TreeView, type TreeViewNode } from '$lib/io-ark/tree-view';
+  import { TreeView, type TreeViewNode } from '$lib/io-poc/tree-view';
 
   import TreeViewExamples from '../../../examples/tree-view-examples.svelte';
   import examplesSource from '../../../examples/tree-view-examples.svelte?raw';
@@ -51,7 +51,7 @@
 
   const source = $derived(
     `<script lang="ts">
-  import { TreeView, type TreeViewNode } from '$lib/io-ark/tree-view';
+  import { TreeView, type TreeViewNode } from '$lib/io-poc/tree-view';
 
   const nodes: TreeViewNode[] = [
     {

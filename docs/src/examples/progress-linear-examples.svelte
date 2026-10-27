@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { ProgressLinear } from '$lib/io-ark/progress';
+  import { ProgressLinear } from '$lib/io-poc/progress';
 
   const formatWorkflows = ({ value }: { value: number | null }) =>
     `${(value ?? 0).toLocaleString()} of 1,000 workflows`;

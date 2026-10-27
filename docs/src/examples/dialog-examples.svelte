@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { Button } from '$lib/io-ark/button';
-  import { Dialog } from '$lib/io-ark/dialog';
-  import { Field, FieldInput } from '$lib/io-ark/field';
+  import { Button } from '$lib/io-poc/button';
+  import { Dialog } from '$lib/io-poc/dialog';
+  import { Field, FieldInput } from '$lib/io-poc/field';
 
   let terminateOpen = $state(false);
   let terminated = $state(false);

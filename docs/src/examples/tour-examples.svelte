@@ -1,7 +1,7 @@
 <script lang="ts">
   import { IconAdd } from '$lib/io/icon';
-  import { Button } from '$lib/io-ark/button';
-  import { Tour, type TourStep } from '$lib/io-ark/tour';
+  import { Button } from '$lib/io-poc/button';
+  import { Tour, type TourStep } from '$lib/io-poc/tour';
 
   let open = $state(false);
   let outcome = $state('Not started');

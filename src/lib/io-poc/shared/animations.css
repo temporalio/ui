@@ -1,0 +1,119 @@
+@keyframes io-poc-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes io-poc-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes io-poc-float-in {
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes io-poc-drop-in {
+  from {
+    opacity: 0;
+    translate: 0 -4px;
+  }
+}
+
+@keyframes io-poc-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
+@keyframes io-poc-zoom-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+}
+
+@keyframes io-poc-slide-in-right {
+  from {
+    translate: 100% 0;
+  }
+}
+
+@keyframes io-poc-slide-out-right {
+  to {
+    translate: 100% 0;
+  }
+}
+
+@keyframes io-poc-slide-in-left {
+  from {
+    translate: -100% 0;
+  }
+}
+
+@keyframes io-poc-slide-out-left {
+  to {
+    translate: -100% 0;
+  }
+}
+
+@keyframes io-poc-slide-in-bottom {
+  from {
+    translate: 0 100%;
+  }
+}
+
+@keyframes io-poc-slide-out-bottom {
+  to {
+    translate: 0 100%;
+  }
+}
+
+@keyframes io-poc-progress-indeterminate {
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(250%);
+  }
+}
+
+@keyframes io-poc-collapsible-expand {
+  from {
+    height: var(--collapsed-height, 0);
+  }
+
+  to {
+    height: var(--height);
+  }
+}
+
+@keyframes io-poc-collapsible-collapse {
+  from {
+    height: var(--height);
+  }
+
+  to {
+    height: var(--collapsed-height, 0);
+  }
+}
+
+.io-poc-collapsible-content[data-state='open'] {
+  animation: io-poc-collapsible-expand 150ms ease-out;
+}
+
+.io-poc-collapsible-content[data-state='closed'] {
+  animation: io-poc-collapsible-collapse 150ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .io-poc-collapsible-content {
+    animation: none !important;
+  }
+}

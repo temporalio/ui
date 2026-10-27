@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Switch } from '$lib/io-ark/switch';
+  import { Switch } from '$lib/io-poc/switch';
 
   let paused = $state(false);
   let autoRefresh = $state(true);

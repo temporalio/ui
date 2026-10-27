@@ -22,8 +22,8 @@ Use tooltips to name icon-only buttons and to show the full value of truncated t
 ```svelte
 <script lang="ts">
   import { IconCopy } from '$lib/io/icon';
-  import { Button } from '$lib/io-ark/button';
-  import { Tooltip } from '$lib/io-ark/tooltip';
+  import { Button } from '$lib/io-poc/button';
+  import { Tooltip } from '$lib/io-poc/tooltip';
 </script>
 
 <Tooltip content="Copy workflow ID">
@@ -38,7 +38,7 @@ Use tooltips to name icon-only buttons and to show the full value of truncated t
 </Tooltip>
 ```
 
-Package consumers can import from `@temporalio/ui/io-ark/tooltip`.
+Package consumers can import from `@temporalio/ui/io-poc/tooltip`.
 
 ### Supplementary content only
 
@@ -66,7 +66,7 @@ delay. Escape closes the tooltip.
 
 ### Contract
 
-The rules reviewers check this component against live in `src/lib/io-ark/tooltip/tooltip.contract.md`, next to the source. The Contract section of this page shows them.
+The rules reviewers check this component against live in `src/lib/io-poc/tooltip/tooltip.contract.md`, next to the source. The Contract section of this page shows them.
 
 ## API reference
 

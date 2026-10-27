@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "io-poc": {
+      "command": "node",
+      "args": ["docs/mcp/server.mjs"]
+    }
+  }
+}

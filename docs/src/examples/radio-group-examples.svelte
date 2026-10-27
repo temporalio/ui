@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { RadioGroup, RadioGroupItem } from '$lib/io-ark/radio-group';
+  import { RadioGroup, RadioGroupItem } from '$lib/io-poc/radio-group';
 
   let conflictPolicy = $state<string | null>('fail');
   let resetPoint = $state<string | null>(null);

@@ -7,7 +7,7 @@
     type ButtonColorScheme,
     ButtonLink,
     type ButtonSize,
-  } from '$lib/io-ark/button';
+  } from '$lib/io-poc/button';
 
   import ButtonExamples from '../../../examples/button-examples.svelte';
   import examplesSource from '../../../examples/button-examples.svelte?raw';
@@ -37,7 +37,7 @@
 
   const source = $derived(
     `<script lang="ts">
-  import { ${componentType} } from '$lib/io-ark/button';${leadingIcon ? "\n  import { IconAdd } from '$lib/io/icon';" : ''}
+  import { ${componentType} } from '$lib/io-poc/button';${leadingIcon ? "\n  import { IconAdd } from '$lib/io/icon';" : ''}
 </` +
       `script>
 

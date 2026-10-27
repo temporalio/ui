@@ -24,7 +24,7 @@ range or a status filter. A sliding indicator marks the selected option.
 
 ```svelte
 <script lang="ts">
-  import { SegmentGroup } from '$lib/io-ark/segment-group';
+  import { SegmentGroup } from '$lib/io-poc/segment-group';
   let range = $state<string | null>('24h');
 </script>
 
@@ -39,7 +39,7 @@ range or a status filter. A sliding indicator marks the selected option.
 />
 ```
 
-Package consumers can import from `@temporalio/ui/io-ark/segment-group`.
+Package consumers can import from `@temporalio/ui/io-poc/segment-group`.
 
 ### When to use
 
@@ -70,7 +70,7 @@ reduced motion is requested.
 
 ### Contract
 
-The rules reviewers check this component against live in `src/lib/io-ark/segment-group/segment-group.contract.md`, next to the source. The Contract section of this page shows them.
+The rules reviewers check this component against live in `src/lib/io-poc/segment-group/segment-group.contract.md`, next to the source. The Contract section of this page shows them.
 
 ## API reference
 

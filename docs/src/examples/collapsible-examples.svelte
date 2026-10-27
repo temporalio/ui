@@ -1,6 +1,6 @@
 <script lang="ts">
   import Input from '$lib/holocene/input/input.svelte';
-  import { Collapsible } from '$lib/io-ark/collapsible';
+  import { Collapsible } from '$lib/io-poc/collapsible';
 
   let maximumAttempts = $state('5');
   const pendingActivities = ['ChargeCard', 'ReserveInventory', 'SendReceipt'];

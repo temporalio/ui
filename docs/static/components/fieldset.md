@@ -23,8 +23,8 @@ such as a retry policy. Disabling the fieldset disables every field inside it.
 
 ```svelte
 <script lang="ts">
-  import { Field, FieldInput } from '$lib/io-ark/field';
-  import { Fieldset } from '$lib/io-ark/fieldset';
+  import { Field, FieldInput } from '$lib/io-poc/field';
+  import { Fieldset } from '$lib/io-poc/fieldset';
 </script>
 
 <Fieldset legend="Retry policy" helperText="Applies to every activity.">
@@ -37,7 +37,7 @@ such as a retry policy. Disabling the fieldset disables every field inside it.
 </Fieldset>
 ```
 
-Package consumers can import from `@temporalio/ui/io-ark/fieldset`.
+Package consumers can import from `@temporalio/ui/io-poc/fieldset`.
 
 ### Legends
 
@@ -58,7 +58,7 @@ and skipped by keyboard navigation.
 
 ### Contract
 
-The rules reviewers check this component against live in `src/lib/io-ark/fieldset/fieldset.contract.md`, next to the source. The Contract section of this page shows them.
+The rules reviewers check this component against live in `src/lib/io-poc/fieldset/fieldset.contract.md`, next to the source. The Contract section of this page shows them.
 
 ## API reference
 

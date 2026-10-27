@@ -3,10 +3,11 @@ import { type ContractDocument, parseContractMarkdown } from './markdown';
 export interface ComponentContract extends ContractDocument {
   slug: string;
   path: string;
+  markdown: string;
 }
 
 const files = import.meta.glob<string>(
-  '../../../src/lib/io-ark/**/*.contract.md',
+  '../../../src/lib/io-poc/**/*.contract.md',
   { query: '?raw', import: 'default', eager: true },
 );
 
@@ -17,12 +18,14 @@ const contracts = new Map(
       .split('/')
       .pop()!
       .replace(/\.contract\.md$/, '');
-    return [slug, { slug, path, ...parseContractMarkdown(markdown) }];
+    return [slug, { slug, path, markdown, ...parseContractMarkdown(markdown) }];
   }),
 );
 
 export const getContract = (slug: string): ComponentContract | undefined =>
   contracts.get(slug);
+
+export const contractSlugs = [...contracts.keys()].sort();
 
 export const maintainerSections = [
   'known-gaps',

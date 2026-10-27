@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Pagination } from '$lib/io-ark/pagination';
+  import { Pagination } from '$lib/io-poc/pagination';
 
   const workflows = Array.from({ length: 87 }, (_, index) => ({
     id: `order-fulfillment-${(index + 1).toString().padStart(4, '0')}`,

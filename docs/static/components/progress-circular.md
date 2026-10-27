@@ -23,13 +23,13 @@ and the indeterminate state while work starts.
 
 ```svelte
 <script lang="ts">
-  import { ProgressCircular } from '$lib/io-ark/progress';
+  import { ProgressCircular } from '$lib/io-poc/progress';
 </script>
 
 <ProgressCircular label="Workers upgraded" value={6} max={8} showValue />
 ```
 
-Package consumers can import from `@temporalio/ui/io-ark/progress`.
+Package consumers can import from `@temporalio/ui/io-poc/progress`.
 
 ### Value
 
@@ -54,7 +54,7 @@ with it. Use `labelHidden` only when the purpose is clear from nearby content.
 
 ### Contract
 
-The rules reviewers check this component against live in `src/lib/io-ark/progress/progress-circular.contract.md`, next to the source. The Contract section of this page shows them.
+The rules reviewers check this component against live in `src/lib/io-poc/progress/progress-circular.contract.md`, next to the source. The Contract section of this page shows them.
 
 ## API reference
 

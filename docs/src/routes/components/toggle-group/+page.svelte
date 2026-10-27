@@ -6,7 +6,7 @@
     ToggleGroup,
     type ToggleGroupOrientation,
     type ToggleGroupSize,
-  } from '$lib/io-ark/toggle-group';
+  } from '$lib/io-poc/toggle-group';
 
   import ToggleGroupExamples from '../../../examples/toggle-group-examples.svelte';
   import examplesSource from '../../../examples/toggle-group-examples.svelte?raw';
@@ -35,7 +35,7 @@
 
   const source = $derived(
     `<script lang="ts">
-  import { ToggleGroup } from '$lib/io-ark/toggle-group';
+  import { ToggleGroup } from '$lib/io-poc/toggle-group';
   let value = $state<string[]>(${JSON.stringify(value)});
 </` +
       `script>

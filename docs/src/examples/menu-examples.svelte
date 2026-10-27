@@ -6,8 +6,8 @@
     IconTemporalSignal,
     IconTrash,
   } from '$lib/io/icon';
-  import { Button } from '$lib/io-ark/button';
-  import { Menu, type MenuEntry } from '$lib/io-ark/menu';
+  import { Button } from '$lib/io-poc/button';
+  import { Menu, type MenuEntry } from '$lib/io-poc/menu';
 
   let lastAction = $state('None');
   let columns = $state({

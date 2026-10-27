@@ -1,7 +1,7 @@
 <script lang="ts">
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import { Switch, type SwitchSize } from '$lib/io-ark/switch';
+  import { Switch, type SwitchSize } from '$lib/io-poc/switch';
 
   import SwitchExamples from '../../../examples/switch-examples.svelte';
   import examplesSource from '../../../examples/switch-examples.svelte?raw';
@@ -32,7 +32,7 @@
 
   const source = $derived(
     `<script lang="ts">
-  import { Switch } from '$lib/io-ark/switch';
+  import { Switch } from '$lib/io-poc/switch';
   let checked = $state(${checked});
 </` +
       `script>

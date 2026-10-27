@@ -24,7 +24,7 @@ compact switch inside a card. Badges show counts that help people choose a tab.
 
 ```svelte
 <script lang="ts">
-  import { Tabs, type TabsItem } from '$lib/io-ark/tabs';
+  import { Tabs, type TabsItem } from '$lib/io-poc/tabs';
 
   const items: TabsItem[] = [
     { value: 'history', label: 'History' },
@@ -41,7 +41,7 @@ compact switch inside a card. Badges show counts that help people choose a tab.
 </Tabs>
 ```
 
-Package consumers can import from `@temporalio/ui/io-ark/tabs`.
+Package consumers can import from `@temporalio/ui/io-poc/tabs`.
 
 ### Panels
 
@@ -73,7 +73,7 @@ the label.
 
 ### Contract
 
-The rules reviewers check this component against live in `src/lib/io-ark/tabs/tabs.contract.md`, next to the source. The Contract section of this page shows them.
+The rules reviewers check this component against live in `src/lib/io-poc/tabs/tabs.contract.md`, next to the source. The Contract section of this page shows them.
 
 ## API reference
 

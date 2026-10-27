@@ -24,7 +24,7 @@ value by small amounts. Add a unit when the number alone is ambiguous.
 
 ```svelte
 <script lang="ts">
-  import { NumberInput } from '$lib/io-ark/number-input';
+  import { NumberInput } from '$lib/io-poc/number-input';
   let attempts = $state('5');
 </script>
 
@@ -37,7 +37,7 @@ value by small amounts. Add a unit when the number alone is ambiguous.
 />
 ```
 
-Package consumers can import from `@temporalio/ui/io-ark/number-input`.
+Package consumers can import from `@temporalio/ui/io-poc/number-input`.
 
 ### Value
 
@@ -70,7 +70,7 @@ hidden from the tab order because the keyboard offers the same actions.
 
 ### Contract
 
-The rules reviewers check this component against live in `src/lib/io-ark/number-input/number-input.contract.md`, next to the source. The Contract section of this page shows them.
+The rules reviewers check this component against live in `src/lib/io-poc/number-input/number-input.contract.md`, next to the source. The Contract section of this page shows them.
 
 ## API reference
 

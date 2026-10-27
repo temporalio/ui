@@ -24,7 +24,7 @@ related secondary actions.
 
 ```svelte
 <script lang="ts">
-  import { Menu, type MenuEntry } from '$lib/io-ark/menu';
+  import { Menu, type MenuEntry } from '$lib/io-poc/menu';
 
   const items: MenuEntry[] = [
     { value: 'signal', label: 'Send signal' },
@@ -37,7 +37,7 @@ related secondary actions.
 <Menu label="Actions" {items} onSelect={(value) => console.log(value)} />
 ```
 
-Package consumers can import from `@temporalio/ui/io-ark/menu`.
+Package consumers can import from `@temporalio/ui/io-poc/menu`.
 
 ### Items
 
@@ -77,7 +77,7 @@ Escape or Arrow Left closes it. Focus returns to the trigger when the menu close
 
 ### Contract
 
-The rules reviewers check this component against live in `src/lib/io-ark/menu/menu.contract.md`, next to the source. The Contract section of this page shows them.
+The rules reviewers check this component against live in `src/lib/io-poc/menu/menu.contract.md`, next to the source. The Contract section of this page shows them.
 
 ## API reference
 

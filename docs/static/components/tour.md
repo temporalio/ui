@@ -26,8 +26,8 @@ steps highlight parts of a workflow list with a spotlight and a popover beside t
 
 ```svelte
 <script lang="ts">
-  import { Button } from '$lib/io-ark/button';
-  import { Tour, type TourStep } from '$lib/io-ark/tour';
+  import { Button } from '$lib/io-poc/button';
+  import { Tour, type TourStep } from '$lib/io-poc/tour';
 
   let open = $state(false);
   let filters = $state<HTMLElement | null>(null);
@@ -52,7 +52,7 @@ steps highlight parts of a workflow list with a spotlight and a popover beside t
 <Tour {steps} bind:open />
 ```
 
-Package consumers can import from `@temporalio/ui/io-ark/tour`.
+Package consumers can import from `@temporalio/ui/io-poc/tour`.
 
 ### Steps
 
@@ -84,7 +84,7 @@ default, clicking outside the popover does not end the tour.
 
 ### Contract
 
-The rules reviewers check this component against live in `src/lib/io-ark/tour/tour.contract.md`, next to the source. The Contract section of this page shows them.
+The rules reviewers check this component against live in `src/lib/io-poc/tour/tour.contract.md`, next to the source. The Contract section of this page shows them.
 
 ## API reference
 

@@ -26,7 +26,7 @@ limits are listed in the error message with the reason.
 
 ```svelte
 <script lang="ts">
-  import { FileUpload } from '$lib/io-ark/file-upload';
+  import { FileUpload } from '$lib/io-poc/file-upload';
   let files = $state<File[]>([]);
 </script>
 
@@ -39,7 +39,7 @@ limits are listed in the error message with the reason.
 />
 ```
 
-Package consumers can import from `@temporalio/ui/io-ark/file-upload`.
+Package consumers can import from `@temporalio/ui/io-poc/file-upload`.
 
 ### Choosing files
 
@@ -73,7 +73,7 @@ error text are linked to it. Each remove button has an accessible label from
 
 ### Contract
 
-The rules reviewers check this component against live in `src/lib/io-ark/file-upload/file-upload.contract.md`, next to the source. The Contract section of this page shows them.
+The rules reviewers check this component against live in `src/lib/io-poc/file-upload/file-upload.contract.md`, next to the source. The Contract section of this page shows them.
 
 ## API reference
 

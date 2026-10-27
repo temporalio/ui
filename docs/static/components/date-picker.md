@@ -25,14 +25,14 @@ start time. Limit the selectable dates with `min`, `max`, or `isDateUnavailable`
 
 ```svelte
 <script lang="ts">
-  import { DatePicker, type DateValue } from '$lib/io-ark/date-picker';
+  import { DatePicker, type DateValue } from '$lib/io-poc/date-picker';
   let value = $state<DateValue[]>([]);
 </script>
 
 <DatePicker label="Start date" bind:value />
 ```
 
-Package consumers can import from `@temporalio/ui/io-ark/date-picker`.
+Package consumers can import from `@temporalio/ui/io-poc/date-picker`.
 
 ### Value
 
@@ -43,7 +43,7 @@ means nothing is selected. Use `parseDate` to create dates from ISO strings or
 
 ```svelte
 <script lang="ts">
-  import { DatePicker, parseDate } from '$lib/io-ark/date-picker';
+  import { DatePicker, parseDate } from '$lib/io-poc/date-picker';
   let value = $state([parseDate('2026-10-01'), parseDate('2026-10-27')]);
 </script>
 
@@ -77,7 +77,7 @@ selects. Escape closes the calendar and returns focus to the trigger.
 
 ### Contract
 
-The rules reviewers check this component against live in `src/lib/io-ark/date-picker/date-picker.contract.md`, next to the source. The Contract section of this page shows them.
+The rules reviewers check this component against live in `src/lib/io-poc/date-picker/date-picker.contract.md`, next to the source. The Contract section of this page shows them.
 
 ## API reference
 

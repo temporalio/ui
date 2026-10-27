@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { NumberInput } from '$lib/io-ark/number-input';
+  import { NumberInput } from '$lib/io-poc/number-input';
 
   let attempts = $state('5');
   let timeout = $state('30');

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Checkbox, CheckboxGroup } from '$lib/io-ark/checkbox';
+  import { Checkbox, CheckboxGroup } from '$lib/io-poc/checkbox';
 
   const taskQueues = ['orders', 'payments', 'notifications'];
   let selectedQueues = $state(['orders']);

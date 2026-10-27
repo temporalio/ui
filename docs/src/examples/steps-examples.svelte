@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { Field, FieldInput } from '$lib/io-ark/field';
-  import { Steps, type StepsItem } from '$lib/io-ark/steps';
+  import { Field, FieldInput } from '$lib/io-poc/field';
+  import { Steps, type StepsItem } from '$lib/io-poc/steps';
 
   const items: StepsItem[] = [
     { title: 'Details', description: 'Name and region' },

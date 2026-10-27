@@ -24,7 +24,7 @@ error message are linked to the control for assistive technology.
 
 ```svelte
 <script lang="ts">
-  import { Field, FieldInput } from '$lib/io-ark/field';
+  import { Field, FieldInput } from '$lib/io-poc/field';
   let workflowId = $state('');
 </script>
 
@@ -33,7 +33,7 @@ error message are linked to the control for assistive technology.
 </Field>
 ```
 
-Package consumers can import from `@temporalio/ui/io-ark/field`.
+Package consumers can import from `@temporalio/ui/io-poc/field`.
 
 ### Labels
 
@@ -62,7 +62,7 @@ you rarely need to wrap them.
 
 ### Contract
 
-The rules reviewers check this component against live in `src/lib/io-ark/field/field.contract.md`, next to the source. The Contract section of this page shows them.
+The rules reviewers check this component against live in `src/lib/io-poc/field/field.contract.md`, next to the source. The Contract section of this page shows them.
 
 ## API reference
 

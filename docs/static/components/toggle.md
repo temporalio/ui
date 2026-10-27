@@ -21,14 +21,14 @@ or pinning an item. Icon-only toggles need an accessible name.
 
 ```svelte
 <script lang="ts">
-  import { Toggle } from '$lib/io-ark/toggle';
+  import { Toggle } from '$lib/io-poc/toggle';
   let liveUpdates = $state(true);
 </script>
 
 <Toggle label="Live updates" bind:pressed={liveUpdates} />
 ```
 
-Package consumers can import from `@temporalio/ui/io-ark/toggle`.
+Package consumers can import from `@temporalio/ui/io-poc/toggle`.
 
 ### When to use
 
@@ -49,7 +49,7 @@ state. Screen readers announce it as a toggle button with its pressed state.
 
 ### Contract
 
-The rules reviewers check this component against live in `src/lib/io-ark/toggle/toggle.contract.md`, next to the source. The Contract section of this page shows them.
+The rules reviewers check this component against live in `src/lib/io-poc/toggle/toggle.contract.md`, next to the source. The Contract section of this page shows them.
 
 ## API reference
 

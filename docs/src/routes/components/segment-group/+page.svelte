@@ -5,7 +5,7 @@
     SegmentGroup,
     type SegmentGroupOrientation,
     type SegmentGroupSize,
-  } from '$lib/io-ark/segment-group';
+  } from '$lib/io-poc/segment-group';
 
   import SegmentGroupExamples from '../../../examples/segment-group-examples.svelte';
   import examplesSource from '../../../examples/segment-group-examples.svelte?raw';
@@ -34,7 +34,7 @@
 
   const source = $derived(
     `<script lang="ts">
-  import { SegmentGroup } from '$lib/io-ark/segment-group';
+  import { SegmentGroup } from '$lib/io-poc/segment-group';
   let value = $state<string | null>(${JSON.stringify(value)});
 </` +
       `script>

@@ -25,7 +25,7 @@ and invalid states. Type to filter the options.
 
 ```svelte
 <script lang="ts">
-  import { Combobox } from '$lib/io-ark/combobox';
+  import { Combobox } from '$lib/io-poc/combobox';
   let value = $state<string[]>([]);
 </script>
 
@@ -37,7 +37,7 @@ and invalid states. Type to filter the options.
 />
 ```
 
-Package consumers can import from `@temporalio/ui/io-ark/combobox`.
+Package consumers can import from `@temporalio/ui/io-poc/combobox`.
 
 ### When to use
 
@@ -88,7 +88,7 @@ change them with `clearLabel` and `triggerLabel`.
 
 ### Contract
 
-The rules reviewers check this component against live in `src/lib/io-ark/combobox/combobox.contract.md`, next to the source. The Contract section of this page shows them.
+The rules reviewers check this component against live in `src/lib/io-poc/combobox/combobox.contract.md`, next to the source. The Contract section of this page shows them.
 
 ## API reference
 

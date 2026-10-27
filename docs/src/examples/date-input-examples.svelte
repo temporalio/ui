@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { DateInput, type DateValue, parseDate } from '$lib/io-ark/date-input';
+  import { DateInput, type DateValue, parseDate } from '$lib/io-poc/date-input';
 
   let cutoff = $state<DateValue | undefined>(parseDate('2026-10-01'));
   let scheduledStart = $state<DateValue | undefined>();

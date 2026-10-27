@@ -25,7 +25,7 @@ exact number. Add two thumbs to select a range, and marks to show common values.
 
 ```svelte
 <script lang="ts">
-  import { Slider } from '$lib/io-ark/slider';
+  import { Slider } from '$lib/io-poc/slider';
   let retention = $state([30]);
 </script>
 
@@ -38,7 +38,7 @@ exact number. Add two thumbs to select a range, and marks to show common values.
 />
 ```
 
-Package consumers can import from `@temporalio/ui/io-ark/slider`.
+Package consumers can import from `@temporalio/ui/io-poc/slider`.
 
 ### Value and ranges
 
@@ -68,7 +68,7 @@ Down change it by a larger step. Home and End jump to the minimum and maximum.
 
 ### Contract
 
-The rules reviewers check this component against live in `src/lib/io-ark/slider/slider.contract.md`, next to the source. The Contract section of this page shows them.
+The rules reviewers check this component against live in `src/lib/io-poc/slider/slider.contract.md`, next to the source. The Contract section of this page shows them.
 
 ## API reference
 

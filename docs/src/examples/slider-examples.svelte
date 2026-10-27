@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Slider } from '$lib/io-ark/slider';
+  import { Slider } from '$lib/io-poc/slider';
 
   let retention = $state([30]);
   let latency = $state([200, 1500]);

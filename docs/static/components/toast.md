@@ -24,8 +24,8 @@ an immediate decision, or track a request while it is in progress.
 
 ```svelte
 <script lang="ts">
-  import { Button } from '$lib/io-ark/button';
-  import { Toaster, toaster } from '$lib/io-ark/toast';
+  import { Button } from '$lib/io-poc/button';
+  import { Toaster, toaster } from '$lib/io-poc/toast';
 </script>
 
 <Toaster />
@@ -42,7 +42,7 @@ an immediate decision, or track a request while it is in progress.
 </Button>
 ```
 
-Package consumers can import from `@temporalio/ui/io-ark/toast`.
+Package consumers can import from `@temporalio/ui/io-poc/toast`.
 
 ### Toaster setup
 
@@ -77,7 +77,7 @@ set `duration: Infinity` so they stay until dismissed.
 
 ### Contract
 
-The rules reviewers check this component against live in `src/lib/io-ark/toast/toast.contract.md`, next to the source. The Contract section of this page shows them.
+The rules reviewers check this component against live in `src/lib/io-poc/toast/toast.contract.md`, next to the source. The Contract section of this page shows them.
 
 ## API reference
 

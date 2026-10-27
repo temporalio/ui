@@ -5,7 +5,7 @@
     type ProgressColorScheme,
     ProgressLinear,
     type ProgressLinearSize,
-  } from '$lib/io-ark/progress';
+  } from '$lib/io-poc/progress';
 
   import ProgressLinearExamples from '../../../examples/progress-linear-examples.svelte';
   import examplesSource from '../../../examples/progress-linear-examples.svelte?raw';
@@ -38,7 +38,7 @@
 
   const source = $derived(
     `<script lang="ts">
-  import { ProgressLinear } from '$lib/io-ark/progress';
+  import { ProgressLinear } from '$lib/io-poc/progress';
 </` +
       `script>
 

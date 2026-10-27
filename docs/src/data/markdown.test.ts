@@ -96,10 +96,10 @@ describe('component Markdown', () => {
 });
 
 describe('component contracts', () => {
-  const contractFiles = readdirSync('src/lib/io-ark', { recursive: true })
+  const contractFiles = readdirSync('src/lib/io-poc', { recursive: true })
     .map(String)
     .filter((file) => file.endsWith('.contract.md'))
-    .map((file) => join('src/lib/io-ark', file));
+    .map((file) => join('src/lib/io-poc', file));
   const docSlugs = readdirSync('docs/static/components').map((file) =>
     file.replace(/\.md$/, ''),
   );

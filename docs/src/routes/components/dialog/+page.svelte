@@ -1,8 +1,8 @@
 <script lang="ts">
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import { Button } from '$lib/io-ark/button';
-  import { Dialog, type DialogSize } from '$lib/io-ark/dialog';
+  import { Button } from '$lib/io-poc/button';
+  import { Dialog, type DialogSize } from '$lib/io-poc/dialog';
 
   import DialogExamples from '../../../examples/dialog-examples.svelte';
   import examplesSource from '../../../examples/dialog-examples.svelte?raw';
@@ -28,8 +28,8 @@
 
   const source = $derived(
     `<script lang="ts">
-  import { Button } from '$lib/io-ark/button';
-  import { Dialog } from '$lib/io-ark/dialog';
+  import { Button } from '$lib/io-poc/button';
+  import { Dialog } from '$lib/io-poc/dialog';
   let open = $state(false);
 </` +
       `script>

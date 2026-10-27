@@ -6,7 +6,7 @@
 
   import { Badge } from '$lib/io/badge';
   import { IconMoon, IconSun, IconTemporal } from '$lib/io/icon';
-  import { Button } from '$lib/io-ark/button';
+  import { Button } from '$lib/io-poc/button';
 
   import { components } from '$docs/data/components';
 
@@ -25,6 +25,11 @@
     { label: 'Typography', href: '/foundations/typography' },
     { label: 'Spacing' },
     { label: 'Icons', href: '/foundations/icons' },
+  ];
+
+  const agentPages = [
+    { label: 'LLMs.txt', href: '/for-agents/llms-txt' },
+    { label: 'MCP server', href: '/for-agents/mcp-server' },
   ];
 
   const navLinkClass =
@@ -100,6 +105,12 @@
               <Badge text="Coming soon" size="sm" />
             </span>
           {/if}
+        {/each}
+      </nav>
+      <h2 id="agents-heading" class="{navHeadingClass} mt-4">For agents</h2>
+      <nav aria-labelledby="agents-heading" class="space-y-1">
+        {#each agentPages as item (item.href)}
+          {@render navLink(item.label, item.href)}
         {/each}
       </nav>
       <h2 id="components-heading" class="{navHeadingClass} mt-4">Components</h2>

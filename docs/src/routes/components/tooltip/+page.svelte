@@ -2,8 +2,8 @@
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import { IconCopy } from '$lib/io/icon';
-  import { Button } from '$lib/io-ark/button';
-  import { Tooltip, type TooltipPlacement } from '$lib/io-ark/tooltip';
+  import { Button } from '$lib/io-poc/button';
+  import { Tooltip, type TooltipPlacement } from '$lib/io-poc/tooltip';
 
   import TooltipExamples from '../../../examples/tooltip-examples.svelte';
   import examplesSource from '../../../examples/tooltip-examples.svelte?raw';
@@ -34,8 +34,8 @@
   const source = $derived(
     `<script lang="ts">
   import { IconCopy } from '$lib/io/icon';
-  import { Button } from '$lib/io-ark/button';
-  import { Tooltip } from '$lib/io-ark/tooltip';
+  import { Button } from '$lib/io-poc/button';
+  import { Tooltip } from '$lib/io-poc/tooltip';
 </` +
       `script>
 

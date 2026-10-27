@@ -1,7 +1,7 @@
 <script lang="ts">
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import { FileUpload } from '$lib/io-ark/file-upload';
+  import { FileUpload } from '$lib/io-poc/file-upload';
 
   import FileUploadExamples from '../../../examples/file-upload-examples.svelte';
   import examplesSource from '../../../examples/file-upload-examples.svelte?raw';
@@ -36,7 +36,7 @@
 
   const source = $derived(
     `<script lang="ts">
-  import { FileUpload } from '$lib/io-ark/file-upload';
+  import { FileUpload } from '$lib/io-poc/file-upload';
   let files = $state<File[]>([]);
 </` +
       `script>

@@ -23,14 +23,14 @@ Sizes are `xs`, `sm`, and `md`.
 
 ```svelte
 <script lang="ts">
-  import { Button, ButtonLink } from '$lib/io-ark/button';
+  import { Button, ButtonLink } from '$lib/io-poc/button';
 </script>
 
 <Button>Create workflow</Button>
 <ButtonLink href="/namespaces">View namespaces</ButtonLink>
 ```
 
-Package consumers can import from `@temporalio/ui/io-ark/button`.
+Package consumers can import from `@temporalio/ui/io-poc/button`.
 
 ### Labels
 
@@ -56,7 +56,7 @@ the result when the action completes.
 
 ### Contract
 
-The rules reviewers check this component against live in `src/lib/io-ark/button/button.contract.md`, next to the source. The Contract section of this page shows them.
+The rules reviewers check this component against live in `src/lib/io-poc/button/button.contract.md`, next to the source. The Contract section of this page shows them.
 
 ## API reference
 

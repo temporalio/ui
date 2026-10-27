@@ -26,7 +26,7 @@ disabled and invalid states.
 
 ```svelte
 <script lang="ts">
-  import { Select } from '$lib/io-ark/select';
+  import { Select } from '$lib/io-poc/select';
   let value = $state<string[]>([]);
 </script>
 
@@ -38,7 +38,7 @@ disabled and invalid states.
 />
 ```
 
-Package consumers can import from `@temporalio/ui/io-ark/select`.
+Package consumers can import from `@temporalio/ui/io-poc/select`.
 
 ### When to use
 
@@ -89,7 +89,7 @@ counterparts.
 
 ### Contract
 
-The rules reviewers check this component against live in `src/lib/io-ark/select/select.contract.md`, next to the source. The Contract section of this page shows them.
+The rules reviewers check this component against live in `src/lib/io-poc/select/select.contract.md`, next to the source. The Contract section of this page shows them.
 
 ## API reference
 

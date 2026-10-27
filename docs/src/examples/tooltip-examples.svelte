@@ -1,7 +1,7 @@
 <script lang="ts">
   import { IconCopy, IconPause, IconRetry } from '$lib/io/icon';
-  import { Button } from '$lib/io-ark/button';
-  import { Tooltip } from '$lib/io-ark/tooltip';
+  import { Button } from '$lib/io-poc/button';
+  import { Tooltip } from '$lib/io-poc/tooltip';
 
   const runId = '5f2c9b1e-41a7-4d3b-9c2e-8a1f7d6e0b34';
 </script>

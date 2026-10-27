@@ -6,7 +6,7 @@
     IconTableDense,
     IconTimeline,
   } from '$lib/io/icon';
-  import { ToggleGroup } from '$lib/io-ark/toggle-group';
+  import { ToggleGroup } from '$lib/io-poc/toggle-group';
 
   let view = $state(['compact']);
   let display = $state(['timestamps']);

@@ -1,8 +1,8 @@
 <script lang="ts">
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import { Field, FieldInput } from '$lib/io-ark/field';
-  import { Fieldset } from '$lib/io-ark/fieldset';
+  import { Field, FieldInput } from '$lib/io-poc/field';
+  import { Fieldset } from '$lib/io-poc/fieldset';
 
   import FieldsetExamples from '../../../examples/fieldset-examples.svelte';
   import examplesSource from '../../../examples/fieldset-examples.svelte?raw';
@@ -26,8 +26,8 @@
 
   const source = $derived(
     `<script lang="ts">
-  import { Field, FieldInput } from '$lib/io-ark/field';
-  import { Fieldset } from '$lib/io-ark/fieldset';
+  import { Field, FieldInput } from '$lib/io-poc/field';
+  import { Fieldset } from '$lib/io-poc/fieldset';
 </` +
       `script>
 

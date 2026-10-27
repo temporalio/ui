@@ -6,7 +6,7 @@
     type TabsItem,
     type TabsOrientation,
     type TabsVariant,
-  } from '$lib/io-ark/tabs';
+  } from '$lib/io-poc/tabs';
 
   import TabsExamples from '../../../examples/tabs-examples.svelte';
   import examplesSource from '../../../examples/tabs-examples.svelte?raw';
@@ -43,7 +43,7 @@
 
   const source = $derived(
     `<script lang="ts">
-  import { Tabs, type TabsItem } from '$lib/io-ark/tabs';
+  import { Tabs, type TabsItem } from '$lib/io-poc/tabs';
 
   const items: TabsItem[] = [
     { value: 'history', label: 'History' },

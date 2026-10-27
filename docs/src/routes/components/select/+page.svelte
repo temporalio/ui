@@ -1,7 +1,7 @@
 <script lang="ts">
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import { Select } from '$lib/io-ark/select';
+  import { Select } from '$lib/io-poc/select';
 
   import SelectExamples from '../../../examples/select-examples.svelte';
   import examplesSource from '../../../examples/select-examples.svelte?raw';
@@ -36,7 +36,7 @@
 
   const source = $derived(
     `<script lang="ts">
-  import { Select } from '$lib/io-ark/select';
+  import { Select } from '$lib/io-poc/select';
   const statuses = ${JSON.stringify(statuses)};
   let value = $state<string[]>(${JSON.stringify(value)});
 </` +

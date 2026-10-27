@@ -1,6 +1,6 @@
 <script lang="ts">
   import { IconPin, IconPinSolid, IconStar, IconStarSolid } from '$lib/io/icon';
-  import { Toggle } from '$lib/io-ark/toggle';
+  import { Toggle } from '$lib/io-poc/toggle';
 
   let liveUpdates = $state(true);
   let pinned = $state(false);

@@ -2,7 +2,7 @@
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import { IconPin, IconPinSolid } from '$lib/io/icon';
-  import { Toggle, type ToggleSize } from '$lib/io-ark/toggle';
+  import { Toggle, type ToggleSize } from '$lib/io-poc/toggle';
 
   import ToggleExamples from '../../../examples/toggle-examples.svelte';
   import examplesSource from '../../../examples/toggle-examples.svelte?raw';
@@ -24,7 +24,7 @@
 
   const source = $derived(
     `<script lang="ts">
-  import { Toggle } from '$lib/io-ark/toggle';${icon ? "\n  import { IconPin, IconPinSolid } from '$lib/io/icon';" : ''}
+  import { Toggle } from '$lib/io-poc/toggle';${icon ? "\n  import { IconPin, IconPinSolid } from '$lib/io/icon';" : ''}
   let pressed = $state(${pressed});
 </` +
       `script>

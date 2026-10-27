@@ -9,17 +9,17 @@ import { defineConfig } from 'vite';
 
 import theme from './tailwind.config';
 
-const sourceDirs = ['../src/lib/io-ark', './src'].map((dir) =>
+const sourceDirs = ['../src/lib/io-poc', './src'].map((dir) =>
   fileURLToPath(new URL(dir, import.meta.url)),
 );
 
 const arkImports = new Set(
   sourceDirs.flatMap((dir) =>
-    readdirSync(dir, { recursive: true, encoding: 'utf8' })
-      .filter((file) => /\.(svelte|ts)$/.test(file))
+    readdirSync(dir, { recursive: true, withFileTypes: true })
+      .filter((file) => file.isFile() && /\.(svelte|ts)$/.test(file.name))
       .flatMap((file) =>
         Array.from(
-          readFileSync(`${dir}/${file}`, 'utf8').matchAll(
+          readFileSync(`${file.parentPath}/${file.name}`, 'utf8').matchAll(
             /from '(@ark-ui\/svelte\/[a-z-]+)'/g,
           ),
           (match) => match[1],

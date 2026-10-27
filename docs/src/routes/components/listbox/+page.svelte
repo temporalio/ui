@@ -1,7 +1,7 @@
 <script lang="ts">
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import { Listbox, type ListboxSelectionMode } from '$lib/io-ark/listbox';
+  import { Listbox, type ListboxSelectionMode } from '$lib/io-poc/listbox';
 
   import ListboxExamples from '../../../examples/listbox-examples.svelte';
   import examplesSource from '../../../examples/listbox-examples.svelte?raw';
@@ -48,7 +48,7 @@
 
   const source = $derived(
     `<script lang="ts">
-  import { Listbox } from '$lib/io-ark/listbox';
+  import { Listbox } from '$lib/io-poc/listbox';
   const taskQueues = ${JSON.stringify(taskQueues, null, 2).replace(/\n/g, '\n  ')};
   let value = $state<string[]>(${JSON.stringify(value)});
 </` +

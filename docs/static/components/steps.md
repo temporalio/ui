@@ -25,7 +25,7 @@ number, a check mark once complete, and a ring on the current step.
 
 ```svelte
 <script lang="ts">
-  import { Steps, type StepsItem } from '$lib/io-ark/steps';
+  import { Steps, type StepsItem } from '$lib/io-poc/steps';
 
   const items: StepsItem[] = [
     { title: 'Details' },
@@ -45,7 +45,7 @@ number, a check mark once complete, and a ring on the current step.
 </Steps>
 ```
 
-Package consumers can import from `@temporalio/ui/io-ark/steps`.
+Package consumers can import from `@temporalio/ui/io-poc/steps`.
 
 ### Step state
 
@@ -77,7 +77,7 @@ its state carry the meaning.
 
 ### Contract
 
-The rules reviewers check this component against live in `src/lib/io-ark/steps/steps.contract.md`, next to the source. The Contract section of this page shows them.
+The rules reviewers check this component against live in `src/lib/io-poc/steps/steps.contract.md`, next to the source. The Contract section of this page shows them.
 
 ## API reference
 

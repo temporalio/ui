@@ -25,7 +25,7 @@ results at once.
 
 ```svelte
 <script lang="ts">
-  import { Pagination } from '$lib/io-ark/pagination';
+  import { Pagination } from '$lib/io-poc/pagination';
   let page = $state(1);
   let pageSize = $state(25);
 </script>
@@ -39,7 +39,7 @@ results at once.
 />
 ```
 
-Package consumers can import from `@temporalio/ui/io-ark/pagination`.
+Package consumers can import from `@temporalio/ui/io-poc/pagination`.
 
 ### Page state
 
@@ -67,7 +67,7 @@ summary is announced politely when it changes.
 
 ### Contract
 
-The rules reviewers check this component against live in `src/lib/io-ark/pagination/pagination.contract.md`, next to the source. The Contract section of this page shows them.
+The rules reviewers check this component against live in `src/lib/io-poc/pagination/pagination.contract.md`, next to the source. The Contract section of this page shows them.
 
 ## API reference
 

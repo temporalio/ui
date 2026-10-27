@@ -5,7 +5,7 @@
     DateInput,
     type DateInputGranularity,
     type DateValue,
-  } from '$lib/io-ark/date-input';
+  } from '$lib/io-poc/date-input';
 
   import DateInputExamples from '../../../examples/date-input-examples.svelte';
   import examplesSource from '../../../examples/date-input-examples.svelte?raw';
@@ -37,7 +37,7 @@
   const hasTime = $derived(granularity !== 'day');
   const source = $derived(
     `<script lang="ts">
-  import { DateInput, type DateValue } from '$lib/io-ark/date-input';
+  import { DateInput, type DateValue } from '$lib/io-poc/date-input';
   let value = $state<DateValue | undefined>();
 </` +
       `script>

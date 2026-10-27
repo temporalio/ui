@@ -23,7 +23,7 @@ custom trigger when the toggle needs to show a count or status.
 
 ```svelte
 <script lang="ts">
-  import { Collapsible } from '$lib/io-ark/collapsible';
+  import { Collapsible } from '$lib/io-poc/collapsible';
   let open = $state(false);
 </script>
 
@@ -32,7 +32,7 @@ custom trigger when the toggle needs to show a count or status.
 </Collapsible>
 ```
 
-Package consumers can import from `@temporalio/ui/io-ark/collapsible`.
+Package consumers can import from `@temporalio/ui/io-poc/collapsible`.
 
 ### Collapsible or Accordion
 
@@ -68,7 +68,7 @@ Disabled triggers cannot be activated.
 
 ### Contract
 
-The rules reviewers check this component against live in `src/lib/io-ark/collapsible/collapsible.contract.md`, next to the source. The Contract section of this page shows them.
+The rules reviewers check this component against live in `src/lib/io-poc/collapsible/collapsible.contract.md`, next to the source. The Contract section of this page shows them.
 
 ## API reference
 

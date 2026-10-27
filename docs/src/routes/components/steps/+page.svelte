@@ -1,6 +1,6 @@
 <script lang="ts">
   import Checkbox from '$lib/holocene/checkbox.svelte';
-  import { Steps, type StepsOrientation } from '$lib/io-ark/steps';
+  import { Steps, type StepsOrientation } from '$lib/io-poc/steps';
 
   import StepsExamples from '../../../examples/steps-examples.svelte';
   import examplesSource from '../../../examples/steps-examples.svelte?raw';
@@ -37,7 +37,7 @@
 
   const source = $derived(
     `<script lang="ts">
-  import { Steps, type StepsItem } from '$lib/io-ark/steps';
+  import { Steps, type StepsItem } from '$lib/io-poc/steps';
 
   const items: StepsItem[] = [
 ${previewItems.map((item) => `    ${JSON.stringify(item).replace(/"(\w+)":/g, '$1: ')},`).join('\n')}

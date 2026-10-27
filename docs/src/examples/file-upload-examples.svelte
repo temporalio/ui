@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { FileUpload } from '$lib/io-ark/file-upload';
+  import { FileUpload } from '$lib/io-poc/file-upload';
 
   let history = $state<File[]>([]);
   let certificates = $state<File[]>([]);

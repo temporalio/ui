@@ -4,7 +4,7 @@
   import {
     RadioGroup,
     type RadioGroupOrientation,
-  } from '$lib/io-ark/radio-group';
+  } from '$lib/io-poc/radio-group';
 
   import RadioGroupExamples from '../../../examples/radio-group-examples.svelte';
   import examplesSource from '../../../examples/radio-group-examples.svelte?raw';
@@ -40,7 +40,7 @@
 
   const source = $derived(
     `<script lang="ts">
-  import { RadioGroup } from '$lib/io-ark/radio-group';
+  import { RadioGroup } from '$lib/io-poc/radio-group';
   let value = $state<string | null>(${JSON.stringify(value)});
 </` +
       `script>

@@ -5,7 +5,7 @@
     NavigationMenu,
     type NavigationMenuItem,
     type NavigationMenuOrientation,
-  } from '$lib/io-ark/navigation-menu';
+  } from '$lib/io-poc/navigation-menu';
 
   import NavigationMenuExamples from '../../../examples/navigation-menu-examples.svelte';
   import examplesSource from '../../../examples/navigation-menu-examples.svelte?raw';
@@ -62,7 +62,7 @@
   import {
     NavigationMenu,
     type NavigationMenuItem,
-  } from '$lib/io-ark/navigation-menu';
+  } from '$lib/io-poc/navigation-menu';
 
   const items: NavigationMenuItem[] = [
     { label: 'Workflows', href: '/workflows'${current === 'Workflows' ? ', current: true' : ''} },

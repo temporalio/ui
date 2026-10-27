@@ -26,14 +26,14 @@ each value as it is added, and limit how many can be entered.
 
 ```svelte
 <script lang="ts">
-  import { TagsInput } from '$lib/io-ark/tags-input';
+  import { TagsInput } from '$lib/io-poc/tags-input';
   let value = $state<string[]>(['priority']);
 </script>
 
 <TagsInput label="Keywords" bind:value placeholder="Add a keyword" />
 ```
 
-Package consumers can import from `@temporalio/ui/io-ark/tags-input`.
+Package consumers can import from `@temporalio/ui/io-poc/tags-input`.
 
 ### When to use
 
@@ -66,7 +66,7 @@ remove the highlighted tag. Each tag's remove button has an accessible label fro
 
 ### Contract
 
-The rules reviewers check this component against live in `src/lib/io-ark/tags-input/tags-input.contract.md`, next to the source. The Contract section of this page shows them.
+The rules reviewers check this component against live in `src/lib/io-poc/tags-input/tags-input.contract.md`, next to the source. The Contract section of this page shows them.
 
 ## API reference
 

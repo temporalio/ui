@@ -3,7 +3,7 @@
     DatePicker,
     type DateValue,
     parseDate,
-  } from '$lib/io-ark/date-picker';
+  } from '$lib/io-poc/date-picker';
 
   let scheduleStart = $state<DateValue[]>([]);
   let startedBetween = $state<DateValue[]>([

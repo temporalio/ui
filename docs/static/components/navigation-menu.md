@@ -27,7 +27,7 @@ single trigger. Mark the page people are on with `current`.
   import {
     NavigationMenu,
     type NavigationMenuItem,
-  } from '$lib/io-ark/navigation-menu';
+  } from '$lib/io-poc/navigation-menu';
 
   const items: NavigationMenuItem[] = [
     { label: 'Workflows', href: '/workflows', current: true },
@@ -45,7 +45,7 @@ single trigger. Mark the page people are on with `current`.
 <NavigationMenu {items} label="Main" />
 ```
 
-Package consumers can import from `@temporalio/ui/io-ark/navigation-menu`.
+Package consumers can import from `@temporalio/ui/io-poc/navigation-menu`.
 
 ### Links and groups
 
@@ -77,7 +77,7 @@ instead of opening a floating panel.
 
 ### Contract
 
-The rules reviewers check this component against live in `src/lib/io-ark/navigation-menu/navigation-menu.contract.md`, next to the source. The Contract section of this page shows them.
+The rules reviewers check this component against live in `src/lib/io-poc/navigation-menu/navigation-menu.contract.md`, next to the source. The Contract section of this page shows them.
 
 ## API reference
 

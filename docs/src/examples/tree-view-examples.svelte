@@ -1,6 +1,6 @@
 <script lang="ts">
   import { IconFolders, IconPlay } from '$lib/io/icon';
-  import { TreeView, type TreeViewNode } from '$lib/io-ark/tree-view';
+  import { TreeView, type TreeViewNode } from '$lib/io-poc/tree-view';
 
   const workflows: TreeViewNode[] = [
     {
