@@ -9,7 +9,7 @@ require (
 	github.com/gomarkdown/markdown v0.0.0-20260411013819-759bbc3e3207
 	github.com/gorilla/securecookie v1.1.1
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.30.0
-	github.com/labstack/echo/v4 v4.15.4
+	github.com/labstack/echo/v4 v4.16.1
 	github.com/stretchr/testify v1.11.1
 	github.com/urfave/cli/v2 v2.3.0
 	go.temporal.io/api v1.64.0
@@ -26,7 +26,7 @@ require (
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/go-jose/go-jose/v4 v4.1.4 // indirect
+	github.com/go-jose/go-jose/v4 v4.1.6 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/huandu/xstrings v1.5.0 // indirect
 	github.com/labstack/gommon v0.5.0 // indirect

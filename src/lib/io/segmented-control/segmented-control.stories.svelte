@@ -11,7 +11,7 @@
   const states = ['default', 'hover', 'focus', 'disabled'];
 
   const { Story } = defineMeta({
-    title: 'IO/Design System/Segmented Control',
+    title: 'IO/Components/Segmented Control',
     component: Segment,
     args: {
       selected: false,

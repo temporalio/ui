@@ -25,5 +25,10 @@
 </script>
 
 <Tooltip topLeft text={delayedText} hide={!delayed}>
-  <BadgeStatus {status} {extensions} data-testid="execution-status" />
+  <BadgeStatus
+    {status}
+    {extensions}
+    data-testid="execution-status"
+    class="shrink-0"
+  />
 </Tooltip>

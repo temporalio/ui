@@ -52,7 +52,7 @@
     'data-testid'?: string;
     menuButtonClass?: ClassNameValue;
     menuClass?: ClassNameValue;
-    variant?: ButtonStyles['variant'];
+    variant?: Extract<ButtonStyles['variant'], 'primary' | 'secondary'>;
     required?: boolean;
     valid?: boolean;
     error?: string;
@@ -125,6 +125,8 @@
 
   const errorId = $derived(`${id}-error`);
   const showError = $derived(!!error && !valid);
+  const isPrimary = $derived(variant === 'primary');
+  const showPlaceholder = $derived(!value && placeholder !== '');
 </script>
 
 <MenuContainer class="w-full" {open}>
@@ -133,7 +135,9 @@
     {#key $labelCtx}
       <MenuButton
         class={merge(
-          'w-full border-secondary bg-background-primary text-primary focus-visible:border-secondary focus-visible:bg-background-primary focus-visible:ring-interactive-primary enabled:hover:border-tertiary enabled:hover:bg-interactive-tertiary-hover disabled:bg-surface-tertiary disabled:opacity-disabled',
+          'w-full',
+          !isPrimary &&
+            'border-secondary bg-background-primary text-primary focus-visible:bg-background-primary enabled:hover:border-tertiary enabled:hover:bg-interactive-tertiary-hover disabled:bg-surface-tertiary',
           !valid &&
             'border-danger focus-visible:border-danger focus-visible:ring-danger',
           menuButtonClass,
@@ -158,11 +162,12 @@
         {/snippet}
         <input
           {id}
-          value={!value && placeholder !== '' ? placeholder : $labelCtx}
+          value={showPlaceholder ? placeholder : $labelCtx}
           tabindex="-1"
           disabled
           class={merge(
-            !value && placeholder !== '' ? 'text-secondary' : 'text-primary',
+            isPrimary ? 'text-white' : 'text-primary',
+            showPlaceholder && (isPrimary ? 'opacity-90' : 'text-secondary'),
           )}
           class:disabled
           {required}
