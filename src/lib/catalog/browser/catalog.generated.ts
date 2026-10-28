@@ -2,7 +2,7 @@ import type { BrowserCatalogArtifact } from './types';
 
 export const catalogArtifact: BrowserCatalogArtifact = {
   sourceHash:
-    'ab1d28559cd8149433f8505b38591843db129021116c4f63f3a2a9f5e2b9f690',
+    '968f077d215a60f4fb8a97a4f08a97aca87b7a3ace8c8721b90373d9e9f9f128',
   descriptors: [
     {
       id: 'activity-heartbeat',
