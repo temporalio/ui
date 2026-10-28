@@ -94,7 +94,9 @@ export async function submitCreateSchedule(
   try {
     body = await getRequestBody(formData);
   } catch (error) {
-    const errorMessage = `${translate('data-encoder.encode-error')}: ${getErrorMessage(error)}`;
+    const errorMessage = translate('schedules.create-schedule-error', {
+      error: getErrorMessage(error),
+    });
     serverError.set(errorMessage);
     toaster.push({ variant: 'error', message: errorMessage });
     return;
@@ -135,7 +137,9 @@ export async function submitEditSchedule(
   try {
     body = await getRequestBody(formData, schedule);
   } catch (error) {
-    const errorMessage = `${translate('data-encoder.encode-error')}: ${getErrorMessage(error)}`;
+    const errorMessage = translate('schedules.edit-schedule-error', {
+      error: getErrorMessage(error),
+    });
     serverError.set(errorMessage);
     toaster.push({ variant: 'error', message: errorMessage });
     return;

@@ -1,10 +1,12 @@
 import { parseDuration } from '$lib/holocene/duration-input/duration-input.svelte';
+import { translate } from '$lib/i18n/translate';
 import type {
   ScheduleActionRequest,
   SchedulePoliciesRequest,
   StartWorkflowRequest,
 } from '$lib/types/schedule';
 import { encodePayloads } from '$lib/utilities/encode-payload';
+import { getErrorMessage } from '$lib/utilities/error-message';
 
 import type { FormWorkflowDetails } from './schema';
 import { getSearchAttributes } from '../../utilities/get-search-attributes';
@@ -57,6 +59,11 @@ export async function getWorkflowActionRequest(
           input: details.input,
           encoding: details.encoding,
           messageType: details.messageType,
+        }).catch((cause: unknown) => {
+          throw new Error(
+            `${translate('data-encoder.encode-error')}: ${getErrorMessage(cause)}`,
+            { cause },
+          );
         })
       : null;
 
