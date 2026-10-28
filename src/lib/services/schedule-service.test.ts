@@ -682,7 +682,7 @@ describe('schedule mutation thrown errors', () => {
           },
         };
         await run(inputForm);
-        const expectedMessage = `Codec Server failed to encode: ${message}`;
+        const expectedMessage = `${prefix}Codec Server failed to encode: ${message}`;
         expect(get(serverError)).toBe(expectedMessage);
         expect(get(toaster.toasts)).toEqual([
           expect.objectContaining({
