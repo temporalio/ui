@@ -1,11 +1,14 @@
 import { ApiObservationError } from './observation';
+import { getCatalogExecutionAction } from '../browser/execution-action';
 import { declaredExecutionId } from '../browser/start-example';
 import type {
   BrowserCatalogDescriptor,
   BrowserCatalogExecution,
+  BrowserScheduleAction,
   JsonValue,
 } from '../browser/types';
 import type {
+  AcceptedLaunchReference,
   EvidenceLink,
   LaunchOutcome,
   LaunchReference,
@@ -24,6 +27,14 @@ type LaunchRequestBase = {
 };
 
 export type ApiLaunchRequest =
+  | (LaunchRequestBase & {
+      kind: 'schedule';
+      action: BrowserScheduleAction;
+      scheduleId: string;
+      spec: JsonValue;
+      policies: JsonValue;
+      state: JsonValue;
+    })
   | (LaunchRequestBase & {
       kind: 'workflow';
       workflowType: string;
@@ -71,9 +82,7 @@ export type WorkbenchHostDependencies = {
     request: { namespace: string; endpoint: string },
     signal?: AbortSignal,
   ) => Promise<boolean>;
-  createEvidenceHref: (
-    reference: LaunchReference & { runId: string },
-  ) => string;
+  createEvidenceHref: (reference: AcceptedLaunchReference) => string;
 };
 
 const targetFor = (execution: BrowserCatalogExecution): LaunchTarget => ({
@@ -95,6 +104,18 @@ const launchRequestFor = (
     input: command.input,
     startOptions: command.startOptions,
   };
+
+  if (execution.kind === 'schedule') {
+    return {
+      ...base,
+      kind: execution.kind,
+      action: execution.action,
+      scheduleId: executionId,
+      spec: execution.spec,
+      policies: execution.policies,
+      state: execution.state,
+    };
+  }
 
   if (execution.kind === 'workflow') {
     return {
@@ -195,8 +216,16 @@ export const assembleWorkbenchHost = ({
         };
       }
 
+      if (result.status === 'accepted' && reference.kind === 'schedule') {
+        return {
+          status: 'accepted',
+          reference: { ...reference, kind: 'schedule' },
+        };
+      }
+
       if (
         result.status === 'accepted' &&
+        reference.kind !== 'schedule' &&
         typeof result.runId === 'string' &&
         result.runId
       ) {
@@ -227,10 +256,11 @@ export const assembleWorkbenchHost = ({
         throw new Error(`Unknown catalog example: ${exampleId}`);
       }
 
+      const action = getCatalogExecutionAction(descriptor.execution);
       const taskQueueType =
-        descriptor.execution.kind === 'workflow'
+        action.kind === 'workflow'
           ? 1
-          : descriptor.execution.kind === 'standalone-activity'
+          : action.kind === 'standalone-activity'
             ? 2
             : 3;
       let workerCheck: WorkerReadinessCheck;
@@ -263,10 +293,10 @@ export const assembleWorkbenchHost = ({
       const checks: ReadinessCheck[] = [workerCheck];
 
       const declaredEndpoints =
-        descriptor.execution.kind === 'standalone-nexus-operation'
-          ? [descriptor.execution.endpoint]
-          : descriptor.execution.kind === 'workflow'
-            ? (descriptor.execution.nexusEndpoints ?? [])
+        action.kind === 'standalone-nexus-operation'
+          ? [action.endpoint]
+          : action.kind === 'workflow'
+            ? (action.nexusEndpoints ?? [])
             : [];
 
       for (const endpoint of declaredEndpoints) {
@@ -310,7 +340,7 @@ export const assembleWorkbenchHost = ({
         request.reference.kind !== descriptor.execution.kind ||
         !request.reference.attempt.attemptId ||
         !request.reference.attempt.executionId ||
-        !request.reference.runId ||
+        (request.reference.kind !== 'schedule' && !request.reference.runId) ||
         target.targetId !== expectedTarget?.targetId ||
         target.namespace !== expectedTarget?.namespace ||
         target.taskQueue !== expectedTarget?.taskQueue
@@ -322,7 +352,10 @@ export const assembleWorkbenchHost = ({
     },
     evidenceLink: (outcome): EvidenceLink => ({
       href: createEvidenceHref(outcome.reference),
-      label: 'Open details',
+      label:
+        outcome.reference.kind === 'schedule'
+          ? 'Open Schedule'
+          : 'Open details',
     }),
   };
 };

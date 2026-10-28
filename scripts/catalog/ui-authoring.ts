@@ -149,7 +149,12 @@ export const createUiCatalogAuthoring = (rootDirectory = getProjectRoot()) => {
       return artifacts.flatMap((artifact) =>
         (artifact?.descriptors ?? []).map((descriptor) => {
           const value = descriptor as {
-            execution?: { targetId?: unknown; workflowType?: unknown };
+            execution?: {
+              kind?: unknown;
+              targetId?: unknown;
+              workflowType?: unknown;
+              action?: { kind?: unknown; workflowType?: unknown };
+            };
             id?: unknown;
             source?: { id?: unknown };
           };
@@ -160,14 +165,18 @@ export const createUiCatalogAuthoring = (rootDirectory = getProjectRoot()) => {
           ) {
             throw new Error('Catalog descriptor graph is invalid');
           }
+          const action =
+            value.execution.kind === 'schedule'
+              ? value.execution.action
+              : value.execution;
           return {
             id: value.id,
             sourceFiles: [],
             sourceId: value.source.id,
             targetId: value.execution.targetId,
             workflowType:
-              typeof value.execution.workflowType === 'string'
-                ? value.execution.workflowType
+              typeof action?.workflowType === 'string'
+                ? action.workflowType
                 : undefined,
           };
         }),

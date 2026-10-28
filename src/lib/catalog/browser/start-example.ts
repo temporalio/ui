@@ -31,12 +31,14 @@ const isJsonObject = (value: JsonValue): value is Record<string, JsonValue> =>
 
 export const executionIdOptionName = (
   kind: BrowserCatalogDescriptor['execution']['kind'],
-): 'activityId' | 'operationId' | 'workflowId' =>
+): 'activityId' | 'operationId' | 'scheduleId' | 'workflowId' =>
   kind === 'workflow'
     ? 'workflowId'
-    : kind === 'standalone-activity'
-      ? 'activityId'
-      : 'operationId';
+    : kind === 'schedule'
+      ? 'scheduleId'
+      : kind === 'standalone-activity'
+        ? 'activityId'
+        : 'operationId';
 
 /**
  * The execution id an example pins in its start options. Examples that leave it
@@ -285,7 +287,9 @@ export const startFromEditors = async ({
     input = parseJson(inputEditor);
     const editorStartOptions = parseJson(startOptionsEditor);
     startOptions =
-      sharedStartOptions && isJsonObject(editorStartOptions)
+      descriptor.execution.kind === 'workflow' &&
+      sharedStartOptions &&
+      isJsonObject(editorStartOptions)
         ? { ...editorStartOptions, ...sharedStartOptions }
         : editorStartOptions;
   } catch {
@@ -336,7 +340,10 @@ export const startFromEditors = async ({
   const session = await sessionStore.start({
     descriptor,
     input,
-    startOptions: await encodeSharedStartOptions(startOptions),
+    startOptions:
+      descriptor.execution.kind === 'schedule'
+        ? startOptions
+        : await encodeSharedStartOptions(startOptions),
     executionId,
   });
 

@@ -40,6 +40,16 @@ export const catalogKinds: Readonly<
     glyphClass: 'rounded-sm bg-action-workflow',
     badgeClass: 'bg-action-workflow-overlay',
   },
+  schedule: {
+    kind: 'schedule',
+    label: 'Schedule',
+    locationLabel: 'Task Queue',
+    location: taskQueue,
+    pollingWorkerLabel: 'A Worker is polling for scheduled tasks',
+    serverlessWorkerLabel: 'A serverless Worker starts for scheduled tasks',
+    glyphClass: 'rounded-full bg-action-workflow',
+    badgeClass: 'bg-action-workflow-overlay',
+  },
   'standalone-activity': {
     kind: 'standalone-activity',
     label: 'Standalone Activity',

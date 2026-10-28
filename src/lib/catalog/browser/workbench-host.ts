@@ -1,4 +1,9 @@
-import type { BrowserCatalogExecution, JsonValue } from './types';
+import { getCatalogExecutionAction } from './execution-action';
+import type {
+  BrowserCatalogDescriptor,
+  BrowserCatalogExecution,
+  JsonValue,
+} from './types';
 
 export type AttemptIdentity = {
   attemptId: string;
@@ -26,9 +31,18 @@ export type LaunchReference = {
   runId?: string;
 };
 
+export type AcceptedLaunchReference = Omit<LaunchReference, 'kind'> &
+  (
+    | { kind: 'schedule' }
+    | {
+        kind: Exclude<BrowserCatalogExecution['kind'], 'schedule'>;
+        runId: string;
+      }
+  );
+
 export type AcceptedLaunchOutcome = {
   status: 'accepted';
-  reference: LaunchReference & { runId: string };
+  reference: AcceptedLaunchReference;
 };
 
 export type RejectedLaunchOutcome = {
@@ -62,7 +76,7 @@ export type ExecutionTerminalStatus =
   | 'timed-out';
 
 export type ObservationRequest = {
-  reference: AcceptedLaunchOutcome['reference'];
+  reference: AcceptedLaunchReference;
   continuation?: JsonValue;
 };
 
@@ -78,7 +92,15 @@ export type TerminalObservation = {
   snapshot: JsonValue;
 };
 
-export type ExecutionObservation = RunningObservation | TerminalObservation;
+export type ResourceReadyObservation = {
+  state: 'ready';
+  snapshot: JsonValue;
+};
+
+export type ExecutionObservation =
+  | RunningObservation
+  | TerminalObservation
+  | ResourceReadyObservation;
 
 export type ReadinessState =
   | 'indeterminate'
@@ -133,14 +155,15 @@ export type CatalogStartPolicy = {
 };
 
 export const catalogStartAllowed = (
-  descriptor: {
-    execution: Pick<BrowserCatalogExecution, 'kind' | 'namespace'>;
-  },
+  descriptor: Pick<BrowserCatalogDescriptor, 'execution'>,
   policy: CatalogStartPolicy,
 ): boolean =>
   !policy.disableWriteActions &&
   !policy.namespaceWriteDisabled(descriptor.execution.namespace) &&
-  !(descriptor.execution.kind === 'workflow' && policy.workflowStartsDisabled);
+  !(
+    getCatalogExecutionAction(descriptor.execution).kind === 'workflow' &&
+    policy.workflowStartsDisabled
+  );
 
 export const createAttemptIdentity = (
   createId: () => string = () => crypto.randomUUID(),

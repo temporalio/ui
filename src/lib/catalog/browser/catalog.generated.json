@@ -1,5 +1,5 @@
 {
-  "sourceHash": "ab1d28559cd8149433f8505b38591843db129021116c4f63f3a2a9f5e2b9f690",
+  "sourceHash": "7591556b58f23da0ff532ce7e343082f50b15296d60d92b10cff8c54810ad34c",
   "descriptors": [
     {
       "id": "activity-heartbeat",
@@ -774,6 +774,176 @@
         "namespace": "default",
         "taskQueue": "ui-catalog",
         "workflowType": "satelliteLaunchEventGroups"
+      },
+      "source": { "id": "oss", "label": "OSS" }
+    },
+    {
+      "id": "schedule-overlap-buffer-one",
+      "title": "Schedule: buffer one overlapping run",
+      "description": "Schedules a 20-second workflow every 10 seconds, buffering one pending action instead of running workflows concurrently, with a three-action allowance.",
+      "capabilityTags": [
+        "schedule",
+        "interval",
+        "overlap",
+        "buffer-one",
+        "timer"
+      ],
+      "expectedEvidence": [
+        "The Schedule has a 10-second interval, Buffer One overlap policy, and an initial allowance of three actions.",
+        "Each workflow history shows a 20-second timer before completion with the supplied message.",
+        "While a run is open, at most one action is buffered. It starts after the open run completes; additional overlapping times are not queued.",
+        "Scheduled runs do not overlap, and automatic starts stop once the three-action allowance is exhausted."
+      ],
+      "setupMarkdown": "Run automatically creates an **active Schedule** in the current namespace; no manual Schedule setup is needed. Keep the catalog worker running. No activities or external services are used.\n\nThe first action occurs at the next 10-second interval boundary. Each workflow sleeps for 20 seconds, so scheduled times arrive while it is still running. Buffer One retains at most one pending action and starts it after the current workflow closes; it does not build an unbounded queue. With the worker available, allow about 60–70 seconds for three workflows to finish. The action allowance is three and the catch-up window is 60 seconds. Inspect buffered actions while a run is open, compare workflow start and close times, and inspect the 20-second timers in history.\n\nOpen the returned **Schedule link** to inspect remaining actions and links to workflow runs. Re-running creates another Schedule unless you supply a scheduleId; delete an existing Schedule before reusing its ID.\n\nFor cleanup, manually delete the Schedule in the UI, including after its allowance is exhausted or it pauses. Deleting a Schedule does not delete or stop workflows already running; let those finish or terminate them separately.",
+      "input": {
+        "defaultValue": ["Buffered run completed"],
+        "schema": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "minItems": 1,
+          "maxItems": 1
+        }
+      },
+      "startOptions": {
+        "defaultValue": {},
+        "schema": {
+          "type": "object",
+          "properties": { "scheduleId": { "type": "string", "minLength": 1 } },
+          "additionalProperties": false
+        }
+      },
+      "execution": {
+        "kind": "schedule",
+        "targetId": "shared-workflows",
+        "namespace": "default",
+        "taskQueue": "ui-catalog",
+        "action": {
+          "kind": "workflow",
+          "workflowType": "scheduleOverlapBufferOne"
+        },
+        "spec": { "interval": [{ "interval": "10s" }] },
+        "policies": {
+          "overlapPolicy": "SCHEDULE_OVERLAP_POLICY_BUFFER_ONE",
+          "pauseOnFailure": false,
+          "catchupWindow": "60s"
+        },
+        "state": {
+          "paused": false,
+          "limitedActions": true,
+          "remainingActions": "3"
+        }
+      },
+      "source": { "id": "oss", "label": "OSS" }
+    },
+    {
+      "id": "schedule-pause-on-failure",
+      "title": "Schedule: pause after a workflow failure",
+      "description": "Runs a deliberately failing workflow every 30 seconds, demonstrating automatic pause on failure with a three-action safety limit.",
+      "capabilityTags": [
+        "schedule",
+        "pause-on-failure",
+        "failure",
+        "limited-actions"
+      ],
+      "expectedEvidence": [
+        "The Schedule starts active with pause on failure enabled, a 30-second interval, and three remaining actions.",
+        "The first workflow fails with a non-retryable ScheduledDemoFailure containing the supplied message, rather than a Workflow Task failure.",
+        "After observing the failure, the Schedule becomes paused, normally with two actions remaining; later interval boundaries do not start workflows while paused."
+      ],
+      "setupMarkdown": "Run automatically creates an **active Schedule** in the current namespace; no manual Schedule setup is needed. Keep the catalog worker running. No activities or external services are used.\n\nThe first action occurs at the next 30-second interval boundary, so normally the failure and automatic pause are visible within about 30 seconds. The workflow deliberately throws ApplicationFailure.nonRetryable with type ScheduledDemoFailure. No workflow retry policy is configured, and workflows do not retry by default; this is a terminal workflow failure, not a repeatedly failing Workflow Task. The Schedule uses Skip overlap, a 60-second catch-up window, and a three-action allowance as a safety bound even if you manually resume it. Normally it pauses after the first failed action with two actions left. Inspect the paused state and failure details, then wait past another interval boundary to confirm there are no new runs.\n\nOpen the returned **Schedule link** to inspect remaining actions and links to workflow runs. Re-running creates another Schedule unless you supply a scheduleId; delete an existing Schedule before reusing its ID.\n\nFor cleanup, manually delete the Schedule in the UI, including after its allowance is exhausted or it pauses. Deleting a Schedule does not delete or stop workflows already running; let those finish or terminate them separately.",
+      "input": {
+        "defaultValue": ["Intentional scheduled failure"],
+        "schema": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "minItems": 1,
+          "maxItems": 1
+        }
+      },
+      "startOptions": {
+        "defaultValue": {},
+        "schema": {
+          "type": "object",
+          "properties": { "scheduleId": { "type": "string", "minLength": 1 } },
+          "additionalProperties": false
+        }
+      },
+      "execution": {
+        "kind": "schedule",
+        "targetId": "shared-workflows",
+        "namespace": "default",
+        "taskQueue": "ui-catalog",
+        "action": {
+          "kind": "workflow",
+          "workflowType": "schedulePauseOnFailure"
+        },
+        "spec": { "interval": [{ "interval": "30s" }] },
+        "policies": {
+          "overlapPolicy": "SCHEDULE_OVERLAP_POLICY_SKIP",
+          "pauseOnFailure": true,
+          "catchupWindow": "60s"
+        },
+        "state": {
+          "paused": false,
+          "limitedActions": true,
+          "remainingActions": "3"
+        }
+      },
+      "source": { "id": "oss", "label": "OSS" }
+    },
+    {
+      "id": "schedule-recurring-success",
+      "title": "Schedule: three successful runs",
+      "description": "Completes a small workflow every 30 seconds, with an allowance of three actions.",
+      "capabilityTags": [
+        "schedule",
+        "interval",
+        "limited-actions",
+        "terminal-outcome"
+      ],
+      "expectedEvidence": [
+        "The Schedule starts active with a 30-second interval, Skip overlap, and three remaining actions.",
+        "Up to three workflows complete with the supplied message as their result, consuming one action each.",
+        "After the third action, remaining actions is zero and no further automatic workflows start. The Schedule still exists."
+      ],
+      "setupMarkdown": "Run automatically creates an **active Schedule** in the current namespace; no manual Schedule setup is needed. Keep the catalog worker running. No activities or external services are used.\n\nThe first action occurs at the next 30-second interval boundary, not necessarily immediately. With the worker available, expect three quick successful runs within about 90 seconds. The action allowance is three, overlap is Skip, and missed times are eligible for catch-up for 60 seconds. Inspect each workflow result to see the supplied message.\n\nOpen the returned **Schedule link** to inspect remaining actions and links to workflow runs. Re-running creates another Schedule unless you supply a scheduleId; delete an existing Schedule before reusing its ID.\n\nFor cleanup, manually delete the Schedule in the UI, including after its allowance is exhausted or it pauses. Deleting a Schedule does not delete or stop workflows already running; let those finish or terminate them separately.",
+      "input": {
+        "defaultValue": ["Scheduled check completed"],
+        "schema": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "minItems": 1,
+          "maxItems": 1
+        }
+      },
+      "startOptions": {
+        "defaultValue": {},
+        "schema": {
+          "type": "object",
+          "properties": { "scheduleId": { "type": "string", "minLength": 1 } },
+          "additionalProperties": false
+        }
+      },
+      "execution": {
+        "kind": "schedule",
+        "targetId": "shared-workflows",
+        "namespace": "default",
+        "taskQueue": "ui-catalog",
+        "action": {
+          "kind": "workflow",
+          "workflowType": "scheduleRecurringSuccess"
+        },
+        "spec": { "interval": [{ "interval": "30s" }] },
+        "policies": {
+          "overlapPolicy": "SCHEDULE_OVERLAP_POLICY_SKIP",
+          "pauseOnFailure": false,
+          "catchupWindow": "60s"
+        },
+        "state": {
+          "paused": false,
+          "limitedActions": true,
+          "remainingActions": "3"
+        }
       },
       "source": { "id": "oss", "label": "OSS" }
     },

@@ -13,9 +13,10 @@ import {
 } from './catalog-test-descriptors';
 
 describe('catalogKinds', () => {
-  it('lists workflows first, then standalone activities and Nexus operations', () => {
+  it('lists workflows and schedules first, then standalone activities and Nexus operations', () => {
     expect(orderedCatalogKinds.map(({ kind }) => kind)).toEqual([
       'workflow',
+      'schedule',
       'standalone-activity',
       'standalone-nexus-operation',
     ]);

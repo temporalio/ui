@@ -162,6 +162,7 @@
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
 
   import { featureLabel } from './catalog-features';
+  import { getCatalogExecutionAction } from './execution-action';
   import { launchOutcomeExplanation } from './launch-outcome-presentation';
   import { createReadinessLoader } from './readiness-loader';
   import { sessionStatusPresentation } from './session-presentation';
@@ -195,6 +196,10 @@
 
   let { descriptor, host, sessionStore, workerStartCommand }: Props = $props();
 
+  let executionAction = $derived(
+    getCatalogExecutionAction(descriptor.execution),
+  );
+
   let inputEditor = $state('');
   let startOptionsEditor = $state('');
   let inputMalformed = $state(false);
@@ -215,6 +220,8 @@
    * their start request cannot carry.
    */
   let sharedStartOptionsDeclared = $derived.by(() => {
+    if (descriptor.execution.kind !== 'workflow') return false;
+
     const schema = descriptor.startOptions.schema;
     const properties =
       typeof schema === 'object' &&
@@ -247,9 +254,11 @@
   let executionIdLabel = $derived(
     descriptor.execution.kind === 'workflow'
       ? 'Workflow ID'
-      : descriptor.execution.kind === 'standalone-activity'
-        ? 'Activity ID'
-        : 'Operation ID',
+      : descriptor.execution.kind === 'schedule'
+        ? 'Schedule ID'
+        : descriptor.execution.kind === 'standalone-activity'
+          ? 'Activity ID'
+          : 'Operation ID',
   );
   let fixedExecutionFields: FixedExecutionField[] = $derived.by(() => {
     const execution = descriptor.execution;
@@ -261,8 +270,16 @@
       id: 'catalog-execution-id',
       label: executionIdLabel,
       value: pinnedId ?? plannedExecutionId,
-      placeholder: pinnedId ? undefined : 'Generated for each run',
-      hint: pinnedId ? undefined : 'Generated for the next run.',
+      placeholder: pinnedId
+        ? undefined
+        : execution.kind === 'schedule'
+          ? 'Generated for each launch'
+          : 'Generated for each run',
+      hint: pinnedId
+        ? undefined
+        : execution.kind === 'schedule'
+          ? 'Generated for the next launch.'
+          : 'Generated for the next run.',
     };
     const taskQueue: FixedExecutionField = {
       id: 'catalog-task-queue',
@@ -270,26 +287,28 @@
       value: execution.taskQueue,
     };
 
-    if (execution.kind === 'workflow') {
+    const action = executionAction;
+
+    if (action.kind === 'workflow') {
       return [
         identity,
         taskQueue,
         {
           id: 'catalog-workflow-type',
           label: 'Workflow Type',
-          value: execution.workflowType,
+          value: action.workflowType,
         },
       ];
     }
 
-    if (execution.kind === 'standalone-activity') {
+    if (action.kind === 'standalone-activity') {
       return [
         identity,
         taskQueue,
         {
           id: 'catalog-activity-type',
           label: 'Activity Type',
-          value: execution.activityType,
+          value: action.activityType,
         },
       ];
     }
@@ -300,17 +319,17 @@
       {
         id: 'catalog-endpoint',
         label: 'Nexus Endpoint',
-        value: execution.endpoint,
+        value: action.endpoint,
       },
       {
         id: 'catalog-service',
         label: 'Service',
-        value: execution.service,
+        value: action.service,
       },
       {
         id: 'catalog-operation',
         label: 'Operation',
-        value: execution.operation,
+        value: action.operation,
       },
     ];
   });
@@ -333,7 +352,7 @@
   let workerPresentation = $derived(
     readinessPresentation({
       kind: 'worker',
-      executionKind: descriptor.execution.kind,
+      executionKind: executionAction.kind,
       state: readinessLoading ? 'loading' : workerReadinessState,
       taskQueue: descriptor.execution.taskQueue,
       workerStartCommand,
@@ -352,7 +371,7 @@
             (check) =>
               readinessPresentation({
                 kind: check.kind,
-                executionKind: descriptor.execution.kind,
+                executionKind: executionAction.kind,
                 state: check.state,
                 taskQueue: descriptor.execution.taskQueue,
               }).iconLabel,
@@ -366,6 +385,9 @@
         session.targetFingerprint ===
           catalogTargetFingerprint(descriptor.execution),
     ),
+  );
+  let attemptsLabel = $derived(
+    descriptor.execution.kind === 'schedule' ? 'Launches' : 'Runs',
   );
   const normalizedKind = (value: string) =>
     value.toLocaleLowerCase().replaceAll('-', ' ');
@@ -656,15 +678,15 @@
         </div>
       </section>
 
-      <section class="space-y-3" aria-label="Runs">
-        <h2 class="text-lg">Runs</h2>
+      <section class="space-y-3" aria-label={attemptsLabel}>
+        <h2 class="text-lg">{attemptsLabel}</h2>
         <div
           data-testid="run-sessions-region"
           class="max-h-96 w-full overflow-auto"
         >
-          <Table aria-label="Runs" class="min-w-[44rem]" fixed>
+          <Table aria-label={attemptsLabel} class="min-w-[44rem]" fixed>
             {#snippet caption()}
-              <caption class="sr-only">Runs</caption>
+              <caption class="sr-only">{attemptsLabel}</caption>
             {/snippet}
             {#snippet headers()}
               <TableHeaderRow>
@@ -748,7 +770,7 @@
             {:else}
               <TableRow>
                 <td colspan="4" class="py-6 text-center text-sm text-secondary">
-                  Runs appear here until you refresh the page.
+                  {attemptsLabel} appear here until you refresh the page.
                 </td>
               </TableRow>
             {/if}
@@ -838,7 +860,7 @@
             {#each prerequisiteReadiness as check, index (`${check.kind}-${index}`)}
               {@const presentation = readinessPresentation({
                 kind: check.kind,
-                executionKind: descriptor.execution.kind,
+                executionKind: executionAction.kind,
                 state: check.state,
                 taskQueue: descriptor.execution.taskQueue,
               })}
