@@ -32,6 +32,20 @@ export const durationString = () =>
     )
     .refine((val): val is DurationString => /^\d+s$/.test(val));
 
+export const optionalDurationString = () =>
+  z
+    .preprocess(
+      (input) => input ?? '',
+      z.union([z.literal(''), durationString()]),
+    )
+    .default('');
+
+export const durationStringWithDefault = (fallback: DurationString) =>
+  z.preprocess(
+    (input) => (input == null || input === '' ? fallback : input),
+    durationString(),
+  );
+
 export const jsonString = () =>
   z
     .string()
