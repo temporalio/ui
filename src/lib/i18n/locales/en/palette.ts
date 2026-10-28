@@ -24,6 +24,7 @@ export const Strings = {
   'scope-hint': 'Type a key and a space to scope. Tab cycles scopes.',
   'on-this-page': 'On this page',
   recent: 'Recent',
-  'result-count': '{{count}} results',
-  'one-result': '1 result',
+  'result-count_one': '{{count}} result',
+  'result-count_other': '{{count}} results',
+  dev: 'dev',
 } as const;

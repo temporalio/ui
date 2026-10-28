@@ -47,6 +47,18 @@ type ItemSource = (tool: PaletteTool, ctx: PaletteContext) => PaletteItem[];
 // the dev styling.
 export type ContextForVariant = (variant: PaletteVariant) => PaletteContext;
 
+function sectionTitle(
+  toolSet: PaletteToolSet,
+  tool: PaletteTool,
+  page: boolean,
+  labelSections: boolean,
+  pageSection: string,
+): string {
+  if (page) return pageSection;
+  if (!labelSections) return tool.section;
+  return `${toolSet.label} · ${tool.section}`;
+}
+
 function entries(
   toolSets: readonly PaletteToolSet[],
   contextFor: ContextForVariant,
@@ -59,11 +71,13 @@ function entries(
     const ctx = contextFor(toolSet.variant ?? 'default');
     return sortTools(toolSet.tools).flatMap((tool) => {
       const page = tool.placement === 'page';
-      const section = page
-        ? pageSection
-        : labelSections
-          ? `${toolSet.label} · ${tool.section}`
-          : tool.section;
+      const section = sectionTitle(
+        toolSet,
+        tool,
+        page,
+        labelSections,
+        pageSection,
+      );
       return source(tool, ctx).map((item) => ({
         section,
         variant: toolSet.variant ?? 'default',

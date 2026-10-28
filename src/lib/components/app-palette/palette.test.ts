@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/svelte';
+import { tick } from 'svelte';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('$app/state', () => ({ page: { params: {}, data: {} } }));
@@ -70,6 +71,14 @@ function setup(toolSets?: PaletteToolSet[]) {
   return { toggle, destroy, secondary, onClose };
 }
 
+// Footer messages show in the footer and are also read from the live region.
+const shown = (text: string) => screen.queryAllByText(text).length > 0;
+
+async function spoken() {
+  await tick();
+  return document.querySelector('[aria-live="polite"]')?.textContent?.trim();
+}
+
 async function openPalette() {
   await fireEvent.keyDown(window, { key: 'k', ...MOD });
   return screen.getByRole<HTMLInputElement>('combobox');
@@ -136,7 +145,7 @@ describe('Palette', () => {
     await fireEvent.keyDown(input, { key: 'ArrowDown' });
     await fireEvent.keyDown(input, { key: 'Enter' });
     expect(destroy).not.toHaveBeenCalled();
-    expect(screen.getByText('Really delete?')).toBeTruthy();
+    expect(shown('Really delete?')).toBe(true);
 
     await fireEvent.keyDown(input, { key: 'Enter' });
     expect(destroy).toHaveBeenCalledTimes(1);
@@ -162,10 +171,10 @@ describe('Palette', () => {
 
     await fireEvent.keyDown(input, { key: 'ArrowDown' });
     await fireEvent.keyDown(input, { key: 'Enter' });
-    expect(screen.getByText('Really delete?')).toBeTruthy();
+    expect(shown('Really delete?')).toBe(true);
 
     await fireEvent.mouseMove(screen.getByText('Open Detail'));
-    expect(screen.queryByText('Really delete?')).toBeNull();
+    expect(shown('Really delete?')).toBe(false);
     await fireEvent.keyDown(input, { key: 'Enter' });
     expect(destroy).not.toHaveBeenCalled();
   });
@@ -227,7 +236,86 @@ describe('Palette', () => {
     const input = await openPalette();
 
     await fireEvent.keyDown(input, { key: 'Enter' });
-    expect(screen.getByRole('status').textContent).toContain('Hi there');
+    expect(shown('Hi there')).toBe(true);
+    expect(await spoken()).toBe('Hi there');
+  });
+
+  it('labels the row actions button for screen readers', async () => {
+    setup();
+    const input = await openPalette();
+    await fireEvent.input(input, { target: { value: 'delete' } });
+
+    expect(
+      screen.getByRole('button', { name: 'Actions for Delete Things' }),
+    ).toBeTruthy();
+  });
+
+  it('returns focus to the menu button when the opener is no longer focusable', async () => {
+    setup();
+    const trigger = document.createElement('button');
+    trigger.setAttribute('aria-controls', 'test-menu');
+    const menu = document.createElement('ul');
+    menu.id = 'test-menu';
+    menu.setAttribute('role', 'menu');
+    const opener = document.createElement('button');
+    menu.append(opener);
+    document.body.append(trigger, menu);
+    opener.focus();
+
+    try {
+      const input = await openPalette();
+      opener.disabled = true;
+      await fireEvent.keyDown(input, { key: 'Escape' });
+
+      expect(document.activeElement).toBe(trigger);
+    } finally {
+      trigger.remove();
+      menu.remove();
+    }
+  });
+
+  it('reads a confirm prompt from the live region', async () => {
+    setup();
+    const input = await openPalette();
+    await fireEvent.input(input, { target: { value: 'delete' } });
+
+    await fireEvent.keyDown(input, { key: 'Enter' });
+    expect(await spoken()).toBe('Really delete?');
+  });
+
+  it('opens on Mod+K from a non-Latin layout', async () => {
+    setup();
+    await fireEvent.keyDown(window, { key: 'л', code: 'KeyK', ...MOD });
+    expect(screen.getByRole('combobox')).toBeTruthy();
+  });
+
+  it('keeps Mod+T on a Dvorak layout for the browser', async () => {
+    setup();
+    await fireEvent.keyDown(window, { key: 't', code: 'KeyK', ...MOD });
+    expect(screen.queryByRole('combobox')).toBeNull();
+  });
+
+  it('stays open when a press inside the panel ends on the backdrop', async () => {
+    setup();
+    const input = await openPalette();
+    const backdrop = document.querySelector<HTMLElement>(
+      '[role="presentation"]',
+    );
+
+    await fireEvent.mouseDown(input);
+    await fireEvent.click(backdrop!);
+    expect(screen.queryByRole('combobox')).toBeTruthy();
+
+    await fireEvent.mouseDown(backdrop!);
+    await fireEvent.click(backdrop!);
+    expect(screen.queryByRole('combobox')).toBeNull();
+  });
+
+  it('closes its state when the dialog closes natively', async () => {
+    setup();
+    await openPalette();
+    await fireEvent(screen.getByRole('dialog'), new Event('close'));
+    expect(screen.queryByRole('combobox')).toBeNull();
   });
 
   it('marks dev sections when dev and user tools are mixed', async () => {
@@ -403,7 +491,7 @@ describe('Palette', () => {
 
       await fireEvent.keyDown(input, { key: 'Enter' });
       expect(run).not.toHaveBeenCalled();
-      expect(screen.getByText('Not allowed here')).toBeTruthy();
+      expect(shown('Not allowed here')).toBe(true);
 
       await fireEvent.keyDown(window, { key: 'k', ...MOD });
       const [disabled, other] = screen.getAllByRole('menuitem');

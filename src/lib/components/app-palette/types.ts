@@ -38,9 +38,19 @@ export interface PaletteContext {
   subject: () => PaletteSubject | undefined;
 }
 
-export type PaletteSubject =
-  | { kind: 'namespace'; namespace: string }
-  | { kind: 'workflow'; namespace: string; workflowId: string; runId?: string };
+export interface PaletteNamespaceSubject {
+  kind: 'namespace';
+  namespace: string;
+}
+
+export interface PaletteWorkflowSubject {
+  kind: 'workflow';
+  namespace: string;
+  workflowId: string;
+  runId?: string;
+}
+
+export type PaletteSubject = PaletteNamespaceSubject | PaletteWorkflowSubject;
 
 export interface PaletteAction {
   title: string;
@@ -52,6 +62,11 @@ export interface PaletteAction {
   disabled?: string;
 }
 
+export interface PaletteAccessory {
+  label: string;
+  tone?: PaletteTone;
+}
+
 export interface PaletteItem {
   id: string;
   title: string;
@@ -60,7 +75,7 @@ export interface PaletteItem {
   icon?: IconComponent;
   // Extra words that match the search but are not shown.
   keywords?: string[];
-  accessory?: { label: string; tone?: PaletteTone };
+  accessory?: PaletteAccessory;
   // Shows the item but blocks its actions, with this text as the reason.
   disabled?: string;
   rules?: PaletteRules;

@@ -12,7 +12,8 @@ export function paletteEnv(isDevServer: boolean, isProd: boolean): PaletteEnv {
   return isProd ? 'production' : 'staging';
 }
 
-// An empty rule list allows everything. Every rule that is set must match.
+// A rule that is missing or empty allows everything. Every other rule must
+// match.
 // A user rule never matches before the user loads.
 export function matchesRules(
   rules: PaletteRules | undefined,
@@ -20,7 +21,7 @@ export function matchesRules(
 ): boolean {
   if (!rules) return true;
   const { env, flags, permissions } = rules;
-  if (env && !env.includes(facts.env)) return false;
+  if (env?.length && !env.includes(facts.env)) return false;
   if (flags && !flags.every((flag) => facts.flags?.has(flag))) return false;
   if (permissions && !permissions.every((perm) => facts.can?.(perm))) {
     return false;

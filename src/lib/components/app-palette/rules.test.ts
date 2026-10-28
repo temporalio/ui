@@ -29,6 +29,10 @@ describe('paletteEnv', () => {
 });
 
 describe('matchesRules', () => {
+  it('treats an empty env list like a missing one', () => {
+    expect(matchesRules({ env: [] }, { env: 'production' })).toBe(true);
+  });
+
   it('allows everything when no rules are set', () => {
     expect(matchesRules(undefined, { env: 'production' })).toBe(true);
     expect(matchesRules({}, { env: 'production' })).toBe(true);

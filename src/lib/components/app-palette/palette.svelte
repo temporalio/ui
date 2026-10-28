@@ -59,7 +59,7 @@
 
   let {
     toolSets,
-    label = translate('palette.label'),
+    label: labelProp,
     open = $bindable(false),
     recentKey = 'palette-recent',
     facts,
@@ -72,7 +72,9 @@
 
   const STATUS_MS = 5000;
   const RECENT_LIMIT = 5;
-  const PAGE_SECTION = translate('palette.on-this-page');
+
+  const label = $derived(labelProp ?? translate('palette.label'));
+  const pageSection = $derived(translate('palette.on-this-page'));
 
   const DEV_TAG =
     'shrink-0 rounded bg-[#facc15] px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[#171717]';
@@ -120,6 +122,9 @@
   const coarse = new MediaQuery('pointer: coarse');
 
   let input = $state<HTMLInputElement>();
+  // A click closes the palette only when it also started on the backdrop, so
+  // a text selection dragged out of the panel does not close it.
+  let pressedBackdrop = false;
   let returnFocus: Element | null = null;
   let statusTimer: ReturnType<typeof setTimeout> | undefined;
   const savedFrames: { query: string; selected: number }[] = [];
@@ -154,10 +159,10 @@
   }
 
   const rootEntries = $derived(
-    currentView ? [] : rootItems(activeSets, contextFor, PAGE_SECTION),
+    currentView ? [] : rootItems(activeSets, contextFor, pageSection),
   );
   const queryEntries = $derived(
-    currentView ? [] : searchItems(activeSets, query, contextFor, PAGE_SECTION),
+    currentView ? [] : searchItems(activeSets, query, contextFor, pageSection),
   );
   const rootVariants = $derived(
     new Map(
@@ -273,13 +278,26 @@
   // Read by screen readers after each change to the list or the scope.
   const announcement = $derived.by(() => {
     if (!open || loading) return '';
-    const count = visibleItems.length;
-    const results =
-      count === 1
-        ? translate('palette.one-result')
-        : translate('palette.result-count', { count });
+    const results = translate('palette.result-count', {
+      count: visibleItems.length,
+    });
     if (!scopedSet || frames.length > 0) return results;
     return `${translate('palette.scoped-to', { scope: scopeLabel })}. ${results}`;
+  });
+
+  // Confirms, footer messages and the result count all go through one live
+  // region. It is written after it renders, because screen readers often
+  // skip a region that appears with its text already in it.
+  const liveMessage = $derived(
+    pendingConfirm?.message ?? status?.message ?? announcement,
+  );
+  // Not a derived value: the region must render empty first and get its text
+  // one tick later.
+  // eslint-disable-next-line svelte/prefer-writable-derived
+  let spoken = $state('');
+
+  $effect(function speak() {
+    spoken = open ? liveMessage : '';
   });
 
   function optionId(index: number) {
@@ -484,9 +502,18 @@
     return IS_MAC ? event.metaKey : event.ctrlKey;
   }
 
+  // Non-Latin layouts report another letter for K, so the physical key also
+  // counts. Latin layouts such as Dvorak keep their own K.
+  function isK(event: KeyboardEvent) {
+    const key = event.key.toLowerCase();
+    if (key === 'k') return true;
+    return !/^[a-z]$/.test(key) && event.code === 'KeyK';
+  }
+
+  // Runs in the capture phase, so Mod+K always opens the palette, even in a
+  // field that handles its own keys.
   function onWindowKeydown(event: KeyboardEvent) {
-    if (event.defaultPrevented) return;
-    if (!hasMod(event) || event.key.toLowerCase() !== 'k') return;
+    if (!hasMod(event) || !isK(event)) return;
     event.preventDefault();
     if (open) {
       toggleActions();
@@ -611,6 +638,21 @@
     toggleActions();
   }
 
+  // An opener inside a menu is hidden once the menu closes, so focus goes to
+  // the button that controls that menu.
+  function restoreFocus(target: Element | null) {
+    if (!(target instanceof HTMLElement) || !target.isConnected) return;
+    target.focus();
+    if (document.activeElement === target) return;
+
+    const menu = target.closest('[role="menu"], [role="dialog"]');
+    if (!menu?.id) return;
+    const trigger = [
+      ...document.querySelectorAll<HTMLElement>('[aria-controls]'),
+    ].find((element) => element.getAttribute('aria-controls') === menu.id);
+    trigger?.focus();
+  }
+
   // showModal() traps focus and makes the page behind inert. The palette
   // can open from the hotkey or from a menu, so focus returns to whatever
   // had it.
@@ -619,9 +661,7 @@
     node.showModal();
     return () => {
       node.close();
-      if (returnFocus instanceof HTMLElement && returnFocus.isConnected) {
-        returnFocus.focus();
-      }
+      restoreFocus(returnFocus);
       returnFocus = null;
     };
   }
@@ -692,7 +732,7 @@
 {/snippet}
 
 {#snippet devMarker()}
-  <span class={DEV_TAG} aria-hidden="true">dev</span>
+  <span class={DEV_TAG} aria-hidden="true">{translate('palette.dev')}</span>
 {/snippet}
 
 {#if open}
@@ -704,13 +744,19 @@
       event.preventDefault();
       handleEscape();
     }}
+    onclose={() => open && close()}
   >
     <!-- svelte-ignore a11y_click_events_have_key_events -->
     <div
-      class="bg-black/30 fixed inset-0 flex items-start justify-center px-4 pt-4 backdrop-blur-sm sm:pt-[12vh]"
+      class="fixed inset-0 flex items-start justify-center bg-[rgb(0_0_0/0.3)] px-4 pt-4 backdrop-blur-sm sm:pt-[12vh]"
       role="presentation"
       transition:fade={motion}
-      onclick={(event) => event.target === event.currentTarget && close()}
+      onmousedown={(event) =>
+        (pressedBackdrop = event.target === event.currentTarget)}
+      onclick={(event) => {
+        if (!pressedBackdrop || event.target !== event.currentTarget) return;
+        close();
+      }}
     >
       <div
         transition:fly={{ ...motion, y: 96 }}
@@ -908,11 +954,13 @@
                       >
                     {/if}
                     {#if item.actions.length > 1 && !item.disabled && (coarse.current || isSelected)}
-                      <!-- Mod+K opens the same menu, so the button is for pointers only. -->
+                      <!-- Keyboard users press Mod+K. Screen readers on touch screens use this button. -->
                       <button
                         type="button"
                         tabindex="-1"
-                        aria-hidden="true"
+                        aria-label={translate('palette.actions-for', {
+                          item: item.title,
+                        })}
                         class="-mr-1 flex h-6 w-6 shrink-0 items-center justify-center rounded text-secondary hover:text-primary"
                         onmousedown={keepInputFocus}
                         onclick={(event) => {
@@ -978,9 +1026,7 @@
             class="flex items-center justify-between gap-3 border-t border-secondary px-4 py-2 text-xs text-secondary"
           >
             {#if pendingConfirm}
-              <span class="truncate text-danger" role="status"
-                >{pendingConfirm.message}</span
-              >
+              <span class="truncate text-danger">{pendingConfirm.message}</span>
               <span class="flex shrink-0 items-center gap-2">
                 <button
                   type="button"
@@ -1002,10 +1048,7 @@
                 </button>
               </span>
             {:else if status}
-              <span
-                class={['truncate', statusClass[status.variant]]}
-                role="status"
-              >
+              <span class={['truncate', statusClass[status.variant]]}>
                 {status.message}
               </span>
               {#if status.link}
@@ -1041,7 +1084,7 @@
       </div>
     </div>
     <div class="sr-only" aria-live="polite" aria-atomic="true">
-      {announcement}
+      {spoken}
     </div>
   </dialog>
 {/if}
