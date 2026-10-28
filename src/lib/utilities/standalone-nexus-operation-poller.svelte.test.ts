@@ -4,6 +4,7 @@ import {
   getNexusOperationExecution,
   pollNexusOperationExecution,
 } from '$lib/services/standalone-nexus-operations';
+import type { Callback } from '$lib/types/nexus';
 import type { NexusOperationExecution } from '$lib/types/nexus-operation-execution';
 
 import { StandaloneNexusOperationPoller } from './standalone-nexus-operation-poller.svelte';
@@ -18,6 +19,15 @@ const originalInput = {
   data: 'MQ==',
 };
 const newInput = { metadata: { encoding: 'anNvbi9wbGFpbg==' }, data: 'Mg==' };
+
+const standbyCallback = {
+  requestId: 'callback-request-id',
+  state: 'Standby',
+} as unknown as Callback;
+const succeededCallback = {
+  requestId: 'callback-request-id',
+  state: 'Succeeded',
+} as unknown as Callback;
 
 const execution = (
   overrides: Partial<NexusOperationExecution> = {},
@@ -88,6 +98,46 @@ describe('StandaloneNexusOperationPoller', () => {
 
     expect(onUpdate).toHaveBeenLastCalledWith(
       expect.objectContaining({ input: newInput }),
+    );
+  });
+
+  it('keeps the initial completion callbacks when a polled update has none', async () => {
+    vi.mocked(getNexusOperationExecution).mockResolvedValue(
+      execution({ completionCallbacks: [standbyCallback] }),
+    );
+    vi.mocked(pollNexusOperationExecution)
+      .mockResolvedValueOnce(
+        execution(
+          { completionCallbacks: [] },
+          'NEXUS_OPERATION_EXECUTION_STATUS_COMPLETED',
+        ),
+      )
+      .mockRejectedValueOnce(abortError());
+
+    await createPoller().start();
+
+    expect(onUpdate).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        completionCallbacks: [standbyCallback],
+        info: { status: 'NEXUS_OPERATION_EXECUTION_STATUS_COMPLETED' },
+      }),
+    );
+  });
+
+  it('uses the completion callbacks from a polled update when present', async () => {
+    vi.mocked(getNexusOperationExecution).mockResolvedValue(
+      execution({ completionCallbacks: [standbyCallback] }),
+    );
+    vi.mocked(pollNexusOperationExecution)
+      .mockResolvedValueOnce(
+        execution({ completionCallbacks: [succeededCallback] }),
+      )
+      .mockRejectedValueOnce(abortError());
+
+    await createPoller().start();
+
+    expect(onUpdate).toHaveBeenLastCalledWith(
+      expect.objectContaining({ completionCallbacks: [succeededCallback] }),
     );
   });
 
