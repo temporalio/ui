@@ -27,11 +27,11 @@
   data-testid={testId}
   aria-live="polite"
 >
-  <span class="flex h-20 w-20 items-center justify-center" aria-hidden="true">
-    <Icon class="block h-full w-full text-information" />
+  <span class="flex h-16 w-16 items-center justify-center" aria-hidden="true">
+    <Icon class="block h-full w-full text-brand" />
   </span>
   <div class="flex w-full min-w-0 flex-col items-center gap-1">
-    <h2 class="text-base font-medium">{title}</h2>
+    <h2 class="text-xl font-medium">{title}</h2>
     {#if description || content}
       <div class="flex max-w-3xl flex-col gap-2 text-sm text-secondary">
         {#if description}
