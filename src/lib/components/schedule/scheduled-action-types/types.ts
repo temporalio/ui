@@ -1,13 +1,10 @@
 import type { ScheduleListEntry } from '$lib/types';
-import type {
-  DescribeFullSchedule,
-  ScheduleActionRequest,
-  SchedulePoliciesRequest,
-} from '$lib/types/schedule';
+import type { DescribeFullSchedule } from '$lib/types/schedule';
 
 import type { FormWorkflowDetails } from './workflow/schema';
 import type {
   WorkflowSchedule,
+  WorkflowScheduledActionRequest,
   WorkflowScheduleListEntry,
 } from './workflow/types';
 
@@ -16,6 +13,7 @@ export type ScheduledActionTypeMap = {
     details: FormWorkflowDetails;
     schedule: WorkflowSchedule;
     listEntry: WorkflowScheduleListEntry;
+    request: WorkflowScheduledActionRequest;
   };
 };
 
@@ -60,10 +58,9 @@ export type ResolvedScheduledActionListEntry =
   | SupportedScheduledActionListEntry
   | { type: 'unknown'; schedule: ScheduleListEntry };
 
-export type ScheduledActionRequest = {
-  action: ScheduleActionRequest;
-  policies: Pick<SchedulePoliciesRequest, 'keepOriginalWorkflowId'>;
-};
+export type ScheduledActionRequest<
+  Type extends ScheduledActionType = ScheduledActionType,
+> = ScheduledActionTypeMap[Type]['request'];
 
 export type ScheduledActionDefinition<Type extends ScheduledActionType> = {
   type: Type;
@@ -77,7 +74,7 @@ export type ScheduledActionDefinition<Type extends ScheduledActionType> = {
   toRequest: (
     actionForm: ScheduledActionFormData<Type>,
     resolvedAction: SupportedScheduledAction<Type>,
-  ) => Promise<ScheduledActionRequest>;
+  ) => Promise<ScheduledActionRequest<Type>>;
 };
 
 export type ScheduledActionForm = {

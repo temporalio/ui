@@ -1,9 +1,16 @@
 import type { ScheduleListEntry } from '$lib/types';
 import type {
   DescribeFullSchedule,
+  ScheduleActionRequest,
+  SchedulePoliciesRequest,
   ScheduleResponse,
   StartWorkflowRequest,
 } from '$lib/types/schedule';
+
+export type WorkflowScheduledActionRequest = {
+  action: ScheduleActionRequest;
+  policies: Pick<SchedulePoliciesRequest, 'keepOriginalWorkflowId'>;
+};
 
 export type WorkflowSchedule = DescribeFullSchedule & {
   schedule: ScheduleResponse & {

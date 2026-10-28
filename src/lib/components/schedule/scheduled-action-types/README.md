@@ -18,9 +18,10 @@ Use `workflow/` as the reference implementation.
 ## Adding an action type
 
 1. Create its directory with a schema, narrowed API types, detection, and request
-   mapper. Add its details, schedule, and list-entry types to
+   mapper. Add its details, schedule, list-entry, and request-result types to
    `ScheduledActionTypeMap` in this directory's shared `types.ts`. The shared
-   discriminated unions are derived from that map.
+   discriminated unions and request results are derived from that map. Request
+   results include the API action and any action-specific Schedule policies.
 2. Add its definition to `registry.ts`, providing creation defaults, full-schedule
    and list-entry resolvers, and a request mapper. Shared resolution and request
    dispatch use this registry. Full schedule descriptions and list entries have

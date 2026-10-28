@@ -9,7 +9,7 @@ import type {
 export function toScheduledActionRequest<Type extends ScheduledActionType>(
   actionForm: ScheduledActionFormData<Type>,
   resolvedAction: NoInfer<SupportedScheduledAction<Type>>,
-): Promise<ScheduledActionRequest> {
+): Promise<ScheduledActionRequest<Type>> {
   return scheduledActionDefinitions[actionForm.type].toRequest(
     actionForm,
     resolvedAction,

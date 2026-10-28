@@ -2,17 +2,16 @@ import { parseDuration } from '$lib/holocene/duration-input/duration-input.svelt
 import { translate } from '$lib/i18n/translate';
 import type {
   ScheduleActionRequest,
-  SchedulePoliciesRequest,
   StartWorkflowRequest,
 } from '$lib/types/schedule';
 import { encodePayloads } from '$lib/utilities/encode-payload';
 import { getErrorMessage } from '$lib/utilities/error-message';
 
 import type { FormWorkflowDetails } from './schema';
+import type { WorkflowScheduledActionRequest } from './types';
 import { getSearchAttributes } from '../../utilities/get-search-attributes';
 import type {
   ScheduledActionFormData,
-  ScheduledActionRequest,
   SupportedScheduledAction,
 } from '../types';
 
@@ -28,7 +27,7 @@ function toWorkflowTimeout(value: string | undefined): string | undefined {
 
 export function getWorkflowPoliciesRequest(
   details: FormWorkflowDetails,
-): Pick<SchedulePoliciesRequest, 'keepOriginalWorkflowId'> {
+): WorkflowScheduledActionRequest['policies'] {
   return {
     keepOriginalWorkflowId: details.keepOriginalWorkflowId,
   };
@@ -37,7 +36,7 @@ export function getWorkflowPoliciesRequest(
 export async function toWorkflowScheduleRequest(
   data: ScheduledActionFormData<'workflow'>,
   resolvedAction: SupportedScheduledAction<'workflow'>,
-): Promise<ScheduledActionRequest> {
+): Promise<WorkflowScheduledActionRequest> {
   return {
     action: await getWorkflowActionRequest(
       data.details,
