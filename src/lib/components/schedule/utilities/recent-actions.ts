@@ -5,7 +5,8 @@ export function getRecentScheduleActions(
   recentActions: ScheduleActionResult[],
   limit = 5,
 ): ScheduleActionResult[] {
-  return [...recentActions]
+  return recentActions
+    .filter(Boolean)
     .sort(
       (a, b) =>
         getEpochMilliseconds(b.actualTime) - getEpochMilliseconds(a.actualTime),

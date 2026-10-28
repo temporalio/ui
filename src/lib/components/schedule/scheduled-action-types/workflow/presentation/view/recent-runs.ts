@@ -1,3 +1,4 @@
+import { getRecentScheduleActions } from '$lib/components/schedule/utilities/recent-actions';
 import { fetchWorkflowsForQuery } from '$lib/services/workflow-service';
 import type { ScheduleActionResult } from '$lib/types';
 import type { DescribeFullSchedule } from '$lib/types/schedule';
@@ -32,19 +33,14 @@ export const toRecentWorkflowRuns = (
   schedule: DescribeFullSchedule,
   limit = RECENT_RUN_COUNT,
 ): RecentWorkflowRun[] =>
-  (schedule?.info?.recentActions ?? [])
-    .filter(Boolean)
-    .sort(
-      (a, b) =>
-        getEpochMilliseconds(b.actualTime) - getEpochMilliseconds(a.actualTime),
-    )
-    .slice(0, limit)
-    .map((action) => ({
+  getRecentScheduleActions(schedule?.info?.recentActions ?? [], limit).map(
+    (action) => ({
       workflowId: action.startWorkflowResult?.workflowId ?? '',
       runId: action.startWorkflowResult?.runId ?? '',
       actualTime: action.actualTime,
       status: toWorkflowStatusReadable(action.startWorkflowStatus ?? null),
-    }));
+    }),
+  );
 
 export const withLatestWorkflowStatuses = (
   runs: RecentWorkflowRun[],
