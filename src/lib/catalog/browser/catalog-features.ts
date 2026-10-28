@@ -2,6 +2,7 @@ const featureLabels: Readonly<Record<string, string>> = {
   activities: 'Activities',
   'child-workflows': 'Child Workflows',
   concurrency: 'Concurrency',
+  'continue-as-new': 'Continue-As-New',
   'event-groups': 'Event Groups',
   'event-history': 'Event History',
   heartbeats: 'Heartbeats',

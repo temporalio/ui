@@ -7,31 +7,34 @@ import type {
 import { catalogExample as example0 } from './activity-heartbeat/example.js';
 import { catalogExample as example1 } from './activity-retry/example.js';
 import { catalogExample as example2 } from './activity-timeout/example.js';
-import { catalogExample as example3 } from './child-fan-out/example.js';
-import { catalogExample as example4 } from './child-workflows/example.js';
-import { catalogExample as example5 } from './hello/example.js';
-import { catalogExample as example6 } from './high-event-count/example.js';
-import { catalogExample as example7 } from './large-history/example.js';
-import { catalogExample as example8 } from './local-activity/example.js';
-import { catalogExample as example9 } from './long-activity/example.js';
-import { catalogExample as example10 } from './nexus-greeting/example.js';
-import { catalogExample as example11 } from './parallel-activities/example.js';
-import { catalogExample as example12 } from './pending-activities/example.js';
-import { catalogExample as example13 } from './pending-nexus/example.js';
-import { catalogExample as example14 } from './priority-fairness/example.js';
-import { catalogExample as example15 } from './satellite-launch-event-groups/example.js';
-import { catalogExample as example16 } from './sequential-activities/example.js';
-import { catalogExample as example17 } from './sequential-markdown-activities/example.js';
-import { catalogExample as example18 } from './sequential-multiline-summary-activities/example.js';
-import { catalogExample as example19 } from './sequential-no-summary-activities/example.js';
-import { catalogExample as example20 } from './sequential-plain-text-activities/example.js';
-import { catalogExample as example21 } from './signal-collector/example.js';
-import { catalogExample as example22 } from './signal-handlers/example.js';
-import { catalogExample as example23 } from './slow-nexus-operation/example.js';
-import { catalogExample as example24 } from './standalone-activity/example.js';
-import { catalogExample as example25 } from './timer-driven-repetition/example.js';
-import { catalogExample as example26 } from './workflow-feature-tour/example.js';
-import { catalogExample as example27 } from './workflow-patching/example.js';
+import { catalogExample as example3 } from './bank-account-entity/example.js';
+import { catalogExample as example4 } from './child-fan-out/example.js';
+import { catalogExample as example5 } from './child-workflows/example.js';
+import { catalogExample as example6 } from './hello/example.js';
+import { catalogExample as example7 } from './high-event-count/example.js';
+import { catalogExample as example8 } from './large-history/example.js';
+import { catalogExample as example9 } from './local-activity/example.js';
+import { catalogExample as example10 } from './long-activity/example.js';
+import { catalogExample as example11 } from './nexus-greeting/example.js';
+import { catalogExample as example12 } from './order-saga/example.js';
+import { catalogExample as example13 } from './parallel-activities/example.js';
+import { catalogExample as example14 } from './pending-activities/example.js';
+import { catalogExample as example15 } from './pending-nexus/example.js';
+import { catalogExample as example16 } from './priority-fairness/example.js';
+import { catalogExample as example17 } from './satellite-launch-event-groups/example.js';
+import { catalogExample as example18 } from './sequential-activities/example.js';
+import { catalogExample as example19 } from './sequential-markdown-activities/example.js';
+import { catalogExample as example20 } from './sequential-multiline-summary-activities/example.js';
+import { catalogExample as example21 } from './sequential-no-summary-activities/example.js';
+import { catalogExample as example22 } from './sequential-plain-text-activities/example.js';
+import { catalogExample as example23 } from './signal-collector/example.js';
+import { catalogExample as example24 } from './signal-handlers/example.js';
+import { catalogExample as example25 } from './slow-nexus-operation/example.js';
+import { catalogExample as example26 } from './standalone-activity/example.js';
+import { catalogExample as example27 } from './timer-driven-repetition/example.js';
+import { catalogExample as example28 } from './unpaid-order-auto-cancel/example.js';
+import { catalogExample as example29 } from './workflow-feature-tour/example.js';
+import { catalogExample as example30 } from './workflow-patching/example.js';
 
 const sharedWorkflowDefinitions = [
   example0,
@@ -62,6 +65,9 @@ const sharedWorkflowDefinitions = [
   example25,
   example26,
   example27,
+  example28,
+  example29,
+  example30,
 ] satisfies readonly CatalogExampleDefinition[];
 
 export const sharedWorkflowExamples: readonly CatalogExampleRegistration[] =
@@ -112,6 +118,8 @@ export const sharedWorkflowSourceFiles = [
   'src/lib/catalog/worker/examples/activity-timeout/activity.ts',
   'src/lib/catalog/worker/examples/activity-timeout/example.ts',
   'src/lib/catalog/worker/examples/activity-timeout/workflow.ts',
+  'src/lib/catalog/worker/examples/bank-account-entity/example.ts',
+  'src/lib/catalog/worker/examples/bank-account-entity/workflow.ts',
   'src/lib/catalog/worker/examples/child-fan-out/example.ts',
   'src/lib/catalog/worker/examples/child-fan-out/workflow.ts',
   'src/lib/catalog/worker/examples/child-workflows/example.ts',
@@ -132,6 +140,9 @@ export const sharedWorkflowSourceFiles = [
   'src/lib/catalog/worker/examples/nexus-greeting/handler.ts',
   'src/lib/catalog/worker/examples/nexus-greeting/service.ts',
   'src/lib/catalog/worker/examples/nexus-greeting/workflow.ts',
+  'src/lib/catalog/worker/examples/order-saga/activities.ts',
+  'src/lib/catalog/worker/examples/order-saga/example.ts',
+  'src/lib/catalog/worker/examples/order-saga/workflow.ts',
   'src/lib/catalog/worker/examples/parallel-activities/example.ts',
   'src/lib/catalog/worker/examples/parallel-activities/workflow.ts',
   'src/lib/catalog/worker/examples/pending-activities/activity.ts',
@@ -173,6 +184,9 @@ export const sharedWorkflowSourceFiles = [
   'src/lib/catalog/worker/examples/standalone-activity/example.ts',
   'src/lib/catalog/worker/examples/timer-driven-repetition/example.ts',
   'src/lib/catalog/worker/examples/timer-driven-repetition/workflow.ts',
+  'src/lib/catalog/worker/examples/unpaid-order-auto-cancel/activities.ts',
+  'src/lib/catalog/worker/examples/unpaid-order-auto-cancel/example.ts',
+  'src/lib/catalog/worker/examples/unpaid-order-auto-cancel/workflow.ts',
   'src/lib/catalog/worker/examples/workflow-feature-tour/activity.ts',
   'src/lib/catalog/worker/examples/workflow-feature-tour/example.ts',
   'src/lib/catalog/worker/examples/workflow-feature-tour/handler.ts',
