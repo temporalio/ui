@@ -7,6 +7,7 @@ import {
   rootItems,
   searchItems,
   sortToolSets,
+  uniqueById,
 } from './root-items';
 import type { PaletteContext, PaletteTool, PaletteToolSet } from './types';
 
@@ -46,7 +47,7 @@ describe('rootItems', () => {
         },
       ],
     };
-    const icons = rootItems([set], ctx, 'On this page').map(
+    const icons = rootItems([set], () => ctx, 'On this page').map(
       ({ item }) => item.icon,
     );
     expect(icons).toEqual([IconFlag, IconKey]);
@@ -64,7 +65,7 @@ describe('rootItems', () => {
     };
 
     expect(
-      rootItems([set], ctx, 'On this page').map(({ section }) => section),
+      rootItems([set], () => ctx, 'On this page').map(({ section }) => section),
     ).toEqual(['Early', 'Late']);
   });
 
@@ -82,7 +83,7 @@ describe('rootItems', () => {
       tools: [tool('nav', 'Navigation')],
     };
 
-    const entries = rootItems([user, dev], ctx, 'On this page');
+    const entries = rootItems([user, dev], () => ctx, 'On this page');
     expect(entries.map(({ section }) => section)).toEqual([
       'User · Navigation',
       'Dev · Navigation',
@@ -106,13 +107,53 @@ describe('rootItems', () => {
     };
 
     expect(
-      rootItems([set], ctx, 'On this page').map(({ section, page }) => [
+      rootItems([set], () => ctx, 'On this page').map(({ section, page }) => [
         section,
         page,
       ]),
     ).toEqual([
       ['On this page', true],
       ['Open', false],
+    ]);
+  });
+});
+
+describe('rootItems contexts', () => {
+  it("builds each set's context from its variant", () => {
+    const variants: string[] = [];
+    const sets: PaletteToolSet[] = [
+      { id: 'user', label: 'User', key: 'u', tools: [tool('a', 'A')] },
+      {
+        id: 'dev',
+        label: 'Dev',
+        key: 'd',
+        variant: 'dev',
+        tools: [tool('b', 'B')],
+      },
+    ];
+    rootItems(
+      sets,
+      (variant) => {
+        variants.push(variant);
+        return ctx;
+      },
+      'On this page',
+    );
+    expect(variants).toEqual(['default', 'dev']);
+  });
+});
+
+describe('uniqueById', () => {
+  it('keeps the first item for each id', () => {
+    expect(
+      uniqueById([
+        { id: 'a', n: 1 },
+        { id: 'b', n: 2 },
+        { id: 'a', n: 3 },
+      ]),
+    ).toEqual([
+      { id: 'a', n: 1 },
+      { id: 'b', n: 2 },
     ]);
   });
 });
@@ -130,7 +171,7 @@ describe('searchItems', () => {
   };
 
   it('builds items from the trimmed query with prefixed ids', () => {
-    const [entry] = searchItems([set], '  order-1 ', ctx, 'On this page');
+    const [entry] = searchItems([set], '  order-1 ', () => ctx, 'On this page');
     expect(entry.item).toMatchObject({
       id: 'workflow:open:q',
       title: 'Open order-1',
@@ -138,7 +179,7 @@ describe('searchItems', () => {
   });
 
   it('builds nothing for an empty query', () => {
-    expect(searchItems([set], '   ', ctx, 'On this page')).toEqual([]);
+    expect(searchItems([set], '   ', () => ctx, 'On this page')).toEqual([]);
   });
 });
 

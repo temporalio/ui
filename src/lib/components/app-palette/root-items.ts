@@ -41,24 +41,30 @@ export function sortToolSets(
   return [...toolSets].sort(byOrder);
 }
 
-type ItemSource = (tool: PaletteTool) => PaletteItem[];
+type ItemSource = (tool: PaletteTool, ctx: PaletteContext) => PaletteItem[];
+
+// Builds the context a set's tools get, so a view a dev tool pushes keeps
+// the dev styling.
+export type ContextForVariant = (variant: PaletteVariant) => PaletteContext;
 
 function entries(
   toolSets: readonly PaletteToolSet[],
+  contextFor: ContextForVariant,
   pageSection: string,
   source: ItemSource,
 ): PaletteEntry[] {
   const labelSections = toolSets.length > 1;
 
-  const all = toolSets.flatMap((toolSet) =>
-    sortTools(toolSet.tools).flatMap((tool) => {
+  const all = toolSets.flatMap((toolSet) => {
+    const ctx = contextFor(toolSet.variant ?? 'default');
+    return sortTools(toolSet.tools).flatMap((tool) => {
       const page = tool.placement === 'page';
       const section = page
         ? pageSection
         : labelSections
           ? `${toolSet.label} · ${tool.section}`
           : tool.section;
-      return source(tool).map((item) => ({
+      return source(tool, ctx).map((item) => ({
         section,
         variant: toolSet.variant ?? 'default',
         page,
@@ -69,8 +75,8 @@ function entries(
           icon: item.icon ?? tool.icon,
         },
       }));
-    }),
-  );
+    });
+  });
   return [
     ...all.filter(({ page }) => page),
     ...all.filter(({ page }) => !page),
@@ -83,26 +89,40 @@ function entries(
 // label goes in front of each other section title.
 export function rootItems(
   toolSets: readonly PaletteToolSet[],
-  ctx: PaletteContext,
+  contextFor: ContextForVariant,
   pageSection: string,
 ): PaletteEntry[] {
-  return entries(toolSets, pageSection, (tool) => tool.items(ctx));
+  return entries(toolSets, contextFor, pageSection, (tool, ctx) =>
+    tool.items(ctx),
+  );
 }
 
 // Items that tools build from the query, with the same id prefix.
 export function searchItems(
   toolSets: readonly PaletteToolSet[],
   query: string,
-  ctx: PaletteContext,
+  contextFor: ContextForVariant,
   pageSection: string,
 ): PaletteEntry[] {
   const trimmed = query.trim();
   if (!trimmed) return [];
   return entries(
     toolSets,
+    contextFor,
     pageSection,
-    (tool) => tool.search?.(trimmed, ctx) ?? [],
+    (tool, ctx) => tool.search?.(trimmed, ctx) ?? [],
   );
+}
+
+// Keeps the first item for each id, so rows and lookups by id stay unique
+// even when a view or a tool repeats an id.
+export function uniqueById<T extends { id: string }>(items: readonly T[]): T[] {
+  const seen = new Set<string>();
+  return items.filter(({ id }) => {
+    if (seen.has(id)) return false;
+    seen.add(id);
+    return true;
+  });
 }
 
 // Groups consecutive entries that share a section, keeping the given order.

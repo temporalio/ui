@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/svelte';
+import { tick } from 'svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('$app/state', () => ({ page: { params: {}, data: {} } }));
@@ -31,6 +32,7 @@ describe('AppPalette', () => {
 
   afterEach(() => {
     unregister.splice(0).forEach((remove) => remove());
+    appPalette.open = false;
   });
 
   it('opens with the hotkey and shows registered sets that match the facts', async () => {
@@ -73,5 +75,15 @@ describe('AppPalette', () => {
     render(AppPalette, { props: { facts: { env: 'local' } } });
 
     expect(appPalette.available).toBe(false);
+  });
+
+  it('drops a request to open while no set is visible', async () => {
+    render(AppPalette, { props: { facts: { env: 'local' } } });
+    appPalette.open = true;
+    await tick();
+
+    unregister.push(registerToolSet(devSet));
+    await tick();
+    expect(screen.queryByRole('dialog')).toBeNull();
   });
 });

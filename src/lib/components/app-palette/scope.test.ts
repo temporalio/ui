@@ -17,6 +17,10 @@ describe('setForKey', () => {
     expect(setForKey(sets, 'W')?.id).toBe('workflow');
   });
 
+  it('matches a set whose key is uppercase', () => {
+    expect(setForKey([set('upper', 'U')], 'u')?.id).toBe('upper');
+  });
+
   it('finds nothing for longer queries or unknown keys', () => {
     expect(setForKey(sets, 'wo')).toBeUndefined();
     expect(setForKey(sets, 'x')).toBeUndefined();

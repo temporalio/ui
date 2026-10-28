@@ -11,7 +11,7 @@ export function setForKey(
   query: string,
 ): PaletteToolSet | undefined {
   const key = query.toLowerCase();
-  return toolSets.find((toolSet) => toolSet.key === key);
+  return toolSets.find((toolSet) => toolSet.key.toLowerCase() === key);
 }
 
 // Moves the scope by `delta` steps, wrapping around through All.
@@ -35,11 +35,13 @@ export function scopedToolSets(
   return scoped.length > 0 ? scoped : [...toolSets];
 }
 
-// Keys that more than one set uses. The registry test keeps this empty.
+// Keys that more than one set uses, ignoring case. The registry warns about
+// them in development.
 export function duplicateKeys(toolSets: readonly PaletteToolSet[]): string[] {
   const seen = new Set<string>();
   const duplicates = new Set<string>();
-  for (const { key } of toolSets) {
+  for (const { key: raw } of toolSets) {
+    const key = raw.toLowerCase();
     if (seen.has(key)) duplicates.add(key);
     seen.add(key);
   }

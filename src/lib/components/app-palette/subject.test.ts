@@ -24,4 +24,17 @@ describe('subjectFromParams', () => {
       runId: 'r1',
     });
   });
+
+  it('has no subject on imported or archived histories', () => {
+    const params = { namespace: 'ns', workflow: 'wf', run: 'r1' };
+    expect(
+      subjectFromParams(params, '/import/events/[namespace]/[workflow]/[run]'),
+    ).toBeUndefined();
+    expect(
+      subjectFromParams(
+        params,
+        '/namespaces/[namespace]/archival/[workflow]/[run]',
+      ),
+    ).toBeUndefined();
+  });
 });

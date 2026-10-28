@@ -4,6 +4,8 @@
   import { MediaQuery } from 'svelte/reactivity';
   import { fade, fly } from 'svelte/transition';
 
+  import { onDestroy } from 'svelte';
+
   import { page } from '$app/state';
 
   import { translate } from '$lib/i18n/translate';
@@ -26,11 +28,15 @@
     rootItems,
     rootVariant,
     searchItems,
+    uniqueById,
   } from './root-items';
+  import { matchesRules } from './rules';
   import { nextScope, scopedToolSets, setForKey } from './scope';
   import { subjectFromParams } from './subject';
   import type {
+    PaletteAction,
     PaletteContext,
+    PaletteFacts,
     PaletteItem,
     PaletteStatusVariant,
     PaletteTone,
@@ -46,6 +52,9 @@
     open?: boolean;
     // Local storage key for recently used items.
     recentKey?: string;
+    // Checked against item rules in pushed views. Root items are already
+    // filtered by the app. Without facts, view items are not filtered.
+    facts?: PaletteFacts;
   }
 
   let {
@@ -53,6 +62,7 @@
     label = translate('palette.label'),
     open = $bindable(false),
     recentKey = 'palette-recent',
+    facts,
   }: Props = $props();
 
   const uid = $props.id();
@@ -72,10 +82,14 @@
     variant: PaletteVariant;
   }
 
+  // The item and action are captured when the confirm opens, so the action
+  // that runs is the one the user confirmed, even if the list changes.
   interface PendingConfirm {
     itemId: string;
     actionIndex: number;
     message: string;
+    item: PaletteItem;
+    action: PaletteAction;
   }
 
   interface Status {
@@ -88,6 +102,8 @@
   let query = $state('');
   let selected = $state(0);
   let actionsOpen = $state(false);
+  // The item whose actions menu is open, captured when the menu opens.
+  let actionsItem = $state.raw<PaletteItem | null>(null);
   let actionSelected = $state(0);
   let pendingConfirm = $state<PendingConfirm | null>(null);
   let status = $state<Status | null>(null);
@@ -96,6 +112,9 @@
   let pickerOpen = $state(false);
   let recent = $state.raw<RecentUse[]>([]);
   let openedAt = $state(0);
+  // Increases on every close. A context from an earlier session does nothing,
+  // so an action that finishes after a close cannot change the next session.
+  let session = 0;
 
   // Touch screens get visible row action buttons and no key hints.
   const coarse = new MediaQuery('pointer: coarse');
@@ -117,25 +136,28 @@
   const isDev = $derived(activeVariant === 'dev');
 
   function contextFor(variant: PaletteVariant): PaletteContext {
+    const owner = session;
+    const live = () => owner === session;
     return {
-      push: (view) => push(view, variant),
-      pop,
-      close,
+      push: (view) => live() && push(view, variant),
+      pop: () => live() && pop(),
+      close: () => live() && close(),
       toast: showStatus,
       namespace: () => page.params.namespace,
-      subject: () => subjectFromParams(page.params),
+      subject: () => subjectFromParams(page.params, page.route.id),
     };
   }
 
+  function allowed(items: PaletteItem[]): PaletteItem[] {
+    if (!facts) return items;
+    return items.filter(({ rules }) => matchesRules(rules, facts));
+  }
+
   const rootEntries = $derived(
-    currentView
-      ? []
-      : rootItems(activeSets, contextFor('default'), PAGE_SECTION),
+    currentView ? [] : rootItems(activeSets, contextFor, PAGE_SECTION),
   );
   const queryEntries = $derived(
-    currentView
-      ? []
-      : searchItems(activeSets, query, contextFor('default'), PAGE_SECTION),
+    currentView ? [] : searchItems(activeSets, query, contextFor, PAGE_SECTION),
   );
   const rootVariants = $derived(
     new Map(
@@ -144,6 +166,11 @@
         variant,
       ]),
     ),
+  );
+  // Only items from the list itself are saved as recent. Query items, such
+  // as a pasted ID, and page items are not.
+  const recordableIds = $derived(
+    new Set(rootEntries.filter(({ page }) => !page).map(({ item }) => item.id)),
   );
 
   // Recent items, then page items, then every item in its natural order.
@@ -181,7 +208,12 @@
         {
           title: '',
           variant: activeVariant,
-          items: [...typed, ...filterPaletteItems(currentView.items(), query)],
+          items: uniqueById(
+            allowed([
+              ...typed,
+              ...filterPaletteItems(currentView.items(), query),
+            ]),
+          ),
         },
       ];
     }
@@ -190,7 +222,7 @@
       {
         title: '',
         variant: 'default',
-        items: [
+        items: uniqueById([
           ...queryEntries
             .filter(({ fallback }) => !fallback)
             .map(({ item }) => item),
@@ -202,7 +234,7 @@
           ...queryEntries
             .filter(({ fallback }) => fallback)
             .map(({ item }) => item),
-        ],
+        ]),
       },
     ];
   });
@@ -225,6 +257,7 @@
     Math.min(selected, Math.max(visibleItems.length - 1, 0)),
   );
   const selectedItem = $derived(visibleItems[selectedIndex]);
+  const menuItem = $derived(actionsOpen ? actionsItem : null);
   const loading = $derived(currentView?.loading?.() ?? false);
   const error = $derived(currentView?.error?.());
   const breadcrumbs = $derived(frames.map(({ view }) => view.title));
@@ -286,6 +319,7 @@
 
   function resetTransientState() {
     actionsOpen = false;
+    actionsItem = null;
     actionSelected = 0;
     pendingConfirm = null;
     pickerOpen = false;
@@ -323,6 +357,8 @@
   }
 
   function close() {
+    session += 1;
+    running = false;
     for (const { view } of [...frames].reverse()) view.onClose?.();
     frames = [];
     savedFrames.length = 0;
@@ -342,7 +378,7 @@
     );
   }
 
-  async function runAction(item: PaletteItem | undefined, index: number) {
+  function runAction(item: PaletteItem | null | undefined, index: number) {
     if (!item) return;
     if (running) {
       showStatus(translate('palette.still-working'));
@@ -361,49 +397,58 @@
     }
 
     actionsOpen = false;
+    actionsItem = null;
     if (action.confirm && !isPending(item.id, index)) {
       pendingConfirm = {
         itemId: item.id,
         actionIndex: index,
         message: action.confirm,
+        item,
+        action,
       };
       return;
     }
 
     pendingConfirm = null;
+    perform(item, action);
+  }
+
+  async function perform(item: PaletteItem, action: PaletteAction) {
     // Saved for the next open. The open list keeps its order, so the
     // selection does not jump.
-    if (frames.length === 0 && rootVariants.has(item.id)) {
+    if (frames.length === 0 && recordableIds.has(item.id)) {
       saveRecent(
         recentKey,
         recordUse(loadRecent(recentKey), item.id, Date.now()),
       );
     }
+    const owner = session;
     running = true;
     try {
       await action.run(contextFor(variantOf(item)));
     } catch (err) {
       showStatus(err instanceof Error ? err.message : String(err), 'error');
     } finally {
-      running = false;
+      if (owner === session) running = false;
     }
   }
 
   function confirmPending() {
     const pending = pendingConfirm;
     if (!pending) return;
-
-    const item = visibleItems.find(({ id }) => id === pending.itemId);
-    if (!item) {
-      pendingConfirm = null;
+    if (running) {
+      showStatus(translate('palette.still-working'));
       return;
     }
-    runAction(item, pending.actionIndex);
+
+    pendingConfirm = null;
+    perform(pending.item, pending.action);
   }
 
   function toggleActions() {
     if (actionsOpen) {
       actionsOpen = false;
+      actionsItem = null;
       return;
     }
     if (!selectedItem || selectedItem.disabled) return;
@@ -411,6 +456,7 @@
 
     pendingConfirm = null;
     actionSelected = 0;
+    actionsItem = selectedItem;
     actionsOpen = true;
   }
 
@@ -421,8 +467,9 @@
   }
 
   function move(delta: number) {
-    if (actionsOpen && selectedItem) {
-      const count = selectedItem.actions.length;
+    if (menuItem) {
+      const count = menuItem.actions.length;
+      if (count === 0) return;
       actionSelected = (actionSelected + delta + count) % count;
       return;
     }
@@ -476,7 +523,7 @@
       return;
     }
     if (actionsOpen) {
-      runAction(selectedItem, actionSelected);
+      runAction(menuItem, actionSelected);
       return;
     }
     runAction(selectedItem, hasMod(event) ? 1 : 0);
@@ -503,13 +550,17 @@
     setScope(toolSet.id);
   }
 
+  // Tab cycles the scope only while the query is empty. With text in the
+  // query, Tab moves focus to the scope chip and the close button.
   function handleTab(event: KeyboardEvent) {
-    if (frames.length > 0 || !canScope) return;
+    if (frames.length > 0 || !canScope || query !== '') return;
     event.preventDefault();
     setScope(nextScope(toolSets, scope, event.shiftKey ? -1 : 1));
   }
 
   function onInputKeydown(event: KeyboardEvent) {
+    // Keys that commit or move inside an IME composition belong to the IME.
+    if (event.isComposing) return;
     switch (event.key) {
       case 'ArrowDown':
         event.preventDefault();
@@ -574,6 +625,13 @@
       returnFocus = null;
     };
   }
+
+  // The app can unmount the palette while it is open, for example when its
+  // last tool set goes away. Close it first, so views clean up and it does
+  // not open again by itself.
+  onDestroy(() => {
+    if (open) close();
+  });
 
   $effect(function loadRecentOnOpen() {
     if (!open) return;
@@ -796,7 +854,7 @@
                     {/if}
                   </div>
                 {/if}
-                {#each section.items as item, itemIndex (item.id)}
+                {#each section.items as item, itemIndex (itemIndex)}
                   {@const index = sectionStarts[sectionIndex] + itemIndex}
                   {@const isSelected = index === selectedIndex}
                   <!-- svelte-ignore a11y_click_events_have_key_events -->
@@ -871,7 +929,7 @@
             </div>
           </div>
 
-          {#if actionsOpen && selectedItem}
+          {#if menuItem}
             <div
               id={menuId}
               class="absolute bottom-12 right-3 max-h-64 w-72 overflow-y-auto rounded-lg border border-primary bg-surface-primary p-1 shadow-xl"
@@ -879,9 +937,9 @@
               aria-label={translate('palette.actions')}
             >
               <div class="truncate px-3 py-1.5 text-xs text-secondary">
-                {selectedItem.title}
+                {menuItem.title}
               </div>
-              {#each selectedItem.actions as action, index (index)}
+              {#each menuItem.actions as action, index (index)}
                 <!-- svelte-ignore a11y_click_events_have_key_events -->
                 <div
                   id={actionId(index)}
@@ -896,7 +954,7 @@
                   ]}
                   onmousedown={keepInputFocus}
                   onmousemove={() => (actionSelected = index)}
-                  onclick={() => runAction(selectedItem, index)}
+                  onclick={() => runAction(menuItem, index)}
                 >
                   <span class="min-w-0">
                     <span class="block truncate">{action.title}</span>

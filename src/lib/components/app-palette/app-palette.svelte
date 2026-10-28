@@ -25,8 +25,15 @@
   const toolSets = $derived(
     sortToolSets(visibleToolSets(registeredToolSets(), facts)),
   );
+
+  // With nothing to show, a request to open is dropped, so the palette does
+  // not open by itself once a set shows up later.
+  $effect.pre(function dropOpenWithoutTools() {
+    if (toolSets.length > 0 || !appPalette.open) return;
+    appPalette.open = false;
+  });
 </script>
 
 {#if toolSets.length > 0}
-  <Palette {toolSets} {recentKey} {label} bind:open={appPalette.open} />
+  <Palette {toolSets} {facts} {recentKey} {label} bind:open={appPalette.open} />
 {/if}
