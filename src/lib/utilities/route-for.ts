@@ -219,6 +219,20 @@ export const routeForStandaloneActivityMetadata = (
   return `${routeForStandaloneActivityBase(parameters)}/metadata`;
 };
 
+export const routeForStandaloneActivityLinks = ({
+  queryParams,
+  ...parameters
+}: NamespaceParameter & {
+  activityId: string;
+  runId: string;
+  queryParams?: Record<string, string>;
+}): ResolvedPathname => {
+  return toURL(
+    `${routeForStandaloneActivityBase(parameters)}/links`,
+    queryParams,
+  );
+};
+
 export const routeForStandaloneNexusOperations = (
   parameters: NamespaceParameter,
 ): ResolvedPathname => {
@@ -275,6 +289,20 @@ export const routeForStandaloneNexusOperationMetadata = (
   parameters: NamespaceParameter & { operationId: string; runId: string },
 ): ResolvedPathname => {
   return `${routeForStandaloneNexusOperationBase(parameters)}/metadata`;
+};
+
+export const routeForStandaloneNexusOperationLinks = ({
+  queryParams,
+  ...parameters
+}: NamespaceParameter & {
+  operationId: string;
+  runId: string;
+  queryParams?: Record<string, string>;
+}): ResolvedPathname => {
+  return toURL(
+    `${routeForStandaloneNexusOperationBase(parameters)}/links`,
+    queryParams,
+  );
 };
 
 type StartWorkflowParameters = NamespaceParameter &

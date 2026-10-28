@@ -95,4 +95,23 @@ describe('getEventLinkHref', () => {
       `${base}/namespaces/test-ns/workflows/test-wf/test-run/history/events/99`,
     );
   });
+
+  it('should return the source Links › Callbacks route for callback links', () => {
+    const link = {
+      callback: {
+        namespace: 'test-ns',
+        execution: {
+          type: 'EXECUTION_TYPE_NEXUS_OPERATION' as const,
+          businessId: 'operation-1',
+          runId: 'run-1',
+        },
+        requestId: 'req-1',
+      },
+    };
+
+    const result = getEventLinkHref(link);
+    expect(result).toBe(
+      `${base}/namespaces/test-ns/nexus-operations/operation-1/run-1/links?tab=callbacks&requestId=req-1`,
+    );
+  });
 });

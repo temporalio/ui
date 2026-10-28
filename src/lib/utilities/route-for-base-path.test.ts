@@ -37,10 +37,12 @@ import {
   routeForStandaloneActivities,
   routeForStandaloneActivitiesWithQuery,
   routeForStandaloneActivityDetails,
+  routeForStandaloneActivityLinks,
   routeForStandaloneActivityMetadata,
   routeForStandaloneActivitySearchAttributes,
   routeForStandaloneActivityWorkers,
   routeForStandaloneNexusOperationDetails,
+  routeForStandaloneNexusOperationLinks,
   routeForStandaloneNexusOperationMetadata,
   routeForStandaloneNexusOperations,
   routeForStandaloneNexusOperationSearchAttributes,
@@ -205,6 +207,10 @@ describe('routeFor functions should resolve the base path exactly once', () => {
       () => routeForStandaloneActivityMetadata(activityParams),
     ],
     [
+      'routeForStandaloneActivityLinks',
+      () => routeForStandaloneActivityLinks(activityParams),
+    ],
+    [
       'routeForStandaloneNexusOperations',
       () => routeForStandaloneNexusOperations(namespaceParams),
     ],
@@ -232,6 +238,10 @@ describe('routeFor functions should resolve the base path exactly once', () => {
     [
       'routeForStandaloneNexusOperationMetadata',
       () => routeForStandaloneNexusOperationMetadata(nexusOperationParams),
+    ],
+    [
+      'routeForStandaloneNexusOperationLinks',
+      () => routeForStandaloneNexusOperationLinks(nexusOperationParams),
     ],
     [
       'routeForWorkflowStart',
@@ -468,6 +478,10 @@ describe('routeFor functions with prefix should resolve base + prefix correctly'
       () => routeForStandaloneActivityMetadata(activityParams),
     ],
     [
+      'routeForStandaloneActivityLinks',
+      () => routeForStandaloneActivityLinks(activityParams),
+    ],
+    [
       'routeForStandaloneNexusOperations',
       () => routeForStandaloneNexusOperations(namespaceParams),
     ],
@@ -495,6 +509,10 @@ describe('routeFor functions with prefix should resolve base + prefix correctly'
     [
       'routeForStandaloneNexusOperationMetadata',
       () => routeForStandaloneNexusOperationMetadata(nexusOperationParams),
+    ],
+    [
+      'routeForStandaloneNexusOperationLinks',
+      () => routeForStandaloneNexusOperationLinks(nexusOperationParams),
     ],
     [
       'routeForWorkflowStart',
