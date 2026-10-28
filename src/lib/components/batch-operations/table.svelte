@@ -59,6 +59,7 @@
           title={translate('batch.empty-state-title')}
           content={translate('batch.empty-state-description')}
           Icon={IconBatchOperation}
+          variant="inline"
         />
       </td>
     </TableRow>

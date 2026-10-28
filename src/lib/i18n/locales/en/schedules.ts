@@ -108,6 +108,7 @@ export const Strings = {
   'getting-started-docs-link-preface': 'Go to',
   'getting-started-docs-link': 'docs',
   'getting-started-cli-link-preface': 'or get started with',
+  'getting-started-sdk-title': 'Create Schedules from your preferred SDK',
   'add-schedule-attr': 'Schedule Attributes',
   'add-workflow-attr': 'Workflow Attributes',
   'schedule-specs': 'Schedule Specs',

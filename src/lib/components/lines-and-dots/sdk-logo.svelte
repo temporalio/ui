@@ -1,8 +1,5 @@
-<script lang="ts">
-  import Link from '$lib/holocene/link.svelte';
-  import Tooltip from '$lib/holocene/tooltip.svelte';
+<script lang="ts" module>
   import {
-    IconBook,
     type IconComponent,
     IconDotnetColorblock,
     IconGoColorblock,
@@ -14,7 +11,7 @@
     IconTypescriptColorblock,
   } from '$lib/io/icon';
 
-  const sdkLogos: Record<string, IconComponent> = {
+  export const sdkLogos: Record<string, IconComponent> = {
     go: IconGoColorblock,
     typescript: IconTypescriptColorblock,
     java: IconJavaColorblock,
@@ -24,6 +21,12 @@
     php: IconPhpColorblock,
     rust: IconRustColorblock,
   };
+</script>
+
+<script lang="ts">
+  import Link from '$lib/holocene/link.svelte';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
+  import { IconBook } from '$lib/io/icon';
 
   const sdkToDocsSlug: Record<string, string> = {
     Ruby: 'ruby',

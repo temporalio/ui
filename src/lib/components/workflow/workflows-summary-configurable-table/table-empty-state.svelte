@@ -7,10 +7,9 @@
   import NoWorkflowTaskFailures from '$lib/components/empty-states/no-workflow-task-failures.svelte';
   import ResourceEmptyState from '$lib/components/empty-states/resource-empty-state.svelte';
   import SdkLinks from '$lib/components/empty-states/sdk-links.svelte';
-  import Alert from '$lib/holocene/alert.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { IconTemporalWorkflow, IconWarning } from '$lib/io/icon';
+  import { IconTemporalWorkflow } from '$lib/io/icon';
   import { workflowError } from '$lib/stores/workflows';
   import { TASK_FAILURES_QUERY } from '$lib/utilities/workflow-task-failures';
 
@@ -43,67 +42,51 @@
 </script>
 
 {#if query}
-  <div
-    class="flex h-full w-full flex-col items-center justify-center p-4"
-    aria-live="polite"
+  <ResourceEmptyState
+    title={$workflowError
+      ? translate('workflows.workflow-query-error-state')
+      : hasTaskFailuresQuery
+        ? translate('workflows.workflow-task-failures-query-empty-state-title')
+        : translate('workflows.workflow-query-empty-state-title')}
+    content={hasTaskFailuresQuery
+      ? translate(
+          'workflows.workflow-task-failures-query-empty-state-description',
+        )
+      : translate('workflows.workflow-query-empty-state-description')}
+    error={$workflowError}
   >
-    <div class="text-center">
-      <h2>
-        {#if $workflowError}
-          {translate('workflows.workflow-query-error-state')}
-        {:else}
-          {hasTaskFailuresQuery
-            ? translate(
-                'workflows.workflow-task-failures-query-empty-state-title',
-              )
-            : translate('workflows.workflow-query-empty-state-title')}
-        {/if}
-      </h2>
-      <p class="text-secondary">
-        {#if $workflowError}
-          {$workflowError}
-        {:else}
-          {hasTaskFailuresQuery
-            ? translate(
-                'workflows.workflow-task-failures-query-empty-state-description',
-              )
-            : translate('workflows.workflow-query-empty-state-description')}
-        {/if}
-      </p>
+    {#snippet illustration()}
       {#if hasTaskFailuresQuery}
-        <NoWorkflowTaskFailures class="m-auto mt-8 text-tertiary" />
+        <NoWorkflowTaskFailures class="text-tertiary" />
       {:else}
-        <NoQueryResults class="m-auto mt-8 text-tertiary" />
+        <NoQueryResults class="text-tertiary" />
       {/if}
-    </div>
-  </div>
+    {/snippet}
+  </ResourceEmptyState>
 {:else}
   <ResourceEmptyState
     title={translate('workflows.workflow-empty-state-title')}
     Icon={IconTemporalWorkflow}
+    error={$workflowError}
+    actions={cloud}
   >
     {#snippet description()}
-      {#if !$workflowError}
-        <p>
-          {translate('workflows.workflow-empty-state-description')}
-          <Link newTab href="https://github.com/temporalio"
-            >github.com/temporalio</Link
-          >.
-        </p>
-      {/if}
+      <p>
+        {translate('workflows.workflow-empty-state-value-proposition')}
+      </p>
+      <p>
+        {translate('workflows.workflow-empty-state-read-docs-prefix')}
+        <Link href="https://docs.temporal.io/workflows" newTab>
+          {translate('workflows.workflow-empty-state-docs-link')}
+        </Link>
+        {translate('workflows.workflow-empty-state-read-docs-suffix')}
+      </p>
     {/snippet}
-    {#if $workflowError}
-      <Alert
-        intent="warning"
-        Icon={IconWarning}
-        title={translate('common.error-occurred')}
-        style="overflow-wrap: anywhere"
-      >
-        {$workflowError}
-      </Alert>
-    {:else}
-      {@render cloud?.()}
-      <SdkLinks links={samples} />
-    {/if}
+    {#snippet resources()}
+      <SdkLinks
+        links={samples}
+        label={translate('workflows.workflow-empty-state-samples-title')}
+      />
+    {/snippet}
   </ResourceEmptyState>
 {/if}

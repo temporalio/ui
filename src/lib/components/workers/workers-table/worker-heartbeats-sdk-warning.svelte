@@ -50,30 +50,38 @@
       ({ sdk }) => sdk.toLowerCase() === $sdkInfo.sdk.toLowerCase(),
     ),
   );
+  const needsUpgrade = $derived(
+    Boolean(
+      currentSdk &&
+      !minimumVersionRequired(currentSdk.version, $sdkInfo.version),
+    ),
+  );
 </script>
+
+{#snippet upgradeNote()}
+  {#if currentSdk}
+    {@const { href, sdk, version } = currentSdk}
+    <div class="flex flex-wrap items-center justify-center gap-1">
+      {translate('workers.worker-heartbeats-sdk-link-preface')}
+      <Link newTab {href}>
+        <SdkLogo {sdk} {version} hideDocsLink />
+      </Link>
+      {translate('workers.worker-heartbeats-sdk-link-postface')}
+    </div>
+  {/if}
+{/snippet}
+
+{#snippet supportedSdks()}
+  <SdkLinks
+    links={supportedVersions}
+    label={translate('workers.worker-heartbeats-sdk-list-preface')}
+  />
+{/snippet}
 
 <ResourceEmptyState
   title={translate('workers.no-worker-heartbeats')}
   Icon={IconHeartbeat}
   testId="worker-heartbeats-sdk-warning"
->
-  {#snippet description()}
-    {#if currentSdk}
-      {@const { href, sdk, version } = currentSdk}
-      {#if !minimumVersionRequired(version, $sdkInfo.version)}
-        <div class="flex flex-wrap items-center justify-center gap-1">
-          {translate('workers.worker-heartbeats-sdk-link-preface')}
-          <Link newTab {href}>
-            <SdkLogo {sdk} {version} hideDocsLink />
-          </Link>
-          {translate('workers.worker-heartbeats-sdk-link-postface')}
-        </div>
-      {/if}
-    {:else}
-      <p>{translate('workers.worker-heartbeats-sdk-list-preface')}</p>
-    {/if}
-  {/snippet}
-  {#if !currentSdk}
-    <SdkLinks links={supportedVersions} />
-  {/if}
-</ResourceEmptyState>
+  description={needsUpgrade ? upgradeNote : undefined}
+  resources={currentSdk ? undefined : supportedSdks}
+/>

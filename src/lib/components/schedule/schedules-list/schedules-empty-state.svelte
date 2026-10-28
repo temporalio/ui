@@ -1,10 +1,9 @@
 <script lang="ts">
   import EmptyState from '$lib/components/empty-states/resource-empty-state.svelte';
   import SdkLinks from '$lib/components/empty-states/sdk-links.svelte';
-  import Alert from '$lib/holocene/alert.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { IconTemporalSchedules, IconWarning } from '$lib/io/icon';
+  import { IconTemporalSchedules } from '$lib/io/icon';
 
   interface Props {
     error?: string;
@@ -53,11 +52,8 @@
   <EmptyState
     title={translate('schedules.empty-state-title')}
     Icon={IconTemporalSchedules}
-  >
-    <Alert intent="warning" Icon={IconWarning} class="mx-12">
-      {error}
-    </Alert>
-  </EmptyState>
+    {error}
+  />
 {:else if query}
   <EmptyState
     title={translate('schedules.empty-state-title')}
@@ -82,6 +78,11 @@
         >.
       </p>
     {/snippet}
-    <SdkLinks links={sdkLinks} />
+    {#snippet resources()}
+      <SdkLinks
+        links={sdkLinks}
+        label={translate('schedules.getting-started-sdk-title')}
+      />
+    {/snippet}
   </EmptyState>
 {/if}

@@ -56,6 +56,26 @@
   <SchedulesEmptyState error="Unable to load schedules." />
 </Story>
 
+<Story
+  name="Workflows No Matches"
+  asChild
+  parameters={{
+    sveltekit_experimental: {
+      stores: {
+        page: {
+          url: new URL(
+            'http://localhost/namespaces/default/workflows?query=WorkflowType%3D%22Example%22',
+          ),
+          params: { namespace: 'default' },
+          data: {},
+        },
+      },
+    },
+  }}
+>
+  <WorkflowsEmptyState />
+</Story>
+
 <Story name="Schedules No Matches" asChild>
   <SchedulesEmptyState query="WorkflowType = &quot;Example&quot;" />
 </Story>
