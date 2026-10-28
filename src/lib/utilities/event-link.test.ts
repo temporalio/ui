@@ -2,7 +2,11 @@ import { describe, expect, it } from 'vitest';
 
 import { base } from '$app/paths';
 
-import { eventLinkTargetTypeLabel, toEventLinkView } from './event-link';
+import {
+  eventLinkTargetTypeLabel,
+  toEventLinkView,
+  toEventLinkViews,
+} from './event-link';
 
 describe('toEventLinkView', () => {
   it('returns a workflow event route for event references', () => {
@@ -233,6 +237,132 @@ describe('toEventLinkView', () => {
     });
   });
 
+  describe('callback links', () => {
+    const callbackLink = (
+      type: string,
+      overrides: Record<string, unknown> = {},
+    ) => ({
+      callback: {
+        namespace: 'source-ns',
+        execution: {
+          type: type as 'EXECUTION_TYPE_NEXUS_OPERATION',
+          businessId: 'source-id',
+          runId: 'source-run',
+        },
+        requestId: 'callback-request',
+        ...overrides,
+      },
+    });
+
+    it('routes a Nexus operation source to its Links › Callbacks tab', () => {
+      const view = toEventLinkView(
+        callbackLink('EXECUTION_TYPE_NEXUS_OPERATION'),
+      );
+
+      expect(view).toMatchObject({
+        variant: 'callback',
+        label: 'Callback Link',
+        value: 'source-id',
+        href: `${base}/namespaces/source-ns/nexus-operations/source-id/source-run/links?tab=callbacks&requestId=callback-request`,
+        namespace: {
+          label: 'Namespace Link',
+          value: 'source-ns',
+          href: `${base}/namespaces/source-ns`,
+        },
+      });
+    });
+
+    it('routes a standalone activity source to its Links › Callbacks tab', () => {
+      const view = toEventLinkView(callbackLink('EXECUTION_TYPE_ACTIVITY'));
+
+      expect(view.href).toBe(
+        `${base}/namespaces/source-ns/activities/source-id/source-run/links?tab=callbacks&requestId=callback-request`,
+      );
+    });
+
+    it('routes a workflow source to the workflow', () => {
+      const view = toEventLinkView(callbackLink('EXECUTION_TYPE_WORKFLOW'));
+
+      expect(view.href).toBe(
+        `${base}/namespaces/source-ns/workflows/source-id/source-run/timeline?requestId=callback-request`,
+      );
+    });
+
+    it('adds the update ID when a workflow callback comes from an update', () => {
+      const view = toEventLinkView(
+        callbackLink('EXECUTION_TYPE_WORKFLOW', {
+          componentPath: ['Update', 'update-1'],
+        }),
+      );
+
+      expect(view.href).toBe(
+        `${base}/namespaces/source-ns/workflows/source-id/source-run/timeline?requestId=callback-request&updateId=update-1`,
+      );
+    });
+
+    it('ignores component paths that are not updates', () => {
+      const view = toEventLinkView(
+        callbackLink('EXECUTION_TYPE_WORKFLOW', {
+          componentPath: ['Signal', 'signal-1'],
+        }),
+      );
+
+      expect(view.href).toBe(
+        `${base}/namespaces/source-ns/workflows/source-id/source-run/timeline?requestId=callback-request`,
+      );
+    });
+
+    it('leaves out the request ID when the link has none', () => {
+      const view = toEventLinkView(
+        callbackLink('EXECUTION_TYPE_NEXUS_OPERATION', { requestId: '' }),
+      );
+
+      expect(view.href).toBe(
+        `${base}/namespaces/source-ns/nexus-operations/source-id/source-run/links?tab=callbacks`,
+      );
+    });
+
+    it('returns a text-only view for an unknown execution type', () => {
+      const view = toEventLinkView(callbackLink('EXECUTION_TYPE_UNSPECIFIED'));
+
+      expect(view).toMatchObject({
+        variant: 'callback',
+        label: 'Callback Link',
+        value: 'source-id',
+        href: undefined,
+      });
+    });
+
+    it('returns a text-only view when the run ID is missing', () => {
+      const view = toEventLinkView({
+        callback: {
+          namespace: 'source-ns',
+          execution: {
+            type: 'EXECUTION_TYPE_NEXUS_OPERATION',
+            businessId: 'source-id',
+          },
+        },
+      });
+
+      expect(view).toMatchObject({
+        variant: 'callback',
+        value: 'source-id',
+        href: undefined,
+      });
+    });
+
+    it('builds distinct keys for callbacks with different request IDs', () => {
+      const [first, second] = toEventLinkViews([
+        callbackLink('EXECUTION_TYPE_NEXUS_OPERATION'),
+        callbackLink('EXECUTION_TYPE_NEXUS_OPERATION', {
+          requestId: 'other-request',
+        }),
+      ]);
+
+      expect(first.key).not.toBe(second.key);
+    });
+  });
+
   it('returns a text-only unknown view for empty links', () => {
     const view = toEventLinkView({});
 
@@ -253,6 +383,10 @@ describe('eventLinkTargetTypeLabel', () => {
   it('labels workflow variants as Workflow', () => {
     expect(eventLinkTargetTypeLabel('workflowEvent')).toBe('Workflow');
     expect(eventLinkTargetTypeLabel('workflow')).toBe('Workflow');
+  });
+
+  it('labels a callback variant as a Callback', () => {
+    expect(eventLinkTargetTypeLabel('callback')).toBe('Callback');
   });
 
   it('returns undefined for variants without a handler target type', () => {
