@@ -59,6 +59,11 @@ interface RetryPolicy {
   maximumAttempts: number;
 }
 
+export type ResolvedPrincipal = {
+  type?: string;
+  nameAtWriteTime?: string;
+};
+
 export interface ActivityExecutionInfo extends Omit<
   temporal.api.activity.v1.IActivityExecutionInfo,
   | 'status'
@@ -90,6 +95,9 @@ export interface ActivityExecutionInfo extends Omit<
   sdkVersion?: string;
   executionTime?: string;
   startDelay?: string;
+  startedByPrincipal?: ResolvedPrincipal | null;
+  lastWorkerPrincipal?: ResolvedPrincipal | null;
+  closedByPrincipal?: ResolvedPrincipal | null;
   lastFailure?:
     | (Omit<Failure, 'applicationFailureInfo'> & {
         applicationFailureInfo?:
