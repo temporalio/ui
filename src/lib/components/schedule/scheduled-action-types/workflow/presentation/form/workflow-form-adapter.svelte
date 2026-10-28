@@ -9,13 +9,13 @@
     ScheduledActionForm,
     ScheduledActionFormData,
     ScheduledActionSummaryItem,
+    SupportedScheduledAction,
   } from '../../../types';
-  import type { ResolvedWorkflowAction } from '../../types';
 
   import WorkflowForm from './workflow-form.svelte';
 
   type Props = {
-    resolvedAction: ResolvedWorkflowAction;
+    resolvedAction: SupportedScheduledAction<'workflow'>;
     customSearchAttributes: SearchAttributes;
     searchAttributes: SearchAttributesSchema;
     onSummaryChange: (summary: ScheduledActionSummaryItem[]) => void;

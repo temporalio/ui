@@ -1,21 +1,17 @@
+import { scheduledActionDefinitions } from './registry';
 import type {
   ScheduledActionFormData,
   ScheduledActionRequest,
+  ScheduledActionType,
   SupportedScheduledAction,
 } from './types';
-import { toWorkflowScheduleRequest } from './workflow/request-mappings';
 
-export function toScheduledActionRequest(
-  actionForm: ScheduledActionFormData,
-  resolvedAction: SupportedScheduledAction,
+export function toScheduledActionRequest<Type extends ScheduledActionType>(
+  actionForm: ScheduledActionFormData<Type>,
+  resolvedAction: NoInfer<SupportedScheduledAction<Type>>,
 ): Promise<ScheduledActionRequest> {
-  switch (actionForm.type) {
-    case 'workflow':
-      if (resolvedAction.type !== 'workflow') {
-        throw new Error(
-          'The form and existing schedule action types do not match',
-        );
-      }
-      return toWorkflowScheduleRequest(actionForm, resolvedAction);
-  }
+  return scheduledActionDefinitions[actionForm.type].toRequest(
+    actionForm,
+    resolvedAction,
+  );
 }

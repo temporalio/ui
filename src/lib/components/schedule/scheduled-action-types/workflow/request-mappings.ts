@@ -7,9 +7,12 @@ import type {
 import { encodePayloads } from '$lib/utilities/encode-payload';
 
 import type { FormWorkflowDetails } from './schema';
-import type { ResolvedWorkflowAction } from './types';
 import { getSearchAttributes } from '../../utilities/get-search-attributes';
-import type { ScheduledActionFormData, ScheduledActionRequest } from '../types';
+import type {
+  ScheduledActionFormData,
+  ScheduledActionRequest,
+  SupportedScheduledAction,
+} from '../types';
 
 // Omit zero/empty workflow timeouts so the server applies its defaults
 // (execution/run: unlimited, task: 10s) rather than sending an explicit 0.
@@ -30,8 +33,8 @@ export function getWorkflowPoliciesRequest(
 }
 
 export async function toWorkflowScheduleRequest(
-  data: Extract<ScheduledActionFormData, { type: 'workflow' }>,
-  resolvedAction: ResolvedWorkflowAction,
+  data: ScheduledActionFormData<'workflow'>,
+  resolvedAction: SupportedScheduledAction<'workflow'>,
 ): Promise<ScheduledActionRequest> {
   return {
     action: await getWorkflowActionRequest(

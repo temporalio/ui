@@ -1,11 +1,11 @@
 import type { ScheduleListEntry } from '$lib/types';
 import type { DescribeFullSchedule } from '$lib/types/schedule';
 
+import type { WorkflowSchedule, WorkflowScheduleListEntry } from './types';
 import type {
-  ResolvedWorkflowAction,
-  WorkflowSchedule,
-  WorkflowScheduleListEntry,
-} from './types';
+  SupportedScheduledAction,
+  SupportedScheduledActionListEntry,
+} from '../types';
 
 export function isWorkflowSchedule(
   schedule: DescribeFullSchedule,
@@ -21,8 +21,18 @@ export function isWorkflowScheduleListEntry(
 
 export function resolveWorkflowAction(
   schedule: DescribeFullSchedule,
-): ResolvedWorkflowAction | null {
+): SupportedScheduledAction<'workflow'> | null {
   if (!isWorkflowSchedule(schedule)) {
+    return null;
+  }
+
+  return { type: 'workflow', schedule };
+}
+
+export function resolveWorkflowActionListEntry(
+  schedule: ScheduleListEntry,
+): SupportedScheduledActionListEntry<'workflow'> | null {
+  if (!isWorkflowScheduleListEntry(schedule)) {
     return null;
   }
 

@@ -18,8 +18,3 @@ export type WorkflowScheduleListEntry = ScheduleListEntry & {
     >;
   };
 };
-
-export type ResolvedWorkflowAction = {
-  type: 'workflow';
-  schedule: WorkflowSchedule | null;
-};

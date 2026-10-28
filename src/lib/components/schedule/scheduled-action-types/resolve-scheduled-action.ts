@@ -1,31 +1,23 @@
 import type { DescribeFullSchedule } from '$lib/types/schedule';
 
-import type {
-  ResolvedScheduledAction,
-  ScheduledActionType,
-  SupportedScheduledAction,
-} from './types';
-import { resolveWorkflowAction } from './workflow/action';
+import { scheduledActionDefinitions } from './registry';
+import type { ResolvedScheduledAction, ScheduledActionType } from './types';
 
 export const DEFAULT_SCHEDULED_ACTION_TYPE: ScheduledActionType = 'workflow';
-
-function getNewScheduledAction(
-  type: ScheduledActionType = DEFAULT_SCHEDULED_ACTION_TYPE,
-): SupportedScheduledAction {
-  return { type, schedule: null };
-}
 
 export function resolveScheduledAction(
   schedule: DescribeFullSchedule | null,
   selectedType: ScheduledActionType = DEFAULT_SCHEDULED_ACTION_TYPE,
 ): ResolvedScheduledAction {
   if (!schedule) {
-    return getNewScheduledAction(selectedType);
+    return scheduledActionDefinitions[selectedType].createAction();
   }
 
-  const workflowAction = resolveWorkflowAction(schedule);
-  if (workflowAction) {
-    return workflowAction;
+  for (const definition of Object.values(scheduledActionDefinitions)) {
+    const action = definition.resolveSchedule(schedule);
+    if (action) {
+      return action;
+    }
   }
 
   return { type: 'unknown', schedule };

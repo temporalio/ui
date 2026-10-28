@@ -217,13 +217,13 @@ export async function getRequestBody(
     describeFullSchedule,
     actionForm.type,
   );
-  if (
-    resolvedAction.type === 'unknown' ||
-    resolvedAction.type !== actionForm.type
-  ) {
+  if (resolvedAction.type === 'unknown') {
     throw new Error(
-      'Cannot save a schedule with a missing, unsupported, or mismatched action type',
+      'Cannot save a schedule with a missing or unsupported action type',
     );
+  }
+  if (resolvedAction.type !== actionForm.type) {
+    throw new Error('The form and existing schedule action types do not match');
   }
 
   const { action: actionRequest, policies: actionPoliciesRequest } =

@@ -13,25 +13,20 @@ import type {
 import { workflowActionPresentation } from './workflow/presentation';
 
 type ActionFormProps<Type extends ScheduledActionType> = {
-  resolvedAction: Extract<SupportedScheduledAction, { type: Type }>;
+  resolvedAction: SupportedScheduledAction<Type>;
   customSearchAttributes: SearchAttributes;
   searchAttributes: SearchAttributesSchema;
   onSummaryChange: (summary: ScheduledActionSummaryItem[]) => void;
 };
 
 type ActionViewProps<Type extends ScheduledActionType> = {
-  schedule: NonNullable<
-    Extract<SupportedScheduledAction, { type: Type }>['schedule']
-  >;
+  schedule: NonNullable<SupportedScheduledAction<Type>['schedule']>;
   namespace: string;
   scheduleId: string;
 };
 
 type ActionSchedulesListProps<Type extends ScheduledActionType> = {
-  schedule: Extract<
-    SupportedScheduledActionListEntry,
-    { type: Type }
-  >['schedule'];
+  schedule: SupportedScheduledActionListEntry<Type>['schedule'];
   namespace: string;
   width?: number;
 };
