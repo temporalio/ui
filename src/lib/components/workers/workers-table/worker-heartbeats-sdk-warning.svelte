@@ -1,5 +1,4 @@
 <script lang="ts">
-  import PlaceholderCards from '$lib/components/empty-states/placeholder-cards.svelte';
   import ResourceEmptyState from '$lib/components/empty-states/resource-empty-state.svelte';
   import SdkLinks from '$lib/components/empty-states/sdk-links.svelte';
   import SdkLogo from '$lib/components/lines-and-dots/sdk-logo.svelte';
@@ -78,10 +77,6 @@
   {/if}
 {/snippet}
 
-{#snippet placeholder()}
-  <PlaceholderCards />
-{/snippet}
-
 {#snippet supportedSdks()}
   <SdkLinks
     links={supportedVersions}
@@ -95,5 +90,5 @@
   testId="worker-heartbeats-sdk-warning"
   description={needsUpgrade ? upgradeNote : undefined}
   resources={currentSdk ? undefined : supportedSdks}
-  illustration={showPlaceholder ? placeholder : undefined}
+  placeholder={showPlaceholder}
 />

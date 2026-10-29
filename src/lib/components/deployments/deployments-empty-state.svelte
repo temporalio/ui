@@ -1,5 +1,4 @@
 <script lang="ts">
-  import PlaceholderCards from '$lib/components/empty-states/placeholder-cards.svelte';
   import ResourceEmptyState from '$lib/components/empty-states/resource-empty-state.svelte';
   import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -24,10 +23,8 @@
   Icon={IconTemporalWorker}
   {error}
   testId="deployments-empty-state"
+  placeholder
 >
-  {#snippet illustration()}
-    <PlaceholderCards />
-  {/snippet}
   {#snippet actions()}
     {#if canCreateServerlessDeployment}
       <Button variant="secondary" href={createHref}>

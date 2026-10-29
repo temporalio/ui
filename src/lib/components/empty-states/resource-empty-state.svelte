@@ -5,6 +5,7 @@
   import type { Snippet } from 'svelte';
   import { twJoin, twMerge } from 'tailwind-merge';
 
+  import PlaceholderCards from '$lib/components/empty-states/placeholder-cards.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
   import { IconComet, type IconComponent, IconWarning } from '$lib/io/icon';
@@ -20,6 +21,7 @@
     testId?: string;
     class?: string;
     illustration?: Snippet;
+    placeholder?: boolean;
     description?: Snippet;
     actions?: Snippet;
     resources?: Snippet;
@@ -35,6 +37,7 @@
     testId,
     class: className,
     illustration,
+    placeholder = false,
     description,
     actions,
     resources,
@@ -58,12 +61,15 @@
     ),
   );
 
+  const showPlaceholder = $derived(placeholder && !error);
+
   const iconBackdropClass = $derived(
     twJoin(
       'flex size-14 shrink-0 items-center justify-center rounded-lg',
       error
         ? 'bg-surface-danger text-danger'
         : 'bg-interactive-secondary-hover text-brand',
+      showPlaceholder && 'md:hidden',
     ),
   );
 
@@ -85,6 +91,9 @@
       {@render illustration()}
     </div>
   {:else}
+    {#if showPlaceholder}
+      <PlaceholderCards />
+    {/if}
     <span class={iconBackdropClass} aria-hidden="true">
       <ResolvedIcon class="size-7" />
     </span>
