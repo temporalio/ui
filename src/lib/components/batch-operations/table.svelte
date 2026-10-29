@@ -1,14 +1,12 @@
 <script lang="ts">
   import BatchOperationStatusBadge from '$lib/components/batch-operations/batch-operation-status-badge.svelte';
   import OperationType from '$lib/components/batch-operations/operation-type.svelte';
-  import EmptyState from '$lib/components/empty-states/resource-empty-state.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
   import Link from '$lib/holocene/link.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { IconBatchOperation } from '$lib/io/icon';
   import type { BatchOperationInfo } from '$lib/types/batch';
   import { routeForBatchOperation } from '$lib/utilities/route-for';
 
@@ -51,17 +49,6 @@
       </td>
       <Timestamp as="td" class="max-sm:hidden" dateTime={startTime} />
       <Timestamp as="td" class="max-sm:hidden" dateTime={closeTime} />
-    </TableRow>
-  {:else}
-    <TableRow>
-      <td colspan="5">
-        <EmptyState
-          title={translate('batch.empty-state-title')}
-          content={translate('batch.empty-state-description')}
-          Icon={IconBatchOperation}
-          variant="inline"
-        />
-      </td>
     </TableRow>
   {/each}
 </Table>

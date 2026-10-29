@@ -58,10 +58,18 @@
 
   const createHref = $derived(routeForWorkerDeploymentCreate({ namespace }));
 
+  let firstPageEmpty = $state(false);
+  const showEmptyState = $derived(firstPageEmpty && !error);
+
   const onFetch = $derived.by(() => {
-    return () => {
+    return async () => {
       error = '';
-      return fetchPaginatedDeployments(namespace, '', onError);
+      const fetchPage = await fetchPaginatedDeployments(namespace, '', onError);
+      return (size: number, token: string) =>
+        fetchPage(size, token).then((result) => {
+          if (!token) firstPageEmpty = result.items.length === 0;
+          return result;
+        });
     };
   });
 
@@ -130,8 +138,11 @@
   };
 </script>
 
+{#if showEmptyState}
+  <DeploymentsEmptyState {createHref} {canCreateServerlessDeployment} />
+{/if}
 {#key [namespace, $refresh]}
-  <div class="flex min-h-0 grow flex-col gap-4">
+  <div class="flex min-h-0 grow flex-col gap-4" class:hidden={showEmptyState}>
     <PaginatedTable
       bind:sort={tableSort.value}
       {sortColumns}
@@ -185,11 +196,13 @@
       {/snippet}
 
       {#snippet empty()}
-        <DeploymentsEmptyState
-          {createHref}
-          {error}
-          {canCreateServerlessDeployment}
-        />
+        {#if error}
+          <DeploymentsEmptyState
+            {createHref}
+            {error}
+            {canCreateServerlessDeployment}
+          />
+        {/if}
       {/snippet}
       {#snippet actionsEndAdditional()}
         <ResetColumnWidthsButton

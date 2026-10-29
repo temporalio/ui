@@ -21,6 +21,7 @@
 
   interface Props {
     filterable?: boolean;
+    showSdkWarning?: boolean;
     namespace: string;
     onFetch: () => Promise<PaginatedRequest<WorkerListInfo | WorkerHeartbeat>>;
     onError?: (err: unknown) => void;
@@ -30,6 +31,7 @@
 
   let {
     filterable = false,
+    showSdkWarning = true,
     namespace,
     onFetch,
     onError,
@@ -122,7 +124,7 @@
     <div class="flex h-full flex-col items-center justify-center">
       {#if hasQuery}
         <WorkersQueryEmptyState />
-      {:else if runningWithNoWorkers}
+      {:else if runningWithNoWorkers || !showSdkWarning}
         <EmptyState title={translate('workers.empty-state-title')} />
       {:else}
         <WorkerHeartbeatsSDKAlert />

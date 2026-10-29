@@ -200,94 +200,101 @@
   </div>
 </header>
 
-<MaximizableTableView>
-  <SavedQueryViews
-    filters={scheduleFilters}
-    savedQueries={savedScheduleQueries}
-    systemViews={systemScheduleViews}
-    defaultView={DEFAULT_SCHEDULE_SYSTEM_VIEW}
-    searchAttributes={scheduleSearchAttributes}
-    id="schedule"
-  />
-  <FilterBar
-    filters={scheduleFilters}
-    options={$scheduleSearchAttributeOptions}
-    searchAttributes={$scheduleSearchAttributes}
-    id="schedules"
-  />
-  {#key [namespace, query, $schedulesRefresh]}
-    <PaginatedTable
-      bind:sort={tableSort.value}
-      {sortColumns}
-      {onFetch}
-      {onError}
-      total={$schedulesCount.count}
-      aria-label={translate('common.schedules')}
-      pageSizeSelectLabel={translate('common.per-page')}
-      nextButtonLabel={translate('common.next')}
-      previousButtonLabel={translate('common.previous')}
-      emptyStateMessage={translate('schedules.empty-state-title')}
-      errorMessage={translate('schedules.error-message-fetching')}
-    >
-      {#snippet caption()}
-        <caption class="sr-only">{translate('common.schedules')}</caption>
-      {/snippet}
-      {#snippet headers()}
-        <tr class="text-left">
-          {#each columns as { label, width }, i (`${label}:${i}`)}
-            <SortableTableHeader column={label} style={columnWidthStyle(width)}>
-              <ColumnResizeHandle
-                {label}
-                {width}
-                min={MIN_COLUMN_WIDTH}
-                onResize={(newWidth) =>
-                  resizeColumn(
-                    label,
-                    newWidth,
-                    namespace,
-                    TABLE_TYPE.SCHEDULES,
-                  )}
-              />
-            </SortableTableHeader>
+{#if !query && countPoller.loaded && $schedulesCount.count === 0}
+  <SchedulesEmptyState />
+{:else}
+  <MaximizableTableView>
+    <SavedQueryViews
+      filters={scheduleFilters}
+      savedQueries={savedScheduleQueries}
+      systemViews={systemScheduleViews}
+      defaultView={DEFAULT_SCHEDULE_SYSTEM_VIEW}
+      searchAttributes={scheduleSearchAttributes}
+      id="schedule"
+    />
+    <FilterBar
+      filters={scheduleFilters}
+      options={$scheduleSearchAttributeOptions}
+      searchAttributes={$scheduleSearchAttributes}
+      id="schedules"
+    />
+    {#key [namespace, query, $schedulesRefresh]}
+      <PaginatedTable
+        bind:sort={tableSort.value}
+        {sortColumns}
+        {onFetch}
+        {onError}
+        total={$schedulesCount.count}
+        aria-label={translate('common.schedules')}
+        pageSizeSelectLabel={translate('common.per-page')}
+        nextButtonLabel={translate('common.next')}
+        previousButtonLabel={translate('common.previous')}
+        emptyStateMessage={translate('schedules.empty-state-title')}
+        errorMessage={translate('schedules.error-message-fetching')}
+      >
+        {#snippet caption()}
+          <caption class="sr-only">{translate('common.schedules')}</caption>
+        {/snippet}
+        {#snippet headers()}
+          <tr class="text-left">
+            {#each columns as { label, width }, i (`${label}:${i}`)}
+              <SortableTableHeader
+                column={label}
+                style={columnWidthStyle(width)}
+              >
+                <ColumnResizeHandle
+                  {label}
+                  {width}
+                  min={MIN_COLUMN_WIDTH}
+                  onResize={(newWidth) =>
+                    resizeColumn(
+                      label,
+                      newWidth,
+                      namespace,
+                      TABLE_TYPE.SCHEDULES,
+                    )}
+                />
+              </SortableTableHeader>
+            {/each}
+          </tr>
+        {/snippet}
+        {#snippet rows({ visibleItems })}
+          <!-- IDs can repeat in visibility results; entry identity stays unique when sorting. -->
+          {#each visibleItems as schedule (schedule)}
+            <SchedulesTableRow {schedule} {columns} />
           {/each}
-        </tr>
-      {/snippet}
-      {#snippet rows({ visibleItems })}
-        <!-- IDs can repeat in visibility results; entry identity stays unique when sorting. -->
-        {#each visibleItems as schedule (schedule)}
-          <SchedulesTableRow {schedule} {columns} />
-        {/each}
-      {/snippet}
+        {/snippet}
 
-      {#snippet empty()}
-        <div class="flex h-full flex-col items-center justify-center">
-          <SchedulesEmptyState {error} {query} />
-        </div>
-      {/snippet}
-      {#snippet actionsEndAdditional()}
-        <ResetColumnWidthsButton
-          {columns}
-          {namespace}
-          table={TABLE_TYPE.SCHEDULES}
-        />
-        <Tooltip text={translate('common.configure-columns')} top>
-          <Button
-            onclick={openCustomizationDrawer}
-            data-testid="schedules-summary-table-configuration-button"
-            size="xs"
-            variant="ghost"
-            aria-label={translate('common.configure-columns')}
-            data-track-name="configure-columns-table-control"
-            data-track-intent="action"
-            data-track-text={translate('common.configure-columns')}
-          >
-            <IconTemporalSettings />
-          </Button>
-        </Tooltip>
-      {/snippet}
-    </PaginatedTable>
-  {/key}
-</MaximizableTableView>
+        {#snippet empty()}
+          <div class="flex h-full flex-col items-center justify-center">
+            <SchedulesEmptyState {error} {query} />
+          </div>
+        {/snippet}
+        {#snippet actionsEndAdditional()}
+          <ResetColumnWidthsButton
+            {columns}
+            {namespace}
+            table={TABLE_TYPE.SCHEDULES}
+          />
+          <Tooltip text={translate('common.configure-columns')} top>
+            <Button
+              onclick={openCustomizationDrawer}
+              data-testid="schedules-summary-table-configuration-button"
+              size="xs"
+              variant="ghost"
+              aria-label={translate('common.configure-columns')}
+              data-track-name="configure-columns-table-control"
+              data-track-intent="action"
+              data-track-text={translate('common.configure-columns')}
+            >
+              <IconTemporalSettings />
+            </Button>
+          </Tooltip>
+        {/snippet}
+      </PaginatedTable>
+    {/key}
+  </MaximizableTableView>
+{/if}
 
 <ConfigurableTableHeadersDrawer
   {availableColumns}

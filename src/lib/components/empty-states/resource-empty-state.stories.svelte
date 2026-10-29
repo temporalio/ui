@@ -1,7 +1,7 @@
 <script lang="ts" module>
   import { defineMeta } from '@storybook/addon-svelte-csf';
 
-  import BatchTable from '$lib/components/batch-operations/table.svelte';
+  import BatchEmptyState from '$lib/components/batch-operations/empty-state.svelte';
   import SchedulesEmptyState from '$lib/components/schedule/schedules-list/schedules-empty-state.svelte';
   import ActivitiesEmptyState from '$lib/components/standalone-activities/activities-summary-configurable-table/table-empty-state.svelte';
   import NexusEmptyState from '$lib/components/standalone-nexus-operations/nexus-operations-summary-configurable-table/table-empty-state.svelte';
@@ -45,11 +45,11 @@
 </Story>
 
 <Story name="Workers" asChild>
-  <WorkersEmptyState />
+  <WorkersEmptyState showPlaceholder />
 </Story>
 
 <Story name="Batch" asChild>
-  <BatchTable namespace="default" operations={[]} />
+  <BatchEmptyState />
 </Story>
 
 <Story name="Schedules Error" asChild>

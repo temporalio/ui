@@ -6,6 +6,7 @@
 
   import CountRefreshButton from '$lib/components/count-refresh-button.svelte';
   import SavedQueryViews from '$lib/components/saved-query-views/saved-views.svelte';
+  import NexusOperationsEmptyState from '$lib/components/standalone-nexus-operations/nexus-operations-summary-configurable-table/table-empty-state.svelte';
   import NexusOperationsSummaryConfigurableTable from '$lib/components/standalone-nexus-operations/nexus-operations-summary-configurable-table.svelte';
   import FilterBar from '$lib/components/standalone-nexus-operations/nexus-operations-summary-filter-bar/filter-bar.svelte';
   import StatusCountFilters from '$lib/components/status-count-filters.svelte';
@@ -72,6 +73,13 @@
   });
 
   let customizationDrawerOpen = $state(false);
+  let countLoaded = $state(false);
+  const showEmptyState = $derived(
+    $supportsAdvancedVisibility &&
+      !query &&
+      countLoaded &&
+      $nexusOperationCount.count === 0,
+  );
 
   const openCustomizationDrawer = () => {
     customizationDrawerOpen = true;
@@ -110,6 +118,7 @@
       {@render releaseStageBadge?.()}
       <StatusCountFilters
         bind:refreshTime
+        bind:loaded={countLoaded}
         countStore={nexusOperationCount}
         refresh={nexusOperationRefresh}
         filters={nexusOperationFilters}
@@ -126,20 +135,24 @@
   </div>
 </header>
 
-<MaximizableTableView>
-  <SavedQueryViews
-    filters={nexusOperationFilters}
-    savedQueries={savedNexusQueries}
-    systemViews={systemNexusViews}
-    defaultView={DEFAULT_NEXUS_SYSTEM_VIEW}
-    searchAttributes={nexusOperationSearchAttributes}
-    id="nexus"
-  />
-  <FilterBar />
-  <NexusOperationsSummaryConfigurableTable
-    onClickConfigure={openCustomizationDrawer}
-  />
-</MaximizableTableView>
+{#if showEmptyState}
+  <NexusOperationsEmptyState />
+{:else}
+  <MaximizableTableView>
+    <SavedQueryViews
+      filters={nexusOperationFilters}
+      savedQueries={savedNexusQueries}
+      systemViews={systemNexusViews}
+      defaultView={DEFAULT_NEXUS_SYSTEM_VIEW}
+      searchAttributes={nexusOperationSearchAttributes}
+      id="nexus"
+    />
+    <FilterBar />
+    <NexusOperationsSummaryConfigurableTable
+      onClickConfigure={openCustomizationDrawer}
+    />
+  </MaximizableTableView>
+{/if}
 <ConfigurableTableHeadersDrawer
   {availableColumns}
   bind:open={customizationDrawerOpen}

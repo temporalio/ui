@@ -1,4 +1,5 @@
 <script lang="ts">
+  import BatchOperationsEmptyState from '$lib/components/batch-operations/empty-state.svelte';
   import BatchOperationsTable from '$lib/components/batch-operations/table.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Loading from '$lib/holocene/loading.svelte';
@@ -31,5 +32,9 @@
       {translate('batch.max-concurrent-alert-description')}
     </Alert>
   {/if}
-  <BatchOperationsTable {operations} {namespace} />
+  {#if operations.length}
+    <BatchOperationsTable {operations} {namespace} />
+  {:else}
+    <BatchOperationsEmptyState />
+  {/if}
 {/await}

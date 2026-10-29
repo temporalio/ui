@@ -5,7 +5,7 @@
   import type { Snippet } from 'svelte';
   import { twJoin, twMerge } from 'tailwind-merge';
 
-  import Alert from '$lib/holocene/alert.svelte';
+  import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
   import { IconComet, type IconComponent, IconWarning } from '$lib/io/icon';
 
@@ -81,7 +81,7 @@
   in:fade={fadeIn}
 >
   {#if illustration && !error}
-    <div class="flex max-w-full justify-center" aria-hidden="true">
+    <div class="flex w-full max-w-full justify-center" aria-hidden="true">
       {@render illustration()}
     </div>
   {:else}
@@ -93,15 +93,15 @@
   <div class="flex w-full min-w-0 max-w-lg flex-col items-center gap-2">
     <h2 class="text-balance text-xl font-medium">{title}</h2>
     {#if error}
-      <Alert
-        intent="warning"
-        Icon={IconWarning}
-        title={translate('common.error-occurred')}
+      <CodeBlock
+        content={error}
+        language="text"
+        copyable
+        copyIconTitle={translate('common.copy-icon-title')}
+        copySuccessIconTitle={translate('common.copy-success-icon-title')}
+        disableMaximize
         class="mt-2 w-full text-left"
-        style="overflow-wrap: anywhere"
-      >
-        {error}
-      </Alert>
+      />
     {:else if hasDescription}
       <div
         class="flex w-full flex-col gap-2 text-pretty text-sm text-secondary"

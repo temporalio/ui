@@ -1,4 +1,5 @@
 <script lang="ts">
+  import PlaceholderCards from '$lib/components/empty-states/placeholder-cards.svelte';
   import EmptyState from '$lib/components/empty-states/resource-empty-state.svelte';
   import SdkLinks from '$lib/components/empty-states/sdk-links.svelte';
   import Link from '$lib/holocene/link.svelte';
@@ -65,6 +66,9 @@
     title={translate('schedules.empty-state-title')}
     Icon={IconTemporalSchedules}
   >
+    {#snippet illustration()}
+      <PlaceholderCards />
+    {/snippet}
     {#snippet description()}
       <p>{translate('schedules.no-schedules-description')}</p>
       <p>

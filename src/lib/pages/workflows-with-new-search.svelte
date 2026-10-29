@@ -37,6 +37,7 @@
   import CancelConfirmationModal from '$lib/components/workflow/client-actions/cancel-confirmation-modal.svelte';
   import TerminateConfirmationModal from '$lib/components/workflow/client-actions/terminate-confirmation-modal.svelte';
   import FilterBar from '$lib/components/workflow/filter-bar/index.svelte';
+  import WorkflowsEmptyState from '$lib/components/workflow/workflows-summary-configurable-table/table-empty-state.svelte';
   import WorkflowsSummaryConfigurableTable from '$lib/components/workflow/workflows-summary-configurable-table.svelte';
   import Button from '$lib/holocene/button.svelte';
   import MaximizableTableView from '$lib/holocene/table/paginated-table/maximizable-view.svelte';
@@ -135,6 +136,13 @@
   });
 
   let customizationDrawerOpen = $state(false);
+  let countLoaded = $state(false);
+  const showEmptyState = $derived(
+    $supportsAdvancedVisibility &&
+      !query &&
+      countLoaded &&
+      $workflowCount.count === 0,
+  );
 
   let batchTerminateConfirmationModalOpen = $state(false);
   let batchCancelConfirmationModalOpen = $state(false);
@@ -254,7 +262,7 @@
           {refreshTimeFormatted}
         </p>
       </div>
-      <StatusCountFilters bind:refreshTime />
+      <StatusCountFilters bind:refreshTime bind:loaded={countLoaded} />
     </div>
     {#if headerActions || workflowStartEnabled}
       <div class="flex items-center gap-4">
@@ -269,21 +277,25 @@
   </div>
 </header>
 
-<MaximizableTableView>
-  <SavedQueryViews
-    filters={workflowFilters}
-    savedQueries={savedWorkflowQueries}
-    {systemViews}
-    defaultView={DEFAULT_WORKFLOW_SYSTEM_VIEW}
-    {searchAttributes}
-    id="workflow"
-  />
-  <FilterBar />
-  <WorkflowsSummaryConfigurableTable
-    onClickConfigure={openCustomizationDrawer}
-    {cloud}
-  />
-</MaximizableTableView>
+{#if showEmptyState}
+  <WorkflowsEmptyState {cloud} />
+{:else}
+  <MaximizableTableView>
+    <SavedQueryViews
+      filters={workflowFilters}
+      savedQueries={savedWorkflowQueries}
+      {systemViews}
+      defaultView={DEFAULT_WORKFLOW_SYSTEM_VIEW}
+      {searchAttributes}
+      id="workflow"
+    />
+    <FilterBar />
+    <WorkflowsSummaryConfigurableTable
+      onClickConfigure={openCustomizationDrawer}
+      {cloud}
+    />
+  </MaximizableTableView>
+{/if}
 <ConfigurableTableHeadersDrawer
   {availableColumns}
   bind:open={customizationDrawerOpen}

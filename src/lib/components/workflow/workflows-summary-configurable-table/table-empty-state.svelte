@@ -5,6 +5,7 @@
 
   import NoQueryResults from '$lib/components/empty-states/no-query-results.svelte';
   import NoWorkflowTaskFailures from '$lib/components/empty-states/no-workflow-task-failures.svelte';
+  import PlaceholderCards from '$lib/components/empty-states/placeholder-cards.svelte';
   import ResourceEmptyState from '$lib/components/empty-states/resource-empty-state.svelte';
   import SdkLinks from '$lib/components/empty-states/sdk-links.svelte';
   import Link from '$lib/holocene/link.svelte';
@@ -70,6 +71,9 @@
     error={$workflowError}
     actions={cloud}
   >
+    {#snippet illustration()}
+      <PlaceholderCards />
+    {/snippet}
     {#snippet description()}
       <p>
         {translate('workflows.workflow-empty-state-value-proposition')}

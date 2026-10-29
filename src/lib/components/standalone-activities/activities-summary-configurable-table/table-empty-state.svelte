@@ -2,6 +2,7 @@
   import { page } from '$app/state';
 
   import NoQueryResults from '$lib/components/empty-states/no-query-results.svelte';
+  import PlaceholderCards from '$lib/components/empty-states/placeholder-cards.svelte';
   import ResourceEmptyState from '$lib/components/empty-states/resource-empty-state.svelte';
   import SdkLinks from '$lib/components/empty-states/sdk-links.svelte';
   import Link from '$lib/holocene/link.svelte';
@@ -66,6 +67,9 @@
     Icon={IconTemporalActivity}
     error={$activityError}
   >
+    {#snippet illustration()}
+      <PlaceholderCards />
+    {/snippet}
     {#snippet description()}
       <p>
         {translate('standalone-activities.empty-state-value-proposition')}

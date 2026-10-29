@@ -17,7 +17,7 @@
 
 <div class="flex flex-col gap-8 p-10">
   <div class="flex flex-col gap-4 lg:flex-row">
-    <div>
+    <div class="min-w-0 flex-1">
       <div class="mb-8 flex items-center gap-4">
         <h1
           data-testid="namespace-selector-title"
@@ -35,7 +35,9 @@
         {@render actions?.()}
       </div>
     </div>
-    <div class="flex w-full items-center justify-center lg:mt-8">
+    <div
+      class="flex w-full shrink-0 items-center justify-center lg:mt-8 lg:w-[26rem] xl:w-[32rem]"
+    >
       <NexusIllustration class="w-full max-w-xl" />
     </div>
   </div>
