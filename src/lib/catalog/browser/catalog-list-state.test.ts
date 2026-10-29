@@ -22,10 +22,13 @@ import {
 } from './catalog-test-descriptors';
 import type { BrowserCatalogDescriptor } from './types';
 
-const workflow = testDescriptor('workflow', workflowExecution(), [
-  'activities',
-  'retries',
-]);
+const workflow = testDescriptor(
+  'workflow',
+  workflowExecution(),
+  ['activities', 'retries'],
+  undefined,
+  ['batch-processing'],
+);
 const localWorkflow = testDescriptor(
   'local-workflow',
   workflowExecution('LocalWorkflow'),
@@ -82,6 +85,28 @@ describe('catalogFacets', () => {
       ['nexus', 'Nexus', 1],
       ['signals', 'Signals', 1],
     ]);
+  });
+
+  it('offers each pattern tag with its count', () => {
+    expect(
+      facets({}).options.pattern.map(({ id, label, count }) => [
+        id,
+        label,
+        count,
+      ]),
+    ).toEqual([['batch-processing', 'Batch Processing', 1]]);
+  });
+
+  it('filters by pattern and narrows the other facet counts', () => {
+    const { options, descriptors } = facets({ pattern: 'batch-processing' });
+
+    expect(ids(descriptors)).toEqual(['workflow']);
+    expect(counts(options.source)).toEqual({ all: 1, oss: 1, local: 0 });
+    expect(counts(options.pattern)).toEqual({ 'batch-processing': 1 });
+  });
+
+  it('searches pattern labels', () => {
+    expect(ids(facets({ query: 'batch' }).descriptors)).toEqual(['workflow']);
   });
 
   it('combines the kind, feature, and source filters', () => {
@@ -163,6 +188,7 @@ describe('catalog filter changes', () => {
       query: 'retry',
       kind: 'workflow',
       feature: 'retries',
+      pattern: 'batch-processing',
       source: 'oss',
     };
 
@@ -173,6 +199,7 @@ describe('catalog filter changes', () => {
     expect(clearCatalogFilters(filters, drawerFilterKeys)).toEqual({
       ...filters,
       feature: null,
+      pattern: null,
       source: null,
     });
     expect(clearCatalogFilters(filters)).toEqual({
@@ -190,6 +217,7 @@ describe('catalog filter URLs', () => {
       query: 'nexus op',
       kind: 'standalone-nexus-operation',
       feature: 'retries',
+      pattern: 'batch-processing',
       source: null,
     });
 
@@ -197,11 +225,13 @@ describe('catalog filter URLs', () => {
     expect(url.searchParams.get('q')).toBe('nexus op');
     expect(url.searchParams.get('kind')).toBe('standalone-nexus-operation');
     expect(url.searchParams.get('feature')).toBe('retries');
+    expect(url.searchParams.get('pattern')).toBe('batch-processing');
     expect(url.searchParams.has('source')).toBe(false);
     expect(catalogFiltersFromSearchParams(url.searchParams)).toEqual({
       query: 'nexus op',
       kind: 'standalone-nexus-operation',
       feature: 'retries',
+      pattern: 'batch-processing',
       source: null,
     });
   });
@@ -231,11 +261,13 @@ describe('activeCatalogFilters', () => {
       source: 'local',
       kind: 'standalone-nexus-operation',
       feature: 'child-workflows',
+      pattern: 'batch-processing',
     };
 
     expect(activeCatalogFilters(facets(filters), filters)).toEqual([
       { key: 'kind', label: 'Standalone Nexus Operation' },
       { key: 'feature', label: 'Child Workflows' },
+      { key: 'pattern', label: 'Batch Processing' },
       { key: 'source', label: 'Local' },
     ]);
   });
@@ -267,6 +299,7 @@ describe('catalogFilterTitle', () => {
   it('names each facet with Temporal terms', () => {
     expect(catalogFilterTitle('kind')).toBe('Execution');
     expect(catalogFilterTitle('feature')).toBe('Feature');
+    expect(catalogFilterTitle('pattern')).toBe('Pattern');
     expect(catalogFilterTitle('source')).toBe('Source');
   });
 });

@@ -228,6 +228,7 @@ describe('CatalogList client interactions', () => {
         query: '',
         kind: null,
         feature: null,
+        pattern: null,
         source: 'local',
       },
       onfilterschange: (filters) => changes.push(filters),
@@ -247,6 +248,7 @@ describe('CatalogList client interactions', () => {
       query: '',
       kind: 'workflow',
       feature: null,
+      pattern: null,
       source: 'local',
     });
   });

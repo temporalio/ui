@@ -5,6 +5,7 @@ import {
   isCatalogKind,
   orderedCatalogKinds,
 } from './catalog-kinds';
+import { patternLabel } from './catalog-patterns';
 import type { BrowserCatalogDescriptor, BrowserCatalogSource } from './types';
 
 export type PendingRunCounts = Readonly<Record<string, number>>;
@@ -22,16 +23,18 @@ export const changePendingRunCount = (
   return remaining;
 };
 
-export type CatalogFilterKey = 'kind' | 'feature' | 'source';
+export type CatalogFilterKey = 'kind' | 'feature' | 'pattern' | 'source';
 
 export const catalogFilterKeys: readonly CatalogFilterKey[] = [
   'kind',
   'feature',
+  'pattern',
   'source',
 ];
 
 export const drawerFilterKeys: readonly CatalogFilterKey[] = [
   'feature',
+  'pattern',
   'source',
 ];
 
@@ -39,6 +42,7 @@ export interface CatalogFilters {
   query: string;
   kind: CatalogExecutionKind | null;
   feature: string | null;
+  pattern: string | null;
   source: string | null;
 }
 
@@ -46,6 +50,7 @@ export const emptyCatalogFilters: CatalogFilters = {
   query: '',
   kind: null,
   feature: null,
+  pattern: null,
   source: null,
 };
 
@@ -139,6 +144,18 @@ const facetDefinitions: Readonly<Record<CatalogFilterKey, FacetDefinition>> = {
         }))
         .sort(byCountThenLabel),
   },
+  pattern: {
+    title: 'Pattern',
+    values: ({ patternTags }) => [...new Set(patternTags ?? [])],
+    options: ({ counts, selected }) =>
+      [...new Set([...counts.keys(), ...(selected ? [selected] : [])])]
+        .map((id) => ({
+          id,
+          label: patternLabel(id),
+          count: counts.get(id) ?? 0,
+        }))
+        .sort(byCountThenLabel),
+  },
   source: {
     title: 'Source',
     values: ({ source }) => [source.id],
@@ -161,6 +178,7 @@ const mapFilterKeys = <Value>(
 ): Record<CatalogFilterKey, Value> => ({
   kind: build('kind'),
   feature: build('feature'),
+  pattern: build('pattern'),
   source: build('source'),
 });
 
@@ -173,6 +191,7 @@ const matchesQuery = (descriptor: BrowserCatalogDescriptor, query: string) => {
     descriptor.execution.kind,
     catalogKinds[descriptor.execution.kind].label,
     ...descriptor.capabilityTags.map(featureLabel),
+    ...(descriptor.patternTags ?? []).map(patternLabel),
   ]
     .join(' ')
     .toLocaleLowerCase()
@@ -249,6 +268,7 @@ const searchParamNames: readonly [keyof CatalogFilters, string][] = [
   ['query', 'q'],
   ['kind', 'kind'],
   ['feature', 'feature'],
+  ['pattern', 'pattern'],
   ['source', 'source'],
 ];
 
@@ -261,6 +281,7 @@ export const catalogFiltersFromSearchParams = (
     query: params.get('q') ?? '',
     kind: isCatalogKind(kind) ? kind : null,
     feature: params.get('feature') || null,
+    pattern: params.get('pattern') || null,
     source: params.get('source') || null,
   };
 };
