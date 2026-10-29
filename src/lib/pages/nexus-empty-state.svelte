@@ -10,28 +10,21 @@
 
   type Props = {
     actions?: Snippet;
+    nexusRegistryDescription?: Snippet;
   };
 
-  let { actions }: Props = $props();
+  let { actions, nexusRegistryDescription = nexusDescription }: Props =
+    $props();
 </script>
 
 <div class="flex flex-col gap-8 p-10">
   <div class="flex flex-col gap-4 lg:flex-row">
     <div class="min-w-0 flex-1">
-      <div class="mb-8 flex items-center gap-4">
-        <h1
-          data-testid="namespace-selector-title"
-          class="text-marketingGreen font-mono uppercase"
-        >
-          {translate('nexus.endpoints')}
-        </h1>
-      </div>
       <div class="flex w-full flex-col gap-4 pr-8 md:pr-24">
-        <h2 class="text-4xl">
+        <h2>
           {translate('nexus.registry-empty-state-title')}
         </h2>
-
-        {@render nexusRegistryDescription()}
+        {@render nexusRegistryDescription?.()}
         {@render actions?.()}
       </div>
     </div>
@@ -43,7 +36,7 @@
   </div>
 </div>
 
-{#snippet nexusRegistryDescription()}
+{#snippet nexusDescription()}
   <p>
     <Link href="https://docs.temporal.io/evaluate/nexus" newTab>
       {translate('nexus.registry-empty-state-nexus-link')}
