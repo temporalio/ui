@@ -39,24 +39,31 @@
   const showExpandIcon = $derived(
     !isRootWorkflow && $showFullTree && childrenCount,
   );
+
+  const Glyph = $derived(expanded ? IconHyphen : IconAdd);
 </script>
 
 <div
   class="flex w-full items-center justify-between gap-2 p-1 text-left text-sm lg:gap-4"
 >
-  <div class="flex w-full flex-col gap-2 lg:flex-row lg:items-center lg:gap-4">
-    <div class="flex items-center gap-2 lg:basis-96">
+  <div
+    class="flex w-full flex-col gap-2 lg:min-w-0 lg:flex-row lg:items-start lg:gap-4"
+  >
+    <div class="flex items-center gap-2 lg:min-w-0 lg:flex-1">
       <div class="w-32 leading-4">
         <WorkflowStatusBadge status={workflow.status} />
       </div>
-      <div class="w-full leading-4">
+      <div class="w-full min-w-0 break-words leading-4">
         {#if isRootWorkflow}
           <p class="text-xs">{translate('common.type')}</p>
         {/if}
         <p>{workflow.name}</p>
       </div>
     </div>
-    <div class="leading-4 lg:basis-[800px]">
+    <div
+      data-testid="relationship-id"
+      class="min-w-0 break-words leading-4 lg:w-[18cqw] lg:shrink-0"
+    >
       {#if isRootWorkflow}
         <p class="text-xs">{translate('common.id')}</p>
       {/if}
@@ -72,7 +79,7 @@
       </Link>
     </div>
     {#if $showFullTree}
-      <div class="text-left leading-4 lg:basis-[140px] lg:text-right">
+      <div class="text-left leading-4 lg:w-20 lg:shrink-0 lg:text-right">
         {#if isRootWorkflow}
           <p class="text-xs">{translate('common.child-count')}</p>
         {/if}
@@ -81,7 +88,10 @@
         </div>
       </div>
     {/if}
-    <div class="hidden items-center gap-4 lg:flex lg:basis-5/12">
+    <div
+      data-testid="relationship-timestamps"
+      class="hidden items-start gap-4 lg:grid lg:w-[28cqw] lg:shrink-0 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_8rem] xl:w-[42cqw]"
+    >
       <div class="leading-4">
         {#if isRootWorkflow}
           <p class="text-xs">{translate('common.start')}</p>
@@ -102,8 +112,5 @@
       </div>
     </div>
   </div>
-  {#if showExpandIcon}
-    {@const Glyph = expanded ? IconHyphen : IconAdd}
-    <Glyph class="shrink-0" />
-  {/if}
+  <Glyph class={showExpandIcon ? 'shrink-0' : 'invisible shrink-0'} />
 </div>
