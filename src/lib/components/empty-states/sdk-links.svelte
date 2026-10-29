@@ -12,7 +12,7 @@
 
 <div class="flex w-full flex-col items-center gap-3">
   {#if label}
-    <p class="text-xs font-medium uppercase tracking-wide text-tertiary">
+    <p class="text-sm font-bold uppercase tracking-wide text-tertiary">
       {label}
     </p>
   {/if}
