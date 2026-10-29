@@ -73,7 +73,6 @@
         {isActive}
         childrenCount={root.children?.length ?? 0}
         {expanded}
-        indent={generation * 16}
       />
     </div>
   </button>

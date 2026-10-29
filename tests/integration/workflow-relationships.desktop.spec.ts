@@ -82,7 +82,7 @@ const expectAlignedColumns = async (page: Page) => {
     }),
   );
   const timestampPositions = await page
-    .locator('.relationship-timestamps-column')
+    .getByTestId('relationship-timestamps')
     .evaluateAll((elements) => {
       return elements.map((element) => element.getBoundingClientRect().x);
     });
@@ -166,7 +166,10 @@ test.describe('Relationships nested tree', () => {
 
     const [childIdBox, childCountBox] = await Promise.all([
       childARow.getByRole('link', { name: childAId }).boundingBox(),
-      childARow.locator('.relationship-id-column + div').boundingBox(),
+      childARow
+        .getByTestId('relationship-id')
+        .locator('xpath=following-sibling::div[1]')
+        .boundingBox(),
     ]);
     expect(childIdBox).not.toBeNull();
     expect(childCountBox).not.toBeNull();
