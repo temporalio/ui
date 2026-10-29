@@ -7,6 +7,9 @@ export const Strings = {
   'empty-state-title': 'No Batch Operations',
   'empty-state-description':
     'Apply the same action to multiple Workflows or Standalone Activities at once, such as canceling or terminating.',
+  'empty-state-read-docs-prefix': 'Read the',
+  'empty-state-docs-link': 'Batch Operation Docs',
+  'empty-state-read-docs-suffix': 'to learn more.',
   'back-link': 'Back to Batch Operations',
   'operation-type': 'Operation Type',
   details: 'Operation Details',
