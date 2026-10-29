@@ -3,6 +3,7 @@
 
   import { page } from '$app/state';
 
+  import EmptyStateTransition from '$lib/components/empty-states/empty-state-transition.svelte';
   import SavedQueryViews from '$lib/components/saved-query-views/saved-views.svelte';
   import FilterBar from '$lib/components/search-attribute-filter/filter-bar.svelte';
   import WorkerHeartbeatsDisabled from '$lib/components/workers/worker-heartbeats-disabled.svelte';
@@ -56,10 +57,10 @@
 </script>
 
 {#if workerHeartbeatsEnabled}
-  {#if showEmptyState}
-    <WorkerHeartbeatsSdkWarning showPlaceholder />
-  {/if}
-  <div class="contents" class:hidden={showEmptyState}>
+  <EmptyStateTransition empty={showEmptyState}>
+    {#snippet emptyState()}
+      <WorkerHeartbeatsSdkWarning showPlaceholder />
+    {/snippet}
     <MaximizableTableView>
       <SavedQueryViews
         filters={workerFilters}
@@ -88,7 +89,7 @@
         />
       {/key}
     </MaximizableTableView>
-  </div>
+  </EmptyStateTransition>
 {:else}
   <WorkerHeartbeatsDisabled />
 {/if}

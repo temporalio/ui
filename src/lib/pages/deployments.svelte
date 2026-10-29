@@ -3,6 +3,7 @@
 
   import DeploymentTableRow from '$lib/components/deployments/deployment-table-row.svelte';
   import DeploymentsEmptyState from '$lib/components/deployments/deployments-empty-state.svelte';
+  import EmptyStateTransition from '$lib/components/empty-states/empty-state-transition.svelte';
   import ConfigurableTableHeadersDrawer from '$lib/components/table/configurable-table-headers-drawer.svelte';
   import ResetColumnWidthsButton from '$lib/components/table/reset-column-widths-button.svelte';
   import Button from '$lib/holocene/button.svelte';
@@ -138,11 +139,11 @@
   };
 </script>
 
-{#if showEmptyState}
-  <DeploymentsEmptyState {createHref} {canCreateServerlessDeployment} />
-{/if}
-{#key [namespace, $refresh]}
-  <div class="flex min-h-0 grow flex-col gap-4" class:hidden={showEmptyState}>
+<EmptyStateTransition empty={showEmptyState}>
+  {#snippet emptyState()}
+    <DeploymentsEmptyState {createHref} {canCreateServerlessDeployment} />
+  {/snippet}
+  {#key [namespace, $refresh]}
     <PaginatedTable
       bind:sort={tableSort.value}
       {sortColumns}
@@ -226,8 +227,8 @@
         </Tooltip>
       {/snippet}
     </PaginatedTable>
-  </div>
-{/key}
+  {/key}
+</EmptyStateTransition>
 
 <ConfigurableTableHeadersDrawer
   {availableColumns}

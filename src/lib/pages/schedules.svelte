@@ -4,6 +4,7 @@
   import { page } from '$app/state';
 
   import CountRefreshButton from '$lib/components/count-refresh-button.svelte';
+  import EmptyStateTransition from '$lib/components/empty-states/empty-state-transition.svelte';
   import SavedQueryViews from '$lib/components/saved-query-views/saved-views.svelte';
   import { scheduledActionPresentations } from '$lib/components/schedule/scheduled-action-types/presentation-registry';
   import { resolveScheduledActionListEntry } from '$lib/components/schedule/scheduled-action-types/resolve-scheduled-action-list-entry';
@@ -211,9 +212,12 @@
   </div>
 </header>
 
-{#if !query && countPoller.loaded && $schedulesCount.count === 0}
-  <SchedulesEmptyState />
-{:else}
+<EmptyStateTransition
+  empty={!query && countPoller.loaded && $schedulesCount.count === 0}
+>
+  {#snippet emptyState()}
+    <SchedulesEmptyState />
+  {/snippet}
   <MaximizableTableView>
     <SavedQueryViews
       filters={scheduleFilters}
@@ -235,6 +239,7 @@
         {sortColumns}
         {onFetch}
         {onError}
+        loading={!query && !countPoller.loaded}
         total={$schedulesCount.count}
         aria-label={translate('common.schedules')}
         pageSizeSelectLabel={translate('common.per-page')}
@@ -305,7 +310,7 @@
       </PaginatedTable>
     {/key}
   </MaximizableTableView>
-{/if}
+</EmptyStateTransition>
 
 <ConfigurableTableHeadersDrawer
   {availableColumns}

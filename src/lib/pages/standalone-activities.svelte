@@ -34,6 +34,7 @@
   import { page } from '$app/state';
 
   import CountRefreshButton from '$lib/components/count-refresh-button.svelte';
+  import EmptyStateTransition from '$lib/components/empty-states/empty-state-transition.svelte';
   import SavedQueryViews from '$lib/components/saved-query-views/saved-views.svelte';
   import ActivitiesEmptyState from '$lib/components/standalone-activities/activities-summary-configurable-table/table-empty-state.svelte';
   import ActivitiesSummaryConfigurableTable from '$lib/components/standalone-activities/activities-summary-configurable-table.svelte';
@@ -237,9 +238,10 @@
   </div>
 </header>
 
-{#if showEmptyState}
-  <ActivitiesEmptyState />
-{:else}
+<EmptyStateTransition empty={showEmptyState}>
+  {#snippet emptyState()}
+    <ActivitiesEmptyState />
+  {/snippet}
   <MaximizableTableView>
     <SavedQueryViews
       filters={activityFilters}
@@ -252,9 +254,10 @@
     <FilterBar />
     <ActivitiesSummaryConfigurableTable
       onClickConfigure={openCustomizationDrawer}
+      {countLoaded}
     />
   </MaximizableTableView>
-{/if}
+</EmptyStateTransition>
 <ConfigurableTableHeadersDrawer
   {availableColumns}
   bind:open={customizationDrawerOpen}

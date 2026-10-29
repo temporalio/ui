@@ -5,6 +5,7 @@
   import { page } from '$app/state';
 
   import CountRefreshButton from '$lib/components/count-refresh-button.svelte';
+  import EmptyStateTransition from '$lib/components/empty-states/empty-state-transition.svelte';
   import SavedQueryViews from '$lib/components/saved-query-views/saved-views.svelte';
   import NexusOperationsEmptyState from '$lib/components/standalone-nexus-operations/nexus-operations-summary-configurable-table/table-empty-state.svelte';
   import NexusOperationsSummaryConfigurableTable from '$lib/components/standalone-nexus-operations/nexus-operations-summary-configurable-table.svelte';
@@ -135,9 +136,10 @@
   </div>
 </header>
 
-{#if showEmptyState}
-  <NexusOperationsEmptyState />
-{:else}
+<EmptyStateTransition empty={showEmptyState}>
+  {#snippet emptyState()}
+    <NexusOperationsEmptyState />
+  {/snippet}
   <MaximizableTableView>
     <SavedQueryViews
       filters={nexusOperationFilters}
@@ -150,9 +152,10 @@
     <FilterBar />
     <NexusOperationsSummaryConfigurableTable
       onClickConfigure={openCustomizationDrawer}
+      {countLoaded}
     />
   </MaximizableTableView>
-{/if}
+</EmptyStateTransition>
 <ConfigurableTableHeadersDrawer
   {availableColumns}
   bind:open={customizationDrawerOpen}

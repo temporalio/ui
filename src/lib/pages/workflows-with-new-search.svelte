@@ -27,6 +27,7 @@
   import { page } from '$app/state';
 
   import CountRefreshButton from '$lib/components/count-refresh-button.svelte';
+  import EmptyStateTransition from '$lib/components/empty-states/empty-state-transition.svelte';
   import SavedQueryViews from '$lib/components/saved-query-views/saved-views.svelte';
   import StatusCountFilters from '$lib/components/status-count-filters.svelte';
   import ConfigurableTableHeadersDrawer from '$lib/components/table/configurable-table-headers-drawer.svelte';
@@ -143,7 +144,6 @@
       countLoaded &&
       $workflowCount.count === 0,
   );
-
   let batchTerminateConfirmationModalOpen = $state(false);
   let batchCancelConfirmationModalOpen = $state(false);
   let batchResetConfirmationModalOpen = $state(false);
@@ -277,9 +277,10 @@
   </div>
 </header>
 
-{#if showEmptyState}
-  <WorkflowsEmptyState {cloud} />
-{:else}
+<EmptyStateTransition empty={showEmptyState}>
+  {#snippet emptyState()}
+    <WorkflowsEmptyState {cloud} />
+  {/snippet}
   <MaximizableTableView>
     <SavedQueryViews
       filters={workflowFilters}
@@ -292,10 +293,11 @@
     <FilterBar />
     <WorkflowsSummaryConfigurableTable
       onClickConfigure={openCustomizationDrawer}
+      {countLoaded}
       {cloud}
     />
   </MaximizableTableView>
-{/if}
+</EmptyStateTransition>
 <ConfigurableTableHeadersDrawer
   {availableColumns}
   bind:open={customizationDrawerOpen}
