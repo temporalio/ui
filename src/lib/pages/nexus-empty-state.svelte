@@ -6,8 +6,7 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
 
-  import { useDarkMode } from '$lib/utilities/dark-mode';
-  import andromeda from '$lib/vendor/andromeda.png';
+  import NexusIllustration from '$lib/components/empty-states/nexus-illustration.svelte';
 
   type Props = {
     actions?: Snippet;
@@ -36,8 +35,8 @@
         {@render actions?.()}
       </div>
     </div>
-    <div class="mx-auto mt-8 w-full bg-background-primary" aria-hidden="true">
-      <img src={andromeda} alt="" class:invert={!$useDarkMode} />
+    <div class="flex w-full items-center justify-center lg:mt-8">
+      <NexusIllustration class="w-full max-w-xl" />
     </div>
   </div>
 </div>
@@ -70,9 +69,3 @@
     {translate('nexus.registry-empty-state-proxy-postface')}
   </p>
 {/snippet}
-
-<style>
-  .invert {
-    filter: invert(1);
-  }
-</style>

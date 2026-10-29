@@ -1,4 +1,7 @@
 <script lang="ts">
+  import { prefersReducedMotion } from 'svelte/motion';
+  import { fade } from 'svelte/transition';
+
   import type { Snippet } from 'svelte';
   import { twJoin, twMerge } from 'tailwind-merge';
 
@@ -66,9 +69,17 @@
 
   const ResolvedIcon = $derived(error ? IconWarning : Icon);
   const hasDescription = $derived(Boolean(description || content));
+  const fadeIn = $derived({
+    duration: prefersReducedMotion.current ? 0 : 200,
+  });
 </script>
 
-<div class={containerClass} data-testid={testId} aria-live="polite">
+<div
+  class={containerClass}
+  data-testid={testId}
+  aria-live="polite"
+  in:fade={fadeIn}
+>
   {#if illustration && !error}
     <div class="flex max-w-full justify-center" aria-hidden="true">
       {@render illustration()}
