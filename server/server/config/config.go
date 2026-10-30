@@ -157,6 +157,8 @@ type (
 		IssuerUrl    string `yaml:"issuerUrl"`
 		ClientID     string `yaml:"clientId"`
 		ClientSecret string `yaml:"clientSecret"`
+		// ClientAssertionFile - optional path to a JWT used as the client assertion (RFC 7523) instead of ClientSecret, ex. a Kubernetes projected service account token
+		ClientAssertionFile string `yaml:"clientAssertionFile"`
 		// Scopes for auth. Typically [openid, profile, email]
 		Scopes []string `yaml:"scopes"`
 		// CallbackURL - URL for the callback URL, ex. https://localhost:8080/sso/callback

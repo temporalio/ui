@@ -72,6 +72,7 @@ auth:
     issuerUrl: {{ env "TEMPORAL_AUTH_ISSUER_URL" | default "" }}
     clientId: {{ env "TEMPORAL_AUTH_CLIENT_ID" }}
     clientSecret: {{ env "TEMPORAL_AUTH_CLIENT_SECRET" }}
+    clientAssertionFile: {{ env "TEMPORAL_AUTH_CLIENT_ASSERTION_FILE" | default "" }}
     callbackUrl: {{ env "TEMPORAL_AUTH_CALLBACK_URL" }}
     useIdTokenAsBearer: {{ env "TEMPORAL_AUTH_USE_ID_TOKEN_AS_BEARER" | default "false" }}
     refreshTokenDuration: {{ env "TEMPORAL_AUTH_REFRESH_TOKEN_DURATION" | default "" }}
