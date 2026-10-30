@@ -16,7 +16,7 @@ export const Strings = {
     'To delete a search attribute, open a Support Ticket.',
 
   // Buttons
-  'add-attribute-button': 'Add New Custom Search Attribute',
+  'add-attribute-button': 'Add New Search Attribute',
   'save-button': 'Save',
   'saving-button': 'Saving...',
   'cancel-button': 'Cancel',
