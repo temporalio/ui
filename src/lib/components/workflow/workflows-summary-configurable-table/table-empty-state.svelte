@@ -5,13 +5,13 @@
 
   import NoQueryResults from '$lib/components/empty-states/no-query-results.svelte';
   import NoWorkflowTaskFailures from '$lib/components/empty-states/no-workflow-task-failures.svelte';
-  import Alert from '$lib/holocene/alert.svelte';
+  import ResourceEmptyState from '$lib/components/empty-states/resource-empty-state.svelte';
+  import SdkLinks from '$lib/components/empty-states/sdk-links.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { IconGithub, IconWarning } from '$lib/io/icon';
+  import { IconTemporalWorkflow } from '$lib/io/icon';
   import { workflowError } from '$lib/stores/workflows';
   import { TASK_FAILURES_QUERY } from '$lib/utilities/workflow-task-failures';
-  import noResultsImages from '$lib/vendor/empty-state.svg';
 
   interface Props {
     cloud?: Snippet;
@@ -24,97 +24,70 @@
   let hasTaskFailuresQuery = $derived(query === TASK_FAILURES_QUERY);
 
   const samples = [
-    'samples-go',
-    'samples-java',
-    'samples-typescript',
-    'samples-python',
-    'samples-dotnet',
-    'samples-php',
-    'samples-ruby',
+    { sdk: 'Go', href: 'https://github.com/temporalio/samples-go' },
+    { sdk: 'Java', href: 'https://github.com/temporalio/samples-java' },
+    {
+      sdk: 'Typescript',
+      href: 'https://github.com/temporalio/samples-typescript',
+    },
+    { sdk: 'Python', href: 'https://github.com/temporalio/samples-python' },
+    { sdk: '.NET', href: 'https://github.com/temporalio/samples-dotnet' },
+    { sdk: 'PHP', href: 'https://github.com/temporalio/samples-php' },
+    { sdk: 'Ruby', href: 'https://github.com/temporalio/samples-ruby' },
+    {
+      sdk: 'Rust',
+      href: 'https://github.com/temporalio/sdk-rust/tree/main/crates/sdk/examples',
+    },
   ];
 </script>
 
 {#if query}
-  <div
-    class="flex h-full w-full flex-col items-center justify-center p-4"
-    aria-live="polite"
+  <ResourceEmptyState
+    title={$workflowError
+      ? translate('workflows.workflow-query-error-state')
+      : hasTaskFailuresQuery
+        ? translate('workflows.workflow-task-failures-query-empty-state-title')
+        : translate('workflows.workflow-query-empty-state-title')}
+    content={hasTaskFailuresQuery
+      ? translate(
+          'workflows.workflow-task-failures-query-empty-state-description',
+        )
+      : translate('workflows.workflow-query-empty-state-description')}
+    error={$workflowError}
   >
-    <div class="text-center">
-      <h2>
-        {#if $workflowError}
-          {translate('workflows.workflow-query-error-state')}
-        {:else}
-          {hasTaskFailuresQuery
-            ? translate(
-                'workflows.workflow-task-failures-query-empty-state-title',
-              )
-            : translate('workflows.workflow-query-empty-state-title')}
-        {/if}
-      </h2>
-      <p class="text-secondary">
-        {#if $workflowError}
-          {$workflowError}
-        {:else}
-          {hasTaskFailuresQuery
-            ? translate(
-                'workflows.workflow-task-failures-query-empty-state-description',
-              )
-            : translate('workflows.workflow-query-empty-state-description')}
-        {/if}
-      </p>
+    {#snippet illustration()}
       {#if hasTaskFailuresQuery}
-        <NoWorkflowTaskFailures class="m-auto mt-8 text-tertiary" />
+        <NoWorkflowTaskFailures class="text-tertiary" />
       {:else}
-        <NoQueryResults class="m-auto mt-8 text-tertiary" />
+        <NoQueryResults class="text-tertiary" />
       {/if}
-    </div>
-  </div>
+    {/snippet}
+  </ResourceEmptyState>
 {:else}
-  <div
-    class="h-full w-full overflow-hidden xl:flex xl:flex-row"
-    aria-live="polite"
+  <ResourceEmptyState
+    title={translate('workflows.workflow-empty-state-title')}
+    Icon={IconTemporalWorkflow}
+    error={$workflowError}
+    actions={cloud}
+    placeholder
   >
-    <div
-      class="flex w-auto min-w-[280px] flex-col gap-4 bg-surface-primary p-8 text-primary xl:min-w-[520px] xl:flex-1"
-    >
-      <h2>
-        {translate('workflows.workflow-empty-state-title')}
-      </h2>
-      {#if $workflowError}
-        <Alert
-          intent="warning"
-          Icon={IconWarning}
-          title={translate('common.error-occurred')}
-          style="overflow-wrap: anywhere"
-        >
-          {$workflowError}
-        </Alert>
-      {:else}
-        {@render cloud?.()}
-        <p>
-          {translate('workflows.workflow-empty-state-description')}
-          <Link newTab href="https://github.com/temporalio"
-            >github.com/temporalio</Link
-          >.
-        </p>
-        <ul class="flex flex-col gap-2">
-          {#each samples as sample (sample)}
-            <li>
-              <Link
-                LeadingIcon={IconGithub}
-                newTab
-                href="https://github.com/temporalio/{sample}">{sample}</Link
-              >
-            </li>
-          {/each}
-        </ul>
-      {/if}
-    </div>
-    <div class="flex flex-col">
-      <div class="bg-surface-primary">
-        <img src={noResultsImages} alt="" class="w-full" />
-      </div>
-      <div class="flex-1 bg-[#8da4ef]"></div>
-    </div>
-  </div>
+    {#snippet description()}
+      <p>
+        {translate('workflows.workflow-empty-state-value-proposition')}
+      </p>
+      <p>
+        {translate('workflows.workflow-empty-state-read-docs-prefix')}
+        <Link href="https://docs.temporal.io/workflows" newTab>
+          {translate('workflows.workflow-empty-state-docs-link')}
+        </Link>
+        {translate('workflows.workflow-empty-state-read-docs-suffix')}
+      </p>
+    {/snippet}
+    {#snippet resources()}
+      <SdkLinks
+        links={samples}
+        label={translate('workflows.workflow-empty-state-samples-title')}
+      />
+    {/snippet}
+  </ResourceEmptyState>
 {/if}

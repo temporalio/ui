@@ -43,9 +43,10 @@
 
   interface Props {
     onClickConfigure: () => void;
+    countLoaded?: boolean;
   }
 
-  let { onClickConfigure }: Props = $props();
+  let { onClickConfigure, countLoaded = true }: Props = $props();
 
   const { allSelected, selectedActivities, selectActivities } =
     getContext<ActivityBatchOperationContext>(ACTIVITY_BATCH_OPERATION_CONTEXT);
@@ -59,6 +60,7 @@
   const tableSort = createTableSort(() => [namespace, query]);
 
   const onFetch = $derived(() => fetchPaginatedActivities(namespace, query));
+  const awaitingCount = $derived(!query && !countLoaded);
 
   const showBatchActions = $derived(
     standaloneActivityBulkActionsEnabled(page) && $supportsAdvancedVisibility,
@@ -122,6 +124,7 @@
     bind:sort={tableSort.value}
     {sortColumns}
     {onFetch}
+    loading={awaitingCount}
     onItemsChange={(items) => {
       visiblePaginatedItems = items;
     }}

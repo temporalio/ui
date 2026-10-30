@@ -16,17 +16,15 @@ export const Strings = {
   'timed-out-activities': 'Timed Out',
   'empty-state-title': 'No Activities Found',
   'empty-state-description': 'No activities match the current filters.',
-  'no-activities-title':
-    'This Namespace doesn’t have any Standalone Activities yet.',
-  'no-activities-description-part-1-preface': ' are Temporal’s ',
-  'job-queue-link': 'job queue',
-  'no-activities-description-part-1-postface':
-    ' – the simplest way to run durable, retryable tasks on Temporal. Create an Activity function once and invoke it standalone (as a job) or as a step in a Workflow.',
-  'no-activities-description-part-2':
-    'Standalone Activities come with the durability benefits of Temporal plus declarative retries, deduplication, priority & fairness, and heartbeats with checkpointing for longer running jobs.',
-  'no-activities-description-part-3':
-    'Get started with a job today and graduate to a Workflow when you need multi-step orchestration, human-in-the-loop, signals, updates, or timers.',
-  'get-started-title': 'Get started with your preferred SDK’s code samples',
+  'no-activities-title': 'No Standalone Activities',
+  'empty-state-value-proposition':
+    'Run durable, retryable tasks from your code without a Workflow, with automatic retries, timeouts, and heartbeats.',
+  'empty-state-read-docs-prefix': 'Read the',
+  'empty-state-activity-docs-link': 'Standalone Activity Docs',
+  'empty-state-read-docs-middle': 'and',
+  'empty-state-job-queue-guide-link': 'Job Queue Guide',
+  'empty-state-read-docs-suffix': 'to get started.',
+  'get-started-title': 'Explore SDK code samples',
   'recent-activities': 'Recent Standalone Activities',
   'activity-id': 'Activity ID',
   'run-id': 'Run ID',

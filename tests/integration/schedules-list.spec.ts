@@ -35,7 +35,7 @@ test.describe('Schedules List with no schedules', () => {
     await page.goto(schedulesUrl);
 
     await page.waitForResponse(SCHEDULES_COUNT_API);
-    const emptyState = page.getByText('No Schedules Found');
+    const emptyState = page.getByText('No Schedules', { exact: true });
     await expect(emptyState).toBeVisible();
   });
 });

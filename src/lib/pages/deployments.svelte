@@ -3,6 +3,7 @@
 
   import DeploymentTableRow from '$lib/components/deployments/deployment-table-row.svelte';
   import DeploymentsEmptyState from '$lib/components/deployments/deployments-empty-state.svelte';
+  import EmptyStateTransition from '$lib/components/empty-states/empty-state-transition.svelte';
   import ConfigurableTableHeadersDrawer from '$lib/components/table/configurable-table-headers-drawer.svelte';
   import ResetColumnWidthsButton from '$lib/components/table/reset-column-widths-button.svelte';
   import Button from '$lib/holocene/button.svelte';
@@ -58,10 +59,18 @@
 
   const createHref = $derived(routeForWorkerDeploymentCreate({ namespace }));
 
+  let firstPageEmpty = $state(false);
+  const showEmptyState = $derived(firstPageEmpty && !error);
+
   const onFetch = $derived.by(() => {
-    return () => {
+    return async () => {
       error = '';
-      return fetchPaginatedDeployments(namespace, '', onError);
+      const fetchPage = await fetchPaginatedDeployments(namespace, '', onError);
+      return (size: number, token: string) =>
+        fetchPage(size, token).then((result) => {
+          if (!token) firstPageEmpty = result.items.length === 0;
+          return result;
+        });
     };
   });
 
@@ -130,8 +139,11 @@
   };
 </script>
 
-{#key [namespace, $refresh]}
-  <div class="flex min-h-0 grow flex-col gap-4">
+<EmptyStateTransition empty={showEmptyState}>
+  {#snippet emptyState()}
+    <DeploymentsEmptyState {createHref} {canCreateServerlessDeployment} />
+  {/snippet}
+  {#key [namespace, $refresh]}
     <PaginatedTable
       bind:sort={tableSort.value}
       {sortColumns}
@@ -185,11 +197,13 @@
       {/snippet}
 
       {#snippet empty()}
-        <DeploymentsEmptyState
-          {createHref}
-          {error}
-          {canCreateServerlessDeployment}
-        />
+        {#if error}
+          <DeploymentsEmptyState
+            {createHref}
+            {error}
+            {canCreateServerlessDeployment}
+          />
+        {/if}
       {/snippet}
       {#snippet actionsEndAdditional()}
         <ResetColumnWidthsButton
@@ -213,8 +227,8 @@
         </Tooltip>
       {/snippet}
     </PaginatedTable>
-  </div>
-{/key}
+  {/key}
+</EmptyStateTransition>
 
 <ConfigurableTableHeadersDrawer
   {availableColumns}

@@ -303,9 +303,14 @@ export const Strings = {
   'workflow-task-failures-query-empty-state-description':
     'None of your Workflows currently match your task failure criteria',
   'workflow-query-error-state': 'Error Filtering Workflows',
-  'workflow-empty-state-title': 'No Workflows running in this Namespace',
-  'workflow-empty-state-description':
-    'You can populate the Web UI with sample Workflows. You can find a complete list of executable code samples at',
+  'workflow-empty-state-title': 'No Workflows',
+  'workflow-empty-state-samples-title': 'Explore SDK code samples',
+  'workflow-empty-state-value-proposition':
+    'Orchestrate Activities, child Workflows, and timers as durable code that survives process failures and restarts.',
+  'workflow-empty-state-read-docs-prefix': 'Read the',
+  'workflow-empty-state-docs-link': 'Workflow Docs',
+  'workflow-empty-state-read-docs-suffix':
+    'and check out the code samples below to get started.',
   'visibility-disabled-archival':
     'This namespace is currently enabled for archival but visibility is not enabled.',
   'archival-link-preface': 'To enable ',

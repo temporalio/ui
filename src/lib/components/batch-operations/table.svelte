@@ -2,7 +2,6 @@
   import BatchOperationStatusBadge from '$lib/components/batch-operations/batch-operation-status-badge.svelte';
   import OperationType from '$lib/components/batch-operations/operation-type.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
-  import EmptyState from '$lib/holocene/empty-state.svelte';
   import Link from '$lib/holocene/link.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
@@ -50,12 +49,6 @@
       </td>
       <Timestamp as="td" class="max-sm:hidden" dateTime={startTime} />
       <Timestamp as="td" class="max-sm:hidden" dateTime={closeTime} />
-    </TableRow>
-  {:else}
-    <TableRow>
-      <td class="max-sm:hidden" colspan="5">
-        <EmptyState title={translate('batch.empty-state-title')}></EmptyState>
-      </td>
     </TableRow>
   {/each}
 </Table>

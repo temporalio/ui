@@ -4,25 +4,24 @@
   import { page } from '$app/state';
 
   import CountRefreshButton from '$lib/components/count-refresh-button.svelte';
+  import EmptyStateTransition from '$lib/components/empty-states/empty-state-transition.svelte';
   import SavedQueryViews from '$lib/components/saved-query-views/saved-views.svelte';
   import { scheduledActionPresentations } from '$lib/components/schedule/scheduled-action-types/presentation-registry';
   import { resolveScheduledActionListEntry } from '$lib/components/schedule/scheduled-action-types/resolve-scheduled-action-list-entry';
+  import SchedulesEmptyState from '$lib/components/schedule/schedules-list/schedules-empty-state.svelte';
   import SchedulesTableRow from '$lib/components/schedule/schedules-list/schedules-table-row.svelte';
   import FilterBar from '$lib/components/search-attribute-filter/filter-bar.svelte';
   import ConfigurableTableHeadersDrawer from '$lib/components/table/configurable-table-headers-drawer.svelte';
   import ResetColumnWidthsButton from '$lib/components/table/reset-column-widths-button.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
-  import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
-  import EmptyState from '$lib/holocene/empty-state.svelte';
-  import Link from '$lib/holocene/link.svelte';
   import ColumnResizeHandle from '$lib/holocene/table/column-resize-handle.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
   import MaximizableTableView from '$lib/holocene/table/paginated-table/maximizable-view.svelte';
   import SortableTableHeader from '$lib/holocene/table/sortable-table-header.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { IconTemporalSettings, IconWarning } from '$lib/io/icon';
+  import { IconTemporalSettings } from '$lib/io/icon';
   import { createCountPoller } from '$lib/runes/count-poller.svelte';
   import { createTableSort } from '$lib/runes/table-sort-state.svelte';
   import { fetchPaginatedSchedules } from '$lib/services/schedule-service';
@@ -213,118 +212,105 @@
   </div>
 </header>
 
-<MaximizableTableView>
-  <SavedQueryViews
-    filters={scheduleFilters}
-    savedQueries={savedScheduleQueries}
-    systemViews={systemScheduleViews}
-    defaultView={DEFAULT_SCHEDULE_SYSTEM_VIEW}
-    searchAttributes={scheduleSearchAttributes}
-    id="schedule"
-  />
-  <FilterBar
-    filters={scheduleFilters}
-    options={$scheduleSearchAttributeOptions}
-    searchAttributes={$scheduleSearchAttributes}
-    id="schedules"
-  />
-  {#key [namespace, query, $schedulesRefresh]}
-    <PaginatedTable
-      bind:sort={tableSort.value}
-      {sortColumns}
-      {onFetch}
-      {onError}
-      total={$schedulesCount.count}
-      aria-label={translate('common.schedules')}
-      pageSizeSelectLabel={translate('common.per-page')}
-      nextButtonLabel={translate('common.next')}
-      previousButtonLabel={translate('common.previous')}
-      emptyStateMessage={translate('schedules.empty-state-title')}
-      errorMessage={translate('schedules.error-message-fetching')}
-    >
-      {#snippet caption()}
-        <caption class="sr-only">{translate('common.schedules')}</caption>
-      {/snippet}
-      {#snippet headers()}
-        <tr class="text-left">
-          {#each columns as { label, width }, i (`${label}:${i}`)}
-            <SortableTableHeader column={label} style={columnWidthStyle(width)}>
-              <ColumnResizeHandle
-                {label}
-                {width}
-                min={MIN_COLUMN_WIDTH}
-                onResize={(newWidth) =>
-                  resizeColumn(
-                    label,
-                    newWidth,
-                    namespace,
-                    TABLE_TYPE.SCHEDULES,
-                  )}
-              />
-            </SortableTableHeader>
+<EmptyStateTransition
+  empty={!query && countPoller.loaded && $schedulesCount.count === 0}
+>
+  {#snippet emptyState()}
+    <SchedulesEmptyState />
+  {/snippet}
+  <MaximizableTableView>
+    <SavedQueryViews
+      filters={scheduleFilters}
+      savedQueries={savedScheduleQueries}
+      systemViews={systemScheduleViews}
+      defaultView={DEFAULT_SCHEDULE_SYSTEM_VIEW}
+      searchAttributes={scheduleSearchAttributes}
+      id="schedule"
+    />
+    <FilterBar
+      filters={scheduleFilters}
+      options={$scheduleSearchAttributeOptions}
+      searchAttributes={$scheduleSearchAttributes}
+      id="schedules"
+    />
+    {#key [namespace, query, $schedulesRefresh]}
+      <PaginatedTable
+        bind:sort={tableSort.value}
+        {sortColumns}
+        {onFetch}
+        {onError}
+        loading={!query && !countPoller.loaded}
+        total={$schedulesCount.count}
+        aria-label={translate('common.schedules')}
+        pageSizeSelectLabel={translate('common.per-page')}
+        nextButtonLabel={translate('common.next')}
+        previousButtonLabel={translate('common.previous')}
+        emptyStateMessage={translate('schedules.empty-state-title')}
+        errorMessage={translate('schedules.error-message-fetching')}
+      >
+        {#snippet caption()}
+          <caption class="sr-only">{translate('common.schedules')}</caption>
+        {/snippet}
+        {#snippet headers()}
+          <tr class="text-left">
+            {#each columns as { label, width }, i (`${label}:${i}`)}
+              <SortableTableHeader
+                column={label}
+                style={columnWidthStyle(width)}
+              >
+                <ColumnResizeHandle
+                  {label}
+                  {width}
+                  min={MIN_COLUMN_WIDTH}
+                  onResize={(newWidth) =>
+                    resizeColumn(
+                      label,
+                      newWidth,
+                      namespace,
+                      TABLE_TYPE.SCHEDULES,
+                    )}
+                />
+              </SortableTableHeader>
+            {/each}
+          </tr>
+        {/snippet}
+        {#snippet rows({ visibleItems })}
+          <!-- IDs can repeat in visibility results; entry identity stays unique when sorting. -->
+          {#each visibleItems as schedule (schedule)}
+            <SchedulesTableRow {schedule} {columns} />
           {/each}
-        </tr>
-      {/snippet}
-      {#snippet rows({ visibleItems })}
-        <!-- IDs can repeat in visibility results; entry identity stays unique when sorting. -->
-        {#each visibleItems as schedule (schedule)}
-          <SchedulesTableRow {schedule} {columns} />
-        {/each}
-      {/snippet}
+        {/snippet}
 
-      {#snippet empty()}
-        <div class="flex h-full flex-col items-center justify-center">
-          {#if error}
-            <EmptyState title={translate('schedules.empty-state-title')}>
-              <Alert intent="warning" Icon={IconWarning} class="mx-12">
-                {error}
-              </Alert>
-            </EmptyState>
-          {:else if query}
-            <EmptyState
-              title={translate('schedules.empty-state-title')}
-              content={translate('schedules.empty-state-description')}
-            />
-          {:else}
-            <EmptyState title={translate('schedules.empty-state-title')}>
-              <p>
-                {translate('schedules.getting-started-docs-link-preface')}
-                <Link newTab href="https://docs.temporal.io/schedule"
-                  >{translate('schedules.getting-started-docs-link')}</Link
-                >
-                {translate('schedules.getting-started-cli-link-preface')}
-                <Link newTab href="https://docs.temporal.io/cli/schedule"
-                  >Temporal CLI</Link
-                >.
-              </p>
-            </EmptyState>
-          {/if}
-        </div>
-      {/snippet}
-      {#snippet actionsEndAdditional()}
-        <ResetColumnWidthsButton
-          {columns}
-          {namespace}
-          table={TABLE_TYPE.SCHEDULES}
-        />
-        <Tooltip text={translate('common.configure-columns')} top>
-          <Button
-            onclick={openCustomizationDrawer}
-            data-testid="schedules-summary-table-configuration-button"
-            size="xs"
-            variant="ghost"
-            aria-label={translate('common.configure-columns')}
-            data-track-name="configure-columns-table-control"
-            data-track-intent="action"
-            data-track-text={translate('common.configure-columns')}
-          >
-            <IconTemporalSettings />
-          </Button>
-        </Tooltip>
-      {/snippet}
-    </PaginatedTable>
-  {/key}
-</MaximizableTableView>
+        {#snippet empty()}
+          <div class="flex h-full flex-col items-center justify-center">
+            <SchedulesEmptyState {error} {query} />
+          </div>
+        {/snippet}
+        {#snippet actionsEndAdditional()}
+          <ResetColumnWidthsButton
+            {columns}
+            {namespace}
+            table={TABLE_TYPE.SCHEDULES}
+          />
+          <Tooltip text={translate('common.configure-columns')} top>
+            <Button
+              onclick={openCustomizationDrawer}
+              data-testid="schedules-summary-table-configuration-button"
+              size="xs"
+              variant="ghost"
+              aria-label={translate('common.configure-columns')}
+              data-track-name="configure-columns-table-control"
+              data-track-intent="action"
+              data-track-text={translate('common.configure-columns')}
+            >
+              <IconTemporalSettings />
+            </Button>
+          </Tooltip>
+        {/snippet}
+      </PaginatedTable>
+    {/key}
+  </MaximizableTableView>
+</EmptyStateTransition>
 
 <ConfigurableTableHeadersDrawer
   {availableColumns}

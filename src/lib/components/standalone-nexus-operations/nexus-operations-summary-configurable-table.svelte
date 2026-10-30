@@ -31,9 +31,10 @@
 
   interface Props {
     onClickConfigure: () => void;
+    countLoaded?: boolean;
   }
 
-  let { onClickConfigure }: Props = $props();
+  let { onClickConfigure, countLoaded = true }: Props = $props();
 
   const namespace = $derived(page.params.namespace);
   const columns = $derived(
@@ -46,6 +47,7 @@
   const onFetch = $derived(() =>
     fetchPaginatedNexusOperations(namespace, query),
   );
+  const awaitingCount = $derived(!query && !countLoaded);
   const sortColumns = $derived(
     getNexusOperationSortColumns(
       columns.map((column) => column.label),
@@ -60,6 +62,7 @@
     bind:sort={tableSort.value}
     {sortColumns}
     {onFetch}
+    loading={awaitingCount}
     aria-label={translate(
       'standalone-nexus-operations.standalone-nexus-operations',
     )}

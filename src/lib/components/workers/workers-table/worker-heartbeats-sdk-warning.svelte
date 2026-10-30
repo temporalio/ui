@@ -1,10 +1,18 @@
 <script lang="ts">
+  import ResourceEmptyState from '$lib/components/empty-states/resource-empty-state.svelte';
+  import SdkLinks from '$lib/components/empty-states/sdk-links.svelte';
   import SdkLogo from '$lib/components/lines-and-dots/sdk-logo.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import { IconHeartbeat } from '$lib/io/icon';
   import { sdkInfo } from '$lib/stores/events';
   import { minimumVersionRequired } from '$lib/utilities/version-check';
+
+  interface Props {
+    showPlaceholder?: boolean;
+  }
+
+  let { showPlaceholder = false }: Props = $props();
 
   const supportedVersions = [
     {
@@ -18,7 +26,7 @@
       href: 'https://github.com/temporalio/sdk-python/releases',
     },
     {
-      sdk: 'TypeScript',
+      sdk: 'Typescript',
       version: '1.14.0',
       href: 'https://github.com/temporalio/sdk-typescript/releases',
     },
@@ -48,42 +56,39 @@
       ({ sdk }) => sdk.toLowerCase() === $sdkInfo.sdk.toLowerCase(),
     ),
   );
+  const needsUpgrade = $derived(
+    Boolean(
+      currentSdk &&
+      !minimumVersionRequired(currentSdk.version, $sdkInfo.version),
+    ),
+  );
 </script>
 
-<div
-  class="my-12 flex w-full flex-col items-center justify-start gap-4"
-  data-testid="worker-heartbeats-sdk-warning"
-  aria-live="polite"
->
-  <span class="flex h-20 w-20 items-center justify-center rounded-full">
-    <IconHeartbeat class="block h-full w-full text-information" />
-  </span>
-  <div class="text-center">
-    <h5>{translate('workers.no-worker-heartbeats')}</h5>
-    {#if currentSdk}
-      {@const { href, sdk, version } = currentSdk}
-      {#if !minimumVersionRequired(version, $sdkInfo.version)}
-        <p class="flex flex-row gap-1 text-secondary">
-          {translate('workers.worker-heartbeats-sdk-link-preface')}
-          <Link newTab {href}>
-            <SdkLogo {sdk} {version} hideDocsLink />
-          </Link>
-          {translate('workers.worker-heartbeats-sdk-link-postface')}
-        </p>
-      {/if}
-    {:else}
-      <p class="text-secondary">
-        {translate('workers.worker-heartbeats-sdk-list-preface')}
-      </p>
-      <div
-        class="mt-4 flex flex-row flex-wrap items-center justify-center gap-4"
-      >
-        {#each supportedVersions as { href, sdk, version } (`${sdk}:${version}`)}
-          <Link newTab {href}>
-            <SdkLogo {sdk} {version} hideDocsLink />
-          </Link>
-        {/each}
-      </div>
-    {/if}
-  </div>
-</div>
+{#snippet upgradeNote()}
+  {#if currentSdk}
+    {@const { href, sdk, version } = currentSdk}
+    <div class="flex flex-wrap items-center justify-center gap-1">
+      {translate('workers.worker-heartbeats-sdk-link-preface')}
+      <Link newTab {href}>
+        <SdkLogo {sdk} {version} hideDocsLink />
+      </Link>
+      {translate('workers.worker-heartbeats-sdk-link-postface')}
+    </div>
+  {/if}
+{/snippet}
+
+{#snippet supportedSdks()}
+  <SdkLinks
+    links={supportedVersions}
+    label={translate('workers.worker-heartbeats-sdk-list-preface')}
+  />
+{/snippet}
+
+<ResourceEmptyState
+  title={translate('workers.no-worker-heartbeats')}
+  Icon={IconHeartbeat}
+  testId="worker-heartbeats-sdk-warning"
+  description={needsUpgrade ? upgradeNote : undefined}
+  resources={currentSdk ? undefined : supportedSdks}
+  placeholder={showPlaceholder}
+/>

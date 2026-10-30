@@ -2,13 +2,12 @@
   import { page } from '$app/state';
 
   import NoQueryResults from '$lib/components/empty-states/no-query-results.svelte';
-  import SdkLogo from '$lib/components/lines-and-dots/sdk-logo.svelte';
-  import Alert from '$lib/holocene/alert.svelte';
+  import ResourceEmptyState from '$lib/components/empty-states/resource-empty-state.svelte';
+  import SdkLinks from '$lib/components/empty-states/sdk-links.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { IconWarning } from '$lib/io/icon';
+  import { IconTemporalActivity } from '$lib/io/icon';
   import { activityError } from '$lib/stores/activities';
-  import noResultsImages from '$lib/vendor/empty-state.svg';
 
   let query = $derived(page.url.searchParams.get('query'));
   const SDK_LINKS = [
@@ -36,89 +35,62 @@
       sdk: 'Ruby',
       href: 'https://docs.temporal.io/develop/ruby/activities/standalone-activities',
     },
+    {
+      sdk: 'Rust',
+      href: 'https://docs.temporal.io/develop/rust/activities/standalone-activities-quickstart',
+    },
   ];
 </script>
 
 {#if query}
-  <div
-    class="flex h-full w-full flex-col items-center justify-center p-4"
-    aria-live="polite"
+  <ResourceEmptyState
+    title={translate(
+      $activityError
+        ? 'standalone-activities.activity-query-error-state'
+        : 'standalone-activities.empty-state-title',
+    )}
+    content={translate('standalone-activities.empty-state-description')}
+    error={$activityError}
   >
-    <div class="text-center">
-      <h2>
-        {#if $activityError}
-          {translate('standalone-activities.activity-query-error-state')}
-        {:else}
-          {translate('standalone-activities.empty-state-title')}
-        {/if}
-      </h2>
-      <p class="text-secondary">
-        {#if $activityError}
-          {$activityError}
-        {:else}
-          {translate('standalone-activities.empty-state-description')}
-        {/if}
-      </p>
-      <NoQueryResults class="m-auto mt-8 text-tertiary" />
-    </div>
-  </div>
+    {#snippet illustration()}
+      <NoQueryResults class="text-tertiary" />
+    {/snippet}
+  </ResourceEmptyState>
 {:else}
-  <div
-    class="h-full w-full overflow-y-auto xl:flex xl:flex-row xl:overflow-hidden"
-    aria-live="polite"
+  <ResourceEmptyState
+    title={translate(
+      $activityError
+        ? 'standalone-activities.empty-state-title'
+        : 'standalone-activities.no-activities-title',
+    )}
+    Icon={IconTemporalActivity}
+    error={$activityError}
+    placeholder
   >
-    <div
-      class="flex w-auto min-w-[280px] flex-col gap-4 bg-surface-primary p-8 text-primary xl:min-w-[520px] xl:flex-1"
-    >
-      {#if $activityError}
-        <h2>
-          {translate('standalone-activities.empty-state-title')}
-        </h2>
-        <Alert
-          intent="warning"
-          Icon={IconWarning}
-          title={translate('common.error-occurred')}
-          style="overflow-wrap: anywhere"
+    {#snippet description()}
+      <p>
+        {translate('standalone-activities.empty-state-value-proposition')}
+      </p>
+      <p>
+        {translate('standalone-activities.empty-state-read-docs-prefix')}
+        <Link href="https://docs.temporal.io/standalone-activity" newTab>
+          {translate('standalone-activities.empty-state-activity-docs-link')}
+        </Link>
+        {translate('standalone-activities.empty-state-read-docs-middle')}
+        <Link
+          href="https://docs.temporal.io/evaluate/development-production-features/job-queue"
+          newTab
         >
-          {$activityError}
-        </Alert>
-      {:else}
-        <h2>
-          {translate('standalone-activities.no-activities-title')}
-        </h2>
-        <p>
-          <Link href="https://docs.temporal.io/standalone-activity" newTab
-            >{translate('standalone-activities.standalone-activities')}</Link
-          >{translate(
-            'standalone-activities.no-activities-description-part-1-preface',
-          )}<Link
-            href="https://docs.temporal.io/evaluate/development-production-features/job-queue"
-            newTab>{translate('standalone-activities.job-queue-link')}</Link
-          >{translate(
-            'standalone-activities.no-activities-description-part-1-postface',
-          )}
-        </p>
-        <p>
-          {translate('standalone-activities.no-activities-description-part-2')}
-        </p>
-        <p>
-          {translate('standalone-activities.no-activities-description-part-3')}
-        </p>
-        <h3>
-          {translate('standalone-activities.get-started-title')}
-        </h3>
-        {#each SDK_LINKS as { sdk, href } (sdk)}
-          <Link newTab {href}>
-            <SdkLogo {sdk} version="" hideDocsLink />
-          </Link>
-        {/each}
-      {/if}
-    </div>
-    <div class="flex flex-col max-xl:hidden">
-      <div class="bg-surface-primary">
-        <img src={noResultsImages} alt="" class="w-full" />
-      </div>
-      <div class="flex-1 bg-[#8da4ef]"></div>
-    </div>
-  </div>
+          {translate('standalone-activities.empty-state-job-queue-guide-link')}
+        </Link>
+        {translate('standalone-activities.empty-state-read-docs-suffix')}
+      </p>
+    {/snippet}
+    {#snippet resources()}
+      <SdkLinks
+        links={SDK_LINKS}
+        label={translate('standalone-activities.get-started-title')}
+      />
+    {/snippet}
+  </ResourceEmptyState>
 {/if}
