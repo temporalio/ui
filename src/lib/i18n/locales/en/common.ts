@@ -50,6 +50,10 @@ export const Strings = {
   ascending: 'Ascending',
   descending: 'Descending',
   'filter-by-column': 'Filter by {{column}}',
+  'column-has-multiple-filters':
+    '{{column}} has {{count}} filters. Applying replaces them with this one.',
+  'remove-all': 'Remove all',
+  'replace-all': 'Replace all',
   'execution-status': 'Execution Status',
   'worker-status': 'Worker Status',
   'sort-page-ascending': 'Sort this page by {{column}}, ascending',

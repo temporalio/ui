@@ -68,6 +68,7 @@
 
 <th
   scope="col"
+  aria-label={leading ? label : undefined}
   {...rest}
   class={twMerge('relative', className)}
   aria-sort={direction}

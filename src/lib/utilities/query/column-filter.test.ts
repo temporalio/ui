@@ -3,9 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   isAppliedFilter,
   isAtQueryLimit,
-  removeFilterById,
   replaceAttributeFilters,
-  upsertFilter,
 } from './column-filter';
 import { MAX_QUERY_LENGTH } from '../request-from-api';
 import { createFilter } from './to-list-workflow-filters';
@@ -64,6 +62,18 @@ describe('isAppliedFilter', () => {
     ).toBe(true);
   });
 
+  it('is false for a value the query leaves out', () => {
+    expect(
+      isAppliedFilter(
+        createFilter({
+          attribute: 'WorkflowId',
+          conditional: '=',
+          value: 'undefined',
+        }),
+      ),
+    ).toBe(false);
+  });
+
   it('is false for a filter that was added but never given a value', () => {
     expect(
       isAppliedFilter(
@@ -105,32 +115,6 @@ describe('replaceAttributeFilters', () => {
         [],
       ).map((f) => f.id),
     ).toEqual(['wid']);
-  });
-});
-
-describe('upsertFilter', () => {
-  it('replaces the filter with the same id where it stands', () => {
-    const updated = { ...workflowId, value: 'xyz' };
-
-    expect(upsertFilter([workflowId, workflowType], updated)).toEqual([
-      updated,
-      workflowType,
-    ]);
-  });
-
-  it('appends a filter it has not seen', () => {
-    expect(upsertFilter([workflowId], workflowType)).toEqual([
-      workflowId,
-      workflowType,
-    ]);
-  });
-});
-
-describe('removeFilterById', () => {
-  it('removes only the filter with that id', () => {
-    expect(removeFilterById([workflowId, workflowType], 'wid')).toEqual([
-      workflowType,
-    ]);
   });
 });
 

@@ -5,10 +5,8 @@ import { searchAttributes } from '$lib/stores/search-attributes';
 import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
 import { formatDate } from '$lib/utilities/format-date';
 
-import { isStatusAttribute } from './quick-filter';
-
 export function isStatusFilter({ attribute }: SearchAttributeFilter) {
-  return isStatusAttribute(attribute);
+  return attribute === 'ExecutionStatus';
 }
 
 export function isTextFilter(

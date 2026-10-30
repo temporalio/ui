@@ -5,6 +5,7 @@
 
   import { page } from '$app/state';
 
+  import Alert from '$lib/holocene/alert.svelte';
   import { Menu, MenuButton, MenuContainer } from '$lib/holocene/menu';
   import { translate } from '$lib/i18n/translate';
   import { IconFilterLines } from '$lib/io/icon';
@@ -13,9 +14,7 @@
   import {
     isAppliedFilter,
     isAtQueryLimit,
-    removeFilterById,
     replaceAttributeFilters,
-    upsertFilter,
   } from '$lib/utilities/query/column-filter';
   import {
     getDefaultConditional,
@@ -65,6 +64,8 @@
     $open && !isStatus ? untrack(createInitialFilter) : undefined,
   );
 
+  const hasMultipleFilters = $derived(appliedFilters.length > 1);
+
   const canRemove = $derived(
     initialFilter !== undefined &&
       $filters.some(({ id }) => id === initialFilter.id),
@@ -77,19 +78,28 @@
 
   const applyFilter = (updated: SearchAttributeFilter) => {
     if (isAppliedFilter(updated)) {
-      setFilters(upsertFilter($filters, updated));
-    } else if ($filters.some(({ id }) => id === updated.id)) {
-      setFilters(removeFilterById($filters, updated.id));
+      setFilters(replaceAttributeFilters($filters, attribute, [updated]));
+    } else if (canRemove) {
+      setFilters(replaceAttributeFilters($filters, attribute, []));
     }
     $open = false;
   };
 
   const removeFilter = () => {
-    if (!initialFilter) return;
-    setFilters(removeFilterById($filters, initialFilter.id));
+    setFilters(replaceAttributeFilters($filters, attribute, []));
     $open = false;
   };
 </script>
+
+{#snippet multipleFiltersNotice()}
+  <Alert intent="warning" data-testid="column-header-filter-multiple">
+    {translate('common.column-has-multiple-filters', {
+      column: label,
+      count: appliedFilters.length,
+      escapeValue: false,
+    })}
+  </Alert>
+{/snippet}
 
 <MenuContainer {open} class="shrink-0">
   <MenuButton
@@ -98,7 +108,10 @@
     size="xs"
     active={filtered || $open}
     disabled={!filtered && atQueryLimit}
-    label={translate('common.filter-by-column', { column: label })}
+    label={translate('common.filter-by-column', {
+      column: label,
+      escapeValue: false,
+    })}
     data-testid="column-header-filter-{attribute}"
     data-filtered={filtered}
   >
@@ -136,6 +149,13 @@
         applyOnEnter
         onApply={applyFilter}
         onRemove={canRemove ? removeFilter : undefined}
+        notice={hasMultipleFilters ? multipleFiltersNotice : undefined}
+        applyLabel={hasMultipleFilters
+          ? translate('common.replace-all')
+          : undefined}
+        removeLabel={hasMultipleFilters
+          ? translate('common.remove-all')
+          : undefined}
       />
     {/if}
   </Menu>

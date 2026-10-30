@@ -178,6 +178,92 @@ describe('ColumnHeaderFilter', () => {
     expect(onWindowKeydown).not.toHaveBeenCalled();
   });
 
+  describe('with several filters on the column', () => {
+    const typeA = () =>
+      createFilter({
+        id: 'type-a',
+        attribute: 'WorkflowType',
+        type: 'Keyword',
+        value: 'a',
+        conditional: '=',
+        operator: 'OR',
+        parenthesis: '(',
+      });
+    const typeB = () =>
+      createFilter({
+        id: 'type-b',
+        attribute: 'WorkflowType',
+        type: 'Keyword',
+        value: 'b',
+        conditional: '=',
+        parenthesis: ')',
+      });
+    const other = () =>
+      createFilter({
+        id: 'wid',
+        attribute: 'WorkflowId',
+        value: 'abc',
+        conditional: '=',
+      });
+
+    it('warns that applying replaces every filter on the column', () => {
+      const { open } = mountFilter({ filters: [typeA(), typeB()] });
+
+      open();
+
+      expect(
+        byTestId('column-header-filter-multiple')?.textContent?.trim(),
+      ).toBe(
+        'WorkflowType has 2 filters. Applying replaces them with this one.',
+      );
+      expect(byTestId('apply-filter-button')?.textContent?.trim()).toBe(
+        'Replace all',
+      );
+      expect(byTestId('remove-filter-button')?.textContent?.trim()).toBe(
+        'Remove all',
+      );
+    });
+
+    it('shows no notice and the usual buttons for a single filter', () => {
+      const { open } = mountFilter({ filters: [workflowType()] });
+
+      open();
+
+      expect(byTestId('column-header-filter-multiple')).toBeNull();
+      expect(byTestId('apply-filter-button')?.textContent?.trim()).toBe(
+        'Apply',
+      );
+      expect(byTestId('remove-filter-button')?.textContent?.trim()).toBe(
+        'Remove',
+      );
+    });
+
+    it('removes every filter on the column', () => {
+      const { store, button, open } = mountFilter({
+        filters: [typeA(), typeB(), other()],
+      });
+
+      open();
+      byTestId('remove-filter-button')?.click();
+      flushSync();
+
+      expect(get(store).map((filter) => filter.id)).toEqual(['wid']);
+      expect(button.dataset.filtered).toBe('false');
+    });
+
+    it('replaces every filter on the column when applied', () => {
+      const { store, open } = mountFilter({
+        filters: [typeA(), typeB(), other()],
+      });
+
+      open();
+      byTestId('apply-filter-button')?.click();
+      flushSync();
+
+      expect(get(store).map((filter) => filter.id)).toEqual(['type-a', 'wid']);
+    });
+  });
+
   it('does not add a filter when applied without a value', () => {
     const { store, button, open } = mountFilter();
 

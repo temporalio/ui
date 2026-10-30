@@ -3,6 +3,7 @@
 
   import { addHours, addMinutes, addSeconds, startOfDay } from 'date-fns';
   import { zonedTimeToUtc } from 'date-fns-tz';
+  import type { Snippet } from 'svelte';
 
   import Button from '$lib/holocene/button.svelte';
   import DatePicker from '$lib/holocene/date-picker.svelte';
@@ -65,6 +66,9 @@
     // Narrows the operators offered, for query surfaces that accept fewer than
     // standard visibility.
     conditionals?: string[];
+    notice?: Snippet;
+    applyLabel?: string;
+    removeLabel?: string;
   };
 
   let {
@@ -75,6 +79,9 @@
     defaultTimeMode,
     applyOnEnter = false,
     conditionals,
+    notice,
+    applyLabel = translate('common.apply'),
+    removeLabel = translate('common.remove'),
   }: Props = $props();
 
   let formElement = $state<HTMLFormElement | null>(null);
@@ -552,6 +559,8 @@
       </div>
     {/if}
 
+    {@render notice?.()}
+
     <div class="flex justify-end gap-2">
       {#if onRemove}
         <Button
@@ -560,14 +569,14 @@
           size="xs"
           data-testid="remove-filter-button"
           type="button"
-          onclick={onRemove}>Remove</Button
+          onclick={onRemove}>{removeLabel}</Button
         >
       {/if}
       <Button
         variant="primary"
         size="xs"
         data-testid="apply-filter-button"
-        type="submit">Apply</Button
+        type="submit">{applyLabel}</Button
       >
     </div>
   </div>
