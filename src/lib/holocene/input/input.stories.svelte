@@ -33,6 +33,8 @@
       clearButtonLabel: 'Clear input',
       copyButtonLabel: 'Copy contents',
       onClear: fn(),
+      size: 'md',
+      focusRing: 'outer',
     },
     argTypes: {
       label: { name: 'Label', control: 'text' },
@@ -72,6 +74,16 @@
         name: 'Clear Button Label',
         control: 'text',
         table: { category: 'Accessibility' },
+      },
+      size: {
+        name: 'Size',
+        control: 'inline-radio',
+        options: ['xs', 'sm', 'md'],
+      },
+      focusRing: {
+        name: 'Focus Ring',
+        control: 'inline-radio',
+        options: ['outer', 'inner'],
       },
       noBorder: {
         name: 'No Border',

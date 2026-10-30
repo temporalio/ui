@@ -62,21 +62,33 @@
       {@render actions?.()}
     </div>
   </header>
-  <div class="flex flex-col gap-4">
-    <Input
-      id="endpoint-search"
-      bind:value={search}
-      Icon={IconSearch}
-      label={searchPlaceholder}
-      labelHidden
-      autoFocus
-      type="search"
-      placeholder={searchPlaceholder}
-      class="w-full"
-      inputContainerClass="bg-surface-primary"
-    />
+  <div class="flex flex-col rounded-lg border border-primary">
+    <search
+      class="block rounded-t-lg border-b border-primary bg-surface-primary"
+      aria-label={translate('common.search')}
+    >
+      <Input
+        id="endpoint-search"
+        bind:value={search}
+        Icon={IconSearch}
+        label={searchPlaceholder}
+        labelHidden
+        autoFocus
+        type="search"
+        placeholder={searchPlaceholder}
+        class="w-full p-2"
+        noBorder
+        size="xs"
+        inputContainerClass="bg-surface-primary"
+      />
+    </search>
     {#if endpoints.length}
-      <Table class="w-full" bordered>
+      <Table
+        class="w-full"
+        bordered={false}
+        rounded={false}
+        containerClass="rounded-b-lg"
+      >
         {#snippet caption()}
           <caption class="sr-only">
             {translate('nexus.endpoints')}
