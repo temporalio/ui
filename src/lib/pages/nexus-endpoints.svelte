@@ -78,7 +78,8 @@
         placeholder={searchPlaceholder}
         class="w-full p-2"
         noBorder
-        inputContainerClass="h-8 bg-surface-primary focus-within:ring-inset focus-within:ring-offset-0"
+        size="xs"
+        inputContainerClass="bg-surface-primary"
       />
     </search>
     {#if endpoints.length}
