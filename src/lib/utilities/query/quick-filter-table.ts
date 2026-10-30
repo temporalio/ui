@@ -32,6 +32,19 @@ export const getColumnAttribute = (
   label: string,
 ): string => attributes[label] ?? label;
 
+export const getColumnFilter = <Row>(
+  columns: QuickFilterColumns<Row>,
+  label: string,
+  searchAttributes: SearchAttributes,
+): { attribute: string; type: SearchAttributeType } | undefined => {
+  if (columns.unfilterable?.includes(label)) return undefined;
+
+  const attribute = getColumnAttribute(columns.attributes, label);
+  const type = searchAttributes[attribute];
+
+  return type ? { attribute, type } : undefined;
+};
+
 export const resolveQuickFilter = <Row>({
   columns,
   searchAttributes,

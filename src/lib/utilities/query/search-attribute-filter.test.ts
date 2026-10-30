@@ -47,7 +47,11 @@ describe('isStatusFilter', () => {
     expect(isStatusFilter({ attribute: 'ExecutionStatus' })).toBe(true);
   });
 
-  it('should return false if the attribute is not ExecutionStatus', () => {
+  it('should return true if the attribute is WorkerStatus', () => {
+    expect(isStatusFilter({ attribute: 'WorkerStatus' })).toBe(true);
+  });
+
+  it('should return false if the attribute is not a status', () => {
     expect(isStatusFilter({ attribute: 'WorkflowType' })).toBe(false);
   });
 });

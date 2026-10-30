@@ -39,6 +39,7 @@ export type ConfigurableTableHeader = {
 };
 
 export const MIN_COLUMN_WIDTH = 80;
+export const MIN_FILTERABLE_COLUMN_WIDTH = MIN_COLUMN_WIDTH + 32;
 
 export const TABLE_TYPE = {
   WORKFLOWS: 'workflows',

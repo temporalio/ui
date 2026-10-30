@@ -5,8 +5,10 @@ import { searchAttributes } from '$lib/stores/search-attributes';
 import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
 import { formatDate } from '$lib/utilities/format-date';
 
+import { isStatusAttribute } from './quick-filter';
+
 export function isStatusFilter({ attribute }: SearchAttributeFilter) {
-  return attribute === 'ExecutionStatus';
+  return isStatusAttribute(attribute);
 }
 
 export function isTextFilter(
@@ -70,22 +72,6 @@ export function isBooleanFilter(
 
   const searchAttributeType = get(attributes)[attribute];
   return searchAttributeType === SEARCH_ATTRIBUTE_TYPE.BOOL;
-}
-
-export function getFocusedElementId(filter: SearchAttributeFilter) {
-  if (isStatusFilter(filter)) return 'status-filter';
-
-  if (
-    isTextFilter(filter) ||
-    isNumberFilter(filter) ||
-    isDateTimeFilter(filter) ||
-    isListFilter(filter)
-  )
-    return 'conditional-menu-button';
-
-  if (isBooleanFilter(filter)) return 'boolean-filter';
-
-  return '';
 }
 
 export function formatListFilterValue(value: string | null): string[] {

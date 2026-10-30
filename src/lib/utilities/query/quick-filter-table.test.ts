@@ -7,6 +7,7 @@ import {
 
 import {
   getColumnAttribute,
+  getColumnFilter,
   type QuickFilterColumns,
   resolveQuickFilter,
 } from './quick-filter-table';
@@ -62,6 +63,27 @@ describe('getColumnAttribute', () => {
 
   it('treats an unmapped label as a custom attribute of the same name', () => {
     expect(getColumnAttribute(columns.attributes, 'MyField')).toBe('MyField');
+  });
+});
+
+describe('getColumnFilter', () => {
+  it('resolves a label to the attribute and type it filters on', () => {
+    expect(getColumnFilter(columns, 'Start', searchAttributes)).toEqual({
+      attribute: 'StartTime',
+      type: SEARCH_ATTRIBUTE_TYPE.DATETIME,
+    });
+  });
+
+  it('offers no filter for an unfilterable label', () => {
+    expect(
+      getColumnFilter(columns, 'Status', searchAttributes),
+    ).toBeUndefined();
+  });
+
+  it('offers no filter for an attribute with no known type', () => {
+    expect(
+      getColumnFilter(columns, 'Nothing', searchAttributes),
+    ).toBeUndefined();
   });
 });
 
