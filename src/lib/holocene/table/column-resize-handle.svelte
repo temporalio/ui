@@ -3,6 +3,7 @@
   import {
     clampColumnWidth,
     handleColumnResizeKey,
+    MIN_COLUMN_WIDTH,
   } from '$lib/utilities/column-width';
 
   interface Props {
@@ -12,7 +13,7 @@
     onResize: (width: number | undefined) => void;
   }
 
-  let { label, width, min = 80, onResize }: Props = $props();
+  let { label, width, min = MIN_COLUMN_WIDTH, onResize }: Props = $props();
 
   let handle = $state<HTMLDivElement>();
   let resizing = $state(false);

@@ -3,6 +3,7 @@ import { derived, type Readable, type Writable } from 'svelte/store';
 import { page } from '$app/stores';
 
 import type { Settings } from '$lib/types/global';
+import { MIN_COLUMN_WIDTH } from '$lib/utilities/column-width';
 
 import { namespaces } from './namespaces';
 import { persistStore } from './persist-store';
@@ -37,9 +38,6 @@ export type ConfigurableTableHeader = {
   pinned?: boolean;
   width?: number;
 };
-
-export const MIN_COLUMN_WIDTH = 80;
-export const MIN_FILTERABLE_COLUMN_WIDTH = MIN_COLUMN_WIDTH + 32;
 
 export const TABLE_TYPE = {
   WORKFLOWS: 'workflows',

@@ -34,10 +34,6 @@ export const WORKFLOW_COLUMN_ATTRIBUTE: Record<string, string> = {
   'Change Version': 'TemporalChangeVersion',
 };
 
-// Parent Namespace is not an indexed search attribute, so there is nothing to
-// filter by.
-export const UNFILTERABLE_WORKFLOW_COLUMNS = ['Parent Namespace'];
-
 // Only columns the archival query surface supports. Archival visibility accepts
 // a narrower set of attributes and operators than standard visibility.
 export const ARCHIVAL_FILTERABLE_COLUMNS = ['Type', 'Workflow ID', 'Run ID'];
@@ -106,7 +102,6 @@ export const WORKFLOW_QUICK_FILTER_COLUMNS: QuickFilterColumns<WorkflowExecution
   {
     attributes: WORKFLOW_COLUMN_ATTRIBUTE,
     getValue: getWorkflowColumnValue,
-    unfilterable: UNFILTERABLE_WORKFLOW_COLUMNS,
   };
 
 export const getWorkflowSortColumns = (

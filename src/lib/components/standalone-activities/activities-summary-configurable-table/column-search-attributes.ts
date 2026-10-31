@@ -8,6 +8,7 @@ import { toActivityStatus } from '$lib/utilities/get-activity-status-and-count';
 import type { QuickFilterValue } from '$lib/utilities/query/quick-filter';
 import {
   getColumnAttribute,
+  getColumnFilter,
   type QuickFilterColumns,
 } from '$lib/utilities/query/quick-filter-table';
 import { searchAttributeSortColumns } from '$lib/utilities/search-attribute-table-sort';
@@ -24,8 +25,6 @@ export const ACTIVITY_COLUMN_ATTRIBUTE: Record<string, string> = {
   'State Transitions': 'StateTransitionCount',
   'Execution Duration': 'ExecutionDuration',
 };
-
-export const UNFILTERABLE_ACTIVITY_COLUMNS: string[] = [];
 
 export const getActivityColumnValue = (
   label: string,
@@ -67,8 +66,12 @@ export const ACTIVITY_QUICK_FILTER_COLUMNS: QuickFilterColumns<ActivityExecution
   {
     attributes: ACTIVITY_COLUMN_ATTRIBUTE,
     getValue: getActivityColumnValue,
-    unfilterable: UNFILTERABLE_ACTIVITY_COLUMNS,
   };
+
+export const getActivityColumnFilter = (
+  label: string,
+  attributes: SearchAttributes,
+) => getColumnFilter(ACTIVITY_QUICK_FILTER_COLUMNS, label, attributes);
 
 export const getActivitySortColumns = (
   labels: string[],

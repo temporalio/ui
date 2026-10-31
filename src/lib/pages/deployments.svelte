@@ -18,13 +18,15 @@
     availableDeploymentColumns,
     configurableTableColumns,
     DEFAULT_DEPLOYMENTS_COLUMNS,
-    MIN_COLUMN_WIDTH,
     resizeColumn,
     TABLE_TYPE,
   } from '$lib/stores/configurable-table-columns';
   import { refresh } from '$lib/stores/workers';
   import type { ListWorkerDeployment } from '$lib/types/deployments';
-  import { columnWidthStyle } from '$lib/utilities/column-width';
+  import {
+    columnWidthStyle,
+    MIN_COLUMN_WIDTH,
+  } from '$lib/utilities/column-width';
   import {
     type ComputeProviderConfig,
     configuredRegions,

@@ -43,7 +43,6 @@ const columns: QuickFilterColumns<Row> = {
         return undefined;
     }
   },
-  unfilterable: ['Status'],
 };
 
 const searchAttributes: SearchAttributes = {
@@ -72,12 +71,6 @@ describe('getColumnFilter', () => {
       attribute: 'StartTime',
       type: SEARCH_ATTRIBUTE_TYPE.DATETIME,
     });
-  });
-
-  it('offers no filter for an unfilterable label', () => {
-    expect(
-      getColumnFilter(columns, 'Status', searchAttributes),
-    ).toBeUndefined();
   });
 
   it('offers no filter for an attribute with no known type', () => {
@@ -129,12 +122,6 @@ describe('resolveQuickFilter', () => {
       row,
     });
     expect(resolved.type).toBeUndefined();
-    expect(resolved.filterable).toBe(false);
-  });
-
-  it('honours the unfilterable list even when there is a value', () => {
-    const resolved = resolve('Status');
-    expect(resolved.filterValue).toBe('Completed');
     expect(resolved.filterable).toBe(false);
   });
 });

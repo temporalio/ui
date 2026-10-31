@@ -2,14 +2,13 @@
   import ColumnHeaderFilter from '$lib/components/search-attribute-filter/column-header-filter.svelte';
   import ColumnResizeHandle from '$lib/holocene/table/column-resize-handle.svelte';
   import SortableTableHeader from '$lib/holocene/table/sortable-table-header.svelte';
-  import {
-    type ConfigurableTableHeader,
-    MIN_COLUMN_WIDTH,
-    MIN_FILTERABLE_COLUMN_WIDTH,
-  } from '$lib/stores/configurable-table-columns';
+  import type { ConfigurableTableHeader } from '$lib/stores/configurable-table-columns';
   import { workflowFilters } from '$lib/stores/filters';
   import { searchAttributes } from '$lib/stores/search-attributes';
-  import { columnWidthStyle } from '$lib/utilities/column-width';
+  import {
+    columnWidthStyle,
+    MIN_COLUMN_WIDTH,
+  } from '$lib/utilities/column-width';
 
   import {
     ARCHIVAL_CONDITIONALS,
@@ -51,11 +50,6 @@
   data-testid="workflows-summary-table-header-cell-{label}"
 >
   {#if onResize}
-    <ColumnResizeHandle
-      {label}
-      {width}
-      min={columnFilter ? MIN_FILTERABLE_COLUMN_WIDTH : MIN_COLUMN_WIDTH}
-      {onResize}
-    />
+    <ColumnResizeHandle {label} {width} min={MIN_COLUMN_WIDTH} {onResize} />
   {/if}
 </SortableTableHeader>

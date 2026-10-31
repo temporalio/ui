@@ -8,7 +8,6 @@ import {
   getWorkflowColumnFilter,
   getWorkflowColumnValue,
   getWorkflowSortColumns,
-  UNFILTERABLE_WORKFLOW_COLUMNS,
   WORKFLOW_COLUMN_ATTRIBUTE,
 } from './column-search-attributes';
 
@@ -159,13 +158,12 @@ describe('getWorkflowColumnValue', () => {
     ).toBeUndefined();
   });
 
-  it.each(UNFILTERABLE_WORKFLOW_COLUMNS)(
-    'has no value to filter on for %s',
-    (label) => {
-      expect(getWorkflowColumnValue(label, workflow)).toBeUndefined();
-      expect(WORKFLOW_COLUMN_ATTRIBUTE[label]).toBeUndefined();
-    },
-  );
+  it('has no value to filter on for Parent Namespace', () => {
+    expect(
+      getWorkflowColumnValue('Parent Namespace', workflow),
+    ).toBeUndefined();
+    expect(WORKFLOW_COLUMN_ATTRIBUTE['Parent Namespace']).toBeUndefined();
+  });
 });
 
 describe('getWorkflowColumnFilter', () => {
@@ -195,15 +193,6 @@ describe('getWorkflowColumnFilter', () => {
 
   it('offers no filter for a column with no known search attribute type', () => {
     expect(getWorkflowColumnFilter('Task Queue', attributes)).toBeUndefined();
-  });
-
-  it('offers no filter for an unfilterable column', () => {
-    expect(
-      getWorkflowColumnFilter('Parent Namespace', {
-        ...attributes,
-        'Parent Namespace': 'Keyword',
-      }),
-    ).toBeUndefined();
   });
 
   it('offers a filter only for archival-supported columns on the archival table', () => {

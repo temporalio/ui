@@ -1,5 +1,7 @@
 export const KEYBOARD_RESIZE_STEP = 16;
 
+export const MIN_COLUMN_WIDTH = 112;
+
 export type ColumnResizeAction =
   | { type: 'resize'; width: number }
   | { type: 'reset' }
