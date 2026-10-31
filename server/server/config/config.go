@@ -154,10 +154,9 @@ type (
 		// OIDC .well-known/openid-configuration URL, ex. https://accounts.google.com/
 		ProviderURL string `yaml:"providerUrl"`
 		// IssuerUrl - optional. Needed only when differs from the auth provider URL
-		IssuerUrl    string `yaml:"issuerUrl"`
-		ClientID     string `yaml:"clientId"`
-		ClientSecret string `yaml:"clientSecret"`
-		// ClientAssertionFile - optional path to a JWT used as the client assertion (RFC 7523) instead of ClientSecret, ex. a Kubernetes projected service account token
+		IssuerUrl           string `yaml:"issuerUrl"`
+		ClientID            string `yaml:"clientId"`
+		ClientSecret        string `yaml:"clientSecret"`
 		ClientAssertionFile string `yaml:"clientAssertionFile"`
 		// Scopes for auth. Typically [openid, profile, email]
 		Scopes []string `yaml:"scopes"`
