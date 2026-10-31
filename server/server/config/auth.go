@@ -64,5 +64,9 @@ func (c *AuthProvider) validate() error {
 		return errors.New("auth callback url is not set")
 	}
 
+	if c.ClientSecret != "" && c.ClientAssertionFile != "" {
+		return errors.New("auth client secret and client assertion file are mutually exclusive")
+	}
+
 	return nil
 }
