@@ -8,6 +8,7 @@ import { toNexusOperationStatus } from '$lib/utilities/get-nexus-operation-statu
 import type { QuickFilterValue } from '$lib/utilities/query/quick-filter';
 import {
   getColumnAttribute,
+  getColumnFilter,
   type QuickFilterColumns,
 } from '$lib/utilities/query/quick-filter-table';
 import { searchAttributeSortColumns } from '$lib/utilities/search-attribute-table-sort';
@@ -24,8 +25,6 @@ export const NEXUS_OPERATION_COLUMN_ATTRIBUTE: Record<string, string> = {
   'State Transitions': 'StateTransitionCount',
   'Execution Duration': 'ExecutionDuration',
 };
-
-export const UNFILTERABLE_NEXUS_OPERATION_COLUMNS: string[] = [];
 
 export const getNexusOperationColumnValue = (
   label: string,
@@ -67,8 +66,12 @@ export const NEXUS_OPERATION_QUICK_FILTER_COLUMNS: QuickFilterColumns<NexusOpera
   {
     attributes: NEXUS_OPERATION_COLUMN_ATTRIBUTE,
     getValue: getNexusOperationColumnValue,
-    unfilterable: UNFILTERABLE_NEXUS_OPERATION_COLUMNS,
   };
+
+export const getNexusOperationColumnFilter = (
+  label: string,
+  attributes: SearchAttributes,
+) => getColumnFilter(NEXUS_OPERATION_QUICK_FILTER_COLUMNS, label, attributes);
 
 export const getNexusOperationSortColumns = (
   labels: string[],

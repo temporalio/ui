@@ -72,22 +72,6 @@ export function isBooleanFilter(
   return searchAttributeType === SEARCH_ATTRIBUTE_TYPE.BOOL;
 }
 
-export function getFocusedElementId(filter: SearchAttributeFilter) {
-  if (isStatusFilter(filter)) return 'status-filter';
-
-  if (
-    isTextFilter(filter) ||
-    isNumberFilter(filter) ||
-    isDateTimeFilter(filter) ||
-    isListFilter(filter)
-  )
-    return 'conditional-menu-button';
-
-  if (isBooleanFilter(filter)) return 'boolean-filter';
-
-  return '';
-}
-
 export function formatListFilterValue(value: string | null): string[] {
   if (!value) return [];
   if (value.startsWith('(') && value.endsWith(')')) {

@@ -11,9 +11,8 @@
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import type { SearchAttributeOption } from '$lib/stores/search-attributes';
   import type { SearchAttributes } from '$lib/types/workflows';
+  import type { StatusAttribute } from '$lib/utilities/query/quick-filter';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
-
-  import type { StatusAttribute } from './types.ts';
 
   import Filter from './filter.svelte';
   import ManualQuery from './manual-query.svelte';

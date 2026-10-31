@@ -31,7 +31,10 @@ const filterKeys: Readonly<Record<string, QueryKey>> = {
   runId: 'RunId',
 } as const;
 
-const isValid = (value: unknown, conditional: string): boolean => {
+export const isValidFilterValue = (
+  value: unknown,
+  conditional: string,
+): boolean => {
   if (isNullConditional(conditional)) return true;
   if (value === null) return false;
   if (value === undefined) return false;
@@ -142,7 +145,7 @@ const toQueryStatementsFromFilters = (
         parenthesis,
         customDate,
       }) => {
-        if (isValid(value, conditional)) {
+        if (isValidFilterValue(value, conditional)) {
           let statement = toFilterQueryStatement(
             attribute,
             type,

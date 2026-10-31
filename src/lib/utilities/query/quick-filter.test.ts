@@ -13,6 +13,7 @@ import {
   getDefaultConditional,
   getQuickFilterConditional,
   isQuickFilterActive,
+  isStatusAttribute,
   RANGE_PREFERRED_ATTRIBUTES,
   requiresOperatorChoice,
   STATUS_ATTRIBUTES,
@@ -533,5 +534,15 @@ describe('ExecutionDuration', () => {
       value: '5m10s',
       conditional: '>=',
     });
+  });
+});
+
+describe('isStatusAttribute', () => {
+  it.each([...STATUS_ATTRIBUTES])('is true for %s', (attribute) => {
+    expect(isStatusAttribute(attribute)).toBe(true);
+  });
+
+  it('is false for any other attribute', () => {
+    expect(isStatusAttribute('WorkflowType')).toBe(false);
   });
 });

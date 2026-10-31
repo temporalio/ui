@@ -15,6 +15,7 @@
   interface Props extends HTMLThAttributes {
     column: string;
     label?: string;
+    leading?: Snippet;
     children?: Snippet;
     class?: string;
     'data-testid'?: string;
@@ -23,6 +24,7 @@
   let {
     column,
     label = column,
+    leading,
     children,
     class: className,
     ...rest
@@ -35,12 +37,7 @@
   );
 </script>
 
-<th
-  scope="col"
-  {...rest}
-  class={twMerge('relative', className)}
-  aria-sort={direction}
->
+{#snippet heading()}
   {#if sortable}
     <button
       type="button"
@@ -66,6 +63,25 @@
     </button>
   {:else}
     <span class="block truncate">{label}</span>
+  {/if}
+{/snippet}
+
+<th
+  scope="col"
+  aria-label={leading ? label : undefined}
+  {...rest}
+  class={twMerge('relative', className)}
+  aria-sort={direction}
+>
+  {#if leading}
+    <div class="flex min-w-0 items-center gap-2">
+      {@render leading()}
+      <div class="min-w-0 flex-1">
+        {@render heading()}
+      </div>
+    </div>
+  {:else}
+    {@render heading()}
   {/if}
   {@render children?.()}
 </th>

@@ -7,6 +7,7 @@ import { getBuildIdFromVersion } from '$lib/utilities/get-deployment-build-id';
 import type { QuickFilterValue } from '$lib/utilities/query/quick-filter';
 import {
   getColumnAttribute,
+  getColumnFilter,
   type QuickFilterColumns,
 } from '$lib/utilities/query/quick-filter-table';
 import { searchAttributeSortColumns } from '$lib/utilities/search-attribute-table-sort';
@@ -33,13 +34,13 @@ export const WORKFLOW_COLUMN_ATTRIBUTE: Record<string, string> = {
   'Change Version': 'TemporalChangeVersion',
 };
 
-// Parent Namespace is not an indexed search attribute, so there is nothing to
-// filter by.
-export const UNFILTERABLE_WORKFLOW_COLUMNS = ['Parent Namespace'];
-
 // Only columns the archival query surface supports. Archival visibility accepts
 // a narrower set of attributes and operators than standard visibility.
 export const ARCHIVAL_FILTERABLE_COLUMNS = ['Type', 'Workflow ID', 'Run ID'];
+export const ARCHIVAL_CONDITIONALS = ['='];
+
+export const isArchivalUnfilterable = (label: string, archival: boolean) =>
+  archival && !ARCHIVAL_FILTERABLE_COLUMNS.includes(label);
 
 const positiveCount = (count: string): string | undefined =>
   parseInt(count, 10) > 0 ? count : undefined;
@@ -101,7 +102,6 @@ export const WORKFLOW_QUICK_FILTER_COLUMNS: QuickFilterColumns<WorkflowExecution
   {
     attributes: WORKFLOW_COLUMN_ATTRIBUTE,
     getValue: getWorkflowColumnValue,
-    unfilterable: UNFILTERABLE_WORKFLOW_COLUMNS,
   };
 
 export const getWorkflowSortColumns = (
@@ -127,3 +127,12 @@ export const getWorkflowSortColumns = (
       },
     },
   );
+
+export const getWorkflowColumnFilter = (
+  label: string,
+  attributes: SearchAttributes,
+  { archival = false }: { archival?: boolean } = {},
+) =>
+  isArchivalUnfilterable(label, archival)
+    ? undefined
+    : getColumnFilter(WORKFLOW_QUICK_FILTER_COLUMNS, label, attributes);

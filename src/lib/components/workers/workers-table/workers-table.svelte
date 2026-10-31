@@ -1,19 +1,25 @@
 <script lang="ts">
   import { page } from '$app/state';
 
+  import ColumnHeaderFilter from '$lib/components/search-attribute-filter/column-header-filter.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import PaginatedTable, {
     type PaginatedRequest,
   } from '$lib/holocene/table/paginated-table/api-paginated.svelte';
   import SortableTableHeader from '$lib/holocene/table/sortable-table-header.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { workerFilters } from '$lib/stores/filters';
+  import { workerSearchAttributes } from '$lib/stores/search-attributes';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type { WorkerHeartbeat, WorkerListInfo } from '$lib/types';
-  import { formatSDKName } from '$lib/utilities/get-sdk-version';
-  import { getWorkerHostName } from '$lib/utilities/get-worker-host-name';
   import { isRunningWithNoWorkers } from '$lib/utilities/is-running-with-no-workers';
-  import { toWorkerStatusReadable } from '$lib/utilities/screaming-enums';
   import type { TableSort, TableSortColumn } from '$lib/utilities/table-sort';
+
+  import {
+    getWorkerColumnAttributes,
+    getWorkerColumnFilter,
+    getWorkerColumns,
+  } from './column-search-attributes';
 
   import WorkerHeartbeatsSDKAlert from './worker-heartbeats-sdk-warning.svelte';
   import WorkersQueryEmptyState from './workers-query-empty-state.svelte';
@@ -37,50 +43,15 @@
     sort = $bindable(),
   }: Props = $props();
 
+  const columns = getWorkerColumns();
+  const columnAttributes = getWorkerColumnAttributes(columns);
+
   const sortColumns: Record<
     string,
     TableSortColumn<WorkerListInfo | WorkerHeartbeat>
-  > = {
-    [translate('workers.status')]: {
-      getValue: (worker) => toWorkerStatusReadable(worker.status),
-      type: 'string',
-    },
-    [translate('workers.instance', { count: 1 })]: {
-      getValue: (worker) => worker.workerInstanceKey,
-      type: 'string',
-    },
-    [translate('deployments.deployment')]: {
-      getValue: (worker) => worker.deploymentVersion?.deploymentName,
-      type: 'string',
-    },
-    [translate('deployments.build-id')]: {
-      getValue: (worker) => worker.deploymentVersion?.buildId,
-      type: 'string',
-    },
-    [translate('workers.task-queue')]: {
-      getValue: (worker) => worker.taskQueue,
-      type: 'string',
-    },
-    [translate('workers.identity')]: {
-      getValue: (worker) => worker.workerIdentity,
-      type: 'string',
-    },
-    [translate('workers.host-name')]: {
-      getValue: getWorkerHostName,
-      type: 'string',
-    },
-    [translate('common.start-time')]: {
-      getValue: (worker) => worker.startTime,
-      type: 'datetime',
-    },
-    [translate('workers.sdk')]: {
-      getValue: (worker) =>
-        worker.sdkName
-          ? `${formatSDKName(worker.sdkName)} ${worker.sdkVersion ?? ''}`.trim()
-          : undefined,
-      type: 'string',
-    },
-  };
+  > = Object.fromEntries(
+    columns.map(({ label, getValue, type }) => [label, { getValue, type }]),
+  );
 
   const hasQuery = $derived(page.url.searchParams.get('query') !== null);
   const runningWithNoWorkers = $derived(isRunningWithNoWorkers($workflowRun));
@@ -108,7 +79,27 @@
   {#snippet headers()}
     <tr class="text-left">
       {#each Object.keys(sortColumns) as label (label)}
-        <SortableTableHeader column={label} />
+        {@const columnFilter = filterable
+          ? getWorkerColumnFilter(
+              label,
+              $workerSearchAttributes,
+              columnAttributes,
+            )
+          : undefined}
+        {#snippet filter()}
+          {#if columnFilter}
+            <ColumnHeaderFilter
+              attribute={columnFilter.attribute}
+              type={columnFilter.type}
+              {label}
+              filters={workerFilters}
+            />
+          {/if}
+        {/snippet}
+        <SortableTableHeader
+          column={label}
+          leading={columnFilter ? filter : undefined}
+        />
       {/each}
     </tr>
   {/snippet}

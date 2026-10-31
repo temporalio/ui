@@ -3,6 +3,7 @@
 
   import { addHours, addMinutes, addSeconds, startOfDay } from 'date-fns';
   import { zonedTimeToUtc } from 'date-fns-tz';
+  import type { Snippet } from 'svelte';
 
   import Button from '$lib/holocene/button.svelte';
   import DatePicker from '$lib/holocene/date-picker.svelte';
@@ -62,6 +63,12 @@
     // A popover opens without moving focus, so Enter cannot reach the form on
     // its own.
     applyOnEnter?: boolean;
+    // Narrows the operators offered, for query surfaces that accept fewer than
+    // standard visibility.
+    conditionals?: string[];
+    notice?: Snippet;
+    applyLabel?: string;
+    removeLabel?: string;
   };
 
   let {
@@ -71,22 +78,22 @@
     onRemove,
     defaultTimeMode,
     applyOnEnter = false,
+    conditionals,
+    notice,
+    applyLabel = translate('common.apply'),
+    removeLabel = translate('common.remove'),
   }: Props = $props();
 
   let formElement = $state<HTMLFormElement | null>(null);
 
   let localFilter = $state({ ...filter });
 
-  // Local so the radios do not rewrite the persisted preference until applied.
   const timeMode = writable(defaultTimeMode ?? get(timeFormatType));
 
   const timezone = $derived(getTimezone($timeFormat ?? 'UTC'));
 
   let { start, end } = $state(getInitialDateTimes(filter, timezone));
 
-  // The date and time pickers only carry seconds, so recomputing the value from
-  // them would round off a seeded timestamp. Keep what we were given unless the
-  // controls were actually touched.
   const seededTimes = JSON.stringify(getInitialDateTimes(filter, timezone));
   const timesUntouched = () => JSON.stringify({ start, end }) === seededTimes;
 
@@ -175,26 +182,35 @@
   $effect(() => {
     if (!applyOnEnter) return;
 
-    const onKeydown = (e: KeyboardEvent) => {
-      if (e.key !== 'Enter' || e.defaultPrevented || e.isComposing) return;
+    const isPlainEnter = (e: KeyboardEvent) =>
+      e.key === 'Enter' && !e.defaultPrevented && !e.isComposing;
+
+    const submit = (e: KeyboardEvent) => {
+      e.preventDefault();
+      formElement?.requestSubmit();
+    };
+
+    const onTriggerKeydown = (e: KeyboardEvent) => {
+      if (!isPlainEnter(e)) return;
 
       const target = e.target;
       if (!(target instanceof Element)) return;
 
-      // Only the form and the button that opened it. Anything else with focus —
-      // the Copy button beside the trigger, say — keeps its own Enter.
-      const isInsideForm = formElement?.contains(target) ?? false;
       const isOpeningTrigger =
         target
           .closest('[data-menu-anchor]')
           ?.getAttribute('data-menu-anchor') === idPrefix;
-      if (!isInsideForm && !isOpeningTrigger) return;
+      if (isOpeningTrigger) submit(e);
+    };
 
-      // A button in the form already does something with Enter: a toggle flips,
-      // Apply submits.
-      if (target instanceof HTMLButtonElement && isInsideForm) return;
+    const onFormKeydown = (e: KeyboardEvent) => {
+      if (!isPlainEnter(e)) return;
 
-      // The chip input claims Enter to commit a keyword.
+      const target = e.target;
+      if (!(target instanceof Element)) return;
+      if (!formElement?.contains(target)) return;
+      if (target instanceof HTMLButtonElement) return;
+
       if (
         target instanceof HTMLInputElement &&
         target.id === `${idPrefix}-list-filter` &&
@@ -203,12 +219,15 @@
         return;
       }
 
-      e.preventDefault();
-      formElement?.requestSubmit();
+      submit(e);
     };
 
-    document.addEventListener('keydown', onKeydown);
-    return () => document.removeEventListener('keydown', onKeydown);
+    document.addEventListener('keydown', onTriggerKeydown, true);
+    document.addEventListener('keydown', onFormKeydown);
+    return () => {
+      document.removeEventListener('keydown', onTriggerKeydown, true);
+      document.removeEventListener('keydown', onFormKeydown);
+    };
   });
 
   function timeError(x: string) {
@@ -306,23 +325,28 @@
 </script>
 
 {#snippet conditionalButtons(options: { value: string; label: string }[])}
-  <ToggleButtons>
-    {#each options as option (option.value)}
-      <ToggleButton
-        variant="secondary"
-        active={localFilter.conditional === option.value}
-        onclick={() => {
-          if (isNullConditional(option.value)) {
-            localFilter.value = '';
-          } else if (isNullFilter) {
-            localFilter.value = filter.value;
-          }
-          localFilter.conditional = option.value;
-        }}
-        size="xs">{option.label}</ToggleButton
-      >
-    {/each}
-  </ToggleButtons>
+  {@const allowedOptions = conditionals
+    ? options.filter((option) => conditionals.includes(option.value))
+    : options}
+  {#if allowedOptions.length > 1}
+    <ToggleButtons>
+      {#each allowedOptions as option (option.value)}
+        <ToggleButton
+          variant="secondary"
+          active={localFilter.conditional === option.value}
+          onclick={() => {
+            if (isNullConditional(option.value)) {
+              localFilter.value = '';
+            } else if (isNullFilter) {
+              localFilter.value = filter.value;
+            }
+            localFilter.conditional = option.value;
+          }}
+          size="xs">{option.label}</ToggleButton
+        >
+      {/each}
+    </ToggleButtons>
+  {/if}
 {/snippet}
 
 <form bind:this={formElement} onsubmit={applyChanges}>
@@ -535,6 +559,8 @@
       </div>
     {/if}
 
+    {@render notice?.()}
+
     <div class="flex justify-end gap-2">
       {#if onRemove}
         <Button
@@ -543,14 +569,14 @@
           size="xs"
           data-testid="remove-filter-button"
           type="button"
-          onclick={onRemove}>Remove</Button
+          onclick={onRemove}>{removeLabel}</Button
         >
       {/if}
       <Button
         variant="primary"
         size="xs"
         data-testid="apply-filter-button"
-        type="submit">Apply</Button
+        type="submit">{applyLabel}</Button
       >
     </div>
   </div>

@@ -5,9 +5,9 @@ import { getColumnAttribute } from '$lib/utilities/query/quick-filter-table';
 import { sortTableItems } from '$lib/utilities/table-sort';
 
 import {
+  getWorkflowColumnFilter,
   getWorkflowColumnValue,
   getWorkflowSortColumns,
-  UNFILTERABLE_WORKFLOW_COLUMNS,
   WORKFLOW_COLUMN_ATTRIBUTE,
 } from './column-search-attributes';
 
@@ -158,11 +158,62 @@ describe('getWorkflowColumnValue', () => {
     ).toBeUndefined();
   });
 
-  it.each(UNFILTERABLE_WORKFLOW_COLUMNS)(
-    'has no value to filter on for %s',
-    (label) => {
-      expect(getWorkflowColumnValue(label, workflow)).toBeUndefined();
-      expect(WORKFLOW_COLUMN_ATTRIBUTE[label]).toBeUndefined();
-    },
-  );
+  it('has no value to filter on for Parent Namespace', () => {
+    expect(
+      getWorkflowColumnValue('Parent Namespace', workflow),
+    ).toBeUndefined();
+    expect(WORKFLOW_COLUMN_ATTRIBUTE['Parent Namespace']).toBeUndefined();
+  });
+});
+
+describe('getWorkflowColumnFilter', () => {
+  const attributes = {
+    ExecutionStatus: 'Keyword',
+    StartTime: 'Datetime',
+    CustomIntField: 'Int',
+  } as const;
+
+  it('resolves a column to the search attribute and type it filters on', () => {
+    expect(getWorkflowColumnFilter('Status', attributes)).toEqual({
+      attribute: 'ExecutionStatus',
+      type: 'Keyword',
+    });
+    expect(getWorkflowColumnFilter('Start', attributes)).toEqual({
+      attribute: 'StartTime',
+      type: 'Datetime',
+    });
+  });
+
+  it('resolves a custom search attribute column by its name', () => {
+    expect(getWorkflowColumnFilter('CustomIntField', attributes)).toEqual({
+      attribute: 'CustomIntField',
+      type: 'Int',
+    });
+  });
+
+  it('offers no filter for a column with no known search attribute type', () => {
+    expect(getWorkflowColumnFilter('Task Queue', attributes)).toBeUndefined();
+  });
+
+  it('offers a filter only for archival-supported columns on the archival table', () => {
+    const withIds = {
+      ...attributes,
+      WorkflowType: 'Keyword',
+      WorkflowId: 'Keyword',
+      RunId: 'Keyword',
+    } as const;
+
+    expect(
+      getWorkflowColumnFilter('Type', withIds, { archival: true }),
+    ).toEqual({ attribute: 'WorkflowType', type: 'Keyword' });
+    expect(
+      getWorkflowColumnFilter('Run ID', withIds, { archival: true }),
+    ).toEqual({ attribute: 'RunId', type: 'Keyword' });
+    expect(
+      getWorkflowColumnFilter('Status', withIds, { archival: true }),
+    ).toBeUndefined();
+    expect(
+      getWorkflowColumnFilter('Start', withIds, { archival: true }),
+    ).toBeUndefined();
+  });
 });
