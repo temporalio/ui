@@ -205,6 +205,6 @@
 
 <style lang="postcss">
   input {
-    @apply pointer-events-none w-full grow bg-transparent text-sm;
+    @apply pointer-events-none w-full grow bg-transparent;
   }
 </style>
