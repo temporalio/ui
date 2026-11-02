@@ -13,9 +13,12 @@ export const isWorkflowDelayed = (workflow: WorkflowExecution): boolean => {
     workflow.startTime,
   );
 
-  if (!delay || workflow.endTime || isFuture(workflow.startTime)) {
+  const workflowNow =
+    workflow.workflowExtendedInfo?.timeSkippingInfo?.currentTime || new Date();
+
+  if (!delay || workflow.endTime || isFuture(workflow.startTime, workflowNow)) {
     return false;
   }
 
-  return isFuture(workflow.executionTime);
+  return isFuture(workflow.executionTime, workflowNow);
 };

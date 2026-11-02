@@ -64,7 +64,7 @@ describe('isWorkflowDelayed', () => {
     expect(isWorkflowDelayed({ ...workflow, startTime: future })).toBe(false);
   });
 
-  it('suppresses delayed status when time skipping puts start time in the future despite a nonzero delay', () => {
+  it('falls back to browser time to suppress a future start when virtual time is unavailable', () => {
     expect(
       isWorkflowDelayed({
         ...workflow,
@@ -72,6 +72,73 @@ describe('isWorkflowDelayed', () => {
         executionTime: later,
       }),
     ).toBe(false);
+  });
+
+  it('returns false when execution time is ahead of browser time but behind virtual time', () => {
+    expect(
+      isWorkflowDelayed({
+        ...workflow,
+        workflowExtendedInfo: {
+          timeSkippingInfo: {
+            currentTime: { seconds: Date.parse(later) / 1000, nanos: 0 },
+          },
+        },
+      }),
+    ).toBe(false);
+  });
+
+  it('returns true when start time is ahead of browser time but the delay has not elapsed in virtual time', () => {
+    expect(
+      isWorkflowDelayed({
+        ...workflow,
+        startTime: future,
+        executionTime: later,
+        workflowExtendedInfo: {
+          timeSkippingInfo: {
+            currentTime: { seconds: Date.parse(future) / 1000 + 60, nanos: 0 },
+          },
+        },
+      }),
+    ).toBe(true);
+  });
+
+  it('returns false when execution time is exactly the current virtual time', () => {
+    expect(
+      isWorkflowDelayed({
+        ...workflow,
+        workflowExtendedInfo: {
+          timeSkippingInfo: {
+            currentTime: { seconds: Date.parse(future) / 1000, nanos: 0 },
+          },
+        },
+      }),
+    ).toBe(false);
+  });
+
+  it('returns false when start time is ahead of virtual time', () => {
+    expect(
+      isWorkflowDelayed({
+        ...workflow,
+        startTime: future,
+        executionTime: later,
+        workflowExtendedInfo: {
+          timeSkippingInfo: {
+            currentTime: { seconds: Date.parse(now) / 1000, nanos: 0 },
+          },
+        },
+      }),
+    ).toBe(false);
+  });
+
+  it('falls back to browser time when time-skipping info has no current time', () => {
+    expect(
+      isWorkflowDelayed({
+        ...workflow,
+        workflowExtendedInfo: {
+          timeSkippingInfo: { effectiveConfig: { enabled: true } },
+        },
+      }),
+    ).toBe(true);
   });
 
   it('returns true when start time is exactly now and execution time is in the future', () => {
