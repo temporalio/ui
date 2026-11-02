@@ -62,7 +62,13 @@
   const tooltipText = $derived(modifierLabels.join(', '));
 </script>
 
-<Tooltip topLeft text={tooltipText} hide={!modifierLabels.length}>
+<Tooltip
+  topLeft
+  text={tooltipText}
+  hide={!modifierLabels.length}
+  usePortal
+  portalOffset={{ y: -4 }}
+>
   {#if status && isWorkflowStatusType(status)}
     <BadgeStatus
       {status}
