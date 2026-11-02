@@ -38,7 +38,7 @@
 
   type T = $$Generic;
 
-  interface Props extends HTMLInputAttributes {
+  interface Props extends Omit<HTMLInputAttributes, 'size'> {
     label: string;
     id: string;
     children?: Snippet;
@@ -53,6 +53,7 @@
     menuButtonClass?: ClassNameValue;
     menuClass?: ClassNameValue;
     variant?: Extract<ButtonStyles['variant'], 'primary' | 'secondary'>;
+    size?: ButtonStyles['size'];
     required?: boolean;
     valid?: boolean;
     error?: string;
@@ -73,6 +74,7 @@
     menuButtonClass = undefined,
     menuClass = undefined,
     variant = 'secondary',
+    size = 'md',
     required = false,
     error = '',
     valid = true,
@@ -146,6 +148,7 @@
         disabled={disabled || loading}
         controls="{id}-select"
         {variant}
+        {size}
         data-testid="{rest['data-testid'] ?? id}-button"
         data-track-name="select"
         data-track-intent="select"
