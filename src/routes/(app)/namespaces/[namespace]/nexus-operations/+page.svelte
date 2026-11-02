@@ -24,7 +24,7 @@
 
 <StandaloneNexusOperations>
   {#snippet releaseStageBadge()}
-    <Badge text="Pre-release" colorScheme="accent" class="mt-1" />
+    <Badge text="Public Preview" colorScheme="accent" class="mt-1" />
   {/snippet}
   {#snippet headerActions()}
     {#if !startDisabled}
