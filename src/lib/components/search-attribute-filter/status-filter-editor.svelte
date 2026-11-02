@@ -109,6 +109,7 @@
     <MenuItem
       data-testid={`status-dropdown-filter-chip-${status}`}
       onclick={() => handleStatusSelect(status)}
+      class="m-0 gap-0 p-2"
     >
       {#snippet leading()}
         <Checkbox
