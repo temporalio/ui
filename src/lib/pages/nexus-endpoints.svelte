@@ -79,6 +79,7 @@
         class="w-full p-2"
         noBorder
         size="xs"
+        focusRing="inner"
         inputContainerClass="bg-surface-primary"
       />
     </search>
