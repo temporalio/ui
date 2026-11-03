@@ -511,6 +511,7 @@
                   leadingDivider={false}
                   sections={['resource']}
                   idPrefix="replica"
+                  {credentials}
                   bind:values={() => replicaValues, () => {}}
                   lambdaArnPlaceholder={lambdaArnPlaceholderFor(
                     replicaRegion?.providerRegion,
@@ -564,6 +565,7 @@
                     <ComputeFields
                       {provider}
                       sections={['access', 'scaling']}
+                      {credentials}
                       idPrefix="replica"
                       bind:values={() => replicaValues, () => {}}
                       errors={replicaErrors}
