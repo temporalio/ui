@@ -15,9 +15,9 @@ COPY . ./
 
 RUN make build-server
 
-FROM golang:1.26.10-alpine3.23 AS dockerize-builder
+FROM golang:1.27.3-alpine3.23 AS dockerize-builder
 
-ARG DOCKERIZE_VERSION=v0.10.1
+ARG DOCKERIZE_VERSION=v0.16.0
 RUN go install github.com/jwilder/dockerize@${DOCKERIZE_VERSION} && \
     cp $(which dockerize) /usr/local/bin/dockerize
 
@@ -39,7 +39,8 @@ WORKDIR /home/ui-server
 
 RUN addgroup -g 1000 temporal && \
     adduser -u 1000 -G temporal -D temporal && \
-    mkdir ./config
+    mkdir ./config && \
+    chown temporal:temporal ./config
 
 COPY --chown=temporal:temporal --from=server-builder /home/server-builder/ui-server ./
 COPY --chown=temporal:temporal config/docker.yaml ./config/docker.yaml
