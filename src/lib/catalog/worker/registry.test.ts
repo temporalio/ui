@@ -1529,4 +1529,52 @@ describe('generateCatalog', () => {
       'invalid metadata fields',
     );
   });
+
+  it('carries optional pattern tags into the browser descriptor', () => {
+    const workflow = () => undefined;
+    const registerPatternExample = (patternTags?: unknown) => {
+      const registry = createCatalogRegistry();
+
+      registry.registerTarget({
+        id: 'catalog',
+        namespace: 'default',
+        taskQueue: 'catalog',
+        workflowsPath: './workflows',
+        workflowExports: { patternWorkflow: workflow },
+      });
+      registry.registerExample({
+        id: 'pattern-example',
+        title: 'Pattern example',
+        description: 'Declares design patterns.',
+        targetId: 'catalog',
+        capabilityTags: [],
+        ...(patternTags === undefined ? {} : { patternTags }),
+        expectedEvidence: [],
+        input: { defaultValue: [], schema: {} },
+        startOptions: { defaultValue: {}, schema: {} },
+        execution: {
+          kind: 'workflow',
+          workflowType: 'patternWorkflow',
+          workflow,
+          activities: {},
+        },
+      } as never);
+
+      return registry;
+    };
+
+    expect(
+      generateCatalog(registerPatternExample(['batch-processing']))
+        .browserDescriptors[0]?.patternTags,
+    ).toEqual(['batch-processing']);
+    expect(
+      generateCatalog(registerPatternExample()).browserDescriptors[0],
+    ).not.toHaveProperty('patternTags');
+    expect(() =>
+      generateCatalog(registerPatternExample('batch-processing')),
+    ).toThrow('invalid metadata fields');
+    expect(() => generateCatalog(registerPatternExample([42]))).toThrow(
+      'invalid metadata fields',
+    );
+  });
 });
