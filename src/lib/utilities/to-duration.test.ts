@@ -4,6 +4,7 @@ import {
   durations,
   fromDate,
   fromSeconds,
+  fromSecondsPrecise,
   isDuration,
   isDurationKey,
   isDurationString,
@@ -398,6 +399,88 @@ describe('fromSeconds', () => {
     expect(fromSeconds('bogus.01')).toEqual('');
     expect(fromSeconds('10.bogus')).toEqual('');
   });
+});
+
+describe('fromSecondsPrecise', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it.each([
+    ['0s', ''],
+    ['0.00s', ''],
+    ['1s', '1 second'],
+    ['6s', '6 seconds'],
+    ['60s', '1 minute'],
+    ['61s', '1 minute, 1 second'],
+    ['3600s', '1 hour'],
+    ['3661s', '1 hour, 1 minute, 1 second'],
+    ['86400s', '1 day'],
+    ['90061s', '1 day, 1 hour, 1 minute, 1 second'],
+    ['2592000s', '30 days'],
+    ['2678400s', '31 days'],
+    ['31449600s', '364 days'],
+    ['31536000s', '365 days'],
+    ['31622400s', '366 days'],
+    ['31708800s', '367 days'],
+    ['63072000s', '730 days'],
+    ['31712461s', '367 days, 1 hour, 1 minute, 1 second'],
+  ])('formats %s as %s without months or years', (input, expected) => {
+    expect(fromSecondsPrecise(input)).toBe(expected);
+  });
+
+  it.each([
+    ['UTC', 0],
+    ['America/Los_Angeles', 480],
+    ['Europe/London', 0],
+    ['Asia/Kolkata', -330],
+    ['Australia/Sydney', -660],
+  ])(
+    'formats day boundaries consistently in %s',
+    (timezone, expectedOffset) => {
+      vi.stubEnv('TZ', timezone);
+
+      expect(new Date('2026-01-01T00:00:00Z').getTimezoneOffset()).toBe(
+        expectedOffset,
+      );
+      expect(fromSecondsPrecise('31449600s')).toBe('364 days');
+      expect(fromSecondsPrecise('31536000s')).toBe('365 days');
+      expect(fromSecondsPrecise('31708800s')).toBe('367 days');
+    },
+  );
+
+  it.each([
+    ['0.001s', '1 millisecond'],
+    ['0.006s', '6 milliseconds'],
+    ['0.0006s', '0.6 milliseconds'],
+    ['0.000000001s', '0.000001 milliseconds'],
+    ['6.412382134s', '6 seconds, 412 milliseconds'],
+    ['59.32322s', '59 seconds, 323 milliseconds'],
+    ['60.123s', '1 minute'],
+    ['61.123s', '1 minute, 1 second'],
+    ['31708800.123s', '367 days'],
+  ])(
+    'preserves the existing millisecond display rules for %s',
+    (input, expected) => {
+      expect(fromSecondsPrecise(input)).toBe(expected);
+    },
+  );
+
+  it('uses the custom delimiter between units, including milliseconds', () => {
+    expect(fromSecondsPrecise('90061s', { delimiter: ' / ' })).toBe(
+      '1 day / 1 hour / 1 minute / 1 second',
+    );
+    expect(fromSecondsPrecise('6.412s', { delimiter: ' / ' })).toBe(
+      '6 seconds / 412 milliseconds',
+    );
+  });
+
+  it.each(['', 'bogus', 'bogus.01s', '3600m', '3600', '10.boguss'])(
+    'returns an empty string for invalid input %j',
+    (input) => {
+      expect(fromSecondsPrecise(input)).toBe('');
+    },
+  );
 });
 
 describe('durations', () => {
