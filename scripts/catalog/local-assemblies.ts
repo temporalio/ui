@@ -5,8 +5,12 @@ import { pathToFileURL } from 'node:url';
 
 import { format, resolveConfig } from 'prettier';
 
+import { resolveCatalogSourceExecution } from './canonical-assemblies.js';
 import type { CatalogRegistrationSource } from '../../src/lib/catalog/worker/registration-source.js';
-import type { CatalogExampleDefinition } from '../../src/lib/catalog/worker/registry.js';
+import {
+  type CatalogExampleDefinition,
+  resolveCatalogWorkflowExecution,
+} from '../../src/lib/catalog/worker/registry.js';
 
 const generatedHeader = '// GENERATED FILE. DO NOT EDIT.\n';
 const localExamplesPath = 'catalog.local/examples';
@@ -70,17 +74,10 @@ const readLocalExamples = async (
       );
     }
 
-    const kind = /\bkind\s*:\s*['"]([^'"]+)['"]/.exec(source)?.[1];
-    const workflowType =
-      kind === 'workflow'
-        ? /\bworkflowType\s*:\s*['"]([^'"]+)['"]/.exec(source)?.[1]
-        : undefined;
-
-    if (kind === 'workflow' && !workflowType) {
-      throw new Error(
-        `${relative(rootDirectory, examplePath)} must declare a valid workflowType`,
-      );
-    }
+    const { workflowType } = resolveCatalogSourceExecution(
+      source,
+      relative(rootDirectory, examplePath),
+    );
 
     examples.push({
       id: entry.name,
@@ -187,11 +184,10 @@ export const loadLocalCatalogRegistrationSource = async (
     }),
   );
   const workflowExports = Object.fromEntries(
-    definitions.flatMap((definition) =>
-      definition.execution.kind === 'workflow'
-        ? [[definition.execution.workflowType, definition.execution.workflow]]
-        : [],
-    ),
+    definitions.flatMap((definition) => {
+      const workflow = resolveCatalogWorkflowExecution(definition.execution);
+      return workflow ? [[workflow.workflowType, workflow.workflow]] : [];
+    }),
   );
   return {
     source: { id: 'local', label: 'Local' },
