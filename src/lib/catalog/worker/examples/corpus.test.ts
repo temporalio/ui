@@ -46,6 +46,7 @@ const migratedWorkflowTypes = [
 ] as const;
 
 const proofExampleIds = [
+  'continue-as-new',
   'priority-fairness',
   'standalone-activity',
   'nexus-greeting',
@@ -179,6 +180,7 @@ describe('shared workflow corpus', () => {
     expect(Object.keys(target?.workflowExports ?? {}).sort()).toEqual(
       [
         ...migratedWorkflowTypes,
+        'continueAsNewChain',
         'priorityFairnessWorkflow',
         'nexusGreeting',
         'satelliteLaunchEventGroups',
@@ -604,6 +606,8 @@ describe('shared workflow corpus', () => {
         'src/lib/catalog/worker/workflows.ts',
         'src/lib/catalog/worker/examples/inventory.ts',
         'src/lib/catalog/worker/examples/index.ts',
+        'src/lib/catalog/worker/examples/continue-as-new/example.ts',
+        'src/lib/catalog/worker/examples/continue-as-new/workflow.ts',
         'src/lib/catalog/worker/examples/shared-activities.ts',
         'src/lib/catalog/worker/examples/hello/example.ts',
         'src/lib/catalog/worker/examples/hello/workflow.ts',

@@ -60,6 +60,7 @@ import {
   routeForWorkers,
   routeForWorkersWithQuery,
   routeForWorkflow,
+  routeForWorkflowChain,
   routeForWorkflowMemo,
   routeForWorkflowQuery,
   routeForWorkflows,
@@ -91,6 +92,7 @@ describe('routeFor functions should resolve the base path exactly once', () => {
   };
 
   const cases: [string, () => string | undefined][] = [
+    ['routeForWorkflowChain', () => routeForWorkflowChain(workflowParams)],
     ['routeForNamespaces', () => routeForNamespaces()],
     ['routeForNexus', () => routeForNexus()],
     [

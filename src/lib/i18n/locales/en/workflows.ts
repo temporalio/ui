@@ -1,6 +1,12 @@
 export const Namespace = 'workflows' as const;
 
 export const Strings = {
+  'execution-chain': 'Workflow execution chain',
+
+  'execution-chain-placeholder':
+    'The execution chain visualization is not implemented yet.',
+  'execution-chain-back': 'Back to workflows',
+  'execution-chain-view-execution': 'View entry execution',
   'loading-workflows': 'Loading workflows',
   'recent-workflows': 'Recent Workflows',
   'recent-workflows-link': 'View Recent Workflows',

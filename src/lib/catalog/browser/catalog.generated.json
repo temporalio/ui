@@ -1,5 +1,5 @@
 {
-  "sourceHash": "ab1d28559cd8149433f8505b38591843db129021116c4f63f3a2a9f5e2b9f690",
+  "sourceHash": "91d6c0b568d98f47fca726e41b49f2b221e088705072c3417318a553de042dfc",
   "descriptors": [
     {
       "id": "activity-heartbeat",
@@ -225,6 +225,61 @@
         "namespace": "default",
         "taskQueue": "ui-catalog",
         "workflowType": "childWorkflowTest"
+      },
+      "source": { "id": "oss", "label": "OSS" }
+    },
+    {
+      "id": "continue-as-new",
+      "title": "Continue-As-New chain",
+      "description": "Creates a bounded chain of workflow runs with the same Workflow ID and distinct Run IDs, then completes the final run.",
+      "capabilityTags": ["continue-as-new", "timers", "terminal-outcome"],
+      "expectedEvidence": [
+        "Five runs with the same Workflow ID and distinct Run IDs using the default inputs.",
+        "The first four runs have Continued-As-New status and link to the next run; the fifth completes.",
+        "Each run contains a durable timer and carries its progress into the next run through workflow input.",
+        "The final workflow result reports the total number of runs in the chain."
+      ],
+      "input": {
+        "defaultValue": [5, 2],
+        "schema": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "title": "Total runs in the chain",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 25
+            },
+            {
+              "title": "Delay per run in seconds",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 30
+            }
+          ],
+          "items": false,
+          "maxItems": 2
+        }
+      },
+      "startOptions": {
+        "defaultValue": {},
+        "schema": {
+          "type": "object",
+          "properties": {
+            "details": { "type": "string" },
+            "searchAttributes": { "type": "object" },
+            "summary": { "type": "string" },
+            "workflowStartDelay": { "type": "string" },
+            "workflowId": { "type": "string", "minLength": 1 }
+          }
+        }
+      },
+      "execution": {
+        "kind": "workflow",
+        "targetId": "shared-workflows",
+        "namespace": "default",
+        "taskQueue": "ui-catalog",
+        "workflowType": "continueAsNewChain"
       },
       "source": { "id": "oss", "label": "OSS" }
     },
