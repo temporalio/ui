@@ -56,6 +56,19 @@ export type ComputeProviderType =
   | 'gcp-cloud-run'
   | 'modal-function';
 
+/**
+ * A consumer's templates, by provider.
+ *
+ * Exhaustive, so a provider added here stops a consumer compiling until it
+ * says what that provider offers. The value is optional because the answer
+ * may be nothing: a Modal App is deployed from the customer's own project,
+ * so there is no infrastructure to hand them.
+ */
+export type ComputeProviderTemplateMap = Record<
+  ComputeProviderValue,
+  ComputeProviderTemplates | undefined
+>;
+
 export type ComputeProviderReleaseStage =
   | 'public-preview'
   | 'pre-release'

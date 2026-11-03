@@ -8,7 +8,7 @@
   import Card from '$lib/holocene/card.svelte';
   import { translate } from '$lib/i18n/translate';
 
-  import { type ComputeProviderTemplates } from './compute-providers';
+  import { type ComputeProviderTemplateMap } from './compute-providers';
   import type { ComputeSection } from './fields/types';
   import { revealFirstProblem } from './motion';
   import {
@@ -62,7 +62,7 @@
      * adding a provider fails the consumer's type check until it supplies
      * templates for it.
      */
-    templates?: Record<ComputeProviderValue, ComputeProviderTemplates>;
+    templates?: ComputeProviderTemplateMap;
     /**
      * Regions this namespace runs in. When more than one is provided (a highly
      * available namespace), the form edits a compute provider per region.

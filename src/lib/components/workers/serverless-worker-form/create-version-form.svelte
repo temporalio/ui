@@ -11,7 +11,7 @@
   import type { VersionSummary } from '$lib/types/deployments';
 
   import {
-    type ComputeProviderTemplates,
+    type ComputeProviderTemplateMap,
     type ComputeProviderValue,
   } from './compute-providers';
   import type { ComputeSection } from './fields/types';
@@ -63,7 +63,7 @@
      * adding a provider fails the consumer's type check until it supplies
      * templates for it.
      */
-    templates?: Record<ComputeProviderValue, ComputeProviderTemplates>;
+    templates?: ComputeProviderTemplateMap;
     /**
      * Regions this namespace runs in. When more than one is provided (a highly
      * available namespace), the form collects a compute provider per region.

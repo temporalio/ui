@@ -1,6 +1,6 @@
 <script lang="ts">
   import {
-    type ComputeProviderTemplates,
+    type ComputeProviderTemplateMap,
     type ComputeProviderValue,
   } from '$lib/components/workers/serverless-worker-form/compute-providers';
   import CreateVersionForm from '$lib/components/workers/serverless-worker-form/create-version-form.svelte';
@@ -34,7 +34,7 @@
     namespace: string;
     deployment: string;
     onSuccess: () => void;
-    templates?: Record<ComputeProviderValue, ComputeProviderTemplates>;
+    templates?: ComputeProviderTemplateMap;
     /**
      * The providers this Namespace may use and the regions it lives in. Two
      * or more regions turn on high availability.

@@ -3,7 +3,7 @@
 
   import DeleteWorkerModal from '$lib/components/workers/delete-worker-modal.svelte';
   import {
-    type ComputeProviderTemplates,
+    type ComputeProviderTemplateMap,
     type ComputeProviderValue,
   } from '$lib/components/workers/serverless-worker-form/compute-providers';
   import EditVersionForm from '$lib/components/workers/serverless-worker-form/edit-version-form.svelte';
@@ -40,7 +40,7 @@
     namespace: string;
     deployment: string;
     buildId: string;
-    templates?: Record<ComputeProviderValue, ComputeProviderTemplates>;
+    templates?: ComputeProviderTemplateMap;
     /**
      * The providers this Namespace may use and the regions it lives in. Two
      * or more regions turn on high availability.

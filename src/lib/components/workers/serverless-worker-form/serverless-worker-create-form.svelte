@@ -10,7 +10,7 @@
   import { translate } from '$lib/i18n/translate';
 
   import {
-    type ComputeProviderTemplates,
+    type ComputeProviderTemplateMap,
     type ComputeProviderValue,
   } from './compute-providers';
   import type { ComputeSection } from './fields/types';
@@ -54,7 +54,7 @@
     ) => Promise<SubmitFieldErrors | void>;
     onSuccess: () => void;
     cancelHref: string;
-    templates?: Record<ComputeProviderValue, ComputeProviderTemplates>;
+    templates?: ComputeProviderTemplateMap;
     computeProviders?: readonly ComputeProviderOption[];
     gcpRegions?: string[];
     /** Credential components supplied by the consumer, keyed by provider. */
