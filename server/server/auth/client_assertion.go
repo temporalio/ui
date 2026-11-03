@@ -36,26 +36,22 @@ import (
 
 const clientAssertionType = "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"
 
-// WithClientAssertionFile returns a context whose token endpoint requests authenticate with the JWT in path (RFC 7523) instead of a client secret.
-func WithClientAssertionFile(ctx context.Context, cfg *oauth2.Config, path string) context.Context {
-	cfg.ClientSecret = ""
-	cfg.Endpoint.AuthStyle = oauth2.AuthStyleInParams
+// WithClientAssertionFile returns a context whose token endpoint requests authenticate with the JWT in provided path (RFC 7523).
+func WithClientAssertionFile(ctx context.Context, path string) context.Context {
 	client := &http.Client{Transport: &clientAssertionTransport{
-		tokenURL: cfg.Endpoint.TokenURL,
-		path:     path,
-		next:     http.DefaultTransport,
+		path: path,
+		next: http.DefaultTransport,
 	}}
 	return context.WithValue(ctx, oauth2.HTTPClient, client)
 }
 
 type clientAssertionTransport struct {
-	tokenURL string
-	path     string
-	next     http.RoundTripper
+	path string
+	next http.RoundTripper
 }
 
 func (t *clientAssertionTransport) RoundTrip(r *http.Request) (*http.Response, error) {
-	if r.Method != http.MethodPost || r.URL.String() != t.tokenURL {
+	if r.Method != http.MethodPost {
 		return t.next.RoundTrip(r)
 	}
 

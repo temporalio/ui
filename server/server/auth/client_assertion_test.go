@@ -59,11 +59,10 @@ func TestWithClientAssertionFile(t *testing.T) {
 	require.NoError(t, os.WriteFile(path, []byte("first-jwt\n"), 0o600))
 
 	cfg := &oauth2.Config{
-		ClientID:     "client-id",
-		ClientSecret: "ignored",
-		Endpoint:     oauth2.Endpoint{TokenURL: srv.URL + "/token"},
+		ClientID: "client-id",
+		Endpoint: oauth2.Endpoint{TokenURL: srv.URL + "/token", AuthStyle: oauth2.AuthStyleInParams},
 	}
-	ctx := auth.WithClientAssertionFile(context.Background(), cfg, path)
+	ctx := auth.WithClientAssertionFile(context.Background(), path)
 
 	_, err := cfg.Exchange(ctx, "code")
 	require.NoError(t, err)
@@ -98,8 +97,8 @@ func TestWithClientAssertionFileErrors(t *testing.T) {
 		"empty file":   empty,
 	} {
 		t.Run(name, func(t *testing.T) {
-			cfg := &oauth2.Config{ClientID: "client-id", Endpoint: oauth2.Endpoint{TokenURL: srv.URL + "/token"}}
-			ctx := auth.WithClientAssertionFile(context.Background(), cfg, path)
+			cfg := &oauth2.Config{ClientID: "client-id", Endpoint: oauth2.Endpoint{TokenURL: srv.URL + "/token", AuthStyle: oauth2.AuthStyleInParams}}
+			ctx := auth.WithClientAssertionFile(context.Background(), path)
 
 			_, err := cfg.Exchange(ctx, "code")
 			assert.Error(t, err)

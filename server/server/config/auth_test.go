@@ -23,20 +23,29 @@
 package config
 
 import (
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestAuthProviderValidateClientCredentials(t *testing.T) {
+	dir := t.TempDir()
+	tokenFile := filepath.Join(dir, "token")
+	require.NoError(t, os.WriteFile(tokenFile, []byte("jwt"), 0o600))
+	missingFile := filepath.Join(dir, "missing")
+
 	tests := map[string]struct {
 		secret, assertionFile string
 		wantErr               bool
 	}{
-		"secret":            {secret: "s"},
-		"assertion file":    {assertionFile: "/var/run/token"},
-		"neither":           {},
-		"both are rejected": {secret: "s", assertionFile: "/var/run/token", wantErr: true},
+		"secret":                 {secret: "s"},
+		"assertion file":         {assertionFile: tokenFile},
+		"neither":                {},
+		"both are rejected":      {secret: "s", assertionFile: tokenFile, wantErr: true},
+		"missing assertion file": {assertionFile: missingFile, wantErr: true},
 	}
 
 	for name, tt := range tests {
