@@ -50,11 +50,6 @@
       gcpRegion?: string[];
       gcpWorkerPool?: string[];
       gcpServiceAccount?: string[];
-      modalAppName?: string[];
-      modalFunctionName?: string[];
-      modalEnvironment?: string[];
-      modalWorkspaceId?: string[];
-      modalVersion?: string[];
       minReplicas?: string[];
       maxReplicas?: string[];
       initialReplicas?: string[];
@@ -182,9 +177,7 @@
         : translate('workers.show-defaults')}
     </Button>
   </div>
-  <!-- Modal joins the invoke-based providers: it pairs with the same `no-sync`
-  scaler, and these are the four knobs the Modal demo tuned. -->
-  {#if showScaling && (provider === 'lambda' || provider === 'agentcore' || provider === 'modal')}
+  {#if showScaling && (provider === 'lambda' || provider === 'agentcore')}
     <div class="mt-4 flex flex-col gap-4">
       <Input
         value={values.scaleUpCooloffMs !== undefined
