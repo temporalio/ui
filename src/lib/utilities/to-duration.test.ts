@@ -4,7 +4,6 @@ import {
   durations,
   fromDate,
   fromSeconds,
-  fromSecondsPrecise,
   isDuration,
   isDurationKey,
   isDurationString,
@@ -401,7 +400,7 @@ describe('fromSeconds', () => {
   });
 });
 
-describe('fromSecondsPrecise', () => {
+describe('fromSeconds fixed-duration formatting', () => {
   afterEach(() => {
     vi.unstubAllEnvs();
   });
@@ -426,7 +425,7 @@ describe('fromSecondsPrecise', () => {
     ['63072000s', '730 days'],
     ['31712461s', '367 days, 1 hour, 1 minute, 1 second'],
   ])('formats %s as %s without months or years', (input, expected) => {
-    expect(fromSecondsPrecise(input)).toBe(expected);
+    expect(fromSeconds(input)).toBe(expected);
   });
 
   it.each([
@@ -444,9 +443,9 @@ describe('fromSecondsPrecise', () => {
       expect(new Date('2026-01-01T00:00:00Z').getTimezoneOffset()).toBe(
         expectedOffset,
       );
-      expect(fromSecondsPrecise('31449600s')).toBe('364 days');
-      expect(fromSecondsPrecise('31536000s')).toBe('365 days');
-      expect(fromSecondsPrecise('31708800s')).toBe('367 days');
+      expect(fromSeconds('31449600s')).toBe('364 days');
+      expect(fromSeconds('31536000s')).toBe('365 days');
+      expect(fromSeconds('31708800s')).toBe('367 days');
     },
   );
 
@@ -463,15 +462,15 @@ describe('fromSecondsPrecise', () => {
   ])(
     'preserves the existing millisecond display rules for %s',
     (input, expected) => {
-      expect(fromSecondsPrecise(input)).toBe(expected);
+      expect(fromSeconds(input)).toBe(expected);
     },
   );
 
   it('uses the custom delimiter between units, including milliseconds', () => {
-    expect(fromSecondsPrecise('90061s', { delimiter: ' / ' })).toBe(
+    expect(fromSeconds('90061s', { delimiter: ' / ' })).toBe(
       '1 day / 1 hour / 1 minute / 1 second',
     );
-    expect(fromSecondsPrecise('6.412s', { delimiter: ' / ' })).toBe(
+    expect(fromSeconds('6.412s', { delimiter: ' / ' })).toBe(
       '6 seconds / 412 milliseconds',
     );
   });
@@ -479,9 +478,60 @@ describe('fromSecondsPrecise', () => {
   it.each(['', 'bogus', 'bogus.01s', '3600m', '3600', '10.boguss'])(
     'returns an empty string for invalid input %j',
     (input) => {
-      expect(fromSecondsPrecise(input)).toBe('');
+      expect(fromSeconds(input)).toBe('');
     },
   );
+});
+
+describe('fromSeconds unit selection', () => {
+  it('requires explicit opt-in for fixed month and year estimates', () => {
+    expect(fromSeconds('31536000s')).toBe('365 days');
+    expect(fromSeconds('31536000s', { units: ['year-365', 'day'] })).toBe(
+      '1 year',
+    );
+    expect(fromSeconds('2592000s', { units: ['month-30', 'day'] })).toBe(
+      '1 month',
+    );
+    expect(fromSeconds('2678400s', { units: ['month-30', 'day'] })).toBe(
+      '1 month, 1 day',
+    );
+    expect(
+      fromSeconds('36892800s', { units: ['year-365', 'month-30', 'day'] }),
+    ).toBe('1 year, 2 months, 2 days');
+  });
+
+  it('rolls omitted units into smaller selected units', () => {
+    expect(
+      fromSeconds('31708800s', {
+        units: ['hour', 'minute', 'second', 'millisecond'],
+      }),
+    ).toBe('8808 hours');
+    expect(fromSeconds('3661s', { units: ['minute', 'second'] })).toBe(
+      '61 minutes, 1 second',
+    );
+    expect(fromSeconds('61s', { units: ['millisecond'] })).toBe(
+      '61000 milliseconds',
+    );
+  });
+
+  it('orders units largest first and ignores duplicates', () => {
+    expect(
+      fromSeconds('90061s', {
+        units: ['second', 'day', 'minute', 'hour', 'day'],
+      }),
+    ).toBe('1 day, 1 hour, 1 minute, 1 second');
+  });
+
+  it('omits milliseconds when they are not selected', () => {
+    expect(fromSeconds('6.412s', { units: ['second'] })).toBe('6 seconds');
+    expect(fromSeconds('0.412s', { units: ['second'] })).toBe('');
+  });
+
+  it('omits remainders smaller than the selected units', () => {
+    expect(fromSeconds('3661s', { units: ['hour'] })).toBe('1 hour');
+    expect(fromSeconds('3599s', { units: ['hour'] })).toBe('');
+    expect(fromSeconds('3661s', { units: [] })).toBe('');
+  });
 });
 
 describe('durations', () => {

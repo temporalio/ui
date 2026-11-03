@@ -5,7 +5,7 @@
   import Accordion from '$lib/holocene/accordion/accordion.svelte';
   import { translate } from '$lib/i18n/translate';
   import { fromScreamingEnum } from '$lib/utilities/screaming-enums';
-  import { fromSecondsPrecise } from '$lib/utilities/to-duration';
+  import { fromSeconds } from '$lib/utilities/to-duration';
 
   import { summarizeScheduleSpec } from '../utilities/summarize';
 
@@ -83,7 +83,7 @@
       </dt>
       <dd>
         {policies?.catchupWindow != null
-          ? fromSecondsPrecise(policies.catchupWindow.toString())
+          ? fromSeconds(policies.catchupWindow.toString())
           : translate('common.none')}
       </dd>
     </div>
