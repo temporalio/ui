@@ -9,6 +9,7 @@
   import EditVersionForm from '$lib/components/workers/serverless-worker-form/edit-version-form.svelte';
   import {
     computeRegionsFor,
+    scalingGroupsToRemove,
     splitHighAvailabilityGroups,
   } from '$lib/components/workers/serverless-worker-form/multi-region';
   import {
@@ -109,26 +110,13 @@
       cancelHref={backHref}
       onSubmit={async (data, regionValues) => {
         error = undefined;
-        // Each group keeps its saved name, so an edit updates it in place.
         const computeConfig = regionValues
-          ? buildComputeConfigForRegions(
-              regionValues.map((entry) => ({
-                ...entry,
-                name:
-                  entry.scoped === false
-                    ? groups.primary?.name
-                    : groups.replica?.name,
-              })),
-            )
+          ? buildComputeConfigForRegions(regionValues)
           : buildComputeConfigFromForm(data);
-        // Only the groups this form edits are removed: the replica's, when
-        // high availability is turned off. Any other group is left alone.
-        const removeScalingGroups = regionValues
-          ? [groups.primary?.name, groups.replica?.name].filter(
-              (name): name is string =>
-                !!name && !(name in (computeConfig.scalingGroups ?? {})),
-            )
-          : [];
+        const removeScalingGroups = scalingGroupsToRemove(
+          info.computeConfig,
+          computeConfig,
+        );
         await updateWorkerDeploymentVersionComputeConfig(
           {
             namespace,
