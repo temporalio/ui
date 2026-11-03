@@ -1,18 +1,17 @@
 <!-- The service account Cloud Run runs the Worker as. -->
 <script lang="ts">
-  import Accordion from '$lib/holocene/accordion/accordion.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { IconInfo } from '$lib/io/icon';
 
+  import type { ComputeSectionProps } from './types';
   import {
     hasCloudRunImpersonatorPlaceholder,
     interpolateCloudRunTerraformTemplate,
   } from '../cloud-run-terraform';
-  import { ACCORDION_CLASS } from './accordion-class';
-  import type { ComputeSectionProps } from './types';
+
+  import SetupHelpAccordion from './setup-help-accordion.svelte';
 
   let {
     values = $bindable(),
@@ -48,37 +47,33 @@
     required
   />
   {#if provider === 'cloud-run'}
-    <Accordion
-      Icon={IconInfo}
+    <SetupHelpAccordion
       title={translate('workers.cloud-run-setup-prompt')}
       bind:open={showCloudRunHelp}
-      class={ACCORDION_CLASS}
     >
-      <div class="-mt-8 flex flex-col gap-3 pt-3">
-        <p class="text-sm text-secondary">
-          {translate('workers.cloud-run-terraform-description-before')}<Link
-            href="https://github.com/temporalio/terraform-modules/tree/main/modules/serverless-workers/gcp/cloud-run"
-            newTab>{translate('workers.cloud-run-terraform-module-link')}</Link
-          >{translate('workers.cloud-run-terraform-description-after')}
+      <p class="text-sm text-secondary">
+        {translate('workers.cloud-run-terraform-description-before')}<Link
+          href="https://github.com/temporalio/terraform-modules/tree/main/modules/serverless-workers/gcp/cloud-run"
+          newTab>{translate('workers.cloud-run-terraform-module-link')}</Link
+        >{translate('workers.cloud-run-terraform-description-after')}
+      </p>
+      {#if showCloudRunImpersonatorWarning}
+        <p class="text-sm text-warning">
+          {translate('workers.cloud-run-impersonator-warning')}
         </p>
-        {#if showCloudRunImpersonatorWarning}
-          <p class="text-sm text-warning">
-            {translate('workers.cloud-run-impersonator-warning')}
-          </p>
-        {/if}
-        <CodeBlock
-          content={resolvedCloudRunTerraformTemplate}
-          language="text"
-          maxHeight={300}
-          copyable
-          label={translate('workers.cloud-run-terraform-module-link')}
-          copyIconTitle={translate('workers.copy-snippet')}
-          copySuccessIconTitle={translate('workers.copied')}
-        />
-        <p class="text-sm text-secondary">
-          {translate('workers.cloud-run-invoker-handoff')}
-        </p>
-      </div>
-    </Accordion>
+      {/if}
+      <CodeBlock
+        content={resolvedCloudRunTerraformTemplate}
+        language="text"
+        maxHeight={300}
+        copyable
+        label={translate('workers.cloud-run-terraform-module-link')}
+        copyIconTitle={translate('workers.copy-snippet')}
+        copySuccessIconTitle={translate('workers.copied')}
+      />
+      <p class="text-sm text-secondary">
+        {translate('workers.cloud-run-invoker-handoff')}
+      </p>
+    </SetupHelpAccordion>
   {/if}
 </div>

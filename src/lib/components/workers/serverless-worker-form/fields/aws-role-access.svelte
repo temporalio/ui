@@ -6,7 +6,6 @@
   provider rather than being shared.
 -->
 <script lang="ts">
-  import Accordion from '$lib/holocene/accordion/accordion.svelte';
   import Button from '$lib/holocene/button.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Input from '$lib/holocene/input/input.svelte';
@@ -14,12 +13,13 @@
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { IconExternalLinkOptical, IconInfo } from '$lib/io/icon';
+  import { IconExternalLinkOptical } from '$lib/io/icon';
 
+  import type { ComputeSectionProps } from './types';
   import { TERRAFORM_MODULES } from '../terraform-modules';
   import { interpolateTerraformTemplate } from '../terraform-template';
-  import { ACCORDION_CLASS } from './accordion-class';
-  import type { ComputeSectionProps } from './types';
+
+  import SetupHelpAccordion from './setup-help-accordion.svelte';
 
   let {
     values = $bindable(),
@@ -112,67 +112,63 @@
     required
   />
   {#if provider === 'lambda' || provider === 'agentcore'}
-    <Accordion
-      Icon={IconInfo}
+    <SetupHelpAccordion
       title={translate('workers.no-role-prompt')}
       bind:open={showRoleHelp}
-      class={ACCORDION_CLASS}
     >
-      <div class="-mt-8 flex flex-col gap-3 pt-3">
-        <ToggleButtons>
-          <ToggleButton
+      <ToggleButtons>
+        <ToggleButton
+          variant="tertiary"
+          size="sm"
+          active={activeRoleHelpTab === 'cloudformation'}
+          onclick={() => (activeRoleHelpTab = 'cloudformation')}
+        >
+          {translate('workers.cfn-tab')}
+        </ToggleButton>
+        <ToggleButton
+          variant="tertiary"
+          size="sm"
+          active={activeRoleHelpTab === 'terraform'}
+          onclick={() => (activeRoleHelpTab = 'terraform')}
+        >
+          {translate('workers.terraform-tab')}
+        </ToggleButton>
+      </ToggleButtons>
+      {#if activeRoleHelpTab === 'cloudformation'}
+        <p class="text-sm text-secondary">
+          {translate('workers.launch-stack-description')}
+        </p>
+        <div class="flex flex-wrap items-center gap-4">
+          <Button
             variant="tertiary"
             size="sm"
-            active={activeRoleHelpTab === 'cloudformation'}
-            onclick={() => (activeRoleHelpTab = 'cloudformation')}
+            href={launchStackHref}
+            target="_blank"
+            TrailingIcon={IconExternalLinkOptical}
           >
-            {translate('workers.cfn-tab')}
-          </ToggleButton>
-          <ToggleButton
-            variant="tertiary"
-            size="sm"
-            active={activeRoleHelpTab === 'terraform'}
-            onclick={() => (activeRoleHelpTab = 'terraform')}
-          >
-            {translate('workers.terraform-tab')}
-          </ToggleButton>
-        </ToggleButtons>
-        {#if activeRoleHelpTab === 'cloudformation'}
-          <p class="text-sm text-secondary">
-            {translate('workers.launch-stack-description')}
-          </p>
-          <div class="flex flex-wrap items-center gap-4">
-            <Button
-              variant="tertiary"
-              size="sm"
-              href={launchStackHref}
-              target="_blank"
-              TrailingIcon={IconExternalLinkOptical}
-            >
-              {translate('workers.launch-stack')}
-            </Button>
-            <Button variant="tertiary" size="sm" onclick={downloadCfnTemplate}>
-              {translate('workers.download-template')}
-            </Button>
-          </div>
-        {:else}
-          <p class="text-sm text-secondary">
-            {translate('workers.terraform-description-before')}<Link
-              href={terraformModuleHref}
-              newTab>{translate('workers.terraform-iam-module-link')}</Link
-            >{translate('workers.terraform-description-after')}
-          </p>
-          <CodeBlock
-            content={resolvedTerraformTemplate}
-            language="text"
-            maxHeight={300}
-            copyable
-            label={translate('workers.terraform-iam-module-link')}
-            copyIconTitle={translate('workers.copy-snippet')}
-            copySuccessIconTitle={translate('workers.copied')}
-          />
-        {/if}
-      </div>
-    </Accordion>
+            {translate('workers.launch-stack')}
+          </Button>
+          <Button variant="tertiary" size="sm" onclick={downloadCfnTemplate}>
+            {translate('workers.download-template')}
+          </Button>
+        </div>
+      {:else}
+        <p class="text-sm text-secondary">
+          {translate('workers.terraform-description-before')}<Link
+            href={terraformModuleHref}
+            newTab>{translate('workers.terraform-iam-module-link')}</Link
+          >{translate('workers.terraform-description-after')}
+        </p>
+        <CodeBlock
+          content={resolvedTerraformTemplate}
+          language="text"
+          maxHeight={300}
+          copyable
+          label={translate('workers.terraform-iam-module-link')}
+          copyIconTitle={translate('workers.copy-snippet')}
+          copySuccessIconTitle={translate('workers.copied')}
+        />
+      {/if}
+    </SetupHelpAccordion>
   {/if}
 </div>
