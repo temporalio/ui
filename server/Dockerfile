@@ -1,7 +1,7 @@
 ARG BUILDER_BASE_IMAGE=golang:1.27.3-alpine3.24
 ARG ALPINE_TAG=3.24
 
-FROM golang:${BUILDER_BASE_IMAGE} AS server-builder
+FROM ${BUILDER_BASE_IMAGE} AS server-builder
 
 RUN apk upgrade --no-cache && \
     apk add --no-cache \
@@ -18,7 +18,7 @@ COPY . ./
 
 RUN make build-server
 
-FROM golang:${BUILDER_BASE_IMAGE} AS dockerize-builder
+FROM ${BUILDER_BASE_IMAGE} AS dockerize-builder
 
 ARG DOCKERIZE_VERSION=v0.16.0
 RUN go install github.com/jwilder/dockerize@${DOCKERIZE_VERSION} && \
