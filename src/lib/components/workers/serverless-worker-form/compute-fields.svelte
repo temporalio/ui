@@ -114,6 +114,11 @@
   // A provider that declares no Access section loses the heading and the
   // dividers with it, rather than showing an empty one.
   const hasAccessFields = $derived(!!AccessFields);
+  // The resource section needs this too: a consumer that owns the credentials
+  // may own a resource field with them.
+  const credentialsSupplied = $derived(
+    !!providerValue && !!credentials?.[providerValue],
+  );
 
   const providerTemplates = $derived(
     providerValue ? templates[providerValue] : undefined,
@@ -143,6 +148,7 @@
       bind:values
       {errors}
       {fieldId}
+      {credentialsSupplied}
       resourcePlaceholder={lambdaArnPlaceholder}
       deployRegions={gcpRegions}
     />

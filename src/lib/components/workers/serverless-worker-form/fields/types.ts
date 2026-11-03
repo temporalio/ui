@@ -33,6 +33,16 @@ export interface ComputeSectionProps {
   templates?: ComputeProviderTemplates;
   /** The provider's published Terraform module, when it has one. */
   terraformModuleHref?: string;
+  /**
+   * True when the consumer supplied this provider's credential fields.
+   *
+   * A resource section reads it to drop a field the consumer's credentials
+   * now determine. Modal's workspace is the case this exists for: typed in
+   * open source, where one API key owns one workspace, but chosen with the
+   * connection in Temporal Cloud, where the grant is per workspace. Without
+   * this the picker and a text input would both claim the same value.
+   */
+  credentialsSupplied?: boolean;
 }
 
 export type ComputeSection = Component<ComputeSectionProps>;
