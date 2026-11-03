@@ -110,9 +110,8 @@ export function isFuture(
 ): boolean {
   if (!time) return false;
 
-  const nowDate = now ? validTimeToDate(now) : new Date();
-
   try {
+    const nowDate = now ? validTimeToDate(now) : new Date();
     const date = isTimestamp(time) ? timestampToDate(time) : new Date(time);
     return date > nowDate;
   } catch {
