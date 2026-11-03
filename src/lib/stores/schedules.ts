@@ -96,6 +96,7 @@ export async function submitCreateSchedule(
   } catch (error) {
     const errorMessage = translate('schedules.create-schedule-error', {
       error: getErrorMessage(error),
+      escapeValue: false,
     });
     serverError.set(errorMessage);
     toaster.push({ variant: 'error', message: errorMessage });
@@ -120,6 +121,7 @@ export async function submitCreateSchedule(
   } catch (error) {
     const errorMessage = translate('schedules.create-schedule-error', {
       error: getErrorMessage(error),
+      escapeValue: false,
     });
     serverError.set(errorMessage);
     toaster.push({ variant: 'error', message: errorMessage });
@@ -139,6 +141,7 @@ export async function submitEditSchedule(
   } catch (error) {
     const errorMessage = translate('schedules.edit-schedule-error', {
       error: getErrorMessage(error),
+      escapeValue: false,
     });
     serverError.set(errorMessage);
     toaster.push({ variant: 'error', message: errorMessage });
@@ -163,6 +166,7 @@ export async function submitEditSchedule(
   } catch (error) {
     const errorMessage = translate('schedules.edit-schedule-error', {
       error: getErrorMessage(error),
+      escapeValue: false,
     });
     serverError.set(errorMessage);
     toaster.push({ variant: 'error', message: errorMessage });
