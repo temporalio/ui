@@ -365,13 +365,16 @@
     roleExternalId: settings.roleExternalId,
     gcpProject: settings.gcpProject,
     gcpServiceAccount: settings.gcpServiceAccount,
-    // Modal is not offered per region: its Function is named by App and
-    // Function, which carry no region, so there is nothing to vary.
-    modalAppName: '',
-    modalFunctionName: '',
-    modalEnvironment: '',
-    modalWorkspaceId: '',
-    modalVersion: '',
+    // A Modal Function is named by App and Function, which carry no region,
+    // so there is nothing to vary per region -- every region saves the same
+    // coordinates. They are carried rather than blanked: this is what a
+    // region saves, and blanking them failed validation on fields the person
+    // had filled in, with no way to submit.
+    modalAppName: settings.modalAppName,
+    modalFunctionName: settings.modalFunctionName,
+    modalEnvironment: settings.modalEnvironment,
+    modalWorkspaceId: settings.modalWorkspaceId,
+    modalVersion: settings.modalVersion,
     minReplicas: settings.minReplicas,
     maxReplicas: settings.maxReplicas,
     initialReplicas: settings.initialReplicas,
