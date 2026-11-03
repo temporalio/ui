@@ -433,6 +433,7 @@ describe('fromSecondsPrecise', () => {
     ['UTC', 0],
     ['America/Los_Angeles', 480],
     ['Europe/London', 0],
+    ['Europe/Madrid', -60],
     ['Asia/Kolkata', -330],
     ['Australia/Sydney', -660],
   ])(
