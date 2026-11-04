@@ -12,7 +12,7 @@ export const darkTheme = {
       brand: colorScales.indigo[8],
       primary: colorScales.slate[1],
       secondary: colorScales.slate[6],
-      tertiary: colorScales.neutral[4],
+      tertiary: colorScales.slate[8],
       information: colorScales.blue[7],
       success: colorScales.green[7],
       warning: colorScales.amber[7],
