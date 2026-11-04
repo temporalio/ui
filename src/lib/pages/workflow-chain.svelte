@@ -12,7 +12,7 @@
 
   const namespace = $derived(page.params.namespace);
   const workflow = $derived(page.params.workflow);
-  const run = $derived(page.params.run);
+  const firstRunId = $derived(page.params.firstRunId);
 </script>
 
 <PageTitle title={translate('workflows.execution-chain')} url={page.url.href} />
@@ -26,7 +26,7 @@
       <Link href={routeForWorkflows({ namespace })}>
         {translate('workflows.execution-chain-back')}
       </Link>
-      <Link href={routeForWorkflow({ namespace, workflow, run })}>
+      <Link href={routeForWorkflow({ namespace, workflow, run: firstRunId })}>
         {translate('workflows.execution-chain-view-execution')}
       </Link>
     {/snippet}
@@ -38,7 +38,7 @@
         </div>
         <div class="min-w-0">
           <dt class="text-secondary">{translate('common.run-id')}</dt>
-          <dd class="break-all font-mono">{run}</dd>
+          <dd class="break-all font-mono">{firstRunId}</dd>
         </div>
       </dl>
     {/snippet}

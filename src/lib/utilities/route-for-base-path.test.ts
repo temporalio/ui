@@ -61,6 +61,7 @@ import {
   routeForWorkersWithQuery,
   routeForWorkflow,
   routeForWorkflowChain,
+  routeForWorkflowChainRedirect,
   routeForWorkflowMemo,
   routeForWorkflowQuery,
   routeForWorkflows,
@@ -92,7 +93,19 @@ describe('routeFor functions should resolve the base path exactly once', () => {
   };
 
   const cases: [string, () => string | undefined][] = [
-    ['routeForWorkflowChain', () => routeForWorkflowChain(workflowParams)],
+    [
+      'routeForWorkflowChainRedirect',
+      () => routeForWorkflowChainRedirect(workflowParams),
+    ],
+    [
+      'routeForWorkflowChain',
+      () =>
+        routeForWorkflowChain({
+          namespace: 'default',
+          workflow: 'wf-id',
+          firstRunId: 'run-id',
+        }),
+    ],
     ['routeForNamespaces', () => routeForNamespaces()],
     ['routeForNexus', () => routeForNexus()],
     [

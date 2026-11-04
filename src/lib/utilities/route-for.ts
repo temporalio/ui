@@ -322,13 +322,16 @@ export const routeForArchivalWorkflows = (
 
 export const routeForWorkflowChain = ({
   workflow,
-  run,
+  firstRunId,
   ...parameters
-}: WorkflowParameters): ResolvedPathname => {
+}: NamespaceParameter & {
+  workflow: string;
+  firstRunId: string;
+}): ResolvedPathname => {
   const id = encodeURIForSvelte(workflow);
-  const runId = encodeURIForSvelte(run);
+  const runId = encodeURIForSvelte(firstRunId);
 
-  return `${routeForWorkflows(parameters)}/chain/${id}/${runId}`;
+  return `${routeForWorkflows(parameters)}/${id}/chain/${runId}`;
 };
 
 export const baseRouteForWorkflow = ({
@@ -340,6 +343,10 @@ export const baseRouteForWorkflow = ({
 
   return `${routeForWorkflows(parameters)}/${id}/${run}`;
 };
+
+export const routeForWorkflowChainRedirect = (
+  parameters: WorkflowParameters,
+): ResolvedPathname => `${baseRouteForWorkflow(parameters)}/chain`;
 
 export const routeForSchedules = (
   parameters: NamespaceParameter,

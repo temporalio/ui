@@ -5,21 +5,13 @@ import type { EventGroupKey } from '$lib/models/event-history/event-group-marker
 import type { WorkflowEvent } from '$lib/types/events';
 
 import {
+  defaultGroupedEventBuffer,
   type EventGroupMatcher,
   type EventGroupOption,
-  getEventArray,
-  getEventGroupMatcher,
-  getEventGroupOptions,
-  getGroupArray,
-  getLazyGroups,
-  getPendingActivityScheduledEvent,
-  getWorkflowTaskFailedEvent,
+  type GroupedEventBuffer,
   type LazyGroup,
   materializeGroup,
-  onChange,
 } from './grouped-event-buffer';
-
-const versionStore = writable(0);
 
 /**
  * Reactive read surface over the grouped-event-buffer.
@@ -34,21 +26,37 @@ const versionStore = writable(0);
  * requestAnimationFrame — that never fires in a hidden tab, which would leave a
  * run opened in a background tab with an empty event history until focused.
  */
-class EventBufferView {
+export class EventBufferView {
   private _version = $state(0);
   private pending = false;
+  private disposed = false;
+  private readonly buffer: GroupedEventBuffer;
+  private readonly unsubscribe: () => void;
+  private readonly writableVersionStore = writable(0);
+  readonly versionStore = readonly(this.writableVersionStore);
 
-  constructor() {
-    onChange((immediate) => this.scheduleUpdate(immediate));
+  constructor(buffer: GroupedEventBuffer) {
+    this.buffer = buffer;
+    this.unsubscribe = buffer.onChange((immediate) =>
+      this.scheduleUpdate(immediate),
+    );
+  }
+
+  dispose(): void {
+    if (this.disposed) return;
+    this.disposed = true;
+    this.pending = false;
+    this.unsubscribe();
   }
 
   private bump(): void {
     this.pending = false;
     this._version++;
-    versionStore.update((current) => current + 1);
+    this.writableVersionStore.update((current) => current + 1);
   }
 
   private scheduleUpdate(immediate: boolean): void {
+    if (this.disposed) return;
     if (immediate) {
       this.bump();
       return;
@@ -56,7 +64,7 @@ class EventBufferView {
     if (this.pending) return;
     this.pending = true;
     queueMicrotask(() => {
-      if (this.pending) this.bump();
+      if (!this.disposed && this.pending) this.bump();
     });
   }
 
@@ -81,7 +89,7 @@ class EventBufferView {
    */
   pendingActivityScheduledEvent(activityId: string): WorkflowEvent | undefined {
     void this._version;
-    return getPendingActivityScheduledEvent(activityId);
+    return this.buffer.getPendingActivityScheduledEvent(activityId);
   }
 
   /**
@@ -90,7 +98,7 @@ class EventBufferView {
    */
   readonly lazyGroupsWithoutWorkflowTasks: LazyGroup[] = $derived.by(() => {
     void this._version;
-    return getLazyGroups({ excludeWorkflowTasks: true });
+    return this.buffer.getLazyGroups({ excludeWorkflowTasks: true });
   });
 
   /**
@@ -99,13 +107,13 @@ class EventBufferView {
    */
   readonly groupsWithoutWorkflowTasks: EventGroup[] = $derived.by(() => {
     void this._version;
-    return getGroupArray({ excludeWorkflowTasks: true });
+    return this.buffer.getGroupArray({ excludeWorkflowTasks: true });
   });
 
   /** Every event group in the run, in order of first appearance. */
   readonly eventGroupOptions: EventGroupOption[] = $derived.by(() => {
     void this._version;
-    return getEventGroupOptions();
+    return this.buffer.getEventGroupOptions();
   });
 
   /**
@@ -116,27 +124,27 @@ class EventBufferView {
     keys: readonly EventGroupKey[],
   ): EventGroupMatcher | undefined {
     void this._version;
-    return getEventGroupMatcher(keys);
+    return this.buffer.getEventGroupMatcher(keys);
   }
 
   readonly events: WorkflowEvent[] = $derived.by(() => {
     void this._version;
-    return getEventArray();
+    return this.buffer.getEventArray();
   });
 
   /** The active WorkflowTaskFailed/TimedOut event, if the run has one. */
   readonly workflowTaskFailedEvent: WorkflowEvent | undefined = $derived.by(
     () => {
       void this._version;
-      return getWorkflowTaskFailedEvent();
+      return this.buffer.getWorkflowTaskFailedEvent();
     },
   );
 }
 
-export const eventBuffer = new EventBufferView();
+export const eventBuffer = new EventBufferView(defaultGroupedEventBuffer);
 
 /**
  * Store mirror of `eventBuffer.version`, for the derived stores in
  * $lib/stores/events that predate runes. Prefer `eventBuffer` in new code.
  */
-export const bufferVersion = readonly(versionStore);
+export const bufferVersion = eventBuffer.versionStore;
