@@ -50,6 +50,11 @@
       gcpRegion?: string[];
       gcpWorkerPool?: string[];
       gcpServiceAccount?: string[];
+      modalAppName?: string[];
+      modalFunctionName?: string[];
+      modalEnvironment?: string[];
+      modalWorkspaceId?: string[];
+      modalAppVersion?: string[];
       minReplicas?: string[];
       maxReplicas?: string[];
       initialReplicas?: string[];
@@ -93,6 +98,9 @@
   const AccessFields = $derived(
     providerValue ? COMPUTE_PROVIDERS[providerValue].fields.access : undefined,
   );
+  // A provider that declares no Access section loses the heading and the
+  // dividers with it, rather than showing an empty one.
+  const hasAccessFields = $derived(!!AccessFields);
 
   const providerTemplates = $derived(
     providerValue ? templates[providerValue] : undefined,
@@ -128,11 +136,11 @@
   {/if}
 {/if}
 
-{#if sections.includes('resource') && sections.includes('access')}
+{#if sections.includes('resource') && sections.includes('access') && hasAccessFields}
   <hr class="my-5 border-primary" />
 {/if}
 
-{#if sections.includes('access')}
+{#if sections.includes('access') && hasAccessFields}
   <h2 class="text-base font-medium">
     {translate('workers.access-section')}
   </h2>
@@ -152,7 +160,7 @@
   {/if}
 {/if}
 
-{#if (sections.includes('resource') || sections.includes('access')) && sections.includes('scaling')}
+{#if (sections.includes('resource') || (sections.includes('access') && hasAccessFields)) && sections.includes('scaling')}
   <hr class="my-5 border-primary" />
 {/if}
 
@@ -177,7 +185,9 @@
         : translate('workers.show-defaults')}
     </Button>
   </div>
-  {#if showScaling && (provider === 'lambda' || provider === 'agentcore')}
+  <!-- Modal joins the invoke-based providers: it pairs with the same `no-sync`
+  scaler, and these are the four knobs the Modal demo tuned. -->
+  {#if showScaling && (provider === 'lambda' || provider === 'agentcore' || provider === 'modal')}
     <div class="mt-4 flex flex-col gap-4">
       <Input
         value={values.scaleUpCooloffMs !== undefined

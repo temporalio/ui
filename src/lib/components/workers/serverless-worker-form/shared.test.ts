@@ -355,6 +355,11 @@ describe('validateRegionValues', () => {
     gcpRegion: '',
     gcpWorkerPool: '',
     gcpServiceAccount: '',
+    modalAppName: '',
+    modalFunctionName: '',
+    modalEnvironment: '',
+    modalWorkspaceId: '',
+    modalAppVersion: '',
     minReplicas: 0,
     maxReplicas: 30,
     initialReplicas: 0,
@@ -407,6 +412,11 @@ describe('buildComputeConfigForRegions', () => {
     gcpRegion: '',
     gcpWorkerPool: '',
     gcpServiceAccount: '',
+    modalAppName: '',
+    modalFunctionName: '',
+    modalEnvironment: '',
+    modalWorkspaceId: '',
+    modalAppVersion: '',
     minReplicas: 0,
     maxReplicas: 30,
     initialReplicas: 0,
@@ -510,6 +520,11 @@ describe('formValuesFromGroup', () => {
           gcpRegion: '',
           gcpWorkerPool: '',
           gcpServiceAccount: '',
+          modalAppName: '',
+          modalFunctionName: '',
+          modalEnvironment: '',
+          modalWorkspaceId: '',
+          modalAppVersion: '',
           minReplicas: 0,
           maxReplicas: 30,
           initialReplicas: 0,
@@ -528,6 +543,45 @@ describe('formValuesFromGroup', () => {
       iamRoleArn: 'arn:aws:iam::123456789012:role/w',
       roleExternalId: 'demo',
       scaleUpCooloffMs: 5000,
+    });
+  });
+
+  it('reads a saved Modal group back into the values that built it', () => {
+    const config = buildComputeConfigForRegions([
+      {
+        regionId: 'aws-us-west-2',
+        values: {
+          provider: 'modal',
+          lambdaArn: '',
+          iamRoleArn: '',
+          roleExternalId: '',
+          agentCoreEndpointArn: '',
+          gcpProject: '',
+          gcpRegion: '',
+          gcpWorkerPool: '',
+          gcpServiceAccount: '',
+          modalAppName: 'temporal-sprint-demo',
+          modalFunctionName: 'temporal_worker',
+          modalEnvironment: 'compute-testing',
+          modalWorkspaceId: '',
+          modalAppVersion: '3',
+          minReplicas: 0,
+          maxReplicas: 30,
+          initialReplicas: 0,
+          utilizationTarget: 0.8,
+          scaleDownStabilization: '90s',
+        },
+      },
+    ]);
+
+    expect(
+      formValuesFromGroup(config.scalingGroups?.['aws-us-west-2']),
+    ).toMatchObject({
+      provider: 'modal',
+      modalAppName: 'temporal-sprint-demo',
+      modalFunctionName: 'temporal_worker',
+      modalEnvironment: 'compute-testing',
+      modalAppVersion: '3',
     });
   });
 

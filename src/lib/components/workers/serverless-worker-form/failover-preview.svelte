@@ -59,6 +59,7 @@
       lambda: translate('workers.preview-resource-lambda'),
       agentcore: translate('workers.preview-resource-agentcore'),
       'cloud-run': translate('workers.preview-resource-cloud-run'),
+      modal: translate('workers.preview-resource-modal'),
     }[provider],
   );
   const accessLabel = $derived(
