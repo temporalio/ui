@@ -6,6 +6,7 @@
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
 
   import { motion } from './motion';
@@ -285,6 +286,12 @@
     runsInPrimary = value;
   };
 
+  /** Without a replica the primary is the only region, so it runs again. */
+  const setHighAvailability = (value: boolean) => {
+    highAvailability = value;
+    if (!value) runsInPrimary = true;
+  };
+
   let replicaSettings = $state<HTMLElement>();
 
   /**
@@ -462,13 +469,23 @@
       bodyClass={primaryActive ? '' : 'py-3'}
     >
       {#snippet action()}
-        {#if replicated}
-          <ToggleSwitch
-            id="primary-compute"
-            label={translate('workers.region-compute')}
-            labelPosition="left"
-            bind:checked={() => runsInPrimary, setRunsInPrimary}
-          />
+        {#if replicaRegion}
+          <!-- On and disabled without high availability, because the primary
+          then runs and is the only region that can. -->
+          <Tooltip
+            text={translate('workers.region-compute-disabled')}
+            hide={replicated}
+            bottomRight
+            width={260}
+          >
+            <ToggleSwitch
+              id="primary-compute"
+              label={translate('workers.region-compute')}
+              labelPosition="left"
+              disabled={!replicated}
+              bind:checked={() => primaryActive, setRunsInPrimary}
+            />
+          </Tooltip>
         {/if}
       {/snippet}
       {#if primaryActive}
@@ -537,7 +554,7 @@
             id="high-availability"
             label={translate('workers.high-availability')}
             labelPosition="left"
-            bind:checked={highAvailability}
+            bind:checked={() => highAvailability, setHighAvailability}
           />
         {/snippet}
         <!-- Each branch grows down from the toggle, so nothing above it moves.
