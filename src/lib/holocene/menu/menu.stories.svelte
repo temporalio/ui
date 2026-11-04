@@ -14,6 +14,7 @@
 
   type MenuArgs = {
     variant?: ComponentProps<typeof MenuButton>['variant'];
+    size?: ComponentProps<typeof MenuButton>['size'];
     keepOpen?: ComponentProps<typeof Menu>['keepOpen'];
     position?: ComponentProps<typeof Menu>['position'];
     usePortal?: ComponentProps<typeof Menu>['usePortal'];
@@ -26,6 +27,7 @@
     subcomponents: { MenuButton, MenuContainer, MenuItem },
     args: {
       variant: 'primary',
+      size: 'md',
       keepOpen: false,
       position: 'left',
       usePortal: false,
@@ -35,6 +37,11 @@
         name: 'Variant',
         control: 'select',
         options: ['primary', 'secondary', 'ghost'],
+      },
+      size: {
+        name: 'Size',
+        control: 'inline-radio',
+        options: ['xs', 'sm', 'md', 'lg'],
       },
       keepOpen: {
         name: 'Keep Open',
@@ -65,7 +72,12 @@
     class="flex items-center justify-center border border-primary bg-surface-primary p-4 text-primary"
   >
     <MenuContainer>
-      <MenuButton hasIndicator variant={args.variant} controls={context.id}>
+      <MenuButton
+        hasIndicator
+        variant={args.variant}
+        size={args.size}
+        controls={context.id}
+      >
         {#snippet leading()}
           <IconTemporal />
         {/snippet}
