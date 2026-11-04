@@ -12,11 +12,8 @@ import {
   buildGcpCloudRunComputeConfig,
   buildLambdaComputeConfig,
   buildModalComputeConfig,
-  decodeAgentCoreProviderDetails,
-  decodeGcpCloudRunProviderDetails,
-  decodeLambdaProviderDetails,
-  decodeModalProviderDetails,
   decodeScalerDetails,
+  providerTypeOf,
 } from '$lib/services/deployments-service';
 import type {
   ComputeConfig,
@@ -26,6 +23,7 @@ import type {
 import {
   COMPUTE_PROVIDER_VALUES,
   COMPUTE_PROVIDERS,
+  computeProviderForType,
   type ComputeProviderReleaseStage,
   type ComputeProviderValue,
 } from './compute-providers';
@@ -578,33 +576,17 @@ export const formValuesFromGroup = (
   group: ComputeConfigScalingGroup | undefined,
 ): ComputeInitialValues => {
   const config: ComputeConfig = { scalingGroups: group ? { group } : {} };
-  const lambda = decodeLambdaProviderDetails(config);
-  const agentCore = decodeAgentCoreProviderDetails(config);
-  const gcp = decodeGcpCloudRunProviderDetails(config);
-  const modal = decodeModalProviderDetails(config);
   const scaler = decodeScalerDetails(config);
+
+  // The group names its provider, so nothing here infers one from which
+  // fields are filled. That inference is what read a saved Modal group as
+  // Lambda and emptied every field the customer had entered.
+  const definition =
+    computeProviderForType(providerTypeOf(group)) ?? COMPUTE_PROVIDERS.lambda;
+
   return {
-    // A saved provider decides which fields it filled.
-    provider: agentCore.agentCoreEndpointArn
-      ? 'agentcore'
-      : gcp.gcpWorkerPool
-        ? 'cloud-run'
-        : modal.modalAppName
-          ? 'modal'
-          : 'lambda',
-    lambdaArn: lambda.lambdaArn ?? '',
-    agentCoreEndpointArn: agentCore.agentCoreEndpointArn ?? '',
-    iamRoleArn: lambda.iamRoleArn ?? agentCore.iamRoleArn ?? '',
-    roleExternalId: lambda.roleExternalId ?? agentCore.roleExternalId ?? '',
-    gcpProject: gcp.gcpProject,
-    gcpRegion: gcp.gcpRegion,
-    gcpWorkerPool: gcp.gcpWorkerPool,
-    gcpServiceAccount: gcp.gcpServiceAccount,
-    modalAppName: modal.modalAppName ?? '',
-    modalFunctionName: modal.modalFunctionName ?? '',
-    modalEnvironment: modal.modalEnvironment ?? '',
-    modalWorkspaceId: modal.modalWorkspaceId ?? '',
-    modalAppVersion: modal.modalAppVersion ?? '',
+    provider: definition.value,
+    ...definition.formValues(config),
     scaleUpCooloffMs: scaler.scaleUpCooloffMs,
     scaleUpBacklogThreshold: scaler.scaleUpBacklogThreshold,
     maxWorkerLifetimeMs: scaler.maxWorkerLifetimeMs,

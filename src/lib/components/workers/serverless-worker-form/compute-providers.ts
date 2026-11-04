@@ -17,6 +17,7 @@ import type { ComputeSection } from './fields/types';
 import defaultAgentCoreTerraform from './serverless-worker-agentcore.tf?raw';
 import defaultCloudRunTerraform from './serverless-worker-cloud-run.tf?raw';
 import defaultLambdaTerraform from './serverless-worker-lambda.tf?raw';
+import type { ComputeInitialValues } from './shared';
 import defaultAgentCoreCloudFormation from './temporal-agentcore-role.yaml?raw';
 import defaultLambdaCloudFormation from './temporal-worker-role.yaml?raw';
 import { TERRAFORM_MODULES } from './terraform-modules';
@@ -150,6 +151,15 @@ export type ComputeProviderDefinition = {
    * list was theirs to maintain, and nothing failed when it fell behind.
    */
   details: (computeConfig: ComputeConfig) => readonly ComputeDetailRow[];
+  /**
+   * This provider's saved settings, as the form holds them.
+   *
+   * Separate from `details` because the shapes differ: details are labelled
+   * rows for reading, these are form fields for editing. Both answer the same
+   * question, and both used to be answered by a reader that named every
+   * provider itself.
+   */
+  formValues: (computeConfig: ComputeConfig) => Partial<ComputeInitialValues>;
 };
 
 /** One labelled setting from a saved Version. */
@@ -161,6 +171,22 @@ export type ComputeDetailRow = {
 };
 
 export { TERRAFORM_MODULES } from './terraform-modules';
+
+/**
+ * The provider a saved group belongs to, by the type the API stores.
+ *
+ * A saved group names its provider, so nothing needs to infer one from which
+ * fields happen to be filled. Readers that inferred it got Modal wrong,
+ * because its fields were not in the list they checked.
+ */
+export const computeProviderForType = (
+  providerType: string | undefined,
+): ComputeProviderDefinition | undefined =>
+  providerType === undefined
+    ? undefined
+    : COMPUTE_PROVIDER_VALUES.map((value) => COMPUTE_PROVIDERS[value]).find(
+        (definition) => definition.providerType === providerType,
+      );
 
 export const COMPUTE_PROVIDERS: Record<
   ComputeProviderValue,
@@ -204,6 +230,15 @@ export const COMPUTE_PROVIDERS: Record<
         },
       ];
     },
+    formValues: (computeConfig) => {
+      const { lambdaArn, iamRoleArn, roleExternalId } =
+        decodeLambdaProviderDetails(computeConfig);
+      return {
+        lambdaArn: lambdaArn ?? '',
+        iamRoleArn: iamRoleArn ?? '',
+        roleExternalId: roleExternalId ?? '',
+      };
+    },
   },
   agentcore: {
     value: 'agentcore',
@@ -243,6 +278,15 @@ export const COMPUTE_PROVIDERS: Record<
         },
       ];
     },
+    formValues: (computeConfig) => {
+      const { agentCoreEndpointArn, iamRoleArn, roleExternalId } =
+        decodeAgentCoreProviderDetails(computeConfig);
+      return {
+        agentCoreEndpointArn: agentCoreEndpointArn ?? '',
+        iamRoleArn: iamRoleArn ?? '',
+        roleExternalId: roleExternalId ?? '',
+      };
+    },
   },
   'cloud-run': {
     value: 'cloud-run',
@@ -274,6 +318,11 @@ export const COMPUTE_PROVIDERS: Record<
           truncate: true,
         },
       ];
+    },
+    formValues: (computeConfig) => {
+      const { gcpProject, gcpRegion, gcpWorkerPool, gcpServiceAccount } =
+        decodeGcpCloudRunProviderDetails(computeConfig);
+      return { gcpProject, gcpRegion, gcpWorkerPool, gcpServiceAccount };
     },
   },
   modal: {
@@ -314,6 +363,22 @@ export const COMPUTE_PROVIDERS: Record<
         },
         { labelKey: 'workers.modal-version-label', value: modalAppVersion },
       ];
+    },
+    formValues: (computeConfig) => {
+      const {
+        modalAppName,
+        modalFunctionName,
+        modalEnvironment,
+        modalWorkspaceId,
+        modalAppVersion,
+      } = decodeModalProviderDetails(computeConfig);
+      return {
+        modalAppName: modalAppName ?? '',
+        modalFunctionName: modalFunctionName ?? '',
+        modalEnvironment: modalEnvironment ?? '',
+        modalWorkspaceId: modalWorkspaceId ?? '',
+        modalAppVersion: modalAppVersion ?? '',
+      };
     },
   },
 };

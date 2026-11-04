@@ -616,7 +616,7 @@ export const buildGcpCloudRunComputeConfig = (
   };
 };
 
-const providerTypeOf = (scalingGroup?: ComputeConfigScalingGroup) =>
+export const providerTypeOf = (scalingGroup?: ComputeConfigScalingGroup) =>
   scalingGroup?.providerType ?? scalingGroup?.provider?.type;
 
 export const decodeLambdaProviderDetails = (
