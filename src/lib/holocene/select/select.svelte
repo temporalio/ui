@@ -52,7 +52,10 @@
     'data-testid'?: string;
     menuButtonClass?: ClassNameValue;
     menuClass?: ClassNameValue;
-    variant?: Extract<ButtonStyles['variant'], 'primary' | 'secondary'>;
+    variant?: Extract<
+      ButtonStyles['variant'],
+      'primary' | 'secondary' | 'tertiary'
+    >;
     size?: ButtonStyles['size'];
     required?: boolean;
     valid?: boolean;
@@ -73,7 +76,7 @@
     onChange = () => {},
     menuButtonClass = undefined,
     menuClass = undefined,
-    variant = 'secondary',
+    variant = 'tertiary',
     size = 'md',
     required = false,
     error = '',
@@ -127,7 +130,6 @@
 
   const errorId = $derived(`${id}-error`);
   const showError = $derived(!!error && !valid);
-  const isPrimary = $derived(variant === 'primary');
   const showPlaceholder = $derived(!value && placeholder !== '');
 </script>
 
@@ -138,8 +140,6 @@
       <MenuButton
         class={merge(
           'w-full',
-          !isPrimary &&
-            'border-secondary bg-background-primary text-primary focus-visible:bg-background-primary enabled:hover:border-tertiary enabled:hover:bg-interactive-tertiary-hover disabled:bg-surface-tertiary',
           !valid &&
             'border-danger focus-visible:border-danger focus-visible:ring-danger',
           menuButtonClass,
@@ -168,10 +168,7 @@
           value={showPlaceholder ? placeholder : $labelCtx}
           tabindex="-1"
           disabled
-          class={merge(
-            isPrimary ? 'text-white' : 'text-primary',
-            showPlaceholder && (isPrimary ? 'opacity-90' : 'text-secondary'),
-          )}
+          class:opacity-70={showPlaceholder}
           class:disabled
           {required}
           aria-required={required}
