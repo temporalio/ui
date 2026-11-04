@@ -1,6 +1,7 @@
 export const Namespace = 'common' as const;
 
 export const Strings = {
+  breadcrumbs: 'Breadcrumbs',
   loading: 'Loading...',
   filtering: 'filtering',
   filter: 'Filter',
