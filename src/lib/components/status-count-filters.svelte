@@ -39,6 +39,7 @@
   let {
     staticQuery = '',
     refreshTime = $bindable(),
+    loaded = $bindable(false),
     countStore = workflowCount,
     refresh = workflowRefresh,
     filters = workflowFilters,
@@ -67,6 +68,10 @@
 
   $effect(function propagateRefreshTimeChange() {
     refreshTime = new Date(statusCounts.refreshTime);
+  });
+
+  $effect(function propagateLoadedChange() {
+    loaded = statusCounts.loaded;
   });
 
   const onStatusClick = (status: Status) => {

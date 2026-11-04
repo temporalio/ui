@@ -95,6 +95,9 @@ export function createStatusCountsState(options: StatusCountsStateOptions) {
     get loading(): boolean {
       return countPoller.loading;
     },
+    get loaded(): boolean {
+      return countPoller.loaded;
+    },
     get refreshTime(): number {
       return countPoller.refreshTime;
     },
@@ -104,6 +107,7 @@ export function createStatusCountsState(options: StatusCountsStateOptions) {
 export interface StatusCountDataProps {
   staticQuery?: string;
   refreshTime?: Date;
+  loaded?: boolean;
   countStore?: CountStore;
   refresh?: Writable<number>;
   fetchCounts?: StatusCountFetcher;

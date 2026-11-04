@@ -34,7 +34,9 @@
   import { page } from '$app/state';
 
   import CountRefreshButton from '$lib/components/count-refresh-button.svelte';
+  import EmptyStateTransition from '$lib/components/empty-states/empty-state-transition.svelte';
   import SavedQueryViews from '$lib/components/saved-query-views/saved-views.svelte';
+  import ActivitiesEmptyState from '$lib/components/standalone-activities/activities-summary-configurable-table/table-empty-state.svelte';
   import ActivitiesSummaryConfigurableTable from '$lib/components/standalone-activities/activities-summary-configurable-table.svelte';
   import FilterBar from '$lib/components/standalone-activities/activities-summary-filter-bar/filter-bar.svelte';
   import BatchCancelConfirmationModal from '$lib/components/standalone-activities/batch-cancel-confirmation-modal.svelte';
@@ -109,6 +111,13 @@
   });
 
   let customizationDrawerOpen = $state(false);
+  let countLoaded = $state(false);
+  const showEmptyState = $derived(
+    $supportsAdvancedVisibility &&
+      !query &&
+      countLoaded &&
+      $activityCount.count === 0,
+  );
 
   let batchCancelConfirmationModalOpen = $state(false);
   let batchTerminateConfirmationModalOpen = $state(false);
@@ -212,6 +221,7 @@
       {@render releaseStageBadge?.()}
       <StatusCountFilters
         bind:refreshTime
+        bind:loaded={countLoaded}
         countStore={activityCount}
         refresh={activityRefresh}
         filters={activityFilters}
@@ -228,20 +238,26 @@
   </div>
 </header>
 
-<MaximizableTableView>
-  <SavedQueryViews
-    filters={activityFilters}
-    savedQueries={savedActivityQueries}
-    systemViews={systemActivityViews}
-    defaultView={DEFAULT_ACTIVITY_SYSTEM_VIEW}
-    searchAttributes={activityExecutionSearchAttributes}
-    id="activity"
-  />
-  <FilterBar />
-  <ActivitiesSummaryConfigurableTable
-    onClickConfigure={openCustomizationDrawer}
-  />
-</MaximizableTableView>
+<EmptyStateTransition empty={showEmptyState}>
+  {#snippet emptyState()}
+    <ActivitiesEmptyState />
+  {/snippet}
+  <MaximizableTableView>
+    <SavedQueryViews
+      filters={activityFilters}
+      savedQueries={savedActivityQueries}
+      systemViews={systemActivityViews}
+      defaultView={DEFAULT_ACTIVITY_SYSTEM_VIEW}
+      searchAttributes={activityExecutionSearchAttributes}
+      id="activity"
+    />
+    <FilterBar />
+    <ActivitiesSummaryConfigurableTable
+      onClickConfigure={openCustomizationDrawer}
+      {countLoaded}
+    />
+  </MaximizableTableView>
+</EmptyStateTransition>
 <ConfigurableTableHeadersDrawer
   {availableColumns}
   bind:open={customizationDrawerOpen}

@@ -23,6 +23,7 @@ export function createCountPoller<T>(opts: CountPollerOptions<T>) {
 
   let attempt = 1;
   let loading = $state(false);
+  let loaded = $state(false);
   let refreshTime = $state(Date.now());
   let timeoutId: ReturnType<typeof setTimeout> | undefined;
 
@@ -52,6 +53,7 @@ export function createCountPoller<T>(opts: CountPollerOptions<T>) {
       const count = opts.transform(response);
       opts.getStore().update((s) => ({ ...s, count }));
       setRefresh();
+      loaded = true;
       opts.onInitialFetch?.(count, response);
     } catch (e: unknown) {
       console.error('Initial count fetch failed', e);
@@ -117,6 +119,9 @@ export function createCountPoller<T>(opts: CountPollerOptions<T>) {
   return {
     get loading() {
       return loading;
+    },
+    get loaded() {
+      return loaded;
     },
     /** Timestamp of the most recent full fetch. Not updated by poll fetches. */
     get refreshTime() {

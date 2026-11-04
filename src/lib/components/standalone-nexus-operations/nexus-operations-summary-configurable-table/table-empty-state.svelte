@@ -2,137 +2,85 @@
   import { page } from '$app/state';
 
   import NoQueryResults from '$lib/components/empty-states/no-query-results.svelte';
-  import Alert from '$lib/holocene/alert.svelte';
+  import ResourceEmptyState from '$lib/components/empty-states/resource-empty-state.svelte';
+  import SdkLinks from '$lib/components/empty-states/sdk-links.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { IconGithub, IconWarning } from '$lib/io/icon';
+  import { IconTemporalNexus } from '$lib/io/icon';
   import { nexusOperationError } from '$lib/stores/nexus-operations';
-  import noResultsImages from '$lib/vendor/empty-state.svg';
 
   let query = $derived(page.url.searchParams.get('query'));
 
   const codeSamples = [
     {
-      label: 'samples-go',
+      sdk: 'Go',
       href: 'https://github.com/temporalio/samples-go',
     },
     {
-      label: 'samples-java',
+      sdk: 'Java',
       href: 'https://github.com/temporalio/samples-java',
     },
     {
-      label: 'samples-typescript',
+      sdk: 'Typescript',
       href: 'https://github.com/temporalio/samples-typescript',
     },
     {
-      label: 'samples-python',
+      sdk: 'Python',
       href: 'https://github.com/temporalio/samples-python',
     },
     {
-      label: 'samples-dotnet',
+      sdk: '.NET',
       href: 'https://github.com/temporalio/samples-dotnet',
     },
   ];
 </script>
 
 {#if query}
-  <div
-    class="flex h-full w-full flex-col items-center justify-center p-4"
-    aria-live="polite"
+  <ResourceEmptyState
+    title={translate(
+      $nexusOperationError
+        ? 'standalone-nexus-operations.nexus-operation-query-error-state'
+        : 'standalone-nexus-operations.empty-state-title',
+    )}
+    content={translate('standalone-nexus-operations.empty-state-description')}
+    error={$nexusOperationError}
   >
-    <div class="text-center">
-      <h2>
-        {#if $nexusOperationError}
-          {translate(
-            'standalone-nexus-operations.nexus-operation-query-error-state',
-          )}
-        {:else}
-          {translate('standalone-nexus-operations.empty-state-title')}
-        {/if}
-      </h2>
-      <p class="text-secondary">
-        {#if $nexusOperationError}
-          {$nexusOperationError}
-        {:else}
-          {translate('standalone-nexus-operations.empty-state-description')}
-        {/if}
-      </p>
-      <NoQueryResults class="m-auto mt-8 text-tertiary" />
-    </div>
-  </div>
+    {#snippet illustration()}
+      <NoQueryResults class="text-tertiary" />
+    {/snippet}
+  </ResourceEmptyState>
 {:else}
-  <div
-    class="h-full w-full overflow-hidden xl:flex xl:flex-row"
-    aria-live="polite"
+  <ResourceEmptyState
+    title={translate('standalone-nexus-operations.empty-state-no-data-title')}
+    Icon={IconTemporalNexus}
+    error={$nexusOperationError}
+    placeholder
   >
-    <div
-      class="flex w-auto min-w-[280px] flex-col gap-6 bg-surface-primary p-8 text-primary xl:min-w-[520px] xl:flex-1"
-    >
-      <h2>
-        {translate('standalone-nexus-operations.empty-state-no-data-title')}
-      </h2>
-      {#if $nexusOperationError}
-        <Alert
-          intent="warning"
-          Icon={IconWarning}
-          title={translate('common.error-occurred')}
-          style="overflow-wrap: anywhere"
-        >
-          {$nexusOperationError}
-        </Alert>
-      {:else}
-        <div class="flex flex-col gap-2">
-          <p>
-            {translate(
-              'standalone-nexus-operations.empty-state-value-proposition',
-            )}
-          </p>
-          <p>
-            {translate(
-              'standalone-nexus-operations.empty-state-read-docs-prefix',
-            )}
-            <Link href="https://docs.temporal.io/evaluate/nexus" newTab>
-              {translate(
-                'standalone-nexus-operations.empty-state-nexus-docs-link',
-              )}
-            </Link>
-            {translate(
-              'standalone-nexus-operations.empty-state-read-docs-middle',
-            )}
-            <Link href="https://docs.temporal.io/cloud/nexus" newTab>
-              {translate(
-                'standalone-nexus-operations.empty-state-nexus-eval-guide-link',
-              )}
-            </Link>
-            {translate(
-              'standalone-nexus-operations.empty-state-read-docs-suffix',
-            )}
-          </p>
-        </div>
-        <div class="flex flex-col gap-3">
-          <h3 class="text-base font-medium">
-            {translate(
-              'standalone-nexus-operations.empty-state-code-samples-title',
-            )}
-          </h3>
-          <ul class="flex flex-col gap-2">
-            {#each codeSamples as sample (sample.label)}
-              <li class="flex items-center gap-2">
-                <IconGithub class="h-5 w-5 shrink-0" />
-                <Link href={sample.href} newTab>
-                  {sample.label}
-                </Link>
-              </li>
-            {/each}
-          </ul>
-        </div>
-      {/if}
-    </div>
-    <div class="flex flex-col">
-      <div class="bg-surface-primary">
-        <img src={noResultsImages} alt="" class="w-full" />
-      </div>
-      <div class="flex-1 bg-[#8da4ef]"></div>
-    </div>
-  </div>
+    {#snippet description()}
+      <p>
+        {translate('standalone-nexus-operations.empty-state-value-proposition')}
+      </p>
+      <p>
+        {translate('standalone-nexus-operations.empty-state-read-docs-prefix')}
+        <Link href="https://docs.temporal.io/evaluate/nexus" newTab>
+          {translate('standalone-nexus-operations.empty-state-nexus-docs-link')}
+        </Link>
+        {translate('standalone-nexus-operations.empty-state-read-docs-middle')}
+        <Link href="https://docs.temporal.io/cloud/nexus" newTab>
+          {translate(
+            'standalone-nexus-operations.empty-state-nexus-eval-guide-link',
+          )}
+        </Link>
+        {translate('standalone-nexus-operations.empty-state-read-docs-suffix')}
+      </p>
+    {/snippet}
+    {#snippet resources()}
+      <SdkLinks
+        links={codeSamples}
+        label={translate(
+          'standalone-nexus-operations.empty-state-code-samples-title',
+        )}
+      />
+    {/snippet}
+  </ResourceEmptyState>
 {/if}

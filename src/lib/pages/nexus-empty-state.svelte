@@ -6,43 +6,37 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
 
-  import { useDarkMode } from '$lib/utilities/dark-mode';
-  import andromeda from '$lib/vendor/andromeda.png';
+  import NexusIllustration from '$lib/components/empty-states/nexus-illustration.svelte';
 
   type Props = {
     actions?: Snippet;
+    nexusRegistryDescription?: Snippet;
   };
 
-  let { actions }: Props = $props();
+  let { actions, nexusRegistryDescription = nexusDescription }: Props =
+    $props();
 </script>
 
 <div class="flex flex-col gap-8 p-10">
   <div class="flex flex-col gap-4 lg:flex-row">
-    <div>
-      <div class="mb-8 flex items-center gap-4">
-        <h1
-          data-testid="namespace-selector-title"
-          class="text-marketingGreen font-mono uppercase"
-        >
-          {translate('nexus.endpoints')}
-        </h1>
-      </div>
+    <div class="min-w-0 flex-1">
       <div class="flex w-full flex-col gap-4 pr-8 md:pr-24">
-        <h2 class="text-4xl">
+        <h2>
           {translate('nexus.registry-empty-state-title')}
         </h2>
-
-        {@render nexusRegistryDescription()}
+        {@render nexusRegistryDescription?.()}
         {@render actions?.()}
       </div>
     </div>
-    <div class="mx-auto mt-8 w-full bg-background-primary" aria-hidden="true">
-      <img src={andromeda} alt="" class:invert={!$useDarkMode} />
+    <div
+      class="flex w-full shrink-0 items-center justify-center lg:mt-8 lg:w-[26rem] xl:w-[32rem]"
+    >
+      <NexusIllustration class="w-full max-w-xl" />
     </div>
   </div>
 </div>
 
-{#snippet nexusRegistryDescription()}
+{#snippet nexusDescription()}
   <p>
     <Link href="https://docs.temporal.io/evaluate/nexus" newTab>
       {translate('nexus.registry-empty-state-nexus-link')}
@@ -70,9 +64,3 @@
     {translate('nexus.registry-empty-state-proxy-postface')}
   </p>
 {/snippet}
-
-<style>
-  .invert {
-    filter: invert(1);
-  }
-</style>

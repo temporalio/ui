@@ -21,7 +21,9 @@ export const Strings = {
   'schedule-spec': 'Schedule Spec',
   'cron-string': 'Cron String',
   'workflow-input': 'Workflow Input',
-  'empty-state-title': 'No Schedules Found',
+  'empty-state-title': 'No Schedules',
+  'no-schedules-description':
+    'Schedules automatically start Workflows at recurring times or intervals. Pause and resume a Schedule, backfill missed runs, and control how overlapping runs are handled.',
   'empty-state-description':
     'Try adjusting or clearing the filters to see the Schedules running on this Namespace.',
   'error-message-fetching': 'Error fetching schedules',
@@ -110,6 +112,7 @@ export const Strings = {
   'getting-started-docs-link-preface': 'Go to',
   'getting-started-docs-link': 'docs',
   'getting-started-cli-link-preface': 'or get started with',
+  'getting-started-sdk-title': 'Create Schedules from your preferred SDK',
   'add-schedule-attr': 'Schedule Attributes',
   'add-workflow-attr': 'Workflow Attributes',
   'schedule-specs': 'Schedule Specs',

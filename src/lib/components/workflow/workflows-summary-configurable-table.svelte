@@ -56,10 +56,11 @@
 
   interface Props {
     onClickConfigure: () => void;
+    countLoaded?: boolean;
     cloud?: Snippet;
   }
 
-  let { onClickConfigure, cloud }: Props = $props();
+  let { onClickConfigure, countLoaded = true, cloud }: Props = $props();
 
   const { allSelected, selectedWorkflows, selectWorkflows } =
     getContext<BatchOperationContext>(BATCH_OPERATION_CONTEXT);
@@ -136,6 +137,7 @@
   };
 
   const onFetch = $derived(() => fetchPaginatedWorkflows(namespace, query));
+  const awaitingCount = $derived(!query && !countLoaded);
 
   const dense = $derived($tableDensity === 'dense');
 
@@ -220,6 +222,7 @@
     bind:sort={tableSort.value}
     {sortColumns}
     {onFetch}
+    loading={awaitingCount}
     onItemsChange={(items) => {
       visiblePaginatedItems = items;
     }}

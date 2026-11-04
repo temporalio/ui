@@ -56,6 +56,7 @@
     sort?: TableSort;
     sortColumns?: Record<string, TableSortColumn<T>>;
     onLoadingChange?: ((loading: boolean) => void) | undefined;
+    loading?: boolean;
     onShiftUp?: KeyboardHandler;
     onShiftDown?: KeyboardHandler;
     onSpace?: KeyboardHandler;
@@ -87,6 +88,7 @@
     sort = $bindable(),
     sortColumns = {},
     onLoadingChange,
+    loading = false,
     onShiftUp,
     onShiftDown,
     onSpace,
@@ -318,7 +320,7 @@
 
 <PaginatedTable
   bind:this={paginatedTable}
-  loading={$store.loading}
+  loading={loading || $store.loading}
   updating={$store.updating}
   {visibleItems}
   {maxHeight}
