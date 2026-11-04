@@ -116,7 +116,7 @@
   {/snippet}
   {#snippet headers()}
     <TableHeaderRow>
-      <th class="w-[114px] text-xs font-normal text-secondary"
+      <th class="text-xs font-normal text-secondary"
         >{translate('nexus.delivery-state')}</th
       >
       <th class="text-xs font-normal text-secondary"
