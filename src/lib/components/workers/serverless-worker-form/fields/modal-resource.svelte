@@ -71,14 +71,14 @@
     placeholder={translate('workers.modal-workspace-id-placeholder')}
   />
   <Input
-    bind:value={values.modalVersion}
-    id={fieldId('modalVersion')}
-    name={fieldId('modalVersion')}
+    bind:value={values.modalAppVersion}
+    id={fieldId('modalAppVersion')}
+    name={fieldId('modalAppVersion')}
     spellcheck={false}
     label={translate('workers.modal-version-label')}
-    hintText={errors.modalVersion?.[0] ||
+    hintText={errors.modalAppVersion?.[0] ||
       translate('workers.modal-version-hint')}
-    error={!!errors.modalVersion?.[0]}
+    error={!!errors.modalAppVersion?.[0]}
     placeholder="0"
   />
 </div>

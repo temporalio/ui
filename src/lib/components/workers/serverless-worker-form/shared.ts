@@ -91,7 +91,7 @@ const providerFields = {
   modalFunctionName: z.string().default(''),
   modalEnvironment: z.string().default(''),
   modalWorkspaceId: z.string().default(''),
-  modalVersion: z.string().default(''),
+  modalAppVersion: z.string().default(''),
   minReplicas: z.number().int().min(0).max(2_147_483_647).default(0),
   maxReplicas: z.number().int().min(1).max(2_147_483_647).default(30),
   initialReplicas: z.number().int().min(0).max(2_147_483_647).default(0),
@@ -186,10 +186,10 @@ const validateProviderFields = (
         path: ['modalEnvironment'],
         message: 'Environment is required',
       });
-    if (data.modalVersion && !/^\d+$/.test(data.modalVersion))
+    if (data.modalAppVersion && !/^\d+$/.test(data.modalAppVersion))
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        path: ['modalVersion'],
+        path: ['modalAppVersion'],
         message: 'Version must be a non-negative whole number',
       });
   } else if (data.provider === 'cloud-run') {
@@ -364,7 +364,7 @@ export const buildComputeConfigFromForm = (
       data.modalFunctionName,
       data.modalEnvironment,
       data.modalWorkspaceId,
-      data.modalVersion,
+      data.modalAppVersion,
       invokeScaling,
     );
   }
@@ -495,7 +495,7 @@ export type ComputeFieldValues = {
   modalFunctionName: string;
   modalEnvironment: string;
   modalWorkspaceId: string;
-  modalVersion: string;
+  modalAppVersion: string;
   minReplicas: number;
   maxReplicas: number;
   initialReplicas: number;
@@ -560,7 +560,7 @@ export type ComputeInitialValues = {
   modalFunctionName?: string;
   modalEnvironment?: string;
   modalWorkspaceId?: string;
-  modalVersion?: string;
+  modalAppVersion?: string;
   minReplicas?: number;
   maxReplicas?: number;
   initialReplicas?: number;

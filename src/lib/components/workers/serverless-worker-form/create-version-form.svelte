@@ -124,7 +124,7 @@
       modalFunctionName: '',
       modalEnvironment: '',
       modalWorkspaceId: '',
-      modalVersion: '',
+      modalAppVersion: '',
       minReplicas: 0,
       maxReplicas: 30,
       initialReplicas: 0,

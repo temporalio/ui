@@ -54,7 +54,7 @@
       modalFunctionName?: string[];
       modalEnvironment?: string[];
       modalWorkspaceId?: string[];
-      modalVersion?: string[];
+      modalAppVersion?: string[];
       minReplicas?: string[];
       maxReplicas?: string[];
       initialReplicas?: string[];

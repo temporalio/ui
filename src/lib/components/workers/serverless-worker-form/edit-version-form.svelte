@@ -127,7 +127,7 @@
       modalFunctionName: initialData.modalFunctionName ?? '',
       modalEnvironment: initialData.modalEnvironment ?? '',
       modalWorkspaceId: initialData.modalWorkspaceId ?? '',
-      modalVersion: initialData.modalVersion ?? '',
+      modalAppVersion: initialData.modalAppVersion ?? '',
       minReplicas: initialData.minReplicas ?? 0,
       maxReplicas: initialData.maxReplicas ?? 30,
       initialReplicas: initialData.initialReplicas ?? 0,
