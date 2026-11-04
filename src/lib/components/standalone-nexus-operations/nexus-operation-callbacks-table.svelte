@@ -100,7 +100,7 @@
 
 <PaginatedTable
   id="nexus-operation-callbacks"
-  class="w-full min-w-[800px]"
+  class="w-full"
   fixed
   aria-label={translate('nexus.callbacks')}
   perPageLabel={translate('common.per-page')}
