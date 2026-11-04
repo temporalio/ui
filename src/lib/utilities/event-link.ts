@@ -1,5 +1,6 @@
 import { translate } from '$lib/i18n/translate';
 import type { EventLink } from '$lib/types';
+import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
 import {
   routeForBatchOperation,
   routeForEventHistoryEvent,
@@ -43,7 +44,8 @@ const isPresent = (value: string | null | undefined): value is string => {
 };
 
 const workflowValueFromHref = (href: string, fallback: string): string => {
-  return href.split('workflows/')?.[1] || fallback || href;
+  const route = href.split('workflows/')?.[1];
+  return route ? decodeURIForSvelte(route) : fallback || href;
 };
 
 const namespaceDisplay = (
