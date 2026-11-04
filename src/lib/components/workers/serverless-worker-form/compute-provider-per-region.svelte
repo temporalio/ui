@@ -188,8 +188,13 @@
   );
   const replicaKey = $derived(replicaRegion?.id ?? 'replica');
   const replicated = $derived(highAvailability && !!replicaRegion);
-  /** Only a replica can stand alone, so the primary runs unless one does. */
-  const primaryActive = $derived(!replicated || runsInPrimary);
+  const primaryLabel = $derived(primaryRegion.label ?? primaryRegion.id);
+  /**
+   * One region always runs Serverless Workers, so the toggle of the only one
+   * running is disabled. With neither, the save would drop the compute.
+   */
+  const primaryIsLast = $derived(runsInPrimary && !replicated);
+  const replicaIsLast = $derived(replicated && !runsInPrimary);
 
   /**
    * A regional resource name needs the provider's own name for the region,
@@ -201,7 +206,7 @@
       ? suggestRegionalArn(arn, replicaRegion.providerRegion)
       : '';
 
-  const inheritsPrimary = $derived(!replica.customized && primaryActive);
+  const inheritsPrimary = $derived(!replica.customized && runsInPrimary);
 
   const replicaLambdaArn = $derived(
     replica.lambdaArnOverride ?? suggestFor(primary.lambdaArn),
@@ -233,7 +238,7 @@
    */
   const sameRegionWarning = $derived(
     replicated &&
-      primaryActive &&
+      runsInPrimary &&
       primaryResourceRegion &&
       primaryResourceRegion === replicaResourceRegion
       ? translate('workers.replica-same-region', {
@@ -286,12 +291,6 @@
     runsInPrimary = value;
   };
 
-  /** Without a replica the primary is the only region, so it runs again. */
-  const setHighAvailability = (value: boolean) => {
-    highAvailability = value;
-    if (!value) runsInPrimary = true;
-  };
-
   let replicaSettings = $state<HTMLElement>();
 
   /**
@@ -336,7 +335,7 @@
   const previewRegions = $derived<PreviewRegion[]>([
     {
       ...regionPreview(primaryRegion, provider, primary),
-      serverless: primaryActive,
+      serverless: runsInPrimary,
     },
     ...(replicated && replicaRegion
       ? [
@@ -392,7 +391,7 @@
   });
 
   const savedValues = $derived<RegionComputeValues[]>([
-    ...(primaryActive
+    ...(runsInPrimary
       ? [
           {
             regionId: primaryRegion.id,
@@ -414,7 +413,7 @@
             }),
             // A replica on its own must name its region, or it would also run
             // in the primary.
-            scoped: !primaryActive || (replicaGroup?.scoped ?? true),
+            scoped: !runsInPrimary || (replicaGroup?.scoped ?? true),
             name: replicaGroup?.name,
           },
         ]
@@ -466,15 +465,13 @@
       region={replicated ? primaryRegion : undefined}
       title={translate('workers.region-role-primary')}
       showRole
-      bodyClass={primaryActive ? '' : 'py-3'}
+      bodyClass={runsInPrimary ? '' : 'py-3'}
     >
       {#snippet action()}
         {#if replicaRegion}
-          <!-- On and disabled without high availability, because the primary
-          then runs and is the only region that can. -->
           <Tooltip
-            text={translate('workers.region-compute-disabled')}
-            hide={replicated}
+            text={translate('workers.region-compute-last')}
+            hide={!primaryIsLast}
             bottomRight
             width={260}
           >
@@ -482,13 +479,13 @@
               id="primary-compute"
               label={translate('workers.region-compute')}
               labelPosition="left"
-              disabled={!replicated}
-              bind:checked={() => primaryActive, setRunsInPrimary}
+              disabled={primaryIsLast}
+              bind:checked={() => runsInPrimary, setRunsInPrimary}
             />
           </Tooltip>
         {/if}
       {/snippet}
-      {#if primaryActive}
+      {#if runsInPrimary}
         <div
           class="flow-root"
           in:slide={motion('reveal')}
@@ -534,7 +531,10 @@
           in:slide={motion('reveal')}
           out:slide={motion('conceal')}
         >
-          {translate('workers.region-compute-off', { region: replicaLabel })}
+          {translate('workers.region-compute-off-primary', {
+            region: primaryLabel,
+            replica: replicaLabel,
+          })}
         </p>
       {/if}
     </RegionBlock>
@@ -550,12 +550,20 @@
         bodyClass={highAvailability ? '' : 'py-3'}
       >
         {#snippet action()}
-          <ToggleSwitch
-            id="high-availability"
-            label={translate('workers.high-availability')}
-            labelPosition="left"
-            bind:checked={() => highAvailability, setHighAvailability}
-          />
+          <Tooltip
+            text={translate('workers.region-compute-last')}
+            hide={!replicaIsLast}
+            bottomRight
+            width={260}
+          >
+            <ToggleSwitch
+              id="replica-compute"
+              label={translate('workers.region-compute')}
+              labelPosition="left"
+              disabled={replicaIsLast}
+              bind:checked={highAvailability}
+            />
+          </Tooltip>
         {/snippet}
         <!-- Each branch grows down from the toggle, so nothing above it moves.
         flow-root keeps the children's margins inside the sliding box. -->
@@ -690,7 +698,9 @@
             in:slide={motion('reveal')}
             out:slide={motion('conceal')}
           >
-            {translate('workers.high-availability-off')}
+            {translate('workers.region-compute-off-replica', {
+              region: replicaLabel,
+            })}
           </p>
         {/if}
       </RegionBlock>
