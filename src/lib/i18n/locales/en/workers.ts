@@ -309,6 +309,9 @@ export const Strings = {
   'high-availability-off':
     'Turn on to run Serverless Workers in a replica region after a failover.',
   'region-the-primary': 'the primary',
+  'region-compute': 'Serverless Workers',
+  'region-compute-off':
+    'Serverless Workers run only in {{region}}. While the Namespace is active in this region, Tasks for this version wait until other Workers poll.',
   'replica-same-region':
     'The primary and the replica both run in {{region}}, so an outage there stops both.',
   'region-arn-suggested-from-primary':

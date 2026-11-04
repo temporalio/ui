@@ -111,6 +111,7 @@
       initialReplicaData={replicaValues}
       primaryGroup={slots?.primary}
       replicaGroup={slots?.replica}
+      initialRunsInPrimary={!!groups.primary || !groups.replica}
       enabledRegionIds={groups.replica && replicaRegionId
         ? [replicaRegionId]
         : []}
