@@ -62,6 +62,10 @@
       modal: translate('workers.preview-resource-modal'),
     }[provider],
   );
+  // Modal has no access row at all, so it needs no label. The worker
+  // controller resolves its own credentials, which is why accessValue returns
+  // nothing for it -- and an empty slot renders as "Not set", which would
+  // claim a Role was missing when none is wanted.
   const accessLabel = $derived(
     provider === 'cloud-run'
       ? translate('workers.preview-access-cloud-run')
@@ -450,8 +454,10 @@
                 })}
               {:else}
                 {@render field(resourceLabel, region.resource)}
-                <div class="my-1 border-t border-primary"></div>
-                {@render field(accessLabel, region.access)}
+                {#if provider !== 'modal'}
+                  <div class="my-1 border-t border-primary"></div>
+                  {@render field(accessLabel, region.access)}
+                {/if}
               {/if}
             </div>
           </div>
