@@ -6,6 +6,9 @@
 #   event payload.
 # - All write operations (labels, comments) go through the github-script-bound
 #   Octokit, never through shell.
+# - The Slack notification step receives PR title / URL / author via step
+#   outputs that came from JS context, then re-exposed via env: vars. No shell
+#   interpolation of untrusted strings.
 name: A11y PR Triage
 
 on:
@@ -37,8 +40,12 @@ jobs:
       - name: Install js-yaml
         run: npm install --no-save --no-audit --no-fund --silent js-yaml@^4
 
-      - name: Triage and label
+      - name: Triage, label, and notify
+        id: triage
         uses: actions/github-script@v7
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_CHANNEL: ${{ vars.DESIGN_FEEDBACK_SLACK_CHANNEL }}
         with:
           script: |
             const fs = require('fs');
@@ -147,6 +154,80 @@ jobs:
             }
             if (toAdd.length > 0) {
               await github.rest.issues.addLabels({ owner, repo, issue_number, labels: toAdd });
+            }
+
+            // Slack notification gating. The previous bucket-notify-via-labeled-event
+            // design didn't work because GITHUB_TOKEN-triggered events don't fire
+            // downstream workflows (GitHub's recursion-prevention rule). We inline
+            // the ping here and dedup via a hidden bot comment so trailer-edit
+            // cycles don't double-ping.
+            const PING_BUCKETS = ['a11y:bucket-3', 'a11y:bucket-4'];
+            const newlyAddedBucket = toAdd.find((l) => PING_BUCKETS.includes(l));
+
+            if (newlyAddedBucket) {
+              try {
+                const NOTIFY_MARKER_PREFIX = '<!-- a11y-bucket-notify-fired:';
+                const allComments = await github.paginate(github.rest.issues.listComments, {
+                  owner, repo, issue_number, per_page: 100,
+                });
+                const marker = allComments.find((c) => c.body && c.body.startsWith(NOTIFY_MARKER_PREFIX));
+                let lastPinged = '';
+                if (marker) {
+                  const m = marker.body.match(/<!-- a11y-bucket-notify-fired: (a11y:bucket-[34]) -->/);
+                  if (m) lastPinged = m[1];
+                }
+                if (lastPinged === newlyAddedBucket) {
+                  core.info(`Already pinged Slack for ${newlyAddedBucket}; skipping.`);
+                } else {
+                  const newBody = `<!-- a11y-bucket-notify-fired: ${newlyAddedBucket} -->\n<sub>Slack notification dedup marker (DT-4048).</sub>`;
+                  if (marker) {
+                    await github.rest.issues.updateComment({ owner, repo, comment_id: marker.id, body: newBody });
+                  } else {
+                    await github.rest.issues.createComment({ owner, repo, issue_number, body: newBody });
+                  }
+                  // CONTRIBUTOR is included because GITHUB_TOKEN-issued lookups
+                  // return CONTRIBUTOR for org members with private membership
+                  // (whose membership visibility isn't visible to repo-scope
+                  // tokens). All four values represent "authorized author."
+                  const ALLOWED_ASSOC = ['MEMBER', 'COLLABORATOR', 'OWNER', 'CONTRIBUTOR'];
+                  if (!ALLOWED_ASSOC.includes(pr.author_association)) {
+                    core.info(`Skipping Slack ping: author_association ${pr.author_association} not in allowed list.`);
+                  } else {
+                    const slackPayload = {
+                      channel: process.env.SLACK_CHANNEL,
+                      text: `A11y review needed (${newlyAddedBucket}): ${pr.title}`,
+                      blocks: [
+                        { type: 'header', text: { type: 'plain_text', text: 'Accessibility PR needs engineer review' } },
+                        { type: 'section', text: { type: 'mrkdwn', text: `*<${pr.html_url}|#${pr.number}: ${pr.title}>*` } },
+                        { type: 'section', fields: [
+                          { type: 'mrkdwn', text: `*Bucket:*\n${newlyAddedBucket}` },
+                          { type: 'mrkdwn', text: `*Author:*\n${(pr.user && pr.user.login) || ''}` },
+                          { type: 'mrkdwn', text: `*Repository:*\n${owner}/${repo}` },
+                        ] },
+                        { type: 'actions', elements: [
+                          { type: 'button', text: { type: 'plain_text', text: 'View PR' }, style: 'primary', url: pr.html_url },
+                        ] },
+                      ],
+                    };
+                    const slackResp = await fetch('https://slack.com/api/chat.postMessage', {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json; charset=utf-8',
+                        'Authorization': `Bearer ${process.env.SLACK_BOT_TOKEN}`,
+                      },
+                      body: JSON.stringify(slackPayload),
+                    });
+                    const slackResult = await slackResp.json();
+                    if (slackResult.ok) {
+                      core.info(`Slack ping sent (${newlyAddedBucket}) to ${process.env.SLACK_CHANNEL}`);
+                    } else {
+                      core.warning(`Slack ping failed: ${slackResult.error || 'unknown'} (status ${slackResp.status})`);
+                    }
+                  }
+                }
+              } catch (err) {
+                core.warning(`A11y Slack section failed: ${err && err.message}`);
+              }
             }
 
             const failureLabels = ['a11y:needs-categorization', 'a11y:broken-ref', 'a11y:no-fix-doc'];
