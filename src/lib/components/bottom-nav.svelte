@@ -1,12 +1,13 @@
 <script lang="ts">
   import { slide } from 'svelte/transition';
 
-  import type { Snippet } from 'svelte';
+  import { type Snippet, untrack } from 'svelte';
   import { type ClassNameValue, twMerge as merge } from 'tailwind-merge';
 
   import { beforeNavigate } from '$app/navigation';
   import { page } from '$app/state';
 
+  import { appPalette } from '$lib/components/app-palette/app-palette-state.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Logo from '$lib/holocene/logo.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -94,6 +95,13 @@
 
   beforeNavigate(() => {
     closeMenu();
+  });
+
+  // A menu item can open the app palette. Close the sheet so the palette is
+  // not left behind it when the palette closes.
+  $effect(function closeForPalette() {
+    if (!appPalette.open) return;
+    untrack(closeMenu);
   });
 
   const namespace = $derived(page.params.namespace || $lastUsedNamespace);
