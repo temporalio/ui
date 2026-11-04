@@ -5,6 +5,13 @@ import {
   IconGcpColor,
   IconModalColor,
 } from '$lib/io/icon';
+import {
+  decodeAgentCoreProviderDetails,
+  decodeGcpCloudRunProviderDetails,
+  decodeLambdaProviderDetails,
+  decodeModalProviderDetails,
+} from '$lib/services/deployments-service';
+import type { ComputeConfig } from '$lib/types/deployments';
 
 import type { ComputeSection } from './fields/types';
 import defaultAgentCoreTerraform from './serverless-worker-agentcore.tf?raw';
@@ -133,6 +140,24 @@ export type ComputeProviderDefinition = {
     /** Absent for a provider that asks for no credentials of its own. */
     access?: ComputeSection;
   };
+  /**
+   * What a saved Version shows for this provider, as labelled rows.
+   *
+   * Rows rather than a shape keyed by field name, so a consumer renders them
+   * without knowing which provider it holds. Every reader that wanted a
+   * provider's saved settings used to name all of them and decode each in
+   * turn, which is why three of them silently rendered nothing for Modal: the
+   * list was theirs to maintain, and nothing failed when it fell behind.
+   */
+  details: (computeConfig: ComputeConfig) => readonly ComputeDetailRow[];
+};
+
+/** One labelled setting from a saved Version. */
+export type ComputeDetailRow = {
+  labelKey: I18nKey<I18nResources>;
+  value: string | undefined;
+  /** An identifier long enough to truncate, keeping the full value on hover. */
+  truncate?: boolean;
 };
 
 export { TERRAFORM_MODULES } from './terraform-modules';
@@ -158,6 +183,27 @@ export const COMPUTE_PROVIDERS: Record<
     },
     terraformModuleHref: `${TERRAFORM_MODULES}/aws/lambda`,
     fields: { resource: LambdaResourceFields, access: AwsRoleAccessFields },
+    details: (computeConfig) => {
+      const { lambdaArn, iamRoleArn, roleExternalId } =
+        decodeLambdaProviderDetails(computeConfig);
+      return [
+        {
+          labelKey: 'workers.preview-resource-lambda',
+          value: lambdaArn,
+          truncate: true,
+        },
+        {
+          labelKey: 'workers.preview-access-aws',
+          value: iamRoleArn,
+          truncate: true,
+        },
+        {
+          labelKey: 'deployments.role-external-id',
+          value: roleExternalId,
+          truncate: true,
+        },
+      ];
+    },
   },
   agentcore: {
     value: 'agentcore',
@@ -176,6 +222,27 @@ export const COMPUTE_PROVIDERS: Record<
     },
     terraformModuleHref: `${TERRAFORM_MODULES}/aws/agentcore`,
     fields: { resource: AgentCoreResourceFields, access: AwsRoleAccessFields },
+    details: (computeConfig) => {
+      const { agentCoreEndpointArn, iamRoleArn, roleExternalId } =
+        decodeAgentCoreProviderDetails(computeConfig);
+      return [
+        {
+          labelKey: 'workers.preview-resource-agentcore',
+          value: agentCoreEndpointArn,
+          truncate: true,
+        },
+        {
+          labelKey: 'workers.preview-access-aws',
+          value: iamRoleArn,
+          truncate: true,
+        },
+        {
+          labelKey: 'deployments.role-external-id',
+          value: roleExternalId,
+          truncate: true,
+        },
+      ];
+    },
   },
   'cloud-run': {
     value: 'cloud-run',
@@ -190,6 +257,24 @@ export const COMPUTE_PROVIDERS: Record<
       terraform: defaultCloudRunTerraform,
     },
     fields: { resource: CloudRunResourceFields, access: CloudRunAccessFields },
+    details: (computeConfig) => {
+      const { gcpWorkerPool, gcpProject, gcpRegion, gcpServiceAccount } =
+        decodeGcpCloudRunProviderDetails(computeConfig);
+      return [
+        {
+          labelKey: 'workers.gcp-worker-pool-label',
+          value: gcpWorkerPool,
+          truncate: true,
+        },
+        { labelKey: 'workers.gcp-project-label', value: gcpProject },
+        { labelKey: 'workers.gcp-region-label', value: gcpRegion },
+        {
+          labelKey: 'workers.gcp-service-account-label',
+          value: gcpServiceAccount,
+          truncate: true,
+        },
+      ];
+    },
   },
   modal: {
     value: 'modal',
@@ -205,6 +290,31 @@ export const COMPUTE_PROVIDERS: Record<
     // No access section: the worker controller resolves Modal credentials
     // itself, so there is nothing for the form to collect.
     fields: { resource: ModalResourceFields },
+    details: (computeConfig) => {
+      const {
+        modalAppName,
+        modalFunctionName,
+        modalEnvironment,
+        modalWorkspaceId,
+        modalAppVersion,
+      } = decodeModalProviderDetails(computeConfig);
+      return [
+        { labelKey: 'workers.modal-app-name-label', value: modalAppName },
+        {
+          labelKey: 'workers.modal-function-name-label',
+          value: modalFunctionName,
+        },
+        {
+          labelKey: 'workers.modal-environment-label',
+          value: modalEnvironment,
+        },
+        {
+          labelKey: 'workers.modal-workspace-id-label',
+          value: modalWorkspaceId,
+        },
+        { labelKey: 'workers.modal-version-label', value: modalAppVersion },
+      ];
+    },
   },
 };
 
