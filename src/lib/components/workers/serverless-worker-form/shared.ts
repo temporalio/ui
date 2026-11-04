@@ -15,6 +15,7 @@ import {
   decodeAgentCoreProviderDetails,
   decodeGcpCloudRunProviderDetails,
   decodeLambdaProviderDetails,
+  decodeModalProviderDetails,
   decodeScalerDetails,
 } from '$lib/services/deployments-service';
 import type {
@@ -580,6 +581,7 @@ export const formValuesFromGroup = (
   const lambda = decodeLambdaProviderDetails(config);
   const agentCore = decodeAgentCoreProviderDetails(config);
   const gcp = decodeGcpCloudRunProviderDetails(config);
+  const modal = decodeModalProviderDetails(config);
   const scaler = decodeScalerDetails(config);
   return {
     // A saved provider decides which fields it filled.
@@ -587,7 +589,9 @@ export const formValuesFromGroup = (
       ? 'agentcore'
       : gcp.gcpWorkerPool
         ? 'cloud-run'
-        : 'lambda',
+        : modal.modalAppName
+          ? 'modal'
+          : 'lambda',
     lambdaArn: lambda.lambdaArn ?? '',
     agentCoreEndpointArn: agentCore.agentCoreEndpointArn ?? '',
     iamRoleArn: lambda.iamRoleArn ?? agentCore.iamRoleArn ?? '',
@@ -596,6 +600,11 @@ export const formValuesFromGroup = (
     gcpRegion: gcp.gcpRegion,
     gcpWorkerPool: gcp.gcpWorkerPool,
     gcpServiceAccount: gcp.gcpServiceAccount,
+    modalAppName: modal.modalAppName ?? '',
+    modalFunctionName: modal.modalFunctionName ?? '',
+    modalEnvironment: modal.modalEnvironment ?? '',
+    modalWorkspaceId: modal.modalWorkspaceId ?? '',
+    modalAppVersion: modal.modalAppVersion ?? '',
     scaleUpCooloffMs: scaler.scaleUpCooloffMs,
     scaleUpBacklogThreshold: scaler.scaleUpBacklogThreshold,
     maxWorkerLifetimeMs: scaler.maxWorkerLifetimeMs,

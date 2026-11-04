@@ -687,6 +687,32 @@ export const decodeGcpCloudRunProviderDetails = (
   }
 };
 
+export const decodeModalProviderDetails = (
+  computeConfig?: ComputeConfig,
+): {
+  modalAppName?: string;
+  modalFunctionName?: string;
+  modalEnvironment?: string;
+  modalWorkspaceId?: string;
+  modalAppVersion?: string;
+} => {
+  const scalingGroup = Object.values(computeConfig?.scalingGroups ?? {})[0];
+  if (providerTypeOf(scalingGroup) !== 'modal-function') return {};
+  if (!scalingGroup?.provider?.details?.data) return {};
+  try {
+    const raw = JSON.parse(atob(scalingGroup.provider.details.data));
+    const result: ReturnType<typeof decodeModalProviderDetails> = {};
+    if (raw.app_name) result.modalAppName = raw.app_name;
+    if (raw.function_name) result.modalFunctionName = raw.function_name;
+    if (raw.environment) result.modalEnvironment = raw.environment;
+    if (raw.workspace_id) result.modalWorkspaceId = raw.workspace_id;
+    if (raw.version) result.modalAppVersion = raw.version;
+    return result;
+  } catch {
+    return {};
+  }
+};
+
 export const decodeScalerDetails = (
   computeConfig?: ComputeConfig,
 ): {
