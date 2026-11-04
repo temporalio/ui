@@ -52,6 +52,7 @@ auth:
 | `issuerUrl`            | string   | Optional. Set only if issuer differs from provider URL                                                                                                                |
 | `clientId`             | string   | OAuth2 client ID                                                                                                                                                      |
 | `clientSecret`         | string   | OAuth2 client secret                                                                                                                                                  |
+| `clientAssertionFile`  | string   | Path to a JWT sent as the client assertion instead of `clientSecret`. See [Client assertion](#client-assertion)                                                       |
 | `scopes`               | array    | OAuth2 scopes. Include `offline_access` to enable token refresh                                                                                                       |
 | `callbackUrl`          | string   | OAuth2 callback URL for your deployment                                                                                                                               |
 | `options`              | object   | Additional URL parameters for the auth redirect                                                                                                                       |
@@ -74,6 +75,7 @@ Docker deployment can be configured without supplying a custom config file.
 | `TEMPORAL_AUTH_ISSUER_URL`             | `auth.providers[0].issuerUrl`                | unset             |
 | `TEMPORAL_AUTH_CLIENT_ID`              | `auth.providers[0].clientId`                 | unset             |
 | `TEMPORAL_AUTH_CLIENT_SECRET`          | `auth.providers[0].clientSecret`             | unset             |
+| `TEMPORAL_AUTH_CLIENT_ASSERTION_FILE`  | `auth.providers[0].clientAssertionFile`      | unset             |
 | `TEMPORAL_AUTH_CALLBACK_URL`           | `auth.providers[0].callbackUrl`              | unset             |
 | `TEMPORAL_AUTH_SCOPES`                 | `auth.providers[0].scopes` (comma separated) | unset             |
 | `TEMPORAL_AUTH_USE_ID_TOKEN_AS_BEARER` | `auth.providers[0].useIdTokenAsBearer`       | `false`           |
@@ -174,6 +176,27 @@ auth:
       callbackUrl: https://temporal-ui.example.com/auth/sso/callback
 ```
 
+To sign in without a client secret on AKS, use [Workload Identity](https://learn.microsoft.com/azure/aks/workload-identity-overview):
+add a federated identity credential to the app registration for the pod's service account, label the
+pod `azure.workload.identity/use: "true"`, and replace `clientSecret` with the token file the webhook mounts:
+
+```yaml
+auth:
+  enabled: true
+  providers:
+    - label: Azure AD
+      type: oidc
+      providerUrl: https://login.microsoftonline.com/{tenant-id}/v2.0
+      clientId: your-client-id
+      clientAssertionFile: /var/run/secrets/azure/tokens/azure-identity-token
+      scopes:
+        - openid
+        - profile
+        - email
+        - offline_access
+      callbackUrl: https://temporal-ui.example.com/auth/sso/callback
+```
+
 ### Auth0
 
 ```yaml
@@ -251,6 +274,15 @@ Store the client secret securely. Consider:
 - Environment variable substitution if your deployment supports it
 - Kubernetes secrets
 - HashiCorp Vault or similar secrets management
+
+### Client Assertion
+
+Instead of a client secret, the server can authenticate to the token endpoint with a signed JWT
+(`private_key_jwt`-style client authentication, [RFC 7523](https://www.rfc-editor.org/rfc/rfc7523)).
+Set `clientAssertionFile` to a file holding that JWT, such as a Kubernetes projected service account
+token that your identity provider trusts as a federated credential. The file is read on every token
+request, so a token rotated in place is picked up without a restart. `clientSecret` and
+`clientAssertionFile` are mutually exclusive.
 
 ### CORS Configuration
 
