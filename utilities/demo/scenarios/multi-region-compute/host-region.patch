@@ -1,0 +1,21 @@
+--- a/service/worker/fx.go
++++ b/service/worker/fx.go
+@@ -5,6 +5,7 @@
+ 	"os"
+ 
+ 	otellog "go.opentelemetry.io/otel/log"
++	"go.temporal.io/auto-scaled-workers/wci/hostconfig"
+ 	wcicomponent "go.temporal.io/auto-scaled-workers/wci/workercomponent"
+ 	"go.temporal.io/server/api/adminservice/v1"
+ 	"go.temporal.io/server/chasm"
+@@ -56,6 +57,10 @@
+ 	batcher.Module,
+ 	workerdeployment.Module,
+ 	wcicomponent.Module,
++	// Feature demo only: the open-source server supplies no host region, so the
++	// worker controller rejects scaling groups that set region_ids. A Temporal
++	// Cloud binary supplies its own.
++	fx.Supply(&hostconfig.Config{RegionID: os.Getenv("TEMPORAL_DEMO_HOST_REGION")}),
+ 	dlq.Module,
+ 	dummy.Module,
+ 	fx.Provide(schedulerpb.NewSchedulerServiceLayeredClient),

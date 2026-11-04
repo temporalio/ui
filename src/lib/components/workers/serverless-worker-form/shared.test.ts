@@ -1,13 +1,16 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  buildComputeConfigForRegions,
   createDeploymentSchema,
   createVersionSchema,
   editVersionSchema,
+  formValuesFromGroup,
   getInitialComputeProvider,
   interpolateTerraformTemplate,
   msToScaleDownStabilization,
   scaleDownStabilizationToMs,
+  validateRegionValues,
 } from './shared';
 
 describe('scale-down stabilization conversion', () => {
@@ -338,5 +341,228 @@ describe('AgentCore provider validation', () => {
 
   it('does not require Lambda or Cloud Run fields', () => {
     expect(errorPaths(valid)).toEqual([]);
+  });
+});
+
+describe('validateRegionValues', () => {
+  const valid = {
+    provider: 'lambda' as const,
+    lambdaArn: 'arn:aws:lambda:us-east-1:123456789012:function:w',
+    iamRoleArn: 'arn:aws:iam::123456789012:role/w',
+    roleExternalId: 'demo',
+    agentCoreEndpointArn: '',
+    gcpProject: '',
+    gcpRegion: '',
+    gcpWorkerPool: '',
+    gcpServiceAccount: '',
+    minReplicas: 0,
+    maxReplicas: 30,
+    initialReplicas: 0,
+    utilizationTarget: 0.8,
+    scaleDownStabilization: '90s',
+  };
+
+  it('passes a region whose resource the schema accepts', () => {
+    expect(validateRegionValues([{ regionId: 'east', values: valid }])).toEqual(
+      {},
+    );
+  });
+
+  it('reports a resource error the schema cannot see', () => {
+    // A well-formed ARN in a region that is not offered as a replica.
+    expect(
+      validateRegionValues([
+        {
+          regionId: 'replica',
+          values: valid,
+          resourceError: { field: 'lambdaArn', message: 'not offered' },
+        },
+      ]),
+    ).toEqual({ replica: { lambdaArn: ['not offered'] } });
+  });
+
+  it("puts the schema's own error on the field first", () => {
+    const errors = validateRegionValues([
+      {
+        regionId: 'replica',
+        values: { ...valid, lambdaArn: 'nope' },
+        resourceError: { field: 'lambdaArn', message: 'not offered' },
+      },
+    ]);
+    expect(errors.replica?.lambdaArn).toEqual(['Invalid Lambda ARN format']);
+  });
+});
+
+describe('buildComputeConfigForRegions', () => {
+  const EAST = 'aws-us-east-1';
+  const WEST = 'aws-us-west-2';
+
+  const lambda = (lambdaArn: string) => ({
+    provider: 'lambda' as const,
+    lambdaArn,
+    iamRoleArn: 'arn:aws:iam::123456789012:role/worker',
+    agentCoreEndpointArn: '',
+    roleExternalId: '',
+    gcpProject: '',
+    gcpRegion: '',
+    gcpWorkerPool: '',
+    gcpServiceAccount: '',
+    minReplicas: 0,
+    maxReplicas: 30,
+    initialReplicas: 0,
+    utilizationTarget: 0.8,
+    scaleDownStabilization: '90s',
+  });
+
+  const read = (group: { provider?: { details?: { data?: string } } }) =>
+    JSON.parse(atob(group.provider?.details?.data ?? btoa('{}')));
+
+  it('writes one group per region, each naming only its own', () => {
+    // A group per region rather than one listing both: a Lambda ARN is
+    // regional, so the two cannot share a group.
+    const config = buildComputeConfigForRegions([
+      {
+        regionId: EAST,
+        values: lambda('arn:aws:lambda:us-east-1:1:function:w'),
+      },
+      {
+        regionId: WEST,
+        values: lambda('arn:aws:lambda:us-west-2:1:function:w'),
+      },
+    ]);
+
+    const groups = config.scalingGroups ?? {};
+    expect(Object.keys(groups)).toEqual([EAST, WEST]);
+    expect(groups[EAST].regionIds).toEqual([EAST]);
+    expect(groups[WEST].regionIds).toEqual([WEST]);
+  });
+
+  it('keeps each region its own resource', () => {
+    const config = buildComputeConfigForRegions([
+      {
+        regionId: EAST,
+        values: lambda('arn:aws:lambda:us-east-1:1:function:w'),
+      },
+      {
+        regionId: WEST,
+        values: lambda('arn:aws:lambda:us-west-2:1:function:w'),
+      },
+    ]);
+
+    const groups = config.scalingGroups ?? {};
+    expect(read(groups[EAST]).arn).toBe(
+      'arn:aws:lambda:us-east-1:1:function:w',
+    );
+    expect(read(groups[WEST]).arn).toBe(
+      'arn:aws:lambda:us-west-2:1:function:w',
+    );
+  });
+
+  it('does not write the hardcoded default group', () => {
+    const config = buildComputeConfigForRegions([
+      {
+        regionId: EAST,
+        values: lambda('arn:aws:lambda:us-east-1:1:function:w'),
+      },
+    ]);
+
+    expect(Object.keys(config.scalingGroups ?? {})).not.toContain('default');
+  });
+
+  it('saves the primary as the unscoped default group, beside a scoped replica', () => {
+    // The PRD's upgrade path: the existing default group stays as it was and
+    // a group scoped to the replica is added beside it.
+    const config = buildComputeConfigForRegions([
+      {
+        regionId: EAST,
+        values: lambda('arn:aws:lambda:us-east-1:1:function:w'),
+        scoped: false,
+      },
+      {
+        regionId: WEST,
+        values: lambda('arn:aws:lambda:us-west-2:1:function:w'),
+      },
+    ]);
+
+    const groups = config.scalingGroups ?? {};
+    expect(Object.keys(groups)).toEqual(['default', WEST]);
+    expect(groups.default.regionIds).toBeUndefined();
+    expect(groups[WEST].regionIds).toEqual([WEST]);
+  });
+
+  it('writes nothing for no regions, rather than an empty default', () => {
+    expect(buildComputeConfigForRegions([]).scalingGroups).toEqual({});
+  });
+});
+
+describe('formValuesFromGroup', () => {
+  it('reads a saved Lambda group back into the values that built it', () => {
+    const config = buildComputeConfigForRegions([
+      {
+        regionId: 'aws-us-west-2',
+        values: {
+          provider: 'lambda',
+          lambdaArn: 'arn:aws:lambda:us-west-2:123456789012:function:w',
+          iamRoleArn: 'arn:aws:iam::123456789012:role/w',
+          roleExternalId: 'demo',
+          agentCoreEndpointArn: '',
+          gcpProject: '',
+          gcpRegion: '',
+          gcpWorkerPool: '',
+          gcpServiceAccount: '',
+          minReplicas: 0,
+          maxReplicas: 30,
+          initialReplicas: 0,
+          utilizationTarget: 0.8,
+          scaleDownStabilization: '90s',
+          scaleUpCooloffMs: 5000,
+        },
+      },
+    ]);
+
+    expect(
+      formValuesFromGroup(config.scalingGroups?.['aws-us-west-2']),
+    ).toMatchObject({
+      provider: 'lambda',
+      lambdaArn: 'arn:aws:lambda:us-west-2:123456789012:function:w',
+      iamRoleArn: 'arn:aws:iam::123456789012:role/w',
+      roleExternalId: 'demo',
+      scaleUpCooloffMs: 5000,
+    });
+  });
+
+  it('reads no group as empty Lambda values', () => {
+    expect(formValuesFromGroup(undefined)).toMatchObject({
+      provider: 'lambda',
+      lambdaArn: '',
+      iamRoleArn: '',
+    });
+  });
+
+  it('keeps a saved group name, so an edit updates it in place', () => {
+    const group = { provider: { type: 'aws-lambda' } };
+    expect(
+      Object.keys(
+        buildComputeConfigForRegions([
+          {
+            regionId: 'aws-us-east-1',
+            values: {
+              ...formValuesFromGroup(group),
+              provider: 'lambda',
+            } as never,
+            scoped: false,
+            name: 'primary-workers',
+          },
+          {
+            regionId: 'aws-us-west-2',
+            values: {
+              ...formValuesFromGroup(group),
+              provider: 'lambda',
+            } as never,
+            name: 'secondary',
+          },
+        ]).scalingGroups ?? {},
+      ),
+    ).toEqual(['primary-workers', 'secondary']);
   });
 });

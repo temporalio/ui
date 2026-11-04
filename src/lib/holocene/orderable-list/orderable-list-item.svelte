@@ -70,7 +70,11 @@
   const handleDrop = (event: ExtendedDragEvent, to: number) => {
     if (!event.dataTransfer) return;
     event.currentTarget.classList.remove('dragging-over');
-    const from = parseInt(event.dataTransfer.getData('text/plain'));
+    const rowIndex = event.dataTransfer.getData('text/plain');
+    if (!rowIndex.trim()) return;
+    const from = Number(rowIndex);
+    if (!Number.isInteger(from) || from < 0 || from >= totalItems) return;
+    if (from === to) return;
     onMoveItem?.({ from, to });
   };
 

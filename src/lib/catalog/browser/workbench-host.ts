@@ -86,11 +86,14 @@ export type ReadinessState =
   | 'skipped'
   | 'unavailable';
 
+export type WorkerAvailability = 'polling' | 'serverless' | 'none';
+
 export type WorkerReadinessCheck = {
   kind: 'worker';
   required: false;
   state: ReadinessState;
   taskQueueType: 1 | 2 | 3;
+  serverless?: true;
 };
 
 export type NexusEndpointReadinessCheck = {

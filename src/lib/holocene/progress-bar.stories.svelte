@@ -14,3 +14,9 @@
     <ProgressBar />
   </div>
 </Story>
+
+<Story name="Subtle, Comet" asChild>
+  <div class="relative mx-auto p-8">
+    <ProgressBar subtle />
+  </div>
+</Story>

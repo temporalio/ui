@@ -1,6 +1,7 @@
 <script lang="ts">
   import { translate } from '$lib/i18n/translate';
   import { fetchDeploymentVersion } from '$lib/services/deployments-service';
+  import type { NamespaceRegion } from '$lib/utilities/compute-regions';
 
   import VersionComputeDetails from './version-compute-details.svelte';
 
@@ -8,9 +9,15 @@
     namespace: string;
     deploymentName: string;
     buildId: string;
+    namespaceRegions?: readonly NamespaceRegion[];
   }
 
-  let { namespace, deploymentName, buildId }: Props = $props();
+  let {
+    namespace,
+    deploymentName,
+    buildId,
+    namespaceRegions = [],
+  }: Props = $props();
 
   let retryCount = $state(0);
   const fetchPromise = $derived.by(() => {
@@ -34,6 +41,7 @@
   {#if result}
     <VersionComputeDetails
       computeConfig={result.workerDeploymentVersionInfo.computeConfig}
+      {namespaceRegions}
     />
   {/if}
 {:catch err}

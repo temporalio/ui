@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import type { Payloads } from '$lib/types';
 import { decodePayloadResult } from '$lib/utilities/decode-payload-result';
+import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
 import { createDecodedPayload } from './decoded-payload.svelte';
 
@@ -10,7 +11,14 @@ vi.mock('$lib/utilities/decode-payload-result', () => ({
   decodePayloadResult: vi.fn(),
 }));
 
+vi.mock('$lib/utilities/parse-with-big-int', async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import('$lib/utilities/parse-with-big-int')>();
+  return { ...actual, stringifyWithBigInt: vi.fn(actual.stringifyWithBigInt) };
+});
+
 const mockDecode = vi.mocked(decodePayloadResult);
+const mockStringify = vi.mocked(stringifyWithBigInt);
 
 const payloads = (data: string): Payloads => ({
   payloads: [{ metadata: {}, data: new TextEncoder().encode(data) }],
@@ -205,5 +213,71 @@ describe('createDecodedPayload', () => {
       status: 'success',
       results: results('b'),
     });
+  });
+
+  it('does not re-stringify an unchanged value', async () => {
+    mockDecode.mockResolvedValue(results('a'));
+    const value = payloads('a');
+    let tick = $state(0);
+    cleanup = $effect.root(() => {
+      const decoded = createDecodedPayload(() => {
+        void tick;
+        return value;
+      });
+      $effect.pre(() => {
+        void decoded.current;
+      });
+    });
+    flushSync();
+    const calls = mockStringify.mock.calls.length;
+    tick++;
+    flushSync();
+    tick++;
+    flushSync();
+    expect(mockStringify.mock.calls.length).toBe(calls);
+    expect(mockDecode).toHaveBeenCalledTimes(1);
+  });
+
+  it('calls onDecode with the results of the current decode', async () => {
+    const stale = deferred<ReturnType<typeof results>>();
+    mockDecode
+      .mockReturnValueOnce(stale.promise)
+      .mockResolvedValueOnce(results('b'));
+    const onDecode = vi.fn();
+    let value = $state<Payloads>(payloads('a'));
+    cleanup = $effect.root(() => {
+      createDecodedPayload(() => value, { onDecode });
+    });
+    flushSync();
+    value = payloads('b');
+    flushSync();
+    await vi.waitFor(() => expect(onDecode).toHaveBeenCalledTimes(1));
+    stale.resolve(results('a'));
+    await stale.promise;
+    expect(onDecode).toHaveBeenCalledTimes(1);
+    expect(onDecode).toHaveBeenCalledWith(results('b'));
+  });
+
+  it('keeps the success state when onDecode throws', async () => {
+    const consoleError = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
+    const failure = new Error('onDecode failed');
+    mockDecode.mockResolvedValueOnce(results('a'));
+    let decoded!: ReturnType<typeof createDecodedPayload>;
+    cleanup = $effect.root(() => {
+      decoded = createDecodedPayload(() => payloads('a'), {
+        onDecode: () => {
+          throw failure;
+        },
+      });
+    });
+    flushSync();
+    await vi.waitFor(() => expect(consoleError).toHaveBeenCalledWith(failure));
+    expect(decoded.current).toEqual({
+      status: 'success',
+      results: results('a'),
+    });
+    consoleError.mockRestore();
   });
 });

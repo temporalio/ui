@@ -105,6 +105,17 @@ export type IoTheme = {
   opacity: {
     disabled: string;
   };
+  spacing: {
+    'page-margin': string;
+    'page-gutter': string;
+    xl: string;
+    lg: string;
+    md: string;
+    sm: string;
+    xs: string;
+    '2xs': string;
+    '3xs': string;
+  };
 };
 
 type AppendPath<Prefix extends string, Key extends string> = Prefix extends ''

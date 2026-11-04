@@ -21,7 +21,10 @@
   let { scheduleId, namespace }: Props = $props();
 
   $effect(() => {
-    return () => clearConfirmationModalActionTimeout('delete');
+    return () => {
+      clearConfirmationModalActionTimeout('delete');
+      closeConfirmationModal('delete');
+    };
   });
 </script>
 

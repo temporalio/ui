@@ -11,6 +11,7 @@ export interface CatalogKindDefinition {
   locationLabel: string;
   location: (descriptor: BrowserCatalogDescriptor) => string;
   pollingWorkerLabel: string;
+  serverlessWorkerLabel: string;
   glyphClass: string;
   badgeClass: string;
 }
@@ -35,6 +36,7 @@ export const catalogKinds: Readonly<
     locationLabel: 'Task Queue',
     location: taskQueue,
     pollingWorkerLabel: 'A Worker is polling for Workflow Tasks',
+    serverlessWorkerLabel: 'A serverless Worker starts for Workflow Tasks',
     glyphClass: 'rounded-sm bg-action-workflow',
     badgeClass: 'bg-action-workflow-overlay',
   },
@@ -44,6 +46,7 @@ export const catalogKinds: Readonly<
     locationLabel: 'Task Queue',
     location: taskQueue,
     pollingWorkerLabel: 'A Worker is polling for Activity Tasks',
+    serverlessWorkerLabel: 'A serverless Worker starts for Activity Tasks',
     glyphClass: 'rounded-full bg-action-activity',
     badgeClass: 'bg-action-activity-overlay',
   },
@@ -53,6 +56,7 @@ export const catalogKinds: Readonly<
     locationLabel: 'Nexus Endpoint',
     location: nexusEndpoint,
     pollingWorkerLabel: 'A handler Worker is polling for Nexus Tasks',
+    serverlessWorkerLabel: 'A serverless handler Worker starts for Nexus Tasks',
     glyphClass: 'rotate-45 scale-[0.82] rounded-[1px] bg-action-nexus',
     badgeClass: 'bg-action-nexus-overlay',
   },

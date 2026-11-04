@@ -36,11 +36,15 @@
     executionKind,
     state,
     taskQueue,
+    workerStartCommand,
+    serverless = false,
   }: {
     kind: HostReadinessCheck['kind'];
     executionKind: CatalogExecutionKind;
     state: WorkerReadinessDisplayState | 'loading';
     taskQueue: string;
+    workerStartCommand?: string;
+    serverless?: boolean;
   }): ReadinessPresentation => {
     const label =
       kind === 'worker'
@@ -59,6 +63,16 @@
           kind === 'worker'
             ? 'Checking for Workers…'
             : 'Checking Nexus Endpoint readiness…',
+      };
+    }
+
+    if (kind === 'worker' && state === 'ready' && serverless) {
+      return {
+        Icon: IconCheckCircle,
+        iconClass: 'text-success',
+        iconLabel: `${iconSubject} is ready`,
+        label: catalogKinds[executionKind].serverlessWorkerLabel,
+        tooltip: `The ${taskQueue} Task Queue is served by a serverless Worker Deployment that scales to zero when idle. A Worker starts when this run creates a task.`,
       };
     }
 
@@ -83,7 +97,7 @@
         label,
         tooltip:
           kind === 'worker'
-            ? `This run will wait for a Worker to poll the ${taskQueue} Task Queue. Run "pnpm catalog worker" to start one.`
+            ? `This run will wait for a Worker to poll the ${taskQueue} Task Queue.${workerStartCommand ? ` Run "${workerStartCommand}" to start one.` : ''}`
             : 'Nexus Endpoint is unavailable.',
       };
     }
@@ -158,7 +172,11 @@
   import { declaredExecutionId, startFromEditors } from './start-example';
   import { catalogSharedStartOptionNames } from './start-options';
   import type { BrowserCatalogDescriptor, JsonValue } from './types';
-  import type { ReadinessCheck, WorkbenchHost } from './workbench-host';
+  import type {
+    ReadinessCheck,
+    WorkbenchHost,
+    WorkerReadinessCheck,
+  } from './workbench-host';
 
   type FixedExecutionField = {
     id: string;
@@ -172,9 +190,10 @@
     descriptor: BrowserCatalogDescriptor;
     host: WorkbenchHost;
     sessionStore: CatalogSessionStore;
+    workerStartCommand?: string;
   }
 
-  let { descriptor, host, sessionStore }: Props = $props();
+  let { descriptor, host, sessionStore, workerStartCommand }: Props = $props();
 
   let inputEditor = $state('');
   let startOptionsEditor = $state('');
@@ -303,11 +322,13 @@
   let loadedExampleId = $state('');
   let descriptorEpoch = 0;
   const readinessLoader = createReadinessLoader(() => host);
+  let workerCheck = $derived(
+    readiness.find(
+      (check): check is WorkerReadinessCheck => check.kind === 'worker',
+    ),
+  );
   let workerReadinessState: WorkerReadinessDisplayState = $derived(
-    readinessError
-      ? 'error'
-      : (readiness.find((check) => check.kind === 'worker')?.state ??
-          'missing'),
+    readinessError ? 'error' : (workerCheck?.state ?? 'missing'),
   );
   let workerPresentation = $derived(
     readinessPresentation({
@@ -315,6 +336,8 @@
       executionKind: descriptor.execution.kind,
       state: readinessLoading ? 'loading' : workerReadinessState,
       taskQueue: descriptor.execution.taskQueue,
+      workerStartCommand,
+      serverless: Boolean(workerCheck?.serverless),
     }),
   );
   let prerequisiteReadiness = $derived(
@@ -796,14 +819,14 @@
               </Tooltip>
               <span>{workerPresentation.label}</span>
             </div>
-            {#if !readinessLoading && workerReadinessState === 'unavailable'}
+            {#if workerStartCommand && !readinessLoading && workerReadinessState === 'unavailable'}
               <p class="mt-2 text-xs text-secondary">
                 Start a catalog worker, then run the example:
               </p>
               <Copyable
                 visible
                 clickAllToCopy
-                content="pnpm catalog worker"
+                content={workerStartCommand}
                 copyIconTitle="Copy the worker start command"
                 copySuccessIconTitle="Copied the worker start command"
                 container-class="mt-1"

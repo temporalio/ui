@@ -3,12 +3,15 @@
     type ComputeProviderTemplates,
     type ComputeProviderValue,
   } from '$lib/components/workers/serverless-worker-form/compute-providers';
+  import { computeRegionsFor } from '$lib/components/workers/serverless-worker-form/multi-region';
   import ServerlessWorkerCreateForm from '$lib/components/workers/serverless-worker-form/serverless-worker-create-form.svelte';
-  import type {
-    ComputeProviderOption,
-    CreateDeploymentFormData,
+  import {
+    buildComputeConfigForRegions,
+    buildComputeConfigFromForm,
+    type CreateDeploymentFormData,
+    getInitialComputeProvider,
+    type RegionComputeValues,
   } from '$lib/components/workers/serverless-worker-form/shared';
-  import { buildComputeConfigFromForm } from '$lib/components/workers/serverless-worker-form/shared';
   import { translate } from '$lib/i18n/translate';
   import {
     createWorkerDeployment,
@@ -19,14 +22,22 @@
     validateWorkerDeploymentVersionComputeConfig,
   } from '$lib/services/deployments-service';
   import type { ComputeConfig } from '$lib/types/deployments';
+  import {
+    type ComputeProviderConfig,
+    configuredRegions,
+    deployRegionsFor,
+  } from '$lib/utilities/compute-provider-config';
   import { routeForWorkers } from '$lib/utilities/route-for';
 
   interface Props {
     namespace: string;
     onSuccess: () => void;
     templates?: Record<ComputeProviderValue, ComputeProviderTemplates>;
-    computeProviders?: readonly ComputeProviderOption[];
-    gcpRegions?: string[];
+    /**
+     * The providers this Namespace may use and the regions it lives in. Two
+     * or more regions turn on high availability.
+     */
+    providerConfig?: ComputeProviderConfig;
   }
 
   interface SubmitFieldErrors {
@@ -34,8 +45,18 @@
     iamRoleArn?: string[];
   }
 
-  let { namespace, onSuccess, templates, computeProviders, gcpRegions }: Props =
-    $props();
+  let { namespace, onSuccess, templates, providerConfig }: Props = $props();
+
+  const computeProviders = $derived(providerConfig?.providers);
+  const gcpRegions = $derived(deployRegionsFor(providerConfig, 'cloud-run'));
+  const namespaceRegions = $derived(configuredRegions(providerConfig));
+
+  const regions = $derived(
+    computeRegionsFor(
+      namespaceRegions,
+      getInitialComputeProvider({ providers: computeProviders }),
+    ),
+  );
 
   async function rollbackDeployment(
     deploymentName: string,
@@ -69,6 +90,7 @@
 
   async function handleCreate(
     data: CreateDeploymentFormData,
+    regionValues?: RegionComputeValues[],
   ): Promise<SubmitFieldErrors | void> {
     let deploymentError: string | undefined;
     const deployment = await createWorkerDeployment(
@@ -82,7 +104,9 @@
     );
     if (deploymentError) throw new Error(deploymentError);
 
-    const computeConfig = buildComputeConfigFromForm(data);
+    const computeConfig = regionValues
+      ? buildComputeConfigForRegions(regionValues)
+      : buildComputeConfigFromForm(data);
 
     let versionError: string | undefined;
     await createWorkerDeploymentVersion(
@@ -186,4 +210,6 @@
   {templates}
   {computeProviders}
   {gcpRegions}
+  {regions}
+  {namespace}
 />

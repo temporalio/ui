@@ -16,7 +16,7 @@
   import { routeForCatalogExample } from '$lib/utilities/route-for';
 
   import { resolveCatalogForNamespace } from './catalog';
-  import { getCatalogServices } from './services';
+  import { catalogWorkerStartCommand, getCatalogServices } from './services';
 
   const coreUser = coreUserStore();
   const identity = getIdentity();
@@ -57,4 +57,5 @@
   exampleHref={(exampleId) => routeForCatalogExample({ namespace, exampleId })}
   {initialFilters}
   onfilterschange={syncFiltersToUrl}
+  workerStartCommand={catalogWorkerStartCommand}
 />

@@ -36,6 +36,7 @@
     exampleHref: (exampleId: string) => string;
     initialFilters?: CatalogFilters;
     onfilterschange?: (filters: CatalogFilters) => void;
+    workerStartCommand?: string;
   }
 
   let {
@@ -45,6 +46,7 @@
     exampleHref,
     initialFilters = emptyCatalogFilters,
     onfilterschange,
+    workerStartCommand,
   }: Props = $props();
 
   // svelte-ignore state_referenced_locally
@@ -146,18 +148,20 @@
   hidden={!workerUnavailable}
 >
   <p>Catalog examples will wait until a Worker is running.</p>
-  <p class="-mt-2 flex items-end gap-1">
-    Start one with:
-    <Copyable
-      visible
-      clickAllToCopy
-      content="pnpm catalog worker"
-      copyIconTitle="Copy the worker start command"
-      copySuccessIconTitle="Copied the worker start command"
-      container-class="mt-2"
-      class="font-mono text-xs"
-    />
-  </p>
+  {#if workerStartCommand}
+    <p class="-mt-2 flex items-end gap-1">
+      Start one with:
+      <Copyable
+        visible
+        clickAllToCopy
+        content={workerStartCommand}
+        copyIconTitle="Copy the worker start command"
+        copySuccessIconTitle="Copied the worker start command"
+        container-class="mt-2"
+        class="font-mono text-xs"
+      />
+    </p>
+  {/if}
 </Alert>
 
 <div class="flex items-start gap-6">

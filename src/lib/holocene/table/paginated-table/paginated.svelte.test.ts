@@ -17,7 +17,13 @@ globalThis.ResizeObserver ??=
 
 const makeItems = (count = 500) => Array.from({ length: count }, (_, i) => i);
 
-const mountPaginated = (search: string, items = makeItems()) => {
+type ParameterProps = { pageParameter?: string; perPageParameter?: string };
+
+const mountPaginated = (
+  search: string,
+  items = makeItems(),
+  parameterProps: ParameterProps = {},
+) => {
   page.url = new URL(`http://localhost:3000/history${search}`);
   const target = document.createElement('div');
   document.body.appendChild(target);
@@ -29,6 +35,7 @@ const mountPaginated = (search: string, items = makeItems()) => {
       pageButtonLabel: (p: number) => `Page ${p}`,
       nextPageButtonLabel: 'Next',
       previousPageButtonLabel: 'Previous',
+      ...parameterProps,
     },
   });
   return { target, component };
@@ -48,8 +55,12 @@ const activePage = (target: HTMLElement): string | undefined =>
     .find((b) => b.classList.contains(ACTIVE_PAGE_CLASS))
     ?.textContent?.trim();
 
-const renderedPageFor = (search: string, items = makeItems()) => {
-  const { target, component } = mountPaginated(search, items);
+const renderedPageFor = (
+  search: string,
+  items = makeItems(),
+  parameterProps: ParameterProps = {},
+) => {
+  const { target, component } = mountPaginated(search, items, parameterProps);
   const rendered = activePage(target);
   unmount(component);
   target.remove();
@@ -81,6 +92,27 @@ describe('Paginated', () => {
     // 450 items is four full pages plus a partial fifth. Clamping on
     // items.length - itemsPerPage lands at index 350, mid-page, and renders 4.
     expect(renderedPageFor('?page=99&per-page=100', makeItems(450))).toBe('5');
+  });
+
+  it('reads the page from a custom page parameter and ignores the default one', () => {
+    expect(
+      renderedPageFor('?inbound-page=3&page=1', makeItems(), {
+        pageParameter: 'inbound-page',
+      }),
+    ).toBe('3');
+  });
+
+  it('reads the page size from a custom per-page parameter', () => {
+    expect(
+      renderedPageFor(
+        '?outbound-page=2&outbound-per-page=250&per-page=100',
+        makeItems(),
+        {
+          pageParameter: 'outbound-page',
+          perPageParameter: 'outbound-per-page',
+        },
+      ),
+    ).toBe('2');
   });
 
   it('keeps rendered rows mounted when items are rebuilt with a new identity', () => {

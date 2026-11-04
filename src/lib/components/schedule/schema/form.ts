@@ -3,33 +3,14 @@ import { z } from 'zod/v3';
 import { parseDuration } from '$lib/holocene/duration-input/duration-input.svelte';
 import { searchAttributesSchema } from '$lib/stores/search-attributes';
 
-import { durationString, jsonString, structuredCalendarSchema } from './common';
 import {
-  DEFAULT_CATCHUP_WINDOW,
-  DEFAULT_TASK_TIMEOUT,
-  MIN_CATCHUP_SECONDS,
-} from '../constants';
-import type { DurationString } from '../types';
+  durationString,
+  durationStringWithDefault,
+  structuredCalendarSchema,
+} from './common';
+import { DEFAULT_CATCHUP_WINDOW, MIN_CATCHUP_SECONDS } from '../constants';
 import { isValidCronString } from '../utilities/cron';
 import { getNowCalendarDateStr } from '../utilities/date';
-
-// An emptied duration input submits as '', which durationString() would coerce
-// to '0s'; fall back to the field's default instead.
-const durationStringWithDefault = (fallback: DurationString) =>
-  z.preprocess(
-    (input) => (input == null || input === '' ? fallback : input),
-    durationString(),
-  );
-
-// Run/execution timeouts may be left empty to mean "use the server default".
-// Keep an emptied input as '' rather than coercing it to 0s.
-const optionalDurationString = () =>
-  z
-    .preprocess(
-      (input) => input ?? '',
-      z.union([z.literal(''), durationString()]),
-    )
-    .default('');
 
 export const overlapPolicy = z
   .enum([
@@ -55,13 +36,9 @@ export const formSchedulePoliciesSchema = z.object({
       return seconds >= MIN_CATCHUP_SECONDS;
     },
     {
-      message: 'Catchup window must be at least 10 seconds.',
+      message: `Catchup window must be at least ${MIN_CATCHUP_SECONDS} seconds.`,
     },
   ),
-  taskTimeout: durationStringWithDefault(DEFAULT_TASK_TIMEOUT),
-  runTimeout: optionalDurationString(),
-  executionTimeout: optionalDurationString(),
-  keepOriginalWorkflowId: z.boolean().optional(),
 });
 
 export type FormSchedulePoliciesSchema = z.infer<
@@ -178,16 +155,8 @@ export const formScheduleSchema = z
       .trim()
       .min(1, 'Name is required')
       .max(232, 'Name is too long'),
-    workflowType: z.string().trim().min(1, 'Workflow type is required'),
-    workflowId: z.string().trim().default(''),
-    taskQueue: z.string().trim().min(1, 'Task queue is required'),
-    input: jsonString().optional(),
-    editInput: z.boolean().default(false),
-    encoding: z.enum(['json/plain', 'json/protobuf']).default('json/plain'),
-    messageType: z.string().trim().optional(),
     jitter: z.number().int().min(0).optional(),
     searchAttributes: searchAttributesSchema.default([]),
-    workflowSearchAttributes: searchAttributesSchema.default([]),
     specs: z
       .array(formSpecSchema)
       .min(1, 'At least one schedule spec is required'),

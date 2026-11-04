@@ -38,7 +38,7 @@
 
   type T = $$Generic;
 
-  interface Props extends HTMLInputAttributes {
+  interface Props extends Omit<HTMLInputAttributes, 'size'> {
     label: string;
     id: string;
     children?: Snippet;
@@ -52,7 +52,8 @@
     'data-testid'?: string;
     menuButtonClass?: ClassNameValue;
     menuClass?: ClassNameValue;
-    variant?: ButtonStyles['variant'];
+    variant?: Extract<ButtonStyles['variant'], 'primary' | 'secondary'>;
+    size?: ButtonStyles['size'];
     required?: boolean;
     valid?: boolean;
     error?: string;
@@ -73,6 +74,7 @@
     menuButtonClass = undefined,
     menuClass = undefined,
     variant = 'secondary',
+    size = 'md',
     required = false,
     error = '',
     valid = true,
@@ -125,6 +127,8 @@
 
   const errorId = $derived(`${id}-error`);
   const showError = $derived(!!error && !valid);
+  const isPrimary = $derived(variant === 'primary');
+  const showPlaceholder = $derived(!value && placeholder !== '');
 </script>
 
 <MenuContainer class="w-full" {open}>
@@ -133,7 +137,9 @@
     {#key $labelCtx}
       <MenuButton
         class={merge(
-          'w-full border-secondary bg-background-primary text-primary focus-visible:border-secondary focus-visible:bg-background-primary focus-visible:ring-interactive-primary enabled:hover:border-tertiary enabled:hover:bg-interactive-tertiary-hover disabled:bg-surface-tertiary disabled:opacity-disabled',
+          'w-full',
+          !isPrimary &&
+            'border-secondary bg-background-primary text-primary focus-visible:bg-background-primary enabled:hover:border-tertiary enabled:hover:bg-interactive-tertiary-hover disabled:bg-surface-tertiary',
           !valid &&
             'border-danger focus-visible:border-danger focus-visible:ring-danger',
           menuButtonClass,
@@ -142,6 +148,7 @@
         disabled={disabled || loading}
         controls="{id}-select"
         {variant}
+        {size}
         data-testid="{rest['data-testid'] ?? id}-button"
         data-track-name="select"
         data-track-intent="select"
@@ -158,11 +165,12 @@
         {/snippet}
         <input
           {id}
-          value={!value && placeholder !== '' ? placeholder : $labelCtx}
+          value={showPlaceholder ? placeholder : $labelCtx}
           tabindex="-1"
           disabled
           class={merge(
-            !value && placeholder !== '' ? 'text-secondary' : 'text-primary',
+            isPrimary ? 'text-white' : 'text-primary',
+            showPlaceholder && (isPrimary ? 'opacity-90' : 'text-secondary'),
           )}
           class:disabled
           {required}
@@ -197,6 +205,6 @@
 
 <style lang="postcss">
   input {
-    @apply pointer-events-none w-full grow bg-transparent text-sm;
+    @apply pointer-events-none w-full grow bg-transparent;
   }
 </style>

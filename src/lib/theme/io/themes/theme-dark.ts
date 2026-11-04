@@ -108,4 +108,15 @@ export const darkTheme = {
   opacity: {
     disabled: '0.32',
   },
+  spacing: {
+    'page-margin': '2.5rem',
+    'page-gutter': '1.5rem',
+    xl: '1.5rem',
+    lg: '1rem',
+    md: '0.75rem',
+    sm: '0.5rem',
+    xs: '0.375rem',
+    '2xs': '0.25rem',
+    '3xs': '0.125rem',
+  },
 } satisfies IoTheme;

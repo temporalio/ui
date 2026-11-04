@@ -342,6 +342,64 @@ describe('deployments service', () => {
         'provider,scaler',
       );
     });
+
+    test('masks region_ids for a group scoped to regions', async () => {
+      // An existing group changes only in its masked fields, so its regions
+      // would never change otherwise.
+      vi.mocked(requestFromAPI).mockResolvedValueOnce(undefined as never);
+
+      await updateWorkerDeploymentVersionComputeConfig({
+        namespace,
+        deploymentName,
+        buildId,
+        computeConfig: {
+          scalingGroups: { 'aws-us-east-1': { regionIds: ['aws-us-east-1'] } },
+        },
+      });
+
+      const body = JSON.parse(
+        vi.mocked(requestFromAPI).mock.calls[0][1].options.body as string,
+      );
+      expect(body.computeConfigScalingGroups['aws-us-east-1'].updateMask).toBe(
+        'provider,scaler,regionIds',
+      );
+    });
+  });
+
+  describe('removing scaling groups', () => {
+    test('sends the groups to remove beside the ones to update', async () => {
+      vi.mocked(requestFromAPI).mockResolvedValueOnce(undefined as never);
+
+      await updateWorkerDeploymentVersionComputeConfig({
+        namespace,
+        deploymentName,
+        buildId,
+        computeConfig: { scalingGroups: { default: {} } },
+        removeScalingGroups: ['secondary'],
+      });
+
+      const body = JSON.parse(
+        vi.mocked(requestFromAPI).mock.calls[0][1].options.body as string,
+      );
+      expect(body.removeComputeConfigScalingGroups).toEqual(['secondary']);
+      expect(Object.keys(body.computeConfigScalingGroups)).toEqual(['default']);
+    });
+
+    test('sends no removal field when nothing is removed', async () => {
+      vi.mocked(requestFromAPI).mockResolvedValueOnce(undefined as never);
+
+      await updateWorkerDeploymentVersionComputeConfig({
+        namespace,
+        deploymentName,
+        buildId,
+        computeConfig: { scalingGroups: { default: {} } },
+      });
+
+      const body = JSON.parse(
+        vi.mocked(requestFromAPI).mock.calls[0][1].options.body as string,
+      );
+      expect(body).not.toHaveProperty('removeComputeConfigScalingGroups');
+    });
   });
 
   describe('validateWorkerDeploymentVersionComputeConfig', () => {

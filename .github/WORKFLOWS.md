@@ -8,6 +8,18 @@ The release management system enforces version bump PRs before any release can b
 
 **Version Source of Truth**: The Go `UIVersion` constant in `server/server/version/version.go` is the authoritative source of truth for the application version. All validation and comparison logic is based on this value, and `package.json` must be kept in sync with it.
 
+## Fork-safe PR metadata checks
+
+`.github/workflows/check-pr-metadata.yml` defines the `check-pr-metadata` workflow and job. It runs on `pull_request_target` and uses the built-in `GITHUB_TOKEN` to read PR metadata and maintain a single bot comment. It does not need a GitHub App token.
+
+The workflow enforces a meaningful PR description, warns when a PR changes more than 600 files, and reminds maintainers to release when `server/go.mod` updates `go.temporal.io/api`. Editing the description reruns the checks. Warnings do not block merging; description failures and API failures fail the job.
+
+The privileged workflow executes an inline script from the trusted base-side workflow. It performs no checkout, dependency installation, or execution of PR code. Contributor input must never be interpolated into executable scripts; PR descriptions, file patches, and comments are treated only as data.
+
+Strict TypeScript checking remains in the existing `check-types` job in `.github/workflows/lint-and-test.yml`, using `pnpm check` and `tsconfig.json`. The separate changed-file strict checker and redundant strict config have been removed.
+
+Merge workflow changes into the target branch before expecting fork PRs to use them. Once merged, editing an open PR's description or pushing a new commit triggers the metadata workflow. Verify required-check settings during rollout; the old strict failures are now covered by `check-types`, not the metadata job. At the time of this change, the `main` ruleset does not require either metadata or type checking. Require `check-pr-metadata` and `check-types` if those failures must prevent merging; a failed job alone does not make it a merge gate. Replace any legacy `danger` requirement with `check-pr-metadata`. Existing comments authored by the former Danger app are not modified by the new bot.
+
 ## 🧩 Custom Actions
 
 The workflow system uses 8 custom GitHub Actions for modular, reusable functionality:

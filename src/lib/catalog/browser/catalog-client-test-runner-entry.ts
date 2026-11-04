@@ -187,12 +187,14 @@ export async function renderList({
   descriptors = [descriptor, localDescriptor, cloudDescriptor],
   exampleHref = (exampleId: string) => `/examples/${exampleId}`,
   workerState = 'ready',
+  workerStartCommand,
   initialFilters,
   onfilterschange,
 }: {
   descriptors?: BrowserCatalogDescriptor[];
   exampleHref?: (exampleId: string) => string;
   workerState?: ReadinessCheck['state'];
+  workerStartCommand?: string;
   initialFilters?: CatalogFilters;
   onfilterschange?: (filters: CatalogFilters) => void;
 } = {}) {
@@ -220,6 +222,7 @@ export async function renderList({
         host,
         sessionStore: createCatalogSessionStore(host),
         exampleHref,
+        workerStartCommand,
       },
     }),
   );

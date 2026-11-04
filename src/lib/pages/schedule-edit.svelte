@@ -2,7 +2,7 @@
   import { page } from '$app/state';
 
   import ScheduleFormView from '$lib/components/schedule/schedule-form/form.svelte';
-  import type { FormScheduleSchema } from '$lib/components/schedule/schema/form';
+  import type { ScheduleFormData } from '$lib/components/schedule/types';
   import Loading from '$lib/holocene/loading.svelte';
   import { fetchSchedule } from '$lib/services/schedule-service';
   import { submitEditSchedule } from '$lib/stores/schedules';
@@ -22,8 +22,7 @@
   });
 
   const handleEdit =
-    (schedule: DescribeFullSchedule) =>
-    async (formData: FormScheduleSchema) => {
+    (schedule: DescribeFullSchedule) => async (formData: ScheduleFormData) => {
       await submitEditSchedule(formData, schedule, {
         namespace: page.params.namespace,
         identity,

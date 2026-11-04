@@ -8,15 +8,24 @@
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributesSchema } from '$lib/stores/search-attributes';
 
+  import { scheduledActionPresentations } from '../scheduled-action-types/presentation-registry';
+  import type { ScheduledActionFormData } from '../scheduled-action-types/types';
+
   interface Props {
     scheduleSearchAttributes: SearchAttributesSchema;
-    workflowSearchAttributes: SearchAttributesSchema;
+    actionSearchAttributes: SearchAttributesSchema;
+    actionType: ScheduledActionFormData['type'] | null;
   }
 
   let {
     scheduleSearchAttributes = $bindable([]),
-    workflowSearchAttributes = $bindable([]),
+    actionSearchAttributes = $bindable([]),
+    actionType,
   }: Props = $props();
+
+  const presentation = $derived(
+    actionType ? scheduledActionPresentations[actionType] : null,
+  );
 </script>
 
 <Card class="w-full">
@@ -35,13 +44,15 @@
         panelId="schedule-panel"
         class="px-1"
       />
-      <Tab
-        label={translate('common.workflows')}
-        id="workflows-tab"
-        data-testid="workflows-tab"
-        panelId="workflows-panel"
-        class="px-1"
-      />
+      {#if presentation}
+        <Tab
+          label={presentation.form.searchAttributes.label()}
+          id={presentation.form.searchAttributes.tabId}
+          data-testid={presentation.form.searchAttributes.tabId}
+          panelId={presentation.form.searchAttributes.panelId}
+          class="px-1"
+        />
+      {/if}
     </TabList>
 
     <div class="flex w-full flex-wrap gap-4">
@@ -58,18 +69,20 @@
         />
       </TabPanel>
 
-      <TabPanel
-        id="workflows-panel"
-        tabId="workflows-tab"
-        class="w-full"
-        data-testid="workflows-panel"
-      >
-        <AddSearchAttributes
-          variant="secondary"
-          bind:attributesToAdd={workflowSearchAttributes}
+      {#if presentation}
+        <TabPanel
+          id={presentation.form.searchAttributes.panelId}
+          tabId={presentation.form.searchAttributes.tabId}
           class="w-full"
-        />
-      </TabPanel>
+          data-testid={presentation.form.searchAttributes.panelId}
+        >
+          {#key actionType}
+            <presentation.form.searchAttributes.Component
+              bind:attributes={actionSearchAttributes}
+            />
+          {/key}
+        </TabPanel>
+      {/if}
     </div>
   </Tabs>
 </Card>

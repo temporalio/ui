@@ -199,20 +199,26 @@ export const Strings = {
   'scale-down-stabilization-hint':
     'Wait this long after demand ends before scaling down. 0 = no wait. Default: 90s.',
   'compute-provider': 'Compute Provider',
+  'provider-change': 'Change',
+  'provider-also-supports-count': 'Also supports {{count}} other providers',
+  'provider-also-supports': 'Also supports {{providers}}',
   'compute-provider-description':
     'Select how your worker activities will be executed.',
   'provider-lambda': 'AWS Lambda',
+  'provider-short-lambda': 'Lambda',
+  'provider-short-agentcore': 'AgentCore',
+  'provider-short-cloud-run': 'Cloud Run',
   'provider-lambda-description':
-    'Run workers as Lambda functions in your AWS account.',
+    'Run Workers as Lambda functions in your AWS account.',
   'provider-agentcore': 'Amazon Bedrock AgentCore',
   'provider-agentcore-description':
     'Run Workers as Bedrock AgentCore Runtime sessions in your AWS account.',
   'provider-cloud-run': 'Google Cloud Run',
   'provider-cloud-run-description':
-    'Run workers as Cloud Run services in your GCP project.',
+    'Run Workers as Cloud Run services in your GCP project.',
   'provider-vercel': 'Vercel Functions',
   'provider-vercel-description':
-    'Run workers as serverless functions on the Vercel platform.',
+    'Run Workers as serverless functions on the Vercel platform.',
   'provider-coming-soon': 'More providers coming soon',
   'provider-coming-soon-description':
     'Support for additional compute providers is planned.',
@@ -267,7 +273,53 @@ export const Strings = {
     'Name this Worker deployment and set its Build ID.',
   'version-configuration-description': 'Set the Build ID for this version.',
   'compute-section': 'Compute',
-  'compute-description': 'Choose where your workers run.',
+  'compute-description': 'Choose where your Workers run.',
+  'region-section': 'Region',
+  'regions-section': 'Regions',
+  'region-runs-anywhere':
+    'Serverless Workers use these resources wherever the Namespace is active.',
+  // Kept no longer than region-runs-anywhere, so turning high availability on
+  // cannot wrap the line and move the toggle the user just used.
+  'regions-run-in':
+    'Serverless Workers use the replica after a failover to {{replica}}.',
+  'preview-title': 'Preview',
+  'preview-description': 'Where Temporal sends Tasks.',
+  'preview-namespace': 'Namespace',
+  'preview-worker-deployment': 'Worker Deployment',
+  'preview-active': 'Active',
+  'preview-resource-lambda': 'Function',
+  'preview-resource-agentcore': 'Endpoint',
+  'preview-resource-cloud-run': 'Worker Pool',
+  'preview-access-aws': 'Role',
+  'preview-access-cloud-run': 'Service Account',
+  'preview-same-as': 'Same as',
+  'preview-not-set': 'Not set',
+  'preview-workers': 'Workers',
+  'preview-no-serverless-workers': 'No Serverless Workers',
+  'region-role-primary-tooltip':
+    'Temporal invokes this resource while the Namespace is active in {{region}}',
+  'region-role-replica-tooltip':
+    'Temporal invokes this resource after failover to {{region}}',
+  'region-order-hint': '(Primary, Replica)',
+  'region-not-configured-tooltip':
+    'If the Namespace fails over to this Region, Tasks for this version wait until other Workers poll.',
+  'region-not-configured-in': 'No Serverless Workers in {{regions}}',
+  'region-all': 'All Regions',
+  'high-availability': 'High Availability',
+  'high-availability-off':
+    'Turn on to run Serverless Workers in a replica region after a failover.',
+  'region-the-primary': 'the primary',
+  'replica-same-region':
+    'The primary and the replica both run in {{region}}, so an outage there stops both.',
+  'region-arn-suggested-from-primary':
+    "Based on the primary's ARN. Check the version number for",
+  'region-inherits-primary':
+    'Uses the same Access and Scaling and Lifecycle settings as',
+  'region-customize': 'Customize',
+  'region-role-primary': 'Primary',
+  'region-role-replica': 'Replica',
+  'region-count_one': '{{count}} Region',
+  'region-count_other': '{{count}} Regions',
   'scaling-section': 'Scaling and Limits',
   'edit-scaling-limits': 'Edit Scaling and Limits',
   'show-scaling-limits': 'Show Scaling and Limits',

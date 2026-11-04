@@ -465,7 +465,7 @@ describe('OSS WorkbenchHost', () => {
   });
 
   it('reports a missing workflow poller as advisory readiness', async () => {
-    const checkWorker = vi.fn().mockResolvedValue(false);
+    const checkWorker = vi.fn().mockResolvedValue('none');
     const host = assembleWorkbenchHost({
       descriptors: [workflowDescriptor],
       launch: vi.fn(),
@@ -492,12 +492,32 @@ describe('OSS WorkbenchHost', () => {
     );
   });
 
+  it('marks a serverless worker as ready', async () => {
+    const host = assembleWorkbenchHost({
+      descriptors: [workflowDescriptor],
+      launch: vi.fn(),
+      checkWorker: vi.fn().mockResolvedValue('serverless'),
+      checkNexusEndpoint: vi.fn(),
+      createEvidenceHref: vi.fn(),
+    });
+
+    await expect(host.checkReadiness('order-lifecycle')).resolves.toEqual([
+      {
+        kind: 'worker',
+        required: false,
+        state: 'ready',
+        taskQueueType: 1,
+        serverless: true,
+      },
+    ]);
+  });
+
   it('checks a required Nexus endpoint separately from its advisory worker', async () => {
     const checkNexusEndpoint = vi.fn().mockResolvedValue(false);
     const host = assembleWorkbenchHost({
       descriptors: [nexusDescriptor],
       launch: vi.fn(),
-      checkWorker: vi.fn().mockResolvedValue(true),
+      checkWorker: vi.fn().mockResolvedValue('polling'),
       checkNexusEndpoint,
       createEvidenceHref: vi.fn(),
     });

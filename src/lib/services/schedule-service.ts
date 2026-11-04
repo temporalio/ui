@@ -3,21 +3,13 @@ import type { ListScheduleResponse, ScheduleListEntry } from '$lib/types';
 import type {
   DescribeFullSchedule,
   OverlapPolicy,
-  RecentScheduleRun,
-  RecentScheduleRunEnriched,
   ScheduleRequestBody,
 } from '$lib/types/schedule';
-import type { WorkflowExecution } from '$lib/types/workflows';
-import { isWorkflowDelayed } from '$lib/utilities/delayed-workflows';
 import { getEpochMilliseconds } from '$lib/utilities/format-time';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import type { ErrorCallback } from '$lib/utilities/request-from-api';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
-import { toWorkflowStatusReadable } from '$lib/utilities/screaming-enums';
-import { isWorkflowTaskFailure } from '$lib/utilities/workflow-task-failures';
-
-import { fetchWorkflowsForQuery } from './workflow-service';
 
 type ScheduleParameters = {
   namespace: string;
@@ -103,26 +95,7 @@ export async function fetchSchedule(
   return { ...response, schedule_id: parameters.scheduleId };
 }
 
-const RECENT_RUN_COUNT = 5;
 const UPCOMING_RUN_COUNT = 5;
-
-export const toRecentScheduleRuns = (
-  schedule: DescribeFullSchedule,
-  limit = RECENT_RUN_COUNT,
-): RecentScheduleRun[] =>
-  (schedule?.info?.recentActions ?? [])
-    .filter(Boolean)
-    .sort(
-      (a, b) =>
-        getEpochMilliseconds(b.actualTime) - getEpochMilliseconds(a.actualTime),
-    )
-    .slice(0, limit)
-    .map((action) => ({
-      workflowId: action.startWorkflowResult?.workflowId ?? '',
-      runId: action.startWorkflowResult?.runId ?? '',
-      actualTime: action.actualTime,
-      status: toWorkflowStatusReadable(action.startWorkflowStatus ?? null),
-    }));
 
 export const toUpcomingScheduleRuns = (
   schedule: DescribeFullSchedule,
@@ -132,88 +105,6 @@ export const toUpcomingScheduleRuns = (
     .filter(Boolean)
     .sort((a, b) => getEpochMilliseconds(a) - getEpochMilliseconds(b))
     .slice(0, limit);
-
-export const withLatestWorkflowStatuses = (
-  runs: RecentScheduleRun[],
-  workflows: WorkflowExecution[],
-): RecentScheduleRunEnriched[] => {
-  const latest = new Map<string, WorkflowExecution>();
-  for (const workflow of workflows) {
-    const current = latest.get(workflow.id);
-    const isNewer =
-      !current ||
-      getEpochMilliseconds(workflow.startTime) >=
-        getEpochMilliseconds(current.startTime);
-    if (isNewer) {
-      latest.set(workflow.id, workflow);
-    }
-  }
-
-  return runs.map((run) => {
-    const latestWorkflow = latest.get(run.workflowId);
-    if (!latestWorkflow) {
-      return {
-        ...run,
-        delayed: false,
-        taskFailure: false,
-        inVisibility: false,
-      };
-    }
-    return {
-      actualTime: run.actualTime,
-      workflowId: latestWorkflow.id || run.workflowId,
-      status: latestWorkflow.status || run.status,
-      runId: latestWorkflow.runId || run.runId,
-      delayed: isWorkflowDelayed(latestWorkflow),
-      taskFailure: isWorkflowTaskFailure(latestWorkflow),
-      inVisibility: true,
-    };
-  });
-};
-
-type RecentRunStatusParams = {
-  namespace: string;
-  scheduleId: string;
-  runs: RecentScheduleRun[];
-};
-
-/**
- * `startWorkflowStatus` on a recent action is only refreshed while the
- * scheduler is watching the run, so it goes stale for long stretches and never
- * reports paused. Resolve the live status from visibility instead.
- *
- * Visibility cannot be sorted, so the query has to be narrow enough that a page
- * can never truncate it: scoping to the runs on screen bounds it to those
- * workflow ids, and excluding ContinuedAsNew discards every link of a
- * continue-as-new chain but the last, leaving at most one execution per id.
- */
-export const fetchRecentScheduleRunStatuses = async (
-  { namespace, scheduleId, runs }: RecentRunStatusParams,
-  request = fetch,
-): Promise<RecentScheduleRunEnriched[]> => {
-  const workflowIds = [
-    ...new Set(runs.map((run) => run.workflowId).filter(Boolean)),
-  ];
-  if (!workflowIds.length) {
-    return withLatestWorkflowStatuses(runs, []);
-  }
-
-  // Backslashes first: the query tokenizer treats them as escape characters, so
-  // an unescaped one swallows the character after it.
-  const ids = workflowIds
-    .map(
-      (workflowId) =>
-        `"${workflowId.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`,
-    )
-    .join(', ');
-  const query =
-    `TemporalScheduledById="${scheduleId}"` +
-    ` AND WorkflowId in (${ids})` +
-    ' AND ExecutionStatus != "ContinuedAsNew"';
-  const workflows = await fetchWorkflowsForQuery({ namespace, query }, request);
-
-  return withLatestWorkflowStatuses(runs, workflows);
-};
 
 export async function deleteSchedule(
   {
@@ -228,6 +119,7 @@ export async function deleteSchedule(
   const route = routeForApi('schedule', { namespace, scheduleId });
   return requestFromAPI(route, {
     request,
+    notifyOnError: false,
     options: { method: 'DELETE' },
     params: identity ? { identity } : {},
   });
@@ -245,20 +137,13 @@ export async function createSchedule({
   scheduleId,
   body,
   identity,
-}: CreateScheduleOptions): Promise<{ error: string; conflictToken: string }> {
-  let error = '';
-  const onError: ErrorCallback = (err) =>
-    (error =
-      err?.body?.message ??
-      `Error creating schedule: ${err.status}: ${err.statusText}`);
-
+}: CreateScheduleOptions): Promise<{ conflictToken: string }> {
   const route = routeForApi('schedule', {
     namespace,
     scheduleId,
   });
-  const { conflictToken } = (await requestFromAPI<{ conflictToken: string }>(
-    route,
-    {
+  const { conflictToken = '' } =
+    (await requestFromAPI<{ conflictToken: string }>(route, {
       options: {
         method: 'POST',
         body: stringifyWithBigInt({
@@ -267,11 +152,10 @@ export async function createSchedule({
           ...(identity && { identity }),
         }),
       },
-      onError,
-    },
-  )) ?? { conflictToken: '' };
+      notifyOnError: false,
+    })) ?? {};
 
-  return { conflictToken, error };
+  return { conflictToken };
 }
 
 type EditScheduleOptions = {
@@ -286,15 +170,7 @@ export async function editSchedule({
   scheduleId,
   body,
   identity,
-}: Partial<EditScheduleOptions> & { identity?: string }): Promise<{
-  error: string;
-}> {
-  let error = '';
-  const onError: ErrorCallback = (err) =>
-    (error =
-      err?.body?.message ??
-      `Error editing schedule: ${err.status}: ${err.statusText}`);
-
+}: Partial<EditScheduleOptions> & { identity?: string }): Promise<void> {
   const route = routeForApi('schedule.edit', {
     namespace: namespace ?? '',
     scheduleId: scheduleId ?? '',
@@ -308,10 +184,8 @@ export async function editSchedule({
         ...(identity && { identity }),
       }),
     },
-    onError,
+    notifyOnError: false,
   });
-
-  return { error };
 }
 
 type PauseScheduleOptions = {
@@ -347,7 +221,7 @@ export async function pauseSchedule({
           ...(identity && { identity }),
         }),
       },
-      onError: (error) => console.error(error),
+      notifyOnError: false,
     })) ?? null
   );
 }
@@ -385,6 +259,7 @@ export async function unpauseSchedule({
           ...(identity && { identity }),
         }),
       },
+      notifyOnError: false,
     })) ?? null
   );
 }
@@ -424,6 +299,7 @@ export async function triggerImmediately({
           ...(identity && { identity }),
         }),
       },
+      notifyOnError: false,
     })) ?? null
   );
 }
@@ -467,6 +343,7 @@ export async function backfillRequest({
           ...(identity && { identity }),
         }),
       },
+      notifyOnError: false,
     })) ?? null
   );
 }

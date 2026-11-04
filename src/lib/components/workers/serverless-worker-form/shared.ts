@@ -11,8 +11,15 @@ import {
   buildAgentCoreComputeConfig,
   buildGcpCloudRunComputeConfig,
   buildLambdaComputeConfig,
+  decodeAgentCoreProviderDetails,
+  decodeGcpCloudRunProviderDetails,
+  decodeLambdaProviderDetails,
+  decodeScalerDetails,
 } from '$lib/services/deployments-service';
-import type { ComputeConfig } from '$lib/types/deployments';
+import type {
+  ComputeConfig,
+  ComputeConfigScalingGroup,
+} from '$lib/types/deployments';
 
 import {
   COMPUTE_PROVIDERS,
@@ -192,17 +199,18 @@ const validateProviderFields = (
   }
 };
 
+const deploymentNameField = z
+  .string()
+  .min(3, 'Name must be at least 3 characters')
+  .max(100)
+  .regex(/^[a-z][a-z0-9-]*$/, 'Must be lowercase, alphanumeric with hyphens');
+
+const buildIdField = z.string().min(1, 'Build ID is required');
+
 export const createDeploymentSchema = z
   .object({
-    name: z
-      .string()
-      .min(3, 'Name must be at least 3 characters')
-      .max(100)
-      .regex(
-        /^[a-z][a-z0-9-]*$/,
-        'Must be lowercase, alphanumeric with hyphens',
-      ),
-    buildId: z.string().min(1, 'Build ID is required'),
+    name: deploymentNameField,
+    buildId: buildIdField,
     ...providerFields,
     ...scalingFields,
   })
@@ -210,11 +218,23 @@ export const createDeploymentSchema = z
 
 export const createVersionSchema = z
   .object({
-    buildId: z.string().min(1, 'Build ID is required'),
+    buildId: buildIdField,
     ...providerFields,
     ...scalingFields,
   })
   .superRefine(validateProviderFields);
+
+// When each region holds its own compute, the form checks only the fields it
+// owns. validateRegionValues checks each region's compute.
+export const multiRegionCreateDeploymentSchema = z
+  .object({ name: deploymentNameField, buildId: buildIdField })
+  .passthrough();
+
+export const multiRegionCreateVersionSchema = z
+  .object({ buildId: buildIdField })
+  .passthrough();
+
+export const multiRegionEditVersionSchema = z.object({}).passthrough();
 
 export const editVersionSchema = z
   .object({
@@ -227,8 +247,48 @@ export type CreateDeploymentFormData = z.infer<typeof createDeploymentSchema>;
 export type CreateVersionFormData = z.infer<typeof createVersionSchema>;
 export type EditVersionFormData = z.infer<typeof editVersionSchema>;
 
-type ComputeFormValues = z.infer<z.ZodObject<typeof providerFields>> &
+export type ComputeFormValues = z.infer<z.ZodObject<typeof providerFields>> &
   Partial<z.infer<z.ZodObject<typeof scalingFields>>>;
+
+/** The compute a highly available Namespace runs in one of its regions. */
+export type RegionComputeValues = {
+  regionId: string;
+  values: ComputeFormValues;
+  /**
+   * False for the primary, which saves as the unscoped default group: it runs
+   * wherever no scoped group matches, as every group did before regions.
+   */
+  scoped?: boolean;
+  /** The group's name when it already exists, so an edit keeps it. */
+  name?: string;
+  /** A problem with the resource that the schema cannot see, such as its region. */
+  resourceError?: { field: keyof ComputeFormValues; message: string };
+};
+
+export type ComputeFieldErrors = Partial<
+  Record<keyof ComputeFormValues, string[]>
+>;
+
+/**
+ * Validates each region with the same rules as a single-region Version.
+ * Returns the field errors of each region that fails, keyed by region.
+ */
+export const validateRegionValues = (
+  entries: readonly RegionComputeValues[],
+): Record<string, ComputeFieldErrors> =>
+  Object.fromEntries(
+    entries.flatMap(({ regionId, values, resourceError }) => {
+      const result = editVersionSchema.safeParse(values);
+      const errors: ComputeFieldErrors = result.success
+        ? {}
+        : (result.error.flatten().fieldErrors as ComputeFieldErrors);
+      // The schema's own error on the field comes first, e.g. a malformed ARN.
+      if (resourceError && !errors[resourceError.field]) {
+        errors[resourceError.field] = [resourceError.message];
+      }
+      return Object.keys(errors).length ? [[regionId, errors]] : [];
+    }),
+  );
 
 // The single place that maps a provider choice onto a ComputeConfig. Every
 // create/edit page routes through here so a new provider is one branch, not a
@@ -276,6 +336,39 @@ export const buildComputeConfigFromForm = (
     invokeScaling,
   );
 };
+
+/**
+ * One scaling group per Namespace region, for a highly available Namespace.
+ *
+ * A group per region rather than one group listing several, because the
+ * resource is regional: a Lambda ARN names its region, so the two regions
+ * cannot share a group even when every other setting matches.
+ * `region_ids` is repeated and would allow the shared shape, which is what a
+ * provider with a non-regional resource would use.
+ *
+ * The group takes the region's own identifier as its name. The name is free
+ * text as far as the API is concerned and `region_ids` is what actually
+ * decides where a group runs, but a map keyed by something meaningful is
+ * easier to read in a diff and in an error message than `group-1`.
+ */
+/** The group a single-region Version saves, and an HA Version's primary. */
+export const DEFAULT_SCALING_GROUP = 'default';
+
+export const buildComputeConfigForRegions = (
+  entries: readonly RegionComputeValues[],
+): ComputeConfig => ({
+  scalingGroups: Object.fromEntries(
+    entries.map(({ regionId, values, scoped = true, name }) => {
+      // Each provider builder emits exactly one group, which is the group this
+      // region needs; only its name and its regions are added here.
+      const built = buildComputeConfigFromForm(values);
+      const [group] = Object.values(built.scalingGroups ?? {});
+      return scoped
+        ? [name ?? regionId, { ...group, regionIds: [regionId] }]
+        : [name ?? DEFAULT_SCALING_GROUP, group];
+    }),
+  ),
+});
 
 export type ComputeProviderOption = {
   value: ComputeProviderValue;
@@ -374,4 +467,65 @@ export const interpolateTerraformTemplate = (
   result = replaceArnList(result, 'agent_runtime_arns', agentCoreEndpointArn);
 
   return result;
+};
+
+/** A form's starting values, as read from a saved scaling group. */
+export type ComputeInitialValues = {
+  provider?: ComputeProviderValue;
+  lambdaArn: string;
+  agentCoreEndpointArn?: string;
+  iamRoleArn: string;
+  roleExternalId: string;
+  gcpProject?: string;
+  gcpRegion?: string;
+  gcpWorkerPool?: string;
+  gcpServiceAccount?: string;
+  minReplicas?: number;
+  maxReplicas?: number;
+  initialReplicas?: number;
+  utilizationTarget?: number;
+  scaleDownStabilization?: string;
+  scaleUpCooloffMs?: number;
+  scaleUpBacklogThreshold?: number;
+  maxWorkerLifetimeMs?: number;
+  metricsPollIntervalMs?: number;
+};
+
+/** Reads one saved scaling group back into a form's values. */
+export const formValuesFromGroup = (
+  group: ComputeConfigScalingGroup | undefined,
+): ComputeInitialValues => {
+  const config: ComputeConfig = { scalingGroups: group ? { group } : {} };
+  const lambda = decodeLambdaProviderDetails(config);
+  const agentCore = decodeAgentCoreProviderDetails(config);
+  const gcp = decodeGcpCloudRunProviderDetails(config);
+  const scaler = decodeScalerDetails(config);
+  return {
+    // A saved provider decides which fields it filled.
+    provider: agentCore.agentCoreEndpointArn
+      ? 'agentcore'
+      : gcp.gcpWorkerPool
+        ? 'cloud-run'
+        : 'lambda',
+    lambdaArn: lambda.lambdaArn ?? '',
+    agentCoreEndpointArn: agentCore.agentCoreEndpointArn ?? '',
+    iamRoleArn: lambda.iamRoleArn ?? agentCore.iamRoleArn ?? '',
+    roleExternalId: lambda.roleExternalId ?? agentCore.roleExternalId ?? '',
+    gcpProject: gcp.gcpProject,
+    gcpRegion: gcp.gcpRegion,
+    gcpWorkerPool: gcp.gcpWorkerPool,
+    gcpServiceAccount: gcp.gcpServiceAccount,
+    scaleUpCooloffMs: scaler.scaleUpCooloffMs,
+    scaleUpBacklogThreshold: scaler.scaleUpBacklogThreshold,
+    maxWorkerLifetimeMs: scaler.maxWorkerLifetimeMs,
+    metricsPollIntervalMs: scaler.metricsPollIntervalMs,
+    minReplicas: scaler.minReplicas,
+    maxReplicas: scaler.maxReplicas,
+    initialReplicas: scaler.initialReplicas,
+    utilizationTarget: scaler.utilizationTarget,
+    scaleDownStabilization:
+      scaler.scaleDownStabilizationMs === undefined
+        ? undefined
+        : msToScaleDownStabilization(scaler.scaleDownStabilizationMs),
+  };
 };

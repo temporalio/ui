@@ -29,29 +29,6 @@
       : translate('schedules.do-not-pause-on-start'),
   );
 
-  const timeoutsSummary = $derived(
-    [
-      $form.taskTimeout &&
-        translate('schedules.timeout-task', {
-          duration:
-            formatDuration($form.taskTimeout) ||
-            translate('schedules.zero-duration'),
-        }),
-      translate('schedules.timeout-run', {
-        duration:
-          formatDuration($form.runTimeout) ||
-          translate('schedules.zero-duration'),
-      }),
-      translate('schedules.timeout-execution', {
-        duration:
-          formatDuration($form.executionTimeout) ||
-          translate('schedules.zero-duration'),
-      }),
-    ]
-      .filter(Boolean)
-      .join(', ') || translate('schedules.no-timeouts'),
-  );
-
   let editPoliciesButton: { focus: () => void };
 
   let wasEditingPolicies = false;
@@ -114,13 +91,6 @@
             ? translate('common.yes')
             : translate('common.no')}
         </dd>
-      </div>
-
-      <div class="lg:contents">
-        <dt class="text-xs text-secondary lg:text-sm">
-          {translate('schedules.timeouts')}
-        </dt>
-        <dd>{timeoutsSummary}</dd>
       </div>
     </dl>
     <div class="mr-auto mt-2">

@@ -711,6 +711,10 @@ let allowFirstPrimaryRename;
 const secondPrimaryRenameStarted = new Promise((resolve) => {
   allowFirstPrimaryRename = resolve;
 });
+let allowFirstRecoveryRename;
+const secondRecoveryRenameStarted = new Promise((resolve) => {
+  allowFirstRecoveryRename = resolve;
+});
 const waitForFreshToken = async (path) => {
   for (;;) {
     const token = await readFile(
@@ -743,8 +747,11 @@ fileSystem.rename = async (from, to) => {
           secondPrimaryRenameStarted,
           new Promise((resolve) => setTimeout(resolve, 50)),
         ]);
+      } else if (from === recoveryPath && renameIndex === 0) {
+        await secondRecoveryRenameStarted;
       } else if (renameIndex > 0) {
         if (from === lockPath) allowFirstPrimaryRename();
+        if (from === recoveryPath) allowFirstRecoveryRename();
         await waitForFreshToken(from);
       }
       await originalRename(from, to);

@@ -58,9 +58,11 @@
   };
 </script>
 
-<div class="flex flex-col bg-surface-primary">
+<div
+  class="relationship-family-shell flex flex-col rounded-lg border border-primary bg-surface-primary"
+>
   <div
-    class="relative z-10 w-full overflow-hidden border-b border-primary bg-surface-primary lg:sticky lg:top-[var(--top-nav-height)]"
+    class="relative z-10 w-full overflow-hidden rounded-t-lg border-b border-primary bg-surface-primary lg:sticky lg:top-[var(--top-nav-height)]"
   >
     <ZoomSvg
       initialZoom={2}
@@ -96,7 +98,7 @@
     </ZoomSvg>
   </div>
   <div
-    class="flex h-auto w-full flex-col overflow-auto bg-surface-secondary text-base text-primary"
+    class="relationship-family-list flex h-auto w-full flex-col overflow-auto rounded-b-lg bg-surface-secondary text-base text-primary"
   >
     <WorkflowFamilyNodeDescription
       {root}
@@ -107,3 +109,15 @@
     />
   </div>
 </div>
+
+<style lang="postcss">
+  .relationship-family-list {
+    container-type: inline-size;
+  }
+
+  @supports (overflow: clip) {
+    .relationship-family-shell {
+      overflow: clip;
+    }
+  }
+</style>

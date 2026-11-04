@@ -99,7 +99,7 @@
   </p>
 {/if}
 <div class="w-full overflow-x-auto">
-  <Table class="mb-6 min-w-[640px]" fixed>
+  <Table class="min-w-[640px]" fixed>
     {#snippet caption()}
       <caption class="sr-only">{translate('workers.pollers')}</caption>
     {/snippet}

@@ -13,6 +13,8 @@ import type {
   ReadinessCheck,
   StartCommand,
   WorkbenchHost,
+  WorkerAvailability,
+  WorkerReadinessCheck,
 } from '../browser/workbench-host';
 
 type LaunchRequestBase = {
@@ -64,7 +66,7 @@ export type WorkbenchHostDependencies = {
       taskQueueType: 1 | 2 | 3;
     },
     signal?: AbortSignal,
-  ) => Promise<boolean>;
+  ) => Promise<WorkerAvailability>;
   checkNexusEndpoint: (
     request: { namespace: string; endpoint: string },
     signal?: AbortSignal,
@@ -231,26 +233,34 @@ export const assembleWorkbenchHost = ({
           : descriptor.execution.kind === 'standalone-activity'
             ? 2
             : 3;
-      let state: ReadinessCheck['state'];
+      let workerCheck: WorkerReadinessCheck;
 
       try {
-        state = (await checkWorker(
+        const availability = await checkWorker(
           {
             namespace: descriptor.execution.namespace,
             taskQueue: descriptor.execution.taskQueue,
             taskQueueType,
           },
           signal,
-        ))
-          ? 'ready'
-          : 'unavailable';
+        );
+        workerCheck = {
+          kind: 'worker',
+          required: false,
+          state: availability === 'none' ? 'unavailable' : 'ready',
+          taskQueueType,
+          ...(availability === 'serverless' ? { serverless: true } : {}),
+        };
       } catch {
-        state = 'indeterminate';
+        workerCheck = {
+          kind: 'worker',
+          required: false,
+          state: 'indeterminate',
+          taskQueueType,
+        };
       }
 
-      const checks: ReadinessCheck[] = [
-        { kind: 'worker', required: false, state, taskQueueType },
-      ];
+      const checks: ReadinessCheck[] = [workerCheck];
 
       const declaredEndpoints =
         descriptor.execution.kind === 'standalone-nexus-operation'
