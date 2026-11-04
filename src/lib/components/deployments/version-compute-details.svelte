@@ -5,6 +5,7 @@
     decodeAgentCoreProviderDetails,
     decodeGcpCloudRunProviderDetails,
     decodeLambdaProviderDetails,
+    decodeModalProviderDetails,
     decodeScalerDetails,
   } from '$lib/services/deployments-service';
   import type { ComputeConfig } from '$lib/types/deployments';
@@ -104,6 +105,7 @@
           lambda,
           agentCore,
           gcp: decodeGcpCloudRunProviderDetails(single),
+          modal: decodeModalProviderDetails(single),
           scaler: decodeScalerDetails(single),
           // Lambda and AgentCore share the assumed-role fields; only one decodes.
           iamRoleArn: lambda.iamRoleArn ?? agentCore.iamRoleArn,
@@ -120,7 +122,8 @@
       (r) =>
         !!r.lambda.lambdaArn ||
         !!r.agentCore.agentCoreEndpointArn ||
-        !!r.gcp.gcpWorkerPool,
+        !!r.gcp.gcpWorkerPool ||
+        !!r.modal.modalAppName,
     ),
   );
 
@@ -149,6 +152,21 @@
       ),
       row(translate('workers.gcp-worker-pool-label'), (g) =>
         resource(g.gcp.gcpWorkerPool),
+      ),
+      row(translate('workers.modal-app-name-label'), (g) =>
+        plain(g.modal.modalAppName),
+      ),
+      row(translate('workers.modal-function-name-label'), (g) =>
+        plain(g.modal.modalFunctionName),
+      ),
+      row(translate('workers.modal-environment-label'), (g) =>
+        plain(g.modal.modalEnvironment),
+      ),
+      row(translate('workers.modal-workspace-id-label'), (g) =>
+        plain(g.modal.modalWorkspaceId),
+      ),
+      row(translate('workers.modal-version-label'), (g) =>
+        plain(g.modal.modalAppVersion),
       ),
       row(translate('workers.gcp-project-label'), (g) =>
         plain(g.gcp.gcpProject),
