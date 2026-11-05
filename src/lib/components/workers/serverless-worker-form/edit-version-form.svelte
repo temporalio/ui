@@ -48,6 +48,8 @@
     primaryGroup?: ScalingGroupSlot;
     /** Where the replica saves. See scalingGroupSlots. */
     replicaGroup?: ScalingGroupSlot;
+    /** False when the Version has compute only in the replica. */
+    initialRunsInPrimary?: boolean;
     onSubmit: (
       data: EditVersionFormData,
       regions?: RegionComputeValues[],
@@ -84,6 +86,7 @@
     enabledRegionIds = [],
     primaryGroup,
     replicaGroup,
+    initialRunsInPrimary,
     onSubmit,
     onDelete,
     cancelHref,
@@ -199,6 +202,7 @@
           initialReplica={initialReplicaData}
           {primaryGroup}
           {replicaGroup}
+          {initialRunsInPrimary}
           regionServerErrors={errorsByRegion}
         />
       {:else}

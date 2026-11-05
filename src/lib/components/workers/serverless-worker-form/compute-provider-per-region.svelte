@@ -6,6 +6,7 @@
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
 
   import { motion } from './motion';
@@ -69,6 +70,11 @@
     primaryGroup?: ScalingGroupSlot;
     /** Where the replica saves, when editing. A new one is named for its region. */
     replicaGroup?: ScalingGroupSlot;
+    /**
+     * False when editing a Version with compute only in the replica. The
+     * primary then starts with no Serverless Workers.
+     */
+    initialRunsInPrimary?: boolean;
   }
 
   let {
@@ -85,6 +91,7 @@
     initialReplica,
     primaryGroup,
     replicaGroup,
+    initialRunsInPrimary = true,
   }: Props = $props();
 
   let provider = $state<ComputeProviderValue>(
@@ -166,6 +173,7 @@
   );
 
   let highAvailability = $state(untrack(() => enabledRegionIds.length > 0));
+  let runsInPrimary = $state(untrack(() => initialRunsInPrimary));
 
   /**
    * The Namespace's replica. The replica's group is scoped to it, because the
@@ -180,6 +188,13 @@
   );
   const replicaKey = $derived(replicaRegion?.id ?? 'replica');
   const replicated = $derived(highAvailability && !!replicaRegion);
+  const primaryLabel = $derived(primaryRegion.label ?? primaryRegion.id);
+  /**
+   * One region always runs Serverless Workers, so the toggle of the only one
+   * running is disabled. With neither, the save would drop the compute.
+   */
+  const primaryIsLast = $derived(runsInPrimary && !replicated);
+  const replicaIsLast = $derived(replicated && !runsInPrimary);
 
   /**
    * A regional resource name needs the provider's own name for the region,
@@ -191,7 +206,7 @@
       ? suggestRegionalArn(arn, replicaRegion.providerRegion)
       : '';
 
-  const inheritsPrimary = $derived(!replica.customized);
+  const inheritsPrimary = $derived(!replica.customized && runsInPrimary);
 
   const replicaLambdaArn = $derived(
     replica.lambdaArnOverride ?? suggestFor(primary.lambdaArn),
@@ -223,6 +238,7 @@
    */
   const sameRegionWarning = $derived(
     replicated &&
+      runsInPrimary &&
       primaryResourceRegion &&
       primaryResourceRegion === replicaResourceRegion
       ? translate('workers.replica-same-region', {
@@ -264,6 +280,15 @@
     if (!inheritsPrimary) return;
     INHERITED_FIELDS.forEach((field) => copyField(primary, replica, field));
     replica.customized = true;
+  };
+
+  /**
+   * With no primary there is nothing to inherit, so the replica keeps the
+   * primary's values as its own first.
+   */
+  const setRunsInPrimary = (value: boolean) => {
+    if (!value) customize();
+    runsInPrimary = value;
   };
 
   let replicaSettings = $state<HTMLElement>();
@@ -308,7 +333,10 @@
   });
 
   const previewRegions = $derived<PreviewRegion[]>([
-    regionPreview(primaryRegion, provider, primary),
+    {
+      ...regionPreview(primaryRegion, provider, primary),
+      serverless: runsInPrimary,
+    },
     ...(replicated && replicaRegion
       ? [
           {
@@ -363,12 +391,16 @@
   });
 
   const savedValues = $derived<RegionComputeValues[]>([
-    {
-      regionId: primaryRegion.id,
-      values: formValues(primary, primary),
-      scoped: primaryGroup?.scoped ?? false,
-      name: primaryGroup?.name,
-    },
+    ...(runsInPrimary
+      ? [
+          {
+            regionId: primaryRegion.id,
+            values: formValues(primary, primary),
+            scoped: primaryGroup?.scoped ?? false,
+            name: primaryGroup?.name,
+          },
+        ]
+      : []),
     ...(replicated
       ? [
           {
@@ -379,7 +411,9 @@
               gcpRegion: replica.gcpRegion,
               gcpWorkerPool: replica.gcpWorkerPool,
             }),
-            scoped: replicaGroup?.scoped ?? true,
+            // A replica on its own must name its region, or it would also run
+            // in the primary.
+            scoped: !runsInPrimary || (replicaGroup?.scoped ?? true),
             name: replicaGroup?.name,
           },
         ]
@@ -431,40 +465,78 @@
       region={replicated ? primaryRegion : undefined}
       title={translate('workers.region-role-primary')}
       showRole
+      bodyClass={runsInPrimary ? '' : 'py-3'}
     >
-      {@render serverError(primaryRegion.id)}
-      <!-- A new provider brings new labels (Function, Worker Pool). The fade
-      shows the fields changed; a slide would move every field twice. -->
-      {#key provider}
-        <div in:fade={motion('swap')}>
-          <ComputeFields
-            {provider}
-            leadingDivider={false}
-            idPrefix={primaryRegion.id}
-            lambdaArnPlaceholder={lambdaArnPlaceholderFor(
-              primaryRegion.providerRegion,
-            )}
-            bind:lambdaArn={primary.lambdaArn}
-            bind:agentCoreEndpointArn={primary.agentCoreEndpointArn}
-            bind:iamRoleArn={primary.iamRoleArn}
-            bind:roleExternalId={primary.roleExternalId}
-            bind:gcpProject={primary.gcpProject}
-            bind:gcpRegion={primary.gcpRegion}
-            bind:gcpWorkerPool={primary.gcpWorkerPool}
-            bind:gcpServiceAccount={primary.gcpServiceAccount}
-            bind:minReplicas={primary.minReplicas}
-            bind:maxReplicas={primary.maxReplicas}
-            bind:initialReplicas={primary.initialReplicas}
-            bind:utilizationTarget={primary.utilizationTarget}
-            bind:scaleDownStabilization={primary.scaleDownStabilization}
-            bind:scaleUpCooloffMs={primary.scaleUpCooloffMs}
-            bind:scaleUpBacklogThreshold={primary.scaleUpBacklogThreshold}
-            bind:maxWorkerLifetimeMs={primary.maxWorkerLifetimeMs}
-            bind:metricsPollIntervalMs={primary.metricsPollIntervalMs}
-            errors={regionErrors[primaryRegion.id]}
-          />
+      {#snippet action()}
+        {#if replicaRegion}
+          <Tooltip
+            text={translate('workers.region-compute-last')}
+            hide={!primaryIsLast}
+            bottomRight
+            width={260}
+          >
+            <ToggleSwitch
+              id="primary-compute"
+              label={translate('workers.region-compute')}
+              labelPosition="left"
+              disabled={primaryIsLast}
+              bind:checked={() => runsInPrimary, setRunsInPrimary}
+            />
+          </Tooltip>
+        {/if}
+      {/snippet}
+      {#if runsInPrimary}
+        <div
+          class="flow-root"
+          in:slide={motion('reveal')}
+          out:slide={motion('conceal')}
+        >
+          {@render serverError(primaryRegion.id)}
+          <!-- A new provider brings new labels (Function, Worker Pool). The fade
+          shows the fields changed; a slide would move every field twice. -->
+          {#key provider}
+            <div in:fade={motion('swap')}>
+              <ComputeFields
+                {provider}
+                leadingDivider={false}
+                idPrefix={primaryRegion.id}
+                lambdaArnPlaceholder={lambdaArnPlaceholderFor(
+                  primaryRegion.providerRegion,
+                )}
+                bind:lambdaArn={primary.lambdaArn}
+                bind:agentCoreEndpointArn={primary.agentCoreEndpointArn}
+                bind:iamRoleArn={primary.iamRoleArn}
+                bind:roleExternalId={primary.roleExternalId}
+                bind:gcpProject={primary.gcpProject}
+                bind:gcpRegion={primary.gcpRegion}
+                bind:gcpWorkerPool={primary.gcpWorkerPool}
+                bind:gcpServiceAccount={primary.gcpServiceAccount}
+                bind:minReplicas={primary.minReplicas}
+                bind:maxReplicas={primary.maxReplicas}
+                bind:initialReplicas={primary.initialReplicas}
+                bind:utilizationTarget={primary.utilizationTarget}
+                bind:scaleDownStabilization={primary.scaleDownStabilization}
+                bind:scaleUpCooloffMs={primary.scaleUpCooloffMs}
+                bind:scaleUpBacklogThreshold={primary.scaleUpBacklogThreshold}
+                bind:maxWorkerLifetimeMs={primary.maxWorkerLifetimeMs}
+                bind:metricsPollIntervalMs={primary.metricsPollIntervalMs}
+                errors={regionErrors[primaryRegion.id]}
+              />
+            </div>
+          {/key}
         </div>
-      {/key}
+      {:else}
+        <p
+          class="text-sm text-secondary"
+          in:slide={motion('reveal')}
+          out:slide={motion('conceal')}
+        >
+          {translate('workers.region-compute-off-primary', {
+            region: primaryLabel,
+            replica: replicaLabel,
+          })}
+        </p>
+      {/if}
     </RegionBlock>
 
     {#if replicaRegion}
@@ -478,12 +550,20 @@
         bodyClass={highAvailability ? '' : 'py-3'}
       >
         {#snippet action()}
-          <ToggleSwitch
-            id="high-availability"
-            label={translate('workers.high-availability')}
-            labelPosition="left"
-            bind:checked={highAvailability}
-          />
+          <Tooltip
+            text={translate('workers.region-compute-last')}
+            hide={!replicaIsLast}
+            bottomRight
+            width={260}
+          >
+            <ToggleSwitch
+              id="replica-compute"
+              label={translate('workers.region-compute')}
+              labelPosition="left"
+              disabled={replicaIsLast}
+              bind:checked={highAvailability}
+            />
+          </Tooltip>
         {/snippet}
         <!-- Each branch grows down from the toggle, so nothing above it moves.
         flow-root keeps the children's margins inside the sliding box. -->
@@ -618,7 +698,9 @@
             in:slide={motion('reveal')}
             out:slide={motion('conceal')}
           >
-            {translate('workers.high-availability-off')}
+            {translate('workers.region-compute-off-replica', {
+              region: replicaLabel,
+            })}
           </p>
         {/if}
       </RegionBlock>
