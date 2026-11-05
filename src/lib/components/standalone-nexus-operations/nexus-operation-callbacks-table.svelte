@@ -5,6 +5,7 @@
   import { page } from '$app/state';
 
   import NoQueryResults from '$lib/components/empty-states/no-query-results.svelte';
+  import SdkGettingStartedLinks from '$lib/components/sdk-getting-started-links.svelte';
   import Button from '$lib/holocene/button.svelte';
   import IconButton from '$lib/holocene/icon-button.svelte';
   import Link from '$lib/holocene/link.svelte';
@@ -15,15 +16,6 @@
   import Badge from '$lib/io/badge/badge.svelte';
   import IconChevronDown from '$lib/io/icon/icons/chevron-down.svelte';
   import IconChevronUp from '$lib/io/icon/icons/chevron-up.svelte';
-  import IconDotnetColorblock from '$lib/io/icon/icons/dotnet-colorblock.svelte';
-  import IconGoColorblock from '$lib/io/icon/icons/go-colorblock.svelte';
-  import IconJavaColorblock from '$lib/io/icon/icons/java-colorblock.svelte';
-  import IconPythonColorblock from '$lib/io/icon/icons/python-colorblock.svelte';
-  import IconRubyColorblock from '$lib/io/icon/icons/ruby-colorblock.svelte';
-  import IconRustColorblock from '$lib/io/icon/icons/rust-colorblock.svelte';
-  import IconSwiftColorblock from '$lib/io/icon/icons/swift-colorblock.svelte';
-  import IconTypescriptColorblock from '$lib/io/icon/icons/typescript-colorblock.svelte';
-  import type { IconComponent } from '$lib/io/icon/types';
   import type { Callback } from '$lib/types/nexus';
   import { toEventLinkView } from '$lib/utilities/event-link';
   import {
@@ -97,57 +89,6 @@
       url: page.url,
     }).then(() => scrollToRow(requestId));
   });
-
-  const SDKS: {
-    id: string;
-    name: string;
-    Icon: IconComponent;
-    href?: string;
-  }[] = [
-    {
-      id: 'go',
-      name: 'Go',
-      Icon: IconGoColorblock,
-      href: 'https://learn.temporal.io/getting_started/go/',
-    },
-    {
-      id: 'python',
-      name: 'Python',
-      Icon: IconPythonColorblock,
-      href: 'https://learn.temporal.io/getting_started/python/',
-    },
-    {
-      id: 'typescript',
-      name: 'TypeScript',
-      Icon: IconTypescriptColorblock,
-      href: 'https://learn.temporal.io/getting_started/typescript/',
-    },
-    {
-      id: 'dotnet',
-      name: '.NET',
-      Icon: IconDotnetColorblock,
-      href: 'https://learn.temporal.io/getting_started/dotnet/',
-    },
-    {
-      id: 'ruby',
-      name: 'Ruby',
-      Icon: IconRubyColorblock,
-      href: 'https://learn.temporal.io/getting_started/ruby/',
-    },
-    {
-      id: 'java',
-      name: 'Java',
-      Icon: IconJavaColorblock,
-      href: 'https://learn.temporal.io/getting_started/java/',
-    },
-    {
-      id: 'rust',
-      name: 'Rust',
-      Icon: IconRustColorblock,
-      href: 'https://docs.temporal.io/develop/rust/quickstart',
-    },
-    { id: 'swift', name: 'Swift', Icon: IconSwiftColorblock },
-  ];
 
   const toTarget = (callback: Callback) => {
     if (String(callback.state) !== 'Succeeded') return undefined;
@@ -288,19 +229,7 @@
             newTab>{translate('common.docs')}</Link
           >{translate('nexus.callbacks-empty-state-postface')}
         </p>
-        <div class="flex flex-wrap justify-center gap-2">
-          {#each SDKS as { id, name, Icon, href } (id)}
-            {#if href}
-              <Link newTab {href} aria-label={name} data-testid="sdk-icon-{id}">
-                <Icon title={name} />
-              </Link>
-            {:else}
-              <span data-testid="sdk-icon-{id}">
-                <Icon title={name} />
-              </span>
-            {/if}
-          {/each}
-        </div>
+        <SdkGettingStartedLinks />
       </div>
     {/if}
   {/snippet}

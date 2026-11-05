@@ -2,27 +2,29 @@ import { isSystemNexusCallerLink } from '$lib/services/system-nexus-caller-link'
 import type { WorkflowEvent } from '$lib/types/events';
 import {
   isWorkflowExecutionOptionsUpdatedEvent,
+  isWorkflowExecutionSignaledEvent,
   isWorkflowExecutionStartedEvent,
+  isWorkflowExecutionUpdateAcceptedEvent,
 } from '$lib/utilities/is-event-type';
 
 export const getInboundNexusLinkEvents = (history: WorkflowEvent[]) => {
   try {
-    const workflowExecutionStartedEvent = $derived(
-      history.find((event) => isWorkflowExecutionStartedEvent(event)),
-    );
-    const workflowExecutionOptionsUpdatedEvents = $derived(
-      history.filter((event) => isWorkflowExecutionOptionsUpdatedEvent(event)),
-    );
-    const matchingEvents: WorkflowEvent[] = $derived(
-      [
-        workflowExecutionStartedEvent,
-        ...workflowExecutionOptionsUpdatedEvents,
-      ].filter((event) => event !== undefined),
-    );
-
-    return matchingEvents.filter((event) =>
-      Boolean(getInboundLinkForEvent(event)),
-    );
+    return history.filter((event) => {
+      if (
+        isWorkflowExecutionStartedEvent(event) ||
+        isWorkflowExecutionOptionsUpdatedEvent(event)
+      ) {
+        return Boolean(getInboundLinkForEvent(event));
+      }
+      if (
+        isWorkflowExecutionSignaledEvent(event) ||
+        isWorkflowExecutionUpdateAcceptedEvent(event)
+      ) {
+        const link = getInboundLinkForEvent(event);
+        return Boolean(link && link.callback);
+      }
+      return false;
+    });
   } catch {
     return [];
   }
@@ -34,7 +36,10 @@ export const getInboundLinkForEvent = (event: WorkflowEvent) => {
     (isWorkflowExecutionOptionsUpdatedEvent(event) &&
       event?.attributes?.attachedCompletionCallbacks?.[0]?.links?.[0]) ||
     (isWorkflowExecutionStartedEvent(event) &&
-      event?.attributes?.completionCallbacks?.[0]?.links?.[0])
+      event?.attributes?.completionCallbacks?.[0]?.links?.[0]) ||
+    (isWorkflowExecutionUpdateAcceptedEvent(event) &&
+      event.workflowExecutionUpdateAcceptedEventAttributes?.acceptedRequest
+        ?.links?.[0])
   );
 };
 

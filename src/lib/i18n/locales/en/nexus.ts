@@ -104,9 +104,10 @@ export const Strings = {
   'standalone-nexus-operation-link': 'Standalone Nexus Operation Link',
   'callback-link': 'Callback Link',
   'namespace-link': 'Namespace Link',
-  'links-empty-state': 'No Nexus Links found.',
-  'inbound-links-empty-state': 'No inbound Nexus Links found.',
-  'outbound-links-empty-state': 'No outbound Nexus Links found.',
+  'links-empty-state': 'No links found.',
+  'inbound-links-empty-state': 'There are no inbound links for this Workflow.',
+  'outbound-links-empty-state':
+    'There are no outbound links for this Workflow.',
   'inbound-links': 'Inbound',
   'outbound-links': 'Outbound',
   'nexus-service': 'Nexus Service',
