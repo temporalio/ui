@@ -291,7 +291,7 @@ export const routeForStandaloneNexusOperationMetadata = (
   return `${routeForStandaloneNexusOperationBase(parameters)}/metadata`;
 };
 
-export const routeForStandaloneNexusOperationLinks = ({
+export const routeForStandaloneNexusOperationCallbacks = ({
   queryParams,
   ...parameters
 }: NamespaceParameter & {
@@ -300,7 +300,7 @@ export const routeForStandaloneNexusOperationLinks = ({
   queryParams?: Record<string, string>;
 }): ResolvedPathname => {
   return toURL(
-    `${routeForStandaloneNexusOperationBase(parameters)}/links`,
+    `${routeForStandaloneNexusOperationBase(parameters)}/callbacks`,
     queryParams,
   );
 };

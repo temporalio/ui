@@ -35,7 +35,7 @@ import {
   routeForScheduleCreate,
   routeForSchedules,
   routeForStandaloneActivityLinks,
-  routeForStandaloneNexusOperationLinks,
+  routeForStandaloneNexusOperationCallbacks,
   routeForTaskQueue,
   routeForWorkerDeploymentCreate,
   routeForWorkerDeploymentVersionCreate,
@@ -69,26 +69,26 @@ describe('routeFor', () => {
     );
   });
 
-  it('should route to a standalone Nexus operation "links" tab', () => {
-    const path = routeForStandaloneNexusOperationLinks({
+  it('should route to a standalone Nexus operation "callbacks" tab', () => {
+    const path = routeForStandaloneNexusOperationCallbacks({
       namespace: 'default',
       operationId: 'operation/1',
       runId: 'run-1',
     });
     expect(path).toBe(
-      `${base}/namespaces/default/nexus-operations/operation%2F1/run-1/links`,
+      `${base}/namespaces/default/nexus-operations/operation%2F1/run-1/callbacks`,
     );
   });
 
-  it('should route to a standalone Nexus operation "links" tab with query params', () => {
-    const path = routeForStandaloneNexusOperationLinks({
+  it('should route to a standalone Nexus operation "callbacks" tab with query params', () => {
+    const path = routeForStandaloneNexusOperationCallbacks({
       namespace: 'default',
       operationId: 'operation-1',
       runId: 'run-1',
-      queryParams: { tab: 'callbacks', requestId: 'req-1' },
+      queryParams: { requestId: 'req-1' },
     });
     expect(path).toBe(
-      `${base}/namespaces/default/nexus-operations/operation-1/run-1/links?tab=callbacks&requestId=req-1`,
+      `${base}/namespaces/default/nexus-operations/operation-1/run-1/callbacks?requestId=req-1`,
     );
   });
 
