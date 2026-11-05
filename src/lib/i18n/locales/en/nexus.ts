@@ -93,6 +93,8 @@ export const Strings = {
   'last-attempt-failure': 'Last Attempt Failure',
   'blocked-reason': 'Blocked Reason',
   'callback-registered-time': 'Callback Registered Time',
+  'callbacks-no-matches': 'No callbacks match the current filters.',
+  'clear-filters': 'Clear filters',
   'delivery-attempt': 'Delivery Attempt',
   link: 'Link',
   'workflow-link': 'Workflow Link',
