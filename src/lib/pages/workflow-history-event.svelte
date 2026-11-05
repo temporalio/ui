@@ -8,7 +8,6 @@
   import { getWorkflowHistoryController } from '$lib/services/workflow-history-controller.svelte.js';
   import { triggerRefresh, workflowRun } from '$lib/stores/workflow-run';
   import type { PendingActivity } from '$lib/types/events';
-  import type { WorkflowExecutionIdentity } from '$lib/types/workflows';
 
   interface Props {
     eventId: string;
@@ -17,7 +16,7 @@
     runId: string;
   }
 
-  const { eventId, namespace, workflowId, runId }: Props = $props();
+  const { eventId }: Props = $props();
   const historyController = getWorkflowHistoryController();
 
   let ids = $derived([eventId]);
@@ -25,11 +24,6 @@
   onMount(() => historyController.resume());
 
   const { workflow } = $derived($workflowRun);
-  const workflowExecutionIdentity: WorkflowExecutionIdentity = $derived({
-    namespace,
-    workflowId: workflow?.id ?? workflowId,
-    runId: workflow?.runId ?? runId,
-  });
   const initialEvent = $derived(
     historyController.history.event(eventId) ??
       historyController.history.event(
@@ -81,7 +75,7 @@
   {#if workflow}
     <ActivityCommands
       {activity}
-      {workflowExecutionIdentity}
+      workflowExecutionIdentity={historyController.workflowExecutionIdentity}
       {workflow}
       onRefresh={triggerRefresh}
       class="justify-end"
@@ -103,7 +97,7 @@
     <tbody>
       {#each visibleItems as event, index}
         <EventSummaryRow
-          {workflowExecutionIdentity}
+          workflowExecutionIdentity={historyController.workflowExecutionIdentity}
           {event}
           {index}
           expanded={event.id === initialEvent?.id}

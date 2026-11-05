@@ -30,10 +30,7 @@
     workflowRun,
   } from '$lib/stores/workflow-run';
   import type { NetworkError } from '$lib/types/global';
-  import type {
-    WorkflowExecution,
-    WorkflowExecutionIdentity,
-  } from '$lib/types/workflows';
+  import type { WorkflowExecution } from '$lib/types/workflows';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
   import { decodePayloadAndParseDataToJSON } from '$lib/utilities/decode-payload';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
@@ -60,7 +57,6 @@
   let workflowError: NetworkError | null = $state(null);
   let workflowRunController: AbortController | null = null;
   let historyController = $state<WorkflowHistoryController | null>(null);
-  let workflowExecutionIdentity: WorkflowExecutionIdentity | null = null;
 
   let _refetchSeq = 0;
 
@@ -151,19 +147,16 @@
     const workers = await getPollers({ queue: taskQueue!, namespace: ns });
     if (!isCurrent()) return;
 
-    const identity = {
-      namespace: ns,
-      workflowId: workflow.id,
-      runId: workflow.runId,
-    };
     const history = new WorkflowHistoryController({
-      workflowExecutionIdentity: identity,
-
-      maximumPageSize: 1000,
+      workflowExecutionIdentity: {
+        namespace: ns,
+        workflowId: workflow.id,
+        runId: workflow.runId,
+      },
       pauseAfterPages: 2,
       liveUpdatesPaused: $pauseLiveUpdates,
     });
-    workflowExecutionIdentity = identity;
+
     historyController = history;
     void history.load(workflow);
 
@@ -204,7 +197,7 @@
       isRunning: $workflowRun?.workflow?.isRunning,
     });
     const controller = workflowRunController;
-    const identity = workflowExecutionIdentity;
+    const identity = historyController?.workflowExecutionIdentity;
     if (!shouldFetch || !controller || !identity || !historyController) return;
 
     // The 10s poll and an action's refetch overlap, so a poll that started
@@ -234,7 +227,6 @@
     workflowRunController = null;
     historyController?.dispose();
     historyController = null;
-    workflowExecutionIdentity = null;
   };
 
   // Pending metadata comes from the workflow run, not the history. The buffer
@@ -245,8 +237,8 @@
     if (
       workflow &&
       controller &&
-      workflow.id === workflowExecutionIdentity?.workflowId &&
-      workflow.runId === workflowExecutionIdentity?.runId
+      workflow.id === controller.workflowExecutionIdentity.workflowId &&
+      workflow.runId === controller.workflowExecutionIdentity.runId
     ) {
       untrack(() => controller.updateWorkflow(workflow));
     }
@@ -302,7 +294,6 @@
 
     return () => {
       clearInterval(refreshInterval);
-      clearWorkflowData();
     };
   });
 </script>

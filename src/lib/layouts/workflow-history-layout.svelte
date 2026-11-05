@@ -42,7 +42,6 @@
     WorkflowTaskFailedEvent,
     WorkflowTaskTimedOutEvent,
   } from '$lib/types/events';
-  import type { WorkflowExecutionIdentity } from '$lib/types/workflows';
   import {
     parseEventFilterParams,
     updateEventFilterParams,
@@ -51,13 +50,7 @@
 
   const historyController = getWorkflowHistoryController();
 
-  const { namespace } = $derived(page.params);
   const { workflow } = $derived($workflowRun);
-  const workflowExecutionIdentity: WorkflowExecutionIdentity = $derived({
-    namespace,
-    workflowId: workflow?.id ?? page.params.workflow,
-    runId: workflow?.runId ?? page.params.run,
-  });
 
   $effect(() => {
     const urlParams = parseEventFilterParams(page.url);
@@ -316,7 +309,7 @@
       <div data-testid="event-summary-table">
         <EventSummaryTable
           initialEvent={historyController.history.initialEvent}
-          {workflowExecutionIdentity}
+          workflowExecutionIdentity={historyController.workflowExecutionIdentity}
           {updating}
           {...tableProps}
         >
@@ -324,7 +317,7 @@
             {#if workflow}
               <ActivityCommands
                 {activity}
-                {workflowExecutionIdentity}
+                workflowExecutionIdentity={historyController.workflowExecutionIdentity}
                 {workflow}
                 onRefresh={triggerRefresh}
                 class="justify-end"
@@ -338,7 +331,5 @@
 </div>
 <DownloadEventHistoryModal
   bind:open={showDownloadPrompt}
-  {namespace}
-  workflowId={workflow?.id ?? ''}
-  runId={workflow?.runId ?? ''}
+  {...historyController.workflowExecutionIdentity}
 />

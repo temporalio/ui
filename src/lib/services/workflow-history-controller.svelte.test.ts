@@ -27,16 +27,6 @@ function deferred<T>() {
   return { promise, resolve, reject };
 }
 
-const stats: Awaited<ReturnType<typeof fetchBidirectional>> = {
-  durationMs: 1,
-  totalEvents: 2,
-  overlap: 0,
-  ascPages: 1,
-  descPages: 1,
-  eventsPerSecond: 2,
-  winner: 'tie',
-};
-
 function workflow(runId = 'run-1', isRunning = false): WorkflowExecution {
   return {
     name: 'TestWorkflow',
@@ -106,12 +96,6 @@ function createController(runId = 'run-1') {
 
 function progress(index: number, totalEstimated = 10, descMinId = 8) {
   request(index).options.onProgress?.({
-    ascEvents: 1,
-    descEvents: 3,
-    ascPages: 1,
-    descPages: 1,
-    elapsedMs: 1,
-    ascMaxId: 1,
     descMinId,
     totalEstimated,
   });
@@ -138,7 +122,7 @@ beforeEach(() => {
 
 afterEach(async () => {
   for (const controller of controllers.splice(0)) controller.dispose();
-  for (const { result } of requests) result.resolve(stats);
+  for (const { result } of requests) result.resolve();
   for (const { result } of polls) result.resolve('');
   await Promise.all([
     ...requests.map(({ result }) => result.promise.catch(() => {})),
@@ -153,10 +137,10 @@ describe('WorkflowHistoryController', () => {
     const firstLoad = first.controller.load(workflow('run-1', true));
     const secondLoad = second.controller.load(workflow('run-2', true));
 
-    request(0).options.onRawPage([makeWorkflowStarted(1)], true);
+    request(0).options.onRawPage([makeWorkflowStarted(1)]);
     progress(0);
     request(0).result.reject(new Error('history failed'));
-    request(1).result.resolve(stats);
+    request(1).result.resolve();
     await Promise.all([firstLoad, secondLoad]);
 
     expect(first.buffer.getEventArray().map((event) => event.id)).toEqual([
@@ -185,7 +169,7 @@ describe('WorkflowHistoryController', () => {
     const reset = vi.spyOn(buffer, 'reset');
     const metadata = vi.spyOn(buffer, 'setPendingMetadata');
     const load = controller.load(workflow());
-    request(0).options.onRawPage([makeWorkflowStarted(1)], true);
+    request(0).options.onRawPage([makeWorkflowStarted(1)]);
     progress(0);
     const failure = new Error('history unavailable');
     request(0).result.reject(failure);
@@ -211,9 +195,9 @@ describe('WorkflowHistoryController', () => {
     progress(1, 9, 9);
     expect(controller.totalExpectedEvents).toBe(10);
     expect(controller.descMinId).toBe(8);
-    request(1).options.onRawPage([makeWorkflowStarted(1)], true);
-    request(1).options.onRawPage([makeWorkflowCompleted(10)], false);
-    request(1).result.resolve(stats);
+    request(1).options.onRawPage([makeWorkflowStarted(1)]);
+    request(1).options.onRawPage([makeWorkflowCompleted(10)]);
+    request(1).result.resolve();
     await retry;
     await Promise.resolve();
 
@@ -243,7 +227,7 @@ describe('WorkflowHistoryController', () => {
     expect(request(0).options.signal?.aborted).toBe(true);
     expect(poll(0).options.signal.aborted).toBe(true);
     expect(resume).toHaveBeenCalledOnce();
-    request(0).result.resolve(stats);
+    request(0).result.resolve();
     await load;
     expect(controller.error).toBe(failure);
     expect(controller.fetchComplete).toBe(false);
@@ -253,9 +237,9 @@ describe('WorkflowHistoryController', () => {
   it('keeps load reset behavior after buffered history', async () => {
     const { controller, buffer } = createController();
     const load = controller.load(workflow());
-    request(0).options.onRawPage([makeWorkflowStarted(1)], true);
+    request(0).options.onRawPage([makeWorkflowStarted(1)]);
     progress(0);
-    request(0).result.resolve(stats);
+    request(0).result.resolve();
     await load;
 
     const nextLoad = controller.load(workflow());
@@ -264,7 +248,7 @@ describe('WorkflowHistoryController', () => {
     expect(controller.totalExpectedEvents).toBe(0);
     expect(controller.descMinId).toBe(0);
     expect(controller.fetchComplete).toBe(false);
-    request(1).result.resolve(stats);
+    request(1).result.resolve();
     await nextLoad;
   });
 
@@ -280,7 +264,7 @@ describe('WorkflowHistoryController', () => {
     expect(requests).toHaveLength(1);
     expect(request(0).options.signal?.aborted).toBe(false);
     expect(poll(0).options.signal.aborted).toBe(false);
-    request(0).result.resolve(stats);
+    request(0).result.resolve();
     await load;
   });
 
@@ -294,14 +278,14 @@ describe('WorkflowHistoryController', () => {
     expect(request(0).options.signal?.aborted).toBe(true);
     expect(poll(0).options.signal.aborted).toBe(true);
 
-    request(0).options.onRawPage([makeWorkflowCompleted(10)], false);
+    request(0).options.onRawPage([makeWorkflowCompleted(10)]);
     progress(0);
     const staleResume = vi.fn();
     request(0).options.onPause?.({ resume: staleResume });
     expect(staleResume).toHaveBeenCalledOnce();
     expect(poll(0).options.onEvent(makeWorkflowCompleted(10))).toBe(false);
     poll(0).options.onToken?.('stale-token');
-    request(0).result.resolve(stats);
+    request(0).result.resolve();
     poll(0).result.resolve('stale-token');
     await load;
     await Promise.resolve();
@@ -312,7 +296,7 @@ describe('WorkflowHistoryController', () => {
     expect(controller.error).toBeNull();
     expect(polls).toHaveLength(2);
     expect(poll(1).options.startToken).toBe('');
-    request(1).result.resolve(stats);
+    request(1).result.resolve();
     await retry;
   });
 
@@ -326,7 +310,7 @@ describe('WorkflowHistoryController', () => {
     await Promise.resolve();
     expect(controller.error).toBeNull();
     expect(request(1).options.signal?.aborted).toBe(false);
-    request(1).result.resolve(stats);
+    request(1).result.resolve();
     await retry;
   });
 
@@ -342,8 +326,6 @@ describe('WorkflowHistoryController', () => {
     controller.resume();
     expect(resume).toHaveBeenCalledOnce();
     expect(otherResume).not.toHaveBeenCalled();
-    expect(controller.resumeRequested).toBe(true);
-    expect(other.resumeRequested).toBe(false);
 
     request(0).result.reject(new Error('retry required'));
     await load;
@@ -353,8 +335,8 @@ describe('WorkflowHistoryController', () => {
     expect(retryResume).toHaveBeenCalledOnce();
     other.resume();
     expect(otherResume).toHaveBeenCalledOnce();
-    request(1).result.resolve(stats);
-    request(2).result.resolve(stats);
+    request(1).result.resolve();
+    request(2).result.resolve();
     await Promise.all([otherLoad, retry]);
   });
 
@@ -374,15 +356,15 @@ describe('WorkflowHistoryController', () => {
     await vi.waitFor(() => expect(polls).toHaveLength(3));
     expect(poll(2).options.startToken).toBe('first-token');
     expect(poll(2).options.runId).toBe('run-1');
-    request(0).result.resolve(stats);
-    request(1).result.resolve(stats);
+    request(0).result.resolve();
+    request(1).result.resolve();
     await Promise.all([firstLoad, secondLoad]);
   });
 
   it('does not repoll observed closed history after a failed session and retry', async () => {
     const { controller } = createController();
     const load = controller.load(workflow('run-1', true));
-    request(0).options.onRawPage([makeWorkflowCompleted(10)], false);
+    request(0).options.onRawPage([makeWorkflowCompleted(10)]);
     expect(poll(0).options.signal.aborted).toBe(true);
     request(0).result.reject(new Error('missing middle history'));
     await load;
@@ -393,7 +375,7 @@ describe('WorkflowHistoryController', () => {
     poll(0).result.resolve('');
     await Promise.resolve();
     expect(polls).toHaveLength(1);
-    request(1).result.resolve(stats);
+    request(1).result.resolve();
     await retry;
     expect(controller.fetchComplete).toBe(true);
   });
@@ -410,10 +392,10 @@ describe('WorkflowHistoryController', () => {
     expect(resume).toHaveBeenCalledOnce();
     expect(request(0).options.signal?.aborted).toBe(true);
     expect(poll(0).options.signal.aborted).toBe(true);
-    request(0).options.onRawPage([makeWorkflowStarted(1)], true);
+    request(0).options.onRawPage([makeWorkflowStarted(1)]);
     progress(0);
     expect(poll(0).options.onEvent(makeWorkflowStarted(1))).toBe(false);
-    request(0).result.resolve(stats);
+    request(0).result.resolve();
     await load;
     controller.resume();
     controller.updateWorkflow(workflow('run-1', true));
@@ -421,7 +403,10 @@ describe('WorkflowHistoryController', () => {
     expect(buffer.getEventArray()).toEqual([]);
     expect(controller.loading).toBe(false);
     expect(controller.fetchComplete).toBe(false);
-    expect(controller.resumeRequested).toBe(false);
+    expect(resume).toHaveBeenCalledOnce();
+    const lateResume = vi.fn();
+    request(0).options.onPause?.({ resume: lateResume });
+    expect(lateResume).toHaveBeenCalledOnce();
     expect(polls).toHaveLength(1);
     await expect(controller.load(workflow())).rejects.toThrow('disposed');
     await expect(controller.retry(workflow())).rejects.toThrow('disposed');

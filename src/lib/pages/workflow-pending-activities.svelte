@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { page } from '$app/state';
-
   import ActivityCommands from '$lib/components/activity/activity-commands.svelte';
   import PendingActivityCard from '$lib/components/workflow/pending-activity/pending-activity-card.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
@@ -36,11 +34,7 @@
             {#if workflow}
               <ActivityCommands
                 activity={actionActivity}
-                workflowExecutionIdentity={{
-                  namespace: page.params.namespace,
-                  workflowId: workflow.id,
-                  runId: workflow.runId,
-                }}
+                workflowExecutionIdentity={historyController.workflowExecutionIdentity}
                 {workflow}
                 onRefresh={triggerRefresh}
                 class="justify-end"

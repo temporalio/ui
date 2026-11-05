@@ -87,10 +87,6 @@ export class WorkflowHistoryController {
     return this.started && !this.fetchComplete && !this.error;
   }
 
-  get resumeRequested(): boolean {
-    return this.historyRequested;
-  }
-
   load(workflow: WorkflowExecution): Promise<void> {
     return this.loadHistory(workflow, { preserveHistory: false });
   }
@@ -280,9 +276,8 @@ export class WorkflowHistoryController {
         }
       },
     })
-      .then((token) => {
+      .then(() => {
         if (!this.isCurrent(session) || controller.signal.aborted) return;
-        session.lastPollToken = token;
         this.historyClosed = true;
       })
       .catch((error) => {

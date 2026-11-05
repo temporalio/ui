@@ -6,7 +6,8 @@ import {
 } from '$lib/utilities/handle-error';
 import type { ErrorCallback } from '$lib/utilities/request-from-api';
 
-import { fetchBidirectional } from './fetch-bidirectional';
+import { fetchBidirectional, type PauseHandle } from './fetch-bidirectional';
+import { createGroupedEventBuffer } from './grouped-event-buffer';
 
 // ---------------------------------------------------------------------------
 // Mocks
@@ -29,7 +30,7 @@ let requestFromAPI: ReturnType<typeof vi.fn>;
 
 beforeEach(async () => {
   const mod = await import('$lib/utilities/request-from-api');
-  requestFromAPI = mod.requestFromAPI as ReturnType<typeof vi.fn>;
+  requestFromAPI = vi.mocked(mod.requestFromAPI);
 });
 
 afterEach(() => {
@@ -68,72 +69,26 @@ const emptyPage = { history: { events: [] }, nextPageToken: '' };
 // ---------------------------------------------------------------------------
 
 describe('fetchBidirectional onRawPage', () => {
-  it('delivers all ascending events via onRawPage with isAscending=true', async () => {
-    const received: { id: string; asc: boolean }[] = [];
-    requestFromAPI.mockImplementation((url: string) => {
-      if (url === 'asc') return Promise.resolve(ascPage([1, 2, 3]));
-      return Promise.resolve(emptyPage);
-    });
+  it('retains each event once when cursor pages overlap', async () => {
+    const buffer = createGroupedEventBuffer();
+    requestFromAPI.mockImplementation((url: string) =>
+      Promise.resolve(url === 'asc' ? ascPage([1, 2, 3]) : descPage([3, 2, 1])),
+    );
 
     await fetchBidirectional({
       namespace: 'ns',
       workflowId: 'wf',
       runId: 'run',
-      onRawPage: (evts, isAsc) => {
-        for (const e of evts) received.push({ id: e.eventId, asc: isAsc });
+      onRawPage: (events) => {
+        for (const event of events) buffer.ingestHistoryEvent(event);
       },
     });
 
-    expect(received.every((r) => r.asc)).toBe(true);
-    expect(received.map((r) => r.id)).toEqual(['1', '2', '3']);
-  });
-
-  it('delivers descending events via onRawPage with isAscending=false', async () => {
-    const received: { id: string; asc: boolean }[] = [];
-    requestFromAPI.mockImplementation((url: string) => {
-      if (url === 'desc') return Promise.resolve(descPage([3, 2, 1]));
-      return Promise.resolve(emptyPage);
-    });
-
-    await fetchBidirectional({
-      namespace: 'ns',
-      workflowId: 'wf',
-      runId: 'run',
-      onRawPage: (evts, isAsc) => {
-        for (const e of evts) received.push({ id: e.eventId, asc: isAsc });
-      },
-    });
-
-    const descEvents = received.filter((r) => !r.asc);
-    expect(descEvents.length).toBeGreaterThan(0);
-    expect(descEvents.every((r) => !r.asc)).toBe(true);
-  });
-
-  it('deduplicates events that both cursors return', async () => {
-    // Ascending: events 1-3. Descending: events 3-1 (overlap at 3).
-    const received: string[] = [];
-    let ascCall = 0;
-    requestFromAPI.mockImplementation((url: string) => {
-      if (url === 'asc') {
-        ascCall++;
-        if (ascCall === 1) return Promise.resolve(ascPage([1, 2, 3]));
-        return Promise.resolve(emptyPage);
-      }
-      return Promise.resolve(descPage([3, 2, 1]));
-    });
-
-    await fetchBidirectional({
-      namespace: 'ns',
-      workflowId: 'wf',
-      runId: 'run',
-      onRawPage: (evts) => {
-        for (const e of evts) received.push(e.eventId);
-      },
-    });
-
-    // Event 3 should only appear once (deduped by the `seen` set).
-    const countOf3 = received.filter((id) => id === '3').length;
-    expect(countOf3).toBe(1);
+    expect(buffer.getEventArray().map((event) => event.id)).toEqual([
+      '1',
+      '2',
+      '3',
+    ]);
   });
 });
 
@@ -164,48 +119,48 @@ describe('fetchBidirectional multi-page ascending', () => {
     });
 
     expect(ascCall).toBe(2);
-    expect(allReceived).toContain('1');
-    expect(allReceived).toContain('4');
+    expect(allReceived).toEqual(['1', '2', '3', '4']);
   });
 });
 
-// ---------------------------------------------------------------------------
-// BidirectionalStats shape
-// ---------------------------------------------------------------------------
+describe('fetchBidirectional progress', () => {
+  it('reports zero descending bounds until a descending page arrives', async () => {
+    const onProgress = vi.fn();
+    requestFromAPI.mockImplementation((url: string) =>
+      Promise.resolve(url === 'asc' ? ascPage([1, 2, 3]) : emptyPage),
+    );
 
-describe('fetchBidirectional stats', () => {
-  it('returns winner=ascending when ascending completes in fewer pages', async () => {
-    requestFromAPI.mockImplementation((url: string) => {
-      if (url === 'asc') return Promise.resolve(ascPage([1, 2, 3]));
-      return Promise.resolve(emptyPage);
-    });
-
-    const stats = await fetchBidirectional({
+    await fetchBidirectional({
       namespace: 'ns',
       workflowId: 'wf',
       runId: 'run',
       onRawPage: () => {},
+      onProgress,
     });
-
-    expect(stats.totalEvents).toBe(3);
-    expect(typeof stats.durationMs).toBe('number');
-    expect(['ascending', 'descending', 'tie']).toContain(stats.winner);
+    expect(onProgress).toHaveBeenCalledExactlyOnceWith({
+      totalEstimated: 0,
+      descMinId: 0,
+    });
   });
 
-  it('counts overlap when both cursors return the same events', async () => {
-    requestFromAPI.mockImplementation((url: string) => {
-      if (url === 'asc') return Promise.resolve(ascPage([1, 2, 3]));
-      return Promise.resolve(descPage([3, 2, 1]));
-    });
+  it('reports descending bounds even when the raw page overlaps', async () => {
+    const onProgress = vi.fn();
+    requestFromAPI.mockImplementation((url: string) =>
+      Promise.resolve(url === 'asc' ? ascPage([1, 2, 3]) : descPage([3, 2, 1])),
+    );
 
-    const stats = await fetchBidirectional({
+    await fetchBidirectional({
       namespace: 'ns',
       workflowId: 'wf',
       runId: 'run',
       onRawPage: () => {},
+      onProgress,
     });
 
-    expect(stats.overlap).toBeGreaterThan(0);
+    expect(onProgress).toHaveBeenLastCalledWith({
+      totalEstimated: 3,
+      descMinId: 1,
+    });
   });
 });
 
@@ -305,7 +260,7 @@ describe('fetchBidirectional failure recovery', () => {
       });
       const onPause = vi.fn();
 
-      const stats = await fetchBidirectional({
+      await fetchBidirectional({
         namespace: 'ns',
         workflowId: 'wf',
         runId: 'run',
@@ -317,7 +272,6 @@ describe('fetchBidirectional failure recovery', () => {
 
       expect(healthyCalls).toBe(3);
       expect(received.toSorted()).toEqual(['1', '2', '3', '4', '5', '6']);
-      expect(stats.totalEvents).toBe(6);
       expect(onPause).not.toHaveBeenCalled();
       expect(
         requestFromAPI.mock.calls.filter(([url]) => url === failedDirection),
@@ -363,6 +317,8 @@ describe('fetchBidirectional failure recovery', () => {
   });
 
   it('succeeds when recovery closes the gap without reaching a terminal token', async () => {
+    const received: string[] = [];
+    const onProgress = vi.fn();
     requestFromAPI.mockImplementation(
       (url: string, init: { token?: string }) => {
         if (url === 'desc') {
@@ -382,9 +338,19 @@ describe('fetchBidirectional failure recovery', () => {
         namespace: 'ns',
         workflowId: 'wf',
         runId: 'run',
-        onRawPage: vi.fn(),
+        onRawPage: (events) =>
+          received.push(...events.map((event) => event.eventId)),
+        onProgress,
       }),
-    ).resolves.toMatchObject({ totalEvents: 10, ascPages: 4, descPages: 1 });
+    ).resolves.toBeUndefined();
+    expect(received.toSorted((a, b) => Number(a) - Number(b))).toEqual(
+      Array.from({ length: 10 }, (_, index) => String(index + 1)),
+    );
+    expect(requestFromAPI).toHaveBeenCalledTimes(6);
+    expect(onProgress).toHaveBeenLastCalledWith({
+      totalEstimated: 10,
+      descMinId: 9,
+    });
   });
 
   it('preserves NetworkError failures', async () => {
@@ -454,6 +420,7 @@ describe('fetchBidirectional failure recovery', () => {
     const failingPage = deferred<ReturnType<typeof ascPage>>();
     const paused = deferred<void>();
     const onPause = vi.fn(() => paused.resolve());
+    const onRawPage = vi.fn();
     let descendingCalls = 0;
     requestFromAPI.mockImplementation((url: string) => {
       if (url === 'asc') return failingPage.promise;
@@ -467,43 +434,72 @@ describe('fetchBidirectional failure recovery', () => {
       namespace: 'ns',
       workflowId: 'wf',
       runId: 'run',
-      onRawPage: vi.fn(),
+      onRawPage,
       pauseAfterPages: 1,
       onPause,
     });
     await paused.promise;
     failingPage.reject(new Error('ascending failed while descending paused'));
 
-    await expect(done).resolves.toMatchObject({ totalEvents: 4 });
+    await expect(done).resolves.toBeUndefined();
+    expect(
+      onRawPage.mock.calls.flatMap(([events]) =>
+        events.map((event: ReturnType<typeof makeEvent>) => event.eventId),
+      ),
+    ).toEqual(['4', '3', '2', '1']);
     expect(descendingCalls).toBe(2);
     expect(onPause).toHaveBeenCalledTimes(1);
   });
 
-  it('does not swallow unexpected page callback errors', async () => {
-    const error = new Error('ingestion failed');
-    const latePage = deferred<ReturnType<typeof descPage>>();
-    requestFromAPI.mockImplementation((url: string) =>
-      url === 'asc' ? Promise.resolve(ascPage([1, 2], 'a2')) : latePage.promise,
-    );
-    const onRawPage = vi.fn(() => {
-      throw error;
-    });
-    const onProgress = vi.fn();
+  it.each(['onRawPage', 'onProgress', 'onPause'])(
+    'propagates %s errors, aborting both requests and suppressing late callbacks',
+    async (callback) => {
+      const error = new Error('callback failed');
+      const latePage = deferred<ReturnType<typeof descPage>>();
+      const signals: AbortSignal[] = [];
+      requestFromAPI.mockImplementation(
+        (url: string, init: { options: { signal: AbortSignal } }) => {
+          signals.push(init.options.signal);
+          return url === 'asc'
+            ? Promise.resolve(ascPage([1, 2], 'a2'))
+            : latePage.promise;
+        },
+      );
+      const callbacks = {
+        onRawPage: vi.fn(),
+        onProgress: vi.fn(),
+        onPause: vi.fn(),
+      };
+      for (const [name, handler] of Object.entries(callbacks)) {
+        if (name === callback)
+          handler.mockImplementation(() => {
+            throw error;
+          });
+      }
 
-    await expect(
-      fetchBidirectional({
-        namespace: 'ns',
-        workflowId: 'wf',
-        runId: 'run',
-        onRawPage,
-        onProgress,
-      }),
-    ).rejects.toBe(error);
-    latePage.resolve(descPage([10, 9]));
-    await latePage.promise;
-    expect(onRawPage).toHaveBeenCalledTimes(1);
-    expect(onProgress).not.toHaveBeenCalled();
-  });
+      await expect(
+        fetchBidirectional({
+          namespace: 'ns',
+          workflowId: 'wf',
+          runId: 'run',
+          pauseAfterPages: 1,
+          ...callbacks,
+        }),
+      ).rejects.toBe(error);
+      expect(signals).toHaveLength(2);
+      expect(signals.every((signal) => signal.aborted)).toBe(true);
+      latePage.resolve(descPage([10, 9]));
+      await latePage.promise;
+      expect(callbacks.onRawPage).toHaveBeenCalledTimes(1);
+      expect(callbacks.onProgress).toHaveBeenCalledTimes(
+        callback === 'onRawPage' ? 0 : 1,
+      );
+      expect(callbacks.onPause).toHaveBeenCalledTimes(
+        callback === 'onPause' ? 1 : 0,
+      );
+      expect(requestFromAPI).toHaveBeenCalledTimes(2);
+    },
+  );
 });
 
 describe('fetchBidirectional empty pages', () => {
@@ -529,7 +525,7 @@ describe('fetchBidirectional empty pages', () => {
           onRawPage: (events) =>
             received.push(...events.map((event) => event.eventId)),
         }),
-      ).resolves.toMatchObject({ totalEvents: 1 });
+      ).resolves.toBeUndefined();
       expect(received).toEqual(['1']);
       expect(requestFromAPI).toHaveBeenCalledWith(
         direction,
@@ -562,6 +558,7 @@ describe('fetchBidirectional empty pages', () => {
   });
 
   it('accepts an empty terminal page as completed pagination', async () => {
+    const onRawPage = vi.fn();
     requestFromAPI.mockImplementation((url: string) =>
       url === 'asc'
         ? Promise.resolve(emptyPage)
@@ -572,9 +569,11 @@ describe('fetchBidirectional empty pages', () => {
         namespace: 'ns',
         workflowId: 'wf',
         runId: 'run',
-        onRawPage: vi.fn(),
+        onRawPage,
       }),
-    ).resolves.toMatchObject({ totalEvents: 0 });
+    ).resolves.toBeUndefined();
+    expect(onRawPage).not.toHaveBeenCalled();
+    expect(requestFromAPI).toHaveBeenCalledTimes(2);
   });
 
   it('does not treat a missing response as completed pagination', async () => {
@@ -587,6 +586,52 @@ describe('fetchBidirectional empty pages', () => {
         onRawPage: vi.fn(),
       }),
     ).rejects.toThrow('Missing workflow history response.');
+  });
+});
+
+describe('fetchBidirectional pause', () => {
+  it('pauses both cursors at the threshold, resumes once, and lets the winner cancel its sibling', async () => {
+    const paused = deferred<void>();
+    let resume = () => {};
+    const onPause = vi.fn((handle: PauseHandle) => {
+      resume = handle.resume;
+      paused.resolve();
+    });
+    const signals: AbortSignal[] = [];
+    const received: string[] = [];
+    requestFromAPI.mockImplementation(
+      (
+        url: string,
+        init: { token?: string; options: { signal: AbortSignal } },
+      ) => {
+        signals.push(init.options.signal);
+        if (init.token) {
+          expect(url).toBe('asc');
+          expect(signals[1].aborted).toBe(true);
+          return Promise.resolve(ascPage([3, 4], 'a3'));
+        }
+        return Promise.resolve(
+          url === 'asc' ? ascPage([1, 2], 'a2') : descPage([6, 5], 'd2'),
+        );
+      },
+    );
+    const done = fetchBidirectional({
+      namespace: 'ns',
+      workflowId: 'wf',
+      runId: 'run',
+      pauseAfterPages: 1,
+      onPause,
+      onRawPage: (events) =>
+        received.push(...events.map((event) => event.eventId)),
+    });
+    await paused.promise;
+    expect(requestFromAPI).toHaveBeenCalledTimes(2);
+    resume();
+    await expect(done).resolves.toBeUndefined();
+    resume();
+    expect(onPause).toHaveBeenCalledTimes(1);
+    expect(requestFromAPI).toHaveBeenCalledTimes(3);
+    expect(received.toSorted()).toEqual(['1', '2', '3', '4', '5', '6']);
   });
 });
 
@@ -646,7 +691,6 @@ describe('fetchBidirectional abort', () => {
       },
     );
     const onRawPage = vi.fn();
-    const onFirstDescPage = vi.fn();
     const onProgress = vi.fn();
     const onPause = vi.fn();
     const done = fetchBidirectional({
@@ -655,7 +699,6 @@ describe('fetchBidirectional abort', () => {
       runId: 'run',
       signal: controller.signal,
       onRawPage,
-      onFirstDescPage,
       onProgress,
       onPause,
       pauseAfterPages: 1,
@@ -668,7 +711,6 @@ describe('fetchBidirectional abort', () => {
 
     expect(signals.every((signal) => signal.aborted)).toBe(true);
     expect(onRawPage).not.toHaveBeenCalled();
-    expect(onFirstDescPage).not.toHaveBeenCalled();
     expect(onProgress).not.toHaveBeenCalled();
     expect(onPause).not.toHaveBeenCalled();
   });

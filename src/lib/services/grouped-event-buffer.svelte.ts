@@ -1,5 +1,3 @@
-import { readonly, writable } from 'svelte/store';
-
 import type { EventGroup } from '$lib/models/event-groups/event-groups';
 import type { EventGroupKey } from '$lib/models/event-history/event-group-markers';
 import type { WorkflowEvent } from '$lib/types/events';
@@ -37,8 +35,6 @@ export class EventBufferView {
   private disposed = false;
   private readonly buffer: GroupedEventBuffer;
   private readonly unsubscribe: () => void;
-  private readonly writableVersionStore = writable(0);
-  readonly versionStore = readonly(this.writableVersionStore);
 
   constructor(buffer: GroupedEventBuffer) {
     this.buffer = buffer;
@@ -57,7 +53,6 @@ export class EventBufferView {
   private bump(): void {
     this.pending = false;
     this._version++;
-    this.writableVersionStore.update((current) => current + 1);
   }
 
   private scheduleUpdate(immediate: boolean): void {
@@ -71,11 +66,6 @@ export class EventBufferView {
     queueMicrotask(() => {
       if (!this.disposed && this.pending) this.bump();
     });
-  }
-
-  /** Bumped once per batch of buffer writes. */
-  get version(): number {
-    return this._version;
   }
 
   /**

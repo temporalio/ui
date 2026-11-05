@@ -13,24 +13,8 @@ import {
 import { routeForApi } from '$lib/utilities/route-for-api';
 
 type BidirectionalProgress = {
-  ascEvents: number;
-  descEvents: number;
-  ascPages: number;
-  descPages: number;
-  elapsedMs: number;
-  ascMaxId: number;
-  descMinId: number;
   totalEstimated: number;
-};
-
-type BidirectionalStats = {
-  durationMs: number;
-  totalEvents: number;
-  overlap: number;
-  ascPages: number;
-  descPages: number;
-  eventsPerSecond: number;
-  winner: 'ascending' | 'descending' | 'tie';
+  descMinId: number;
 };
 
 export type PauseHandle = {
@@ -44,13 +28,7 @@ export type FetchBidirectionalParams = {
   runId: string;
   signal?: AbortSignal;
   onProgress?: (p: BidirectionalProgress) => void;
-  /** Fires after every page with that page's raw events and direction flag.
-   *  Feed directly into processEvent() to resolve buffer Promises live. */
-  onRawPage: (events: HistoryEvent[], isAscending: boolean) => void;
-  /** Fires once with the raw events from the first descending page — the most
-   *  recent events in the history. Use to call setFailedEvent() before the
-   *  ascending cursor processes events that affect billableActions. */
-  onFirstDescPage?: (events: HistoryEvent[]) => void;
+  onRawPage: (events: HistoryEvent[]) => void;
   maximumPageSize?: number;
   /** After this many total pages (asc + desc combined), pause both cursors and
    *  call onPause with a handle whose resume() continues the fetch. */
@@ -66,29 +44,16 @@ export const fetchBidirectional = async ({
   signal,
   onProgress,
   onRawPage,
-  onFirstDescPage,
   maximumPageSize,
   pauseAfterPages,
   onPause,
-}: FetchBidirectionalParams): Promise<BidirectionalStats> => {
-  if (signal?.aborted) {
-    return {
-      durationMs: 0,
-      totalEvents: 0,
-      overlap: 0,
-      ascPages: 0,
-      descPages: 0,
-      eventsPerSecond: 0,
-      winner: 'tie',
-    };
-  }
+}: FetchBidirectionalParams): Promise<void> => {
+  if (signal?.aborted) return;
 
   const handlePageError: ErrorCallback = (error) => {
     handleUnauthorizedOrForbiddenError(error);
     throw error;
   };
-
-  const t0 = performance.now();
 
   const rootCtrl = new AbortController();
   const ascCtrl = new AbortController();
@@ -97,16 +62,13 @@ export const fetchBidirectional = async ({
   let ascMaxId = 0;
   let descMinId = Infinity;
   let descMaxId = 0;
-  let ascPages = 0;
-  let descPages = 0;
+  let pages = 0;
   let observedPageSize = 0;
   let winnerChosen = false;
-  let totalEvents = 0;
+
   let pauseFired = false;
   let failure: Error | NetworkError | null = null;
   let reachedEnd = false;
-
-  const seen = new Set<number>();
 
   const gap = () => Math.max(0, descMinId - ascMaxId - 1);
 
@@ -152,7 +114,7 @@ export const fetchBidirectional = async ({
       !pauseFired &&
       pauseAfterPages !== undefined &&
       onPause &&
-      ascPages + descPages >= pauseAfterPages
+      pages >= pauseAfterPages
     ) {
       pauseFired = true;
       pauseLatch = new Promise<void>((resolve) => {
@@ -164,12 +126,6 @@ export const fetchBidirectional = async ({
 
   const reportProgress = () => {
     onProgress?.({
-      ascEvents: ascMaxId,
-      descEvents: totalEvents - descMinId + 1,
-      ascPages,
-      descPages,
-      elapsedMs: performance.now() - t0,
-      ascMaxId,
       descMinId: descMinId === Infinity ? 0 : descMinId,
       totalEstimated: descMaxId,
     });
@@ -210,23 +166,33 @@ export const fetchBidirectional = async ({
     }
   };
 
-  const runAscending = async () => {
-    const route = routeForApi('events.ascending', { namespace, workflowId });
+  const runCursor = async ({
+    direction,
+    controller,
+    sibling,
+    updateBounds,
+  }: {
+    direction: 'ascending' | 'descending';
+    controller: AbortController;
+    sibling: AbortController;
+    updateBounds: (id: number) => void;
+  }) => {
+    const route = routeForApi(`events.${direction}`, { namespace, workflowId });
     let token: Token;
-    while (!ascCtrl.signal.aborted) {
-      await checkPause(ascCtrl.signal);
-      if (ascCtrl.signal.aborted) break;
+    while (!controller.signal.aborted) {
+      await checkPause(controller.signal);
+      if (controller.signal.aborted) break;
       const g = gap();
       if (g <= 0) {
-        descCtrl.abort();
+        sibling.abort();
         break;
       }
       if (observedPageSize > 0 && g <= observedPageSize && !winnerChosen) {
         winnerChosen = true;
-        descCtrl.abort();
+        sibling.abort();
       }
 
-      const response = await fetchPage(route, ascCtrl, token);
+      const response = await fetchPage(route, controller, token);
       if (!response || rootCtrl.signal.aborted) break;
 
       const events = response.history?.events ?? [];
@@ -239,19 +205,10 @@ export const fetchBidirectional = async ({
         break;
       }
 
-      ascPages++;
+      pages++;
       observedPageSize = Math.max(observedPageSize, events.length);
-
-      const fresh: HistoryEvent[] = [];
-      for (const e of events) {
-        const id = parseInt(e.eventId);
-        if (id > ascMaxId) ascMaxId = id;
-        if (!seen.has(id)) {
-          seen.add(id);
-          fresh.push(e);
-        }
-      }
-      if (fresh.length) onRawPage(fresh, true);
+      for (const event of events) updateBounds(parseInt(event.eventId));
+      onRawPage(events);
       if (rootCtrl.signal.aborted) break;
       reportProgress();
       if (rootCtrl.signal.aborted) break;
@@ -259,69 +216,7 @@ export const fetchBidirectional = async ({
 
       if (!response.nextPageToken) reachedEnd = true;
       if (!response.nextPageToken || gap() <= 0) {
-        descCtrl.abort();
-        break;
-      }
-      token = String(response.nextPageToken);
-    }
-  };
-
-  const runDescending = async () => {
-    const route = routeForApi('events.descending', { namespace, workflowId });
-    let token: Token;
-    while (!descCtrl.signal.aborted) {
-      await checkPause(descCtrl.signal);
-      if (descCtrl.signal.aborted) break;
-      const g = gap();
-      if (g <= 0) {
-        ascCtrl.abort();
-        break;
-      }
-      if (observedPageSize > 0 && g <= observedPageSize && !winnerChosen) {
-        winnerChosen = true;
-        ascCtrl.abort();
-      }
-
-      const response = await fetchPage(route, descCtrl, token);
-      if (!response || rootCtrl.signal.aborted) break;
-
-      const events = response.history?.events ?? [];
-      if (!events.length) {
-        if (response.nextPageToken) {
-          token = String(response.nextPageToken);
-          continue;
-        }
-        reachedEnd = true;
-        break;
-      }
-
-      descPages++;
-      observedPageSize = Math.max(observedPageSize, events.length);
-
-      const fresh: HistoryEvent[] = [];
-      for (const e of events) {
-        const id = parseInt(e.eventId);
-        if (id < descMinId) descMinId = id;
-        if (id > descMaxId) {
-          descMaxId = id;
-          totalEvents = id;
-        }
-        if (!seen.has(id)) {
-          seen.add(id);
-          fresh.push(e);
-        }
-      }
-      if (fresh.length) onRawPage(fresh, false);
-      if (rootCtrl.signal.aborted) break;
-      if (descPages === 1) onFirstDescPage?.(fresh);
-      if (rootCtrl.signal.aborted) break;
-      reportProgress();
-      if (rootCtrl.signal.aborted) break;
-      maybePause();
-
-      if (!response.nextPageToken) reachedEnd = true;
-      if (!response.nextPageToken || gap() <= 0) {
-        ascCtrl.abort();
+        sibling.abort();
         break;
       }
       token = String(response.nextPageToken);
@@ -329,7 +224,25 @@ export const fetchBidirectional = async ({
   };
 
   try {
-    await Promise.all([runAscending(), runDescending()]);
+    await Promise.all([
+      runCursor({
+        direction: 'ascending',
+        controller: ascCtrl,
+        sibling: descCtrl,
+        updateBounds: (id) => {
+          ascMaxId = Math.max(ascMaxId, id);
+        },
+      }),
+      runCursor({
+        direction: 'descending',
+        controller: descCtrl,
+        sibling: ascCtrl,
+        updateBounds: (id) => {
+          descMinId = Math.min(descMinId, id);
+          descMaxId = Math.max(descMaxId, id);
+        },
+      }),
+    ]);
     if (!signal?.aborted && failure && !reachedEnd && gap() > 0) {
       throw failure;
     }
@@ -337,27 +250,4 @@ export const fetchBidirectional = async ({
     onAbort();
     signal?.removeEventListener('abort', onAbort);
   }
-
-  const durationMs = performance.now() - t0;
-  const total = seen.size;
-  const fetched =
-    ascPages * (observedPageSize || 1) + descPages * (observedPageSize || 1);
-  const overlap = Math.max(0, fetched - total);
-
-  const winner: BidirectionalStats['winner'] =
-    ascPages === descPages
-      ? 'tie'
-      : ascPages > descPages
-        ? 'ascending'
-        : 'descending';
-
-  return {
-    durationMs,
-    totalEvents: total,
-    overlap,
-    ascPages,
-    descPages,
-    eventsPerSecond: Math.round(total / (durationMs / 1000)),
-    winner,
-  };
 };
