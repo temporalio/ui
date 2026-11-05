@@ -1,11 +1,5 @@
 <script lang="ts">
-  import { getContext } from 'svelte';
-
   import PollersTable from '$lib/components/workers/pollers-table/pollers-table.svelte';
-  import {
-    HISTORY_CTX,
-    type HistoryContext,
-  } from '$lib/contexts/history-context';
   import Alert from '$lib/holocene/alert.svelte';
   import Skeleton from '$lib/holocene/skeleton/index.svelte';
   import SkeletonTable from '$lib/holocene/skeleton/table.svelte';
@@ -20,6 +14,7 @@
     fetchWorkerCount,
   } from '$lib/services/worker-service';
   import { workerCountEnabled } from '$lib/stores/workers';
+  import type { getSDKandVersion } from '$lib/utilities/get-sdk-version';
 
   import WorkersTable from './workers-table.svelte';
 
@@ -29,6 +24,7 @@
     searchAttributes?: Record<string, string>;
     taskQueue: string;
     onCount?: (count: number) => void;
+    sdkInfo?: ReturnType<typeof getSDKandVersion>;
   }
 
   let {
@@ -37,10 +33,8 @@
     searchAttributes,
     taskQueue,
     onCount,
+    sdkInfo,
   }: Props = $props();
-
-  const historyCtx = getContext<HistoryContext | undefined>(HISTORY_CTX);
-  const sdkInfo = $derived(historyCtx?.history?.sdkInfo);
 
   const query = $derived(`TaskQueue="${taskQueue}"`);
   const onFetch = $derived(() => fetchPaginatedWorkers({ namespace, query }));

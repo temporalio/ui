@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getContext, onMount } from 'svelte';
+  import { onMount } from 'svelte';
 
   import { beforeNavigate, goto } from '$app/navigation';
   import { page } from '$app/state';
@@ -12,10 +12,6 @@
   import DownloadEventHistoryModal from '$lib/components/workflow/download-event-history-modal.svelte';
   import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
   import WorkflowCallbacks from '$lib/components/workflow/workflow-callbacks.svelte';
-  import {
-    HISTORY_CTX,
-    type HistoryContext,
-  } from '$lib/contexts/history-context';
   import TabButton from '$lib/holocene/tab-buttons/tab-button.svelte';
   import TabButtons from '$lib/holocene/tab-buttons/tab-buttons.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
@@ -35,6 +31,7 @@
   } from '$lib/models/event-history/get-event-categorization';
   import WorkflowHistoryJson from '$lib/pages/workflow-history-json.svelte';
   import type { LazyGroup } from '$lib/services/grouped-event-buffer';
+  import { getWorkflowHistoryController } from '$lib/services/workflow-history-controller.svelte.js';
   import { clearActives } from '$lib/stores/active-events';
   import { eventFilterSort, eventViewType } from '$lib/stores/event-view';
   import { pauseLiveUpdates } from '$lib/stores/events';
@@ -53,8 +50,7 @@
   } from '$lib/utilities/event-filter-params';
   import { orderGroupsByPending } from '$lib/utilities/order-groups-by-pending';
 
-  const historyCtx = getContext<HistoryContext>(HISTORY_CTX);
-  const historyView = $derived(historyCtx.history);
+  const historyController = getWorkflowHistoryController();
 
   const { namespace } = $derived(page.params);
   const { workflow } = $derived($workflowRun);
@@ -83,20 +79,18 @@
   // Enough to filter, sort and paginate; only the rendered page is materialized.
   // The feed view needs full groups, read lazily in tableProps below.
   const bufferLazyGroups = $derived(
-    historyView?.lazyGroupsWithoutWorkflowTasks ?? [],
+    historyController.history.lazyGroupsWithoutWorkflowTasks,
   );
-  const bufferEvents = $derived(historyView?.events ?? []);
-  let updating = $derived(!historyCtx.fetchComplete);
+  const bufferEvents = $derived(historyController.history.events);
+  let updating = $derived(historyController.loading);
 
-  onMount(() => {
-    historyCtx.resume();
-  });
+  onMount(() => historyController.resume());
 
   const selectedEventGroups = $derived(
     parseEventFilterParams(page.url).eventGroups,
   );
   const eventGroupMatcher = $derived(
-    historyView?.eventGroupMatcher(selectedEventGroups),
+    historyController.history.eventGroupMatcher(selectedEventGroups),
   );
 
   const isCategoryVisible = $derived.by(() => {
@@ -123,8 +117,8 @@
   );
 
   const workflowTaskFailedError = $derived.by(() => {
-    if (!historyCtx.fetchComplete) return undefined;
-    return historyView?.workflowTaskFailedEvent as
+    if (!historyController.fetchComplete) return undefined;
+    return historyController.history.workflowTaskFailedEvent as
       | WorkflowTaskFailedEvent
       | WorkflowTaskTimedOutEvent
       | undefined;
@@ -149,7 +143,9 @@
       activities: isCategoryVisible(CATEGORIES.ACTIVITY)
         ? (workflow?.pendingActivities ?? []).filter(({ activityId }) =>
             isInSelectedGroups(
-              historyView?.pendingActivityScheduledEvent(activityId)?.id,
+              historyController.history.pendingActivityScheduledEvent(
+                activityId,
+              )?.id,
             ),
           )
         : [],
@@ -167,8 +163,8 @@
   // EventSummaryTable's props are a union on `compact`, so the pair travels as
   // one object. Keeps the materialized groups on the feed branch too.
   const tableProps = $derived.by(() => {
-    const view = historyView;
-    return compact && view
+    const view = historyController.history;
+    return compact
       ? {
           compact: true as const,
           items: orderGroupsByPending(lazyGroups, reverseSort),
@@ -179,7 +175,7 @@
           items: reverseSort
             ? [...pending.nexusOperations, ...pending.activities, ...history]
             : [...history, ...pending.activities, ...pending.nexusOperations],
-          groups: view?.groupsWithoutWorkflowTasks ?? [],
+          groups: view.groupsWithoutWorkflowTasks,
         };
   });
 
@@ -226,7 +222,7 @@
   };
 </script>
 
-<InputAndResults events={historyView?.events ?? []} />
+<InputAndResults events={historyController.history.events} />
 <div class="flex flex-col gap-2">
   {#if workflowTaskFailedError}
     <WorkflowError
@@ -237,7 +233,7 @@
   {#if workflow?.callbacks?.length}
     <WorkflowCallbacks
       callbacks={workflow.callbacks}
-      initialEvent={historyView?.initialEvent}
+      initialEvent={historyController.history.initialEvent}
     />
   {/if}
 </div>
@@ -289,7 +285,9 @@
           </ToggleButton>
         {/if}
         <EventTypeFilter {compact} />
-        <EventGroupFilter options={historyView?.eventGroupOptions ?? []} />
+        <EventGroupFilter
+          options={historyController.history.eventGroupOptions}
+        />
         <ToggleButton
           disabled={isNotPending}
           data-testid="pause"
@@ -324,10 +322,10 @@
       <div class="border-t border-primary px-4">
         <WorkflowHistoryJson events={filteredEvents} />
       </div>
-    {:else if historyView}
+    {:else}
       <div data-testid="event-summary-table">
         <EventSummaryTable
-          initialEvent={historyView.initialEvent}
+          initialEvent={historyController.history.initialEvent}
           {workflowExecutionIdentity}
           {updating}
           {...tableProps}

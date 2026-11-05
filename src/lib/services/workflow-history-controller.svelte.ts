@@ -1,3 +1,5 @@
+import { createContext } from 'svelte';
+
 import type { HistoryEvent } from '$lib/types/events';
 import type { NetworkError } from '$lib/types/global';
 import type {
@@ -18,13 +20,15 @@ import { runLivePoll } from './live-poll';
 
 import { EventBufferView } from './grouped-event-buffer.svelte';
 
+export const [getWorkflowHistoryController, setWorkflowHistoryController] =
+  createContext<WorkflowHistoryController>();
+
 type HistoryLoadSession = {
   controller: AbortController;
   livePollController: AbortController | null;
   livePollTask: Promise<void> | null;
   lastPollToken: string;
   workflowWasRunning: boolean;
-  historyClosed: boolean;
 };
 
 type WorkflowHistoryControllerOptions = {
@@ -48,6 +52,7 @@ export class WorkflowHistoryController {
   private started = $state(false);
   private disposed = false;
   private historyRequested = false;
+  private historyClosed = false;
   private liveUpdatesPaused: boolean;
   private pauseHandle: PauseHandle | null = null;
   private session: HistoryLoadSession | null = null;
@@ -86,19 +91,33 @@ export class WorkflowHistoryController {
     return this.historyRequested;
   }
 
-  async load(workflow: WorkflowExecution): Promise<void> {
+  load(workflow: WorkflowExecution): Promise<void> {
+    return this.loadHistory(workflow, { preserveHistory: false });
+  }
+
+  retry(workflow: WorkflowExecution): Promise<void> {
+    return this.loadHistory(workflow, { preserveHistory: true });
+  }
+
+  private async loadHistory(
+    workflow: WorkflowExecution,
+    { preserveHistory }: { preserveHistory: boolean },
+  ): Promise<void> {
     if (this.disposed)
       throw new Error('Cannot load a disposed workflow history.');
     this.verifyWorkflow(workflow);
     this.stopSession();
 
     this.fetchComplete = false;
-    this.latestEventId = 0;
-    this.totalExpectedEvents = 0;
-    this.descMinId = 0;
     this.error = null;
     this.started = true;
-    this.buffer.reset(parseInt(workflow.historyEvents ?? '0') || 0);
+    if (!preserveHistory) {
+      this.latestEventId = 0;
+      this.totalExpectedEvents = 0;
+      this.descMinId = 0;
+      this.historyClosed = false;
+      this.buffer.reset(parseInt(workflow.historyEvents ?? '0') || 0);
+    }
     this.buffer.setPendingMetadata(
       workflow.pendingActivities ?? [],
       workflow.pendingNexusOperations ?? [],
@@ -110,7 +129,6 @@ export class WorkflowHistoryController {
       livePollTask: null,
       lastPollToken: '',
       workflowWasRunning: workflow.isRunning,
-      historyClosed: false,
     };
     this.session = session;
     this.startLivePoll(session);
@@ -123,8 +141,15 @@ export class WorkflowHistoryController {
         pauseAfterPages: this.pauseAfterPages,
         onProgress: (progress) => {
           if (!this.isCurrent(session)) return;
-          this.totalExpectedEvents = progress.totalEstimated;
-          this.descMinId = progress.descMinId;
+          this.totalExpectedEvents = Math.max(
+            this.totalExpectedEvents,
+            progress.totalEstimated,
+          );
+          if (progress.descMinId > 0) {
+            this.descMinId = this.descMinId
+              ? Math.min(this.descMinId, progress.descMinId)
+              : progress.descMinId;
+          }
         },
         onPause: (handle) => {
           if (!this.isCurrent(session) || this.historyRequested) {
@@ -215,7 +240,7 @@ export class WorkflowHistoryController {
       this.isCurrent(session) &&
       !this.liveUpdatesPaused &&
       session.workflowWasRunning &&
-      !session.historyClosed
+      !this.historyClosed
     );
   }
 
@@ -230,7 +255,7 @@ export class WorkflowHistoryController {
       parseInt(event.eventId) || 0,
     );
     if (isWorkflowCloseEvent(event)) {
-      session.historyClosed = true;
+      this.historyClosed = true;
       session.livePollController?.abort();
     }
     return isNew;
@@ -258,7 +283,7 @@ export class WorkflowHistoryController {
       .then((token) => {
         if (!this.isCurrent(session) || controller.signal.aborted) return;
         session.lastPollToken = token;
-        session.historyClosed = true;
+        this.historyClosed = true;
       })
       .catch((error) => {
         if (!this.isCurrent(session) || controller.signal.aborted) return;

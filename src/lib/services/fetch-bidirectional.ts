@@ -2,7 +2,14 @@ import type {
   GetWorkflowExecutionHistoryResponse,
   HistoryEvent,
 } from '$lib/types/events';
-import { requestFromAPI } from '$lib/utilities/request-from-api';
+import type { NetworkError } from '$lib/types/global';
+import { getErrorMessage } from '$lib/utilities/error-message';
+import { handleUnauthorizedOrForbiddenError } from '$lib/utilities/handle-error';
+import { isNetworkError } from '$lib/utilities/is-network-error';
+import {
+  type ErrorCallback,
+  requestFromAPI,
+} from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
 
 type BidirectionalProgress = {
@@ -76,6 +83,11 @@ export const fetchBidirectional = async ({
     };
   }
 
+  const handlePageError: ErrorCallback = (error) => {
+    handleUnauthorizedOrForbiddenError(error);
+    throw error;
+  };
+
   const t0 = performance.now();
 
   const rootCtrl = new AbortController();
@@ -91,6 +103,8 @@ export const fetchBidirectional = async ({
   let winnerChosen = false;
   let totalEvents = 0;
   let pauseFired = false;
+  let failure: Error | NetworkError | null = null;
+  let reachedEnd = false;
 
   const seen = new Set<number>();
 
@@ -163,6 +177,39 @@ export const fetchBidirectional = async ({
 
   type Token = string | undefined;
 
+  const fetchPage = async (
+    route: string,
+    controller: AbortController,
+    token: Token,
+  ): Promise<GetWorkflowExecutionHistoryResponse | undefined> => {
+    try {
+      const response =
+        await requestFromAPI<GetWorkflowExecutionHistoryResponse>(route, {
+          token,
+          request: fetch,
+          params: {
+            'execution.runId': runId,
+            waitNewEvent: 'false',
+            ...(maximumPageSize && {
+              maximumPageSize: String(maximumPageSize),
+            }),
+          },
+          options: { signal: controller.signal },
+          handleError: handlePageError,
+        });
+      if (!response) throw new Error('Missing workflow history response.');
+      return response;
+    } catch (error) {
+      if (controller.signal.aborted) return;
+      failure ??=
+        error instanceof Error || isNetworkError(error)
+          ? error
+          : new Error(getErrorMessage(error));
+      pauseFired = true;
+      releasePause();
+    }
+  };
+
   const runAscending = async () => {
     const route = routeForApi('events.ascending', { namespace, workflowId });
     let token: Token;
@@ -179,32 +226,18 @@ export const fetchBidirectional = async ({
         descCtrl.abort();
       }
 
-      let response: GetWorkflowExecutionHistoryResponse | undefined;
-      try {
-        response = await requestFromAPI<GetWorkflowExecutionHistoryResponse>(
-          route,
-          {
-            token,
-            request: fetch,
-            params: {
-              'execution.runId': runId,
-              waitNewEvent: 'false',
-              ...(maximumPageSize && {
-                maximumPageSize: String(maximumPageSize),
-              }),
-            },
-            options: { signal: ascCtrl.signal },
-          },
-        );
-      } catch (error) {
-        if (ascCtrl.signal.aborted) break;
-        onAbort();
-        throw error;
-      }
-      if (rootCtrl.signal.aborted) break;
+      const response = await fetchPage(route, ascCtrl, token);
+      if (!response || rootCtrl.signal.aborted) break;
 
-      const events = response?.history?.events ?? [];
-      if (!events.length) break;
+      const events = response.history?.events ?? [];
+      if (!events.length) {
+        if (response.nextPageToken) {
+          token = String(response.nextPageToken);
+          continue;
+        }
+        reachedEnd = true;
+        break;
+      }
 
       ascPages++;
       observedPageSize = Math.max(observedPageSize, events.length);
@@ -224,7 +257,8 @@ export const fetchBidirectional = async ({
       if (rootCtrl.signal.aborted) break;
       maybePause();
 
-      if (!response?.nextPageToken || gap() <= 0) {
+      if (!response.nextPageToken) reachedEnd = true;
+      if (!response.nextPageToken || gap() <= 0) {
         descCtrl.abort();
         break;
       }
@@ -248,32 +282,18 @@ export const fetchBidirectional = async ({
         ascCtrl.abort();
       }
 
-      let response: GetWorkflowExecutionHistoryResponse | undefined;
-      try {
-        response = await requestFromAPI<GetWorkflowExecutionHistoryResponse>(
-          route,
-          {
-            token,
-            request: fetch,
-            params: {
-              'execution.runId': runId,
-              waitNewEvent: 'false',
-              ...(maximumPageSize && {
-                maximumPageSize: String(maximumPageSize),
-              }),
-            },
-            options: { signal: descCtrl.signal },
-          },
-        );
-      } catch (error) {
-        if (descCtrl.signal.aborted) break;
-        onAbort();
-        throw error;
-      }
-      if (rootCtrl.signal.aborted) break;
+      const response = await fetchPage(route, descCtrl, token);
+      if (!response || rootCtrl.signal.aborted) break;
 
-      const events = response?.history?.events ?? [];
-      if (!events.length) break;
+      const events = response.history?.events ?? [];
+      if (!events.length) {
+        if (response.nextPageToken) {
+          token = String(response.nextPageToken);
+          continue;
+        }
+        reachedEnd = true;
+        break;
+      }
 
       descPages++;
       observedPageSize = Math.max(observedPageSize, events.length);
@@ -299,7 +319,8 @@ export const fetchBidirectional = async ({
       if (rootCtrl.signal.aborted) break;
       maybePause();
 
-      if (!response?.nextPageToken || gap() <= 0) {
+      if (!response.nextPageToken) reachedEnd = true;
+      if (!response.nextPageToken || gap() <= 0) {
         ascCtrl.abort();
         break;
       }
@@ -309,6 +330,9 @@ export const fetchBidirectional = async ({
 
   try {
     await Promise.all([runAscending(), runDescending()]);
+    if (!signal?.aborted && failure && !reachedEnd && gap() > 0) {
+      throw failure;
+    }
   } finally {
     onAbort();
     signal?.removeEventListener('abort', onAbort);

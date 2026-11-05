@@ -791,20 +791,3 @@ export function createGroupedEventBuffer() {
 }
 
 export type GroupedEventBuffer = ReturnType<typeof createGroupedEventBuffer>;
-
-export const defaultGroupedEventBuffer = createGroupedEventBuffer();
-
-export const {
-  reset,
-  setFailedEvent,
-  ingestHistoryEvent,
-  setPendingMetadata,
-  getPendingActivityScheduledEvent,
-  onChange,
-  getLazyGroups,
-  getGroupArray,
-  getEventGroupOptions,
-  getEventGroupMatcher,
-  getEventArray,
-  getWorkflowTaskFailedEvent,
-} = defaultGroupedEventBuffer;

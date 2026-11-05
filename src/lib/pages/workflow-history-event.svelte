@@ -1,16 +1,13 @@
 <script lang="ts">
-  import { getContext, onMount } from 'svelte';
+  import { onMount } from 'svelte';
 
   import ActivityCommands from '$lib/components/activity/activity-commands.svelte';
   import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
-  import {
-    HISTORY_CTX,
-    type HistoryContext,
-  } from '$lib/contexts/history-context';
   import Button from '$lib/holocene/button.svelte';
   import { IconArrowDown, IconArrowUp } from '$lib/io/icon';
   import { buildGroupIndex, groupEvents } from '$lib/models/event-groups';
   import { isEvent } from '$lib/models/event-history';
+  import { getWorkflowHistoryController } from '$lib/services/workflow-history-controller.svelte.js';
   import { eventFilterSort } from '$lib/stores/event-view';
   import { triggerRefresh, workflowRun } from '$lib/stores/workflow-run';
   import type { PendingActivity } from '$lib/types/events';
@@ -24,14 +21,12 @@
   }
 
   const { eventId, namespace, workflowId, runId }: Props = $props();
-  const historyCtx = getContext<HistoryContext>(HISTORY_CTX);
-  const events = $derived(historyCtx.history?.events ?? []);
+  const historyController = getWorkflowHistoryController();
+  const events = $derived(historyController.history.events);
 
   let ids = $derived([eventId]);
 
-  onMount(() => {
-    historyCtx.resume();
-  });
+  onMount(() => historyController.resume());
 
   const { workflow } = $derived($workflowRun);
   const workflowExecutionIdentity: WorkflowExecutionIdentity = $derived({
@@ -66,7 +61,7 @@
   const visibleItems = $derived(
     events.filter((e) => ids.includes(e.id) || e.id === initialEvent?.id),
   );
-  const loading = $derived(!historyCtx.fetchComplete && !visibleItems.length);
+  const loading = $derived(historyController.loading && !visibleItems.length);
   const lastEventId = $derived(events.at(-1)?.id);
 
   const loadPrevious = () => {
@@ -129,7 +124,7 @@
           {index}
           expanded={event.id === initialEvent?.id}
           group={isEvent(event) ? groupIndex.get(event.id) : undefined}
-          initialItem={historyCtx.history?.initialEvent}
+          initialItem={historyController.history.initialEvent}
           {activityActions}
         />
       {/each}

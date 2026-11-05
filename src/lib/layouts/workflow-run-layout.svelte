@@ -1,23 +1,23 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
-  import { onMount, setContext, untrack } from 'svelte';
+  import { onMount, untrack } from 'svelte';
 
   import { page } from '$app/state';
 
   import WorkflowError from '$lib/components/workflow/workflow-error.svelte';
-  import {
-    HISTORY_CTX,
-    type HistoryContext,
-  } from '$lib/contexts/history-context';
+  import Alert from '$lib/holocene/alert.svelte';
   import CopyButton from '$lib/holocene/copyable/button.svelte';
   import SkeletonWorkflow from '$lib/holocene/skeleton/workflow.svelte';
   import { translate } from '$lib/i18n/translate';
+  import Button from '$lib/io/button/button.svelte';
+  import { IconRetry } from '$lib/io/icon';
   import WorkflowHeader from '$lib/layouts/workflow-header.svelte';
+  import WorkflowHistoryProvider from '$lib/layouts/workflow-history-provider.svelte';
   import { throttleRefresh } from '$lib/services/events-service';
   import { getPollers } from '$lib/services/pollers-service';
   import { getWorkflowMetadata } from '$lib/services/query-service';
   import { fetchWorkerCount } from '$lib/services/worker-service';
-  import { WorkflowHistoryController } from '$lib/services/workflow-history-controller.svelte';
+  import { WorkflowHistoryController } from '$lib/services/workflow-history-controller.svelte.js';
   import { fetchWorkflow } from '$lib/services/workflow-service';
   import { resetLastDataEncoderSuccess } from '$lib/stores/data-encoder-config';
   import { eventFilterSort } from '$lib/stores/event-view';
@@ -61,11 +61,7 @@
   let workflowRunController: AbortController | null = null;
   let historyController = $state<WorkflowHistoryController | null>(null);
   let workflowExecutionIdentity: WorkflowExecutionIdentity | null = null;
-  const displayError = $derived(
-    workflowError ?? historyController?.error ?? null,
-  );
 
-  let _resumeRequested = false;
   let _refetchSeq = 0;
 
   const fullJson = $derived({
@@ -73,31 +69,14 @@
     eventHistory: historyController?.history.events ?? [],
   });
 
-  const ctx: HistoryContext = {
-    get history() {
-      return historyController?.history ?? null;
-    },
-    get fetchComplete() {
-      return historyController?.fetchComplete ?? false;
-    },
-    get latestEventId() {
-      return historyController?.latestEventId ?? 0;
-    },
-    get totalExpectedEvents() {
-      return historyController?.totalExpectedEvents ?? 0;
-    },
-    get descMinId() {
-      return historyController?.descMinId ?? 0;
-    },
-    resume() {
-      _resumeRequested = true;
-      historyController?.resume();
-    },
-  };
-
-  setContext(HISTORY_CTX, ctx);
-
   const { copy, copied } = copyToClipboard();
+
+  const retryHistory = () => {
+    const workflow = $workflowRun.workflow;
+    if (workflow && historyController) {
+      void historyController.retry(workflow);
+    }
+  };
 
   const handleCopy = (e: Event) => {
     copy(e, stringifyWithBigInt(fullJson));
@@ -187,7 +166,6 @@
     workflowExecutionIdentity = identity;
     historyController = history;
     void history.load(workflow);
-    if (_resumeRequested) history.resume();
 
     $workflowRun = { ...$workflowRun, workflow, workers, workersLoaded: true };
 
@@ -342,11 +320,36 @@
     />
     {stringifyWithBigInt(fullJson, undefined, 2)}
   </div>
-{:else if displayError}
-  <WorkflowError error={displayError} />
+{:else if workflowError}
+  <WorkflowError error={workflowError} />
 {:else if !$workflowRun.workflow || !historyController}
   <SkeletonWorkflow />
 {:else}
-  <WorkflowHeader history={historyController.history} {headerSnippet} />
-  {@render children()}
+  <WorkflowHistoryProvider controller={historyController}>
+    <WorkflowHeader history={historyController.history} {headerSnippet} />
+    {#if historyController.error}
+      <Alert
+        intent="error"
+        title={translate('workflows.history-load-error')}
+        data-testid="history-load-error"
+        class="my-4"
+      >
+        <div class="space-y-3 pt-1">
+          <div class="space-y-1">
+            <p>{translate('workflows.history-load-error-description')}</p>
+            <p class="text-secondary">{historyController.error.message}</p>
+          </div>
+          <Button
+            size="sm"
+            colorScheme="tertiary"
+            LeadingIcon={IconRetry}
+            onclick={retryHistory}
+          >
+            {translate('workflows.history-load-retry')}
+          </Button>
+        </div>
+      </Alert>
+    {/if}
+    {@render children()}
+  </WorkflowHistoryProvider>
 {/if}

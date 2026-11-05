@@ -62,6 +62,7 @@
     totalExpectedEvents?: number;
     descMinId?: number;
     panelHeight?: number;
+    activeGroupId?: string;
     onTimelineInit?: (timeline: Timeline) => void;
   }
 
@@ -80,6 +81,7 @@
     totalExpectedEvents = 0,
     descMinId = 0,
     panelHeight = $bindable(0),
+    activeGroupId = $bindable(),
     onTimelineInit,
   }: Props = $props();
 
@@ -88,8 +90,6 @@
     workflowId: workflow.id,
     runId: workflow.runId,
   });
-
-  let activeGroupId = $state<string>();
 
   const selectGroup = (group: { id: string }) => {
     panelHeight = 0;
@@ -319,8 +319,8 @@
       : undefined,
   );
 
-  $effect(() => {
-    if (activeIdx < 0) panelHeight = 0;
+  $effect.pre(() => {
+    if (activeIdx < 0) closeGroup();
   });
 
   // Open detail panel pushes rows below the active one down by panelHeight.
