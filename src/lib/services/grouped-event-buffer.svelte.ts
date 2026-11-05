@@ -12,6 +12,7 @@ import {
 import {
   type EventGroupMatcher,
   type EventGroupOption,
+  type GroupArrayOptions,
   type GroupedEventBuffer,
   type LazyGroup,
   materializeGroup,
@@ -129,6 +130,19 @@ export class EventBufferView {
   ): EventGroupMatcher | undefined {
     void this._version;
     return this.buffer.getEventGroupMatcher(keys);
+  }
+
+  event(eventId: string): WorkflowEvent | undefined {
+    void this._version;
+    return this.buffer.getEvent(eventId);
+  }
+
+  eventGroup(
+    eventId: string,
+    opts?: GroupArrayOptions,
+  ): EventGroup | undefined {
+    void this._version;
+    return this.buffer.getEventGroup(eventId, opts);
   }
 
   readonly events: WorkflowEvent[] = $derived.by(() => {

@@ -722,6 +722,28 @@ export function createGroupedEventBuffer() {
     return initialEvent;
   }
 
+  function getEvent(eventId: string): WorkflowEvent | undefined {
+    const id = Number(eventId);
+    if (!Number.isSafeInteger(id) || id < 1 || String(id) !== eventId) return;
+    const event = events[id - 1];
+    return event?.id === eventId ? event : undefined;
+  }
+
+  function getEventGroup(
+    eventId: string,
+    opts?: GroupArrayOptions,
+  ): EventGroup | undefined {
+    const event = getEvent(eventId);
+    if (!event) return;
+    const headSlot = headSlotFor(event, Number(eventId) - 1);
+    const recordIndex = headGroup[headSlot];
+    if (!recordIndex) return;
+    const record = records[recordIndex - 1];
+    if (!record.headsGroup) return;
+    if (opts?.excludeWorkflowTasks && isWorkflowTaskGroup(record)) return;
+    return materializeEventGroup(record) ?? undefined;
+  }
+
   /** Flat WorkflowEvent[] in ascending event-id order. */
   function getEventArray(): WorkflowEvent[] {
     if (cachedEvents && cachedEventsRevision === revision) return cachedEvents;
@@ -785,6 +807,8 @@ export function createGroupedEventBuffer() {
     getEventGroupOptions,
     getEventGroupMatcher,
     getEventArray,
+    getEvent,
+    getEventGroup,
     getInitialEvent,
     getWorkflowTaskFailedEvent,
   };

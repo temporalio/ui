@@ -105,6 +105,34 @@ test.describe('Workflow run detail history loading errors', () => {
     expect(ascendingTokens).toEqual([null, '2', '4', '6', '8']);
   });
 
+  test('shows the status text fallback when both history directions return HTTP 503 with an empty message', async ({
+    page,
+  }) => {
+    const failedDirections = new Set<string>();
+    for (const api of [EVENT_HISTORY_API, EVENT_HISTORY_API_REVERSE]) {
+      await page.route(api, (route) => {
+        failedDirections.add(api);
+        return route.fulfill({
+          status: 503,
+          json: { code: 14, message: '' },
+        });
+      });
+    }
+
+    await page.goto(historyUrl);
+
+    const heading = page.getByTestId('workflow-id-heading');
+    const alert = page.getByTestId('history-load-error');
+    const detail = alert.locator('.text-secondary');
+    await expect(heading).toBeVisible();
+    await expect(heading).toContainText(workflowId);
+    await expect(alert).toBeVisible();
+    await expect(alert).toContainText('Unable to load the full event history.');
+    await expect(detail).toBeVisible();
+    await expect(detail).toHaveText(/\S/);
+    await expect.poll(() => failedDirections.size).toBe(2);
+  });
+
   test('retains partial history after both directions return HTTP 503 and while retrying, then loads the remaining events', async ({
     page,
   }) => {

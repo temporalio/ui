@@ -5,10 +5,7 @@
   import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
   import Button from '$lib/holocene/button.svelte';
   import { IconArrowDown, IconArrowUp } from '$lib/io/icon';
-  import { buildGroupIndex, groupEvents } from '$lib/models/event-groups';
-  import { isEvent } from '$lib/models/event-history';
   import { getWorkflowHistoryController } from '$lib/services/workflow-history-controller.svelte.js';
-  import { eventFilterSort } from '$lib/stores/event-view';
   import { triggerRefresh, workflowRun } from '$lib/stores/workflow-run';
   import type { PendingActivity } from '$lib/types/events';
   import type { WorkflowExecutionIdentity } from '$lib/types/workflows';
@@ -22,7 +19,6 @@
 
   const { eventId, namespace, workflowId, runId }: Props = $props();
   const historyController = getWorkflowHistoryController();
-  const events = $derived(historyController.history.events);
 
   let ids = $derived([eventId]);
 
@@ -34,35 +30,23 @@
     workflowId: workflow?.id ?? workflowId,
     runId: workflow?.runId ?? runId,
   });
-  const pendingActivities = $derived(workflow?.pendingActivities);
-  const pendingNexusOperations = $derived(workflow?.pendingNexusOperations);
-
-  const ascendingGroups = $derived(
-    groupEvents(events, 'ascending', pendingActivities, pendingNexusOperations),
-  );
-  const groups = $derived(
-    $eventFilterSort === 'ascending'
-      ? ascendingGroups
-      : [...ascendingGroups].reverse(),
-  );
-  const groupIndex = $derived(buildGroupIndex(groups));
-
   const initialEvent = $derived(
-    events.find(
-      (e) =>
-        e.id === eventId ||
-        e.id ===
-          String(
-            workflow?.workflowExtendedInfo?.requestIdInfos?.[eventId]?.eventId,
-          ),
-    ),
+    historyController.history.event(eventId) ??
+      historyController.history.event(
+        String(
+          workflow?.workflowExtendedInfo?.requestIdInfos?.[eventId]?.eventId,
+        ),
+      ),
   );
 
   const visibleItems = $derived(
-    events.filter((e) => ids.includes(e.id) || e.id === initialEvent?.id),
+    [...new Set(initialEvent ? [...ids, initialEvent.id] : ids)]
+      .map((id) => historyController.history.event(id))
+      .filter((event) => event !== undefined)
+      .sort((a, b) => Number(a.id) - Number(b.id)),
   );
   const loading = $derived(historyController.loading && !visibleItems.length);
-  const lastEventId = $derived(events.at(-1)?.id);
+  const lastEventId = $derived(String(historyController.latestEventId));
 
   const loadPrevious = () => {
     const firstId = parseInt(ids[0]);
@@ -123,7 +107,9 @@
           {event}
           {index}
           expanded={event.id === initialEvent?.id}
-          group={isEvent(event) ? groupIndex.get(event.id) : undefined}
+          group={historyController.history.eventGroup(event.id, {
+            excludeWorkflowTasks: true,
+          })}
           initialItem={historyController.history.initialEvent}
           {activityActions}
         />

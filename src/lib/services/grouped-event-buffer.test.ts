@@ -1,15 +1,42 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { groupEvents } from '$lib/models/event-groups';
+import {
+  buildGroupIndex,
+  groupEvents,
+  groupWorkflowTaskEvents,
+} from '$lib/models/event-groups';
+import {
+  createEventGroup,
+  createWorkflowTaskGroup,
+} from '$lib/models/event-groups/create-event-group';
 import type { EventGroup } from '$lib/models/event-groups/event-groups';
 import { toEvent, toEventHistory } from '$lib/models/event-history';
-import type { HistoryEvent } from '$lib/types/events';
+import type {
+  HistoryEvent,
+  PendingActivity,
+  PendingNexusOperation,
+} from '$lib/types/events';
 
 vi.mock('$lib/models/event-history', async (importOriginal) => {
   const actual =
     await importOriginal<typeof import('$lib/models/event-history')>();
   return { ...actual, toEvent: vi.fn(actual.toEvent) };
 });
+
+vi.mock(
+  '$lib/models/event-groups/create-event-group',
+  async (importOriginal) => {
+    const actual =
+      await importOriginal<
+        typeof import('$lib/models/event-groups/create-event-group')
+      >();
+    return {
+      ...actual,
+      createEventGroup: vi.fn(actual.createEventGroup),
+      createWorkflowTaskGroup: vi.fn(actual.createWorkflowTaskGroup),
+    };
+  },
+);
 
 import {
   createGroupedEventBuffer,
@@ -68,6 +95,324 @@ afterEach(() => {
 // ---------------------------------------------------------------------------
 // 1. Correctness: output equivalence with groupEvents
 // ---------------------------------------------------------------------------
+
+describe('direct event lookups', () => {
+  const invalidIds = [
+    '',
+    '0',
+    '-1',
+    '1.5',
+    '01',
+    '+1',
+    ' 1',
+    '1 ',
+    '1.0',
+    '1e0',
+    '0x1',
+    'NaN',
+    'Infinity',
+    '9007199254740992',
+    '1suffix',
+    '1e000000-0000-4000-8000-000000000000',
+  ];
+
+  it.each(invalidIds)('rejects noncanonical or invalid ID %j', (id) => {
+    buffer.reset(3);
+    loadAll(makeActivityGroup(1));
+    expect(buffer.getEvent(id)).toBeUndefined();
+    expect(buffer.getEventGroup(id)).toBeUndefined();
+  });
+
+  it('rejects a stored event whose ID does not match its numeric slot', () => {
+    buffer.reset(3);
+    buffer.ingestHistoryEvent({ ...makeActivityScheduled(1), eventId: '01' });
+    expect(buffer.getEvent('1')).toBeUndefined();
+    expect(buffer.getEventGroup('1')).toBeUndefined();
+    expect(buffer.getEvent('01')).toBeUndefined();
+    expect(buffer.getEventGroup('01')).toBeUndefined();
+  });
+
+  it('reads sparse event slots without flattening or creating groups', () => {
+    buffer.reset(1);
+    const event = makeActivityScheduled(100);
+    buffer.ingestHistoryEvent(event);
+    const createGroup = vi.mocked(createEventGroup).mockClear();
+    const createWft = vi.mocked(createWorkflowTaskGroup).mockClear();
+    const flatten = vi.spyOn(buffer, 'getEventArray');
+    expect(buffer.getEvent('1')).toBeUndefined();
+    expect(buffer.getEvent('99')).toBeUndefined();
+    expect(buffer.getEvent('101')).toBeUndefined();
+    expect(buffer.getEvent('100')).toEqual(toEvent(event));
+    expect(buffer.getEvent('100')).toBe(buffer.getEvent('100'));
+    expect(flatten).not.toHaveBeenCalled();
+    expect(createGroup).not.toHaveBeenCalled();
+    expect(createWft).not.toHaveBeenCalled();
+  });
+
+  it.each([false, true])(
+    'matches the legacy group index with excludeWorkflowTasks=%s',
+    (excludeWorkflowTasks) => {
+      const signal: HistoryEvent = {
+        ...makeWorkflowStarted(22),
+        eventType: 'WorkflowExecutionSignaled',
+        workflowExecutionSignaledEventAttributes: { signalName: 'signal' },
+      };
+      const marker: HistoryEvent = {
+        ...makeLocalActivityMarker(23),
+        markerRecordedEventAttributes: { markerName: 'Version', details: {} },
+      };
+      const externalSignal: HistoryEvent = {
+        ...makeWorkflowStarted(24),
+        eventType: 'SignalExternalWorkflowExecutionInitiated',
+        signalExternalWorkflowExecutionInitiatedEventAttributes: {
+          signalName: 'external',
+          workflowExecution: { workflowId: 'other', runId: 'run' },
+        },
+      };
+      const signalDelivered: HistoryEvent = {
+        ...makeWorkflowStarted(25),
+        eventType: 'ExternalWorkflowExecutionSignaled',
+        externalWorkflowExecutionSignaledEventAttributes: {
+          initiatedEventId: '24',
+          workflowExecution: { workflowId: 'other', runId: 'run' },
+        },
+      };
+      const raw = [
+        makeWorkflowStarted(1),
+        ...makeActivityGroup(2),
+        ...makeTimerGroup(5),
+        ...makeChildWorkflowGroup(7),
+        ...makeLocalActivityGroup(10),
+        ...makeWorkflowUpdateGroup(11),
+        ...makeNexusOperationGroup(13),
+        ...makeWorkflowTaskGroup(16),
+        makeWorkflowCompleted(19),
+        signal,
+        marker,
+        externalSignal,
+        signalDelivered,
+      ];
+      buffer.reset(25);
+      loadAll(raw);
+      const events = toEventHistory(raw);
+      const groups = groupEvents(events);
+      const expected = buildGroupIndex(
+        excludeWorkflowTasks
+          ? groups
+          : [...groups, ...groupWorkflowTaskEvents(events)],
+      );
+      expect(new Set(groups.map((group) => group.category))).toEqual(
+        new Set([
+          'activity',
+          'timer',
+          'child-workflow',
+          'local-activity',
+          'update',
+          'nexus',
+          'signal',
+          'other',
+        ]),
+      );
+      for (const event of events) {
+        expect(buffer.getEvent(event.id)).toEqual(event);
+        expect(
+          buffer.getEventGroup(event.id, { excludeWorkflowTasks }),
+        ).toEqual(expected.get(event.id));
+      }
+      for (const group of expected.values()) {
+        for (const event of group.eventList) {
+          expect(buffer.getEventGroup(event.id, { excludeWorkflowTasks })).toBe(
+            buffer.getEventGroup(group.initialEvent.id, {
+              excludeWorkflowTasks,
+            }),
+          );
+        }
+      }
+    },
+  );
+
+  it('exposes descending followers only after their head arrives', () => {
+    buffer.reset(10);
+    const [head, started, completed] = makeActivityGroup(1);
+    buffer.ingestHistoryEvent(completed);
+    buffer.ingestHistoryEvent(started);
+    expect(buffer.getEvent('3')?.id).toBe('3');
+    expect(buffer.getEventGroup('1')).toBeUndefined();
+    expect(buffer.getEventGroup('2')).toBeUndefined();
+    expect(buffer.getEventGroup('3')).toBeUndefined();
+    buffer.ingestHistoryEvent(head);
+    const expected = buildGroupIndex(
+      groupEvents(toEventHistory([head, started, completed])),
+    );
+    expect(buffer.getEventGroup('3')).toEqual(expected.get('3'));
+    expect(buffer.getEventGroup('2')).toBe(buffer.getEventGroup('1'));
+  });
+
+  it('does not create groups for missing events, absent heads, solo events, or excluded WFTs', () => {
+    buffer.reset(20);
+    buffer.ingestHistoryEvent(makeWorkflowStarted(1));
+    buffer.ingestHistoryEvent(makeActivityStarted(3, 1));
+    buffer.ingestHistoryEvent(makeActivityStarted(5, 4));
+    loadAll(makeWorkflowTaskGroup(6));
+    const createGroup = vi.mocked(createEventGroup).mockClear();
+    const createWft = vi.mocked(createWorkflowTaskGroup).mockClear();
+    for (const id of ['1', '2', '3', '4', '5', '99']) {
+      expect(buffer.getEventGroup(id)).toBeUndefined();
+    }
+    for (const id of ['6', '7', '8']) {
+      expect(
+        buffer.getEventGroup(id, { excludeWorkflowTasks: true }),
+      ).toBeUndefined();
+    }
+    expect(createGroup).not.toHaveBeenCalled();
+    expect(createWft).not.toHaveBeenCalled();
+    expect(buffer.getEventGroup('8')?.id).toBe('6');
+  });
+
+  it('materializes only the requested record and shares its cache with array reads', () => {
+    buffer.reset(100);
+    loadAll(makeActivityGroup(1));
+    loadAll(makeTimerGroup(4));
+    loadAll(makeNexusOperationGroup(6));
+    const createGroup = vi.mocked(createEventGroup).mockClear();
+    const createWft = vi.mocked(createWorkflowTaskGroup).mockClear();
+    const first = buffer.getEventGroup('2');
+    expect(first?.id).toBe('1');
+    expect(createGroup).toHaveBeenCalledTimes(1);
+    expect(createWft).not.toHaveBeenCalled();
+    expect(buffer.getEventGroup('3')).toBe(first);
+    buffer.ingestHistoryEvent(makeWorkflowCompleted(50));
+    expect(buffer.getEventGroup('1')).toBe(first);
+    expect(createGroup).toHaveBeenCalledTimes(1);
+    expect(buffer.getGroupArray()[0]).toBe(first);
+    expect(createGroup).toHaveBeenCalledTimes(3);
+  });
+
+  it('invalidates only the record whose members or pending metadata changed', () => {
+    buffer.reset(20);
+    const [scheduled, started, completed] = makeActivityGroup(1);
+    const [nexusScheduled, nexusStarted, nexusCompleted] =
+      makeNexusOperationGroup(4);
+    loadAll([
+      scheduled,
+      started,
+      nexusScheduled,
+      nexusStarted,
+      ...makeTimerGroup(7),
+    ]);
+    const activity: PendingActivity = {
+      id: '1',
+      activityId: '1',
+      state: 'Started',
+      activityType: 'TestActivity',
+    };
+    const nexus: PendingNexusOperation = {
+      scheduledEventId: '4',
+      scheduleToStartTimeout: null,
+      startToCloseTimeout: null,
+    };
+    const timer = buffer.getEventGroup('8');
+    const before = buffer.getEventGroup('2');
+    buffer.setPendingMetadata([activity], [nexus]);
+    const pendingActivity = buffer.getEventGroup('2');
+    const pendingNexus = buffer.getEventGroup('5');
+    expect(pendingActivity).not.toBe(before);
+    expect(pendingActivity?.pendingActivity).toEqual(activity);
+    expect(pendingNexus?.pendingNexusOperation).toEqual(nexus);
+    expect(pendingActivity?.isPending).toBe(true);
+    expect(pendingNexus?.isPending).toBe(true);
+    const expected = buildGroupIndex(
+      groupEvents(
+        toEventHistory([scheduled, started, nexusScheduled, nexusStarted]),
+        'ascending',
+        [activity],
+        [nexus],
+      ),
+    );
+    expect(pendingActivity).toEqual(expected.get('2'));
+    expect(pendingNexus).toEqual(expected.get('5'));
+    buffer.setPendingMetadata([activity], [nexus]);
+    expect(buffer.getEventGroup('1')).toBe(pendingActivity);
+    expect(buffer.getEventGroup('4')).toBe(pendingNexus);
+    buffer.setPendingMetadata(
+      [{ ...activity, state: 'CancelRequested' }],
+      [nexus],
+    );
+    expect(buffer.getEventGroup('2')).not.toBe(pendingActivity);
+    expect(buffer.getEventGroup('5')).toBe(pendingNexus);
+    buffer.ingestHistoryEvent(completed);
+    expect(buffer.getEventGroup('3')?.pendingActivity).toBeUndefined();
+    expect(buffer.getEventGroup('3')?.isPending).toBe(false);
+    expect(buffer.getEventGroup('5')).toBe(pendingNexus);
+    buffer.ingestHistoryEvent(nexusCompleted);
+    expect(buffer.getEventGroup('6')).not.toBe(pendingNexus);
+    expect(buffer.getEventGroup('6')?.pendingNexusOperation).toBeUndefined();
+    expect(buffer.getEventGroup('6')?.isPending).toBe(false);
+    expect(buffer.getEventGroup('8')).toBe(timer);
+    expect(pendingActivity?.pendingActivity).toEqual(activity);
+    expect(pendingNexus?.pendingNexusOperation).toEqual(nexus);
+  });
+
+  it('reads pending metadata that predates heads and refreshes nexus updates and removal', () => {
+    buffer.reset(10);
+    const activity: PendingActivity = {
+      id: '1',
+      activityId: '1',
+      state: 'Scheduled',
+    };
+    const nexus: PendingNexusOperation = {
+      scheduledEventId: '4',
+      endpoint: 'before',
+      scheduleToStartTimeout: null,
+      startToCloseTimeout: null,
+    };
+    buffer.setPendingMetadata([activity], [nexus]);
+    expect(buffer.getEventGroup('1')).toBeUndefined();
+    expect(buffer.getEventGroup('4')).toBeUndefined();
+    buffer.ingestHistoryEvent(makeActivityScheduled(1));
+    buffer.ingestHistoryEvent(makeNexusOperationGroup(4)[0]);
+    const activityGroup = buffer.getEventGroup('1');
+    const nexusGroup = buffer.getEventGroup('4');
+    expect(activityGroup?.pendingActivity).toEqual(activity);
+    expect(nexusGroup?.pendingNexusOperation).toEqual(nexus);
+    const updatedNexus = { ...nexus, endpoint: 'after' };
+    buffer.setPendingMetadata([activity], [updatedNexus]);
+    expect(buffer.getEventGroup('1')).toBe(activityGroup);
+    expect(buffer.getEventGroup('4')).not.toBe(nexusGroup);
+    expect(buffer.getEventGroup('4')?.pendingNexusOperation).toEqual(
+      updatedNexus,
+    );
+    expect(nexusGroup?.pendingNexusOperation).toEqual(nexus);
+    buffer.setPendingMetadata([], []);
+    expect(buffer.getEventGroup('1')?.pendingActivity).toBeUndefined();
+    expect(buffer.getEventGroup('4')?.pendingNexusOperation).toBeUndefined();
+    expect(buffer.getEventGroup('1')?.isPending).toBe(false);
+    expect(buffer.getEventGroup('4')?.isPending).toBe(false);
+  });
+
+  it('isolates buffers and discards events and cached groups on reset', () => {
+    buffer.reset(3);
+    loadAll(makeActivityGroup(1));
+    const other = createGroupedEventBuffer();
+    other.reset(3);
+    for (const event of makeActivityGroup(1, 'Other'))
+      other.ingestHistoryEvent(event);
+    const previousEvent = buffer.getEvent('1');
+    const previousGroup = buffer.getEventGroup('1');
+    const otherGroup = other.getEventGroup('1');
+    expect(otherGroup).not.toBe(previousGroup);
+    buffer.reset(3);
+    expect(buffer.getEvent('1')).toBeUndefined();
+    expect(buffer.getEventGroup('3')).toBeUndefined();
+    expect(other.getEventGroup('1')).toBe(otherGroup);
+    loadAll(makeTimerGroup(1));
+    expect(buffer.getEvent('1')).not.toBe(previousEvent);
+    expect(buffer.getEventGroup('1')).not.toBe(previousGroup);
+    expect(buffer.getEventGroup('2')?.category).toBe('timer');
+    expect(buffer.getEvent('3')).toBeUndefined();
+    expect(buffer.getEventGroup('3')).toBeUndefined();
+  });
+});
 
 describe('output equivalence with groupEvents', () => {
   it('matches groupEvents for a small ascending load', async () => {
