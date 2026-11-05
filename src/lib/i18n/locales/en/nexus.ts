@@ -92,6 +92,8 @@ export const Strings = {
   'next-attempt-scheduled-time': 'Next Attempt Scheduled Time',
   'last-attempt-failure': 'Last Attempt Failure',
   'blocked-reason': 'Blocked Reason',
+  'callback-registered-time': 'Callback Registered Time',
+  'delivery-attempt': 'Delivery Attempt',
   link: 'Link',
   'workflow-link': 'Workflow Link',
   'standalone-activity-link': 'Standalone Activity Link',

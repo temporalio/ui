@@ -1,5 +1,5 @@
-import { mount, unmount } from 'svelte';
-import { afterEach, describe, expect, it } from 'vitest';
+import { flushSync, mount, tick, unmount } from 'svelte';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { base } from '$app/paths';
 import { page } from '$app/state';
@@ -8,6 +8,17 @@ import type { EventLink } from '$lib/types';
 import type { Callback } from '$lib/types/nexus';
 
 import NexusOperationCallbacksTable from './nexus-operation-callbacks-table.svelte';
+
+vi.mock('$app/navigation', async (importOriginal) => {
+  const original = await importOriginal<typeof import('$app/navigation')>();
+  const { page } = await import('$app/state');
+  return {
+    ...original,
+    goto: vi.fn(async (url: string | URL) => {
+      page.url = new URL(String(url), page.url);
+    }),
+  };
+});
 
 class ResizeObserverStub {
   observe() {}
@@ -49,8 +60,8 @@ const makeCallback = (
 
 let cleanup: (() => void) | undefined;
 
-const mountTable = (callbacks: Callback[]) => {
-  page.url = new URL('http://localhost:3000/callbacks');
+const mountTable = (callbacks: Callback[], search = '') => {
+  page.url = new URL(`http://localhost:3000/callbacks${search}`);
   const target = document.createElement('div');
   document.body.appendChild(target);
   const component = mount(NexusOperationCallbacksTable, {
@@ -248,5 +259,235 @@ describe('NexusOperationCallbacksTable', () => {
     expect(visible).toHaveLength(100);
     expect(text(cell(visible[0], 'callback-endpoint'))).toBe('task-queue-0');
     expect(text(cell(visible[99], 'callback-endpoint'))).toBe('task-queue-99');
+  });
+});
+
+describe('NexusOperationCallbacksTable expanded details', () => {
+  const detailedCallback = (
+    overrides: Record<string, unknown> = {},
+    index = 0,
+  ): Callback =>
+    ({
+      ...makeCallback('BackingOff', [], index),
+      registrationTime: '2026-11-05T16:50:49Z',
+      attempt: 3,
+      lastAttemptCompleteTime: '2026-11-05T16:51:00Z',
+      nextAttemptScheduleTime: '2026-11-05T16:52:00Z',
+      blockedReason: 'circuit breaker open',
+      lastAttemptFailure: { message: 'handler unavailable' },
+      ...overrides,
+    }) as unknown as Callback;
+
+  const expandButton = (row: Element) =>
+    cell(row, 'callback-expand')?.querySelector('button') ?? null;
+
+  const details = (target: HTMLElement) =>
+    target.querySelector('[data-testid="callback-details"]');
+
+  const field = (target: HTMLElement, name: string) =>
+    text(target.querySelector(`[data-testid="callback-detail-${name}"]`));
+
+  beforeEach(() => {
+    Element.prototype.scrollIntoView = vi.fn();
+  });
+
+  it('starts collapsed with an expand button', () => {
+    const target = mountTable([detailedCallback()]);
+    const button = expandButton(rows(target)[0]);
+
+    expect(details(target)).toBeNull();
+    expect(button?.getAttribute('aria-expanded')).toBe('false');
+    expect(button?.getAttribute('aria-label')).toBe('Expand details');
+  });
+
+  it('expands and collapses the delivery details from the chevron', () => {
+    const target = mountTable([detailedCallback()]);
+    const button = expandButton(rows(target)[0]);
+
+    button?.click();
+    flushSync();
+
+    const detailsRow = details(target)?.closest('tr');
+    expect(button?.getAttribute('aria-expanded')).toBe('true');
+    expect(button?.getAttribute('aria-label')).toBe('Collapse details');
+    expect(detailsRow?.id).toBe(button?.getAttribute('aria-controls'));
+    expect(detailsRow?.querySelector('td')?.getAttribute('colspan')).toBe('7');
+
+    button?.click();
+    flushSync();
+
+    expect(details(target)).toBeNull();
+    expect(button?.getAttribute('aria-expanded')).toBe('false');
+  });
+
+  it('expands and collapses when any part of the row is clicked', () => {
+    const target = mountTable([detailedCallback()]);
+    const [row] = rows(target);
+
+    expect(row.classList.contains('hover:cursor-pointer')).toBe(true);
+
+    (cell(row, 'callback-service') as HTMLElement).click();
+    flushSync();
+
+    expect(details(target)).not.toBeNull();
+    expect(expandButton(row)?.getAttribute('aria-expanded')).toBe('true');
+
+    (cell(row, 'callback-operation') as HTMLElement).click();
+    flushSync();
+
+    expect(details(target)).toBeNull();
+  });
+
+  it('toggles once when the chevron inside the clickable row is clicked', () => {
+    const target = mountTable([detailedCallback()]);
+    const button = expandButton(rows(target)[0]);
+
+    button?.click();
+    flushSync();
+
+    expect(details(target)).not.toBeNull();
+    expect(button?.getAttribute('aria-expanded')).toBe('true');
+  });
+
+  it('follows a target link without expanding the row', () => {
+    const target = mountTable([
+      detailedCallback({
+        state: 'Succeeded',
+        callback: makeCallback('Succeeded', [workflowEventLink]).callback,
+      }),
+    ]);
+    const link =
+      cell(rows(target)[0], 'callback-target-execution')?.querySelector('a') ??
+      null;
+
+    expect(link).not.toBeNull();
+    link?.click();
+    flushSync();
+
+    expect(details(target)).toBeNull();
+  });
+
+  it('shows every delivery field', () => {
+    const target = mountTable([detailedCallback()]);
+    expandButton(rows(target)[0])?.click();
+    flushSync();
+
+    expect(field(target, 'request-id')).toBe('request-0');
+    expect(field(target, 'registration-time')).toContain('2026');
+    expect(field(target, 'attempt')).toBe('3');
+    expect(field(target, 'last-attempt-complete-time')).toContain('2026');
+    expect(field(target, 'next-attempt-schedule-time')).toContain('2026');
+    expect(field(target, 'blocked-reason')).toBe('circuit breaker open');
+  });
+
+  it('shows a hyphen for every field without a value', () => {
+    const target = mountTable([
+      detailedCallback({
+        requestId: undefined,
+        registrationTime: undefined,
+        attempt: 0,
+        lastAttemptCompleteTime: undefined,
+        nextAttemptScheduleTime: undefined,
+        blockedReason: undefined,
+      }),
+    ]);
+    expandButton(rows(target)[0])?.click();
+    flushSync();
+
+    for (const name of [
+      'request-id',
+      'registration-time',
+      'attempt',
+      'last-attempt-complete-time',
+      'next-attempt-schedule-time',
+      'blocked-reason',
+    ]) {
+      expect(field(target, name)).toBe('-');
+    }
+  });
+
+  it('shows the last attempt failure beside the fields', () => {
+    const target = mountTable([detailedCallback()]);
+    expandButton(rows(target)[0])?.click();
+    flushSync();
+
+    const failure = target.querySelector(
+      '[data-testid="callback-detail-last-attempt-failure"]',
+    );
+    expect(failure?.textContent).toContain('Last Attempt Failure');
+    expect(failure?.textContent).toContain('handler unavailable');
+  });
+
+  it('leaves out the failure block when there is no failure', () => {
+    const target = mountTable([
+      detailedCallback({ lastAttemptFailure: undefined }),
+    ]);
+    expandButton(rows(target)[0])?.click();
+    flushSync();
+
+    expect(
+      target.querySelector(
+        '[data-testid="callback-detail-last-attempt-failure"]',
+      ),
+    ).toBeNull();
+    expect(details(target)?.textContent).not.toContain('Last Attempt Failure');
+  });
+
+  it('expands and scrolls to the callback named in ?requestId', async () => {
+    const target = mountTable(
+      [detailedCallback({}, 0), detailedCallback({}, 1)],
+      '?requestId=request-1',
+    );
+    await tick();
+    flushSync();
+
+    expect(field(target, 'request-id')).toBe('request-1');
+    expect(expandButton(rows(target)[1])?.getAttribute('aria-expanded')).toBe(
+      'true',
+    );
+    expect(expandButton(rows(target)[0])?.getAttribute('aria-expanded')).toBe(
+      'false',
+    );
+    await vi.waitFor(() =>
+      expect(Element.prototype.scrollIntoView).toHaveBeenCalled(),
+    );
+  });
+
+  it('moves to the page holding the ?requestId callback before expanding it', async () => {
+    const { goto } = await import('$app/navigation');
+    const callbacks = Array.from({ length: 150 }, (_, index) =>
+      detailedCallback({}, index),
+    );
+
+    mountTable(callbacks, '?requestId=request-120');
+    await vi.waitFor(() =>
+      expect(goto).toHaveBeenCalledWith(
+        expect.stringContaining('callbacks-page=2'),
+        expect.anything(),
+      ),
+    );
+
+    const navigatedSearch = page.url.search;
+    cleanup?.();
+    const target = mountTable(callbacks, navigatedSearch);
+    await tick();
+    flushSync();
+
+    expect(text(cell(rows(target)[0], 'callback-endpoint'))).toBe(
+      'task-queue-100',
+    );
+    expect(field(target, 'request-id')).toBe('request-120');
+    await vi.waitFor(() =>
+      expect(Element.prototype.scrollIntoView).toHaveBeenCalled(),
+    );
+  });
+
+  it('expands nothing when ?requestId matches no callback', async () => {
+    const target = mountTable([detailedCallback()], '?requestId=missing');
+    await tick();
+    flushSync();
+
+    expect(details(target)).toBeNull();
+    expect(Element.prototype.scrollIntoView).not.toHaveBeenCalled();
   });
 });
