@@ -516,6 +516,7 @@
   function onWindowKeydown(event: KeyboardEvent) {
     if (!hasMod(event) || !isK(event)) return;
     event.preventDefault();
+    event.stopPropagation();
     if (open) {
       toggleActions();
       return;
@@ -616,6 +617,12 @@
         handleTab(event);
         return;
     }
+  }
+
+  // Keys typed in the palette are not page shortcuts. Holocene inputs stop
+  // them the same way.
+  function stopPageShortcuts(event: KeyboardEvent) {
+    event.stopPropagation();
   }
 
   function onInput() {
@@ -741,6 +748,7 @@
     {@attach modal}
     aria-label={label}
     class="m-0 h-full max-h-none w-full max-w-none overflow-visible border-0 bg-transparent p-0 backdrop:bg-transparent"
+    onkeydown={stopPageShortcuts}
     oncancel={(event) => {
       event.preventDefault();
       handleEscape();

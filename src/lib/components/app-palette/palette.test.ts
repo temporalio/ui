@@ -274,6 +274,26 @@ describe('Palette', () => {
     }
   });
 
+  it('keeps keys typed in the palette from reaching page shortcuts', async () => {
+    setup();
+    const pageShortcut = vi.fn();
+    window.addEventListener('keydown', pageShortcut);
+
+    try {
+      const input = await openPalette();
+      await fireEvent.keyDown(input, { key: 'l', code: 'KeyL' });
+      await fireEvent.keyDown(input, { key: ' ', code: 'Space' });
+      await fireEvent.keyDown(input, { key: 'ArrowDown' });
+      await fireEvent.keyDown(input, { key: 'k', ...MOD });
+
+      expect(pageShortcut).not.toHaveBeenCalled();
+      expect(input.getAttribute('aria-activedescendant')).toMatch(/action-0$/);
+      expect(screen.getByRole('menu').textContent).toContain('Delete');
+    } finally {
+      window.removeEventListener('keydown', pageShortcut);
+    }
+  });
+
   it('reads a confirm prompt from the live region', async () => {
     setup();
     const input = await openPalette();
