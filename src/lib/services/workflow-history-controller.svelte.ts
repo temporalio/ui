@@ -27,6 +27,7 @@ type HistoryLoadSession = {
   controller: AbortController;
   livePollController: AbortController | null;
   livePollTask: Promise<void> | null;
+  livePollFailed: boolean;
   lastPollToken: string;
   workflowWasRunning: boolean;
 };
@@ -84,7 +85,7 @@ export class WorkflowHistoryController {
   }
 
   get loading(): boolean {
-    return this.started && !this.fetchComplete && !this.error;
+    return this.started && !this.fetchComplete;
   }
 
   load(workflow: WorkflowExecution): Promise<void> {
@@ -102,6 +103,9 @@ export class WorkflowHistoryController {
     if (this.disposed)
       throw new Error('Cannot load a disposed workflow history.');
     this.verifyWorkflow(workflow);
+    const lastPollToken = preserveHistory
+      ? (this.session?.lastPollToken ?? '')
+      : '';
     this.stopSession();
 
     this.fetchComplete = false;
@@ -123,7 +127,8 @@ export class WorkflowHistoryController {
       controller: new AbortController(),
       livePollController: null,
       livePollTask: null,
-      lastPollToken: '',
+      livePollFailed: false,
+      lastPollToken,
       workflowWasRunning: workflow.isRunning,
     };
     this.session = session;
@@ -136,7 +141,8 @@ export class WorkflowHistoryController {
         maximumPageSize: this.maximumPageSize,
         pauseAfterPages: this.pauseAfterPages,
         onProgress: (progress) => {
-          if (!this.isCurrent(session)) return;
+          if (!this.isCurrent(session) || session.controller.signal.aborted)
+            return;
           this.totalExpectedEvents = Math.max(
             this.totalExpectedEvents,
             progress.totalEstimated,
@@ -148,14 +154,19 @@ export class WorkflowHistoryController {
           }
         },
         onPause: (handle) => {
-          if (!this.isCurrent(session) || this.historyRequested) {
+          if (
+            !this.isCurrent(session) ||
+            session.controller.signal.aborted ||
+            this.historyRequested
+          ) {
             handle.resume();
             return;
           }
           this.pauseHandle = handle;
         },
         onRawPage: (events) => {
-          if (!this.isCurrent(session)) return;
+          if (!this.isCurrent(session) || session.controller.signal.aborted)
+            return;
           for (const event of events) this.ingestEvent(event, session);
         },
       });
@@ -169,7 +180,12 @@ export class WorkflowHistoryController {
         error instanceof Error || isNetworkError(error)
           ? error
           : new Error(getErrorMessage(error));
-      this.stopSession();
+      session.controller.abort();
+      const handle = this.pauseHandle;
+      this.pauseHandle = null;
+      handle?.resume();
+    } finally {
+      if (this.isCurrent(session)) this.started = false;
     }
   }
 
@@ -224,17 +240,14 @@ export class WorkflowHistoryController {
   }
 
   private isCurrent(session: HistoryLoadSession): boolean {
-    return (
-      !this.disposed &&
-      this.session === session &&
-      !session.controller.signal.aborted
-    );
+    return !this.disposed && this.session === session;
   }
 
   private canPoll(session: HistoryLoadSession): boolean {
     return (
       this.isCurrent(session) &&
       !this.liveUpdatesPaused &&
+      !session.livePollFailed &&
       session.workflowWasRunning &&
       !this.historyClosed
     );
@@ -286,7 +299,8 @@ export class WorkflowHistoryController {
           error instanceof Error || isNetworkError(error)
             ? error
             : new Error(getErrorMessage(error));
-        this.stopSession();
+        session.livePollFailed = true;
+        controller.abort();
       })
       .finally(() => {
         session.livePollTask = null;

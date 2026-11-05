@@ -107,46 +107,57 @@ function visibleIds(page: Page) {
 }
 
 test.describe('Workflow event detail live history', () => {
-  test('resolves a request ID to its event and expands the related group', async ({
-    page,
-  }) => {
-    const requestId = 'request-for-started-activity';
-    const events = [
-      makeWorkflowStarted(1),
-      makeActivityScheduled(2, 'RequestIdActivity'),
-      makeActivityStarted(3, 2),
-    ];
-    const { initialResponse, liveResponse } = await mockEventDetail(
+  for (const requestId of ['request-for-started-activity', '123-request-id']) {
+    test(`resolves ${requestId} and paginates from its event`, async ({
       page,
-      events,
-      [],
-      {
-        ...runningWorkflow,
-        workflowExtendedInfo: {
-          requestIdInfos: { [requestId]: { eventId: '3' } },
+    }) => {
+      const events = [
+        makeWorkflowStarted(1),
+        makeActivityScheduled(2, 'RequestIdActivity'),
+        makeActivityStarted(3, 2),
+        makeActivityScheduled(4),
+        makeActivityScheduled(5),
+      ];
+      const { initialResponse, liveResponse } = await mockEventDetail(
+        page,
+        events,
+        [],
+        {
+          ...runningWorkflow,
+          workflowExtendedInfo: {
+            requestIdInfos: { [requestId]: { eventId: '3' } },
+          },
         },
-      },
-    );
-    try {
-      initialResponse.release();
-      await page.goto(eventUrl(requestId));
+      );
+      try {
+        initialResponse.release();
+        await page.goto(eventUrl(requestId));
 
-      await expect.poll(() => visibleIds(page)).toEqual(['3']);
-      const details = page.getByTestId('event-summary-row-expanded');
-      await expect(details).toHaveCount(1);
-      await expect(
-        details.getByText('Activity Task Scheduled', { exact: true }),
-      ).toBeVisible();
-      await expect(
-        details.getByText('Activity Task Started', { exact: true }),
-      ).toBeVisible();
-      await expect(details).toContainText('RequestIdActivity');
-      await expect(page).toHaveURL(eventUrl(requestId));
-    } finally {
-      initialResponse.release();
-      liveResponse.release();
-    }
-  });
+        await expect.poll(() => visibleIds(page)).toEqual(['3']);
+        const details = page.getByTestId('event-summary-row-expanded');
+        await expect(details).toHaveCount(1);
+        await expect(
+          details.getByText('Activity Task Scheduled', { exact: true }),
+        ).toBeVisible();
+        await expect(
+          details.getByText('Activity Task Started', { exact: true }),
+        ).toBeVisible();
+        await expect(details).toContainText('RequestIdActivity');
+        await page.getByTestId('load-previous').click();
+        await expect.poll(() => visibleIds(page)).toEqual(['1', '2', '3']);
+        await expect(page.getByTestId('load-previous')).toBeDisabled();
+        await page.getByTestId('load-next').click();
+        await expect
+          .poll(() => visibleIds(page))
+          .toEqual(['1', '2', '3', '4', '5']);
+        await expect(page.getByTestId('load-next')).toBeDisabled();
+        await expect(page).toHaveURL(eventUrl(requestId));
+      } finally {
+        initialResponse.release();
+        liveResponse.release();
+      }
+    });
+  }
 
   test('shows ordered ten-ID ranges with gaps and enables Next when the live tail grows', async ({
     page,

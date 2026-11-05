@@ -1,8 +1,6 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
 
-  import { page } from '$app/state';
-
   import EventHistoryLegend from '$lib/components/lines-and-dots/event-history-legend.svelte';
   import LiveCountAnnouncer from '$lib/components/live-count-announcer.svelte';
   import Paginated from '$lib/holocene/table/paginated-table/paginated.svelte';
@@ -20,12 +18,10 @@
   } from '$lib/services/grouped-event-buffer';
   import { isCloud } from '$lib/stores/advanced-visibility';
   import { eventStatusFilter } from '$lib/stores/filters';
-  import { currentPageKey, perPageKey } from '$lib/stores/pagination';
   import type {
     IterableEventWithPending,
     PendingActivity,
     WorkflowEvent,
-    WorkflowEventWithPending,
   } from '$lib/types/events';
   import type { WorkflowExecutionIdentity } from '$lib/types/workflows';
   import {
@@ -36,8 +32,6 @@
     isPendingActivity,
     isPendingNexusOperation,
   } from '$lib/utilities/is-pending-activity';
-
-  import HistoryGraph from '../lines-and-dots/history-graph/history-graph.svelte';
 
   import EventEmptyRow from './event-empty-row.svelte';
   import EventSummaryRow from './event-summary-row.svelte';
@@ -50,7 +44,6 @@
     initialEvent: WorkflowEvent | undefined;
     updating?: boolean;
     loading?: boolean;
-    minimized?: boolean;
     activityActions?: Snippet<[PendingActivity]>;
   } & (
     | {
@@ -58,14 +51,12 @@
         items: LazyGroup[];
         materializeGroup: (group: LazyGroup) => EventGroup;
         groups?: never;
-        workflowTaskGroups?: never;
       }
     | {
         compact?: false;
         items: IterableEventWithPending[];
         materializeGroup?: never;
         groups?: EventGroups;
-        workflowTaskGroups?: EventGroups;
       }
   );
 
@@ -74,26 +65,18 @@
     workflowExecutionIdentity,
     initialEvent,
     materializeGroup,
-    workflowTaskGroups = [],
     items,
     compact,
     groups = [],
     updating = false,
     loading = false,
-    minimized = true,
     activityActions,
   }: Props = $props();
 
   // Set by a hovered row, read by its siblings to highlight related activities.
   let hoveredEventId = $state<string | undefined>(undefined);
 
-  const showGraph = $derived(!minimized && !compact);
   const groupIndex = $derived(buildGroupIndex(groups));
-  const url = $derived(page.url);
-  const perPageParam = $derived(url.searchParams.get(perPageKey) ?? '100');
-  const currentPageParam = $derived(
-    url.searchParams.get(currentPageKey) || '1',
-  );
 
   // Array-of-union, not union-of-arrays: Paginated is generic over one Item,
   // which `LazyGroup[] | IterableEventWithPending[]` gives it no way to pick.
@@ -101,21 +84,6 @@
     compact
       ? getFailedOrPendingGroups(items, $eventStatusFilter)
       : getFailedOrPendingEvents(items, $eventStatusFilter),
-  );
-
-  // The gutter graph sits outside Paginated, so it re-derives the page.
-  const graphHistory = $derived(
-    showGraph
-      ? filteredItems
-          .filter(
-            (item): item is WorkflowEventWithPending =>
-              !isLazyGroup(item) && !isEventGroup(item),
-          )
-          .slice(
-            (parseInt(currentPageParam) - 1) * parseInt(perPageParam),
-            parseInt(currentPageParam) * parseInt(perPageParam),
-          )
-      : [],
   );
 
   const columns = $derived([
@@ -153,11 +121,6 @@
     translate('workflows.new-events-announcement', { count })}
 />
 <div class="flex">
-  <div class="pt-9">
-    {#if showGraph}
-      <HistoryGraph {groups} history={graphHistory} {workflowTaskGroups} />
-    {/if}
-  </div>
   <Paginated
     perPageLabel={translate('common.per-page')}
     nextPageButtonLabel={translate('common.next-page')}

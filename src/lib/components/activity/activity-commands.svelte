@@ -49,14 +49,16 @@
       (workflow.isRunning || workflow.isPaused),
   );
 
+  const execution = $derived({
+    workflowId: workflowExecutionIdentity.workflowId,
+    runId: workflowExecutionIdentity.runId,
+  });
+
   const onPause = async (reason: string) => {
     const refresh = onRefresh;
     await pauseActivity({
       namespace: workflowExecutionIdentity.namespace,
-      execution: {
-        workflowId: workflowExecutionIdentity.workflowId,
-        runId: workflowExecutionIdentity.runId,
-      },
+      execution,
       id: activity.activityId,
       reason,
       identity,
@@ -68,10 +70,7 @@
     const refresh = onRefresh;
     await unpauseActivity({
       namespace: workflowExecutionIdentity.namespace,
-      execution: {
-        workflowId: workflowExecutionIdentity.workflowId,
-        runId: workflowExecutionIdentity.runId,
-      },
+      execution,
       id: activity.activityId,
       identity,
     });
@@ -83,10 +82,7 @@
     const activityId = activity.activityId;
     await resetActivity({
       namespace: workflowExecutionIdentity.namespace,
-      execution: {
-        workflowId: workflowExecutionIdentity.workflowId,
-        runId: workflowExecutionIdentity.runId,
-      },
+      execution,
       id: activityId,
       resetHeartbeat,
       identity,
@@ -102,10 +98,7 @@
     const refresh = onRefresh;
     await updateActivityOptions({
       namespace: workflowExecutionIdentity.namespace,
-      execution: {
-        workflowId: workflowExecutionIdentity.workflowId,
-        runId: workflowExecutionIdentity.runId,
-      },
+      execution,
       id: activity.activityId,
       activityOptions: options,
       identity,

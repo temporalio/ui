@@ -5,6 +5,9 @@ import {
   makeTimerGroup,
   makeWorkflowCompleted,
   makeWorkflowStarted,
+  makeWorkflowTaskFailed,
+  makeWorkflowTaskScheduled,
+  makeWorkflowTaskStarted,
 } from '$src/lib/services/test-helpers/synthetic-events';
 import type { HistoryEvent } from '$src/lib/types/events';
 import type { WorkflowExecutionAPIResponse } from '$src/lib/types/workflows';
@@ -132,6 +135,50 @@ test.describe('Workflow run detail history loading errors', () => {
     await expect(detail).toHaveText(/\S/);
     await expect.poll(() => failedDirections.size).toBe(2);
   });
+
+  for (const view of ['history', 'timeline']) {
+    test(`shows a loaded workflow-task failure on ${view} after a partial history error`, async ({
+      page,
+    }) => {
+      await mockWorkflowApis(page, {
+        ...completedWorkflow,
+        workflowExecutionInfo: {
+          ...completedWorkflow.workflowExecutionInfo,
+          status: 'Running',
+          closeTime: '',
+        },
+      });
+      for (const { api, pageEvents } of [
+        { api: EVENT_HISTORY_API, pageEvents: events.slice(0, 2) },
+        {
+          api: EVENT_HISTORY_API_REVERSE,
+          pageEvents: [
+            makeWorkflowTaskFailed(9, 7, 'NonDeterministicError'),
+            makeWorkflowTaskStarted(8, 7),
+            makeWorkflowTaskScheduled(7),
+          ],
+        },
+      ]) {
+        await page.route(api, (route) => {
+          if (
+            new URL(route.request().url()).searchParams.has('next_page_token')
+          ) {
+            return failHistoryPage(route);
+          }
+          return route.fulfill({
+            json: { history: { events: pageEvents }, nextPageToken: 'more' },
+          });
+        });
+      }
+
+      await page.goto(historyUrl.replace('/history?', `/${view}?`));
+
+      await expect(page.getByTestId('history-load-error')).toBeVisible();
+      await expect(
+        page.getByText('Non Deterministic Error', { exact: true }),
+      ).toBeVisible();
+    });
+  }
 
   test('retains partial history after both directions return HTTP 503 and while retrying, then loads the remaining events', async ({
     page,

@@ -86,7 +86,7 @@
   );
 
   const workflowTaskFailedError = $derived.by(() => {
-    if (!historyController.fetchComplete) return undefined;
+    if (historyController.loading) return undefined;
     return historyController.history.workflowTaskFailedEvent as
       | WorkflowTaskFailedEvent
       | WorkflowTaskTimedOutEvent
@@ -252,11 +252,7 @@
       {#snippet activityActions(activity)}
         <ActivityCommands
           {activity}
-          workflowExecutionIdentity={{
-            namespace,
-            workflowId: workflow.id,
-            runId: workflow.runId,
-          }}
+          workflowExecutionIdentity={historyController.workflowExecutionIdentity}
           {workflow}
           onRefresh={triggerRefresh}
           class="justify-end"

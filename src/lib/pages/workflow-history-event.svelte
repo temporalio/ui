@@ -16,8 +16,6 @@
   const { eventId }: Props = $props();
   const historyController = getWorkflowHistoryController();
 
-  let ids = $derived([eventId]);
-
   onMount(() => historyController.resume());
 
   const { workflow } = $derived($workflowRun);
@@ -30,8 +28,11 @@
       ),
   );
 
+  const resolvedEventId = $derived(initialEvent?.id);
+  let ids = $derived(resolvedEventId ? [resolvedEventId] : []);
+
   const visibleItems = $derived(
-    [...new Set(initialEvent ? [...ids, initialEvent.id] : ids)]
+    ids
       .map((id) => historyController.history.event(id))
       .filter((event) => event !== undefined)
       .sort((a, b) => Number(a.id) - Number(b.id)),
@@ -40,6 +41,7 @@
   const lastEventId = $derived(historyController.latestEventId);
 
   const loadPrevious = () => {
+    if (!ids.length) return;
     const firstId = parseInt(ids[0]);
     const previousTen: string[] = [];
     const start = firstId - 10;
@@ -54,6 +56,7 @@
   };
 
   const loadNext = () => {
+    if (!ids.length) return;
     const lastId = parseInt(ids[ids.length - 1]);
     const nextTen: string[] = [];
     const start = lastId + 1;
@@ -86,7 +89,7 @@
     size="xs"
     LeadingIcon={IconArrowUp}
     onclick={loadPrevious}
-    disabled={ids[0] === '1' || loading}
+    disabled={!ids.length || ids[0] === '1' || loading}
     data-testid="load-previous">Show Previous 10</Button
   >
   <table>
@@ -112,7 +115,9 @@
     size="xs"
     LeadingIcon={IconArrowDown}
     onclick={loadNext}
-    disabled={ids[ids.length - 1] === String(lastEventId) || loading}
+    disabled={!ids.length ||
+      ids[ids.length - 1] === String(lastEventId) ||
+      loading}
     data-testid="load-next">Show Next 10</Button
   >
 </div>
