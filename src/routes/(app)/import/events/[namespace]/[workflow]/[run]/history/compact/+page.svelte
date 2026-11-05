@@ -5,8 +5,9 @@
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { eventFilterSort } from '$lib/stores/event-view';
   import { eventCategoryFilter } from '$lib/stores/filters';
-  import { importEventGroups } from '$lib/stores/import-events';
+  import { importEventGroups, importEvents } from '$lib/stores/import-events';
   import type { WorkflowExecutionIdentity } from '$lib/types/workflows';
+  import { isWorkflowExecutionStartedEvent } from '$lib/utilities/is-event-type';
 
   const workflowExecutionIdentity: WorkflowExecutionIdentity = $derived({
     namespace: page.params.namespace,
@@ -29,6 +30,7 @@
 </script>
 
 <EventSummaryTable
+  initialEvent={$importEvents.find(isWorkflowExecutionStartedEvent)}
   items={filteredEventGroups}
   groups={filteredEventGroups}
   {workflowExecutionIdentity}

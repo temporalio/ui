@@ -9,7 +9,10 @@
   import { translate } from '$lib/i18n/translate';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type { WorkerHeartbeat, WorkerListInfo } from '$lib/types';
-  import { formatSDKName } from '$lib/utilities/get-sdk-version';
+  import {
+    formatSDKName,
+    type getSDKandVersion,
+  } from '$lib/utilities/get-sdk-version';
   import { getWorkerHostName } from '$lib/utilities/get-worker-host-name';
   import { isRunningWithNoWorkers } from '$lib/utilities/is-running-with-no-workers';
   import { toWorkerStatusReadable } from '$lib/utilities/screaming-enums';
@@ -21,6 +24,7 @@
 
   interface Props {
     filterable?: boolean;
+    sdkInfo?: ReturnType<typeof getSDKandVersion>;
     namespace: string;
     onFetch: () => Promise<PaginatedRequest<WorkerListInfo | WorkerHeartbeat>>;
     onError?: (err: unknown) => void;
@@ -30,6 +34,7 @@
 
   let {
     filterable = false,
+    sdkInfo,
     namespace,
     onFetch,
     onError,
@@ -125,7 +130,7 @@
       {:else if runningWithNoWorkers}
         <EmptyState title={translate('workers.empty-state-title')} />
       {:else}
-        <WorkerHeartbeatsSDKAlert />
+        <WorkerHeartbeatsSDKAlert {sdkInfo} />
       {/if}
     </div>
   {/snippet}

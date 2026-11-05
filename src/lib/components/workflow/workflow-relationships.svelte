@@ -5,8 +5,14 @@
 </script>
 
 <script lang="ts">
+  import { getContext } from 'svelte';
+
   import { page } from '$app/state';
 
+  import {
+    HISTORY_CTX,
+    type HistoryContext,
+  } from '$lib/contexts/history-context';
   import Loading from '$lib/holocene/loading.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
@@ -19,6 +25,9 @@
 
   import WorkflowFamilyTree from './relationships/workflow-family-tree.svelte';
   import WorkflowRelationshipsOld from './workflow-relationships-old.svelte';
+
+  const historyCtx = getContext<HistoryContext>(HISTORY_CTX);
+  const events = $derived(historyCtx.history?.events ?? []);
 
   const MAX_UPPER_LIMIT = 5000;
 
@@ -76,12 +85,12 @@
         <Loading />
       {:then root}
         {#if root}
-          <WorkflowFamilyTree {root} {namespace} />
+          <WorkflowFamilyTree {root} {namespace} {events} />
         {:else}
-          <WorkflowRelationshipsOld />
+          <WorkflowRelationshipsOld {events} />
         {/if}
       {:catch}
-        <WorkflowRelationshipsOld />
+        <WorkflowRelationshipsOld {events} />
       {/await}
     {:else}
       <h4 class="px-8 py-4">{translate('workflows.no-relationships')}</h4>

@@ -58,7 +58,7 @@
     workflowExecutionIdentity: WorkflowExecutionIdentity;
     event: IterableEvent;
     group: EventGroup | undefined;
-    initialItem: WorkflowEvent;
+    initialItem: WorkflowEvent | undefined;
     index: number;
     compact?: boolean;
     expanded?: boolean;

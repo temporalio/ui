@@ -26,8 +26,8 @@
   import { BadgeCount } from '$lib/io/badge-count';
   import { IconCanceled, IconChevronLeft, IconInfo } from '$lib/io/icon';
   import { getVisibleInboundNexusLinkEvents } from '$lib/runes/inbound-nexus-links.svelte';
+  import type { EventBufferView } from '$lib/services/grouped-event-buffer.svelte';
   import { workflowViewPreference } from '$lib/stores/event-view';
-  import { fullEventHistory } from '$lib/stores/events';
   import { resetWorkflows } from '$lib/stores/reset-workflows';
   import { workflowRun } from '$lib/stores/workflow-run';
   import { workflowsSearchParams } from '$lib/stores/workflows';
@@ -66,7 +66,10 @@
     id: eventId,
   } = $derived(page.params);
 
-  let { headerSnippet }: { headerSnippet?: Snippet } = $props();
+  let {
+    history,
+    headerSnippet,
+  }: { history: EventBufferView; headerSnippet?: Snippet } = $props();
 
   const { workflow, workers, workerCount } = $derived($workflowRun);
   const runningWithNoWorkers = $derived(isRunningWithNoWorkers($workflowRun));
@@ -85,8 +88,7 @@
   );
   const cancelInProgress = $derived(
     Boolean(
-      workflow?.status &&
-      isCancelInProgress(workflow.status, $fullEventHistory),
+      workflow?.status && isCancelInProgress(workflow.status, history.events),
     ),
   );
   const isPaused = $derived(workflow?.isPaused);
@@ -98,7 +100,7 @@
   );
   const workflowHasBeenReset = $derived(!!resetRunId);
   const workflowRelationships = $derived(
-    getWorkflowRelationships(workflow, $fullEventHistory, page.data.namespace),
+    getWorkflowRelationships(workflow, history.events, page.data.namespace),
   );
   const workflowsHref = $derived(
     `${routeForWorkflows({
@@ -106,10 +108,10 @@
     })}?${$workflowsSearchParams}`,
   );
   const outboundLinks = $derived(
-    getWorkflowNexusLinksFromHistory($fullEventHistory)?.length || 0,
+    getWorkflowNexusLinksFromHistory(history.events)?.length || 0,
   );
   const visibleInboundLinks = getVisibleInboundNexusLinkEvents(
-    () => $fullEventHistory,
+    () => history.events,
   );
   const inboundLinks = $derived(visibleInboundLinks.events?.length || 0);
   const linkCount = $derived(outboundLinks + inboundLinks);
@@ -161,6 +163,7 @@
         {/if}
         <div class="xl:hidden">
           <WorkflowActions
+            resetEvents={history.resetEvents}
             {cancelInProgress}
             workflow={workflow!}
             {namespace}
@@ -187,6 +190,7 @@
     </div>
     <div class="max-xl:hidden">
       <WorkflowActions
+        resetEvents={history.resetEvents}
         {cancelInProgress}
         workflow={workflow!}
         {namespace}
@@ -196,7 +200,11 @@
     </div>
   </div>
   <CodecServerErrorBanner />
-  <WorkflowDetails workflow={workflow!} next={workflowRelationships.next} />
+  <WorkflowDetails
+    {history}
+    workflow={workflow!}
+    next={workflowRelationships.next}
+  />
   <ExtensionSlot
     name="workflow.header.after-details"
     class="flex w-full flex-col gap-2"

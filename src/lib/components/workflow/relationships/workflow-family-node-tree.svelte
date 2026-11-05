@@ -6,8 +6,8 @@
   import { translate } from '$lib/i18n/translate';
   import { IconTemporalSchedules } from '$lib/io/icon';
   import type { RootNode } from '$lib/services/workflow-service';
-  import { fullEventHistory } from '$lib/stores/events';
   import { workflowRun } from '$lib/stores/workflow-run';
+  import type { WorkflowEvents } from '$lib/types/events';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
   import {
@@ -21,6 +21,7 @@
 
   interface Props {
     root: RootNode;
+    events: WorkflowEvents;
     width: number;
     height: number;
     zoomLevel: number;
@@ -35,6 +36,7 @@
 
   let {
     root,
+    events,
     width,
     height,
     zoomLevel,
@@ -52,11 +54,7 @@
   const namespace = $derived(page.params.namespace);
   const fullWorkflow = $derived($workflowRun.workflow);
   const workflowRelationships = $derived(
-    getWorkflowRelationships(
-      fullWorkflow,
-      $fullEventHistory,
-      page.data.namespace,
-    ),
+    getWorkflowRelationships(fullWorkflow, events, page.data.namespace),
   );
   const first = $derived(workflowRelationships.first);
   const next = $derived(workflowRelationships.next);
@@ -170,6 +168,7 @@
   {#if child.children.length && isExpanded(child)}
     <WorkflowFamilyNodeTree
       root={child}
+      {events}
       {width}
       {height}
       {zoomLevel}

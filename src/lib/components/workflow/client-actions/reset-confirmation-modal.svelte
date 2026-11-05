@@ -10,10 +10,10 @@
   import { Action } from '$lib/models/workflow-actions';
   import { resetWorkflow } from '$lib/services/workflow-service';
   import { isCloud } from '$lib/stores/advanced-visibility';
-  import { resetEvents } from '$lib/stores/events';
   import { resetWorkflows } from '$lib/stores/reset-workflows';
   import { temporalVersion } from '$lib/stores/versions';
   import { triggerRefresh } from '$lib/stores/workflow-run';
+  import type { WorkflowEvents } from '$lib/types/events';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { getIdentity } from '$lib/utilities/core-context';
   import { isNetworkError } from '$lib/utilities/is-network-error';
@@ -22,10 +22,16 @@
   interface Props {
     open: boolean;
     workflow: WorkflowExecution;
+    resetEvents: WorkflowEvents;
     namespace: string;
   }
 
-  let { open = $bindable(), workflow, namespace }: Props = $props();
+  let {
+    open = $bindable(),
+    workflow,
+    resetEvents,
+    namespace,
+  }: Props = $props();
 
   let error = $state('');
   let loading = $state(false);
@@ -104,7 +110,7 @@
         id="reset-event-id"
         required
       >
-        {#each $resetEvents as event (event.eventId)}
+        {#each resetEvents as event (event.eventId)}
           <Option value={event.id}>{event.id} - {event.eventType}</Option>
         {/each}
       </Select>

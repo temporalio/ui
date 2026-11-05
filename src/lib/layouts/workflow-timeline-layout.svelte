@@ -27,7 +27,6 @@
     IconCollapse,
     IconDownload,
   } from '$lib/io/icon';
-  import { eventBuffer } from '$lib/services/grouped-event-buffer.svelte';
   import { clearActives } from '$lib/stores/active-events';
   import { collapseIdleTime, eventFilterSort } from '$lib/stores/event-view';
   import { pauseLiveUpdates } from '$lib/stores/events';
@@ -44,6 +43,7 @@
   import { getTimelineGroups } from '$lib/utilities/sort-timeline-groups';
 
   const historyCtx = getContext<HistoryContext>(HISTORY_CTX);
+  const historyView = $derived(historyCtx.history);
 
   const namespace = $derived(page.params.namespace);
   const workflow = $derived($workflowRun.workflow);
@@ -64,10 +64,12 @@
 
   const reverseSort = $derived($eventFilterSort === 'descending');
 
-  const bufferLazyGroups = $derived(eventBuffer.lazyGroupsWithoutWorkflowTasks);
+  const bufferLazyGroups = $derived(
+    historyView?.lazyGroupsWithoutWorkflowTasks ?? [],
+  );
 
   const eventGroupMatcher = $derived(
-    eventBuffer.eventGroupMatcher(urlParams.eventGroups),
+    historyView?.eventGroupMatcher(urlParams.eventGroups),
   );
 
   const filteredBufferLazyGroups = $derived.by(() => {
@@ -90,7 +92,7 @@
 
   const workflowTaskFailedError = $derived.by(() => {
     if (!historyCtx.fetchComplete) return undefined;
-    return eventBuffer.workflowTaskFailedEvent as
+    return historyView?.workflowTaskFailedEvent as
       | WorkflowTaskFailedEvent
       | WorkflowTaskTimedOutEvent
       | undefined;
@@ -143,7 +145,7 @@
   };
 </script>
 
-<InputAndResults />
+<InputAndResults events={historyView?.events ?? []} />
 <div class="flex flex-col gap-2">
   {#if workflowTaskFailedError}
     <WorkflowError
@@ -152,7 +154,10 @@
     />
   {/if}
   {#if workflow?.callbacks?.length}
-    <WorkflowCallbacks callbacks={workflow.callbacks} />
+    <WorkflowCallbacks
+      callbacks={workflow.callbacks}
+      initialEvent={historyView?.initialEvent}
+    />
   {/if}
 </div>
 
@@ -195,7 +200,7 @@
             : translate('workflows.hide-idle-time')}
         </ToggleButton>
         <EventTypeFilter compact={false} />
-        <EventGroupFilter options={eventBuffer.eventGroupOptions} />
+        <EventGroupFilter options={historyView?.eventGroupOptions ?? []} />
         <ToggleButton
           disabled={isNotPending}
           data-testid="pause"
@@ -231,12 +236,12 @@
   virtualizes itself via IntersectionObserver (no bounded scroll container,
   no scroll-offset bridge).
 -->
-  {#if workflow}
+  {#if workflow && historyView}
     {#key JSON.stringify([namespace, workflow.id, workflow.runId])}
       <TimelineGraph
         {namespace}
         {workflow}
-        history={eventBuffer}
+        history={historyView}
         {lazyGroups}
         {reverseSort}
         collapseIdleTime={$collapseIdleTime === 'on'}

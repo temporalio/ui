@@ -11,6 +11,7 @@
   import { IconChevronLeft } from '$lib/io/icon';
   import { groupEvents } from '$lib/models/event-groups';
   import type { WorkflowExecutionIdentity } from '$lib/types/workflows';
+  import { isWorkflowExecutionStartedEvent } from '$lib/utilities/is-event-type';
   import { routeForArchivalWorkflows } from '$lib/utilities/route-for';
 
   let { data }: { data: PageData } = $props();
@@ -49,7 +50,12 @@
   <SkeletonWorkflow />
 {:then history}
   {@const groups = groupEvents(history, 'ascending', [], [])}
-  <EventSummaryTable items={history} {groups} {workflowExecutionIdentity} />
+  <EventSummaryTable
+    initialEvent={history.find(isWorkflowExecutionStartedEvent)}
+    items={history}
+    {groups}
+    {workflowExecutionIdentity}
+  />
 {:catch error}
   <div class="text-center align-middle">
     <h1 class="leading-0 text-[12rem] font-semibold">

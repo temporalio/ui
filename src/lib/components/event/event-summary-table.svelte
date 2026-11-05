@@ -9,20 +9,22 @@
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import { translate } from '$lib/i18n/translate';
   import { buildGroupIndex, isEventGroup } from '$lib/models/event-groups';
-  import type { EventGroups } from '$lib/models/event-groups/event-groups';
+  import type {
+    EventGroup,
+    EventGroups,
+  } from '$lib/models/event-groups/event-groups';
   import { isEvent } from '$lib/models/event-history';
   import {
     isLazyGroup,
     type LazyGroup,
   } from '$lib/services/grouped-event-buffer';
-  import { eventBuffer } from '$lib/services/grouped-event-buffer.svelte';
   import { isCloud } from '$lib/stores/advanced-visibility';
-  import { fullEventHistory } from '$lib/stores/events';
   import { eventStatusFilter } from '$lib/stores/filters';
   import { currentPageKey, perPageKey } from '$lib/stores/pagination';
   import type {
     IterableEventWithPending,
     PendingActivity,
+    WorkflowEvent,
     WorkflowEventWithPending,
   } from '$lib/types/events';
   import type { WorkflowExecutionIdentity } from '$lib/types/workflows';
@@ -45,22 +47,34 @@
   /** Discriminated on `compact` so `items` narrows without a cast. */
   type Props = {
     workflowExecutionIdentity: WorkflowExecutionIdentity;
+    initialEvent: WorkflowEvent | undefined;
     updating?: boolean;
     loading?: boolean;
     minimized?: boolean;
     activityActions?: Snippet<[PendingActivity]>;
   } & (
-    | { compact: true; items: LazyGroup[]; groups?: never }
+    | {
+        compact: true;
+        items: LazyGroup[];
+        materializeGroup: (group: LazyGroup) => EventGroup;
+        groups?: never;
+        workflowTaskGroups?: never;
+      }
     | {
         compact?: false;
         items: IterableEventWithPending[];
+        materializeGroup?: never;
         groups?: EventGroups;
+        workflowTaskGroups?: EventGroups;
       }
   );
 
   // `const` with no default on `compact` — `let` or a default breaks narrowing.
   const {
     workflowExecutionIdentity,
+    initialEvent,
+    materializeGroup,
+    workflowTaskGroups = [],
     items,
     compact,
     groups = [],
@@ -74,7 +88,6 @@
   let hoveredEventId = $state<string | undefined>(undefined);
 
   const showGraph = $derived(!minimized && !compact);
-  const initialItem = $derived($fullEventHistory?.[0]);
   const groupIndex = $derived(buildGroupIndex(groups));
   const url = $derived(page.url);
   const perPageParam = $derived(url.searchParams.get(perPageKey) ?? '100');
@@ -93,10 +106,15 @@
   // The gutter graph sits outside Paginated, so it re-derives the page.
   const graphHistory = $derived(
     showGraph
-      ? (filteredItems as WorkflowEventWithPending[]).slice(
-          (parseInt(currentPageParam) - 1) * parseInt(perPageParam),
-          parseInt(currentPageParam) * parseInt(perPageParam),
-        )
+      ? filteredItems
+          .filter(
+            (item): item is WorkflowEventWithPending =>
+              !isLazyGroup(item) && !isEventGroup(item),
+          )
+          .slice(
+            (parseInt(currentPageParam) - 1) * parseInt(perPageParam),
+            parseInt(currentPageParam) * parseInt(perPageParam),
+          )
       : [],
   );
 
@@ -110,7 +128,7 @@
 
   const materializeRowReactive = (
     item: IterableEventWithPending | LazyGroup,
-  ) => (isLazyGroup(item) ? eventBuffer.materializeGroup(item) : item);
+  ) => (isLazyGroup(item) ? (compact ? materializeGroup(item) : item) : item);
 
   const iterableKey = (event: IterableEventWithPending | LazyGroup) => {
     if (isPendingNexusOperation(event)) {
@@ -137,7 +155,7 @@
 <div class="flex">
   <div class="pt-9">
     {#if showGraph}
-      <HistoryGraph {groups} history={graphHistory} />
+      <HistoryGraph {groups} history={graphHistory} {workflowTaskGroups} />
     {/if}
   </div>
   <Paginated
@@ -175,7 +193,7 @@
             {workflowExecutionIdentity}
             group={row}
             {compact}
-            {initialItem}
+            initialItem={initialEvent}
           />
         {:else if isPendingActivity(row)}
           <PendingActivitySummaryRow
@@ -201,7 +219,7 @@
                   row.scheduledEventId,
             )}
           />
-        {:else}
+        {:else if !isLazyGroup(row)}
           <EventSummaryRow
             bind:hoveredEventId
             event={row}
@@ -210,11 +228,11 @@
             {workflowExecutionIdentity}
             group={isEvent(row) ? groupIndex.get(row.id) : undefined}
             {compact}
-            {initialItem}
+            initialItem={initialEvent}
           />
         {/if}
       {:else}
-        <EventEmptyRow loading={!$fullEventHistory.length || loading} />
+        <EventEmptyRow loading={loading || updating} />
       {/each}
     {/snippet}
   </Paginated>

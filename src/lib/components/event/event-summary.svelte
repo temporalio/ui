@@ -7,33 +7,47 @@
   import TabButtons from '$lib/holocene/tab-buttons/tab-buttons.svelte';
   import { IconCode, IconCompact, IconFeed } from '$lib/io/icon';
   import type { EventGroups } from '$lib/models/event-groups/event-groups';
+  import { isEvent } from '$lib/models/event-history';
   import WorkflowHistoryJson from '$lib/pages/workflow-history-json.svelte';
+  import { materializeGroup } from '$lib/services/grouped-event-buffer';
   import { eventFilterSort, eventViewType } from '$lib/stores/event-view';
-  import { fullEventHistory } from '$lib/stores/events';
-  import { eventCategoryFilter } from '$lib/stores/filters';
+  import { eventCategoryFilter, eventTypeFilter } from '$lib/stores/filters';
   import { triggerRefresh, workflowRun } from '$lib/stores/workflow-run';
   import type {
     EventTypeCategory,
     IterableEventWithPending,
+    WorkflowEvent,
   } from '$lib/types/events';
   import type { WorkflowExecutionIdentity } from '$lib/types/workflows';
   import { orderGroupsByPending } from '$lib/utilities/order-groups-by-pending';
 
   let {
     history,
+    initialEvent,
+    workflowTaskGroups = [],
     groups,
     workflowExecutionIdentity,
     minimized = true,
+    loading = false,
+    updating = false,
   }: {
     history: IterableEventWithPending[];
+    initialEvent: WorkflowEvent | undefined;
+    workflowTaskGroups?: EventGroups;
     groups: EventGroups;
     workflowExecutionIdentity: WorkflowExecutionIdentity;
     minimized?: boolean;
+    loading?: boolean;
+    updating?: boolean;
   } = $props();
 
   const workflow = $derived($workflowRun.workflow);
   const reverseSort = $derived($eventFilterSort === 'descending');
-  const updating = $derived(!$fullEventHistory.length);
+  const filteredEvents = $derived(
+    history
+      .filter(isEvent)
+      .filter((event) => $eventTypeFilter.includes(event.category)),
+  );
   const compact = $derived($eventViewType === 'compact');
 
   $effect(() => {
@@ -54,6 +68,7 @@
       ? {
           compact: true as const,
           items: orderGroupsByPending(groups, reverseSort),
+          materializeGroup,
         }
       : {
           compact: false as const,
@@ -61,6 +76,7 @@
             ? [...pendingNexusOperations, ...pendingActivities, ...history]
             : [...history, ...pendingActivities, ...pendingNexusOperations],
           groups,
+          workflowTaskGroups,
         },
   );
 
@@ -106,12 +122,14 @@
 </div>
 {#if $eventViewType === 'json'}
   <div class="border-t border-primary px-4">
-    <WorkflowHistoryJson />
+    <WorkflowHistoryJson events={filteredEvents} />
   </div>
 {:else}
   <div data-testid="event-summary-table">
     <EventSummaryTable
       {workflowExecutionIdentity}
+      {initialEvent}
+      {loading}
       {updating}
       {minimized}
       {...tableProps}

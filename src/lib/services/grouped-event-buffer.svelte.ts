@@ -3,9 +3,13 @@ import { readonly, writable } from 'svelte/store';
 import type { EventGroup } from '$lib/models/event-groups/event-groups';
 import type { EventGroupKey } from '$lib/models/event-history/event-group-markers';
 import type { WorkflowEvent } from '$lib/types/events';
+import { getSDKandVersion } from '$lib/utilities/get-sdk-version';
+import {
+  isResetEvent,
+  isWorkflowTaskCompletedEvent,
+} from '$lib/utilities/is-event-type';
 
 import {
-  defaultGroupedEventBuffer,
   type EventGroupMatcher,
   type EventGroupOption,
   type GroupedEventBuffer,
@@ -132,6 +136,17 @@ export class EventBufferView {
     return this.buffer.getEventArray();
   });
 
+  readonly initialEvent = $derived.by(() => {
+    void this._version;
+    return this.buffer.getInitialEvent();
+  });
+
+  readonly resetEvents = $derived(this.events.filter(isResetEvent));
+
+  readonly sdkInfo = $derived(
+    getSDKandVersion(this.events.filter(isWorkflowTaskCompletedEvent)),
+  );
+
   /** The active WorkflowTaskFailed/TimedOut event, if the run has one. */
   readonly workflowTaskFailedEvent: WorkflowEvent | undefined = $derived.by(
     () => {
@@ -145,11 +160,3 @@ export type ExecutionHistory = Pick<
   EventBufferView,
   'events' | 'materializeGroup'
 >;
-
-export const eventBuffer = new EventBufferView(defaultGroupedEventBuffer);
-
-/**
- * Store mirror of `eventBuffer.version`, for the derived stores in
- * $lib/stores/events that predate runes. Prefer `eventBuffer` in new code.
- */
-export const bufferVersion = eventBuffer.versionStore;

@@ -1,5 +1,11 @@
 <script lang="ts">
+  import { getContext } from 'svelte';
+
   import PollersTable from '$lib/components/workers/pollers-table/pollers-table.svelte';
+  import {
+    HISTORY_CTX,
+    type HistoryContext,
+  } from '$lib/contexts/history-context';
   import Alert from '$lib/holocene/alert.svelte';
   import Skeleton from '$lib/holocene/skeleton/index.svelte';
   import SkeletonTable from '$lib/holocene/skeleton/table.svelte';
@@ -32,6 +38,9 @@
     taskQueue,
     onCount,
   }: Props = $props();
+
+  const historyCtx = getContext<HistoryContext | undefined>(HISTORY_CTX);
+  const sdkInfo = $derived(historyCtx?.history?.sdkInfo);
 
   const query = $derived(`TaskQueue="${taskQueue}"`);
   const onFetch = $derived(() => fetchPaginatedWorkers({ namespace, query }));
@@ -121,7 +130,7 @@
     </ToggleButton>
   </ToggleButtons>
   {#if selected === View.Workers}
-    <WorkersTable {namespace} {onFetch} {total} />
+    <WorkersTable {namespace} {onFetch} {total} {sdkInfo} />
   {:else}
     {@render pollersTable()}
   {/if}

@@ -6,6 +6,7 @@
     fetchAllDirectWorkflows,
     type RootNode,
   } from '$lib/services/workflow-service';
+  import type { WorkflowEvents } from '$lib/types/events';
   import type { WorkflowExecution } from '$lib/types/workflows';
 
   import { showFullTree } from '../workflow-relationships.svelte';
@@ -15,10 +16,11 @@
 
   interface Props {
     root: RootNode;
+    events: WorkflowEvents;
     namespace: string;
   }
 
-  let { root = $bindable(), namespace }: Props = $props();
+  let { root = $bindable(), namespace, events }: Props = $props();
 
   let expandAll = $derived(!$showFullTree);
   let activeWorkflow = $state<WorkflowExecution | undefined>(undefined);
@@ -86,6 +88,7 @@
       {#snippet graph({ width, height, zoomLevel })}
         <WorkflowFamilyNodeTree
           {root}
+          {events}
           {width}
           {height}
           {zoomLevel}

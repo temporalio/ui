@@ -34,7 +34,7 @@
     isCategoryType,
   } from '$lib/models/event-history/get-event-categorization';
   import WorkflowHistoryJson from '$lib/pages/workflow-history-json.svelte';
-  import { eventBuffer } from '$lib/services/grouped-event-buffer.svelte';
+  import type { LazyGroup } from '$lib/services/grouped-event-buffer';
   import { clearActives } from '$lib/stores/active-events';
   import { eventFilterSort, eventViewType } from '$lib/stores/event-view';
   import { pauseLiveUpdates } from '$lib/stores/events';
@@ -54,6 +54,7 @@
   import { orderGroupsByPending } from '$lib/utilities/order-groups-by-pending';
 
   const historyCtx = getContext<HistoryContext>(HISTORY_CTX);
+  const historyView = $derived(historyCtx.history);
 
   const { namespace } = $derived(page.params);
   const { workflow } = $derived($workflowRun);
@@ -81,8 +82,10 @@
 
   // Enough to filter, sort and paginate; only the rendered page is materialized.
   // The feed view needs full groups, read lazily in tableProps below.
-  const bufferLazyGroups = $derived(eventBuffer.lazyGroupsWithoutWorkflowTasks);
-  const bufferEvents = $derived(eventBuffer.events);
+  const bufferLazyGroups = $derived(
+    historyView?.lazyGroupsWithoutWorkflowTasks ?? [],
+  );
+  const bufferEvents = $derived(historyView?.events ?? []);
   let updating = $derived(!historyCtx.fetchComplete);
 
   onMount(() => {
@@ -93,7 +96,7 @@
     parseEventFilterParams(page.url).eventGroups,
   );
   const eventGroupMatcher = $derived(
-    eventBuffer.eventGroupMatcher(selectedEventGroups),
+    historyView?.eventGroupMatcher(selectedEventGroups),
   );
 
   const isCategoryVisible = $derived.by(() => {
@@ -121,7 +124,7 @@
 
   const workflowTaskFailedError = $derived.by(() => {
     if (!historyCtx.fetchComplete) return undefined;
-    return eventBuffer.workflowTaskFailedEvent as
+    return historyView?.workflowTaskFailedEvent as
       | WorkflowTaskFailedEvent
       | WorkflowTaskTimedOutEvent
       | undefined;
@@ -146,7 +149,7 @@
       activities: isCategoryVisible(CATEGORIES.ACTIVITY)
         ? (workflow?.pendingActivities ?? []).filter(({ activityId }) =>
             isInSelectedGroups(
-              eventBuffer.pendingActivityScheduledEvent(activityId)?.id,
+              historyView?.pendingActivityScheduledEvent(activityId)?.id,
             ),
           )
         : [],
@@ -163,20 +166,22 @@
 
   // EventSummaryTable's props are a union on `compact`, so the pair travels as
   // one object. Keeps the materialized groups on the feed branch too.
-  const tableProps = $derived(
-    compact
+  const tableProps = $derived.by(() => {
+    const view = historyView;
+    return compact && view
       ? {
           compact: true as const,
           items: orderGroupsByPending(lazyGroups, reverseSort),
+          materializeGroup: (group: LazyGroup) => view.materializeGroup(group),
         }
       : {
           compact: false as const,
           items: reverseSort
             ? [...pending.nexusOperations, ...pending.activities, ...history]
             : [...history, ...pending.activities, ...pending.nexusOperations],
-          groups: eventBuffer.groupsWithoutWorkflowTasks,
-        },
-  );
+          groups: view?.groupsWithoutWorkflowTasks ?? [],
+        };
+  });
 
   $effect(() => {
     $eventViewType;
@@ -221,7 +226,7 @@
   };
 </script>
 
-<InputAndResults />
+<InputAndResults events={historyView?.events ?? []} />
 <div class="flex flex-col gap-2">
   {#if workflowTaskFailedError}
     <WorkflowError
@@ -230,7 +235,10 @@
     />
   {/if}
   {#if workflow?.callbacks?.length}
-    <WorkflowCallbacks callbacks={workflow.callbacks} />
+    <WorkflowCallbacks
+      callbacks={workflow.callbacks}
+      initialEvent={historyView?.initialEvent}
+    />
   {/if}
 </div>
 <div class="relative">
@@ -281,7 +289,7 @@
           </ToggleButton>
         {/if}
         <EventTypeFilter {compact} />
-        <EventGroupFilter options={eventBuffer.eventGroupOptions} />
+        <EventGroupFilter options={historyView?.eventGroupOptions ?? []} />
         <ToggleButton
           disabled={isNotPending}
           data-testid="pause"
@@ -316,9 +324,10 @@
       <div class="border-t border-primary px-4">
         <WorkflowHistoryJson events={filteredEvents} />
       </div>
-    {:else}
+    {:else if historyView}
       <div data-testid="event-summary-table">
         <EventSummaryTable
+          initialEvent={historyView.initialEvent}
           {workflowExecutionIdentity}
           {updating}
           {...tableProps}

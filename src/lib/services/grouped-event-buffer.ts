@@ -20,6 +20,7 @@ import type {
   PendingActivity,
   PendingNexusOperation,
   WorkflowEvent,
+  WorkflowExecutionStartedEvent,
 } from '$lib/types/events';
 import {
   isFailedTaskEvent,
@@ -37,6 +38,7 @@ import {
   isNexusOperationFailedEvent,
   isNexusOperationScheduledEvent,
   isNexusOperationTimedOutEvent,
+  isWorkflowExecutionStartedEvent,
 } from '$lib/utilities/is-event-type';
 
 /**
@@ -252,6 +254,7 @@ export function createGroupedEventBuffer() {
   let maxSlot = -1;
 
   let failedEvent: HistoryEvent | null = null;
+  let initialEvent: WorkflowExecutionStartedEvent | undefined;
 
   // Accumulated WFT IDs for marker billable-action dedup. Shared by both cursors
   // and the live poll — the direction an event arrives from is a fetch detail,
@@ -492,6 +495,7 @@ export function createGroupedEventBuffer() {
     maxSlot = -1;
 
     failedEvent = null;
+    initialEvent = undefined;
     processedWorkflowTaskIds.clear();
     eventGroupLabels = createEventGroupLabelRegistry();
     eventGroupIndex = new Map();
@@ -527,6 +531,9 @@ export function createGroupedEventBuffer() {
     if (events[slot]) return false;
 
     const event = toWorkflowEvent(raw);
+    if (!initialEvent && isWorkflowExecutionStartedEvent(event)) {
+      initialEvent = event;
+    }
     events[slot] = event;
     if (slot > maxSlot) maxSlot = slot;
 
@@ -711,6 +718,10 @@ export function createGroupedEventBuffer() {
     };
   }
 
+  function getInitialEvent(): WorkflowExecutionStartedEvent | undefined {
+    return initialEvent;
+  }
+
   /** Flat WorkflowEvent[] in ascending event-id order. */
   function getEventArray(): WorkflowEvent[] {
     if (cachedEvents && cachedEventsRevision === revision) return cachedEvents;
@@ -774,6 +785,7 @@ export function createGroupedEventBuffer() {
     getEventGroupOptions,
     getEventGroupMatcher,
     getEventArray,
+    getInitialEvent,
     getWorkflowTaskFailedEvent,
   };
 }

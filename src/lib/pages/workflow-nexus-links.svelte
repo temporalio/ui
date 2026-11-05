@@ -1,6 +1,12 @@
 <script lang="ts">
+  import { getContext } from 'svelte';
+
   import { page } from '$app/state';
 
+  import {
+    HISTORY_CTX,
+    type HistoryContext,
+  } from '$lib/contexts/history-context';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Link from '$lib/holocene/link.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/paginated.svelte';
@@ -17,7 +23,6 @@
     getInboundLinkForEvent,
     getVisibleInboundNexusLinkEvents,
   } from '$lib/runes/inbound-nexus-links.svelte';
-  import { fullEventHistory } from '$lib/stores/events';
   import { workflowRun } from '$lib/stores/workflow-run';
   import { isSystemNexusScheduledEvent } from '$lib/system-nexus-endpoints';
   import {
@@ -35,18 +40,16 @@
   import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
+  const historyCtx = getContext<HistoryContext>(HISTORY_CTX);
+  const events = $derived(historyCtx.history?.events ?? []);
+
   const { namespace, workflow: workflowId, run } = $derived(page.params);
   const { workflow } = $derived($workflowRun);
   const pendingActivities = $derived(workflow?.pendingActivities);
   const pendingNexusOperations = $derived(workflow?.pendingNexusOperations);
 
   const groups = $derived(
-    groupEvents(
-      $fullEventHistory,
-      'ascending',
-      pendingActivities,
-      pendingNexusOperations,
-    ),
+    groupEvents(events, 'ascending', pendingActivities, pendingNexusOperations),
   );
   const nexusGroups = $derived(
     groups.filter(
@@ -56,9 +59,7 @@
         !group.eventList.some((event) => isSystemNexusScheduledEvent(event)),
     ),
   );
-  const inboundLinks = getVisibleInboundNexusLinkEvents(
-    () => $fullEventHistory,
-  );
+  const inboundLinks = getVisibleInboundNexusLinkEvents(() => events);
   const inboundLinkEvents = $derived(inboundLinks.events);
 
   const counts = $derived({

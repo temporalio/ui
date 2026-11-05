@@ -1,15 +1,17 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { getContext, onMount } from 'svelte';
 
   import ActivityCommands from '$lib/components/activity/activity-commands.svelte';
   import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
+  import {
+    HISTORY_CTX,
+    type HistoryContext,
+  } from '$lib/contexts/history-context';
   import Button from '$lib/holocene/button.svelte';
   import { IconArrowDown, IconArrowUp } from '$lib/io/icon';
   import { buildGroupIndex, groupEvents } from '$lib/models/event-groups';
   import { isEvent } from '$lib/models/event-history';
-  import { fetchAllEvents } from '$lib/services/events-service';
   import { eventFilterSort } from '$lib/stores/event-view';
-  import { fullEventHistory } from '$lib/stores/events';
   import { triggerRefresh, workflowRun } from '$lib/stores/workflow-run';
   import type { PendingActivity } from '$lib/types/events';
   import type { WorkflowExecutionIdentity } from '$lib/types/workflows';
@@ -22,30 +24,13 @@
   }
 
   const { eventId, namespace, workflowId, runId }: Props = $props();
+  const historyCtx = getContext<HistoryContext>(HISTORY_CTX);
+  const events = $derived(historyCtx.history?.events ?? []);
 
   let ids = $derived([eventId]);
 
-  const resetFullHistory = () => {
-    $fullEventHistory = [];
-  };
-
-  const fetchEvents = async (
-    namespace: string,
-    workflowId: string,
-    runId: string,
-  ) => {
-    if (!$fullEventHistory.length) {
-      resetFullHistory();
-      $fullEventHistory = await fetchAllEvents({
-        namespace,
-        workflowId,
-        runId,
-      });
-    }
-  };
-
   onMount(() => {
-    fetchEvents(namespace, workflowId, runId);
+    historyCtx.resume();
   });
 
   const { workflow } = $derived($workflowRun);
@@ -58,12 +43,7 @@
   const pendingNexusOperations = $derived(workflow?.pendingNexusOperations);
 
   const ascendingGroups = $derived(
-    groupEvents(
-      $fullEventHistory,
-      'ascending',
-      pendingActivities,
-      pendingNexusOperations,
-    ),
+    groupEvents(events, 'ascending', pendingActivities, pendingNexusOperations),
   );
   const groups = $derived(
     $eventFilterSort === 'ascending'
@@ -73,7 +53,7 @@
   const groupIndex = $derived(buildGroupIndex(groups));
 
   const initialEvent = $derived(
-    $fullEventHistory.find(
+    events.find(
       (e) =>
         e.id === eventId ||
         e.id ===
@@ -84,14 +64,10 @@
   );
 
   const visibleItems = $derived(
-    $fullEventHistory.filter(
-      (e) => ids.includes(e.id) || e.id === initialEvent?.id,
-    ),
+    events.filter((e) => ids.includes(e.id) || e.id === initialEvent?.id),
   );
-  const loading = $derived(!visibleItems.length);
-  const lastEventId = $derived(
-    $fullEventHistory[$fullEventHistory.length - 1]?.id,
-  );
+  const loading = $derived(!historyCtx.fetchComplete && !visibleItems.length);
+  const lastEventId = $derived(events.at(-1)?.id);
 
   const loadPrevious = () => {
     const firstId = parseInt(ids[0]);
@@ -113,7 +89,7 @@
     const start = lastId + 1;
 
     for (let i = 0; i < 10; i++) {
-      if (start + i <= $fullEventHistory.length) {
+      if (start + i <= Number(lastEventId ?? 0)) {
         nextTen.push((start + i).toString());
       }
     }
@@ -153,7 +129,7 @@
           {index}
           expanded={event.id === initialEvent?.id}
           group={isEvent(event) ? groupIndex.get(event.id) : undefined}
-          initialItem={$fullEventHistory[0]}
+          initialItem={historyCtx.history?.initialEvent}
           {activityActions}
         />
       {/each}

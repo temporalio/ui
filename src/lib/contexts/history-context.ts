@@ -1,6 +1,9 @@
+import type { EventBufferView } from '$lib/services/grouped-event-buffer.svelte';
+
 export const HISTORY_CTX = Symbol('history-ctx');
 
 export type HistoryContext = {
+  readonly history: EventBufferView | null;
   /** Unblocks the paused bidirectional fetch cursors. Safe to call multiple times. */
   resume: () => void;
   /** True once the full bidirectional fetch + enrichGroups has completed. */

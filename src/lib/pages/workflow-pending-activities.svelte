@@ -1,13 +1,19 @@
 <script lang="ts">
+  import { getContext } from 'svelte';
+
   import { page } from '$app/state';
 
   import ActivityCommands from '$lib/components/activity/activity-commands.svelte';
   import PendingActivityCard from '$lib/components/workflow/pending-activity/pending-activity-card.svelte';
+  import {
+    HISTORY_CTX,
+    type HistoryContext,
+  } from '$lib/contexts/history-context';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { eventBuffer } from '$lib/services/grouped-event-buffer.svelte';
   import { triggerRefresh, workflowRun } from '$lib/stores/workflow-run';
 
+  const historyCtx = getContext<HistoryContext>(HISTORY_CTX);
   const workflow = $derived($workflowRun.workflow);
 
   const pendingActivities = $derived(
@@ -27,7 +33,7 @@
         <PendingActivityCard
           {activity}
           totalPending={pendingActivities.length}
-          scheduledEvent={eventBuffer.pendingActivityScheduledEvent(
+          scheduledEvent={historyCtx.history?.pendingActivityScheduledEvent(
             activity.activityId,
           )}
         >

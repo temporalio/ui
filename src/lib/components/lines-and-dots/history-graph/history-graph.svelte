@@ -1,8 +1,6 @@
 <script lang="ts">
-  import { groupWorkflowTaskEvents } from '$lib/models/event-groups';
   import type { EventGroups } from '$lib/models/event-groups/event-groups';
   import { eventFilterSort } from '$lib/stores/event-view';
-  import { filteredEventHistory } from '$lib/stores/events';
   import type { WorkflowEventWithPending } from '$lib/types/events';
   import { getGroupForEventOrPendingEvent } from '$lib/utilities/pending-activities';
 
@@ -14,13 +12,10 @@
   interface Props {
     groups: EventGroups;
     history: WorkflowEventWithPending[];
+    workflowTaskGroups: EventGroups;
   }
 
-  let { groups, history }: Props = $props();
-
-  const workflowTaskGroups = $derived(
-    groupWorkflowTaskEvents($filteredEventHistory, $eventFilterSort),
-  );
+  let { groups, history, workflowTaskGroups }: Props = $props();
   const allGroups = $derived([...workflowTaskGroups, ...groups]);
 
   const nodeBuffer = 4 * RADIUS;
@@ -69,7 +64,7 @@
       height={canvasHeight}
       width={canvasWidth}
     >
-      {#each history as event, index}
+      {#each history as event, index (index)}
         {@const group = getGroupForEventOrPendingEvent(allGroups, event)}
         {#if group}
           <HistoryGraphRowVisual

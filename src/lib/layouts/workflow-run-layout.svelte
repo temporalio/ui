@@ -14,8 +14,6 @@
   import { translate } from '$lib/i18n/translate';
   import WorkflowHeader from '$lib/layouts/workflow-header.svelte';
   import { throttleRefresh } from '$lib/services/events-service';
-  import { defaultGroupedEventBuffer } from '$lib/services/grouped-event-buffer';
-  import { eventBuffer } from '$lib/services/grouped-event-buffer.svelte';
   import { getPollers } from '$lib/services/pollers-service';
   import { getWorkflowMetadata } from '$lib/services/query-service';
   import { fetchWorkerCount } from '$lib/services/worker-service';
@@ -23,11 +21,7 @@
   import { fetchWorkflow } from '$lib/services/workflow-service';
   import { resetLastDataEncoderSuccess } from '$lib/stores/data-encoder-config';
   import { eventFilterSort } from '$lib/stores/event-view';
-  import {
-    fullEventHistory,
-    pauseLiveUpdates,
-    timelineEvents,
-  } from '$lib/stores/events';
+  import { pauseLiveUpdates } from '$lib/stores/events';
   import { workerCountEnabled } from '$lib/stores/workers';
   import {
     initialWorkflowRun,
@@ -62,10 +56,6 @@
   let workerCountEnabledForNamespace = $derived(
     workerHeartbeatsEnabled && $workerCountEnabled,
   );
-  let fullJson = $derived({
-    ...$workflowRun,
-    eventHistory: eventBuffer.events,
-  });
 
   let workflowError: NetworkError | null = $state(null);
   let workflowRunController: AbortController | null = null;
@@ -78,7 +68,15 @@
   let _resumeRequested = false;
   let _refetchSeq = 0;
 
+  const fullJson = $derived({
+    ...$workflowRun,
+    eventHistory: historyController?.history.events ?? [],
+  });
+
   const ctx: HistoryContext = {
+    get history() {
+      return historyController?.history ?? null;
+    },
     get fetchComplete() {
       return historyController?.fetchComplete ?? false;
     },
@@ -181,7 +179,7 @@
     };
     const history = new WorkflowHistoryController({
       workflowExecutionIdentity: identity,
-      buffer: defaultGroupedEventBuffer,
+
       maximumPageSize: 1000,
       pauseAfterPages: 2,
       liveUpdatesPaused: $pauseLiveUpdates,
@@ -276,14 +274,9 @@
     }
   });
 
-  $effect(() => {
-    $fullEventHistory = eventBuffer.events;
-  });
-
   const clearWorkflowData = () => {
-    $timelineEvents = null;
     $workflowRun = initialWorkflowRun;
-    $fullEventHistory = [];
+
     workflowError = null;
     _refetchSeq++;
     abortAll();
@@ -351,9 +344,9 @@
   </div>
 {:else if displayError}
   <WorkflowError error={displayError} />
-{:else if !$workflowRun.workflow}
+{:else if !$workflowRun.workflow || !historyController}
   <SkeletonWorkflow />
 {:else}
-  <WorkflowHeader {headerSnippet} />
+  <WorkflowHeader history={historyController.history} {headerSnippet} />
   {@render children()}
 {/if}
