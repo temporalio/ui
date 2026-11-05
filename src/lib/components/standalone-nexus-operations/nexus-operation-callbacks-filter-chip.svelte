@@ -1,8 +1,9 @@
 <script lang="ts">
   import { writable } from 'svelte/store';
 
-  import { onMount } from 'svelte';
+  import { onMount, untrack } from 'svelte';
 
+  import Button from '$lib/holocene/button.svelte';
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import MenuButton from '$lib/holocene/menu/menu-button.svelte';
@@ -24,8 +25,8 @@
     options: CallbackFilterOption[];
     selected: string[];
     openOnMount?: boolean;
-    onToggle: (value: string) => void;
-    onClose: () => void;
+    onApply: (values: string[]) => void;
+    onDismiss: () => void;
   };
 
   let {
@@ -34,21 +35,35 @@
     options,
     selected,
     openOnMount = false,
-    onToggle,
-    onClose,
+    onApply,
+    onDismiss,
   }: Props = $props();
 
   const open = writable(false);
   let search = $state('');
+  let pending = $state<string[]>([]);
   let wasOpen = false;
+  let applied = false;
 
   const controlsId = $derived(`callbacks-filter-chip-${field}`);
   const visible = $derived(
     limitCallbackFilterOptions(
       options.filter(({ value }) => matchesCallbackFilterSearch(value, search)),
-      selected,
+      pending,
     ),
   );
+
+  const toggle = (value: string) => {
+    pending = pending.includes(value)
+      ? pending.filter((pendingValue) => pendingValue !== value)
+      : [...pending, value];
+  };
+
+  const apply = () => {
+    applied = true;
+    onApply(pending);
+    $open = false;
+  };
 
   onMount(() => {
     if (openOnMount) $open = true;
@@ -56,13 +71,15 @@
 
   $effect(() => {
     if ($open) {
+      if (!wasOpen) pending = untrack(() => [...selected]);
       wasOpen = true;
       return;
     }
     if (!wasOpen) return;
     wasOpen = false;
     search = '';
-    onClose();
+    if (!applied) onDismiss();
+    applied = false;
   });
 </script>
 
@@ -101,11 +118,11 @@
         clearButtonLabel={translate('common.clear-input-button-label')}
       />
       {#each visible as { value, count } (value)}
-        {@const checked = selected.includes(value)}
-        <MenuItem onclick={() => onToggle(value)} class="min-w-0">
+        {@const checked = pending.includes(value)}
+        <MenuItem onclick={() => toggle(value)} class="min-w-0">
           {#snippet leading()}
             <Checkbox
-              onclick={() => onToggle(value)}
+              onclick={() => toggle(value)}
               {checked}
               label={value}
               labelHidden
@@ -123,6 +140,16 @@
           {translate('common.no-results')}
         </p>
       {/each}
+      <div class="flex justify-end">
+        <Button
+          variant="primary"
+          size="xs"
+          data-testid="callbacks-filter-apply"
+          onclick={apply}
+        >
+          {translate('common.apply')}
+        </Button>
+      </div>
     </div>
   </Menu>
 </MenuContainer>

@@ -54,18 +54,13 @@
     addedField = field;
   };
 
-  const toggle = (field: CallbackFilterField, value: string) => {
-    editingField = field;
-    const selected = filters[field];
-    setFilters({
-      ...filters,
-      [field]: selected.includes(value)
-        ? selected.filter((selectedValue) => selectedValue !== value)
-        : [...selected, value],
-    });
+  const applyFilter = (field: CallbackFilterField, values: string[]) => {
+    editingField = values.length > 0 ? field : null;
+    if (addedField === field) addedField = null;
+    setFilters({ ...filters, [field]: values });
   };
 
-  const closeChip = (field: CallbackFilterField) => {
+  const dismissChip = (field: CallbackFilterField) => {
     if (editingField === field) editingField = null;
     if (addedField === field) addedField = null;
   };
@@ -88,8 +83,8 @@
       options={options[field]}
       selected={filters[field]}
       openOnMount={field === addedField}
-      onToggle={(value) => toggle(field, value)}
-      onClose={() => closeChip(field)}
+      onApply={(values) => applyFilter(field, values)}
+      onDismiss={() => dismissChip(field)}
     />
   {/each}
   <MenuContainer>

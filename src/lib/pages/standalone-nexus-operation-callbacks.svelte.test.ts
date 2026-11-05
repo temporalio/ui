@@ -141,6 +141,18 @@ describe('StandaloneNexusOperationCallbacks filter', () => {
   const chipMenu = (field: string) =>
     document.querySelector(`#callbacks-filter-chip-${field}`);
 
+  const pickValue = (field: string, value: string) => {
+    menuItems(chipMenu(field))
+      .find((item) => item.textContent?.includes(value))
+      ?.click();
+    flushSync();
+  };
+
+  const applyButton = (field: string) =>
+    chipMenu(field)?.querySelector<HTMLButtonElement>(
+      '[data-testid="callbacks-filter-apply"]',
+    );
+
   const addFilter = (label: string) => {
     addFilterButton()?.click();
     flushSync();
@@ -233,18 +245,58 @@ describe('StandaloneNexusOperationCallbacks filter', () => {
     expect(endpoint?.getAttribute('aria-disabled')).toBe('true');
   });
 
-  it('adds a value to the URL and returns to the first page when it is picked', async () => {
+  it('adds the picked values to the URL and returns to the first page on Apply', async () => {
+    const { goto } = await import('$app/navigation');
     renderCallbacks(callbacks, '?callbacks-page=2');
+    vi.mocked(goto).mockClear();
     addFilter('Nexus Endpoint');
 
-    menuItems(chipMenu('endpoint'))
-      .find((item) => item.textContent?.includes('billing-tq'))
-      ?.click();
+    pickValue('endpoint', 'billing-tq');
+    pickValue('endpoint', 'orders-tq');
+    expect(vi.mocked(goto)).not.toHaveBeenCalled();
+
+    applyButton('endpoint')?.click();
     flushSync();
 
     const url = await lastGotoUrl();
-    expect(url.searchParams.get('callbacks-endpoint')).toBe('billing-tq');
+    expect(url.searchParams.get('callbacks-endpoint')).toBe(
+      'billing-tq,orders-tq',
+    );
     expect(url.searchParams.has('callbacks-page')).toBe(false);
+    expect(chipButton('endpoint')?.getAttribute('aria-expanded')).toBe('false');
+  });
+
+  it('removes an applied value on Apply', async () => {
+    renderCallbacks(callbacks, '?callbacks-service=order-service');
+    chipButton('service')?.click();
+    flushSync();
+
+    pickValue('service', 'order-service');
+    applyButton('service')?.click();
+    flushSync();
+
+    const url = await lastGotoUrl();
+    expect(url.searchParams.has('callbacks-service')).toBe(false);
+  });
+
+  it('discards picked values when the dropdown closes without Apply', async () => {
+    const { goto } = await import('$app/navigation');
+    renderCallbacks(callbacks, '?callbacks-service=order-service');
+    chipButton('service')?.click();
+    flushSync();
+    pickValue('service', 'billing-service');
+
+    document.body.click();
+    flushSync();
+    chipButton('service')?.click();
+    flushSync();
+
+    const checked = menuItems(chipMenu('service'))
+      .filter((item) => item.querySelector('input[type="checkbox"]:checked'))
+      .map((item) => text(item));
+    expect(vi.mocked(goto)).not.toHaveBeenCalled();
+    expect(checked).toHaveLength(1);
+    expect(checked[0]).toContain('order-service');
   });
 
   it('removes a chip with no values when its dropdown closes', () => {
