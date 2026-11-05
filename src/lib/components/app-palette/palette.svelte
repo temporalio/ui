@@ -116,7 +116,8 @@
   let openedAt = $state(0);
   // Increases on every close. A context from an earlier session does nothing,
   // so an action that finishes after a close cannot change the next session.
-  let session = 0;
+  // It is state, so root items rebuild their contexts for each new session.
+  let session = $state(0);
 
   // Touch screens get visible row action buttons and no key hints.
   const coarse = new MediaQuery('pointer: coarse');

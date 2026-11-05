@@ -26,7 +26,7 @@ import Palette from './palette.svelte';
 const MOD = { ctrlKey: true };
 
 function oneSet(
-  items: () => PaletteItem[],
+  items: PaletteToolSet['tools'][number]['items'],
   extra: Partial<PaletteToolSet['tools'][number]> = {},
 ): PaletteToolSet[] {
   return [
@@ -230,6 +230,27 @@ describe('Palette sessions', () => {
     seen?.push(view);
     await Promise.resolve();
     expect(await screen.findByText('Dev tools')).toBeTruthy();
+  });
+
+  it('gives root items a live context again after the palette reopens', async () => {
+    let seen: PaletteContext | undefined;
+    const view: PaletteView = { id: 'v', title: 'Kept view', items: () => [] };
+    mount(
+      oneSet((ctx) => {
+        seen = ctx;
+        return [{ id: 'x', title: 'X', actions: [] }];
+      }),
+    );
+
+    const input = await openPalette();
+    await fireEvent.keyDown(input, { key: 'Escape' });
+    await openPalette();
+    seen?.push(view);
+    await Promise.resolve();
+
+    expect(
+      await screen.findByRole('combobox', { name: 'Kept view' }),
+    ).toBeTruthy();
   });
 
   it('cycles scopes with Tab only while the query is empty', async () => {
