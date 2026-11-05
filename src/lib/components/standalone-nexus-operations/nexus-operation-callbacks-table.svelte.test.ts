@@ -320,6 +320,53 @@ describe('NexusOperationCallbacksTable expanded details', () => {
     expect(button?.getAttribute('aria-expanded')).toBe('false');
   });
 
+  it('expands and collapses when any part of the row is clicked', () => {
+    const target = mountTable([detailedCallback()]);
+    const [row] = rows(target);
+
+    expect(row.classList.contains('hover:cursor-pointer')).toBe(true);
+
+    (cell(row, 'callback-service') as HTMLElement).click();
+    flushSync();
+
+    expect(details(target)).not.toBeNull();
+    expect(expandButton(row)?.getAttribute('aria-expanded')).toBe('true');
+
+    (cell(row, 'callback-operation') as HTMLElement).click();
+    flushSync();
+
+    expect(details(target)).toBeNull();
+  });
+
+  it('toggles once when the chevron inside the clickable row is clicked', () => {
+    const target = mountTable([detailedCallback()]);
+    const button = expandButton(rows(target)[0]);
+
+    button?.click();
+    flushSync();
+
+    expect(details(target)).not.toBeNull();
+    expect(button?.getAttribute('aria-expanded')).toBe('true');
+  });
+
+  it('follows a target link without expanding the row', () => {
+    const target = mountTable([
+      detailedCallback({
+        state: 'Succeeded',
+        callback: makeCallback('Succeeded', [workflowEventLink]).callback,
+      }),
+    ]);
+    const link =
+      cell(rows(target)[0], 'callback-target-execution')?.querySelector('a') ??
+      null;
+
+    expect(link).not.toBeNull();
+    link?.click();
+    flushSync();
+
+    expect(details(target)).toBeNull();
+  });
+
   it('shows every delivery field', () => {
     const target = mountTable([detailedCallback()]);
     expandButton(rows(target)[0])?.click();

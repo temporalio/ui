@@ -191,7 +191,12 @@
       )}
       {@const handler = callback.callback?.nexusHandler}
       {@const target = toTarget(callback)}
-      <TableRow id={rowId(key)} data-testid="callback-row">
+      <TableRow
+        id={rowId(key)}
+        class="hover:cursor-pointer"
+        data-testid="callback-row"
+        onclick={() => toggle(key)}
+      >
         <td data-testid="callback-delivery-state">
           <Badge
             text={deliveryState.label}
