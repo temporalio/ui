@@ -68,10 +68,13 @@ export const getFailedOrPendingEvents = (
   );
 };
 
+export const isFailedOrPendingGroup = (group: FilterableGroup): boolean =>
+  isFailedGroup(group) || group.isPending;
+
 export const getFailedOrPendingGroups = <T extends FilterableGroup>(
   items: T[],
   filterForFailedOrPending: boolean,
 ): T[] => {
   if (!filterForFailedOrPending) return items;
-  return items.filter((item) => isFailedGroup(item) || item.isPending);
+  return items.filter(isFailedOrPendingGroup);
 };

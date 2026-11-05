@@ -1,3 +1,5 @@
+import { writable } from 'svelte/store';
+
 import { persistStore } from '$lib/stores/persist-store';
 import type { EventView } from '$lib/types/events';
 import type { BooleanString } from '$lib/types/global';
@@ -17,6 +19,8 @@ export const collapseIdleTime = persistStore<'on' | 'off'>(
   'collapseIdleTime',
   'on',
 );
+
+export const showTimelineEventGroups = writable(false);
 
 export const eventViewType = persistStore<EventView>('eventView', 'feed', true);
 

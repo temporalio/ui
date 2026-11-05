@@ -1,0 +1,130 @@
+import { expect, type Page, test } from '@playwright/test';
+
+import {
+  makeActivityCompleted,
+  makeActivityScheduled,
+  makeActivityStarted,
+  makeTimerFired,
+  makeTimerStarted,
+  makeWorkflowStarted,
+} from '$src/lib/services/test-helpers/synthetic-events';
+import {
+  mockEventHistoryApi,
+  mockWorkflowApis,
+} from '~/test-utilities/mock-apis';
+import { mockWorkflow } from '~/test-utilities/mocks/workflow';
+
+const { workflowId, runId } = mockWorkflow.workflowExecutionInfo.execution;
+const timelineUrl = `/namespaces/default/workflows/${workflowId}/${runId}/timeline`;
+
+const inGroup = <T extends object>(event: T, id: string) => ({
+  ...event,
+  eventGroupMarkers: [{ label: { id } }],
+});
+
+const events = [
+  makeWorkflowStarted(1),
+  inGroup(makeActivityScheduled(2, 'LaunchActivity'), 'satellite:A'),
+  makeActivityStarted(3, 2),
+  makeActivityCompleted(4, 2, 3),
+  inGroup(makeTimerStarted(5), 'satellite:A'),
+  makeTimerFired(6, 5),
+  inGroup(makeActivityScheduled(7, 'OrbitActivity'), 'satellite:B'),
+  makeActivityStarted(8, 7),
+  makeActivityCompleted(9, 7, 8),
+  makeActivityScheduled(10, 'UngroupedActivity'),
+  makeActivityStarted(11, 10),
+  makeActivityCompleted(12, 10, 11),
+];
+
+const timeline = (page: Page) => page.locator('#event-history-timeline-graph');
+const eventRows = (page: Page) =>
+  timeline(page).getByRole('button', { name: /^Event / });
+const eventRow = (page: Page, name: string) =>
+  timeline(page).getByRole('button', { name: new RegExp(`^Event ${name}`) });
+const groupRow = (page: Page, name: string) =>
+  timeline(page).getByRole('button', { name: new RegExp(`^${name}`) });
+const toggle = (page: Page) => page.getByTestId('toggle-event-groups');
+
+test.describe('Timeline event groups', () => {
+  test.beforeEach(async ({ page }) => {
+    await mockWorkflowApis(page);
+    await mockEventHistoryApi(page, {
+      history: { events },
+      nextPageToken: null,
+    });
+    await page.goto(timelineUrl);
+    await page
+      .getByRole('img', { name: `Workflow ${workflowId}: Running` })
+      .scrollIntoViewIfNeeded();
+    await expect(eventRow(page, 'UngroupedActivity')).toBeVisible();
+  });
+
+  test('shows one row per event group when toggled on', async ({ page }) => {
+    await expect(toggle(page)).toHaveText('Show Event Groups');
+
+    await toggle(page).click();
+
+    await expect(toggle(page)).toHaveText('Hide Event Groups');
+    await expect(groupRow(page, 'satellite:A')).toContainText('5 events');
+    await expect(groupRow(page, 'satellite:B')).toContainText('3 events');
+    await expect(eventRows(page)).toHaveCount(0);
+
+    await toggle(page).click();
+
+    await expect(toggle(page)).toHaveText('Show Event Groups');
+    await expect(groupRow(page, 'satellite:A')).toHaveCount(0);
+    await expect(eventRow(page, 'UngroupedActivity')).toBeVisible();
+  });
+
+  test('expands and closes an event group', async ({ page }) => {
+    await toggle(page).click();
+    const row = groupRow(page, 'satellite:A');
+    await expect(row).toHaveAttribute('aria-expanded', 'false');
+
+    await row.click();
+
+    const header = page.getByTestId('selected-event-group-header');
+    await expect(header).toContainText('satellite:A');
+    await expect(header).toContainText('5 events');
+    await expect(row).toHaveAttribute('aria-expanded', 'true');
+    await expect(eventRows(page)).toHaveCount(2);
+    await expect(eventRow(page, 'LaunchActivity')).toBeVisible();
+    await expect(page.getByTestId('close-event-group')).toBeFocused();
+
+    await page.getByTestId('close-event-group').click();
+
+    await expect(header).toHaveCount(0);
+    await expect(eventRows(page)).toHaveCount(0);
+    await expect(row).toHaveAttribute('aria-expanded', 'false');
+    await expect(row).toBeFocused();
+  });
+
+  test('narrows event groups with the event group filter', async ({ page }) => {
+    await toggle(page).click();
+
+    await page
+      .locator('button[aria-controls="event-group-filter-menu"]')
+      .click();
+    await page
+      .locator('#event-group-filter-menu')
+      .getByRole('menuitem', { name: /satellite:B/ })
+      .click();
+    await page.keyboard.press('Escape');
+
+    await expect(groupRow(page, 'satellite:B')).toBeVisible();
+    await expect(groupRow(page, 'satellite:A')).toHaveCount(0);
+  });
+
+  test('stays on when switching to History and back', async ({ page }) => {
+    await toggle(page).click();
+    await expect(groupRow(page, 'satellite:A')).toBeVisible();
+
+    await page.getByTestId('history-tab').click();
+    await expect(page.getByTestId('event-summary-table')).toBeVisible();
+    await page.getByTestId('timeline-tab').click();
+
+    await expect(toggle(page)).toHaveText('Hide Event Groups');
+    await expect(groupRow(page, 'satellite:A')).toBeVisible();
+  });
+});

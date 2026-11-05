@@ -5,7 +5,7 @@
   import { page } from '$app/state';
 
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
-  import EventGroupFilter from '$lib/components/lines-and-dots/event-group-filter/event-group-filter.svelte';
+  import EventGroupControls from '$lib/components/lines-and-dots/event-group-filter/event-group-controls.svelte';
   import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
   import WorkflowError from '$lib/components/lines-and-dots/workflow-error.svelte';
   import DownloadEventHistoryModal from '$lib/components/workflow/download-event-history-modal.svelte';
@@ -274,7 +274,7 @@
           </ToggleButton>
         {/if}
         <EventTypeFilter {compact} />
-        <EventGroupFilter options={eventBuffer.eventGroupOptions} />
+        <EventGroupControls options={eventBuffer.eventGroupOptions} />
         <ToggleButton
           disabled={isNotPending}
           data-testid="pause"

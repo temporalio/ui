@@ -2,6 +2,7 @@ import { readonly, writable } from 'svelte/store';
 
 import type { EventGroup } from '$lib/models/event-groups/event-groups';
 import type { EventGroupKey } from '$lib/models/event-history/event-group-markers';
+import type { TimelineEventGroup } from '$lib/models/event-history/timeline-event-groups';
 import type { WorkflowEvent } from '$lib/types/events';
 
 import {
@@ -13,6 +14,7 @@ import {
   getGroupArray,
   getLazyGroups,
   getPendingActivityScheduledEvent,
+  getTimelineEventGroups,
   getWorkflowTaskFailedEvent,
   type LazyGroup,
   materializeGroup,
@@ -107,6 +109,13 @@ class EventBufferView {
     void this._version;
     return getEventGroupOptions();
   });
+
+  readonly timelineEventGroups: TimelineEventGroup<LazyGroup>[] = $derived.by(
+    () => {
+      void this._version;
+      return getTimelineEventGroups();
+    },
+  );
 
   /**
    * Matcher for the selected event group keys, re-derived as events arrive.
