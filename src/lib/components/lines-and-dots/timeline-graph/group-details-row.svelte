@@ -1,8 +1,6 @@
 <script lang="ts">
   import { onMount, type Snippet } from 'svelte';
 
-  import { page } from '$app/stores';
-
   import EventDetailsFull from '$lib/components/event/event-details-full.svelte';
   import EventStatusBadge, {
     type EventStatus,
@@ -27,7 +25,7 @@
     // Reports panel height so timeline-graph can shift the rows below it.
     onHeight?: (h: number) => void;
     onClose?: () => void;
-    executionIdentity?: WorkflowExecutionIdentity;
+    workflowExecutionIdentity: WorkflowExecutionIdentity;
     activityActions?: Snippet<[PendingActivity]>;
   };
 
@@ -39,7 +37,7 @@
     y,
     onHeight,
     onClose,
-    executionIdentity,
+    workflowExecutionIdentity,
     activityActions,
   }: Props = $props();
 
@@ -60,9 +58,7 @@
     return () => observer.disconnect();
   });
 
-  const namespace = $derived(
-    executionIdentity?.namespace ?? $page.params.namespace,
-  );
+  const namespace = $derived(workflowExecutionIdentity.namespace);
   const title = $derived(group.displayName);
 
   const childWorkflowStartedEvent = $derived(
@@ -113,7 +109,7 @@
     <div class="bg-surface-primary text-primary">
       <EventDetailsFull
         {group}
-        {executionIdentity}
+        {workflowExecutionIdentity}
         {activityActions}
         event={group.initialEvent}
         lazy={true}

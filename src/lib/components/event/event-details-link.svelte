@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { page } from '$app/state';
-
   import Link from '$lib/holocene/link.svelte';
   import type { WorkflowExecutionIdentity } from '$lib/types/workflows';
   import type { CombinedAttributes } from '$lib/utilities/format-event-attributes';
@@ -16,22 +14,19 @@
     attributes: CombinedAttributes;
     type: EventLinkType;
     class?: string;
-    executionIdentity?: WorkflowExecutionIdentity;
+    workflowExecutionIdentity: WorkflowExecutionIdentity;
   }
 
   let {
     value,
     attributes,
     type,
-    executionIdentity,
+    workflowExecutionIdentity,
     class: className = '',
   }: Props = $props();
 
-  const namespace = $derived(
-    executionIdentity?.namespace ?? page.params.namespace,
-  );
-  const workflow = $derived(
-    executionIdentity?.workflowId ?? page.params.workflow,
+  const { namespace, workflowId: workflow } = $derived(
+    workflowExecutionIdentity,
   );
 
   function getHref(

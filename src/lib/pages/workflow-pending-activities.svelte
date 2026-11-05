@@ -35,7 +35,7 @@
             {#if workflow}
               <ActivityCommands
                 activity={actionActivity}
-                executionIdentity={{
+                workflowExecutionIdentity={{
                   namespace: page.params.namespace,
                   workflowId: workflow.id,
                   runId: workflow.runId,

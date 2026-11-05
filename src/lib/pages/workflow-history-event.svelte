@@ -12,6 +12,7 @@
   import { fullEventHistory } from '$lib/stores/events';
   import { triggerRefresh, workflowRun } from '$lib/stores/workflow-run';
   import type { PendingActivity } from '$lib/types/events';
+  import type { WorkflowExecutionIdentity } from '$lib/types/workflows';
 
   interface Props {
     eventId: string;
@@ -48,6 +49,11 @@
   });
 
   const { workflow } = $derived($workflowRun);
+  const workflowExecutionIdentity: WorkflowExecutionIdentity = $derived({
+    namespace,
+    workflowId: workflow?.id ?? workflowId,
+    runId: workflow?.runId ?? runId,
+  });
   const pendingActivities = $derived(workflow?.pendingActivities);
   const pendingNexusOperations = $derived(workflow?.pendingNexusOperations);
 
@@ -120,7 +126,7 @@
   {#if workflow}
     <ActivityCommands
       {activity}
-      executionIdentity={{ namespace, workflowId, runId }}
+      {workflowExecutionIdentity}
       {workflow}
       onRefresh={triggerRefresh}
       class="justify-end"
@@ -142,6 +148,7 @@
     <tbody>
       {#each visibleItems as event, index}
         <EventSummaryRow
+          {workflowExecutionIdentity}
           {event}
           {index}
           expanded={event.id === initialEvent?.id}

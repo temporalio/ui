@@ -83,7 +83,7 @@
     onTimelineInit,
   }: Props = $props();
 
-  const executionIdentity: WorkflowExecutionIdentity = $derived({
+  const workflowExecutionIdentity: WorkflowExecutionIdentity = $derived({
     namespace,
     workflowId: workflow.id,
     runId: workflow.runId,
@@ -645,7 +645,7 @@
             y={panelY}
             group={activeGroup}
             {canvasWidth}
-            {executionIdentity}
+            {workflowExecutionIdentity}
             {activityActions}
             onClose={closeGroup}
             endTime={workflow?.endTime ? endTime : nowMs}

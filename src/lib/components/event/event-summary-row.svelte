@@ -2,8 +2,6 @@
   import { onMount, type Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
-  import { page } from '$app/state';
-
   import PayloadSummary from '$lib/components/payload/payload-summary.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
   import PendingAttemptBadge from '$lib/components/workflow/pending-attempt-badge/pending-attempt-badge.svelte';
@@ -29,6 +27,7 @@
     PendingActivity,
     WorkflowEvent,
   } from '$lib/types/events';
+  import type { WorkflowExecutionIdentity } from '$lib/types/workflows';
   import { decodeLocalActivity } from '$lib/utilities/decode-local-activity';
   import { formatEventGroupDuration } from '$lib/utilities/event-group-duration';
   import { toEventLinkView } from '$lib/utilities/event-link';
@@ -56,6 +55,7 @@
   import EventLink from './event-link.svelte';
 
   interface Props {
+    workflowExecutionIdentity: WorkflowExecutionIdentity;
     event: IterableEvent;
     group: EventGroup | undefined;
     initialItem: WorkflowEvent;
@@ -68,6 +68,7 @@
   }
 
   let {
+    workflowExecutionIdentity,
     event,
     group,
     initialItem,
@@ -86,7 +87,9 @@
     isEventGroup(event) ? event.eventList[0]?.id : event.id,
   );
 
-  const { workflow, run, namespace } = $derived(page.params);
+  const namespace = $derived(workflowExecutionIdentity.namespace);
+  const workflow = $derived(workflowExecutionIdentity.workflowId);
+  const run = $derived(workflowExecutionIdentity.runId);
 
   const href = $derived(
     routeForEventHistoryEvent({ eventId: event.id, namespace, workflow, run }),
@@ -374,12 +377,17 @@
       {#if !primaryLocalAttribute && primaryAttribute?.key}
         <EventDetailsRow
           {...primaryAttribute}
+          {workflowExecutionIdentity}
           {attributes}
           tooltip={primaryAttributeTooltip}
         />
       {/if}
       {#if primaryLocalAttribute && primaryLocalAttribute.key}
-        <EventDetailsRow {...primaryLocalAttribute} {attributes} />
+        <EventDetailsRow
+          {...primaryLocalAttribute}
+          {attributes}
+          {workflowExecutionIdentity}
+        />
       {/if}
       {#if currentEvent?.userMetadata?.summary}
         <div
@@ -403,6 +411,7 @@
       {/if}
       {#if systemNexus?.summaryAttribute}
         <EventDetailsRow
+          {workflowExecutionIdentity}
           key={systemNexus.summaryAttribute.key}
           value={systemNexus.summaryAttribute.value}
           {attributes}
@@ -432,13 +441,18 @@
       {/if}
       {#if nonPendingActivityAttempt}
         <EventDetailsRow
+          {workflowExecutionIdentity}
           key="attempt"
           value={nonPendingActivityAttempt.toString()}
           {attributes}
         />
       {/if}
       {#if showSecondaryAttribute}
-        <EventDetailsRow {...secondaryAttribute} {attributes} />
+        <EventDetailsRow
+          {...secondaryAttribute}
+          {attributes}
+          {workflowExecutionIdentity}
+        />
       {/if}
     </div>
   </td>
@@ -465,6 +479,7 @@
   >
     <td class="!p-0" colspan={$isCloud ? 5 : 4}>
       <EventDetailsFull
+        {workflowExecutionIdentity}
         {group}
         event={currentEvent}
         groupRow={isEventGroup(event)}

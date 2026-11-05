@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { page } from '$app/state';
-
   import PayloadCodeBlock from '$lib/components/payload/payload-code-block.svelte';
   import PayloadSummary from '$lib/components/payload/payload-summary.svelte';
   import Timestamp, { timestamp } from '$lib/components/timestamp.svelte';
@@ -55,21 +53,19 @@
     event,
     lazy = false,
     initiatingEvent = undefined,
-    executionIdentity,
+    workflowExecutionIdentity,
   }: {
     event: WorkflowEvent;
-    executionIdentity?: WorkflowExecutionIdentity;
+    workflowExecutionIdentity: WorkflowExecutionIdentity;
     lazy?: boolean;
     /** The operation's NexusOperationScheduled event, when this is part of a group. */
     initiatingEvent?: WorkflowEvent;
   } = $props();
-  const namespace = $derived(
-    executionIdentity?.namespace ?? page.params.namespace,
-  );
-  const workflow = $derived(
-    executionIdentity?.workflowId ?? page.params.workflow,
-  );
-  const run = $derived(executionIdentity?.runId ?? page.params.run);
+  const {
+    namespace,
+    workflowId: workflow,
+    runId: run,
+  } = $derived(workflowExecutionIdentity);
 
   const systemNexus = $derived(
     resolveSystemNexusEvent(event, {
@@ -401,7 +397,7 @@
       container-class="min-w-0"
     >
       <EventDetailsLink
-        {executionIdentity}
+        {workflowExecutionIdentity}
         value={String(value)}
         {attributes}
         type={displayLinkType(key, attributes)}

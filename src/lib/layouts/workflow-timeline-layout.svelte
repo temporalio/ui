@@ -250,7 +250,7 @@
         {#snippet activityActions(activity)}
           <ActivityCommands
             {activity}
-            executionIdentity={{
+            workflowExecutionIdentity={{
               namespace,
               workflowId: workflow.id,
               runId: workflow.runId,

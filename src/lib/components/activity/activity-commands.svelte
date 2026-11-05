@@ -24,7 +24,7 @@
 
   type Props = {
     activity: PendingActivity;
-    executionIdentity: WorkflowExecutionIdentity;
+    workflowExecutionIdentity: WorkflowExecutionIdentity;
     workflow: Pick<WorkflowExecution, 'isRunning' | 'isPaused'>;
     onRefresh: (action: Action) => void | Promise<void>;
     class?: string;
@@ -32,7 +32,7 @@
 
   let {
     activity,
-    executionIdentity,
+    workflowExecutionIdentity,
     workflow,
     onRefresh,
     class: className = '',
@@ -44,7 +44,7 @@
     activityCommandsEnabled(
       page.data.settings,
       $coreUser,
-      executionIdentity.namespace,
+      workflowExecutionIdentity.namespace,
     ) &&
       (workflow.isRunning || workflow.isPaused),
   );
@@ -52,10 +52,10 @@
   const onPause = async (reason: string) => {
     const refresh = onRefresh;
     await pauseActivity({
-      namespace: executionIdentity.namespace,
+      namespace: workflowExecutionIdentity.namespace,
       execution: {
-        workflowId: executionIdentity.workflowId,
-        runId: executionIdentity.runId,
+        workflowId: workflowExecutionIdentity.workflowId,
+        runId: workflowExecutionIdentity.runId,
       },
       id: activity.activityId,
       reason,
@@ -67,10 +67,10 @@
   const onUnpause = async () => {
     const refresh = onRefresh;
     await unpauseActivity({
-      namespace: executionIdentity.namespace,
+      namespace: workflowExecutionIdentity.namespace,
       execution: {
-        workflowId: executionIdentity.workflowId,
-        runId: executionIdentity.runId,
+        workflowId: workflowExecutionIdentity.workflowId,
+        runId: workflowExecutionIdentity.runId,
       },
       id: activity.activityId,
       identity,
@@ -82,10 +82,10 @@
     const refresh = onRefresh;
     const activityId = activity.activityId;
     await resetActivity({
-      namespace: executionIdentity.namespace,
+      namespace: workflowExecutionIdentity.namespace,
       execution: {
-        workflowId: executionIdentity.workflowId,
-        runId: executionIdentity.runId,
+        workflowId: workflowExecutionIdentity.workflowId,
+        runId: workflowExecutionIdentity.runId,
       },
       id: activityId,
       resetHeartbeat,
@@ -101,10 +101,10 @@
   const onUpdateOptions = async (options: ActivityOptions) => {
     const refresh = onRefresh;
     await updateActivityOptions({
-      namespace: executionIdentity.namespace,
+      namespace: workflowExecutionIdentity.namespace,
       execution: {
-        workflowId: executionIdentity.workflowId,
-        runId: executionIdentity.runId,
+        workflowId: workflowExecutionIdentity.workflowId,
+        runId: workflowExecutionIdentity.runId,
       },
       id: activity.activityId,
       activityOptions: options,

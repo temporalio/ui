@@ -16,15 +16,18 @@
     EventTypeCategory,
     IterableEventWithPending,
   } from '$lib/types/events';
+  import type { WorkflowExecutionIdentity } from '$lib/types/workflows';
   import { orderGroupsByPending } from '$lib/utilities/order-groups-by-pending';
 
   let {
     history,
     groups,
+    workflowExecutionIdentity,
     minimized = true,
   }: {
     history: IterableEventWithPending[];
     groups: EventGroups;
+    workflowExecutionIdentity: WorkflowExecutionIdentity;
     minimized?: boolean;
   } = $props();
 
@@ -107,16 +110,17 @@
   </div>
 {:else}
   <div data-testid="event-summary-table">
-    <EventSummaryTable {updating} {minimized} {...tableProps}>
+    <EventSummaryTable
+      {workflowExecutionIdentity}
+      {updating}
+      {minimized}
+      {...tableProps}
+    >
       {#snippet activityActions(activity)}
         {#if workflow}
           <ActivityCommands
             {activity}
-            executionIdentity={{
-              namespace: page.params.namespace,
-              workflowId: workflow.id,
-              runId: workflow.runId,
-            }}
+            {workflowExecutionIdentity}
             {workflow}
             onRefresh={triggerRefresh}
             class="justify-end"

@@ -17,7 +17,7 @@
     event = undefined,
     lazy = false,
     groupRow = false,
-    executionIdentity,
+    workflowExecutionIdentity,
     activityActions,
   }: {
     group?: EventGroup;
@@ -25,7 +25,7 @@
     lazy?: boolean;
     /** The row that opened this represents the whole group, not one event. */
     groupRow?: boolean;
-    executionIdentity?: WorkflowExecutionIdentity;
+    workflowExecutionIdentity: WorkflowExecutionIdentity;
     activityActions?: Snippet<[PendingActivity]>;
   } = $props();
 
@@ -66,7 +66,7 @@
     {/if}
     {#each group?.eventList ?? [] as groupEvent (groupEvent.id)}
       <EventCard
-        {executionIdentity}
+        {workflowExecutionIdentity}
         event={groupEvent}
         initiatingEvent={group?.initialEvent}
         {lazy}
@@ -76,7 +76,7 @@
 {:else if event}
   <EventCard
     {event}
-    {executionIdentity}
+    {workflowExecutionIdentity}
     initiatingEvent={group?.initialEvent}
     {lazy}
   />

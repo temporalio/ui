@@ -46,6 +46,7 @@
     WorkflowTaskFailedEvent,
     WorkflowTaskTimedOutEvent,
   } from '$lib/types/events';
+  import type { WorkflowExecutionIdentity } from '$lib/types/workflows';
   import {
     parseEventFilterParams,
     updateEventFilterParams,
@@ -56,6 +57,11 @@
 
   const { namespace } = $derived(page.params);
   const { workflow } = $derived($workflowRun);
+  const workflowExecutionIdentity: WorkflowExecutionIdentity = $derived({
+    namespace,
+    workflowId: workflow?.id ?? page.params.workflow,
+    runId: workflow?.runId ?? page.params.run,
+  });
 
   $effect(() => {
     const urlParams = parseEventFilterParams(page.url);
@@ -312,16 +318,16 @@
       </div>
     {:else}
       <div data-testid="event-summary-table">
-        <EventSummaryTable {updating} {...tableProps}>
+        <EventSummaryTable
+          {workflowExecutionIdentity}
+          {updating}
+          {...tableProps}
+        >
           {#snippet activityActions(activity)}
             {#if workflow}
               <ActivityCommands
                 {activity}
-                executionIdentity={{
-                  namespace,
-                  workflowId: workflow.id,
-                  runId: workflow.runId,
-                }}
+                {workflowExecutionIdentity}
                 {workflow}
                 onRefresh={triggerRefresh}
                 class="justify-end"
