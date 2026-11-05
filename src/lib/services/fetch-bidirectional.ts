@@ -78,13 +78,9 @@ export const fetchBidirectional = async ({
 
   const t0 = performance.now();
 
+  const rootCtrl = new AbortController();
   const ascCtrl = new AbortController();
   const descCtrl = new AbortController();
-  const onAbort = () => {
-    ascCtrl.abort();
-    descCtrl.abort();
-  };
-  signal?.addEventListener('abort', onAbort);
 
   let ascMaxId = 0;
   let descMinId = Infinity;
@@ -105,8 +101,36 @@ export const fetchBidirectional = async ({
   // onPause is called. resume() resolves it, unblocking both loops.
   let pauseLatch: Promise<void> | null = null;
 
-  const checkPause = async () => {
-    if (pauseLatch) await pauseLatch;
+  let resumePause: (() => void) | undefined;
+
+  const releasePause = () => {
+    pauseLatch = null;
+    resumePause?.();
+    resumePause = undefined;
+  };
+
+  const onAbort = () => {
+    rootCtrl.abort();
+    ascCtrl.abort();
+    descCtrl.abort();
+    releasePause();
+  };
+  signal?.addEventListener('abort', onAbort);
+
+  const checkPause = async (cursorSignal: AbortSignal) => {
+    if (!pauseLatch || cursorSignal.aborted) return;
+    let onCursorAbort = () => {};
+    try {
+      await Promise.race([
+        pauseLatch,
+        new Promise<void>((resolve) => {
+          onCursorAbort = resolve;
+          cursorSignal.addEventListener('abort', onCursorAbort, { once: true });
+        }),
+      ]);
+    } finally {
+      cursorSignal.removeEventListener('abort', onCursorAbort);
+    }
   };
 
   const maybePause = () => {
@@ -118,13 +142,9 @@ export const fetchBidirectional = async ({
     ) {
       pauseFired = true;
       pauseLatch = new Promise<void>((resolve) => {
-        onPause({
-          resume: () => {
-            pauseLatch = null;
-            resolve();
-          },
-        });
+        resumePause = resolve;
       });
+      onPause({ resume: releasePause });
     }
   };
 
@@ -147,7 +167,7 @@ export const fetchBidirectional = async ({
     const route = routeForApi('events.ascending', { namespace, workflowId });
     let token: Token;
     while (!ascCtrl.signal.aborted) {
-      await checkPause();
+      await checkPause(ascCtrl.signal);
       if (ascCtrl.signal.aborted) break;
       const g = gap();
       if (g <= 0) {
@@ -176,11 +196,14 @@ export const fetchBidirectional = async ({
             options: { signal: ascCtrl.signal },
           },
         );
-      } catch {
-        break;
+      } catch (error) {
+        if (ascCtrl.signal.aborted) break;
+        onAbort();
+        throw error;
       }
+      if (rootCtrl.signal.aborted) break;
 
-      const events = (response?.history?.events ?? []) as HistoryEvent[];
+      const events = response?.history?.events ?? [];
       if (!events.length) break;
 
       ascPages++;
@@ -196,14 +219,16 @@ export const fetchBidirectional = async ({
         }
       }
       if (fresh.length) onRawPage(fresh, true);
+      if (rootCtrl.signal.aborted) break;
       reportProgress();
+      if (rootCtrl.signal.aborted) break;
       maybePause();
 
       if (!response?.nextPageToken || gap() <= 0) {
         descCtrl.abort();
         break;
       }
-      token = response.nextPageToken as unknown as string;
+      token = String(response.nextPageToken);
     }
   };
 
@@ -211,7 +236,7 @@ export const fetchBidirectional = async ({
     const route = routeForApi('events.descending', { namespace, workflowId });
     let token: Token;
     while (!descCtrl.signal.aborted) {
-      await checkPause();
+      await checkPause(descCtrl.signal);
       if (descCtrl.signal.aborted) break;
       const g = gap();
       if (g <= 0) {
@@ -240,11 +265,14 @@ export const fetchBidirectional = async ({
             options: { signal: descCtrl.signal },
           },
         );
-      } catch {
-        break;
+      } catch (error) {
+        if (descCtrl.signal.aborted) break;
+        onAbort();
+        throw error;
       }
+      if (rootCtrl.signal.aborted) break;
 
-      const events = (response?.history?.events ?? []) as HistoryEvent[];
+      const events = response?.history?.events ?? [];
       if (!events.length) break;
 
       descPages++;
@@ -264,20 +292,27 @@ export const fetchBidirectional = async ({
         }
       }
       if (fresh.length) onRawPage(fresh, false);
+      if (rootCtrl.signal.aborted) break;
       if (descPages === 1) onFirstDescPage?.(fresh);
+      if (rootCtrl.signal.aborted) break;
       reportProgress();
+      if (rootCtrl.signal.aborted) break;
       maybePause();
 
       if (!response?.nextPageToken || gap() <= 0) {
         ascCtrl.abort();
         break;
       }
-      token = response.nextPageToken as unknown as string;
+      token = String(response.nextPageToken);
     }
   };
 
-  await Promise.allSettled([runAscending(), runDescending()]);
-  signal?.removeEventListener('abort', onAbort);
+  try {
+    await Promise.all([runAscending(), runDescending()]);
+  } finally {
+    onAbort();
+    signal?.removeEventListener('abort', onAbort);
+  }
 
   const durationMs = performance.now() - t0;
   const total = seen.size;

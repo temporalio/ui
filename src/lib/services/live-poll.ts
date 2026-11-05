@@ -18,6 +18,7 @@ export type LivePollOptions = {
   onEvent: (ev: HistoryEvent) => boolean;
   /** Optional hook, called once per poll iteration that added new events. */
   onNewEvents?: () => void;
+  onToken?: (token: string) => void;
   /** ms to wait when a long-poll times out with no new events. Default 2000. */
   backoffMs?: number;
   /** ms to wait after a network error before retrying. Default 5000. */
@@ -50,9 +51,23 @@ export async function runLivePoll({
   signal,
   onEvent,
   onNewEvents,
+  onToken,
   backoffMs = 2000,
   errorBackoffMs = 5000,
 }: LivePollOptions): Promise<string> {
+  const wait = (delay: number): Promise<void> => {
+    if (signal.aborted) return Promise.resolve();
+    return new Promise<void>((resolve) => {
+      const finish = () => {
+        clearTimeout(timer);
+        signal.removeEventListener('abort', finish);
+        resolve();
+      };
+      const timer = setTimeout(finish, delay);
+      signal.addEventListener('abort', finish, { once: true });
+    });
+  };
+
   let token: string = startToken;
   while (!signal.aborted) {
     try {
@@ -66,7 +81,7 @@ export async function runLivePoll({
           },
           options: { signal },
         });
-      const events = (response?.history?.events ?? []) as HistoryEvent[];
+      const events = response?.history?.events ?? [];
       let added = 0;
       for (const ev of events) {
         if (onEvent(ev)) added++;
@@ -75,16 +90,18 @@ export async function runLivePoll({
       if (isWorkflowCloseEvent(events.at(-1))) break;
 
       if (response?.nextPageToken) {
-        token = response.nextPageToken as unknown as string;
+        token = String(response.nextPageToken);
+        onToken?.(token);
       } else {
         token = '';
+        onToken?.(token);
         if (added === 0) {
-          await new Promise((r) => setTimeout(r, backoffMs));
+          await wait(backoffMs);
         }
       }
     } catch {
       if (!signal.aborted) {
-        await new Promise((r) => setTimeout(r, errorBackoffMs));
+        await wait(errorBackoffMs);
       }
     }
   }
