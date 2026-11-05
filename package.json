@@ -330,6 +330,10 @@
       "types": "./dist/io/chip-status/index.d.ts",
       "import": "./dist/io/chip-status/index.js"
     },
+    "./io/breadcrumbs": {
+      "types": "./dist/io/breadcrumbs/index.d.ts",
+      "import": "./dist/io/breadcrumbs/index.js"
+    },
     "./io/text-link": {
       "types": "./dist/io/text-link/index.d.ts",
       "import": "./dist/io/text-link/index.js"
