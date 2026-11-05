@@ -179,8 +179,8 @@ test.describe('Workflow History view with pending activities and filters', () =>
   test('hides pending activities when activities are filtered out', async ({
     page,
   }) => {
-    await page.locator('button[aria-controls="status-menu"]').click();
-    await page.locator('#event-type-menu').getByTestId('Activity').click();
+    await page.locator('button[aria-controls="event-type-filter"]').click();
+    await page.locator('#event-type-filter').getByTestId('Activity').click();
 
     await expect(page.getByTestId('pending-activity-summary-row')).toHaveCount(
       0,

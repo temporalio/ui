@@ -228,13 +228,15 @@
 </div>
 <div class="relative">
   <div
-    class="sticky top-0 z-[11] flex flex-wrap items-center justify-between gap-2 bg-background-primary text-primary md:top-[var(--top-nav-height)] md:pt-2 xl:gap-8"
+    class="sticky top-0 z-[11] flex flex-wrap items-center justify-between gap-2 bg-background-primary text-primary md:top-[var(--top-nav-height)] md:pt-2 xl:gap-x-8"
   >
-    <div class="items-bottom flex gap-4 pt-2">
-      <h2>
+    <div class="items-bottom flex gap-4 pt-2 max-2xl:contents">
+      <h2 class="order-1 max-2xl:pt-2 2xl:order-none">
         {translate('workflows.history-tab')}
       </h2>
-      <TabButtons class="relative">
+      <TabButtons
+        class="relative order-3 basis-full 2xl:order-none 2xl:basis-auto"
+      >
         <TabButton
           active={$eventViewType === 'feed'}
           data-testid="feed"
@@ -258,8 +260,12 @@
         >
       </TabButtons>
     </div>
-    <div class="flex items-center gap-2 pb-2">
-      <ToggleButtons>
+    <div
+      class="order-2 flex flex-wrap items-center gap-2 pb-2 xl:gap-x-0 2xl:order-none"
+    >
+      <ToggleButtons
+        class="[&>:first-child_.menu-button-anchor>button]:rounded-l max-xl:[&>:last-child_.menu-button-anchor>button]:rounded-r"
+      >
         {#if $eventViewType !== 'json'}
           <ToggleButton
             LeadingIcon={reverseSort ? IconArrowDescending : IconArrowAscending}
@@ -274,11 +280,17 @@
           </ToggleButton>
         {/if}
         <EventTypeFilter {compact} />
+      </ToggleButtons>
+      <ToggleButtons
+        class="empty:hidden max-xl:[&_.menu-button-anchor>button]:rounded max-xl:[&_.menu-button-anchor>button]:border-l"
+      >
         <EventGroupControls options={eventBuffer.eventGroupOptions} />
+      </ToggleButtons>
+      <ToggleButtons>
         <ToggleButton
           disabled={isNotPending}
           data-testid="pause"
-          class="border-l-0"
+          class="xl:!rounded-l-none xl:border-l-0"
           size="sm"
           variant="tertiary"
           onclick={onAutoRefreshToggle}

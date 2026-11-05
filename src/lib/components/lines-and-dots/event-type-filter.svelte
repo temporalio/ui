@@ -111,7 +111,7 @@
 
 <MenuContainer {open}>
   <MenuButton
-    controls="status-menu"
+    controls="event-type-filter"
     size="sm"
     variant="tertiary"
     class="rounded-none"
@@ -127,10 +127,11 @@
     <span class="hidden text-sm md:block">{translate('common.filter')}</span>
   </MenuButton>
   <Menu
-    id="event-type-menu"
+    id="event-type-filter"
     keepOpen
+    usePortal
     position="right"
-    class="w-[220px] md:w-[360px]"
+    class="w-[220px] min-w-0 md:w-[360px]"
   >
     <MenuItem data-testid={translate('common.all')} onclick={onAllClick}>
       {#snippet leading()}

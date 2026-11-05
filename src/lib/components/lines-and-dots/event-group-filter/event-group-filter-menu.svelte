@@ -135,8 +135,9 @@
   <Menu
     id="event-group-filter-menu"
     keepOpen
+    usePortal
     position="right"
-    class="w-[280px] min-w-0 max-w-[calc(100dvw-1rem)] md:w-[380px]"
+    class="w-[280px] min-w-0 md:w-[380px]"
   >
     {#if $open}
       <li role="none" class="p-2">

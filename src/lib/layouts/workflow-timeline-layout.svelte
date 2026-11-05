@@ -269,8 +269,10 @@
       <h2>{translate('workflows.timeline-tab')}</h2>
       <EventHistoryLegend />
     </div>
-    <div class="flex items-center gap-2">
-      <ToggleButtons>
+    <div class="flex flex-wrap items-center gap-2 xl:gap-x-0">
+      <ToggleButtons
+        class="max-xl:[&>:last-child_.menu-button-anchor>button]:rounded-r"
+      >
         <ToggleButton
           LeadingIcon={reverseSort ? IconArrowDescending : IconArrowAscending}
           data-testid="zoom-in"
@@ -295,13 +297,17 @@
             : translate('workflows.hide-idle-time')}
         </ToggleButton>
         <EventTypeFilter compact={false} />
+      </ToggleButtons>
+      <ToggleButtons
+        class="empty:hidden max-xl:[&>:last-child_.menu-button-anchor>button]:rounded-r"
+      >
         <EventGroupControls options={eventBuffer.eventGroupOptions}>
           {#snippet toggle()}
             <ToggleButton
               data-testid="toggle-event-groups"
               size="sm"
               variant="tertiary"
-              class="border-l-0 [&:not(:last-child)]:border-r"
+              class="max-xl:rounded-l xl:border-l-0 [&:not(:last-child)]:border-r"
               onclick={onEventGroupsToggle}
             >
               {$showTimelineEventGroups
@@ -310,10 +316,12 @@
             </ToggleButton>
           {/snippet}
         </EventGroupControls>
+      </ToggleButtons>
+      <ToggleButtons>
         <ToggleButton
           disabled={isNotPending}
           data-testid="pause"
-          class="border-l-0"
+          class="xl:!rounded-l-none xl:border-l-0"
           size="sm"
           variant="tertiary"
           onclick={onAutoRefreshToggle}
