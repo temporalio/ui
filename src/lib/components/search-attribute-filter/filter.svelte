@@ -25,9 +25,8 @@
   import { afterNavigate } from '$app/navigation';
 
   import type { SearchAttributeOption } from '$lib/stores/search-attributes';
+  import type { StatusAttribute } from '$lib/utilities/query/quick-filter';
   import { createFilter } from '$lib/utilities/query/to-list-workflow-filters';
-
-  import type { StatusAttribute } from './types.ts';
 
   import DropdownFilterList from './filter-list.svelte';
   import SearchAttributeMenu from './search-attribute-menu.svelte';
