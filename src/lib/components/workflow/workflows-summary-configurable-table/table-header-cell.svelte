@@ -34,6 +34,7 @@
     <ColumnHeaderFilter
       attribute={columnFilter.attribute}
       type={columnFilter.type}
+      statusFilter={columnFilter.statusFilter}
       {label}
       filters={workflowFilters}
       conditionals={archival ? ARCHIVAL_CONDITIONALS : undefined}

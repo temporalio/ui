@@ -76,10 +76,6 @@ export type StatusAttribute = (typeof STATUS_ATTRIBUTE_NAMES)[number];
 
 export const STATUS_ATTRIBUTES = new Set<string>(STATUS_ATTRIBUTE_NAMES);
 
-export const isStatusAttribute = (
-  attribute: string,
-): attribute is StatusAttribute => STATUS_ATTRIBUTES.has(attribute);
-
 export const requiresOperatorChoice = ({
   attribute,
   type,
