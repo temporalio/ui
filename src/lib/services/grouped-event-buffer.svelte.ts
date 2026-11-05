@@ -141,6 +141,11 @@ export class EventBufferView {
   );
 }
 
+export type ExecutionHistory = Pick<
+  EventBufferView,
+  'events' | 'materializeGroup'
+>;
+
 export const eventBuffer = new EventBufferView(defaultGroupedEventBuffer);
 
 /**

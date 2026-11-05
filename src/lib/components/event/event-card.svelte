@@ -24,6 +24,7 @@
   import type { EventLink as ELink } from '$lib/types';
   import { type Payload as RawPayload } from '$lib/types';
   import type { WorkflowEvent } from '$lib/types/events';
+  import type { WorkflowExecutionIdentity } from '$lib/types/workflows';
   import { isRawPayload } from '$lib/utilities/decode-payload';
   import {
     type EventLinkDisplay,
@@ -54,13 +55,21 @@
     event,
     lazy = false,
     initiatingEvent = undefined,
+    executionIdentity,
   }: {
     event: WorkflowEvent;
+    executionIdentity?: WorkflowExecutionIdentity;
     lazy?: boolean;
     /** The operation's NexusOperationScheduled event, when this is part of a group. */
     initiatingEvent?: WorkflowEvent;
   } = $props();
-  const { namespace, workflow, run } = $derived(page.params);
+  const namespace = $derived(
+    executionIdentity?.namespace ?? page.params.namespace,
+  );
+  const workflow = $derived(
+    executionIdentity?.workflowId ?? page.params.workflow,
+  );
+  const run = $derived(executionIdentity?.runId ?? page.params.run);
 
   const systemNexus = $derived(
     resolveSystemNexusEvent(event, {
@@ -128,8 +137,7 @@
         typeof value !== 'object' &&
         displayLinkType(key, attributes) === 'none' &&
         !hiddenDetailFields.includes(key) &&
-        (key !== 'namespace' ||
-          (key === 'namespace' && page.params.namespace !== value)),
+        (key !== 'namespace' || (key === 'namespace' && namespace !== value)),
     ),
   );
 </script>
@@ -393,6 +401,7 @@
       container-class="min-w-0"
     >
       <EventDetailsLink
+        {executionIdentity}
         value={String(value)}
         {attributes}
         type={displayLinkType(key, attributes)}

@@ -21,7 +21,6 @@
   import Preview from '$lib/holocene/markdown-editor/preview.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
-  import { setActiveGroup } from '$lib/stores/active-events';
   import { resolveSystemNexusEvent } from '$lib/system-nexus-endpoints';
   import {
     decodeLocalActivity,
@@ -46,6 +45,7 @@
     canvasWidth: number;
     project: (time: ValidTime | undefined | null) => number;
     readOnly: boolean;
+    onSelect?: (group: EventGroup) => void;
     // Reactive event count so the row recomputes on streamed appends (eventList
     // is mutated in place) and on pooled re-point.
     eventCount?: number;
@@ -56,6 +56,7 @@
     canvasWidth,
     project,
     readOnly = false,
+    onSelect,
     eventCount = 0,
   }: Props = $props();
 
@@ -133,7 +134,7 @@
 
   const onClick = () => {
     if (readOnly) return;
-    setActiveGroup(group);
+    onSelect?.(group);
   };
 
   // Only activity groups carry an ActivityTaskStarted event; guard so other

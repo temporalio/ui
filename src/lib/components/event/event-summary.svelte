@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from '$app/state';
 
+  import ActivityCommands from '$lib/components/activity/activity-commands.svelte';
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
   import TabButton from '$lib/holocene/tab-buttons/tab-button.svelte';
   import TabButtons from '$lib/holocene/tab-buttons/tab-buttons.svelte';
@@ -10,7 +11,7 @@
   import { eventFilterSort, eventViewType } from '$lib/stores/event-view';
   import { fullEventHistory } from '$lib/stores/events';
   import { eventCategoryFilter } from '$lib/stores/filters';
-  import { workflowRun } from '$lib/stores/workflow-run';
+  import { triggerRefresh, workflowRun } from '$lib/stores/workflow-run';
   import type {
     EventTypeCategory,
     IterableEventWithPending,
@@ -106,6 +107,22 @@
   </div>
 {:else}
   <div data-testid="event-summary-table">
-    <EventSummaryTable {updating} {minimized} {...tableProps} />
+    <EventSummaryTable {updating} {minimized} {...tableProps}>
+      {#snippet activityActions(activity)}
+        {#if workflow}
+          <ActivityCommands
+            {activity}
+            executionIdentity={{
+              namespace: page.params.namespace,
+              workflowId: workflow.id,
+              runId: workflow.runId,
+            }}
+            {workflow}
+            onRefresh={triggerRefresh}
+            class="justify-end"
+          />
+        {/if}
+      {/snippet}
+    </EventSummaryTable>
   </div>
 {/if}

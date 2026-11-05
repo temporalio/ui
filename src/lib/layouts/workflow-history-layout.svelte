@@ -4,6 +4,7 @@
   import { beforeNavigate, goto } from '$app/navigation';
   import { page } from '$app/state';
 
+  import ActivityCommands from '$lib/components/activity/activity-commands.svelte';
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
   import EventGroupFilter from '$lib/components/lines-and-dots/event-group-filter/event-group-filter.svelte';
   import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
@@ -38,7 +39,7 @@
   import { eventFilterSort, eventViewType } from '$lib/stores/event-view';
   import { pauseLiveUpdates } from '$lib/stores/events';
   import { eventCategoryFilter, eventTypeFilter } from '$lib/stores/filters';
-  import { workflowRun } from '$lib/stores/workflow-run';
+  import { triggerRefresh, workflowRun } from '$lib/stores/workflow-run';
   import type {
     EventTypeCategory,
     WorkflowEvent,
@@ -311,7 +312,23 @@
       </div>
     {:else}
       <div data-testid="event-summary-table">
-        <EventSummaryTable {updating} {...tableProps} />
+        <EventSummaryTable {updating} {...tableProps}>
+          {#snippet activityActions(activity)}
+            {#if workflow}
+              <ActivityCommands
+                {activity}
+                executionIdentity={{
+                  namespace,
+                  workflowId: workflow.id,
+                  runId: workflow.runId,
+                }}
+                {workflow}
+                onRefresh={triggerRefresh}
+                class="justify-end"
+              />
+            {/if}
+          {/snippet}
+        </EventSummaryTable>
       </div>
     {/if}
   </div>

@@ -2,6 +2,7 @@
   import { page } from '$app/state';
 
   import Link from '$lib/holocene/link.svelte';
+  import type { WorkflowExecutionIdentity } from '$lib/types/workflows';
   import type { CombinedAttributes } from '$lib/utilities/format-event-attributes';
   import { type EventLinkType } from '$lib/utilities/get-single-attribute-for-event';
   import {
@@ -15,12 +16,23 @@
     attributes: CombinedAttributes;
     type: EventLinkType;
     class?: string;
+    executionIdentity?: WorkflowExecutionIdentity;
   }
 
-  let { value, attributes, type, class: className = '' }: Props = $props();
+  let {
+    value,
+    attributes,
+    type,
+    executionIdentity,
+    class: className = '',
+  }: Props = $props();
 
-  const namespace = $derived(page.params.namespace);
-  const workflow = $derived(page.params.workflow);
+  const namespace = $derived(
+    executionIdentity?.namespace ?? page.params.namespace,
+  );
+  const workflow = $derived(
+    executionIdentity?.workflowId ?? page.params.workflow,
+  );
 
   function getHref(
     ns: string,

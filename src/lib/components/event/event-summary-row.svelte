@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, type Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import { page } from '$app/state';
@@ -24,7 +24,11 @@
   } from '$lib/models/event-groups/get-event-in-group';
   import { isCloud } from '$lib/stores/advanced-visibility';
   import { resolveSystemNexusEvent } from '$lib/system-nexus-endpoints';
-  import type { IterableEvent, WorkflowEvent } from '$lib/types/events';
+  import type {
+    IterableEvent,
+    PendingActivity,
+    WorkflowEvent,
+  } from '$lib/types/events';
   import { decodeLocalActivity } from '$lib/utilities/decode-local-activity';
   import { formatEventGroupDuration } from '$lib/utilities/event-group-duration';
   import { toEventLinkView } from '$lib/utilities/event-link';
@@ -60,6 +64,7 @@
     expanded?: boolean;
     hoveredEventId?: string | undefined;
     onRowClick?: () => void;
+    activityActions?: Snippet<[PendingActivity]>;
   }
 
   let {
@@ -71,6 +76,7 @@
     expanded: expandedProp = false,
     onRowClick = () => {},
     hoveredEventId = $bindable(),
+    activityActions,
   }: Props = $props();
 
   let expanded = $state(expandedProp);
@@ -462,6 +468,7 @@
         {group}
         event={currentEvent}
         groupRow={isEventGroup(event)}
+        {activityActions}
       />
     </td>
   </tr>

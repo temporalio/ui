@@ -4,6 +4,7 @@
   import { beforeNavigate, goto } from '$app/navigation';
   import { page } from '$app/state';
 
+  import ActivityCommands from '$lib/components/activity/activity-commands.svelte';
   import EventGroupFilter from '$lib/components/lines-and-dots/event-group-filter/event-group-filter.svelte';
   import EventHistoryLegend from '$lib/components/lines-and-dots/event-history-legend.svelte';
   import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
@@ -30,8 +31,8 @@
   import { clearActives } from '$lib/stores/active-events';
   import { collapseIdleTime, eventFilterSort } from '$lib/stores/event-view';
   import { pauseLiveUpdates } from '$lib/stores/events';
-  import { eventTypeFilter } from '$lib/stores/filters';
-  import { workflowRun } from '$lib/stores/workflow-run';
+  import { eventStatusFilter, eventTypeFilter } from '$lib/stores/filters';
+  import { triggerRefresh, workflowRun } from '$lib/stores/workflow-run';
   import type {
     WorkflowTaskFailedEvent,
     WorkflowTaskTimedOutEvent,
@@ -231,16 +232,36 @@
   no scroll-offset bridge).
 -->
   {#if workflow}
-    <TimelineGraph
-      {workflow}
-      {lazyGroups}
-      {reverseSort}
-      loading={!historyCtx.fetchComplete}
-      totalExpectedEvents={estimatedTotalGroups}
-      descMinId={historyCtx.descMinId}
-      error={Boolean(workflowTaskFailedError)}
-      onTimelineInit={handleTimelineInit}
-    />
+    {#key JSON.stringify([namespace, workflow.id, workflow.runId])}
+      <TimelineGraph
+        {namespace}
+        {workflow}
+        history={eventBuffer}
+        {lazyGroups}
+        {reverseSort}
+        collapseIdleTime={$collapseIdleTime === 'on'}
+        failedOrPendingOnly={$eventStatusFilter}
+        loading={!historyCtx.fetchComplete}
+        totalExpectedEvents={estimatedTotalGroups}
+        descMinId={historyCtx.descMinId}
+        error={Boolean(workflowTaskFailedError)}
+        onTimelineInit={handleTimelineInit}
+      >
+        {#snippet activityActions(activity)}
+          <ActivityCommands
+            {activity}
+            executionIdentity={{
+              namespace,
+              workflowId: workflow.id,
+              runId: workflow.runId,
+            }}
+            {workflow}
+            onRefresh={triggerRefresh}
+            class="justify-end"
+          />
+        {/snippet}
+      </TimelineGraph>
+    {/key}
   {/if}
 </div>
 <!-- end wrapper -->

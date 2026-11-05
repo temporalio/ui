@@ -15,9 +15,16 @@
     namespace: string;
     execution: WorkflowExecution;
     activity: PendingActivity;
+    onRefresh?: (action: Action) => void;
   };
 
-  let { open = $bindable(), namespace, execution, activity }: Props = $props();
+  let {
+    open = $bindable(),
+    namespace,
+    execution,
+    activity,
+    onRefresh = triggerRefresh,
+  }: Props = $props();
 
   const identity = getIdentity();
 
@@ -29,7 +36,7 @@
       activityOptions,
       identity,
     });
-    triggerRefresh(Action.Update);
+    onRefresh(Action.Update);
   };
 </script>
 

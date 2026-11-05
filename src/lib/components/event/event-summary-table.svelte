@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   import { page } from '$app/state';
 
   import EventHistoryLegend from '$lib/components/lines-and-dots/event-history-legend.svelte';
@@ -20,6 +22,7 @@
   import { currentPageKey, perPageKey } from '$lib/stores/pagination';
   import type {
     IterableEventWithPending,
+    PendingActivity,
     WorkflowEventWithPending,
   } from '$lib/types/events';
   import {
@@ -43,6 +46,7 @@
     updating?: boolean;
     loading?: boolean;
     minimized?: boolean;
+    activityActions?: Snippet<[PendingActivity]>;
   } & (
     | { compact: true; items: LazyGroup[]; groups?: never }
     | {
@@ -60,6 +64,7 @@
     updating = false,
     loading = false,
     minimized = true,
+    activityActions,
   }: Props = $props();
 
   // Set by a hovered row, read by its siblings to highlight related activities.
@@ -163,6 +168,7 @@
             bind:hoveredEventId
             event={row}
             {index}
+            {activityActions}
             group={row}
             {compact}
             {initialItem}
@@ -171,6 +177,7 @@
           <PendingActivitySummaryRow
             event={row}
             {index}
+            {activityActions}
             group={groups.find(
               (g) =>
                 isPendingActivity(row) && g?.pendingActivity?.id === row.id,
@@ -180,6 +187,7 @@
           <PendingNexusSummaryRow
             event={row}
             {index}
+            {activityActions}
             group={groups.find(
               (g) =>
                 isPendingNexusOperation(row) &&
@@ -192,6 +200,7 @@
             bind:hoveredEventId
             event={row}
             {index}
+            {activityActions}
             group={isEvent(row) ? groupIndex.get(row.id) : undefined}
             {compact}
             {initialItem}

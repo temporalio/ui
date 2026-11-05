@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
 
+  import ActivityCommands from '$lib/components/activity/activity-commands.svelte';
   import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
   import Button from '$lib/holocene/button.svelte';
   import { IconArrowDown, IconArrowUp } from '$lib/io/icon';
@@ -9,7 +10,8 @@
   import { fetchAllEvents } from '$lib/services/events-service';
   import { eventFilterSort } from '$lib/stores/event-view';
   import { fullEventHistory } from '$lib/stores/events';
-  import { workflowRun } from '$lib/stores/workflow-run';
+  import { triggerRefresh, workflowRun } from '$lib/stores/workflow-run';
+  import type { PendingActivity } from '$lib/types/events';
 
   interface Props {
     eventId: string;
@@ -114,6 +116,18 @@
   };
 </script>
 
+{#snippet activityActions(activity: PendingActivity)}
+  {#if workflow}
+    <ActivityCommands
+      {activity}
+      executionIdentity={{ namespace, workflowId, runId }}
+      {workflow}
+      onRefresh={triggerRefresh}
+      class="justify-end"
+    />
+  {/if}
+{/snippet}
+
 <div class="flex flex-col gap-2 pb-24" data-testid="event-summary-log">
   <Button
     variant="secondary"
@@ -133,6 +147,7 @@
           expanded={event.id === initialEvent?.id}
           group={isEvent(event) ? groupIndex.get(event.id) : undefined}
           initialItem={$fullEventHistory[0]}
+          {activityActions}
         />
       {/each}
     </tbody>

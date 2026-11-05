@@ -19,6 +19,12 @@ import type {
 } from './events';
 import type { Optional, Replace } from './global';
 
+export type WorkflowExecutionIdentity = {
+  namespace: string;
+  workflowId: string;
+  runId: string;
+};
+
 /**
  * Type-level equivalent of `fromScreamingEnum`: converts a SCREAMING_SNAKE_CASE
  * enum key to PascalCase and strips the given prefix.

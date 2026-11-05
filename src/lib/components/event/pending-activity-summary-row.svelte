@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   import { page } from '$app/stores';
 
   import { timestamp } from '$lib/components/timestamp.svelte';
@@ -23,6 +25,7 @@
     index: number;
     expanded?: boolean;
     onRowClick?: () => void;
+    activityActions?: Snippet<[PendingActivity]>;
   }
 
   const {
@@ -31,6 +34,7 @@
     index,
     expanded: expandedProp = false,
     onRowClick = () => {},
+    activityActions,
   }: Props = $props();
 
   let expanded = $state(expandedProp);
@@ -129,7 +133,7 @@
 {#if expanded}
   <tr class="w-full px-2 text-sm no-underline">
     <td class="!p-0" colspan={$isCloud ? 5 : 4}>
-      <EventDetailsFull {group} />
+      <EventDetailsFull {group} {activityActions} />
     </td>
   </tr>
 {/if}
