@@ -4,6 +4,7 @@
   import { page } from '$app/state';
 
   import NoQueryResults from '$lib/components/empty-states/no-query-results.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import IconButton from '$lib/holocene/icon-button.svelte';
   import Link from '$lib/holocene/link.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/paginated.svelte';
@@ -37,9 +38,13 @@
   let {
     callbacks,
     namespace,
+    filtered = false,
+    onClearFilters,
   }: {
     callbacks: Callback[];
     namespace: string;
+    filtered?: boolean;
+    onClearFilters?: () => void;
   } = $props();
 
   const PAGE_PARAMETER = 'callbacks-page';
@@ -252,33 +257,48 @@
     {/each}
   {/snippet}
   {#snippet empty()}
-    <div
-      class="flex flex-col items-center gap-2 p-8 text-center"
-      data-testid="callbacks-empty-state"
-    >
-      <NoQueryResults class="mb-4" />
-      <h3 class="text-primary">
-        {translate('nexus.callbacks-empty-state-title')}
-      </h3>
-      <p class="text-secondary">
-        {translate('nexus.callbacks-empty-state-preface')}<Link
-          href="https://docs.temporal.io/nexus"
-          newTab>{translate('common.docs')}</Link
-        >{translate('nexus.callbacks-empty-state-postface')}
-      </p>
-      <div class="flex flex-wrap justify-center gap-2">
-        {#each SDKS as { id, name, Icon, href } (id)}
-          {#if href}
-            <Link newTab {href} aria-label={name} data-testid="sdk-icon-{id}">
-              <Icon title={name} />
-            </Link>
-          {:else}
-            <span data-testid="sdk-icon-{id}">
-              <Icon title={name} />
-            </span>
-          {/if}
-        {/each}
+    {#if filtered}
+      <div
+        class="flex flex-col items-center gap-4 p-8 text-center"
+        data-testid="callbacks-no-matches"
+      >
+        <NoQueryResults class="mb-4" />
+        <h3 class="text-primary">
+          {translate('nexus.callbacks-no-matches')}
+        </h3>
+        <Button variant="secondary" size="sm" onclick={onClearFilters}>
+          {translate('nexus.clear-filters')}
+        </Button>
       </div>
-    </div>
+    {:else}
+      <div
+        class="flex flex-col items-center gap-2 p-8 text-center"
+        data-testid="callbacks-empty-state"
+      >
+        <NoQueryResults class="mb-4" />
+        <h3 class="text-primary">
+          {translate('nexus.callbacks-empty-state-title')}
+        </h3>
+        <p class="text-secondary">
+          {translate('nexus.callbacks-empty-state-preface')}<Link
+            href="https://docs.temporal.io/nexus"
+            newTab>{translate('common.docs')}</Link
+          >{translate('nexus.callbacks-empty-state-postface')}
+        </p>
+        <div class="flex flex-wrap justify-center gap-2">
+          {#each SDKS as { id, name, Icon, href } (id)}
+            {#if href}
+              <Link newTab {href} aria-label={name} data-testid="sdk-icon-{id}">
+                <Icon title={name} />
+              </Link>
+            {:else}
+              <span data-testid="sdk-icon-{id}">
+                <Icon title={name} />
+              </span>
+            {/if}
+          {/each}
+        </div>
+      </div>
+    {/if}
   {/snippet}
 </PaginatedTable>
