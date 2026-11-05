@@ -30,8 +30,9 @@ import { catalogExample as example22 } from './signal-handlers/example.js';
 import { catalogExample as example23 } from './slow-nexus-operation/example.js';
 import { catalogExample as example24 } from './standalone-activity/example.js';
 import { catalogExample as example25 } from './timer-driven-repetition/example.js';
-import { catalogExample as example26 } from './workflow-feature-tour/example.js';
-import { catalogExample as example27 } from './workflow-patching/example.js';
+import { catalogExample as example26 } from './worker-crash/example.js';
+import { catalogExample as example27 } from './workflow-feature-tour/example.js';
+import { catalogExample as example28 } from './workflow-patching/example.js';
 
 const sharedWorkflowDefinitions = [
   example0,
@@ -62,6 +63,7 @@ const sharedWorkflowDefinitions = [
   example25,
   example26,
   example27,
+  example28,
 ] satisfies readonly CatalogExampleDefinition[];
 
 export const sharedWorkflowExamples: readonly CatalogExampleRegistration[] =
@@ -173,6 +175,8 @@ export const sharedWorkflowSourceFiles = [
   'src/lib/catalog/worker/examples/standalone-activity/example.ts',
   'src/lib/catalog/worker/examples/timer-driven-repetition/example.ts',
   'src/lib/catalog/worker/examples/timer-driven-repetition/workflow.ts',
+  'src/lib/catalog/worker/examples/worker-crash/example.ts',
+  'src/lib/catalog/worker/examples/worker-crash/workflow.ts',
   'src/lib/catalog/worker/examples/workflow-feature-tour/activity.ts',
   'src/lib/catalog/worker/examples/workflow-feature-tour/example.ts',
   'src/lib/catalog/worker/examples/workflow-feature-tour/handler.ts',

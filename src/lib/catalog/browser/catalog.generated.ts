@@ -2,8 +2,8 @@ import type { BrowserCatalogArtifact } from './types';
 
 export const catalogArtifact: BrowserCatalogArtifact = {
   sourceHash:
-    'cae30b226b8ff1bd1cf3bb9c179fa7731add510cf81befc0037234143ead6e17',
-  workspaces: [{ id: 'shared-workflows' }],
+    'befe8936897f8aa323a011fe78e0a86a957d7a80b1b2e89fc53eaa733bdaac65',
+  workspaces: [{ id: 'shared-workflows', controls: ['crash'] }],
   descriptors: [
     {
       id: 'activity-heartbeat',
@@ -1235,6 +1235,56 @@ export const catalogArtifact: BrowserCatalogArtifact = {
         namespace: 'default',
         taskQueue: 'ui-catalog',
         workflowType: 'scheduleWorkflow',
+      },
+      source: { id: 'oss', label: 'OSS' },
+    },
+    {
+      id: 'worker-crash',
+      title: 'Worker crash and recovery',
+      description:
+        'Exits the Worker process on request, then continues the run on the restarted Worker.',
+      capabilityTags: ['updates', 'activities', 'retries', 'workers'],
+      expectedEvidence: [
+        'The crashWorker update returns that attempt 2 ran on a new Worker.',
+        'The run completes after the Worker restarts.',
+      ],
+      input: {
+        defaultValue: [120],
+        schema: {
+          type: 'array',
+          prefixItems: [
+            {
+              title: 'Run duration in seconds',
+              type: 'integer',
+              minimum: 10,
+              maximum: 600,
+            },
+          ],
+          items: false,
+          maxItems: 1,
+        },
+      },
+      startOptions: {
+        defaultValue: {},
+        schema: {
+          type: 'object',
+          properties: {
+            details: { type: 'string' },
+            searchAttributes: { type: 'object' },
+            summary: { type: 'string' },
+            workflowStartDelay: { type: 'string' },
+            workflowId: { type: 'string', minLength: 1 },
+          },
+        },
+      },
+      setupMarkdown:
+        'Start the worker with `CATALOG_CONTROL=on`. The worker then restarts after it exits.\n\nWhile the run waits, send the `crashWorker` update:\n\n```\ntemporal workflow update execute --name crashWorker --workflow-id <workflow id>\n```\n\nThe worker process exits and restarts. The update returns once the crash activity succeeds on the new worker. Without `CATALOG_CONTROL=on`, the update fails and the worker keeps running.',
+      execution: {
+        kind: 'workflow',
+        workspaceId: 'shared-workflows',
+        namespace: 'default',
+        taskQueue: 'ui-catalog',
+        workflowType: 'workerCrashWorkflow',
       },
       source: { id: 'oss', label: 'OSS' },
     },

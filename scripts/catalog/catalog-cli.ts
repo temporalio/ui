@@ -1,10 +1,14 @@
 import { spawn } from 'node:child_process';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { parseEnv } from 'node:util';
 
 import { getProjectRoot } from '../get-project-root.js';
 import { migrateLegacyCatalogLocalState } from './local-migration.js';
 import { createUiCatalogAuthoring } from './ui-authoring.js';
 import { catalogHelp, runCatalogCli } from '../../src/lib/catalog/authoring.js';
+import { catalogCrashExitCode } from '../../src/lib/catalog/worker/crash.js';
 
 export { catalogHelp };
 
@@ -69,14 +73,74 @@ const runCatalogDevelopmentEntry = (
     });
   });
 
-export const runCatalogWorkerDevelopment = (
-  spawnProcess?: SpawnCatalogDevelopmentProcess,
+const readEnvironmentFile = (path: string) => {
+  try {
+    return parseEnv(readFileSync(path, 'utf8'));
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return {};
+    throw error;
+  }
+};
+
+export const catalogControlSetting = (
+  rootDirectory: string,
+  environment: Readonly<Record<string, string | undefined>> = process.env,
 ) =>
-  runCatalogDevelopmentEntry(
-    catalogWorkerEntry,
-    catalogWorkerWatchArguments,
-    spawnProcess,
-  );
+  environment.CATALOG_CONTROL ??
+  readEnvironmentFile(join(rootDirectory, '.env.catalog.local'))
+    .CATALOG_CONTROL ??
+  readEnvironmentFile(join(rootDirectory, '.env.catalog')).CATALOG_CONTROL;
+
+const runCrashableCatalogWorker = (
+  spawnProcess: SpawnCatalogDevelopmentProcess,
+  log: (message: string) => void,
+) =>
+  new Promise<void>((resolve, reject) => {
+    const start = () => {
+      const child = spawnProcess('pnpm', ['exec', 'esno', catalogWorkerEntry]);
+
+      child.once('error', reject);
+      child.once('exit', (code) => {
+        if (code === catalogCrashExitCode) {
+          log('Catalog worker crashed on request. Restarting it.');
+          start();
+          return;
+        }
+        if (code === 0 || code === null) resolve();
+        else
+          reject(
+            new Error(
+              `${catalogWorkerEntry} exited with status ${code ?? 'unknown'}`,
+            ),
+          );
+      });
+    };
+
+    log(
+      'Crash control is on: the worker restarts after a crash, and file watching is off.',
+    );
+    start();
+  });
+
+export const runCatalogWorkerDevelopment = (
+  spawnProcess: SpawnCatalogDevelopmentProcess = spawnCatalogDevelopmentProcess,
+  {
+    rootDirectory = getProjectRoot(),
+    environment = process.env,
+    log = console.info,
+  }: {
+    rootDirectory?: string;
+    environment?: Readonly<Record<string, string | undefined>>;
+    log?: (message: string) => void;
+  } = {},
+) =>
+  catalogControlSetting(rootDirectory, environment) === 'on'
+    ? runCrashableCatalogWorker(spawnProcess, log)
+    : runCatalogDevelopmentEntry(
+        catalogWorkerEntry,
+        catalogWorkerWatchArguments,
+        spawnProcess,
+      );
 
 export const prepareCatalogCommand = async ({
   rootDirectory = getProjectRoot(),

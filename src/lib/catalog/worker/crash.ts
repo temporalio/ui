@@ -5,6 +5,8 @@ import type { CatalogWorkspaceControl } from '../browser/metadata-schema.js';
 
 export const crashCatalogWorkerActivityName = 'crashCatalogWorker';
 
+export const catalogCrashExitCode = 75;
+
 export type CrashCatalogWorkerOptions = {
   enabled: boolean;
   exit: (code: number) => void;
@@ -41,7 +43,7 @@ export const createCrashCatalogWorkerActivity = ({
       return `Worker recovered. Attempt ${attempt} ran on a new Worker.`;
 
     log('Catalog Worker is exiting on purpose to demonstrate a crash.');
-    exit(1);
+    exit(catalogCrashExitCode);
     return 'Worker exited.';
   },
 });

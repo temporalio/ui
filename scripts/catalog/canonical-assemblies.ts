@@ -7,6 +7,7 @@ import { format, resolveConfig } from 'prettier';
 
 import type { CatalogRegistrationSource } from '../../src/lib/catalog/worker/registration-source.js';
 import type { CatalogExampleDefinition } from '../../src/lib/catalog/worker/registry.js';
+import { sharedCatalogWorkspace } from '../../src/lib/catalog/worker/shared-workspace.js';
 
 const examplesPath = 'src/lib/catalog/worker/examples';
 const indexPath = `${examplesPath}/index.ts`;
@@ -257,6 +258,7 @@ export const loadCanonicalCatalogRegistrationSource = async (
     source: { id: 'oss', label: 'OSS' },
     sourceFiles: [
       'src/lib/catalog/worker/shared-registrations.ts',
+      'src/lib/catalog/worker/shared-workspace.ts',
       workflowsPath,
       `${examplesPath}/inventory.ts`,
       indexPath,
@@ -265,6 +267,7 @@ export const loadCanonicalCatalogRegistrationSource = async (
     ],
     register: (registry) => {
       registry.registerWorkspace({
+        ...sharedCatalogWorkspace,
         id: 'shared-workflows',
         namespace: 'default',
         taskQueue: 'ui-catalog',

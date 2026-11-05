@@ -44,7 +44,7 @@ describe('catalog Worker crash', () => {
 
     await crashCatalogWorker();
 
-    expect(exit).toHaveBeenCalledWith(1);
+    expect(exit).toHaveBeenCalledWith(75);
     expect(log).toHaveBeenCalledWith(
       'Catalog Worker is exiting on purpose to demonstrate a crash.',
     );

@@ -125,6 +125,7 @@ describe('shared workflow corpus', () => {
         namespace: 'default',
         taskQueue: 'ui-catalog',
         workflowsPath: './workflows.js',
+        controls: ['crash'],
       },
     ]);
   });
@@ -187,6 +188,7 @@ describe('shared workflow corpus', () => {
         'largeHistory',
         'featureTourWorkflow',
         'childFanOut',
+        'workerCrashWorkflow',
         ...activitySummaryExamples.map(({ workflowType }) => workflowType),
       ].sort(),
     );
@@ -601,8 +603,11 @@ describe('shared workflow corpus', () => {
     expect([...catalogRegistrationSource.sourceFiles].sort()).toEqual(
       [
         'src/lib/catalog/worker/shared-registrations.ts',
+        'src/lib/catalog/worker/shared-workspace.ts',
         'src/lib/catalog/worker/workflows.ts',
         'src/lib/catalog/worker/examples/inventory.ts',
+        'src/lib/catalog/worker/examples/worker-crash/example.ts',
+        'src/lib/catalog/worker/examples/worker-crash/workflow.ts',
         'src/lib/catalog/worker/examples/index.ts',
         'src/lib/catalog/worker/examples/shared-activities.ts',
         'src/lib/catalog/worker/examples/hello/example.ts',

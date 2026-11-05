@@ -1,11 +1,18 @@
 import { execFile } from 'node:child_process';
-import { readFile } from 'node:fs/promises';
+import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { promisify } from 'node:util';
 
 import { describe, expect, it, vi } from 'vitest';
 
-import { catalogHelp, prepareCatalogCommand } from './catalog-cli';
+import {
+  catalogControlSetting,
+  catalogHelp,
+  catalogWorkerEntry,
+  prepareCatalogCommand,
+  runCatalogWorkerDevelopment,
+} from './catalog-cli';
 
 const execFileAsync = promisify(execFile);
 
@@ -142,5 +149,78 @@ describe('catalog CLI', () => {
     expect(packageJson.scripts).not.toHaveProperty('catalog:new');
     expect(packageJson.scripts).not.toHaveProperty('dev:catalog');
     expect(packageJson.scripts).not.toHaveProperty('dev:catalog-worker');
+  });
+
+  describe('worker crash restarts', () => {
+    const createSpawn = () => {
+      const exits: ((code: number | null) => void)[] = [];
+      const spawned: (readonly string[])[] = [];
+      const spawnProcess = vi.fn(
+        (_command: string, args: readonly string[]) => {
+          spawned.push(args);
+          return {
+            once: (event: string, listener: (code: number | null) => void) => {
+              if (event === 'exit') exits.push(listener);
+            },
+          } as never;
+        },
+      );
+
+      return { exits, spawnProcess, spawned };
+    };
+    const options = {
+      environment: { CATALOG_CONTROL: 'on' },
+      rootDirectory: '/nonexistent-catalog-root',
+      log: () => undefined,
+    };
+
+    it('restarts the worker without watch mode after a crash exit', async () => {
+      const { exits, spawnProcess, spawned } = createSpawn();
+      const development = runCatalogWorkerDevelopment(spawnProcess, options);
+
+      exits[0](75);
+      exits[1](0);
+
+      await expect(development).resolves.toBeUndefined();
+      expect(spawned).toEqual([
+        ['exec', 'esno', catalogWorkerEntry],
+        ['exec', 'esno', catalogWorkerEntry],
+      ]);
+    });
+
+    it('stops on any other failure instead of restarting', async () => {
+      const { exits, spawnProcess } = createSpawn();
+      const development = runCatalogWorkerDevelopment(spawnProcess, options);
+
+      exits[0](1);
+
+      await expect(development).rejects.toThrow(
+        `${catalogWorkerEntry} exited with status 1`,
+      );
+      expect(spawnProcess).toHaveBeenCalledOnce();
+    });
+
+    it('reads the crash control from the environment, then the local env file, then the defaults', async () => {
+      const rootDirectory = await mkdtemp(join(tmpdir(), 'catalog-control-'));
+
+      try {
+        await writeFile(
+          join(rootDirectory, '.env.catalog'),
+          'CATALOG_CONTROL=off\n',
+        );
+        expect(catalogControlSetting(rootDirectory, {})).toBe('off');
+
+        await writeFile(
+          join(rootDirectory, '.env.catalog.local'),
+          'CATALOG_CONTROL=on\n',
+        );
+        expect(catalogControlSetting(rootDirectory, {})).toBe('on');
+        expect(
+          catalogControlSetting(rootDirectory, { CATALOG_CONTROL: 'off' }),
+        ).toBe('off');
+      } finally {
+        await rm(rootDirectory, { recursive: true, force: true });
+      }
+    });
   });
 });

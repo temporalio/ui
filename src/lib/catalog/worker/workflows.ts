@@ -23,5 +23,6 @@ export { sequentialPlainTextActivities } from './examples/sequential-plain-text-
 export { signalCollector } from './examples/signal-collector/workflow.js';
 export { signalWorkflow } from './examples/signal-handlers/workflow.js';
 export { scheduleWorkflow } from './examples/timer-driven-repetition/workflow.js';
+export { workerCrashWorkflow } from './examples/worker-crash/workflow.js';
 export { featureTourWorkflow } from './examples/workflow-feature-tour/workflow.js';
 export { patchWorkflow } from './examples/workflow-patching/workflow.js';

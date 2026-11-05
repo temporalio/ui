@@ -129,11 +129,20 @@ export async function moneyTransfer(input: TransferInput) {
 }
 ```
 
-The update runs the `crashCatalogWorker` activity. On its first attempt, the activity exits the worker process with code 1. The host restarts the process. The activity's heartbeat timeout expires, Temporal retries it on the new worker, and the retry returns. The update result reports the recovery, and the run continues.
+The update runs the `crashCatalogWorker` activity. On its first attempt, the activity exits the worker process with code 75. The host restarts the process. The activity's heartbeat timeout expires, Temporal retries it on the new worker, and the retry returns. The update result reports the recovery, and the run continues.
 
 Crash is on only when the workspace declares `controls: ['crash']` and the runtime sets `CATALOG_CONTROL=on`. Otherwise the activity fails without retrying, and the update returns that failure. A serverless runtime should not set it, because it cannot restart a process.
 
 The exit ends the whole process, so every workspace in it restarts. Run the worker under something that restarts it after a non-zero exit. A worker with crash enabled sets a 1-second sticky queue timeout, so the restarted worker picks up the run within a few seconds.
+
+Locally, `pnpm catalog worker` and `pnpm catalog dev` restart the worker after a crash when `CATALOG_CONTROL=on`, from the environment or an env file. They restart only on the crash exit code, 75. Any other failure stops the command. File watching is off while crash control is on.
+
+The shared catalog declares the crash control. Its `worker-crash` example waits for a set time so you can crash the worker during the run:
+
+```sh
+CATALOG_CONTROL=on pnpm catalog dev
+temporal workflow update execute --name crashWorker --workflow-id <workflow id>
+```
 
 The worker waits for the server rather than exiting if it starts first, printing progress while it retries. Non-connection failures, such as an invalid API key, still fail immediately.
 

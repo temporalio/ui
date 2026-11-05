@@ -614,7 +614,7 @@ describe('catalog runner', () => {
 
       await activities.crashCatalogWorker();
 
-      expect(exit).toHaveBeenCalledWith(1);
+      expect(exit).toHaveBeenCalledWith(75);
     });
 
     it('shortens the sticky queue timeout so a restarted Worker picks up the run quickly', async () => {
