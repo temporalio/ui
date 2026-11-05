@@ -66,6 +66,8 @@ export const Strings = {
   },
   'callback-url': 'Callback URL',
   callbacks: 'Callbacks',
+  'callbacks-intro':
+    'Use callbacks to send this Standalone Nexus Operation’s result anywhere you need, without needing a Workflow.',
   'callback-state': {
     standby: 'Standby',
     scheduled: 'Scheduled',

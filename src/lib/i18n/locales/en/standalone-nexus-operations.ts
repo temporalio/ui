@@ -39,6 +39,7 @@ export const Strings = {
   'back-to-nexus-operations': 'Back to Standalone Nexus Operations',
   'layout-tabs-label': 'Nexus Operation Details',
   'layout-details-tab': 'Details',
+  'layout-callbacks-tab': 'Callbacks',
   'layout-search-attributes-tab': 'Search Attributes',
   'layout-user-metadata-tab': 'Metadata',
   'operation-id': 'Operation ID',

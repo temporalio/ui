@@ -6,8 +6,8 @@ import {
   routeForNamespace,
   routeForStandaloneActivityDetails,
   routeForStandaloneActivityLinks,
+  routeForStandaloneNexusOperationCallbacks,
   routeForStandaloneNexusOperationDetails,
-  routeForStandaloneNexusOperationLinks,
   routeForWorkflow,
 } from '$lib/utilities/route-for';
 import { fromScreamingEnum } from '$lib/utilities/screaming-enums';
@@ -108,11 +108,13 @@ const callbackLinkHref = (callback: CallbackLink): string | undefined => {
 
   switch (String(callback.execution?.type)) {
     case 'EXECUTION_TYPE_NEXUS_OPERATION':
-      return routeForStandaloneNexusOperationLinks({
+      return routeForStandaloneNexusOperationCallbacks({
         namespace,
         operationId: businessId,
         runId,
-        queryParams: { tab: 'callbacks', ...requestIdParam },
+        ...(isPresent(callback.requestId) && {
+          queryParams: requestIdParam,
+        }),
       });
     case 'EXECUTION_TYPE_ACTIVITY':
       return routeForStandaloneActivityLinks({

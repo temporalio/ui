@@ -254,7 +254,7 @@ describe('toEventLinkView', () => {
       },
     });
 
-    it('routes a Nexus operation source to its Links › Callbacks tab', () => {
+    it('routes a Nexus operation source to its Callbacks tab', () => {
       const view = toEventLinkView(
         callbackLink('EXECUTION_TYPE_NEXUS_OPERATION'),
       );
@@ -263,7 +263,7 @@ describe('toEventLinkView', () => {
         variant: 'callback',
         label: 'Callback Link',
         value: 'source-id',
-        href: `${base}/namespaces/source-ns/nexus-operations/source-id/source-run/links?tab=callbacks&requestId=callback-request`,
+        href: `${base}/namespaces/source-ns/nexus-operations/source-id/source-run/callbacks?requestId=callback-request`,
         namespace: {
           label: 'Namespace Link',
           value: 'source-ns',
@@ -318,7 +318,7 @@ describe('toEventLinkView', () => {
       );
 
       expect(view.href).toBe(
-        `${base}/namespaces/source-ns/nexus-operations/source-id/source-run/links?tab=callbacks`,
+        `${base}/namespaces/source-ns/nexus-operations/source-id/source-run/callbacks`,
       );
     });
 

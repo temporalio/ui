@@ -96,7 +96,7 @@ describe('getEventLinkHref', () => {
     );
   });
 
-  it('should return the source Links › Callbacks route for callback links', () => {
+  it('should return the source Callbacks route for callback links', () => {
     const link = {
       callback: {
         namespace: 'test-ns',
@@ -111,7 +111,7 @@ describe('getEventLinkHref', () => {
 
     const result = getEventLinkHref(link);
     expect(result).toBe(
-      `${base}/namespaces/test-ns/nexus-operations/operation-1/run-1/links?tab=callbacks&requestId=req-1`,
+      `${base}/namespaces/test-ns/nexus-operations/operation-1/run-1/callbacks?requestId=req-1`,
     );
   });
 });
