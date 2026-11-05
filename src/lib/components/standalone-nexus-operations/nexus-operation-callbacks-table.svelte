@@ -116,24 +116,12 @@
   {/snippet}
   {#snippet headers()}
     <TableHeaderRow>
-      <th class="text-xs font-normal text-secondary"
-        >{translate('nexus.delivery-state')}</th
-      >
-      <th class="text-xs font-normal text-secondary"
-        >{translate('nexus.nexus-endpoint-column')}</th
-      >
-      <th class="text-xs font-normal text-secondary"
-        >{translate('nexus.nexus-service')}</th
-      >
-      <th class="text-xs font-normal text-secondary"
-        >{translate('nexus.nexus-operation')}</th
-      >
-      <th class="text-xs font-normal text-secondary"
-        >{translate('nexus.target-execution')}</th
-      >
-      <th class="text-xs font-normal text-secondary"
-        >{translate('nexus.target-event')}</th
-      >
+      <th>{translate('nexus.delivery-state')}</th>
+      <th>{translate('nexus.nexus-endpoint-column')}</th>
+      <th>{translate('nexus.nexus-service')}</th>
+      <th>{translate('nexus.nexus-operation')}</th>
+      <th>{translate('nexus.target-execution')}</th>
+      <th>{translate('nexus.target-event')}</th>
       <th class="w-11"></th>
     </TableHeaderRow>
   {/snippet}
@@ -144,7 +132,7 @@
       )}
       {@const handler = callback.callback?.nexusHandler}
       {@const target = toTarget(callback)}
-      <TableRow data-testid="callback-row" class="text-xs">
+      <TableRow data-testid="callback-row">
         <td data-testid="callback-delivery-state">
           <Badge
             text={deliveryState.label}
