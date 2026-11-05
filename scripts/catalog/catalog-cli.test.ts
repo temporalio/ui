@@ -10,6 +10,7 @@ import {
   catalogControlSetting,
   catalogHelp,
   catalogWorkerEntry,
+  isCatalogSourceChange,
   prepareCatalogCommand,
   runCatalogWorkerDevelopment,
 } from './catalog-cli';
@@ -152,52 +153,175 @@ describe('catalog CLI', () => {
   });
 
   describe('worker crash restarts', () => {
-    const createSpawn = () => {
+    const createHarness = () => {
       const exits: ((code: number | null) => void)[] = [];
+      const kills: NodeJS.Signals[] = [];
       const spawned: (readonly string[])[] = [];
-      const spawnProcess = vi.fn(
-        (_command: string, args: readonly string[]) => {
-          spawned.push(args);
-          return {
-            once: (event: string, listener: (code: number | null) => void) => {
-              if (event === 'exit') exits.push(listener);
-            },
-          } as never;
-        },
-      );
+      const signalListeners = new Map<string, () => void>();
+      let onChange: (filename: string) => void = () => undefined;
+      const stopWatching = vi.fn();
+      const watchedPaths: string[] = [];
 
-      return { exits, spawnProcess, spawned };
+      const spawnWorker = vi.fn((_command: string, args: readonly string[]) => {
+        spawned.push(args);
+        return {
+          once: (event: string, listener: (code: number | null) => void) => {
+            if (event === 'exit') exits.push(listener);
+          },
+          kill: (signal: NodeJS.Signals) => kills.push(signal),
+        } as never;
+      });
+      const options = {
+        environment: { CATALOG_CONTROL: 'on' },
+        rootDirectory: '/catalog-root',
+        log: () => undefined,
+        spawnWorker,
+        debounceMs: 200,
+        watchSources: (
+          paths: readonly string[],
+          listener: (filename: string) => void,
+        ) => {
+          watchedPaths.push(...paths);
+          onChange = listener;
+          return stopWatching;
+        },
+        signals: {
+          on: (signal: string, listener: () => void) =>
+            signalListeners.set(signal, listener),
+          off: (signal: string) => signalListeners.delete(signal),
+        },
+      };
+
+      return {
+        change: (filename: string) => onChange(filename),
+        exits,
+        kills,
+        options,
+        signal: (name: string) => signalListeners.get(name)?.(),
+        signalListeners,
+        spawnWorker,
+        spawned,
+        stopWatching,
+        watchedPaths,
+      };
     };
-    const options = {
-      environment: { CATALOG_CONTROL: 'on' },
-      rootDirectory: '/nonexistent-catalog-root',
-      log: () => undefined,
-    };
+    const spawnProcess = vi.fn();
 
     it('restarts the worker without watch mode after a crash exit', async () => {
-      const { exits, spawnProcess, spawned } = createSpawn();
-      const development = runCatalogWorkerDevelopment(spawnProcess, options);
+      const harness = createHarness();
+      const development = runCatalogWorkerDevelopment(
+        spawnProcess,
+        harness.options,
+      );
 
-      exits[0](75);
-      exits[1](0);
+      harness.exits[0](75);
+      harness.exits[1](0);
 
       await expect(development).resolves.toBeUndefined();
-      expect(spawned).toEqual([
+      expect(harness.spawned).toEqual([
         ['exec', 'esno', catalogWorkerEntry],
         ['exec', 'esno', catalogWorkerEntry],
       ]);
+      expect(spawnProcess).not.toHaveBeenCalled();
     });
 
     it('stops on any other failure instead of restarting', async () => {
-      const { exits, spawnProcess } = createSpawn();
-      const development = runCatalogWorkerDevelopment(spawnProcess, options);
+      const harness = createHarness();
+      const development = runCatalogWorkerDevelopment(
+        spawnProcess,
+        harness.options,
+      );
 
-      exits[0](1);
+      harness.exits[0](1);
 
       await expect(development).rejects.toThrow(
         `${catalogWorkerEntry} exited with status 1`,
       );
-      expect(spawnProcess).toHaveBeenCalledOnce();
+      expect(harness.spawnWorker).toHaveBeenCalledOnce();
+      expect(harness.stopWatching).toHaveBeenCalledOnce();
+      expect(harness.signalListeners.size).toBe(0);
+    });
+
+    it('watches the catalog sources under the project root', () => {
+      const harness = createHarness();
+      void runCatalogWorkerDevelopment(spawnProcess, harness.options);
+
+      expect(harness.watchedPaths).toEqual([
+        '/catalog-root/src/lib/catalog',
+        '/catalog-root/scripts/catalog',
+        '/catalog-root/catalog.local',
+      ]);
+    });
+
+    it('restarts the worker once for a burst of source changes', async () => {
+      vi.useFakeTimers();
+      try {
+        const harness = createHarness();
+        const development = runCatalogWorkerDevelopment(
+          spawnProcess,
+          harness.options,
+        );
+
+        harness.change('worker/examples/hello/workflow.ts');
+        harness.change('browser/catalog.generated.json');
+        vi.advanceTimersByTime(199);
+        expect(harness.kills).toEqual([]);
+
+        vi.advanceTimersByTime(1);
+        expect(harness.kills).toEqual(['SIGTERM']);
+
+        harness.exits[0](null);
+        expect(harness.spawnWorker).toHaveBeenCalledTimes(2);
+
+        harness.exits[1](0);
+        await expect(development).resolves.toBeUndefined();
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    it('ignores changes to files the worker does not load', () => {
+      vi.useFakeTimers();
+      try {
+        const harness = createHarness();
+        void runCatalogWorkerDevelopment(spawnProcess, harness.options);
+
+        harness.change('README.md');
+        harness.change('worker/.workflow.ts.swp');
+        harness.change('node_modules/pkg/index.js');
+        vi.advanceTimersByTime(1000);
+
+        expect(harness.kills).toEqual([]);
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    it('forwards an interrupt to the worker and stops without restarting', async () => {
+      const harness = createHarness();
+      const development = runCatalogWorkerDevelopment(
+        spawnProcess,
+        harness.options,
+      );
+
+      harness.signal('SIGINT');
+      expect(harness.kills).toEqual(['SIGINT']);
+
+      harness.exits[0](75);
+
+      await expect(development).resolves.toBeUndefined();
+      expect(harness.spawnWorker).toHaveBeenCalledOnce();
+      expect(harness.stopWatching).toHaveBeenCalledOnce();
+    });
+
+    it('recognizes worker source files', () => {
+      expect(isCatalogSourceChange('worker/runner.ts')).toBe(true);
+      expect(isCatalogSourceChange('browser/catalog.generated.json')).toBe(
+        true,
+      );
+      expect(isCatalogSourceChange('examples/index.mjs')).toBe(true);
+      expect(isCatalogSourceChange('README.md')).toBe(false);
+      expect(isCatalogSourceChange('node_modules/x/index.js')).toBe(false);
     });
 
     it('reads the crash control from the environment, then the local env file, then the defaults', async () => {

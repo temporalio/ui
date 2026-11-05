@@ -135,7 +135,7 @@ Crash is on only when the workspace declares `controls: ['crash']` and the runti
 
 The exit ends the whole process, so every workspace in it restarts. Run the worker under something that restarts it after a non-zero exit. A worker with crash enabled sets a 1-second sticky queue timeout, so the restarted worker picks up the run within a few seconds.
 
-Locally, `pnpm catalog worker` and `pnpm catalog dev` restart the worker after a crash when `CATALOG_CONTROL=on`, from the environment or an env file. They restart only on the crash exit code, 75. Any other failure stops the command. File watching is off while crash control is on.
+Locally, `pnpm catalog worker` and `pnpm catalog dev` restart the worker after a crash when `CATALOG_CONTROL=on`, from the environment or an env file. They restart only on the crash exit code, 75. Any other failure stops the command. Node's `--watch` cannot restart a process that exits, so with crash control on, the command watches `src/lib/catalog`, `scripts/catalog` and `catalog.local` itself. A change to a `.ts`, `.js` or `.json` file restarts the worker, including a new example or workspace.
 
 The shared catalog declares the crash control. Its `worker-crash` example waits for a set time so you can crash the worker during the run:
 
