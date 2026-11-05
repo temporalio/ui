@@ -41,7 +41,8 @@ export type LivePollOptions = {
  * workflow's close event.
  */
 /**
- * Returns the last cursor token when the loop exits (due to abort or error).
+ * Returns the last cursor token when the loop exits (due to abort or close).
+ * Rejects if response processing or a callback throws.
  * The caller can save this token and pass it as `startToken` when resuming.
  */
 export async function runLivePoll({
@@ -70,9 +71,11 @@ export async function runLivePoll({
 
   let token: string = startToken;
   while (!signal.aborted) {
+    let response: GetWorkflowExecutionHistoryResponse | undefined;
     try {
-      const response =
-        await requestFromAPI<GetWorkflowExecutionHistoryResponse>(route, {
+      response = await requestFromAPI<GetWorkflowExecutionHistoryResponse>(
+        route,
+        {
           token: token || undefined,
           request: fetch,
           params: {
@@ -80,28 +83,30 @@ export async function runLivePoll({
             waitNewEvent: 'true',
           },
           options: { signal },
-        });
-      const events = response?.history?.events ?? [];
-      let added = 0;
-      for (const ev of events) {
-        if (onEvent(ev)) added++;
-      }
-      if (added > 0) onNewEvents?.();
-      if (isWorkflowCloseEvent(events.at(-1))) break;
-
-      if (response?.nextPageToken) {
-        token = String(response.nextPageToken);
-        onToken?.(token);
-      } else {
-        token = '';
-        onToken?.(token);
-        if (added === 0) {
-          await wait(backoffMs);
-        }
-      }
+        },
+      );
     } catch {
       if (!signal.aborted) {
         await wait(errorBackoffMs);
+      }
+      continue;
+    }
+    const events = response?.history?.events ?? [];
+    let added = 0;
+    for (const ev of events) {
+      if (onEvent(ev)) added++;
+    }
+    if (added > 0) onNewEvents?.();
+    if (isWorkflowCloseEvent(events.at(-1))) break;
+
+    if (response?.nextPageToken) {
+      token = String(response.nextPageToken);
+      onToken?.(token);
+    } else {
+      token = '';
+      onToken?.(token);
+      if (added === 0) {
+        await wait(backoffMs);
       }
     }
   }

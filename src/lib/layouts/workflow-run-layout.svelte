@@ -328,6 +328,10 @@
   <WorkflowHistoryProvider controller={historyController}>
     <WorkflowHeader history={historyController.history} {headerSnippet} />
     {#if historyController.error}
+      {@const error = historyController.error}
+      {@const errorDetail =
+        error.message?.trim() ||
+        ('statusText' in error ? error.statusText?.trim() : '')}
       <Alert
         intent="error"
         title={translate('workflows.history-load-error')}
@@ -337,7 +341,9 @@
         <div class="space-y-3 pt-1">
           <div class="space-y-1">
             <p>{translate('workflows.history-load-error-description')}</p>
-            <p class="text-secondary">{historyController.error.message}</p>
+            {#if errorDetail}
+              <p class="text-secondary">{errorDetail}</p>
+            {/if}
           </div>
           <Button
             size="sm"

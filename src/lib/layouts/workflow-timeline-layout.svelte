@@ -234,37 +234,35 @@
   no scroll-offset bridge).
 -->
   {#if workflow}
-    {#key JSON.stringify([namespace, workflow.id, workflow.runId])}
-      <TimelineGraph
-        {namespace}
-        {workflow}
-        history={historyController.history}
-        {lazyGroups}
-        {reverseSort}
-        bind:activeGroupId
-        collapseIdleTime={$collapseIdleTime === 'on'}
-        failedOrPendingOnly={$eventStatusFilter}
-        loading={historyController.loading}
-        totalExpectedEvents={estimatedTotalGroups}
-        descMinId={historyController.descMinId}
-        error={Boolean(workflowTaskFailedError)}
-        onTimelineInit={handleTimelineInit}
-      >
-        {#snippet activityActions(activity)}
-          <ActivityCommands
-            {activity}
-            workflowExecutionIdentity={{
-              namespace,
-              workflowId: workflow.id,
-              runId: workflow.runId,
-            }}
-            {workflow}
-            onRefresh={triggerRefresh}
-            class="justify-end"
-          />
-        {/snippet}
-      </TimelineGraph>
-    {/key}
+    <TimelineGraph
+      {namespace}
+      {workflow}
+      history={historyController.history}
+      {lazyGroups}
+      {reverseSort}
+      bind:activeGroupId
+      collapseIdleTime={$collapseIdleTime === 'on'}
+      failedOrPendingOnly={$eventStatusFilter}
+      loading={historyController.loading}
+      totalExpectedEvents={estimatedTotalGroups}
+      descMinId={historyController.descMinId}
+      error={Boolean(workflowTaskFailedError)}
+      onTimelineInit={handleTimelineInit}
+    >
+      {#snippet activityActions(activity)}
+        <ActivityCommands
+          {activity}
+          workflowExecutionIdentity={{
+            namespace,
+            workflowId: workflow.id,
+            runId: workflow.runId,
+          }}
+          {workflow}
+          onRefresh={triggerRefresh}
+          class="justify-end"
+        />
+      {/snippet}
+    </TimelineGraph>
   {/if}
 </div>
 <!-- end wrapper -->

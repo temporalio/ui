@@ -227,6 +227,29 @@ describe('WorkflowHistoryController', () => {
     expect(controller.error).toBeNull();
   });
 
+  it('surfaces poll processing errors and cancels the history and poll session', async () => {
+    const { controller } = createController();
+    const load = controller.load(workflow('run-1', true));
+    const resume = vi.fn();
+    request(0).options.onPause?.({ resume });
+    expect(controller.loading).toBe(true);
+    const failure = new Error('poll processing failed');
+    poll(0).result.reject(failure);
+
+    await vi.waitFor(() => expect(controller.error).toBe(failure));
+
+    expect(controller.loading).toBe(false);
+    expect(controller.fetchComplete).toBe(false);
+    expect(request(0).options.signal?.aborted).toBe(true);
+    expect(poll(0).options.signal.aborted).toBe(true);
+    expect(resume).toHaveBeenCalledOnce();
+    request(0).result.resolve(stats);
+    await load;
+    expect(controller.error).toBe(failure);
+    expect(controller.fetchComplete).toBe(false);
+    expect(polls).toHaveLength(1);
+  });
+
   it('keeps load reset behavior after buffered history', async () => {
     const { controller, buffer } = createController();
     const load = controller.load(workflow());

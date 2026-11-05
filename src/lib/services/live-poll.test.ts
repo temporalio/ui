@@ -195,6 +195,51 @@ describe('runLivePoll — waitNewEvent long-poll', () => {
 // Event delivery
 // ---------------------------------------------------------------------------
 
+describe('runLivePoll — callback failures', () => {
+  it.each<{
+    callback: 'onEvent' | 'onNewEvents' | 'onToken';
+    nextPageToken: string;
+  }>([
+    { callback: 'onEvent', nextPageToken: 'next-token' },
+    { callback: 'onNewEvents', nextPageToken: 'next-token' },
+    { callback: 'onToken', nextPageToken: 'next-token' },
+    { callback: 'onToken', nextPageToken: '' },
+  ])(
+    'rejects without retrying when $callback throws (token: "$nextPageToken")',
+    async ({ callback, nextPageToken }) => {
+      const ctrl = new AbortController();
+      const failure = new Error('processing failed');
+      const callbacks = {
+        onEvent: vi.fn(() => true),
+        onNewEvents: vi.fn(),
+        onToken: vi.fn(),
+      };
+      callbacks[callback].mockImplementation(() => {
+        throw failure;
+      });
+      requestFromAPI
+        .mockResolvedValueOnce(pollResponse([1], nextPageToken))
+        .mockImplementation(() => {
+          ctrl.abort();
+          return Promise.resolve(pollResponse([]));
+        });
+
+      await expect(
+        runLivePoll({
+          route: '/api/events',
+          runId: 'run-1',
+          startToken: 'start-tok',
+          signal: ctrl.signal,
+          ...callbacks,
+          ...FAST,
+        }),
+      ).rejects.toBe(failure);
+      expect(requestFromAPI).toHaveBeenCalledTimes(1);
+      expect(ctrl.signal.aborted).toBe(false);
+    },
+  );
+});
+
 describe('runLivePoll — event delivery', () => {
   it('calls onEvent for each event in the response', async () => {
     const { onEvent, done } = startPoll([pollResponse([1, 2, 3])]);

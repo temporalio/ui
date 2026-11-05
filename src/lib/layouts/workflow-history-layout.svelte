@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
 
-  import { beforeNavigate, goto } from '$app/navigation';
+  import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
   import ActivityCommands from '$lib/components/activity/activity-commands.svelte';
@@ -32,7 +32,6 @@
   import WorkflowHistoryJson from '$lib/pages/workflow-history-json.svelte';
   import type { LazyGroup } from '$lib/services/grouped-event-buffer';
   import { getWorkflowHistoryController } from '$lib/services/workflow-history-controller.svelte.js';
-  import { clearActives } from '$lib/stores/active-events';
   import { eventFilterSort, eventViewType } from '$lib/stores/event-view';
   import { pauseLiveUpdates } from '$lib/stores/events';
   import { eventCategoryFilter, eventTypeFilter } from '$lib/stores/filters';
@@ -177,15 +176,6 @@
             : [...history, ...pending.activities, ...pending.nexusOperations],
           groups: view.groupsWithoutWorkflowTasks,
         };
-  });
-
-  $effect(() => {
-    $eventViewType;
-    clearActives();
-  });
-
-  beforeNavigate(() => {
-    clearActives();
   });
 
   $effect(() => {

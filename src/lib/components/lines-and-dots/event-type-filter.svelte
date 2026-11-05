@@ -16,7 +16,6 @@
     allEventTypeOptions,
     compactEventTypeOptions,
   } from '$lib/models/event-history/get-event-categorization';
-  import { clearActiveGroups } from '$lib/stores/active-events';
   import { eventViewType } from '$lib/stores/event-view';
   import { eventStatusFilter, eventTypeFilter } from '$lib/stores/filters';
   import { temporalVersion } from '$lib/stores/versions';
@@ -59,7 +58,6 @@
   });
 
   const onOptionClick = ({ value }: (typeof options)[number]) => {
-    clearActiveGroups();
     const newCategories = $eventTypeFilter.some((type) => type === value)
       ? $eventTypeFilter.filter((type) => type !== value)
       : [...$eventTypeFilter, value];
