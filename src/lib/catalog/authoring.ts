@@ -37,13 +37,29 @@ export type CatalogAuthoringSource = {
   registrationTypePath: string;
 };
 
+export type CatalogTargetGrouping = 'shared' | 'per-example';
+
 export type CatalogAuthoringTarget = {
   defaultNamespace: string;
   defaultTaskQueue: string;
+  grouping?: CatalogTargetGrouping;
   id: string;
   sourceId: string;
   workflowsModulePath: string;
 };
+
+export const perExampleTargetId = (
+  target: Pick<CatalogAuthoringTarget, 'id'>,
+  exampleId: string,
+) => `${target.id}-${exampleId}`;
+
+export const perExampleTaskQueue = (
+  target: Pick<CatalogAuthoringTarget, 'defaultTaskQueue'>,
+  exampleId: string,
+) => `${target.defaultTaskQueue}-${exampleId}`;
+
+const isPerExample = (target: Pick<CatalogAuthoringTarget, 'grouping'>) =>
+  target.grouping === 'per-example';
 
 export type CatalogAuthoringOutput = {
   consumers: readonly ('authoring' | 'browser' | 'worker')[];
@@ -240,6 +256,15 @@ export const validateCatalogAuthoringGraph = (
   }
   for (const target of graph.targets) {
     assertExplicitRelativePath(target.workflowsModulePath);
+    if (
+      target.grouping !== undefined &&
+      target.grouping !== 'shared' &&
+      target.grouping !== 'per-example'
+    ) {
+      throw new Error(
+        `Catalog target has an unknown grouping: ${String(target.grouping)}`,
+      );
+    }
     if (!sources.has(target.sourceId)) {
       throw new Error(
         `Catalog target references an unknown source: ${target.sourceId}`,
@@ -287,6 +312,29 @@ export const validateCatalogAuthoringGraph = (
   }
   const seenExamples = new Set<string>();
   const workflowOwners = new Map<string, string>();
+  const effectiveTargetIds = new Map(
+    graph.targets.map((target) => [target.id, `target ${target.id}`]),
+  );
+  const effectiveTaskQueues = new Map(
+    graph.targets.map((target) => [
+      target.defaultTaskQueue,
+      `target ${target.id}`,
+    ]),
+  );
+  const claimEffective = (
+    claims: Map<string, string>,
+    value: string,
+    owner: string,
+    kind: string,
+  ) => {
+    const existing = claims.get(value);
+    if (existing) {
+      throw new Error(
+        `Catalog ${kind} "${value}" is claimed by both ${existing} and ${owner}`,
+      );
+    }
+    claims.set(value, owner);
+  };
   for (const example of examples) {
     assertExampleId(example.id);
     if (seenExamples.has(example.id)) {
@@ -301,8 +349,26 @@ export const validateCatalogAuthoringGraph = (
       );
     }
     for (const path of example.sourceFiles) assertExplicitRelativePath(path);
+    if (isPerExample(target)) {
+      const owner = `example ${example.id}`;
+      claimEffective(
+        effectiveTargetIds,
+        perExampleTargetId(target, example.id),
+        owner,
+        'target id',
+      );
+      claimEffective(
+        effectiveTaskQueues,
+        perExampleTaskQueue(target, example.id),
+        owner,
+        'task queue',
+      );
+    }
     if (example.workflowType) {
-      const key = `${example.targetId}\0${example.workflowType}`;
+      const workerKey = isPerExample(target)
+        ? perExampleTargetId(target, example.id)
+        : example.targetId;
+      const key = `${workerKey}\0${example.workflowType}`;
       const existing = workflowOwners.get(key);
       if (existing) {
         throw new Error(
@@ -352,20 +418,59 @@ export const renderCatalogSourceAssembly = ({
     (example, index) =>
       `import { catalogExample as example${index} } from '${moduleSpecifier(source.registrationOutputPath, example.definitionImportPath)}';`,
   );
-  const registrations = ordered.map(
-    (_example, index) =>
-      `    registry.registerExample({ ...example${index}, targetId: '${target.id}' });`,
-  );
   const sourceFiles = [
     ...new Set(ordered.flatMap((example) => example.sourceFiles)),
   ]
     .sort()
     .map((path) => `    '${path}',`);
+  const workflowsUrl = (path: string) =>
+    `new URL('${moduleSpecifier(source.registrationOutputPath, path).replace(/\.js$/, '.ts')}', import.meta.url).href`;
+  const workerImports = isPerExample(target)
+    ? ordered.flatMap((example, index) =>
+        example.workflowExport && example.workflowImportPath
+          ? [
+              `import { ${example.workflowExport} as workflow${index} } from '${moduleSpecifier(source.registrationOutputPath, example.workflowImportPath)}';`,
+            ]
+          : [],
+      )
+    : [
+        `import * as workflows from '${moduleSpecifier(source.registrationOutputPath, target.workflowsModulePath)}';`,
+      ];
+  const sharedRegistrations = [
+    '    registry.registerTarget({',
+    `      id: '${target.id}',`,
+    `      namespace: '${target.defaultNamespace}',`,
+    `      taskQueue: '${target.defaultTaskQueue}',`,
+    `      workflowsPath: ${workflowsUrl(target.workflowsModulePath)},`,
+    '      workflowExports: workflows,',
+    '    });',
+    ...ordered.map(
+      (_example, index) =>
+        `    registry.registerExample({ ...example${index}, targetId: '${target.id}' });`,
+    ),
+  ];
+  const perExampleRegistrations = ordered.flatMap((example, index) => {
+    const targetId = perExampleTargetId(target, example.id);
+    const hasWorkflow = Boolean(
+      example.workflowExport && example.workflowImportPath,
+    );
+    const workflowType = example.workflowType ?? example.workflowExport;
+    return [
+      '    registry.registerTarget({',
+      `      id: '${targetId}',`,
+      `      namespace: '${target.defaultNamespace}',`,
+      `      taskQueue: '${perExampleTaskQueue(target, example.id)}',`,
+      `      workflowsPath: ${workflowsUrl(hasWorkflow ? example.workflowImportPath! : target.workflowsModulePath)},`,
+      `      workflowExports: ${hasWorkflow ? `{ ${workflowType}: workflow${index} }` : '{}'},`,
+      '    });',
+      `    registry.registerExample({ ...example${index}, targetId: '${targetId}' });`,
+    ];
+  });
   const registration = [
     '// GENERATED FILE. DO NOT EDIT.',
     ...imports,
     `import type { CatalogRegistrationSource } from '${moduleSpecifier(source.registrationOutputPath, source.registrationTypePath)}';`,
-    `import * as workflows from '${moduleSpecifier(source.registrationOutputPath, target.workflowsModulePath)}';`,
+    ...workerImports,
     '',
     'export const catalogRegistrationSource: CatalogRegistrationSource = {',
     `  source: ${JSON.stringify({ id: source.id, label: source.label })},`,
@@ -373,14 +478,7 @@ export const renderCatalogSourceAssembly = ({
     ...sourceFiles,
     '  ],',
     '  register: (registry) => {',
-    '    registry.registerTarget({',
-    `      id: '${target.id}',`,
-    `      namespace: '${target.defaultNamespace}',`,
-    `      taskQueue: '${target.defaultTaskQueue}',`,
-    `      workflowsPath: new URL('${moduleSpecifier(source.registrationOutputPath, target.workflowsModulePath).replace(/\.js$/, '.ts')}', import.meta.url).href,`,
-    '      workflowExports: workflows,',
-    '    });',
-    ...registrations,
+    ...(isPerExample(target) ? perExampleRegistrations : sharedRegistrations),
     '  },',
     '};',
     '',

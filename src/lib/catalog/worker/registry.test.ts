@@ -622,6 +622,56 @@ describe('generateCatalog', () => {
     );
   });
 
+  it('keeps same-name activities apart when each example has its own target', () => {
+    const registry = createCatalogRegistry();
+    const first = (name: string) => `hello ${name}`;
+    const second = (name: string) => `welcome ${name}`;
+    const registerIsolated = (
+      id: string,
+      activity: (name: string) => string,
+    ) => {
+      registry.registerTarget({
+        id: `catalog-${id}`,
+        namespace: 'default',
+        taskQueue: `catalog-${id}`,
+        workflowsPath: './workflows',
+        workflowExports: {},
+      });
+      registry.registerExample({
+        id,
+        title: id,
+        description: 'Runs a standalone greeting activity.',
+        targetId: `catalog-${id}`,
+        capabilityTags: [],
+        expectedEvidence: ['A completed activity result'],
+        input: { defaultValue: {}, schema: { type: 'object' } },
+        startOptions: { defaultValue: {}, schema: { type: 'object' } },
+        execution: {
+          kind: 'standalone-activity',
+          activityType: 'greetingActivity',
+          activity,
+          timeouts: {},
+          policies: {},
+        },
+      });
+    };
+
+    registerIsolated('first-greeting', first);
+    registerIsolated('second-greeting', second);
+
+    const { workerBindings } = generateCatalog(registry);
+
+    expect(
+      workerBindings.map(({ target, activities }) => [
+        target.taskQueue,
+        activities.greetingActivity,
+      ]),
+    ).toEqual([
+      ['catalog-first-greeting', first],
+      ['catalog-second-greeting', second],
+    ]);
+  });
+
   it('fails when browser metadata cannot be serialized as JSON', () => {
     const cyclicInput: Record<string, unknown> = {};
     cyclicInput.self = cyclicInput;

@@ -23,6 +23,8 @@ import {
   createCatalogAuthoring as createCatalogAuthoringSdk,
   createCatalogLocalArtifactVitePlugin,
   defineCatalogArtifact,
+  perExampleTargetId,
+  perExampleTaskQueue,
   renderCatalogSourceAssembly,
   runCatalogCli,
   validateCatalogAuthoringGraph,
@@ -1628,5 +1630,187 @@ try {
         [example],
       ),
     ).toThrow('browser boundary must declare a browser consumer');
+  });
+});
+
+describe('per-example catalog targets', () => {
+  const source = {
+    examplesPath: 'demos/examples',
+    id: 'demos',
+    label: 'Demos',
+    registrationOutputPath: 'demos/registration.ts',
+    registrationTypePath: 'demos/registration-source.ts',
+  };
+  const target = {
+    defaultNamespace: 'default',
+    defaultTaskQueue: 'demos',
+    grouping: 'per-example' as const,
+    id: 'demos',
+    sourceId: 'demos',
+    workflowsModulePath: 'demos/workflows.ts',
+  };
+  const workflowExample = (id: string, workflowType: string) => ({
+    definitionImportPath: `demos/examples/${id}/example.ts`,
+    id,
+    sourceFiles: [
+      `demos/examples/${id}/example.ts`,
+      `demos/examples/${id}/workflow.ts`,
+    ],
+    sourceId: 'demos',
+    targetId: 'demos',
+    workflowExport: workflowType,
+    workflowImportPath: `demos/examples/${id}/workflow.ts`,
+    workflowType,
+  });
+  const graph = {
+    boundaries: {
+      browserPaths: ['demos/catalog.json'],
+      packageJsonPath: 'package.json',
+      workerPaths: ['demos/registration.ts', 'demos/workflows.ts'],
+    },
+    outputs: [
+      { consumers: ['browser'] as const, path: 'demos/catalog.json' },
+      { consumers: ['worker'] as const, path: 'demos/registration.ts' },
+      { consumers: ['worker'] as const, path: 'demos/workflows.ts' },
+    ],
+    sources: [source],
+    targets: [target],
+  };
+
+  it('derives a target id and task queue for each example', () => {
+    expect(perExampleTargetId(target, 'money-transfer')).toBe(
+      'demos-money-transfer',
+    );
+    expect(perExampleTaskQueue(target, 'money-transfer')).toBe(
+      'demos-money-transfer',
+    );
+  });
+
+  it('registers one target, task queue, and workflow bundle for each example', () => {
+    const [registration] = renderCatalogSourceAssembly({
+      examples: [
+        workflowExample('order-saga', 'orderSaga'),
+        workflowExample('money-transfer', 'moneyTransfer'),
+      ],
+      source,
+      target,
+    });
+    const content = String(registration.content);
+
+    expect(content).not.toContain('import * as workflows');
+    expect(content).toContain(
+      "import { moneyTransfer as workflow0 } from './examples/money-transfer/workflow.js';",
+    );
+    expect(content).toContain(
+      [
+        '    registry.registerTarget({',
+        "      id: 'demos-money-transfer',",
+        "      namespace: 'default',",
+        "      taskQueue: 'demos-money-transfer',",
+        "      workflowsPath: new URL('./examples/money-transfer/workflow.ts', import.meta.url).href,",
+        '      workflowExports: { moneyTransfer: workflow0 },',
+        '    });',
+        "    registry.registerExample({ ...example0, targetId: 'demos-money-transfer' });",
+      ].join('\n'),
+    );
+    expect(content).toContain("taskQueue: 'demos-order-saga'");
+    expect(content).not.toContain("taskQueue: 'demos',");
+  });
+
+  it('keeps the shared registration unchanged when grouping is omitted', () => {
+    const sharedTarget = { ...target, grouping: undefined };
+    const explicitShared = { ...target, grouping: 'shared' as const };
+    const examples = [workflowExample('money-transfer', 'moneyTransfer')];
+
+    const omitted = renderCatalogSourceAssembly({
+      examples,
+      source,
+      target: sharedTarget,
+    });
+    const explicit = renderCatalogSourceAssembly({
+      examples,
+      source,
+      target: explicitShared,
+    });
+
+    expect(omitted).toEqual(explicit);
+    expect(String(omitted[0].content)).toContain(
+      "import * as workflows from './workflows.js';",
+    );
+    expect(String(omitted[0].content)).toContain("taskQueue: 'demos',");
+  });
+
+  it('allows the same workflow type in two per-example demos', () => {
+    expect(() =>
+      validateCatalogAuthoringGraph(graph, [
+        workflowExample('first-demo', 'demoWorkflow'),
+        workflowExample('second-demo', 'demoWorkflow'),
+      ]),
+    ).not.toThrow();
+  });
+
+  it('still rejects the same workflow type twice in a shared target', () => {
+    const sharedGraph = {
+      ...graph,
+      targets: [{ ...target, grouping: 'shared' as const }],
+    };
+
+    expect(() =>
+      validateCatalogAuthoringGraph(sharedGraph, [
+        workflowExample('first-demo', 'demoWorkflow'),
+        workflowExample('second-demo', 'demoWorkflow'),
+      ]),
+    ).toThrow('Workflow type "demoWorkflow" is declared by both');
+  });
+
+  it('rejects a derived task queue that collides with another target', () => {
+    const collidingGraph = {
+      ...graph,
+      sources: [
+        source,
+        {
+          ...source,
+          id: 'other',
+          registrationOutputPath: 'other/registration.ts',
+        },
+      ],
+      outputs: [
+        ...graph.outputs,
+        { consumers: ['worker'] as const, path: 'other/registration.ts' },
+        { consumers: ['worker'] as const, path: 'other/workflows.ts' },
+      ],
+      targets: [
+        target,
+        {
+          defaultNamespace: 'default',
+          defaultTaskQueue: 'demos-money-transfer',
+          id: 'other',
+          sourceId: 'other',
+          workflowsModulePath: 'other/workflows.ts',
+        },
+      ],
+    };
+
+    expect(() =>
+      validateCatalogAuthoringGraph(collidingGraph, [
+        workflowExample('money-transfer', 'moneyTransfer'),
+      ]),
+    ).toThrow(
+      'Catalog task queue "demos-money-transfer" is claimed by both target other and example money-transfer',
+    );
+  });
+
+  it('rejects an unknown grouping', () => {
+    expect(() =>
+      validateCatalogAuthoringGraph(
+        {
+          ...graph,
+          targets: [
+            { ...target, grouping: 'per-tenant' as unknown as 'shared' },
+          ],
+        },
+        [],
+      ),
+    ).toThrow('Catalog target has an unknown grouping: per-tenant');
   });
 });

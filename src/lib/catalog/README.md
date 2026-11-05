@@ -68,6 +68,19 @@ An API key cannot be combined with any TLS variable. The CA certificate and serv
 
 A target is a worker specification: a namespace, a task queue, a workflow bundle, and its activities. The catalog runs **one worker per target**, all in a single process sharing one connection. Starting the worker with two targets registered starts two workers.
 
+### Grouping examples into targets
+
+An authoring target declares how its examples map to workers with `grouping`:
+
+| Grouping                | Workers                 | Task queue                    | Workflow bundle             | Same activity name in two examples |
+| ----------------------- | ----------------------- | ----------------------------- | --------------------------- | ---------------------------------- |
+| `shared` (the default)  | One for all examples    | `defaultTaskQueue`            | The generated workflows module | An error                        |
+| `per-example`           | One for each example    | `<defaultTaskQueue>-<example>` | The example's own `workflow.ts` | Allowed                       |
+
+Use `shared` for many small examples that exercise primitives. Use `per-example` when each example must have clear boundaries: its own task queue, bundle, and activities. Both groupings run in the same process. The generated catalog lists each example's task queue, so the browser does not need to know which grouping produced it.
+
+A `per-example` target registers targets named `<target id>-<example id>`. Validation fails when a derived target ID or task queue collides with another target. Moving an example to a target with a different grouping changes its task queue.
+
 The worker waits for the server rather than exiting if it starts first, printing progress while it retries. Non-connection failures, such as an invalid API key, still fail immediately.
 
 On a plaintext local connection, the worker creates any Nexus endpoints its examples declare. When it lacks the authority to do so — any credentialed connection, including Temporal Cloud — it prints the exact `temporal operator nexus endpoint create` command instead, and the catalog page shows the same command as copyable text.
