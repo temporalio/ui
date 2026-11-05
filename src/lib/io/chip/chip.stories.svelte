@@ -15,7 +15,7 @@
   ];
 
   const { Story } = defineMeta({
-    title: 'IO/Design System/Chip',
+    title: 'IO/Components/Chip',
     component: Chip,
     args: {
       text: 'chip',

@@ -211,6 +211,7 @@
       {id}
       class="flex h-full grow border-r border-primary bg-transparent p-2 text-primary placeholder:text-tertiary focus-visible:outline-none disabled:cursor-not-allowed disabled:text-tertiary"
       type="number"
+      aria-invalid={error ? 'true' : undefined}
       {disabled}
       bind:value={rawValue}
       {...inputProps}

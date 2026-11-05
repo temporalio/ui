@@ -82,8 +82,3 @@ const SECONDS_PER_YEAR = 365 * SECONDS_PER_DAY;
 
 export const MIN_CATCHUP_SECONDS = 10;
 export const DEFAULT_CATCHUP_WINDOW: DurationString = `${SECONDS_PER_YEAR}s`;
-export const DEFAULT_TASK_TIMEOUT: DurationString = '10s';
-// Run/execution timeouts default to empty, meaning "use the server default"
-// (unlimited). An empty value is omitted from the request entirely.
-export const DEFAULT_RUN_TIMEOUT = '';
-export const DEFAULT_EXECUTION_TIMEOUT = '';

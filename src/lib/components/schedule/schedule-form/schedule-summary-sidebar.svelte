@@ -5,15 +5,17 @@
   import Card from '$lib/holocene/card.svelte';
   import { translate } from '$lib/i18n/translate';
 
+  import type { ScheduledActionSummaryItem } from '../scheduled-action-types/types';
   import type { FormScheduleSchema } from '../schema/form';
   import { calendarDateStrToEndOfDayTimestamp } from '../utilities/date';
   import { getScheduleSpecSummary } from '../utilities/summarize';
 
   interface Props {
     form: Readable<FormScheduleSchema>;
+    actionSummary: ScheduledActionSummaryItem[];
   }
 
-  let { form }: Props = $props();
+  let { form, actionSummary }: Props = $props();
 
   const endDisplay = $derived.by(() => {
     switch ($form.endKind) {
@@ -86,18 +88,12 @@
       </dt>
       <dd class="text-sm">{endDisplay}</dd>
     </div>
-    <div>
-      <dt class="text-xs text-secondary">
-        {translate('schedules.summary-workflow-type-label')}
-      </dt>
-      <dd class="text-sm">{$form.workflowType || '--'}</dd>
-    </div>
-    <div>
-      <dt class="text-xs text-secondary">
-        {translate('common.task-queue')}
-      </dt>
-      <dd class="text-sm">{$form.taskQueue || '--'}</dd>
-    </div>
+    {#each actionSummary as { label, value } (label)}
+      <div>
+        <dt class="text-xs text-secondary">{label}</dt>
+        <dd class="text-sm">{value || '--'}</dd>
+      </div>
+    {/each}
     <div>
       <dt class="text-xs text-secondary">
         {translate('common.description')}

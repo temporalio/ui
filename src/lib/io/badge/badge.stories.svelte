@@ -22,7 +22,7 @@
   ];
 
   const { Story } = defineMeta({
-    title: 'IO/Design System/Badge',
+    title: 'IO/Components/Badge',
     component: Badge,
     args: {
       text: 'badge',

@@ -10,7 +10,6 @@
   import Card from '$lib/holocene/card.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { IconAdd } from '$lib/io/icon';
 
   import type {
     SearchAttributeDefinition,
@@ -222,12 +221,11 @@
       </div>
 
       <Button
-        variant="secondary"
+        variant="tertiary"
         size="sm"
         onclick={addAttribute}
         disabled={$submitting}
         type="button"
-        LeadingIcon={IconAdd}
       >
         {translate('search-attributes.add-attribute-button')}
       </Button>

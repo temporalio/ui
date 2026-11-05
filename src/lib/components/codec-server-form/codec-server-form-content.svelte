@@ -13,7 +13,7 @@
   import Textarea from '$lib/holocene/textarea.svelte';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { IconAdd, IconTrash } from '$lib/io/icon';
+  import { IconTrash } from '$lib/io/icon';
 
   import type { CodecServerFormData } from './types';
 
@@ -239,11 +239,10 @@
       {#if !showCustomSection}
         <Button
           type="button"
-          variant="secondary"
+          variant="tertiary"
           size="sm"
           onclick={() => (showCustomSection = true)}
           disabled={$submitting}
-          LeadingIcon={IconAdd}
         >
           {translate('codec-server.add-custom-button')}
         </Button>

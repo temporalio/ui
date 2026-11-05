@@ -17,8 +17,6 @@
   import type { FormScheduleSchema } from '../schema/form';
   import { fromCalendarDateStr, toCalendarDateStr } from '../utilities/date';
 
-  import ScheduleInputPayload from './schedule-input-payload.svelte';
-
   interface Props {
     form: SuperForm<FormScheduleSchema>['form'];
     errors: SuperForm<FormScheduleSchema>['errors'];
@@ -61,34 +59,6 @@
       hintText={$errors.name?.[0]}
       maxLength={232}
       disabled={Boolean(schedule)}
-      required
-    />
-    <Input
-      id="workflowType"
-      bind:value={$form.workflowType}
-      data-testid="schedule-type-input"
-      label={translate('common.workflow-type')}
-      error={!!$errors.workflowType?.[0]}
-      hintText={$errors.workflowType?.[0]}
-      required
-    />
-    <Input
-      id="workflowId"
-      bind:value={$form.workflowId}
-      data-testid="schedule-workflow-id-input"
-      label={translate('common.workflow-id')}
-      hintText={$errors.workflowId?.[0] ||
-        translate('schedules.workflow-id-hint')}
-      error={!!$errors.workflowId?.[0]}
-    />
-    <Input
-      id="taskQueue"
-      bind:value={$form.taskQueue}
-      data-testid="schedule-task-queue-input"
-      label={translate('common.task-queue')}
-      error={!!$errors.taskQueue?.[0]}
-      hintText={$errors.taskQueue?.[0] ||
-        translate('schedules.task-queue-hint')}
       required
     />
 
@@ -221,16 +191,5 @@
         {/snippet}
       </Input>
     </div>
-
-    <ScheduleInputPayload
-      bind:input={() => $form.input ?? '', (v) => ($form.input = v)}
-      bind:editInput={$form.editInput}
-      bind:encoding={$form.encoding}
-      bind:messageType={
-        () => $form.messageType ?? '', (v) => ($form.messageType = v)
-      }
-      payloads={schedule?.schedule?.action?.startWorkflow?.input ?? undefined}
-      showEditActions={Boolean(schedule)}
-    />
   </div>
 </Card>

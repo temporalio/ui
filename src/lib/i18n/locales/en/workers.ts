@@ -305,10 +305,14 @@ export const Strings = {
     'If the Namespace fails over to this Region, Tasks for this version wait until other Workers poll.',
   'region-not-configured-in': 'No Serverless Workers in {{regions}}',
   'region-all': 'All Regions',
-  'high-availability': 'High Availability',
-  'high-availability-off':
-    'Turn on to run Serverless Workers in a replica region after a failover.',
   'region-the-primary': 'the primary',
+  'region-compute': 'Serverless',
+  'region-compute-last':
+    'One Region must run Serverless Workers. Turn on the other Region first.',
+  'region-compute-off-primary':
+    'While the Namespace is active in {{region}}, Tasks for this version wait for your own Workers. Serverless Workers run only after failover to {{replica}}.',
+  'region-compute-off-replica':
+    'After failover to {{region}}, Tasks for this version wait for your own Workers.',
   'replica-same-region':
     'The primary and the replica both run in {{region}}, so an outage there stops both.',
   'region-arn-suggested-from-primary':

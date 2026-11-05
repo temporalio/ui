@@ -12,7 +12,7 @@ export const darkTheme = {
       brand: colorScales.indigo[8],
       primary: colorScales.slate[1],
       secondary: colorScales.slate[6],
-      tertiary: colorScales.neutral[4],
+      tertiary: colorScales.slate[8],
       information: colorScales.blue[7],
       success: colorScales.green[7],
       warning: colorScales.amber[7],
@@ -107,5 +107,16 @@ export const darkTheme = {
   },
   opacity: {
     disabled: '0.32',
+  },
+  spacing: {
+    'page-margin': '2.5rem',
+    'page-gutter': '1.5rem',
+    xl: '1.5rem',
+    lg: '1rem',
+    md: '0.75rem',
+    sm: '0.5rem',
+    xs: '0.375rem',
+    '2xs': '0.25rem',
+    '3xs': '0.125rem',
   },
 } satisfies IoTheme;

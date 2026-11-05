@@ -4,7 +4,7 @@
   import IconSvgWrapper from './icon-svg-wrapper.svelte';
 
   const { Story } = defineMeta({
-    title: 'IO/Design System/Icon',
+    title: 'IO/Components/Icon',
     component: IconSvgWrapper,
     argTypes: {
       title: { name: 'Accessible label', control: 'text' },
@@ -40,7 +40,7 @@
 <Story name="Contact Sheet">
   {#snippet template()}
     <div class="text-primary">
-      <p class="mb-4 text-sm opacity-60">{glyphs.length} icons</p>
+      <p class="mb-4 text-sm text-secondary">{glyphs.length} icons</p>
       <ul
         class="grid list-none grid-cols-[repeat(auto-fill,minmax(6.5rem,1fr))] gap-2 p-0"
       >

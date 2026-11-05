@@ -36,15 +36,13 @@
     <Skeleton class="h-8 w-28 rounded-sm" />
   </div>
 
-  <dl class="flex flex-col gap-2">
-    <dt class="text-sm font-medium text-secondary">
-      {translate('workflows.total-workflows')}
-    </dt>
-    <dd class="flex flex-wrap items-center gap-2">
+  <div class="flex flex-col gap-2">
+    <Skeleton class="h-5 w-32 rounded-sm" />
+    <div class="flex flex-wrap items-center gap-2">
       <Skeleton class="h-6 w-16 rounded-sm" />
       <Skeleton class="h-6 w-24 rounded-sm" />
-    </dd>
-  </dl>
+    </div>
+  </div>
 </header>
 <div class="flex flex-col gap-4 pb-24">
   <div class="flex flex-col gap-4 xl:flex-row">

@@ -5,6 +5,8 @@
 
   import CountRefreshButton from '$lib/components/count-refresh-button.svelte';
   import SavedQueryViews from '$lib/components/saved-query-views/saved-views.svelte';
+  import { scheduledActionPresentations } from '$lib/components/schedule/scheduled-action-types/presentation-registry';
+  import { resolveScheduledActionListEntry } from '$lib/components/schedule/scheduled-action-types/resolve-scheduled-action-list-entry';
   import SchedulesTableRow from '$lib/components/schedule/schedules-list/schedules-table-row.svelte';
   import FilterBar from '$lib/components/search-attribute-filter/filter-bar.svelte';
   import ConfigurableTableHeadersDrawer from '$lib/components/table/configurable-table-headers-drawer.svelte';
@@ -104,7 +106,16 @@
         type: 'string',
       },
       [translate('common.workflow-type')]: {
-        getValue: (schedule) => schedule.info?.workflowType?.name,
+        getValue: (schedule) => {
+          const action = resolveScheduledActionListEntry(schedule);
+          if (action.type === 'unknown') {
+            return undefined;
+          }
+
+          return scheduledActionPresentations[
+            action.type
+          ].schedulesList.getTypeSortValue(action.schedule);
+        },
         type: 'string',
       },
       [translate('schedules.recent-runs')]: {
@@ -278,7 +289,7 @@
             <EmptyState title={translate('schedules.empty-state-title')}>
               <p>
                 {translate('schedules.getting-started-docs-link-preface')}
-                <Link newTab href="https://docs.temporal.io/workflows/#schedule"
+                <Link newTab href="https://docs.temporal.io/schedule"
                   >{translate('schedules.getting-started-docs-link')}</Link
                 >
                 {translate('schedules.getting-started-cli-link-preface')}
