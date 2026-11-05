@@ -18,11 +18,11 @@ const createNexusHandler = (name: string) => {
   });
 };
 
-const createActivityBindings = (...targetIds: string[]) => {
+const createActivityBindings = (...workspaceIds: string[]) => {
   const registry = createCatalogRegistry();
 
-  for (const id of targetIds) {
-    registry.registerTarget({
+  for (const id of workspaceIds) {
+    registry.registerWorkspace({
       id,
       namespace: `${id}-namespace`,
       taskQueue: `${id}-queue`,
@@ -33,7 +33,7 @@ const createActivityBindings = (...targetIds: string[]) => {
       id: `${id}-example`,
       title: `${id} example`,
       description: `${id} example.`,
-      targetId: id,
+      workspaceId: id,
       capabilityTags: [],
       expectedEvidence: [`${id} result`],
       input: { defaultValue: {}, schema: {} },
@@ -52,7 +52,7 @@ const createActivityBindings = (...targetIds: string[]) => {
 };
 
 describe('catalog runner', () => {
-  it('constructs one worker from a generated target binding', async () => {
+  it('constructs one worker from a generated workspace binding', async () => {
     const registry = createCatalogRegistry();
     const activity = () => 'activity';
     const nexusService = createNexusHandler('catalog-service');
@@ -60,7 +60,7 @@ describe('catalog runner', () => {
     const run = vi.fn(async () => undefined);
     const shutdown = vi.fn();
     const createWorker = vi.fn(async () => ({ run, shutdown }));
-    registry.registerTarget({
+    registry.registerWorkspace({
       id: 'catalog-target',
       namespace: 'catalog-namespace',
       taskQueue: 'catalog-task-queue',
@@ -71,7 +71,7 @@ describe('catalog runner', () => {
       id: 'activity-example',
       title: 'Activity example',
       description: 'Runs an activity.',
-      targetId: 'catalog-target',
+      workspaceId: 'catalog-target',
       capabilityTags: [],
       expectedEvidence: ['Activity result'],
       input: { defaultValue: {}, schema: {} },
@@ -88,7 +88,7 @@ describe('catalog runner', () => {
       id: 'nexus-example',
       title: 'Nexus example',
       description: 'Runs a Nexus operation.',
-      targetId: 'catalog-target',
+      workspaceId: 'catalog-target',
       capabilityTags: [],
       expectedEvidence: ['Nexus result'],
       input: { defaultValue: {}, schema: {} },
@@ -134,7 +134,7 @@ describe('catalog runner', () => {
     }));
     const bindings = createActivityBindings('catalog').map((binding) => ({
       ...binding,
-      target: { ...binding.target, workflowsPath },
+      workspace: { ...binding.workspace, workflowsPath },
     }));
 
     const runner = await startCatalogRunner({
@@ -160,8 +160,8 @@ describe('catalog runner', () => {
     }));
     const bindings = createActivityBindings('catalog').map((binding) => ({
       ...binding,
-      target: {
-        ...binding.target,
+      workspace: {
+        ...binding.workspace,
         workflowsPath: pathToFileURL(workflowsPath).href,
       },
     }));
@@ -190,7 +190,7 @@ describe('catalog runner', () => {
     }));
     const bindings = createActivityBindings('catalog').map((binding) => ({
       ...binding,
-      target: { ...binding.target, workflowsPath: './workflows.js' },
+      workspace: { ...binding.workspace, workflowsPath: './workflows.js' },
     }));
 
     expect(fs.existsSync(packagedWorkflowsPath)).toBe(false);
@@ -224,14 +224,14 @@ describe('catalog runner', () => {
     }
   });
 
-  it('constructs every target worker before any worker begins running', async () => {
+  it('constructs every workspace worker before any worker begins running', async () => {
     const registry = createCatalogRegistry();
     const events: string[] = [];
     const connection = { close: vi.fn(async () => undefined) };
 
     for (const id of ['first', 'second']) {
       const activity = () => id;
-      registry.registerTarget({
+      registry.registerWorkspace({
         id,
         namespace: `${id}-namespace`,
         taskQueue: `${id}-queue`,
@@ -242,7 +242,7 @@ describe('catalog runner', () => {
         id: `${id}-example`,
         title: `${id} example`,
         description: `Runs the ${id} activity.`,
-        targetId: id,
+        workspaceId: id,
         capabilityTags: [],
         expectedEvidence: [`${id} result`],
         input: { defaultValue: {}, schema: {} },
@@ -290,7 +290,7 @@ describe('catalog runner', () => {
     };
 
     for (const id of ['first', 'second']) {
-      registry.registerTarget({
+      registry.registerWorkspace({
         id,
         namespace: `${id}-namespace`,
         taskQueue: `${id}-queue`,
@@ -301,7 +301,7 @@ describe('catalog runner', () => {
         id: `${id}-example`,
         title: `${id} example`,
         description: `${id} example.`,
-        targetId: id,
+        workspaceId: id,
         capabilityTags: [],
         expectedEvidence: [`${id} result`],
         input: { defaultValue: {}, schema: {} },
@@ -407,7 +407,7 @@ describe('catalog runner', () => {
     ]);
   });
 
-  it('emits a structured, secret-free event when a target worker run fails', async () => {
+  it('emits a structured, secret-free event when a workspace worker run fails', async () => {
     const runError = new Error('worker run failed');
     const events: unknown[] = [];
     const connection = {
@@ -435,8 +435,8 @@ describe('catalog runner', () => {
     await expect(runner.completion).rejects.toBe(runError);
 
     expect(events).toContainEqual({
-      type: 'target-failed',
-      targetId: 'catalog',
+      type: 'workspace-failed',
+      workspaceId: 'catalog',
       phase: 'run',
     });
     expect(JSON.stringify(events)).not.toContain(connection.address);
@@ -515,7 +515,7 @@ describe('catalog runner', () => {
     ]);
   });
 
-  it('emits structured, secret-free connection and target lifecycle events', async () => {
+  it('emits structured, secret-free connection and workspace lifecycle events', async () => {
     const events: unknown[] = [];
     let settleRun: (() => void) | undefined;
 
@@ -535,17 +535,17 @@ describe('catalog runner', () => {
 
     expect(events).toEqual([
       { type: 'connection-acquired', mode: 'owned' },
-      { targetId: 'catalog', type: 'target-creating' },
-      { targetId: 'catalog', type: 'target-created' },
-      { targetId: 'catalog', type: 'target-running' },
-      { targetId: 'catalog', type: 'target-stopped' },
+      { workspaceId: 'catalog', type: 'workspace-creating' },
+      { workspaceId: 'catalog', type: 'workspace-created' },
+      { workspaceId: 'catalog', type: 'workspace-running' },
+      { workspaceId: 'catalog', type: 'workspace-stopped' },
     ]);
     expect(JSON.stringify(events)).not.toContain('TEMPORAL_API_KEY');
     expect(JSON.stringify(events)).not.toContain('certificate');
     expect(JSON.stringify(events)).not.toContain('temporal.example');
   });
 
-  it('creates one owned connection and shares it across every target worker', async () => {
+  it('creates one owned connection and shares it across every workspace worker', async () => {
     const connection = { close: vi.fn(async () => undefined) };
     const connectionFactory = vi.fn(async () => connection);
     const workerConnections: unknown[] = [];
@@ -577,7 +577,7 @@ describe('catalog runner', () => {
         connectionFactory,
         createWorker: vi.fn(),
       }),
-    ).rejects.toThrowError('Catalog has no runnable targets');
+    ).rejects.toThrowError('Catalog has no runnable workspaces');
 
     expect(connectionFactory).not.toHaveBeenCalled();
   });

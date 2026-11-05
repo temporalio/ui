@@ -8,9 +8,9 @@ The catalog page is reachable only in local development. Every other environment
 
 Two rules answer nearly every configuration question.
 
-**Namespace comes from where you are.** In the browser, it is the namespace in the URL: `/namespaces/staging/catalog` targets `staging`. For the worker, it comes from `TEMPORAL_NAMESPACE`. These are separate settings, so point them at the same namespace — otherwise the catalog shows examples whose readiness reports no worker polling, because the worker is polling somewhere else.
+**Namespace comes from where you are.** In the browser, it is the namespace in the URL: `/namespaces/staging/catalog` workspaces `staging`. For the worker, it comes from `TEMPORAL_NAMESPACE`. These are separate settings, so point them at the same namespace — otherwise the catalog shows examples whose readiness reports no worker polling, because the worker is polling somewhere else.
 
-**Task queues come only from registration.** Each target declares its own task queue in code. No environment variable overrides it. This is deliberate: the UI's readiness check and the worker's polling derive the queue from the same declaration, so they cannot disagree.
+**Task queues come only from registration.** Each workspace declares its own task queue in code. No environment variable overrides it. This is deliberate: the UI's readiness check and the worker's polling derive the queue from the same declaration, so they cannot disagree.
 
 ## Environment files
 
@@ -30,7 +30,7 @@ Copy the example file to `.env.catalog.local` and uncomment what you need. Only 
 | ---------------------------- | ------------------------------------------------------------------- |
 | `TEMPORAL_ADDRESS`           | Server address. Defaults to `127.0.0.1:7233`.                       |
 | `TEMPORAL_NAMESPACE`         | Namespace the worker registers and polls in. Defaults to `default`. |
-| `CATALOG_TARGET_ID` | Optional. Run one target instead of all of them.                    |
+| `CATALOG_WORKSPACE_ID` | Optional. Run one workspace instead of all of them.                    |
 
 Prefer `127.0.0.1` over `localhost`. On some machines `localhost` resolves to IPv6 and reaches a different Temporal server than the UI is reading — for example a container publishing the same port — which appears as a healthy worker the catalog cannot see.
 
@@ -66,11 +66,11 @@ An API key cannot be combined with any TLS variable. The CA certificate and serv
 
 ## The worker
 
-A target is a worker specification: a namespace, a task queue, a workflow bundle, and its activities. The catalog runs **one worker per target**, all in a single process sharing one connection. Starting the worker with two targets registered starts two workers.
+A workspace is a worker specification: a namespace, a task queue, a workflow bundle, and its activities. The catalog runs **one worker per workspace**, all in a single process sharing one connection. Starting the worker with two workspaces registered starts two workers.
 
-### Grouping examples into targets
+### Grouping examples into workspaces
 
-An authoring target declares how its examples map to workers with `grouping`:
+An authoring workspace declares how its examples map to workers with `grouping`:
 
 | Grouping                | Workers                 | Task queue                    | Workflow bundle             | Same activity name in two examples |
 | ----------------------- | ----------------------- | ----------------------------- | --------------------------- | ---------------------------------- |
@@ -79,7 +79,7 @@ An authoring target declares how its examples map to workers with `grouping`:
 
 Use `shared` for many small examples that exercise primitives. Use `per-example` when each example must have clear boundaries: its own task queue, bundle, and activities. Both groupings run in the same process. The generated catalog lists each example's task queue, so the browser does not need to know which grouping produced it.
 
-A `per-example` target registers targets named `<target id>-<example id>`. Validation fails when a derived target ID or task queue collides with another target. Moving an example to a target with a different grouping changes its task queue.
+A `per-example` workspace registers workspaces named `<workspace id>-<example id>`. Validation fails when a derived workspace ID or task queue collides with another workspace. Moving an example to a workspace with a different grouping changes its task queue.
 
 The worker waits for the server rather than exiting if it starts first, printing progress while it retries. Non-connection failures, such as an invalid API key, still fail immediately.
 

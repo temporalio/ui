@@ -67,7 +67,7 @@ const sharedWorkflowDefinitions = [
 export const sharedWorkflowExamples: readonly CatalogExampleRegistration[] =
   sharedWorkflowDefinitions.map((example) => ({
     ...example,
-    targetId: 'shared-workflows',
+    workspaceId: 'shared-workflows',
   }));
 
 const seenExampleIds = new Set<string>();

@@ -37,29 +37,29 @@ export type CatalogAuthoringSource = {
   registrationTypePath: string;
 };
 
-export type CatalogTargetGrouping = 'shared' | 'per-example';
+export type CatalogWorkspaceGrouping = 'shared' | 'per-folder';
 
-export type CatalogAuthoringTarget = {
+export type CatalogAuthoringWorkspace = {
   defaultNamespace: string;
   defaultTaskQueue: string;
-  grouping?: CatalogTargetGrouping;
+  grouping?: CatalogWorkspaceGrouping;
   id: string;
   sourceId: string;
   workflowsModulePath: string;
 };
 
-export const perExampleTargetId = (
-  target: Pick<CatalogAuthoringTarget, 'id'>,
+export const perFolderWorkspaceId = (
+  workspace: Pick<CatalogAuthoringWorkspace, 'id'>,
   exampleId: string,
-) => `${target.id}-${exampleId}`;
+) => `${workspace.id}-${exampleId}`;
 
-export const perExampleTaskQueue = (
-  target: Pick<CatalogAuthoringTarget, 'defaultTaskQueue'>,
+export const perFolderTaskQueue = (
+  workspace: Pick<CatalogAuthoringWorkspace, 'defaultTaskQueue'>,
   exampleId: string,
-) => `${target.defaultTaskQueue}-${exampleId}`;
+) => `${workspace.defaultTaskQueue}-${exampleId}`;
 
-const isPerExample = (target: Pick<CatalogAuthoringTarget, 'grouping'>) =>
-  target.grouping === 'per-example';
+const isPerFolder = (workspace: Pick<CatalogAuthoringWorkspace, 'grouping'>) =>
+  workspace.grouping === 'per-folder';
 
 export type CatalogAuthoringOutput = {
   consumers: readonly ('authoring' | 'browser' | 'worker')[];
@@ -74,14 +74,14 @@ export type CatalogAuthoringGraph = {
   };
   outputs: readonly CatalogAuthoringOutput[];
   sources: readonly CatalogAuthoringSource[];
-  targets: readonly CatalogAuthoringTarget[];
+  workspaces: readonly CatalogAuthoringWorkspace[];
 };
 
 export type CatalogComposedExample = {
   id: string;
   sourceFiles: readonly string[];
   sourceId: string;
-  targetId: string;
+  workspaceId: string;
   workflowType?: string;
 };
 
@@ -227,7 +227,7 @@ export const validateCatalogAuthoringGraph = (
     return byId;
   };
   const sources = uniqueById(graph.sources, 'source');
-  const targets = uniqueById(graph.targets, 'target');
+  const workspaces = uniqueById(graph.workspaces, 'workspace');
   const outputPaths = new Set<string>();
   const outputsByPath = new Map<string, CatalogAuthoringOutput>();
   for (const output of graph.outputs) {
@@ -254,30 +254,33 @@ export const validateCatalogAuthoringGraph = (
       );
     }
   }
-  for (const target of graph.targets) {
-    assertExplicitRelativePath(target.workflowsModulePath);
+  for (const workspace of graph.workspaces) {
+    assertExplicitRelativePath(workspace.workflowsModulePath);
     if (
-      target.grouping !== undefined &&
-      target.grouping !== 'shared' &&
-      target.grouping !== 'per-example'
+      workspace.grouping !== undefined &&
+      workspace.grouping !== 'shared' &&
+      workspace.grouping !== 'per-folder'
     ) {
       throw new Error(
-        `Catalog target has an unknown grouping: ${String(target.grouping)}`,
+        `Catalog workspace has an unknown grouping: ${String(workspace.grouping)}`,
       );
     }
-    if (!sources.has(target.sourceId)) {
+    if (!sources.has(workspace.sourceId)) {
       throw new Error(
-        `Catalog target references an unknown source: ${target.sourceId}`,
+        `Catalog workspace references an unknown source: ${workspace.sourceId}`,
       );
     }
-    if (!target.defaultNamespace.trim() || !target.defaultTaskQueue.trim()) {
+    if (
+      !workspace.defaultNamespace.trim() ||
+      !workspace.defaultTaskQueue.trim()
+    ) {
       throw new Error(
-        `Catalog target must declare a default namespace and task queue: ${target.id}`,
+        `Catalog workspace must declare a default namespace and task queue: ${workspace.id}`,
       );
     }
-    if (!outputPaths.has(target.workflowsModulePath)) {
+    if (!outputPaths.has(workspace.workflowsModulePath)) {
       throw new Error(
-        `Catalog workflows output is undeclared: ${target.workflowsModulePath}`,
+        `Catalog workflows output is undeclared: ${workspace.workflowsModulePath}`,
       );
     }
   }
@@ -312,13 +315,16 @@ export const validateCatalogAuthoringGraph = (
   }
   const seenExamples = new Set<string>();
   const workflowOwners = new Map<string, string>();
-  const effectiveTargetIds = new Map(
-    graph.targets.map((target) => [target.id, `target ${target.id}`]),
+  const effectiveWorkspaceIds = new Map(
+    graph.workspaces.map((workspace) => [
+      workspace.id,
+      `workspace ${workspace.id}`,
+    ]),
   );
   const effectiveTaskQueues = new Map(
-    graph.targets.map((target) => [
-      target.defaultTaskQueue,
-      `target ${target.id}`,
+    graph.workspaces.map((workspace) => [
+      workspace.defaultTaskQueue,
+      `workspace ${workspace.id}`,
     ]),
   );
   const claimEffective = (
@@ -342,32 +348,32 @@ export const validateCatalogAuthoringGraph = (
     }
     seenExamples.add(example.id);
     const source = sources.get(example.sourceId);
-    const target = targets.get(example.targetId);
-    if (!source || !target || target.sourceId !== source.id) {
+    const workspace = workspaces.get(example.workspaceId);
+    if (!source || !workspace || workspace.sourceId !== source.id) {
       throw new Error(
-        `Catalog example has an invalid source/target composition: ${example.id}`,
+        `Catalog example has an invalid source/workspace composition: ${example.id}`,
       );
     }
     for (const path of example.sourceFiles) assertExplicitRelativePath(path);
-    if (isPerExample(target)) {
+    if (isPerFolder(workspace)) {
       const owner = `example ${example.id}`;
       claimEffective(
-        effectiveTargetIds,
-        perExampleTargetId(target, example.id),
+        effectiveWorkspaceIds,
+        perFolderWorkspaceId(workspace, example.id),
         owner,
-        'target id',
+        'workspace id',
       );
       claimEffective(
         effectiveTaskQueues,
-        perExampleTaskQueue(target, example.id),
+        perFolderTaskQueue(workspace, example.id),
         owner,
         'task queue',
       );
     }
     if (example.workflowType) {
-      const workerKey = isPerExample(target)
-        ? perExampleTargetId(target, example.id)
-        : example.targetId;
+      const workerKey = isPerFolder(workspace)
+        ? perFolderWorkspaceId(workspace, example.id)
+        : example.workspaceId;
       const key = `${workerKey}\0${example.workflowType}`;
       const existing = workflowOwners.get(key);
       if (existing) {
@@ -391,22 +397,25 @@ const moduleSpecifier = (fromPath: string, toPath: string) => {
 export const renderCatalogSourceAssembly = ({
   examples,
   source,
-  target,
+  workspace,
 }: {
   examples: readonly CatalogAssemblyExample[];
   source: CatalogAuthoringSource;
-  target: CatalogAuthoringTarget;
+  workspace: CatalogAuthoringWorkspace;
 }) => {
-  if (target.sourceId !== source.id) {
-    throw new Error('Catalog source assembly target has the wrong source');
+  if (workspace.sourceId !== source.id) {
+    throw new Error('Catalog source assembly workspace has the wrong source');
   }
   const ordered = [...examples].sort((left, right) =>
     left.id < right.id ? -1 : left.id > right.id ? 1 : 0,
   );
   for (const example of ordered) {
-    if (example.sourceId !== source.id || example.targetId !== target.id) {
+    if (
+      example.sourceId !== source.id ||
+      example.workspaceId !== workspace.id
+    ) {
       throw new Error(
-        `Catalog assembly example is assigned to another source or target: ${example.id}`,
+        `Catalog assembly example is assigned to another source or workspace: ${example.id}`,
       );
     }
     assertExplicitRelativePath(example.definitionImportPath);
@@ -425,7 +434,7 @@ export const renderCatalogSourceAssembly = ({
     .map((path) => `    '${path}',`);
   const workflowsUrl = (path: string) =>
     `new URL('${moduleSpecifier(source.registrationOutputPath, path).replace(/\.js$/, '.ts')}', import.meta.url).href`;
-  const workerImports = isPerExample(target)
+  const workerImports = isPerFolder(workspace)
     ? ordered.flatMap((example, index) =>
         example.workflowExport && example.workflowImportPath
           ? [
@@ -434,36 +443,36 @@ export const renderCatalogSourceAssembly = ({
           : [],
       )
     : [
-        `import * as workflows from '${moduleSpecifier(source.registrationOutputPath, target.workflowsModulePath)}';`,
+        `import * as workflows from '${moduleSpecifier(source.registrationOutputPath, workspace.workflowsModulePath)}';`,
       ];
   const sharedRegistrations = [
-    '    registry.registerTarget({',
-    `      id: '${target.id}',`,
-    `      namespace: '${target.defaultNamespace}',`,
-    `      taskQueue: '${target.defaultTaskQueue}',`,
-    `      workflowsPath: ${workflowsUrl(target.workflowsModulePath)},`,
+    '    registry.registerWorkspace({',
+    `      id: '${workspace.id}',`,
+    `      namespace: '${workspace.defaultNamespace}',`,
+    `      taskQueue: '${workspace.defaultTaskQueue}',`,
+    `      workflowsPath: ${workflowsUrl(workspace.workflowsModulePath)},`,
     '      workflowExports: workflows,',
     '    });',
     ...ordered.map(
       (_example, index) =>
-        `    registry.registerExample({ ...example${index}, targetId: '${target.id}' });`,
+        `    registry.registerExample({ ...example${index}, workspaceId: '${workspace.id}' });`,
     ),
   ];
   const perExampleRegistrations = ordered.flatMap((example, index) => {
-    const targetId = perExampleTargetId(target, example.id);
+    const workspaceId = perFolderWorkspaceId(workspace, example.id);
     const hasWorkflow = Boolean(
       example.workflowExport && example.workflowImportPath,
     );
     const workflowType = example.workflowType ?? example.workflowExport;
     return [
-      '    registry.registerTarget({',
-      `      id: '${targetId}',`,
-      `      namespace: '${target.defaultNamespace}',`,
-      `      taskQueue: '${perExampleTaskQueue(target, example.id)}',`,
-      `      workflowsPath: ${workflowsUrl(hasWorkflow ? example.workflowImportPath! : target.workflowsModulePath)},`,
+      '    registry.registerWorkspace({',
+      `      id: '${workspaceId}',`,
+      `      namespace: '${workspace.defaultNamespace}',`,
+      `      taskQueue: '${perFolderTaskQueue(workspace, example.id)}',`,
+      `      workflowsPath: ${workflowsUrl(hasWorkflow ? example.workflowImportPath! : workspace.workflowsModulePath)},`,
       `      workflowExports: ${hasWorkflow ? `{ ${workflowType}: workflow${index} }` : '{}'},`,
       '    });',
-      `    registry.registerExample({ ...example${index}, targetId: '${targetId}' });`,
+      `    registry.registerExample({ ...example${index}, workspaceId: '${workspaceId}' });`,
     ];
   });
   const registration = [
@@ -478,7 +487,7 @@ export const renderCatalogSourceAssembly = ({
     ...sourceFiles,
     '  ],',
     '  register: (registry) => {',
-    ...(isPerExample(target) ? perExampleRegistrations : sharedRegistrations),
+    ...(isPerFolder(workspace) ? perExampleRegistrations : sharedRegistrations),
     '  },',
     '};',
     '',
@@ -487,12 +496,12 @@ export const renderCatalogSourceAssembly = ({
     .filter((example) => example.workflowExport && example.workflowImportPath)
     .map(
       (example) =>
-        `export { ${example.workflowExport} } from '${moduleSpecifier(target.workflowsModulePath, example.workflowImportPath!)}';`,
+        `export { ${example.workflowExport} } from '${moduleSpecifier(workspace.workflowsModulePath, example.workflowImportPath!)}';`,
     );
   return composeCatalogArtifacts([
     defineCatalogArtifact(source.registrationOutputPath, registration),
     defineCatalogArtifact(
-      target.workflowsModulePath,
+      workspace.workflowsModulePath,
       ['// GENERATED FILE. DO NOT EDIT.', ...workflowExports, ''].join('\n'),
     ),
   ]);
@@ -1323,7 +1332,7 @@ const formatCatalogList = (examples: readonly CatalogComposedExample[]) => {
       [
         example.id,
         example.sourceId,
-        example.targetId,
+        example.workspaceId,
         example.workflowType ?? '-',
       ].join('\t'),
     )

@@ -14,7 +14,7 @@ export const catalogRegistrationSource: CatalogRegistrationSource = {
     ...sharedWorkflowSourceFiles,
   ],
   register: (registry) => {
-    registry.registerTarget({
+    registry.registerWorkspace({
       id: 'shared-workflows',
       namespace: 'default',
       taskQueue: 'ui-catalog',

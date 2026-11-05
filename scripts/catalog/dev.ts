@@ -17,7 +17,7 @@ import {
   declaredNexusEndpoints,
   ensureDeclaredNexusEndpoints,
 } from '../../src/lib/catalog/worker/endpoint-provisioning';
-import type { CatalogTarget } from '../../src/lib/catalog/worker/registry';
+import type { CatalogWorkspace } from '../../src/lib/catalog/worker/registry';
 import { requireCatalogRoutingFromEnvironment } from '../../src/lib/catalog/worker/routing-config';
 import type { CatalogRunnerEvent } from '../../src/lib/catalog/worker/runner';
 import {
@@ -39,23 +39,23 @@ const environmentPaths = [
 const loadEnvironment = (
   process as NodeJS.Process & { loadEnvFile: (path: string) => void }
 ).loadEnvFile;
-const runningTargetIds = new Set<string>();
-let announcedTargets: readonly { target: CatalogTarget }[] = [];
+const runningWorkspaceIds = new Set<string>();
+let announcedWorkspaces: readonly { workspace: CatalogWorkspace }[] = [];
 
 const emitCatalogEvent = ({ type, ...details }: CatalogRunnerEvent) => {
   console.info(
     JSON.stringify({ component: 'catalog', event: type, ...details }),
   );
 
-  if (type !== 'target-running') return;
+  if (type !== 'workspace-running') return;
 
-  runningTargetIds.add((details as { targetId: string }).targetId);
+  runningWorkspaceIds.add((details as { workspaceId: string }).workspaceId);
 
-  if (runningTargetIds.size !== announcedTargets.length) return;
+  if (runningWorkspaceIds.size !== announcedWorkspaces.length) return;
 
   console.info(
     formatCatalogBanner({
-      targets: announcedTargets.map(({ target }) => target),
+      workspaces: announcedWorkspaces.map(({ workspace }) => workspace),
       color: supportsAnsiColor({
         isTTY: Boolean(process.stdout.isTTY),
         environment: process.env,
@@ -73,15 +73,15 @@ for (const environmentPath of environmentPaths) {
 }
 
 try {
-  const workerBindings = await loadProjectCatalogWorkerBindings((targets) =>
-    requireCatalogRoutingFromEnvironment(process.env, targets),
+  const workerBindings = await loadProjectCatalogWorkerBindings((workspaces) =>
+    requireCatalogRoutingFromEnvironment(process.env, workspaces),
   );
-  const selectedBindings = process.env.CATALOG_TARGET_ID
+  const selectedBindings = process.env.CATALOG_WORKSPACE_ID
     ? workerBindings.filter(
-        ({ target }) => target.id === process.env.CATALOG_TARGET_ID,
+        ({ workspace }) => workspace.id === process.env.CATALOG_WORKSPACE_ID,
       )
     : workerBindings;
-  announcedTargets = selectedBindings;
+  announcedWorkspaces = selectedBindings;
   const connectionConfig = parseCatalogConnectionConfig(process.env);
 
   if (
@@ -137,7 +137,7 @@ try {
 
   await runCatalogDevelopment({
     bindings: workerBindings,
-    targetId: process.env.CATALOG_TARGET_ID,
+    workspaceId: process.env.CATALOG_WORKSPACE_ID,
     connectionFactory: () =>
       connectWithRetry({
         connect: () => NativeConnection.connect(connectionConfig),

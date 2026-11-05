@@ -25,7 +25,7 @@ const generateWorkflowExampleWithInputSchema = (
   const workflow = () => undefined;
   const registry = createCatalogRegistry();
 
-  registry.registerTarget({
+  registry.registerWorkspace({
     id: 'catalog',
     namespace: 'default',
     taskQueue: 'catalog',
@@ -36,7 +36,7 @@ const generateWorkflowExampleWithInputSchema = (
     id: 'schema-example',
     title: 'Schema example',
     description: 'Exercises a JSON Schema registration.',
-    targetId: 'catalog',
+    workspaceId: 'catalog',
     capabilityTags: [],
     expectedEvidence: [],
     input: { defaultValue, schema },
@@ -104,7 +104,7 @@ describe('generateCatalog', () => {
     const activity = () => 'world';
     const registry = createCatalogRegistry();
 
-    registry.registerTarget({
+    registry.registerWorkspace({
       id: 'catalog',
       namespace: 'default',
       taskQueue: 'catalog',
@@ -115,7 +115,7 @@ describe('generateCatalog', () => {
       id: 'greeting',
       title: 'Greeting',
       description: 'Returns a greeting.',
-      targetId: 'catalog',
+      workspaceId: 'catalog',
       capabilityTags: ['signals'],
       expectedEvidence: ['A completed greeting result'],
       input: {
@@ -167,7 +167,7 @@ describe('generateCatalog', () => {
         },
         execution: {
           kind: 'workflow',
-          targetId: 'catalog',
+          workspaceId: 'catalog',
           namespace: 'default',
           taskQueue: 'catalog',
           workflowType: 'greetingWorkflow',
@@ -179,7 +179,7 @@ describe('generateCatalog', () => {
     );
     expect(generated.workerBindings).toEqual([
       {
-        target: {
+        workspace: {
           id: 'catalog',
           namespace: 'default',
           taskQueue: 'catalog',
@@ -207,7 +207,7 @@ describe('generateCatalog', () => {
     const activity = (name: string) => `hello ${name}`;
     const registry = createCatalogRegistry();
 
-    registry.registerTarget({
+    registry.registerWorkspace({
       id: 'catalog',
       namespace: 'default',
       taskQueue: 'catalog',
@@ -218,7 +218,7 @@ describe('generateCatalog', () => {
       id: 'standalone-greeting',
       title: 'Standalone greeting activity',
       description: 'Runs an activity without a workflow.',
-      targetId: 'catalog',
+      workspaceId: 'catalog',
       capabilityTags: ['terminal-outcome'],
       expectedEvidence: ['A completed activity result'],
       input: {
@@ -248,7 +248,7 @@ describe('generateCatalog', () => {
 
     expect(generated.browserDescriptors[0]?.execution).toEqual({
       kind: 'standalone-activity',
-      targetId: 'catalog',
+      workspaceId: 'catalog',
       namespace: 'default',
       taskQueue: 'catalog',
       activityType: 'greetingActivity',
@@ -279,7 +279,7 @@ describe('generateCatalog', () => {
     const handler = createNexusHandler('GreetingService');
     const registry = createCatalogRegistry();
 
-    registry.registerTarget({
+    registry.registerWorkspace({
       id: 'nexus-handler',
       namespace: 'nexus-target',
       taskQueue: 'nexus-handler-queue',
@@ -290,7 +290,7 @@ describe('generateCatalog', () => {
       id: 'nexus-greeting',
       title: 'Nexus greeting operation',
       description: 'Runs a standalone Nexus operation.',
-      targetId: 'nexus-handler',
+      workspaceId: 'nexus-handler',
       capabilityTags: ['nexus-links'],
       expectedEvidence: ['A completed Nexus operation result'],
       input: {
@@ -321,7 +321,7 @@ describe('generateCatalog', () => {
 
     expect(generated.browserDescriptors[0]?.execution).toEqual({
       kind: 'standalone-nexus-operation',
-      targetId: 'nexus-handler',
+      workspaceId: 'nexus-handler',
       namespace: 'nexus-target',
       taskQueue: 'nexus-handler-queue',
       endpoint: 'catalog-endpoint',
@@ -353,7 +353,7 @@ describe('generateCatalog', () => {
     const handler = createNexusHandler('GreetingService');
     const registry = createCatalogRegistry();
 
-    registry.registerTarget({
+    registry.registerWorkspace({
       id: 'nexus-handler',
       namespace: 'nexus-target',
       taskQueue: 'nexus-handler-queue',
@@ -366,7 +366,7 @@ describe('generateCatalog', () => {
         id: operation,
         title: `${operation} Nexus operation`,
         description: `Runs the ${operation} Nexus operation.`,
-        targetId: 'nexus-handler',
+        workspaceId: 'nexus-handler',
         capabilityTags: [],
         expectedEvidence: [],
         input: { defaultValue: {}, schema: {} },
@@ -390,7 +390,7 @@ describe('generateCatalog', () => {
   it('rejects conflicting Nexus service handlers before worker creation', () => {
     const registry = createCatalogRegistry();
 
-    registry.registerTarget({
+    registry.registerWorkspace({
       id: 'nexus-handler',
       namespace: 'nexus-target',
       taskQueue: 'nexus-handler-queue',
@@ -403,7 +403,7 @@ describe('generateCatalog', () => {
         id,
         title: `${id} Nexus operation`,
         description: `Runs the ${id} Nexus operation.`,
-        targetId: 'nexus-handler',
+        workspaceId: 'nexus-handler',
         capabilityTags: [],
         expectedEvidence: [],
         input: { defaultValue: {}, schema: {} },
@@ -420,14 +420,14 @@ describe('generateCatalog', () => {
     }
 
     expect(() => generateCatalog(registry)).toThrowError(
-      'Catalog Nexus service "GreetingService" has conflicting handlers on target "nexus-handler"',
+      'Catalog Nexus service "GreetingService" has conflicting handlers on workspace "nexus-handler"',
     );
   });
 
   it('rejects a Nexus service name that differs from its handler definition', () => {
     const registry = createCatalogRegistry();
 
-    registry.registerTarget({
+    registry.registerWorkspace({
       id: 'nexus-handler',
       namespace: 'nexus-target',
       taskQueue: 'nexus-handler-queue',
@@ -438,7 +438,7 @@ describe('generateCatalog', () => {
       id: 'mismatched-service',
       title: 'Mismatched Nexus service',
       description: 'Declares the wrong Nexus service.',
-      targetId: 'nexus-handler',
+      workspaceId: 'nexus-handler',
       capabilityTags: [],
       expectedEvidence: [],
       input: { defaultValue: {}, schema: {} },
@@ -461,7 +461,7 @@ describe('generateCatalog', () => {
   it('rejects a Nexus operation missing from its handler definition', () => {
     const registry = createCatalogRegistry();
 
-    registry.registerTarget({
+    registry.registerWorkspace({
       id: 'nexus-handler',
       namespace: 'nexus-target',
       taskQueue: 'nexus-handler-queue',
@@ -472,7 +472,7 @@ describe('generateCatalog', () => {
       id: 'missing-operation',
       title: 'Missing Nexus operation',
       description: 'Declares an unknown Nexus operation.',
-      targetId: 'nexus-handler',
+      workspaceId: 'nexus-handler',
       capabilityTags: [],
       expectedEvidence: [],
       input: { defaultValue: {}, schema: {} },
@@ -500,7 +500,7 @@ describe('generateCatalog', () => {
         id: 'greeting',
         title,
         description: 'Returns a greeting.',
-        targetId: 'catalog',
+        workspaceId: 'catalog',
         capabilityTags: [],
         expectedEvidence: ['A completed greeting result'],
         input: { defaultValue: [], schema: { type: 'array' } },
@@ -513,7 +513,7 @@ describe('generateCatalog', () => {
         },
       });
 
-    registry.registerTarget({
+    registry.registerWorkspace({
       id: 'catalog',
       namespace: 'default',
       taskQueue: 'catalog',
@@ -528,14 +528,14 @@ describe('generateCatalog', () => {
     );
   });
 
-  it('fails when an example references an unknown target ID', () => {
+  it('fails when an example references an unknown workspace ID', () => {
     const registry = createCatalogRegistry();
 
     registry.registerExample({
       id: 'orphaned-activity',
       title: 'Orphaned activity',
-      description: 'References a target that is not registered.',
-      targetId: 'missing-target',
+      description: 'References a workspace that is not registered.',
+      workspaceId: 'missing-target',
       capabilityTags: [],
       expectedEvidence: ['A completed activity result'],
       input: { defaultValue: {}, schema: { type: 'object' } },
@@ -550,14 +550,14 @@ describe('generateCatalog', () => {
     });
 
     expect(() => generateCatalog(registry)).toThrowError(
-      'Unknown catalog target id "missing-target" for example "orphaned-activity"',
+      'Unknown catalog workspace id "missing-target" for example "orphaned-activity"',
     );
   });
 
-  it("fails when a workflow type is absent from its target's static exports", () => {
+  it("fails when a workflow type is absent from its workspace's static exports", () => {
     const registry = createCatalogRegistry();
 
-    registry.registerTarget({
+    registry.registerWorkspace({
       id: 'catalog',
       namespace: 'default',
       taskQueue: 'catalog',
@@ -568,7 +568,7 @@ describe('generateCatalog', () => {
       id: 'missing-workflow',
       title: 'Missing workflow',
       description: 'References a workflow type that is not exported.',
-      targetId: 'catalog',
+      workspaceId: 'catalog',
       capabilityTags: [],
       expectedEvidence: ['A completed workflow result'],
       input: { defaultValue: [], schema: { type: 'array' } },
@@ -582,18 +582,18 @@ describe('generateCatalog', () => {
     });
 
     expect(() => generateCatalog(registry)).toThrowError(
-      'Workflow type "missingWorkflow" for example "missing-workflow" is not exported by target "catalog"',
+      'Workflow type "missingWorkflow" for example "missing-workflow" is not exported by workspace "catalog"',
     );
   });
 
-  it('fails when one target receives conflicting same-name activity implementations', () => {
+  it('fails when one workspace receives conflicting same-name activity implementations', () => {
     const registry = createCatalogRegistry();
     const registerActivity = (id: string, activity: (name: string) => string) =>
       registry.registerExample({
         id,
         title: id,
         description: 'Runs a standalone greeting activity.',
-        targetId: 'catalog',
+        workspaceId: 'catalog',
         capabilityTags: [],
         expectedEvidence: ['A completed activity result'],
         input: { defaultValue: {}, schema: { type: 'object' } },
@@ -607,7 +607,7 @@ describe('generateCatalog', () => {
         },
       });
 
-    registry.registerTarget({
+    registry.registerWorkspace({
       id: 'catalog',
       namespace: 'default',
       taskQueue: 'catalog',
@@ -618,11 +618,11 @@ describe('generateCatalog', () => {
     registerActivity('second-greeting', (name) => `welcome ${name}`);
 
     expect(() => generateCatalog(registry)).toThrowError(
-      'Activity "greetingActivity" has conflicting implementations on target "catalog"',
+      'Activity "greetingActivity" has conflicting implementations on workspace "catalog"',
     );
   });
 
-  it('keeps same-name activities apart when each example has its own target', () => {
+  it('keeps same-name activities apart when each example has its own workspace', () => {
     const registry = createCatalogRegistry();
     const first = (name: string) => `hello ${name}`;
     const second = (name: string) => `welcome ${name}`;
@@ -630,7 +630,7 @@ describe('generateCatalog', () => {
       id: string,
       activity: (name: string) => string,
     ) => {
-      registry.registerTarget({
+      registry.registerWorkspace({
         id: `catalog-${id}`,
         namespace: 'default',
         taskQueue: `catalog-${id}`,
@@ -641,7 +641,7 @@ describe('generateCatalog', () => {
         id,
         title: id,
         description: 'Runs a standalone greeting activity.',
-        targetId: `catalog-${id}`,
+        workspaceId: `catalog-${id}`,
         capabilityTags: [],
         expectedEvidence: ['A completed activity result'],
         input: { defaultValue: {}, schema: { type: 'object' } },
@@ -662,8 +662,8 @@ describe('generateCatalog', () => {
     const { workerBindings } = generateCatalog(registry);
 
     expect(
-      workerBindings.map(({ target, activities }) => [
-        target.taskQueue,
+      workerBindings.map(({ workspace, activities }) => [
+        workspace.taskQueue,
         activities.greetingActivity,
       ]),
     ).toEqual([
@@ -677,7 +677,7 @@ describe('generateCatalog', () => {
     cyclicInput.self = cyclicInput;
     const registry = createCatalogRegistry();
 
-    registry.registerTarget({
+    registry.registerWorkspace({
       id: 'catalog',
       namespace: 'default',
       taskQueue: 'catalog',
@@ -688,7 +688,7 @@ describe('generateCatalog', () => {
       id: 'cyclic-input',
       title: 'Cyclic input',
       description: 'Contains browser metadata that cannot be serialized.',
-      targetId: 'catalog',
+      workspaceId: 'catalog',
       capabilityTags: [],
       expectedEvidence: ['A completed activity result'],
       input: {
@@ -710,17 +710,17 @@ describe('generateCatalog', () => {
     );
   });
 
-  it('fails when two targets use the same target ID', () => {
+  it('fails when two workspaces use the same workspace ID', () => {
     const registry = createCatalogRegistry();
 
-    registry.registerTarget({
+    registry.registerWorkspace({
       id: 'catalog',
       namespace: 'first-namespace',
       taskQueue: 'first-queue',
       workflowsPath: './workflows',
       workflowExports: {},
     });
-    registry.registerTarget({
+    registry.registerWorkspace({
       id: 'catalog',
       namespace: 'second-namespace',
       taskQueue: 'second-queue',
@@ -731,7 +731,7 @@ describe('generateCatalog', () => {
       id: 'greeting',
       title: 'Greeting activity',
       description: 'Runs a standalone greeting activity.',
-      targetId: 'catalog',
+      workspaceId: 'catalog',
       capabilityTags: [],
       expectedEvidence: ['A completed activity result'],
       input: { defaultValue: {}, schema: { type: 'object' } },
@@ -746,14 +746,14 @@ describe('generateCatalog', () => {
     });
 
     expect(() => generateCatalog(registry)).toThrowError(
-      'Duplicate catalog target id "catalog"',
+      'Duplicate catalog workspace id "catalog"',
     );
   });
 
   it('fails when browser metadata contains a non-finite JSON number', () => {
     const registry = createCatalogRegistry();
 
-    registry.registerTarget({
+    registry.registerWorkspace({
       id: 'catalog',
       namespace: 'default',
       taskQueue: 'catalog',
@@ -764,7 +764,7 @@ describe('generateCatalog', () => {
       id: 'non-finite-input',
       title: 'Non-finite input',
       description: 'Contains a number that JSON would change to null.',
-      targetId: 'catalog',
+      workspaceId: 'catalog',
       capabilityTags: [],
       expectedEvidence: ['A completed activity result'],
       input: {
@@ -791,7 +791,7 @@ describe('generateCatalog', () => {
     sparseInput.length = 1;
     const registry = createCatalogRegistry();
 
-    registry.registerTarget({
+    registry.registerWorkspace({
       id: 'catalog',
       namespace: 'default',
       taskQueue: 'catalog',
@@ -802,7 +802,7 @@ describe('generateCatalog', () => {
       id: 'sparse-input',
       title: 'Sparse input',
       description: 'Contains an array hole that JSON would change to null.',
-      targetId: 'catalog',
+      workspaceId: 'catalog',
       capabilityTags: [],
       expectedEvidence: ['A completed activity result'],
       input: {
@@ -832,7 +832,7 @@ describe('generateCatalog', () => {
     });
     const registry = createCatalogRegistry();
 
-    registry.registerTarget({
+    registry.registerWorkspace({
       id: 'catalog',
       namespace: 'default',
       taskQueue: 'catalog',
@@ -843,7 +843,7 @@ describe('generateCatalog', () => {
       id: 'getter-input',
       title: 'Getter input',
       description: 'Contains executable browser metadata.',
-      targetId: 'catalog',
+      workspaceId: 'catalog',
       capabilityTags: [],
       expectedEvidence: ['A completed activity result'],
       input: {
@@ -870,15 +870,15 @@ describe('generateCatalog', () => {
     const proxyInput = new Proxy(
       { name: 'Temporal' },
       {
-        get: (target, property, receiver) => {
+        get: (workspace, property, receiver) => {
           trapCalls += 1;
-          return Reflect.get(target, property, receiver);
+          return Reflect.get(workspace, property, receiver);
         },
       },
     );
     const registry = createCatalogRegistry();
 
-    registry.registerTarget({
+    registry.registerWorkspace({
       id: 'catalog',
       namespace: 'default',
       taskQueue: 'catalog',
@@ -889,7 +889,7 @@ describe('generateCatalog', () => {
       id: 'proxy-input',
       title: 'Proxy input',
       description: 'Contains executable proxy traps.',
-      targetId: 'catalog',
+      workspaceId: 'catalog',
       capabilityTags: [],
       expectedEvidence: ['A completed activity result'],
       input: {
@@ -916,7 +916,7 @@ describe('generateCatalog', () => {
     const inputDefault = { name: 'Temporal' };
     const registry = createCatalogRegistry();
 
-    registry.registerTarget({
+    registry.registerWorkspace({
       id: 'catalog',
       namespace: 'default',
       taskQueue: 'catalog',
@@ -927,7 +927,7 @@ describe('generateCatalog', () => {
       id: 'locked-input',
       title: 'Locked input',
       description: 'Keeps generated browser intent stable.',
-      targetId: 'catalog',
+      workspaceId: 'catalog',
       capabilityTags: [],
       expectedEvidence: ['A completed activity result'],
       input: {
@@ -959,7 +959,7 @@ describe('generateCatalog', () => {
       id: 'getter-title',
       title: 'Getter title',
       description: 'Contains an executable title accessor.',
-      targetId: 'catalog',
+      workspaceId: 'catalog',
       capabilityTags: [],
       expectedEvidence: ['A completed activity result'],
       input: { defaultValue: {}, schema: { type: 'object' } },
@@ -980,7 +980,7 @@ describe('generateCatalog', () => {
         return 'Getter title';
       },
     });
-    registry.registerTarget({
+    registry.registerWorkspace({
       id: 'catalog',
       namespace: 'default',
       taskQueue: 'catalog',
@@ -1002,7 +1002,7 @@ describe('generateCatalog', () => {
       id: 'getter-activity-type',
       title: 'Getter activity type',
       description: 'Contains an executable execution accessor.',
-      targetId: 'catalog',
+      workspaceId: 'catalog',
       capabilityTags: [],
       expectedEvidence: ['A completed activity result'],
       input: { defaultValue: {}, schema: { type: 'object' } },
@@ -1023,7 +1023,7 @@ describe('generateCatalog', () => {
         return 'getterActivityType';
       },
     });
-    registry.registerTarget({
+    registry.registerWorkspace({
       id: 'catalog',
       namespace: 'default',
       taskQueue: 'catalog',
@@ -1044,7 +1044,7 @@ describe('generateCatalog', () => {
       id: 'unknown-metadata',
       title: 'Unknown metadata',
       description: 'Contains a field outside the registration contract.',
-      targetId: 'catalog',
+      workspaceId: 'catalog',
       capabilityTags: [],
       expectedEvidence: ['A completed activity result'],
       input: { defaultValue: {}, schema: { type: 'object' } },
@@ -1059,7 +1059,7 @@ describe('generateCatalog', () => {
       internalNote: 'must not reach the browser',
     };
 
-    registry.registerTarget({
+    registry.registerWorkspace({
       id: 'catalog',
       namespace: 'default',
       taskQueue: 'catalog',
@@ -1080,7 +1080,7 @@ describe('generateCatalog', () => {
       id: 'workflow-with-activity-id',
       title: 'Workflow with activity ID',
       description: 'Contains a standalone activity field.',
-      targetId: 'catalog',
+      workspaceId: 'catalog',
       capabilityTags: [],
       expectedEvidence: ['A completed workflow result'],
       input: { defaultValue: [], schema: { type: 'array' } },
@@ -1094,7 +1094,7 @@ describe('generateCatalog', () => {
       },
     };
 
-    registry.registerTarget({
+    registry.registerWorkspace({
       id: 'catalog',
       namespace: 'default',
       taskQueue: 'catalog',
@@ -1112,7 +1112,7 @@ describe('generateCatalog', () => {
     const workflow = () => 'hello';
     const registry = createCatalogRegistry();
 
-    registry.registerTarget({
+    registry.registerWorkspace({
       id: 'catalog',
       namespace: 'default',
       taskQueue: 'catalog',
@@ -1123,7 +1123,7 @@ describe('generateCatalog', () => {
       id: 'workflow-with-numeric-type',
       title: 'Workflow with numeric type',
       description: 'Contains an invalid workflow type.',
-      targetId: 'catalog',
+      workspaceId: 'catalog',
       capabilityTags: [],
       expectedEvidence: ['A completed workflow result'],
       input: { defaultValue: [], schema: { type: 'array' } },
@@ -1147,7 +1147,7 @@ describe('generateCatalog', () => {
       id: 'activity-with-workflow-type',
       title: 'Activity with workflow type',
       description: 'Contains a workflow-only field.',
-      targetId: 'catalog',
+      workspaceId: 'catalog',
       capabilityTags: [],
       expectedEvidence: ['A completed activity result'],
       input: { defaultValue: {}, schema: { type: 'object' } },
@@ -1162,7 +1162,7 @@ describe('generateCatalog', () => {
       },
     };
 
-    registry.registerTarget({
+    registry.registerWorkspace({
       id: 'catalog',
       namespace: 'default',
       taskQueue: 'catalog',
@@ -1179,7 +1179,7 @@ describe('generateCatalog', () => {
   it('rejects invalid standalone activity execution runtime field types', () => {
     const registry = createCatalogRegistry();
 
-    registry.registerTarget({
+    registry.registerWorkspace({
       id: 'catalog',
       namespace: 'default',
       taskQueue: 'catalog',
@@ -1190,7 +1190,7 @@ describe('generateCatalog', () => {
       id: 'activity-with-string-implementation',
       title: 'Activity with string implementation',
       description: 'Contains an invalid activity implementation.',
-      targetId: 'catalog',
+      workspaceId: 'catalog',
       capabilityTags: [],
       expectedEvidence: ['A completed activity result'],
       input: { defaultValue: {}, schema: { type: 'object' } },
@@ -1212,7 +1212,7 @@ describe('generateCatalog', () => {
   it('rejects boolean standalone activity timeouts', () => {
     const registry = createCatalogRegistry();
 
-    registry.registerTarget({
+    registry.registerWorkspace({
       id: 'catalog',
       namespace: 'default',
       taskQueue: 'catalog',
@@ -1223,7 +1223,7 @@ describe('generateCatalog', () => {
       id: 'activity-with-boolean-timeouts',
       title: 'Activity with boolean timeouts',
       description: 'Contains invalid activity timeouts.',
-      targetId: 'catalog',
+      workspaceId: 'catalog',
       capabilityTags: [],
       expectedEvidence: [],
       input: { defaultValue: {}, schema: true },
@@ -1245,7 +1245,7 @@ describe('generateCatalog', () => {
   it('rejects boolean standalone activity policies', () => {
     const registry = createCatalogRegistry();
 
-    registry.registerTarget({
+    registry.registerWorkspace({
       id: 'catalog',
       namespace: 'default',
       taskQueue: 'catalog',
@@ -1256,7 +1256,7 @@ describe('generateCatalog', () => {
       id: 'activity-with-boolean-policies',
       title: 'Activity with boolean policies',
       description: 'Contains invalid activity policies.',
-      targetId: 'catalog',
+      workspaceId: 'catalog',
       capabilityTags: [],
       expectedEvidence: [],
       input: { defaultValue: {}, schema: true },
@@ -1281,7 +1281,7 @@ describe('generateCatalog', () => {
       id: 'nexus-with-activity-id',
       title: 'Nexus operation with activity ID',
       description: 'Contains an activity-only field.',
-      targetId: 'nexus-handler',
+      workspaceId: 'nexus-handler',
       capabilityTags: [],
       expectedEvidence: ['A completed Nexus operation result'],
       input: { defaultValue: {}, schema: { type: 'object' } },
@@ -1297,7 +1297,7 @@ describe('generateCatalog', () => {
       },
     };
 
-    registry.registerTarget({
+    registry.registerWorkspace({
       id: 'nexus-handler',
       namespace: 'default',
       taskQueue: 'nexus-handler-queue',
@@ -1314,7 +1314,7 @@ describe('generateCatalog', () => {
   it('rejects invalid standalone Nexus execution runtime field types', () => {
     const registry = createCatalogRegistry();
 
-    registry.registerTarget({
+    registry.registerWorkspace({
       id: 'nexus-handler',
       namespace: 'default',
       taskQueue: 'nexus-handler-queue',
@@ -1325,7 +1325,7 @@ describe('generateCatalog', () => {
       id: 'nexus-with-array-policies',
       title: 'Nexus operation with array policies',
       description: 'Contains invalid Nexus policies.',
-      targetId: 'nexus-handler',
+      workspaceId: 'nexus-handler',
       capabilityTags: [],
       expectedEvidence: ['A completed Nexus operation result'],
       input: { defaultValue: {}, schema: { type: 'object' } },
@@ -1348,7 +1348,7 @@ describe('generateCatalog', () => {
   it('rejects boolean standalone Nexus policies', () => {
     const registry = createCatalogRegistry();
 
-    registry.registerTarget({
+    registry.registerWorkspace({
       id: 'nexus-handler',
       namespace: 'default',
       taskQueue: 'nexus-handler-queue',
@@ -1359,7 +1359,7 @@ describe('generateCatalog', () => {
       id: 'nexus-with-boolean-policies',
       title: 'Nexus operation with boolean policies',
       description: 'Contains invalid Nexus policies.',
-      targetId: 'nexus-handler',
+      workspaceId: 'nexus-handler',
       capabilityTags: [],
       expectedEvidence: [],
       input: { defaultValue: {}, schema: true },
@@ -1384,7 +1384,7 @@ describe('generateCatalog', () => {
     const registeredWorkflow = () => 'registered';
     const registry = createCatalogRegistry();
 
-    registry.registerTarget({
+    registry.registerWorkspace({
       id: 'catalog',
       namespace: 'default',
       taskQueue: 'catalog',
@@ -1395,7 +1395,7 @@ describe('generateCatalog', () => {
       id: 'mismatched-workflow',
       title: 'Mismatched workflow',
       description: 'Uses a different function than its static export.',
-      targetId: 'catalog',
+      workspaceId: 'catalog',
       capabilityTags: [],
       expectedEvidence: ['A completed workflow result'],
       input: { defaultValue: [], schema: { type: 'array' } },
@@ -1409,14 +1409,14 @@ describe('generateCatalog', () => {
     });
 
     expect(() => generateCatalog(registry)).toThrowError(
-      'Workflow implementation "greetingWorkflow" for example "mismatched-workflow" does not match target "catalog" static export',
+      'Workflow implementation "greetingWorkflow" for example "mismatched-workflow" does not match workspace "catalog" static export',
     );
   });
 
-  it('requires a non-empty packaged workflow path on every target', () => {
+  it('requires a non-empty packaged workflow path on every workspace', () => {
     const registry = createCatalogRegistry();
 
-    registry.registerTarget({
+    registry.registerWorkspace({
       id: 'catalog',
       namespace: 'default',
       taskQueue: 'catalog',
@@ -1425,14 +1425,14 @@ describe('generateCatalog', () => {
     });
 
     expect(() => generateCatalog(registry)).toThrowError(
-      'Catalog target "catalog" has an invalid packaged workflowsPath',
+      'Catalog workspace "catalog" has an invalid packaged workflowsPath',
     );
   });
 
   it('rejects missing or invalid known top-level registration fields', () => {
     const registry = createCatalogRegistry();
 
-    registry.registerTarget({
+    registry.registerWorkspace({
       id: 'catalog',
       namespace: 'default',
       taskQueue: 'catalog',
@@ -1442,7 +1442,7 @@ describe('generateCatalog', () => {
     registry.registerExample({
       id: 'missing-title',
       description: 'Has no required title.',
-      targetId: 'catalog',
+      workspaceId: 'catalog',
       capabilityTags: [],
       expectedEvidence: ['A completed activity result'],
       input: { defaultValue: {}, schema: { type: 'object' } },
@@ -1464,7 +1464,7 @@ describe('generateCatalog', () => {
   it('rejects unknown execution discriminants before variant validation', () => {
     const registry = createCatalogRegistry();
 
-    registry.registerTarget({
+    registry.registerWorkspace({
       id: 'catalog',
       namespace: 'default',
       taskQueue: 'catalog',
@@ -1475,7 +1475,7 @@ describe('generateCatalog', () => {
       id: 'unknown-execution-kind',
       title: 'Unknown execution kind',
       description: 'Uses an execution kind outside the closed union.',
-      targetId: 'catalog',
+      workspaceId: 'catalog',
       capabilityTags: [],
       expectedEvidence: ['No execution is accepted'],
       input: { defaultValue: {}, schema: { type: 'object' } },
@@ -1491,10 +1491,10 @@ describe('generateCatalog', () => {
     );
   });
 
-  it('rejects targets outside the closed runtime contract', () => {
-    const invalidTargets = [
+  it('rejects workspaces outside the closed runtime contract', () => {
+    const invalidWorkspaces = [
       {
-        target: {
+        workspace: {
           id: 'catalog',
           namespace: 'default',
           taskQueue: 'catalog',
@@ -1502,10 +1502,10 @@ describe('generateCatalog', () => {
           workflowExports: {},
           apiKey: 'must-not-enter-a-binding',
         },
-        error: 'Catalog target "catalog" contains unknown fields',
+        error: 'Catalog workspace "catalog" contains unknown fields',
       },
       {
-        target: {
+        workspace: {
           id: 'catalog',
           namespace: 42,
           taskQueue: 'catalog',
@@ -1513,23 +1513,23 @@ describe('generateCatalog', () => {
           workflowExports: {},
         },
         error:
-          'Catalog target "catalog" has invalid identity or routing fields',
+          'Catalog workspace "catalog" has invalid identity or routing fields',
       },
       {
-        target: {
+        workspace: {
           id: 'catalog',
           namespace: 'default',
           taskQueue: 'catalog',
           workflowsPath: './workflows',
           workflowExports: { greetingWorkflow: 'not-a-function' },
         },
-        error: 'Catalog target "catalog" has invalid workflow exports',
+        error: 'Catalog workspace "catalog" has invalid workflow exports',
       },
     ];
 
-    for (const { target, error } of invalidTargets) {
+    for (const { workspace, error } of invalidWorkspaces) {
       const registry = createCatalogRegistry();
-      registry.registerTarget(target as never);
+      registry.registerWorkspace(workspace as never);
 
       expect(() => generateCatalog(registry)).toThrowError(error);
     }
@@ -1540,7 +1540,7 @@ describe('generateCatalog', () => {
     const registerSetupExample = (setupMarkdown?: string) => {
       const registry = createCatalogRegistry();
 
-      registry.registerTarget({
+      registry.registerWorkspace({
         id: 'catalog',
         namespace: 'default',
         taskQueue: 'catalog',
@@ -1551,7 +1551,7 @@ describe('generateCatalog', () => {
         id: 'setup-example',
         title: 'Setup example',
         description: 'Shows setup instructions.',
-        targetId: 'catalog',
+        workspaceId: 'catalog',
         capabilityTags: [],
         expectedEvidence: [],
         input: { defaultValue: [], schema: {} },

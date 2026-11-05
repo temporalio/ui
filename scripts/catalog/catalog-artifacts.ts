@@ -7,7 +7,7 @@ import { format } from 'prettier';
 
 import { assertCatalogSource } from '../../src/lib/catalog/browser/catalog-sources';
 import {
-  type CatalogRoutableTarget,
+  type CatalogRoutableWorkspace,
   type CatalogRouting,
   resolveCatalogRouting,
 } from '../../src/lib/catalog/browser/routing';
@@ -337,8 +337,8 @@ const createArtifactOptions = async (options: CatalogArtifactsOptions) => {
   localSource.register(localRegistry);
 
   for (const registry of [sharedRegistry, localRegistry]) {
-    for (const target of registry.targets) {
-      combinedRegistry.registerTarget(target);
+    for (const workspace of registry.workspaces) {
+      combinedRegistry.registerWorkspace(workspace);
     }
     for (const example of registry.examples) {
       combinedRegistry.registerExample(example);
@@ -348,8 +348,8 @@ const createArtifactOptions = async (options: CatalogArtifactsOptions) => {
   const { workerBindings } = generateCatalog(combinedRegistry);
 
   const localProjectionRegistry = createCatalogRegistry();
-  for (const target of combinedRegistry.targets) {
-    localProjectionRegistry.registerTarget(target);
+  for (const workspace of combinedRegistry.workspaces) {
+    localProjectionRegistry.registerWorkspace(workspace);
   }
   for (const example of localRegistry.examples) {
     localProjectionRegistry.registerExample(example);
@@ -384,29 +384,29 @@ const createArtifactOptions = async (options: CatalogArtifactsOptions) => {
 
 export type CatalogRoutingInput =
   | CatalogRouting
-  | ((targets: readonly CatalogRoutableTarget[]) => CatalogRouting);
+  | ((workspaces: readonly CatalogRoutableWorkspace[]) => CatalogRouting);
 
 export const loadCatalogWorkerBindings = async (
   options: CatalogArtifactsOptions,
   routing: CatalogRoutingInput = {},
 ) => {
   const { workerBindings } = await createArtifactOptions(options);
-  const targets = workerBindings.map(({ target }) => ({
-    targetId: target.id,
-    namespace: target.namespace,
-    taskQueue: target.taskQueue,
+  const workspaces = workerBindings.map(({ workspace }) => ({
+    workspaceId: workspace.id,
+    namespace: workspace.namespace,
+    taskQueue: workspace.taskQueue,
   }));
-  const resolvedTargets = resolveCatalogRouting(
-    targets,
-    typeof routing === 'function' ? routing(targets) : routing,
+  const resolvedWorkspaces = resolveCatalogRouting(
+    workspaces,
+    typeof routing === 'function' ? routing(workspaces) : routing,
   );
 
   return workerBindings.map((binding, index) => ({
     ...binding,
-    target: {
-      ...binding.target,
-      namespace: resolvedTargets[index].namespace,
-      taskQueue: resolvedTargets[index].taskQueue,
+    workspace: {
+      ...binding.workspace,
+      namespace: resolvedWorkspaces[index].namespace,
+      taskQueue: resolvedWorkspaces[index].taskQueue,
     },
   }));
 };

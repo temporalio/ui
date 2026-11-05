@@ -114,12 +114,12 @@ const activitySummaryExamples = [
 ] as const;
 
 describe('shared workflow corpus', () => {
-  it('registers one shared-workflows target with committed default routing', () => {
+  it('registers one shared-workflows workspace with committed default routing', () => {
     const registry = createCatalogRegistry();
 
     catalogRegistrationSource.register(registry);
 
-    expect(registry.targets).toMatchObject([
+    expect(registry.workspaces).toMatchObject([
       {
         id: 'shared-workflows',
         namespace: 'default',
@@ -175,8 +175,8 @@ describe('shared workflow corpus', () => {
       )?.title,
     ).toBe('Timer-driven repeated activities');
 
-    const target = registry.targets[0];
-    expect(Object.keys(target?.workflowExports ?? {}).sort()).toEqual(
+    const workspace = registry.workspaces[0];
+    expect(Object.keys(workspace?.workflowExports ?? {}).sort()).toEqual(
       [
         ...migratedWorkflowTypes,
         'priorityFairnessWorkflow',
@@ -191,8 +191,8 @@ describe('shared workflow corpus', () => {
       ].sort(),
     );
     for (const example of registry.examples) {
-      if (example.execution.kind !== 'workflow' || !target) continue;
-      expect(target.workflowExports[example.execution.workflowType]).toBe(
+      if (example.execution.kind !== 'workflow' || !workspace) continue;
+      expect(workspace.workflowExports[example.execution.workflowType]).toBe(
         example.execution.workflow,
       );
     }
@@ -268,7 +268,7 @@ describe('shared workflow corpus', () => {
     const example = generated.browserDescriptors.find(
       ({ id }) => id === 'priority-fairness',
     );
-    const target = registry.targets[0];
+    const workspace = registry.workspaces[0];
     const binding = generated.workerBindings[0];
 
     expect(example).toMatchObject({
@@ -382,7 +382,7 @@ describe('shared workflow corpus', () => {
         memo: { fields: {} },
       }),
     ).resolves.toBe(true);
-    expect(target?.workflowExports.priorityFairnessWorkflow).toBe(
+    expect(workspace?.workflowExports.priorityFairnessWorkflow).toBe(
       priorityFairnessWorkflow,
     );
     expect(binding?.activities.greet).toBe(greet);

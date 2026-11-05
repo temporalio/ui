@@ -313,14 +313,14 @@ describe('catalog artifacts', () => {
     ).resolves.toBe(generatedContent);
   });
 
-  it('loads worker bindings with runtime routing applied to the requested target', async () => {
+  it('loads worker bindings with runtime routing applied to the requested workspace', async () => {
     const rootDirectory = await createTemporaryDirectory();
     const workflow = () => undefined;
     const sharedSource = {
       source: { id: 'oss', label: 'OSS' },
       sourceFiles: ['shared-registration.ts'],
       register: (registry: ReturnType<typeof createCatalogRegistry>) => {
-        registry.registerTarget({
+        registry.registerWorkspace({
           id: 'shared-workflows',
           namespace: 'registered-namespace',
           taskQueue: 'registered-task-queue',
@@ -331,7 +331,7 @@ describe('catalog artifacts', () => {
           id: 'shared-example',
           title: 'Shared example',
           description: 'Runs a shared workflow.',
-          targetId: 'shared-workflows',
+          workspaceId: 'shared-workflows',
           capabilityTags: [],
           expectedEvidence: [],
           input: { defaultValue: [], schema: {} },
@@ -363,21 +363,21 @@ describe('catalog artifacts', () => {
       },
     );
 
-    expect(bindings[0]?.target).toMatchObject({
+    expect(bindings[0]?.workspace).toMatchObject({
       id: 'shared-workflows',
       namespace: 'runtime-namespace',
       taskQueue: 'runtime-task-queue',
     });
   });
 
-  it('relocates every discovered target through target-aware environment routing', async () => {
+  it('relocates every discovered workspace through target-aware environment routing', async () => {
     const rootDirectory = await createTemporaryDirectory();
     const workflow = () => undefined;
     const sharedSource = {
       source: { id: 'oss', label: 'OSS' },
       sourceFiles: ['shared-registration.ts'],
       register: (registry: ReturnType<typeof createCatalogRegistry>) => {
-        registry.registerTarget({
+        registry.registerWorkspace({
           id: 'shared-workflows',
           namespace: 'registered-namespace',
           taskQueue: 'registered-task-queue',
@@ -388,7 +388,7 @@ describe('catalog artifacts', () => {
           id: 'shared-example',
           title: 'Shared example',
           description: 'Runs a shared workflow.',
-          targetId: 'shared-workflows',
+          workspaceId: 'shared-workflows',
           capabilityTags: [],
           expectedEvidence: [],
           input: { defaultValue: [], schema: {} },
@@ -412,14 +412,14 @@ describe('catalog artifacts', () => {
         localFallback: localRegistrationFallback,
         localArtifactPath: 'local.generated.json',
       },
-      (targets) =>
+      (workspaces) =>
         requireCatalogRoutingFromEnvironment(
           { TEMPORAL_NAMESPACE: 'runtime-namespace' },
-          targets,
+          workspaces,
         ),
     );
 
-    expect(bindings[0]?.target).toMatchObject({
+    expect(bindings[0]?.workspace).toMatchObject({
       id: 'shared-workflows',
       namespace: 'runtime-namespace',
       taskQueue: 'registered-task-queue',
@@ -477,7 +477,7 @@ describe('catalog artifacts', () => {
       join(rootDirectory, sourcePath),
       'export const populated = true;\n',
     );
-    registry.registerTarget({
+    registry.registerWorkspace({
       id: 'catalog',
       namespace: 'default',
       taskQueue: 'catalog',
@@ -488,7 +488,7 @@ describe('catalog artifacts', () => {
       id: 'hello',
       title: 'Hello',
       description: 'Returns a greeting.',
-      targetId: 'catalog',
+      workspaceId: 'catalog',
       capabilityTags: ['activities', 'terminal-outcome'],
       expectedEvidence: ['A completed result'],
       input: { defaultValue: ['Temporal'], schema: { type: 'array' } },
@@ -532,7 +532,7 @@ describe('catalog artifacts', () => {
       join(rootDirectory, sourcePath),
       'export const populated = true;\n',
     );
-    registry.registerTarget({
+    registry.registerWorkspace({
       id: 'catalog',
       namespace: 'default',
       taskQueue: 'catalog',
@@ -543,7 +543,7 @@ describe('catalog artifacts', () => {
       id: 'greeting',
       title: 'Greeting',
       description: 'Returns a greeting.',
-      targetId: 'catalog',
+      workspaceId: 'catalog',
       capabilityTags: [],
       expectedEvidence: ['A completed result'],
       input: { defaultValue: [], schema: { type: 'array' } },
@@ -571,7 +571,7 @@ describe('catalog artifacts', () => {
     expect(artifactContent).not.toContain('executable-marker');
     expect(JSON.parse(artifactContent).descriptors).toHaveLength(1);
     expect(
-      generated.workerBindings[0]?.target.workflowExports.greetingWorkflow,
+      generated.workerBindings[0]?.workspace.workflowExports.greetingWorkflow,
     ).toBe(workflow);
     expect(generated.workerBindings[0]?.activities.greetingActivity).toBe(
       activity,
@@ -779,7 +779,7 @@ export const catalogRegistrationSource = {
   source: { id: 'local', label: 'Local' },
   sourceFiles: ['catalog.local/registration.ts'],
   register(registry) {
-    registry.registerTarget({
+    registry.registerWorkspace({
       id: 'local',
       namespace: 'default',
       taskQueue: 'local-catalog',
@@ -790,7 +790,7 @@ export const catalogRegistrationSource = {
       id: 'local-example',
       title: 'Local example',
       description: 'Stays local.',
-      targetId: 'local',
+      workspaceId: 'local',
       capabilityTags: [],
       expectedEvidence: ['A local result'],
       input: { defaultValue: {}, schema: { type: 'object' } },
@@ -937,9 +937,9 @@ export const catalogRegistrationSource = {
   register(registry) {
     registry.registerExample({
       id: 'local-on-shared-target',
-      title: 'Local on shared target',
-      description: 'Uses a shared target.',
-      targetId: 'shared-target',
+      title: 'Local on shared workspace',
+      description: 'Uses a shared workspace.',
+      workspaceId: 'shared-target',
       capabilityTags: [],
       expectedEvidence: ['A local result'],
       input: { defaultValue: {}, schema: { type: 'object' } },
@@ -963,7 +963,7 @@ export const catalogRegistrationSource = {
         source: { id: 'oss', label: 'OSS' },
         sourceFiles: [sharedSourcePath],
         register: (registry) =>
-          registry.registerTarget({
+          registry.registerWorkspace({
             id: 'shared-target',
             namespace: 'default',
             taskQueue: 'shared-catalog',
@@ -1019,7 +1019,7 @@ export const catalogRegistrationSource = {
       source: { id: 'oss', label: 'OSS' },
       sourceFiles: [sharedSourcePath],
       register: (registry: ReturnType<typeof createCatalogRegistry>) =>
-        registry.registerTarget({
+        registry.registerWorkspace({
           id: 'shared-target',
           namespace: 'default',
           taskQueue: sharedTaskQueue,
@@ -1050,9 +1050,9 @@ export const catalogRegistrationSource = {
   register(registry) {
     registry.registerExample({
       id: 'local-on-shared-target',
-      title: 'Local on shared target',
+      title: 'Local on shared workspace',
       description: 'Uses shared routing.',
-      targetId: 'shared-target',
+      workspaceId: 'shared-target',
       capabilityTags: [],
       expectedEvidence: ['A local result'],
       input: { defaultValue: {}, schema: {} },
@@ -1102,7 +1102,7 @@ export const catalogRegistrationSource = {
     );
   });
 
-  it('rejects duplicate examples, target conflicts, and activity collisions across sources', async () => {
+  it('rejects duplicate examples, workspace conflicts, and activity collisions across sources', async () => {
     const expectCrossSourceConflict = async (
       localRegistration: string,
       expectedMessage: string,
@@ -1147,7 +1147,7 @@ export const catalogRegistrationSource = {
             source: { id: 'oss', label: 'OSS' },
             sourceFiles: [sharedSourcePath],
             register: (registry) => {
-              registry.registerTarget({
+              registry.registerWorkspace({
                 id: 'shared-target',
                 namespace: 'default',
                 taskQueue: 'shared-catalog',
@@ -1159,7 +1159,7 @@ export const catalogRegistrationSource = {
                   id: 'shared-example',
                   title: 'Shared example',
                   description: 'Shared.',
-                  targetId: 'shared-target',
+                  workspaceId: 'shared-target',
                   capabilityTags: [],
                   expectedEvidence: ['Shared evidence'],
                   input: { defaultValue: {}, schema: {} },
@@ -1192,7 +1192,7 @@ registry.registerExample({
   id: '${id}',
   title: 'Local example',
   description: 'Local.',
-  targetId: 'shared-target',
+  workspaceId: 'shared-target',
   capabilityTags: [],
   expectedEvidence: ['Local evidence'],
   input: { defaultValue: {}, schema: {} },
@@ -1212,18 +1212,18 @@ registry.registerExample({
       true,
     );
     await expectCrossSourceConflict(
-      `registry.registerTarget({
+      `registry.registerWorkspace({
   id: 'shared-target',
   namespace: 'other',
   taskQueue: 'other-catalog',
   workflowsPath: './other-workflows',
   workflowExports: {},
 });`,
-      'Duplicate catalog target id "shared-target"',
+      'Duplicate catalog workspace id "shared-target"',
     );
     await expectCrossSourceConflict(
       localExample('local-example', 'collidingActivity'),
-      'Activity "collidingActivity" has conflicting implementations on target "shared-target"',
+      'Activity "collidingActivity" has conflicting implementations on workspace "shared-target"',
       true,
     );
   });
@@ -1613,7 +1613,7 @@ registry.registerExample({
           "  localExamplesPath: 'local-examples',",
           "  trackedExamplesPath: 'tracked-examples',",
           "  generatedPaths: ['generated/catalog.json'],",
-          "  graph: { boundaries: { browserPaths: ['generated/catalog.json'], packageJsonPath: 'package.json', workerPaths: ['generated/registration.ts', 'generated/workflows.ts'] }, outputs: [{ consumers: ['browser'], path: 'generated/catalog.json' }, { consumers: ['worker'], path: 'generated/registration.ts' }, { consumers: ['worker'], path: 'generated/workflows.ts' }], sources: [{ examplesPath: 'tracked-examples', id: 'cloud', label: 'Cloud', registrationOutputPath: 'generated/registration.ts', registrationTypePath: 'generated/registration-source.ts' }], targets: [{ defaultNamespace: 'default', defaultTaskQueue: 'cloud-catalog', id: 'cloud-catalog', sourceId: 'cloud', workflowsModulePath: 'generated/workflows.ts' }] },",
+          "  graph: { boundaries: { browserPaths: ['generated/catalog.json'], packageJsonPath: 'package.json', workerPaths: ['generated/registration.ts', 'generated/workflows.ts'] }, outputs: [{ consumers: ['browser'], path: 'generated/catalog.json' }, { consumers: ['worker'], path: 'generated/registration.ts' }, { consumers: ['worker'], path: 'generated/workflows.ts' }], sources: [{ examplesPath: 'tracked-examples', id: 'cloud', label: 'Cloud', registrationOutputPath: 'generated/registration.ts', registrationTypePath: 'generated/registration-source.ts' }], workspaces: [{ defaultNamespace: 'default', defaultTaskQueue: 'cloud-catalog', id: 'cloud-catalog', sourceId: 'cloud', workflowsModulePath: 'generated/workflows.ts' }] },",
           '  loadExamples: () => [],',
           '  parseModuleSpecifiers: () => [],',
           '  scaffold: ({ exampleId }) => [{ path: `local-examples/${exampleId}/example.ts`, content: `export const id = ${JSON.stringify(exampleId)};\\n` }],',
@@ -1632,7 +1632,7 @@ registry.registerExample({
           "if (!workflowsPath.endsWith('/catalog/worker/workflows.js')) throw new Error(`Unexpected workflows path: ${workflowsPath}`);",
           'const workerOptions = [];',
           'const runner = await startCatalogRunner({',
-          "  bindings: [{ target: { id: 'catalog', namespace: 'default', taskQueue: 'catalog', workflowsPath: './workflows.js', workflowExports: {} }, examples: [], activities: {}, nexusServices: [] }],",
+          "  bindings: [{ workspace: { id: 'catalog', namespace: 'default', taskQueue: 'catalog', workflowsPath: './workflows.js', workflowExports: {} }, examples: [], activities: {}, nexusServices: [] }],",
           '  connection: { close: async () => undefined },',
           '  createWorker: async (options) => {',
           '    workerOptions.push(options);',
@@ -1652,8 +1652,8 @@ registry.registerExample({
           "import { resolveCatalogRouting } from '@temporalio/ui/catalog/browser/routing';",
           "if (!Array.isArray(catalog)) throw new Error('Expected a catalog descriptor array');",
           "if (!catalog.every((descriptor) => typeof descriptor.id === 'string' && typeof descriptor.title === 'string')) throw new Error('Expected valid catalog descriptor data');",
-          "const [target] = resolveCatalogRouting([{ targetId: 'shared-workflows', namespace: 'default', taskQueue: 'default' }], { 'shared-workflows': { namespace: 'runtime', taskQueue: 'runtime' } });",
-          "if (target.namespace !== 'runtime' || target.taskQueue !== 'runtime') throw new Error('Expected injectable catalog routing');",
+          "const [workspace] = resolveCatalogRouting([{ workspaceId: 'shared-workflows', namespace: 'default', taskQueue: 'default' }], { 'shared-workflows': { namespace: 'runtime', taskQueue: 'runtime' } });",
+          "if (workspace.namespace !== 'runtime' || workspace.taskQueue !== 'runtime') throw new Error('Expected injectable catalog routing');",
         ].join('\n'),
       );
       await writeFile(
@@ -1677,11 +1677,11 @@ registry.registerExample({
           "import CatalogDetail from '@temporalio/ui/catalog/browser/catalog-detail.svelte';",
           "import CatalogList from '@temporalio/ui/catalog/browser/catalog-list.svelte';",
           "import { IconAdd } from '@temporalio/ui/io/icon';",
-          "const [target] = resolveCatalogRouting([{ targetId: 'shared-workflows', namespace: 'default', taskQueue: 'default' }], { 'shared-workflows': { namespace: 'runtime', taskQueue: 'runtime' } });",
+          "const [workspace] = resolveCatalogRouting([{ workspaceId: 'shared-workflows', namespace: 'default', taskQueue: 'default' }], { 'shared-workflows': { namespace: 'runtime', taskQueue: 'runtime' } });",
           'document.body.dataset.catalogSize = String(catalog.length);',
           'document.body.dataset.catalogDetail = typeof CatalogDetail;',
           'document.body.dataset.catalogList = typeof CatalogList;',
-          'document.body.dataset.catalogNamespace = target.namespace;',
+          'document.body.dataset.catalogNamespace = workspace.namespace;',
           'document.body.dataset.iconAdd = typeof IconAdd;',
         ].join('\n'),
       );
@@ -1817,7 +1817,7 @@ registry.registerExample({
   );
 
   it(
-    'reports an unknown selected development target before connecting',
+    'reports an unknown selected development workspace before connecting',
     async () => {
       let commandFailure: unknown;
 
@@ -1827,7 +1827,7 @@ registry.registerExample({
             ...process.env,
             TEMPORAL_ADDRESS: 'localhost:7233',
             TEMPORAL_NAMESPACE: 'default',
-            CATALOG_TARGET_ID: 'missing-target',
+            CATALOG_WORKSPACE_ID: 'missing-target',
           },
         });
       } catch (error) {
@@ -1839,7 +1839,7 @@ registry.registerExample({
         `${(commandFailure as { stdout?: string }).stdout ?? ''}${
           (commandFailure as { stderr?: string }).stderr ?? ''
         }`,
-      ).toContain('Catalog target "missing-target" was not found');
+      ).toContain('Catalog workspace "missing-target" was not found');
     },
     catalogCommandTestTimeoutMs,
   );

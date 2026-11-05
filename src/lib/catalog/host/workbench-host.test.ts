@@ -15,7 +15,7 @@ const workflowDescriptor: BrowserCatalogDescriptor = {
   startOptions: { defaultValue: {}, schema: {} },
   execution: {
     kind: 'workflow',
-    targetId: 'catalog',
+    workspaceId: 'catalog',
     namespace: 'catalog-demo',
     taskQueue: 'catalog-queue',
     workflowType: 'orderWorkflow',
@@ -27,7 +27,7 @@ const nexusDescriptor: BrowserCatalogDescriptor = {
   id: 'nexus-greeting',
   execution: {
     kind: 'standalone-nexus-operation',
-    targetId: 'nexus-caller',
+    workspaceId: 'nexus-caller',
     namespace: 'caller-demo',
     taskQueue: 'caller-queue',
     endpoint: 'greeting-endpoint',
@@ -42,7 +42,7 @@ const activityDescriptor: BrowserCatalogDescriptor = {
   id: 'priority-activity',
   execution: {
     kind: 'standalone-activity',
-    targetId: 'catalog',
+    workspaceId: 'catalog',
     namespace: 'catalog-demo',
     taskQueue: 'catalog-queue',
     activityType: 'priorityActivity',
@@ -78,7 +78,7 @@ describe('OSS WorkbenchHost', () => {
       {
         kind: 'workflow',
         target: {
-          targetId: 'catalog',
+          workspaceId: 'catalog',
           namespace: 'catalog-demo',
           taskQueue: 'catalog-queue',
         },
@@ -96,7 +96,7 @@ describe('OSS WorkbenchHost', () => {
         kind: 'workflow',
         attempt: { attemptId: 'attempt-1', executionId: 'order-1' },
         target: {
-          targetId: 'catalog',
+          workspaceId: 'catalog',
           namespace: 'catalog-demo',
           taskQueue: 'catalog-queue',
         },
@@ -155,7 +155,7 @@ describe('OSS WorkbenchHost', () => {
     expect(launch).toHaveBeenCalledWith(
       expect.objectContaining({
         target: {
-          targetId: 'catalog',
+          workspaceId: 'catalog',
           namespace: 'catalog-demo',
           taskQueue: 'catalog-queue',
         },
@@ -305,7 +305,7 @@ describe('OSS WorkbenchHost', () => {
         kind: 'workflow',
         attempt: { attemptId: 'attempt-1', executionId: 'order-1' },
         target: {
-          targetId: 'catalog',
+          workspaceId: 'catalog',
           namespace: 'catalog-demo',
           taskQueue: 'catalog-queue',
         },
@@ -562,7 +562,7 @@ describe('OSS WorkbenchHost', () => {
       kind: 'workflow' as const,
       attempt: { attemptId: 'attempt-observe', executionId: 'workflow-1' },
       target: {
-        targetId: 'catalog',
+        workspaceId: 'catalog',
         namespace: 'catalog-demo',
         taskQueue: 'catalog-queue',
       },
@@ -607,7 +607,7 @@ describe('OSS WorkbenchHost', () => {
               executionId: 'workflow-forged',
             },
             target: {
-              targetId: 'catalog',
+              workspaceId: 'catalog',
               namespace: 'other-namespace',
               taskQueue: 'catalog-queue',
             },

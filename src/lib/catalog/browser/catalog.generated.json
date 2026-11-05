@@ -1,5 +1,5 @@
 {
-  "sourceHash": "ab1d28559cd8149433f8505b38591843db129021116c4f63f3a2a9f5e2b9f690",
+  "sourceHash": "cae30b226b8ff1bd1cf3bb9c179fa7731add510cf81befc0037234143ead6e17",
   "descriptors": [
     {
       "id": "activity-heartbeat",
@@ -46,7 +46,7 @@
       },
       "execution": {
         "kind": "workflow",
-        "targetId": "shared-workflows",
+        "workspaceId": "shared-workflows",
         "namespace": "default",
         "taskQueue": "ui-catalog",
         "workflowType": "heartbeatWorkflow"
@@ -92,7 +92,7 @@
       },
       "execution": {
         "kind": "workflow",
-        "targetId": "shared-workflows",
+        "workspaceId": "shared-workflows",
         "namespace": "default",
         "taskQueue": "ui-catalog",
         "workflowType": "retryWorkflow"
@@ -133,7 +133,7 @@
       },
       "execution": {
         "kind": "workflow",
-        "targetId": "shared-workflows",
+        "workspaceId": "shared-workflows",
         "namespace": "default",
         "taskQueue": "ui-catalog",
         "workflowType": "timeoutWorkflow"
@@ -187,7 +187,7 @@
       },
       "execution": {
         "kind": "workflow",
-        "targetId": "shared-workflows",
+        "workspaceId": "shared-workflows",
         "namespace": "default",
         "taskQueue": "ui-catalog",
         "workflowType": "childFanOut"
@@ -221,7 +221,7 @@
       },
       "execution": {
         "kind": "workflow",
-        "targetId": "shared-workflows",
+        "workspaceId": "shared-workflows",
         "namespace": "default",
         "taskQueue": "ui-catalog",
         "workflowType": "childWorkflowTest"
@@ -262,7 +262,7 @@
       },
       "execution": {
         "kind": "workflow",
-        "targetId": "shared-workflows",
+        "workspaceId": "shared-workflows",
         "namespace": "default",
         "taskQueue": "ui-catalog",
         "workflowType": "hello"
@@ -314,7 +314,7 @@
       },
       "execution": {
         "kind": "workflow",
-        "targetId": "shared-workflows",
+        "workspaceId": "shared-workflows",
         "namespace": "default",
         "taskQueue": "ui-catalog",
         "workflowType": "highEventCountWorkflow"
@@ -368,7 +368,7 @@
       },
       "execution": {
         "kind": "workflow",
-        "targetId": "shared-workflows",
+        "workspaceId": "shared-workflows",
         "namespace": "default",
         "taskQueue": "ui-catalog",
         "workflowType": "largeHistory"
@@ -409,7 +409,7 @@
       },
       "execution": {
         "kind": "workflow",
-        "targetId": "shared-workflows",
+        "workspaceId": "shared-workflows",
         "namespace": "default",
         "taskQueue": "ui-catalog",
         "workflowType": "localActivityWorkflow"
@@ -455,7 +455,7 @@
       },
       "execution": {
         "kind": "workflow",
-        "targetId": "shared-workflows",
+        "workspaceId": "shared-workflows",
         "namespace": "default",
         "taskQueue": "ui-catalog",
         "workflowType": "longActivity"
@@ -497,7 +497,7 @@
       "setupMarkdown": "The workflow calls the `greet` operation on the `catalog-greeting` service through the `ui-catalog` Nexus endpoint.\n\n- **Local development:** the catalog worker creates the endpoint automatically when it starts.\n- **Other environments:** create the endpoint yourself before running, adjusting the address for your server:\n\n```\ntemporal operator nexus endpoint create --name ui-catalog --target-namespace <namespace> --target-task-queue ui-catalog\n```",
       "execution": {
         "kind": "workflow",
-        "targetId": "shared-workflows",
+        "workspaceId": "shared-workflows",
         "namespace": "default",
         "taskQueue": "ui-catalog",
         "workflowType": "nexusGreeting",
@@ -539,7 +539,7 @@
       },
       "execution": {
         "kind": "workflow",
-        "targetId": "shared-workflows",
+        "workspaceId": "shared-workflows",
         "namespace": "default",
         "taskQueue": "ui-catalog",
         "workflowType": "parallelActivities"
@@ -593,7 +593,7 @@
       },
       "execution": {
         "kind": "workflow",
-        "targetId": "shared-workflows",
+        "workspaceId": "shared-workflows",
         "namespace": "default",
         "taskQueue": "ui-catalog",
         "workflowType": "pendingActivitiesWorkflow"
@@ -641,7 +641,7 @@
       },
       "execution": {
         "kind": "workflow",
-        "targetId": "shared-workflows",
+        "workspaceId": "shared-workflows",
         "namespace": "default",
         "taskQueue": "ui-catalog",
         "workflowType": "pendingNexus",
@@ -697,7 +697,7 @@
       },
       "execution": {
         "kind": "workflow",
-        "targetId": "shared-workflows",
+        "workspaceId": "shared-workflows",
         "namespace": "default",
         "taskQueue": "ui-catalog",
         "workflowType": "priorityFairnessWorkflow"
@@ -770,7 +770,7 @@
       },
       "execution": {
         "kind": "workflow",
-        "targetId": "shared-workflows",
+        "workspaceId": "shared-workflows",
         "namespace": "default",
         "taskQueue": "ui-catalog",
         "workflowType": "satelliteLaunchEventGroups"
@@ -811,7 +811,7 @@
       },
       "execution": {
         "kind": "workflow",
-        "targetId": "shared-workflows",
+        "workspaceId": "shared-workflows",
         "namespace": "default",
         "taskQueue": "ui-catalog",
         "workflowType": "sequentialActivities"
@@ -859,7 +859,7 @@
       },
       "execution": {
         "kind": "workflow",
-        "targetId": "shared-workflows",
+        "workspaceId": "shared-workflows",
         "namespace": "default",
         "taskQueue": "ui-catalog",
         "workflowType": "sequentialMarkdownActivities"
@@ -906,7 +906,7 @@
       },
       "execution": {
         "kind": "workflow",
-        "targetId": "shared-workflows",
+        "workspaceId": "shared-workflows",
         "namespace": "default",
         "taskQueue": "ui-catalog",
         "workflowType": "sequentialMultilineSummaryActivities"
@@ -953,7 +953,7 @@
       },
       "execution": {
         "kind": "workflow",
-        "targetId": "shared-workflows",
+        "workspaceId": "shared-workflows",
         "namespace": "default",
         "taskQueue": "ui-catalog",
         "workflowType": "sequentialNoSummaryActivities"
@@ -1000,7 +1000,7 @@
       },
       "execution": {
         "kind": "workflow",
-        "targetId": "shared-workflows",
+        "workspaceId": "shared-workflows",
         "namespace": "default",
         "taskQueue": "ui-catalog",
         "workflowType": "sequentialPlainTextActivities"
@@ -1053,7 +1053,7 @@
       },
       "execution": {
         "kind": "workflow",
-        "targetId": "shared-workflows",
+        "workspaceId": "shared-workflows",
         "namespace": "default",
         "taskQueue": "ui-catalog",
         "workflowType": "signalCollector"
@@ -1099,7 +1099,7 @@
       },
       "execution": {
         "kind": "workflow",
-        "targetId": "shared-workflows",
+        "workspaceId": "shared-workflows",
         "namespace": "default",
         "taskQueue": "ui-catalog",
         "workflowType": "signalWorkflow"
@@ -1149,7 +1149,7 @@
       },
       "execution": {
         "kind": "standalone-nexus-operation",
-        "targetId": "shared-workflows",
+        "workspaceId": "shared-workflows",
         "namespace": "default",
         "taskQueue": "ui-catalog",
         "endpoint": "ui-catalog-slow-nexus",
@@ -1182,7 +1182,7 @@
       },
       "execution": {
         "kind": "standalone-activity",
-        "targetId": "shared-workflows",
+        "workspaceId": "shared-workflows",
         "namespace": "default",
         "taskQueue": "ui-catalog",
         "activityType": "standalone-activity",
@@ -1239,7 +1239,7 @@
       },
       "execution": {
         "kind": "workflow",
-        "targetId": "shared-workflows",
+        "workspaceId": "shared-workflows",
         "namespace": "default",
         "taskQueue": "ui-catalog",
         "workflowType": "scheduleWorkflow"
@@ -1295,7 +1295,7 @@
       },
       "execution": {
         "kind": "workflow",
-        "targetId": "shared-workflows",
+        "workspaceId": "shared-workflows",
         "namespace": "default",
         "taskQueue": "ui-catalog",
         "workflowType": "featureTourWorkflow",
@@ -1337,7 +1337,7 @@
       },
       "execution": {
         "kind": "workflow",
-        "targetId": "shared-workflows",
+        "workspaceId": "shared-workflows",
         "namespace": "default",
         "taskQueue": "ui-catalog",
         "workflowType": "patchWorkflow"

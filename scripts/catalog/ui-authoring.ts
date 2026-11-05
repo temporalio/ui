@@ -106,7 +106,7 @@ export const createUiCatalogAuthoring = (rootDirectory = getProjectRoot()) => {
           registrationTypePath: 'src/lib/catalog/worker/registration-source.ts',
         },
       ],
-      targets: [
+      workspaces: [
         {
           defaultNamespace: 'default',
           defaultTaskQueue: 'ui-catalog',
@@ -149,14 +149,14 @@ export const createUiCatalogAuthoring = (rootDirectory = getProjectRoot()) => {
       return artifacts.flatMap((artifact) =>
         (artifact?.descriptors ?? []).map((descriptor) => {
           const value = descriptor as {
-            execution?: { targetId?: unknown; workflowType?: unknown };
+            execution?: { workspaceId?: unknown; workflowType?: unknown };
             id?: unknown;
             source?: { id?: unknown };
           };
           if (
             typeof value.id !== 'string' ||
             typeof value.source?.id !== 'string' ||
-            typeof value.execution?.targetId !== 'string'
+            typeof value.execution?.workspaceId !== 'string'
           ) {
             throw new Error('Catalog descriptor graph is invalid');
           }
@@ -164,7 +164,7 @@ export const createUiCatalogAuthoring = (rootDirectory = getProjectRoot()) => {
             id: value.id,
             sourceFiles: [],
             sourceId: value.source.id,
-            targetId: value.execution.targetId,
+            workspaceId: value.execution.workspaceId,
             workflowType:
               typeof value.execution.workflowType === 'string'
                 ? value.execution.workflowType

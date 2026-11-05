@@ -165,7 +165,7 @@ ${definitions}
 export const sharedWorkflowExamples: readonly CatalogExampleRegistration[] =
   sharedWorkflowDefinitions.map((example) => ({
     ...example,
-    targetId: 'shared-workflows',
+    workspaceId: 'shared-workflows',
   }));
 
 const seenExampleIds = new Set<string>();
@@ -264,7 +264,7 @@ export const loadCanonicalCatalogRegistrationSource = async (
       ...new Set(examples.flatMap(({ sourceFiles }) => sourceFiles)),
     ],
     register: (registry) => {
-      registry.registerTarget({
+      registry.registerWorkspace({
         id: 'shared-workflows',
         namespace: 'default',
         taskQueue: 'ui-catalog',
@@ -274,7 +274,7 @@ export const loadCanonicalCatalogRegistrationSource = async (
       for (const definition of definitions) {
         registry.registerExample({
           ...definition,
-          targetId: 'shared-workflows',
+          workspaceId: 'shared-workflows',
         });
       }
     },

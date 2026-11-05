@@ -121,7 +121,7 @@ export const renderLocalCatalogAssemblies = async (rootDirectory: string) => {
   const registrations = examples
     .map(
       (_, index) =>
-        `    registry.registerExample({ ...example${index}, targetId: 'local-workflows' });`,
+        `    registry.registerExample({ ...example${index}, workspaceId: 'local-workflows' });`,
     )
     .join('\n');
   const sourceFiles = localCatalogSourceFiles(examples)
@@ -137,7 +137,7 @@ export const catalogRegistrationSource: CatalogRegistrationSource = {
 ${sourceFiles}
   ],
   register: (registry) => {
-    registry.registerTarget({
+    registry.registerWorkspace({
       id: 'local-workflows',
       namespace: 'default',
       taskQueue: 'ui-catalog-local',
@@ -197,7 +197,7 @@ export const loadLocalCatalogRegistrationSource = async (
     source: { id: 'local', label: 'Local' },
     sourceFiles: localCatalogSourceFiles(examples),
     register: (registry) => {
-      registry.registerTarget({
+      registry.registerWorkspace({
         id: 'local-workflows',
         namespace: 'default',
         taskQueue: 'ui-catalog-local',
@@ -209,7 +209,7 @@ export const loadLocalCatalogRegistrationSource = async (
       for (const definition of definitions) {
         registry.registerExample({
           ...definition,
-          targetId: 'local-workflows',
+          workspaceId: 'local-workflows',
         });
       }
     },
