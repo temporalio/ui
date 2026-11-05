@@ -1,5 +1,6 @@
 <script lang="ts">
   import { tick } from 'svelte';
+  import { type ClassNameValue, twMerge as merge } from 'tailwind-merge';
 
   import { page } from '$app/state';
 
@@ -40,11 +41,13 @@
     namespace,
     filtered = false,
     onClearFilters,
+    class: className = '',
   }: {
     callbacks: Callback[];
     namespace: string;
     filtered?: boolean;
     onClearFilters?: () => void;
+    class?: ClassNameValue;
   } = $props();
 
   const PAGE_PARAMETER = 'callbacks-page';
@@ -162,7 +165,7 @@
 
 <PaginatedTable
   id="nexus-operation-callbacks"
-  class="w-full"
+  class={merge('w-full', className)}
   fixed
   aria-label={translate('nexus.callbacks')}
   perPageLabel={translate('common.per-page')}

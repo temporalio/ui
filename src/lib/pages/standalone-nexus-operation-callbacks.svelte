@@ -30,17 +30,18 @@
 </script>
 
 <section class="flex flex-col gap-4">
-  <header class="flex flex-wrap items-end justify-between gap-4">
-    <div class="flex flex-col gap-1">
-      <h2>{translate('nexus.callbacks')}</h2>
-      <p class="text-sm text-secondary">{translate('nexus.callbacks-intro')}</p>
-    </div>
-    <NexusOperationCallbacksFilter {callbacks} />
+  <header class="flex flex-col gap-1">
+    <h2>{translate('nexus.callbacks')}</h2>
+    <p class="text-sm text-secondary">{translate('nexus.callbacks-intro')}</p>
   </header>
-  <NexusOperationCallbacksTable
-    callbacks={filteredCallbacks}
-    filtered={appliedCallbackFilterCount(filters) > 0}
-    onClearFilters={clearFilters}
-    {namespace}
-  />
+  <div class="flex flex-col">
+    <NexusOperationCallbacksFilter {callbacks} />
+    <NexusOperationCallbacksTable
+      class="rounded-t-none"
+      callbacks={filteredCallbacks}
+      filtered={appliedCallbackFilterCount(filters) > 0}
+      onClearFilters={clearFilters}
+      {namespace}
+    />
+  </div>
 </section>

@@ -55,7 +55,17 @@ const renderCallbacks = (completionCallbacks?: Callback[], search = '') => {
   return target;
 };
 
+beforeEach(() => {
+  vi.stubGlobal('IntersectionObserver', ResizeObserverStub);
+  Object.defineProperty(Element.prototype, 'animate', {
+    configurable: true,
+    value: () => ({ cancel() {} }) as Animation,
+  });
+});
+
 afterEach(() => {
+  delete (Element.prototype as { animate?: unknown }).animate;
+  vi.unstubAllGlobals();
   if (component) unmount(component);
   component = undefined;
   nexusOperationExecution.set(undefined);
@@ -112,15 +122,44 @@ describe('StandaloneNexusOperationCallbacks filter', () => {
   const rows = (target: HTMLElement) =>
     Array.from(target.querySelectorAll('[data-testid="callback-row"]'));
 
-  const filterButton = (target: HTMLElement) =>
-    target.querySelector<HTMLButtonElement>(
-      'button[aria-controls="callbacks-filter-menu"]',
+  const text = (element: Element | null | undefined) =>
+    element?.textContent?.trim().replace(/\s+/g, ' ');
+
+  const addFilterButton = () =>
+    document.querySelector<HTMLButtonElement>(
+      '[data-testid="callbacks-add-filter-button"]',
     );
 
-  const openMenu = (target: HTMLElement) => {
-    filterButton(target)?.click();
+  const menuItems = (menu: Element | null) =>
+    Array.from(menu?.querySelectorAll<HTMLElement>('[role="menuitem"]') ?? []);
+
+  const chipButton = (field: string) =>
+    document.querySelector<HTMLButtonElement>(
+      `button[aria-controls="callbacks-filter-chip-${field}"]`,
+    );
+
+  const chipMenu = (field: string) =>
+    document.querySelector(`#callbacks-filter-chip-${field}`);
+
+  const pickValue = (field: string, value: string) => {
+    menuItems(chipMenu(field))
+      .find((item) => item.textContent?.includes(value))
+      ?.click();
     flushSync();
-    return target.querySelector('#callbacks-filter-menu');
+  };
+
+  const applyButton = (field: string) =>
+    chipMenu(field)?.querySelector<HTMLButtonElement>(
+      '[data-testid="callbacks-filter-apply"]',
+    );
+
+  const addFilter = (label: string) => {
+    addFilterButton()?.click();
+    flushSync();
+    menuItems(document.querySelector('#callbacks-add-filter-menu'))
+      .find((item) => item.textContent?.trim() === label)
+      ?.click();
+    flushSync();
   };
 
   const lastGotoUrl = async () => {
@@ -134,14 +173,53 @@ describe('StandaloneNexusOperationCallbacks filter', () => {
     vi.mocked(goto).mockClear();
   });
 
-  it('shows a Filter button with no count when nothing is filtered', () => {
+  it('shows a filter bar with an Add Filter button above the table', () => {
     const target = renderCallbacks(callbacks);
+    const bar = target.querySelector('[data-testid="callbacks-filter-bar"]');
+    const table = target.querySelector('[data-testid="callback-row"]');
 
-    expect(filterButton(target)?.textContent).toContain('Filter');
+    expect(addFilterButton()?.textContent).toContain('Add Filter');
+    expect(bar?.contains(addFilterButton() ?? null)).toBe(true);
+    expect(
+      bar && table
+        ? bar.compareDocumentPosition(table) & Node.DOCUMENT_POSITION_FOLLOWING
+        : 0,
+    ).toBeTruthy();
     expect(rows(target)).toHaveLength(3);
   });
 
-  it('shows only the callbacks that match the filters in the URL', () => {
+  it('lists the three filter fields in the Add Filter menu', () => {
+    renderCallbacks(callbacks);
+    addFilterButton()?.click();
+    flushSync();
+
+    expect(
+      menuItems(document.querySelector('#callbacks-add-filter-menu')).map(
+        (item) => item.textContent?.trim(),
+      ),
+    ).toEqual(['Nexus Endpoint', 'Nexus Service', 'Nexus Operation']);
+  });
+
+  it('opens a dropdown of the field’s values, with counts, when a field is picked', () => {
+    renderCallbacks(callbacks);
+
+    addFilter('Nexus Service');
+
+    const menu = chipMenu('service');
+    expect(chipButton('service')?.getAttribute('aria-expanded')).toBe('true');
+    expect(menu?.textContent).toContain('Filter by Nexus Service');
+    const items = menuItems(menu).map((item) => text(item));
+    expect(items).toHaveLength(2);
+    expect(items.find((item) => item?.includes('order-service'))).toMatch(
+      / 2$/,
+    );
+    expect(items.find((item) => item?.includes('billing-service'))).toMatch(
+      / 1$/,
+    );
+    expect(chipMenu('endpoint')).toBeNull();
+  });
+
+  it('shows only the callbacks that match the filters in the URL, with a chip per field', () => {
     const target = renderCallbacks(
       callbacks,
       '?callbacks-endpoint=orders-tq&callbacks-operation=update-workflow',
@@ -149,46 +227,93 @@ describe('StandaloneNexusOperationCallbacks filter', () => {
 
     expect(rows(target)).toHaveLength(1);
     expect(rows(target)[0].textContent).toContain('update-workflow');
-    expect(filterButton(target)?.textContent).toContain('2');
+    expect(text(chipButton('endpoint'))).toBe('Nexus Endpoint = orders-tq');
+    expect(text(chipButton('operation'))).toBe(
+      'Nexus Operation = update-workflow',
+    );
+    expect(chipButton('service')).toBeNull();
   });
 
-  it('lists every field’s values in the menu, with counts', () => {
-    const target = renderCallbacks(callbacks);
-    const menu = openMenu(target);
+  it('disables fields that already have a chip in the Add Filter menu', () => {
+    renderCallbacks(callbacks, '?callbacks-endpoint=orders-tq');
+    addFilterButton()?.click();
+    flushSync();
 
-    expect(menu?.textContent).toContain('Nexus Endpoint');
-    expect(menu?.textContent).toContain('Nexus Service');
-    expect(menu?.textContent).toContain('Nexus Operation');
-    for (const value of [
-      'orders-tq',
-      'billing-tq',
-      'order-service',
-      'billing-service',
-      'start-workflow',
-      'update-workflow',
-    ]) {
-      expect(menu?.textContent).toContain(value);
-    }
+    const endpoint = menuItems(
+      document.querySelector('#callbacks-add-filter-menu'),
+    ).find((item) => item.textContent?.trim() === 'Nexus Endpoint');
+    expect(endpoint?.getAttribute('aria-disabled')).toBe('true');
   });
 
-  it('adds a value to the URL and returns to the first page when it is picked', async () => {
-    const target = renderCallbacks(callbacks, '?callbacks-page=2');
-    const menu = openMenu(target);
-    const option = Array.from(
-      menu?.querySelectorAll<HTMLElement>('[role="menuitem"]') ?? [],
-    ).find((item) => item.textContent?.includes('billing-tq'));
+  it('adds the picked values to the URL and returns to the first page on Apply', async () => {
+    const { goto } = await import('$app/navigation');
+    renderCallbacks(callbacks, '?callbacks-page=2');
+    vi.mocked(goto).mockClear();
+    addFilter('Nexus Endpoint');
 
-    option?.click();
+    pickValue('endpoint', 'billing-tq');
+    pickValue('endpoint', 'orders-tq');
+    expect(vi.mocked(goto)).not.toHaveBeenCalled();
+
+    applyButton('endpoint')?.click();
     flushSync();
 
     const url = await lastGotoUrl();
-    expect(url.searchParams.get('callbacks-endpoint')).toBe('billing-tq');
+    expect(url.searchParams.get('callbacks-endpoint')).toBe(
+      'billing-tq,orders-tq',
+    );
     expect(url.searchParams.has('callbacks-page')).toBe(false);
+    expect(chipButton('endpoint')?.getAttribute('aria-expanded')).toBe('false');
   });
 
-  it('narrows the menu values with the search box', () => {
-    const target = renderCallbacks(callbacks);
-    const menu = openMenu(target);
+  it('removes an applied value on Apply', async () => {
+    renderCallbacks(callbacks, '?callbacks-service=order-service');
+    chipButton('service')?.click();
+    flushSync();
+
+    pickValue('service', 'order-service');
+    applyButton('service')?.click();
+    flushSync();
+
+    const url = await lastGotoUrl();
+    expect(url.searchParams.has('callbacks-service')).toBe(false);
+  });
+
+  it('discards picked values when the dropdown closes without Apply', async () => {
+    const { goto } = await import('$app/navigation');
+    renderCallbacks(callbacks, '?callbacks-service=order-service');
+    chipButton('service')?.click();
+    flushSync();
+    pickValue('service', 'billing-service');
+
+    document.body.click();
+    flushSync();
+    chipButton('service')?.click();
+    flushSync();
+
+    const checked = menuItems(chipMenu('service'))
+      .filter((item) => item.querySelector('input[type="checkbox"]:checked'))
+      .map((item) => text(item));
+    expect(vi.mocked(goto)).not.toHaveBeenCalled();
+    expect(checked).toHaveLength(1);
+    expect(checked[0]).toContain('order-service');
+  });
+
+  it('removes a chip with no values when its dropdown closes', () => {
+    renderCallbacks(callbacks);
+    addFilter('Nexus Operation');
+    expect(chipButton('operation')).not.toBeNull();
+
+    document.body.click();
+    flushSync();
+
+    expect(chipButton('operation')).toBeNull();
+  });
+
+  it('narrows the field’s values with the search box', () => {
+    renderCallbacks(callbacks);
+    addFilter('Nexus Endpoint');
+    const menu = chipMenu('endpoint');
     const search = menu?.querySelector<HTMLInputElement>(
       'input[type="search"]',
     );
@@ -199,29 +324,35 @@ describe('StandaloneNexusOperationCallbacks filter', () => {
     }
     flushSync();
 
+    expect(search).not.toBeNull();
     expect(menu?.textContent).toContain('billing-tq');
-    expect(menu?.textContent).toContain('billing-service');
     expect(menu?.textContent).not.toContain('orders-tq');
-    expect(menu?.textContent).not.toContain('update-workflow');
   });
 
-  it('clears every filter from the menu', async () => {
+  it('clears every filter from the bar', async () => {
     const target = renderCallbacks(
       callbacks,
       '?callbacks-endpoint=orders-tq&callbacks-service=order-service',
     );
-    const menu = openMenu(target);
-    const clearAll = Array.from(
-      menu?.querySelectorAll<HTMLElement>('[role="menuitem"]') ?? [],
-    ).find((item) => item.textContent?.trim() === 'Clear all');
+    const clearAll = target.querySelector<HTMLButtonElement>(
+      '[data-testid="callbacks-clear-all-filters"]',
+    );
 
     clearAll?.click();
     flushSync();
 
     const url = await lastGotoUrl();
-    expect(clearAll).toBeDefined();
+    expect(text(clearAll)).toBe('Clear all');
     expect(url.searchParams.has('callbacks-endpoint')).toBe(false);
     expect(url.searchParams.has('callbacks-service')).toBe(false);
+  });
+
+  it('hides Clear all when nothing is filtered', () => {
+    const target = renderCallbacks(callbacks);
+
+    expect(
+      target.querySelector('[data-testid="callbacks-clear-all-filters"]'),
+    ).toBeNull();
   });
 
   it('shows a no-matches state, not the empty state, when filters hide every callback', async () => {

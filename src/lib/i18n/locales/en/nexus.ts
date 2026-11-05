@@ -95,6 +95,8 @@ export const Strings = {
   'callback-registered-time': 'Callback Registered Time',
   'callbacks-no-matches': 'No callbacks match the current filters.',
   'clear-filters': 'Clear filters',
+  'add-filter': 'Add Filter',
+  'filter-by-field': 'Filter by {{field}}',
   'delivery-attempt': 'Delivery Attempt',
   link: 'Link',
   'workflow-link': 'Workflow Link',
