@@ -1,7 +1,8 @@
 <script lang="ts">
   import { page } from '$app/state';
 
-  import EmptyState from '$lib/holocene/empty-state.svelte';
+  import NoQueryResults from '$lib/components/empty-states/no-query-results.svelte';
+  import SdkGettingStartedLinks from '$lib/components/sdk-getting-started-links.svelte';
   import Link from '$lib/holocene/link.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/paginated.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
@@ -25,6 +26,7 @@
     eventLinkTargetTypeLabel,
     toEventLinkView,
   } from '$lib/utilities/event-link';
+  import { toInboundLinkRow } from '$lib/utilities/inbound-link-row';
   import { isNexusOperationScheduledEvent } from '$lib/utilities/is-event-type';
   import {
     getNexusLinksView,
@@ -83,12 +85,23 @@
   };
 </script>
 
-{#snippet linkDisplay(view: EventLinkDisplay)}
+{#snippet linkDisplay(view: Pick<EventLinkDisplay, 'value' | 'href'>)}
   {#if view.href}
     <Link href={view.href}>{view.value}</Link>
   {:else}
     {view.value}
   {/if}
+{/snippet}
+
+{#snippet linksEmptyState(testId: string, message: string)}
+  <div
+    class="flex flex-col items-center gap-2 p-8 text-center"
+    data-testid={testId}
+  >
+    <NoQueryResults class="mb-4" />
+    <h3 class="text-primary">{message}</h3>
+    <SdkGettingStartedLinks />
+  </div>
 {/snippet}
 
 {#snippet inboundTable()}
@@ -111,30 +124,39 @@
     {#snippet headers()}
       <TableHeaderRow>
         <th>{translate('nexus.caller-event')}</th>
-        <th>{translate('nexus.caller-link')}</th>
+        <th>{translate('nexus.caller-execution')}</th>
         <th>{translate('nexus.caller-namespace')}</th>
-        <th>{translate('nexus.handler-event')}</th>
+        <th>{translate('nexus.target')}</th>
       </TableHeaderRow>
     {/snippet}
     {#snippet rows({ visibleItems })}
       {#each visibleItems as event (event?.id)}
-        {@const link = event ? getInboundLinkForEvent(event) : undefined}
-        {@const linkView = toEventLinkView(link || undefined, { namespace })}
-        <TableRow data-testid="worker-row">
+        {@const row = toInboundLinkRow(
+          (event && getInboundLinkForEvent(event)) || undefined,
+          namespace,
+        )}
+        <TableRow data-testid="inbound-link-row">
           <td class="break-all text-left" data-testid="caller-event">
-            {#if linkView.event}
-              {@render linkDisplay(linkView.event)}
+            {#if row.callerEvent}
+              {@render linkDisplay(row.callerEvent)}
             {/if}
           </td>
-          <td class="break-all text-left" data-testid="link-event">
-            {@render linkDisplay(linkView)}
-          </td>
-          <td class="break-all text-left" data-testid="link-namespace">
-            {#if linkView.namespace}
-              {@render linkDisplay(linkView.namespace)}
+          <td class="break-all text-left" data-testid="caller-execution">
+            {#if row.callerExecution}
+              {@render linkDisplay(row.callerExecution)}
+              {#if row.callerExecution.typeLabel}
+                <p class="text-xs text-secondary opacity-80">
+                  {row.callerExecution.typeLabel}
+                </p>
+              {/if}
             {/if}
           </td>
-          <td class="break-all text-left" data-testid="handler-event">
+          <td class="break-all text-left" data-testid="caller-namespace">
+            {#if row.callerNamespace}
+              {@render linkDisplay(row.callerNamespace)}
+            {/if}
+          </td>
+          <td class="break-all text-left" data-testid="target-event">
             <Link
               href={routeForEventHistoryEvent({
                 namespace: namespace,
@@ -150,7 +172,10 @@
       {/each}
     {/snippet}
     {#snippet empty()}
-      <EmptyState title={translate('nexus.inbound-links-empty-state')} />
+      {@render linksEmptyState(
+        'inbound-links-empty-state',
+        translate('nexus.inbound-links-empty-state'),
+      )}
     {/snippet}
   </PaginatedTable>
 {/snippet}
@@ -236,7 +261,10 @@
       {/each}
     {/snippet}
     {#snippet empty()}
-      <EmptyState title={translate('nexus.outbound-links-empty-state')} />
+      {@render linksEmptyState(
+        'outbound-links-empty-state',
+        translate('nexus.outbound-links-empty-state'),
+      )}
     {/snippet}
   </PaginatedTable>
 {/snippet}
