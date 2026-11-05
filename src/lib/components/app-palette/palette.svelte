@@ -517,10 +517,17 @@
     return !/^[a-z]$/.test(key) && event.code === 'KeyK';
   }
 
+  // Only Mod+K, with no Alt or Shift. AltGr sends Ctrl+Alt on Windows, and
+  // AltGr+K types a letter on some layouts.
+  function isModK(event: KeyboardEvent) {
+    if (event.altKey || event.shiftKey) return false;
+    return hasMod(event) && isK(event);
+  }
+
   // Runs in the capture phase, so Mod+K always opens the palette, even in a
   // field that handles its own keys.
   function onWindowKeydown(event: KeyboardEvent) {
-    if (!hasMod(event) || !isK(event)) return;
+    if (!isModK(event)) return;
     event.preventDefault();
     event.stopPropagation();
     if (open) {

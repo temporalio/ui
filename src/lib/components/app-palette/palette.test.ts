@@ -309,6 +309,25 @@ describe('Palette', () => {
     expect(screen.getByRole('combobox')).toBeTruthy();
   });
 
+  it('leaves AltGr+K and Mod+Shift+K to the page', async () => {
+    setup();
+    const altGr = await fireEvent.keyDown(window, {
+      key: 'ł',
+      code: 'KeyK',
+      altKey: true,
+      ...MOD,
+    });
+    const shifted = await fireEvent.keyDown(window, {
+      key: 'K',
+      shiftKey: true,
+      ...MOD,
+    });
+
+    expect(altGr).toBe(true);
+    expect(shifted).toBe(true);
+    expect(screen.queryByRole('combobox')).toBeNull();
+  });
+
   it('keeps Mod+T on a Dvorak layout for the browser', async () => {
     setup();
     await fireEvent.keyDown(window, { key: 't', code: 'KeyK', ...MOD });
