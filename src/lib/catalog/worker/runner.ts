@@ -145,7 +145,6 @@ export const startCatalogRunner = async <Connection extends CatalogConnection>(
           namespace: binding.workspace.namespace,
           taskQueue: binding.workspace.taskQueue,
           workflowsPath:
-            binding.workspace.workflowsPath === './workflows.js' &&
             !existsSync(packagedWorkflowsPath) &&
             existsSync(sourceWorkflowsPath)
               ? sourceWorkflowsPath

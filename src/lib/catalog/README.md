@@ -84,7 +84,9 @@ A `per-folder` workspace registers workspaces named `<workspace id>-<folder>`. V
 
 ### Workspace metadata
 
-A `per-folder` folder can describe its workspace in an optional `workspace.ts`:
+A source names its files explicitly, for example `files: { example: 'example.ts', workflow: 'workflow.ts', workspace: 'workspace.ts' }`. Generation lists the source's folders and checks only for those files. It does not parse them or derive names from them: everything else comes from the modules when they are registered. The generated registration and the generate step both call `registerCatalogSource`, so they register the same workspaces.
+
+A `workspace.ts` describes a workspace. In a `per-folder` source it sits in a folder and describes that folder's workspace. In a `shared` source it sits at the source root and describes the one shared workspace:
 
 ```ts
 export const catalogWorkspace = {
@@ -97,7 +99,7 @@ export const catalogWorkspace = {
 } satisfies CatalogWorkspaceDefinition;
 ```
 
-Every field is optional. The ID, namespace and task queue come from the folder, so the file cannot set them. Generation validates the metadata with the Zod schema in `browser/metadata-schema.ts` and writes a `workspaces` list into the generated catalog. Each descriptor's `execution.workspaceId` points into that list.
+Every field is optional. The ID, namespace and task queue come from the source and folder, so the file cannot set them. A `workspace.ts` in the wrong place fails generation: a folder file in a `shared` source, or a root file in a `per-folder` source. Generation validates the metadata with the Zod schema in `browser/metadata-schema.ts` and writes a `workspaces` list into the generated catalog. Each descriptor's `execution.workspaceId` points into that list.
 
 ### Scenarios
 

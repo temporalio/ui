@@ -1,41 +1,124 @@
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
+import { format, resolveConfig } from 'prettier';
+
 import {
   type CatalogAuthoringArtifact,
+  type CatalogAuthoringSource,
+  type CatalogAuthoringWorkspace,
   composeCatalogArtifacts,
   createCatalogAuthoring,
   defineCatalogArtifact,
   deleteCatalogArtifact,
+  discoverCatalogSource,
+  loadCatalogSource,
+  renderCatalogSourceAssembly,
 } from '../../src/lib/catalog/authoring.js';
 import { getProjectRoot } from '../get-project-root.js';
-import {
-  loadCanonicalCatalogRegistrationSource,
-  renderCanonicalCatalogAssemblies,
-} from './canonical-assemblies.js';
 import {
   parseCatalogTypeScriptModuleSpecifiers,
   planDirectoryCatalogPromotion,
 } from './directory-promotion.js';
-import {
-  loadLocalCatalogRegistrationSource,
-  renderLocalCatalogAssemblies,
-} from './local-assemblies.js';
 import {
   renderProjectCatalogArtifacts,
   verifyProjectCatalogBoundaries,
 } from './project-artifacts.js';
 import { renderDirectoryCatalogScaffold } from './scaffold.js';
 
+const registrationModulePath = 'src/lib/catalog/worker/registration-source.ts';
+const exampleFiles = {
+  example: 'example.ts',
+  workflow: 'workflow.ts',
+  workspace: 'workspace.ts',
+};
+
+const sharedSource: CatalogAuthoringSource = {
+  examplesPath: 'src/lib/catalog/worker/examples',
+  id: 'oss',
+  label: 'OSS',
+  registrationOutputPath: 'src/lib/catalog/worker/shared-registrations.ts',
+  registrationModulePath,
+  files: exampleFiles,
+  sourceFiles: [
+    'src/lib/catalog/worker/examples/inventory.ts',
+    'src/lib/catalog/worker/examples/shared-activities.ts',
+  ],
+};
+
+const localSource: CatalogAuthoringSource = {
+  examplesPath: 'catalog.local/examples',
+  id: 'local',
+  label: 'Local',
+  registrationOutputPath: 'catalog.local/registration.ts',
+  registrationModulePath,
+  files: exampleFiles,
+};
+
+const sharedWorkspace: CatalogAuthoringWorkspace = {
+  defaultNamespace: 'default',
+  defaultTaskQueue: 'ui-catalog',
+  id: 'shared-workflows',
+  sourceId: sharedSource.id,
+  workflowsModulePath: 'src/lib/catalog/worker/workflows.ts',
+};
+
+const localWorkspace: CatalogAuthoringWorkspace = {
+  defaultNamespace: 'default',
+  defaultTaskQueue: 'ui-catalog-local',
+  id: 'local-workflows',
+  sourceId: localSource.id,
+  workflowsModulePath: 'catalog.local/workflows.ts',
+};
+
 export const uiCatalogGeneratedPaths = [
   'catalog.local/registration.ts',
   'catalog.local/workflows.ts',
   'catalog.local/catalog.generated.json',
-  'src/lib/catalog/worker/examples/index.ts',
+  'src/lib/catalog/worker/shared-registrations.ts',
   'src/lib/catalog/worker/workflows.ts',
   'src/lib/catalog/browser/catalog.generated.json',
   'src/lib/catalog/browser/catalog.generated.ts',
 ] as const;
+
+const formatTypeScript = async (
+  rootDirectory: string,
+  artifact: CatalogAuthoringArtifact,
+) => {
+  if (artifact.delete) return artifact;
+  const prettierConfig =
+    (await resolveConfig(join(rootDirectory, 'package.json'))) ?? {};
+  return defineCatalogArtifact(
+    artifact.path,
+    await format(artifact.content.toString(), {
+      ...prettierConfig,
+      filepath: join(rootDirectory, artifact.path),
+      singleQuote: true,
+      trailingComma: 'all',
+    }),
+  );
+};
+
+const prepareSource = async (
+  rootDirectory: string,
+  source: CatalogAuthoringSource,
+  workspace: CatalogAuthoringWorkspace,
+) => {
+  const discovered = await discoverCatalogSource({ rootDirectory, source });
+  const [assemblies, registrationSource] = await Promise.all([
+    Promise.all(
+      renderCatalogSourceAssembly({ discovered, source, workspace }).map(
+        (artifact) => formatTypeScript(rootDirectory, artifact),
+      ),
+    ),
+    loadCatalogSource({ discovered, rootDirectory, source, workspace }),
+  ]);
+  return {
+    assemblies,
+    registrationSource,
+    empty: discovered.folders.length === 0,
+  };
+};
 
 export const createUiCatalogAuthoring = (rootDirectory = getProjectRoot()) => {
   let renderGenerated: () => Promise<readonly CatalogAuthoringArtifact[]>;
@@ -48,7 +131,6 @@ export const createUiCatalogAuthoring = (rootDirectory = getProjectRoot()) => {
         ],
         packageJsonPath: 'package.json',
         workerPaths: [
-          'src/lib/catalog/worker/examples/index.ts',
           'src/lib/catalog/worker/shared-registrations.ts',
           'src/lib/catalog/worker/workflows.ts',
           'catalog.local/registration.ts',
@@ -70,10 +152,6 @@ export const createUiCatalogAuthoring = (rootDirectory = getProjectRoot()) => {
         },
         {
           consumers: ['authoring', 'worker'] as const,
-          path: 'src/lib/catalog/worker/examples/index.ts',
-        },
-        {
-          consumers: ['authoring', 'worker'] as const,
           path: 'src/lib/catalog/worker/workflows.ts',
         },
         {
@@ -85,43 +163,12 @@ export const createUiCatalogAuthoring = (rootDirectory = getProjectRoot()) => {
           path: 'src/lib/catalog/browser/catalog.generated.ts',
         },
         {
-          consumers: ['worker'] as const,
+          consumers: ['authoring', 'worker'] as const,
           path: 'src/lib/catalog/worker/shared-registrations.ts',
         },
       ],
-      sources: [
-        {
-          examplesPath: 'src/lib/catalog/worker/examples',
-          id: 'oss',
-          label: 'OSS',
-          registrationOutputPath:
-            'src/lib/catalog/worker/shared-registrations.ts',
-          registrationTypePath: 'src/lib/catalog/worker/registration-source.ts',
-        },
-        {
-          examplesPath: 'catalog.local/examples',
-          id: 'local',
-          label: 'Local',
-          registrationOutputPath: 'catalog.local/registration.ts',
-          registrationTypePath: 'src/lib/catalog/worker/registration-source.ts',
-        },
-      ],
-      workspaces: [
-        {
-          defaultNamespace: 'default',
-          defaultTaskQueue: 'ui-catalog',
-          id: 'shared-workflows',
-          sourceId: 'oss',
-          workflowsModulePath: 'src/lib/catalog/worker/workflows.ts',
-        },
-        {
-          defaultNamespace: 'default',
-          defaultTaskQueue: 'ui-catalog-local',
-          id: 'local-workflows',
-          sourceId: 'local',
-          workflowsModulePath: 'catalog.local/workflows.ts',
-        },
-      ],
+      sources: [sharedSource, localSource],
+      workspaces: [sharedWorkspace, localWorkspace],
     },
     rootDirectory,
     parseModuleSpecifiers: parseCatalogTypeScriptModuleSpecifiers,
@@ -176,47 +223,29 @@ export const createUiCatalogAuthoring = (rootDirectory = getProjectRoot()) => {
     validatePromotion: ({ exampleId }) =>
       planDirectoryCatalogPromotion({ exampleId, rootDirectory }),
     generate: (renderGenerated = async () => {
-      const local = await renderLocalCatalogAssemblies(rootDirectory);
-      const localSource =
-        await loadLocalCatalogRegistrationSource(rootDirectory);
-      const localAssemblies = localSource
-        ? [
-            defineCatalogArtifact(
-              'catalog.local/registration.ts',
-              local.registration,
-            ),
-            defineCatalogArtifact(
-              'catalog.local/workflows.ts',
-              local.workflows,
-            ),
-          ]
+      const [shared, local] = await Promise.all([
+        prepareSource(rootDirectory, sharedSource, sharedWorkspace),
+        prepareSource(rootDirectory, localSource, localWorkspace),
+      ]);
+      const localAssemblies = !local.empty
+        ? local.assemblies
         : [
-            deleteCatalogArtifact('catalog.local/registration.ts'),
-            deleteCatalogArtifact('catalog.local/workflows.ts'),
+            deleteCatalogArtifact(localSource.registrationOutputPath),
+            deleteCatalogArtifact(localWorkspace.workflowsModulePath),
           ];
-      const [canonicalAssemblies, sharedSource] = await Promise.all([
-        renderCanonicalCatalogAssemblies(rootDirectory),
-        loadCanonicalCatalogRegistrationSource(rootDirectory),
-      ]);
-      const sourceContentOverrides = new Map([
-        ...localAssemblies.flatMap((artifact) =>
-          artifact.delete ? [] : [[artifact.path, artifact.content] as const],
-        ),
-        ...canonicalAssemblies.map(
-          ({ content, path }) => [path, content] as const,
-        ),
-      ]);
+      const assemblies = [...shared.assemblies, ...localAssemblies];
       const project = await renderProjectCatalogArtifacts({
         rootDirectory,
-        sharedSource,
-        sourceContentOverrides,
-        ...(localSource ? { localSource } : { localSource: null }),
+        sharedSource: shared.registrationSource,
+        localSource: local.empty ? null : local.registrationSource,
+        sourceContentOverrides: new Map(
+          assemblies.flatMap((artifact) =>
+            artifact.delete ? [] : [[artifact.path, artifact.content] as const],
+          ),
+        ),
       });
       return composeCatalogArtifacts(
-        localAssemblies,
-        canonicalAssemblies.map(({ content, path }) =>
-          defineCatalogArtifact(path, content),
-        ),
+        assemblies,
         project.artifacts.map(({ artifactPath, content }) =>
           content === null
             ? deleteCatalogArtifact(artifactPath)
@@ -265,14 +294,14 @@ export const createUiCatalogAuthoring = (rootDirectory = getProjectRoot()) => {
       }
     },
     verify: async () => {
-      const [sharedSource, localSource] = await Promise.all([
-        loadCanonicalCatalogRegistrationSource(rootDirectory),
-        loadLocalCatalogRegistrationSource(rootDirectory),
+      const [shared, local] = await Promise.all([
+        prepareSource(rootDirectory, sharedSource, sharedWorkspace),
+        prepareSource(rootDirectory, localSource, localWorkspace),
       ]);
       await verifyProjectCatalogBoundaries({
         rootDirectory,
-        sharedSource,
-        localSource: localSource ?? null,
+        sharedSource: shared.registrationSource,
+        localSource: local.empty ? null : local.registrationSource,
       });
     },
   });

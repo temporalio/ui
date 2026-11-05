@@ -1614,7 +1614,7 @@ registry.registerExample({
           "  localExamplesPath: 'local-examples',",
           "  trackedExamplesPath: 'tracked-examples',",
           "  generatedPaths: ['generated/catalog.json'],",
-          "  graph: { boundaries: { browserPaths: ['generated/catalog.json'], packageJsonPath: 'package.json', workerPaths: ['generated/registration.ts', 'generated/workflows.ts'] }, outputs: [{ consumers: ['browser'], path: 'generated/catalog.json' }, { consumers: ['worker'], path: 'generated/registration.ts' }, { consumers: ['worker'], path: 'generated/workflows.ts' }], sources: [{ examplesPath: 'tracked-examples', id: 'cloud', label: 'Cloud', registrationOutputPath: 'generated/registration.ts', registrationTypePath: 'generated/registration-source.ts' }], workspaces: [{ defaultNamespace: 'default', defaultTaskQueue: 'cloud-catalog', id: 'cloud-catalog', sourceId: 'cloud', workflowsModulePath: 'generated/workflows.ts' }] },",
+          "  graph: { boundaries: { browserPaths: ['generated/catalog.json'], packageJsonPath: 'package.json', workerPaths: ['generated/registration.ts', 'generated/workflows.ts'] }, outputs: [{ consumers: ['browser'], path: 'generated/catalog.json' }, { consumers: ['worker'], path: 'generated/registration.ts' }, { consumers: ['worker'], path: 'generated/workflows.ts' }], sources: [{ examplesPath: 'tracked-examples', id: 'cloud', label: 'Cloud', registrationOutputPath: 'generated/registration.ts', registrationModulePath: 'generated/registration-source.ts', files: { example: 'example.ts' } }], workspaces: [{ defaultNamespace: 'default', defaultTaskQueue: 'cloud-catalog', id: 'cloud-catalog', sourceId: 'cloud', workflowsModulePath: 'generated/workflows.ts' }] },",
           '  loadExamples: () => [],',
           '  parseModuleSpecifiers: () => [],',
           '  scaffold: ({ exampleId }) => [{ path: `local-examples/${exampleId}/example.ts`, content: `export const id = ${JSON.stringify(exampleId)};\\n` }],',
@@ -1851,7 +1851,8 @@ registry.registerExample({
   it(
     'rejects stale artifacts before development can load or rewrite them',
     async () => {
-      const sharedSourcePath = 'src/lib/catalog/worker/shared-registrations.ts';
+      const sharedSourcePath =
+        'src/lib/catalog/worker/examples/hello/example.ts';
       const sharedArtifactPath =
         'src/lib/catalog/browser/catalog.generated.json';
       const originalSource = await readFile(sharedSourcePath, 'utf8');

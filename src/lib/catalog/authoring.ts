@@ -24,6 +24,26 @@ import {
   resolve,
   sep,
 } from 'node:path';
+import { pathToFileURL } from 'node:url';
+
+import {
+  type CatalogRegistrationSource,
+  type CatalogSourceFolder,
+  type CatalogWorkspaceGrouping,
+  perFolderTaskQueue,
+  perFolderWorkspaceId,
+  registerCatalogSource,
+} from './worker/registration-source.js';
+import type {
+  CatalogExampleDefinition,
+  CatalogWorkspaceDefinition,
+} from './worker/registry.js';
+
+export {
+  type CatalogWorkspaceGrouping,
+  perFolderTaskQueue,
+  perFolderWorkspaceId,
+};
 
 export type CatalogAuthoringArtifact =
   | { content: string | Uint8Array; delete?: false; path: string }
@@ -34,10 +54,16 @@ export type CatalogAuthoringSource = {
   id: string;
   label: string;
   registrationOutputPath: string;
-  registrationTypePath: string;
+  registrationModulePath: string;
+  files: CatalogSourceFiles;
+  sourceFiles?: readonly string[];
 };
 
-export type CatalogWorkspaceGrouping = 'shared' | 'per-folder';
+export type CatalogSourceFiles = {
+  example: string;
+  workflow?: string;
+  workspace?: string;
+};
 
 export type CatalogAuthoringWorkspace = {
   defaultNamespace: string;
@@ -47,16 +73,6 @@ export type CatalogAuthoringWorkspace = {
   sourceId: string;
   workflowsModulePath: string;
 };
-
-export const perFolderWorkspaceId = (
-  workspace: Pick<CatalogAuthoringWorkspace, 'id'>,
-  exampleId: string,
-) => `${workspace.id}-${exampleId}`;
-
-export const perFolderTaskQueue = (
-  workspace: Pick<CatalogAuthoringWorkspace, 'defaultTaskQueue'>,
-  exampleId: string,
-) => `${workspace.defaultTaskQueue}-${exampleId}`;
 
 const isPerFolder = (workspace: Pick<CatalogAuthoringWorkspace, 'grouping'>) =>
   workspace.grouping === 'per-folder';
@@ -83,13 +99,6 @@ export type CatalogComposedExample = {
   sourceId: string;
   workspaceId: string;
   workflowType?: string;
-};
-
-export type CatalogAssemblyExample = CatalogComposedExample & {
-  definitionImportPath: string;
-  workflowExport?: string;
-  workflowImportPath?: string;
-  workspaceImportPath?: string;
 };
 
 export type CatalogAuthoringAdapter = {
@@ -245,7 +254,17 @@ export const validateCatalogAuthoringGraph = (
   for (const source of graph.sources) {
     assertExplicitRelativePath(source.examplesPath);
     assertExplicitRelativePath(source.registrationOutputPath);
-    assertExplicitRelativePath(source.registrationTypePath);
+    assertExplicitRelativePath(source.registrationModulePath);
+    for (const file of Object.values(source.files)) {
+      if (file !== undefined && !/^[\w.-]+$/.test(file)) {
+        throw new Error(
+          `Catalog source files must be plain file names: ${source.id}`,
+        );
+      }
+    }
+    for (const path of source.sourceFiles ?? []) {
+      assertExplicitRelativePath(path);
+    }
     if (!source.label.trim()) {
       throw new Error(`Catalog source label is required: ${source.id}`);
     }
@@ -360,20 +379,20 @@ export const validateCatalogAuthoringGraph = (
       const owner = `example ${example.id}`;
       claimEffective(
         effectiveWorkspaceIds,
-        perFolderWorkspaceId(workspace, example.id),
+        perFolderWorkspaceId(workspace.id, example.id),
         owner,
         'workspace id',
       );
       claimEffective(
         effectiveTaskQueues,
-        perFolderTaskQueue(workspace, example.id),
+        perFolderTaskQueue(workspace.defaultTaskQueue, example.id),
         owner,
         'task queue',
       );
     }
     if (example.workflowType) {
       const workerKey = isPerFolder(workspace)
-        ? perFolderWorkspaceId(workspace, example.id)
+        ? perFolderWorkspaceId(workspace.id, example.id)
         : example.workspaceId;
       const key = `${workerKey}\0${example.workflowType}`;
       const existing = workflowOwners.get(key);
@@ -387,139 +406,355 @@ export const validateCatalogAuthoringGraph = (
   }
 };
 
-const moduleSpecifier = (fromPath: string, toPath: string) => {
+export type CatalogDiscoveredFolder = {
+  id: string;
+  examplePath: string;
+  workflowPath?: string;
+  workspacePath?: string;
+  sourceFiles: string[];
+};
+
+export type CatalogDiscoveredSource = {
+  folders: CatalogDiscoveredFolder[];
+  workspacePath?: string;
+  sourceFiles: string[];
+};
+
+const compareCodePoints = (left: string, right: string) =>
+  left < right ? -1 : left > right ? 1 : 0;
+
+const filesUnder = async (
+  rootDirectory: string,
+  path: string,
+): Promise<string[]> => {
+  const entries = await readdir(join(rootDirectory, path), {
+    withFileTypes: true,
+  });
+  const files: string[] = [];
+
+  for (const entry of entries.sort((left, right) =>
+    compareCodePoints(left.name, right.name),
+  )) {
+    const entryPath = posix.join(path, entry.name);
+    if (entry.isDirectory()) {
+      files.push(...(await filesUnder(rootDirectory, entryPath)));
+      continue;
+    }
+    if (!entry.isFile()) {
+      throw new Error(
+        `Catalog example sources must be regular files: ${entryPath}`,
+      );
+    }
+    files.push(entryPath);
+  }
+
+  return files;
+};
+
+const existingPath = async (rootDirectory: string, path: string) =>
+  (await pathExists(join(rootDirectory, path))) ? path : undefined;
+
+/**
+ * Lists the example folders of a source and reports which of its declared
+ * files each folder has. It reads nothing else: every other fact comes from
+ * the modules themselves when they are registered.
+ */
+export const discoverCatalogSource = async ({
+  rootDirectory,
+  source,
+}: {
+  rootDirectory: string;
+  source: CatalogAuthoringSource;
+}): Promise<CatalogDiscoveredSource> => {
+  const { example, workflow, workspace } = source.files;
+  const folders: CatalogDiscoveredFolder[] = [];
+
+  for (const id of await exampleIdsAt(rootDirectory, source.examplesPath)) {
+    assertExampleId(id);
+    const folderPath = posix.join(source.examplesPath, id);
+    const examplePath = posix.join(folderPath, example);
+
+    if (!(await pathExists(join(rootDirectory, examplePath)))) {
+      throw new Error(`Catalog example folder is missing ${examplePath}`);
+    }
+
+    folders.push({
+      id,
+      examplePath,
+      workflowPath: workflow
+        ? await existingPath(rootDirectory, posix.join(folderPath, workflow))
+        : undefined,
+      workspacePath: workspace
+        ? await existingPath(rootDirectory, posix.join(folderPath, workspace))
+        : undefined,
+      sourceFiles: await filesUnder(rootDirectory, folderPath),
+    });
+  }
+
+  const workspacePath = workspace
+    ? await existingPath(
+        rootDirectory,
+        posix.join(source.examplesPath, workspace),
+      )
+    : undefined;
+
+  return {
+    folders,
+    workspacePath,
+    sourceFiles: [
+      ...new Set([
+        ...(workspacePath ? [workspacePath] : []),
+        ...(source.sourceFiles ?? []),
+        ...folders.flatMap(({ sourceFiles }) => sourceFiles),
+      ]),
+    ],
+  };
+};
+
+export const composeDiscoveredExamples = (
+  source: CatalogAuthoringSource,
+  workspace: CatalogAuthoringWorkspace,
+  discovered: CatalogDiscoveredSource,
+): CatalogComposedExample[] =>
+  discovered.folders.map(({ id, sourceFiles }) => ({
+    id,
+    sourceFiles,
+    sourceId: source.id,
+    workspaceId: workspace.id,
+  }));
+
+const moduleSpecifier = (
+  fromPath: string,
+  toPath: string,
+  extension: '.js' | '.ts' = '.js',
+) => {
   const relativePath = posix.relative(posix.dirname(fromPath), toPath);
   return `${relativePath.startsWith('.') ? '' : './'}${relativePath}`.replace(
     /\.(?:ts|tsx)$/,
-    '.js',
+    extension,
   );
 };
 
-export const renderCatalogSourceAssembly = ({
-  examples,
-  source,
-  workspace,
-}: {
-  examples: readonly CatalogAssemblyExample[];
-  source: CatalogAuthoringSource;
-  workspace: CatalogAuthoringWorkspace;
-}) => {
+const assertSourceWorkspace = (
+  source: CatalogAuthoringSource,
+  workspace: CatalogAuthoringWorkspace,
+) => {
   if (workspace.sourceId !== source.id) {
     throw new Error('Catalog source assembly workspace has the wrong source');
   }
-  const ordered = [...examples].sort((left, right) =>
-    left.id < right.id ? -1 : left.id > right.id ? 1 : 0,
-  );
-  for (const example of ordered) {
-    if (
-      example.sourceId !== source.id ||
-      example.workspaceId !== workspace.id
-    ) {
-      throw new Error(
-        `Catalog assembly example is assigned to another source or workspace: ${example.id}`,
-      );
-    }
-    assertExplicitRelativePath(example.definitionImportPath);
-    if (example.workflowImportPath) {
-      assertExplicitRelativePath(example.workflowImportPath);
-    }
-    if (example.workspaceImportPath && !isPerFolder(workspace)) {
-      throw new Error(
-        `Catalog workspace metadata needs a per-folder workspace: ${example.id}`,
-      );
-    }
-    if (example.workspaceImportPath) {
-      assertExplicitRelativePath(example.workspaceImportPath);
-    }
-  }
-  const imports = ordered.map(
-    (example, index) =>
-      `import { catalogExample as example${index} } from '${moduleSpecifier(source.registrationOutputPath, example.definitionImportPath)}';`,
-  );
-  const sourceFiles = [
-    ...new Set(ordered.flatMap((example) => example.sourceFiles)),
-  ]
-    .sort()
-    .map((path) => `    '${path}',`);
-  const workflowsUrl = (path: string) =>
-    `new URL('${moduleSpecifier(source.registrationOutputPath, path).replace(/\.js$/, '.ts')}', import.meta.url).href`;
-  const workerImports = isPerFolder(workspace)
-    ? ordered.flatMap((example, index) => [
-        ...(example.workflowExport && example.workflowImportPath
-          ? [
-              `import { ${example.workflowExport} as workflow${index} } from '${moduleSpecifier(source.registrationOutputPath, example.workflowImportPath)}';`,
-            ]
-          : []),
-        ...(example.workspaceImportPath
-          ? [
-              `import { catalogWorkspace as workspace${index} } from '${moduleSpecifier(source.registrationOutputPath, example.workspaceImportPath)}';`,
-            ]
-          : []),
-      ])
-    : [
-        `import * as workflows from '${moduleSpecifier(source.registrationOutputPath, workspace.workflowsModulePath)}';`,
-      ];
-  const sharedRegistrations = [
-    '    registry.registerWorkspace({',
-    `      id: '${workspace.id}',`,
-    `      namespace: '${workspace.defaultNamespace}',`,
-    `      taskQueue: '${workspace.defaultTaskQueue}',`,
-    `      workflowsPath: ${workflowsUrl(workspace.workflowsModulePath)},`,
-    '      workflowExports: workflows,',
-    '    });',
-    ...ordered.map(
-      (_example, index) =>
-        `    registry.registerExample({ ...example${index}, workspaceId: '${workspace.id}' });`,
-    ),
-  ];
-  const perFolderRegistrations = ordered.flatMap((example, index) => {
-    const workspaceId = perFolderWorkspaceId(workspace, example.id);
-    const hasWorkflow = Boolean(
-      example.workflowExport && example.workflowImportPath,
-    );
-    const workflowType = example.workflowType ?? example.workflowExport;
-    return [
-      '    registry.registerWorkspace({',
-      ...(example.workspaceImportPath ? [`      ...workspace${index},`] : []),
-      `      id: '${workspaceId}',`,
-      `      namespace: '${workspace.defaultNamespace}',`,
-      `      taskQueue: '${perFolderTaskQueue(workspace, example.id)}',`,
-      `      workflowsPath: ${workflowsUrl(hasWorkflow ? example.workflowImportPath! : workspace.workflowsModulePath)},`,
-      `      workflowExports: ${hasWorkflow ? `{ ${workflowType}: workflow${index} }` : '{}'},`,
-      '    });',
-      `    registry.registerExample({ ...example${index}, workspaceId: '${workspaceId}' });`,
-    ];
+};
+
+/**
+ * Renders a source's registration module and, for a shared workspace, its
+ * workflows module. The registration imports each folder's modules and calls
+ * registerCatalogSource, the same function loadCatalogSource calls while
+ * generating, so the two cannot disagree.
+ */
+export const renderCatalogSourceAssembly = ({
+  discovered,
+  importExtension = '.js',
+  source,
+  workspace,
+}: {
+  discovered: CatalogDiscoveredSource;
+  importExtension?: '.js' | '.ts';
+  source: CatalogAuthoringSource;
+  workspace: CatalogAuthoringWorkspace;
+}) => {
+  assertSourceWorkspace(source, workspace);
+  const from = source.registrationOutputPath;
+  const specifier = (path: string) =>
+    moduleSpecifier(from, path, importExtension);
+  const url = (path: string) =>
+    `new URL('${specifier(path)}', import.meta.url).href`;
+  const folders = discovered.folders;
+
+  const importFrom = (path: string, clause: string) => ({
+    from: specifier(path),
+    statement: `import ${clause} from '${specifier(path)}';`,
   });
+  const imports = [
+    importFrom(
+      source.registrationModulePath,
+      '{ type CatalogRegistrationSource, registerCatalogSource }',
+    ),
+    ...(discovered.workspacePath
+      ? [
+          importFrom(
+            discovered.workspacePath,
+            '{ catalogWorkspace as sourceWorkspace }',
+          ),
+        ]
+      : []),
+    ...folders.flatMap((folder, index) => [
+      importFrom(folder.examplePath, `{ catalogExample as example${index} }`),
+      ...(folder.workflowPath
+        ? [importFrom(folder.workflowPath, `* as workflows${index}`)]
+        : []),
+      ...(folder.workspacePath
+        ? [
+            importFrom(
+              folder.workspacePath,
+              `{ catalogWorkspace as workspace${index} }`,
+            ),
+          ]
+        : []),
+    ]),
+  ]
+    .sort((left, right) => compareCodePoints(left.from, right.from))
+    .map(({ statement }) => statement);
+  const folderEntries = folders.map((folder, index) =>
+    [
+      '      {',
+      `        id: '${folder.id}',`,
+      `        example: example${index},`,
+      ...(folder.workflowPath
+        ? [
+            `        workflows: workflows${index},`,
+            `        workflowsPath: ${url(folder.workflowPath)},`,
+          ]
+        : []),
+      ...(folder.workspacePath ? [`        metadata: workspace${index},`] : []),
+      '      },',
+    ].join('\n'),
+  );
   const registration = [
     '// GENERATED FILE. DO NOT EDIT.',
     ...imports,
-    `import type { CatalogRegistrationSource } from '${moduleSpecifier(source.registrationOutputPath, source.registrationTypePath)}';`,
-    ...workerImports,
     '',
     'export const catalogRegistrationSource: CatalogRegistrationSource = {',
     `  source: ${JSON.stringify({ id: source.id, label: source.label })},`,
     '  sourceFiles: [',
-    ...sourceFiles,
+    ...discovered.sourceFiles.map((path) => `    '${path}',`),
     '  ],',
-    '  register: (registry) => {',
-    ...(isPerFolder(workspace) ? perFolderRegistrations : sharedRegistrations),
-    '  },',
+    '  register: (registry) =>',
+    '    registerCatalogSource(',
+    '      registry,',
+    '      {',
+    `        id: '${workspace.id}',`,
+    `        grouping: '${workspace.grouping ?? 'shared'}',`,
+    `        namespace: '${workspace.defaultNamespace}',`,
+    `        taskQueue: '${workspace.defaultTaskQueue}',`,
+    `        workflowsPath: ${url(workspace.workflowsModulePath)},`,
+    ...(discovered.workspacePath ? ['        metadata: sourceWorkspace,'] : []),
+    '      },',
+    '      [',
+    ...folderEntries,
+    '      ],',
+    '    ),',
     '};',
     '',
   ].join('\n');
-  const workflowExports = ordered
-    .filter((example) => example.workflowExport && example.workflowImportPath)
-    .map(
-      (example) =>
-        `export { ${example.workflowExport} } from '${moduleSpecifier(workspace.workflowsModulePath, example.workflowImportPath!)}';`,
-    );
+  const workflowsModule = [
+    '// GENERATED FILE. DO NOT EDIT.',
+    ...folders.flatMap(({ workflowPath }) =>
+      workflowPath
+        ? [
+            `export * from '${moduleSpecifier(workspace.workflowsModulePath, workflowPath, importExtension)}';`,
+          ]
+        : [],
+    ),
+    ...(folders.some(({ workflowPath }) => workflowPath) ? [] : ['export {};']),
+    '',
+  ].join('\n');
+
   return composeCatalogArtifacts([
     defineCatalogArtifact(source.registrationOutputPath, registration),
-    defineCatalogArtifact(
-      workspace.workflowsModulePath,
-      ['// GENERATED FILE. DO NOT EDIT.', ...workflowExports, ''].join('\n'),
-    ),
+    defineCatalogArtifact(workspace.workflowsModulePath, workflowsModule),
   ]);
+};
+
+const importModule = async (
+  rootDirectory: string,
+  path: string,
+  fresh: boolean,
+) => {
+  const href = pathToFileURL(join(rootDirectory, path)).href;
+  return (await import(
+    fresh ? `${href}?catalog=${randomUUID()}` : href
+  )) as Record<string, unknown>;
+};
+
+/**
+ * Loads a source from its files and registers it with registerCatalogSource,
+ * for generating before the registration module exists or is current.
+ */
+export const loadCatalogSource = async ({
+  discovered,
+  rootDirectory,
+  source,
+  workspace,
+}: {
+  discovered: CatalogDiscoveredSource;
+  rootDirectory: string;
+  source: CatalogAuthoringSource;
+  workspace: CatalogAuthoringWorkspace;
+}): Promise<CatalogRegistrationSource> => {
+  assertSourceWorkspace(source, workspace);
+  const href = (path: string) => pathToFileURL(join(rootDirectory, path)).href;
+  const exportOf = async <Value>(
+    path: string,
+    name: string,
+    fresh: boolean,
+  ) => {
+    const value = (await importModule(rootDirectory, path, fresh))[name];
+    if (!value) throw new Error(`${path} must export ${name}`);
+    return value as Value;
+  };
+  const metadata = discovered.workspacePath
+    ? await exportOf<CatalogWorkspaceDefinition>(
+        discovered.workspacePath,
+        'catalogWorkspace',
+        true,
+      )
+    : undefined;
+  const folders: CatalogSourceFolder[] = await Promise.all(
+    discovered.folders.map(async (folder) => ({
+      id: folder.id,
+      example: await exportOf<CatalogExampleDefinition>(
+        folder.examplePath,
+        'catalogExample',
+        true,
+      ),
+      ...(folder.workflowPath
+        ? {
+            workflows: await importModule(
+              rootDirectory,
+              folder.workflowPath,
+              false,
+            ),
+            workflowsPath: href(folder.workflowPath),
+          }
+        : {}),
+      ...(folder.workspacePath
+        ? {
+            metadata: await exportOf<CatalogWorkspaceDefinition>(
+              folder.workspacePath,
+              'catalogWorkspace',
+              true,
+            ),
+          }
+        : {}),
+    })),
+  );
+
+  return {
+    source: { id: source.id, label: source.label },
+    sourceFiles: discovered.sourceFiles,
+    register: (registry) =>
+      registerCatalogSource(
+        registry,
+        {
+          id: workspace.id,
+          grouping: workspace.grouping ?? 'shared',
+          namespace: workspace.defaultNamespace,
+          taskQueue: workspace.defaultTaskQueue,
+          workflowsPath: href(workspace.workflowsModulePath),
+          ...(metadata ? { metadata } : {}),
+        },
+        folders,
+      ),
+  };
 };
 
 export const createCatalogAuthoring = (adapter: CatalogAuthoringAdapter) => {

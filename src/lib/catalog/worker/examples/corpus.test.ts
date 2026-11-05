@@ -124,7 +124,7 @@ describe('shared workflow corpus', () => {
         id: 'shared-workflows',
         namespace: 'default',
         taskQueue: 'ui-catalog',
-        workflowsPath: './workflows.js',
+        workflowsPath: expect.stringMatching(/\/workflows\.[jt]s$/),
         controls: ['crash'],
       },
     ]);
@@ -602,13 +602,10 @@ describe('shared workflow corpus', () => {
   it('declares every catalog-owned corpus source so generated artifact verification catches drift', () => {
     expect([...catalogRegistrationSource.sourceFiles].sort()).toEqual(
       [
-        'src/lib/catalog/worker/shared-registrations.ts',
-        'src/lib/catalog/worker/shared-workspace.ts',
-        'src/lib/catalog/worker/workflows.ts',
+        'src/lib/catalog/worker/examples/workspace.ts',
         'src/lib/catalog/worker/examples/inventory.ts',
         'src/lib/catalog/worker/examples/worker-crash/example.ts',
         'src/lib/catalog/worker/examples/worker-crash/workflow.ts',
-        'src/lib/catalog/worker/examples/index.ts',
         'src/lib/catalog/worker/examples/shared-activities.ts',
         'src/lib/catalog/worker/examples/hello/example.ts',
         'src/lib/catalog/worker/examples/hello/workflow.ts',

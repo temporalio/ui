@@ -25,7 +25,6 @@ import {
   defineCatalogArtifact,
   perFolderTaskQueue,
   perFolderWorkspaceId,
-  renderCatalogSourceAssembly,
   runCatalogCli,
   validateCatalogAuthoringGraph,
 } from './authoring';
@@ -69,14 +68,16 @@ const createCatalogAuthoring = (
           id: 'local',
           label: 'Local',
           registrationOutputPath: supportOutputs[0],
-          registrationTypePath: '.catalog-test/registration-source.ts',
+          registrationModulePath: '.catalog-test/registration-source.ts',
+          files: { example: 'example.ts', workflow: 'workflow.ts' },
         },
         {
           examplesPath: adapter.trackedExamplesPath,
           id: 'tracked',
           label: 'Tracked',
           registrationOutputPath: supportOutputs[2],
-          registrationTypePath: '.catalog-test/registration-source.ts',
+          registrationModulePath: '.catalog-test/registration-source.ts',
+          files: { example: 'example.ts', workflow: 'workflow.ts' },
         },
       ],
       workspaces: [
@@ -1555,13 +1556,14 @@ try {
     ]);
   });
 
-  it('renders and validates a declared source, workspace, output, and example graph', () => {
+  it('validates a declared source, workspace, output, and example graph', () => {
     const source = {
       examplesPath: 'cloud/examples',
       id: 'cloud',
       label: 'Cloud',
       registrationOutputPath: 'cloud/registration.ts',
-      registrationTypePath: 'cloud/registration-source.ts',
+      registrationModulePath: 'cloud/registration-source.ts',
+      files: { example: 'example.ts', workflow: 'workflow.ts' },
     };
     const workspace = {
       defaultNamespace: 'default',
@@ -1571,7 +1573,6 @@ try {
       workflowsModulePath: 'cloud/workflows.ts',
     };
     const example = {
-      definitionImportPath: 'cloud/examples/cloud-hello/example.ts',
       id: 'cloud-hello',
       sourceFiles: [
         'cloud/examples/cloud-hello/example.ts',
@@ -1579,8 +1580,6 @@ try {
       ],
       sourceId: 'cloud',
       workspaceId: 'cloud-catalog',
-      workflowExport: 'cloudHello',
-      workflowImportPath: 'cloud/examples/cloud-hello/workflow.ts',
       workflowType: 'cloudHello',
     };
     const graph = {
@@ -1599,21 +1598,6 @@ try {
     };
 
     expect(() => validateCatalogAuthoringGraph(graph, [example])).not.toThrow();
-    const assembly = renderCatalogSourceAssembly({
-      examples: [example],
-      source,
-      workspace,
-    });
-    expect(assembly.map(({ path }) => path)).toEqual([
-      'cloud/registration.ts',
-      'cloud/workflows.ts',
-    ]);
-    expect(String(assembly[0].content)).toContain(
-      "registry.registerWorkspace({\n      id: 'cloud-catalog'",
-    );
-    expect(String(assembly[1].content)).toContain(
-      "export { cloudHello } from './examples/cloud-hello/workflow.js';",
-    );
 
     expect(() =>
       validateCatalogAuthoringGraph(
@@ -1639,7 +1623,8 @@ describe('per-folder catalog workspaces', () => {
     id: 'demos',
     label: 'Demos',
     registrationOutputPath: 'demos/registration.ts',
-    registrationTypePath: 'demos/registration-source.ts',
+    registrationModulePath: 'demos/registration-source.ts',
+    files: { example: 'example.ts', workflow: 'workflow.ts' },
   };
   const workspace = {
     defaultNamespace: 'default',
@@ -1678,108 +1663,12 @@ describe('per-folder catalog workspaces', () => {
   };
 
   it('derives a workspace id and task queue for each example', () => {
-    expect(perFolderWorkspaceId(workspace, 'money-transfer')).toBe(
+    expect(perFolderWorkspaceId(workspace.id, 'money-transfer')).toBe(
       'demos-money-transfer',
     );
-    expect(perFolderTaskQueue(workspace, 'money-transfer')).toBe(
-      'demos-money-transfer',
-    );
-  });
-
-  it('registers one workspace, task queue, and workflow bundle for each example', () => {
-    const [registration] = renderCatalogSourceAssembly({
-      examples: [
-        workflowExample('order-saga', 'orderSaga'),
-        workflowExample('money-transfer', 'moneyTransfer'),
-      ],
-      source,
-      workspace,
-    });
-    const content = String(registration.content);
-
-    expect(content).not.toContain('import * as workflows');
-    expect(content).toContain(
-      "import { moneyTransfer as workflow0 } from './examples/money-transfer/workflow.js';",
-    );
-    expect(content).toContain(
-      [
-        '    registry.registerWorkspace({',
-        "      id: 'demos-money-transfer',",
-        "      namespace: 'default',",
-        "      taskQueue: 'demos-money-transfer',",
-        "      workflowsPath: new URL('./examples/money-transfer/workflow.ts', import.meta.url).href,",
-        '      workflowExports: { moneyTransfer: workflow0 },',
-        '    });',
-        "    registry.registerExample({ ...example0, workspaceId: 'demos-money-transfer' });",
-      ].join('\n'),
-    );
-    expect(content).toContain("taskQueue: 'demos-order-saga'");
-    expect(content).not.toContain("taskQueue: 'demos',");
-  });
-
-  it("spreads a folder's workspace metadata under its derived identity", () => {
-    const [registration] = renderCatalogSourceAssembly({
-      examples: [
-        {
-          ...workflowExample('money-transfer', 'moneyTransfer'),
-          workspaceImportPath: 'demos/examples/money-transfer/workspace.ts',
-        },
-      ],
-      source,
-      workspace,
-    });
-    const content = String(registration.content);
-
-    expect(content).toContain(
-      "import { catalogWorkspace as workspace0 } from './examples/money-transfer/workspace.js';",
-    );
-    expect(content).toContain(
-      [
-        '    registry.registerWorkspace({',
-        '      ...workspace0,',
-        "      id: 'demos-money-transfer',",
-      ].join('\n'),
-    );
-  });
-
-  it('rejects workspace metadata on a shared workspace', () => {
-    expect(() =>
-      renderCatalogSourceAssembly({
-        examples: [
-          {
-            ...workflowExample('money-transfer', 'moneyTransfer'),
-            workspaceImportPath: 'demos/examples/money-transfer/workspace.ts',
-          },
-        ],
-        source,
-        workspace: { ...workspace, grouping: 'shared' as const },
-      }),
-    ).toThrow(
-      'Catalog workspace metadata needs a per-folder workspace: money-transfer',
-    );
-  });
-
-  it('keeps the shared registration unchanged when grouping is omitted', () => {
-    const sharedWorkspace = { ...workspace, grouping: undefined };
-    const explicitShared = { ...workspace, grouping: 'shared' as const };
-    const examples = [workflowExample('money-transfer', 'moneyTransfer')];
-
-    const omitted = renderCatalogSourceAssembly({
-      examples,
-      source,
-      workspace: sharedWorkspace,
-    });
-    const explicit = renderCatalogSourceAssembly({
-      examples,
-      source,
-      workspace: explicitShared,
-    });
-
-    expect(omitted).toEqual(explicit);
-    expect(String(omitted[0].content)).toContain(
-      "import * as workflows from './workflows.js';",
-    );
-    expect(String(omitted[0].content)).toContain("taskQueue: 'demos',");
+    expect(
+      perFolderTaskQueue(workspace.defaultTaskQueue, 'money-transfer'),
+    ).toBe('demos-money-transfer');
   });
 
   it('allows the same workflow type in two per-folder demos', () => {
