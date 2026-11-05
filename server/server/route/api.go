@@ -27,7 +27,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"go.temporal.io/api/workflowservice/v1"
 
 	"github.com/temporalio/ui-server/v2/server/api"
@@ -36,7 +36,7 @@ import (
 
 func DisableWriteMiddleware(cfgProvider *config.ConfigProviderWithRefresh) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
+		return func(c *echo.Context) error {
 			cfg, err := cfgProvider.GetConfig()
 			if err != nil {
 				return c.JSON(http.StatusInternalServerError, err)

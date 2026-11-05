@@ -28,8 +28,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+	"github.com/labstack/echo/v5"
+	"github.com/labstack/echo/v5/middleware"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -158,7 +158,7 @@ func TestCSRFMiddlewareWithSecFetchSite(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			e := echo.New()
 			e.Use(middleware.CSRFWithConfig(MiddlewareConfig(corsConfig([]string{"https://ui.example"}, false), false)))
-			e.POST("/api/v1/*", func(c echo.Context) error {
+			e.POST("/api/v1/*", func(c *echo.Context) error {
 				return c.NoContent(http.StatusOK)
 			})
 
@@ -191,7 +191,7 @@ func TestCSRFMiddlewareWithSecFetchSite(t *testing.T) {
 func TestCSRFMiddlewareSkipsOnAuthorizationHeader(t *testing.T) {
 	e := echo.New()
 	e.Use(middleware.CSRFWithConfig(MiddlewareConfig(corsConfig(nil, false), false)))
-	e.POST("/api/v1/*", func(c echo.Context) error {
+	e.POST("/api/v1/*", func(c *echo.Context) error {
 		return c.NoContent(http.StatusOK)
 	})
 

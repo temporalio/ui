@@ -29,7 +29,10 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/pem"
+	"fmt"
 	"math/big"
+	"net"
+	"net/http"
 	"os"
 	"path/filepath"
 	"testing"
@@ -39,6 +42,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/temporalio/ui-server/v2/server/config"
+	"github.com/temporalio/ui-server/v2/server/server_options"
 )
 
 func TestBuildMTLSConfig(t *testing.T) {
@@ -155,4 +159,87 @@ func generateTLSKeyPair(t *testing.T, commonName string) (certPEM, keyPEM []byte
 	require.NoError(t, err)
 	certPEM = pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: der})
 	return certPEM, keyPEM
+}
+
+// freePort returns a TCP port that was free a moment ago.
+func freePort(t *testing.T) int {
+	t.Helper()
+	l, err := net.Listen("tcp", "127.0.0.1:0")
+	require.NoError(t, err)
+	defer l.Close()
+	return l.Addr().(*net.TCPAddr).Port
+}
+
+// startAndWait starts the server in the background and blocks until it answers on /healthz.
+func startAndWait(t *testing.T, s *Server, client *http.Client, url string) chan error {
+	t.Helper()
+	done := make(chan error, 1)
+	go func() { done <- s.Start() }()
+	require.Eventually(t, func() bool {
+		resp, err := client.Get(url)
+		if err != nil {
+			return false
+		}
+		_ = resp.Body.Close()
+		return resp.StatusCode == http.StatusOK
+	}, 5*time.Second, 20*time.Millisecond)
+	return done
+}
+
+func waitStopped(t *testing.T, done chan error) {
+	t.Helper()
+	select {
+	case err := <-done:
+		require.NoError(t, err)
+	case <-time.After(15 * time.Second):
+		t.Fatal("server did not stop")
+	}
+}
+
+func TestStartStop(t *testing.T) {
+	port := freePort(t)
+	s := NewServer(server_options.WithConfigProvider(&config.Config{
+		Host: "127.0.0.1", Port: port, TemporalGRPCAddress: "127.0.0.1:1", HideLogs: true,
+	}))
+	url := fmt.Sprintf("http://127.0.0.1:%d/healthz", port)
+	done := startAndWait(t, s, http.DefaultClient, url)
+
+	s.Stop()
+	waitStopped(t, done)
+
+	_, err := http.Get(url)
+	require.Error(t, err)
+}
+
+// The cert and key are given as absolute paths and both HTTP/1.1 and h2 must be served.
+func TestStartStandardTLS(t *testing.T) {
+	dir := t.TempDir()
+	certPEM, keyPEM := generateTLSKeyPair(t, "localhost")
+	certFile, keyFile := filepath.Join(dir, "cert.pem"), filepath.Join(dir, "key.pem")
+	require.NoError(t, os.WriteFile(certFile, certPEM, 0o600))
+	require.NoError(t, os.WriteFile(keyFile, keyPEM, 0o600))
+	port := freePort(t)
+	s := NewServer(server_options.WithConfigProvider(&config.Config{
+		Host: "127.0.0.1", Port: port, TemporalGRPCAddress: "127.0.0.1:1", HideLogs: true,
+		UIServerTLS: config.UIServerTLS{CertFile: certFile, KeyFile: keyFile},
+	}))
+	url := fmt.Sprintf("https://127.0.0.1:%d/healthz", port)
+	insecure := &tls.Config{InsecureSkipVerify: true}
+	h1 := &http.Client{Transport: &http.Transport{TLSClientConfig: insecure}}
+	done := startAndWait(t, s, h1, url)
+	defer func() {
+		s.Stop()
+		waitStopped(t, done)
+	}()
+
+	resp, err := h1.Get(url)
+	require.NoError(t, err)
+	_ = resp.Body.Close()
+	require.Equal(t, 1, resp.ProtoMajor)
+
+	h2 := &http.Client{Transport: &http.Transport{TLSClientConfig: insecure, ForceAttemptHTTP2: true}}
+	resp, err = h2.Get(url)
+	require.NoError(t, err)
+	_ = resp.Body.Close()
+	require.Equal(t, 2, resp.ProtoMajor)
 }

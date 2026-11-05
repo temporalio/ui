@@ -28,8 +28,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+	"github.com/labstack/echo/v5"
+	"github.com/labstack/echo/v5/middleware"
 
 	"github.com/temporalio/ui-server/v2/server/config"
 )
@@ -71,7 +71,7 @@ func MiddlewareConfig(cfgProvider config.ConfigProvider, cookieSecure bool) midd
 // middleware validates against the same value the browser was handed.
 func EnsureTokenCookie(cookieSecure bool) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
+		return func(c *echo.Context) error {
 			if _, err := c.Cookie(tokenCookieName); err == nil {
 				return next(c)
 			}

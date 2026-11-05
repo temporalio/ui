@@ -27,8 +27,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+	"github.com/labstack/echo/v5"
+	"github.com/labstack/echo/v5/middleware"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -61,7 +61,7 @@ func TestEnsureTokenCookieIssuesCookieToBrowsers(t *testing.T) {
 			e := echo.New()
 			e.Use(EnsureTokenCookie(true))
 			e.Use(middleware.CSRFWithConfig(MiddlewareConfig(corsConfig([]string{"https://ui.example"}, false), true)))
-			e.GET("/healthz", func(c echo.Context) error {
+			e.GET("/healthz", func(c *echo.Context) error {
 				return c.NoContent(http.StatusOK)
 			})
 
@@ -91,7 +91,7 @@ func TestEnsureTokenCookieKeepsExistingToken(t *testing.T) {
 
 	e := echo.New()
 	e.Use(EnsureTokenCookie(true))
-	e.GET("/healthz", func(c echo.Context) error {
+	e.GET("/healthz", func(c *echo.Context) error {
 		cookie, err := c.Cookie(tokenCookieName)
 		require.NoError(t, err)
 		assert.Equal(t, token, cookie.Value)
@@ -112,7 +112,7 @@ func TestEnsureTokenCookieKeepsExistingToken(t *testing.T) {
 func TestEnsureTokenCookieHonorsCookieInsecure(t *testing.T) {
 	e := echo.New()
 	e.Use(EnsureTokenCookie(false))
-	e.GET("/healthz", func(c echo.Context) error {
+	e.GET("/healthz", func(c *echo.Context) error {
 		return c.NoContent(http.StatusOK)
 	})
 
@@ -145,8 +145,8 @@ func TestBrowserRoundTrip(t *testing.T) {
 			e := echo.New()
 			e.Use(EnsureTokenCookie(false))
 			e.Use(middleware.CSRFWithConfig(MiddlewareConfig(corsConfig([]string{"https://ui.example"}, false), false)))
-			e.GET("/", func(c echo.Context) error { return c.NoContent(http.StatusOK) })
-			e.POST("/api/v1/*", func(c echo.Context) error { return c.NoContent(http.StatusOK) })
+			e.GET("/", func(c *echo.Context) error { return c.NoContent(http.StatusOK) })
+			e.POST("/api/v1/*", func(c *echo.Context) error { return c.NoContent(http.StatusOK) })
 
 			// 1. The browser loads the UI and is handed a token.
 			pageReq := httptest.NewRequest(http.MethodGet, "/", nil)

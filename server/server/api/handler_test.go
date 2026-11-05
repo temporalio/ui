@@ -8,7 +8,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/temporalio/ui-server/v2/server/config"
@@ -313,7 +313,7 @@ func TestGetUIExtensionsRequiresAuthorizationWhenAuthEnabled(t *testing.T) {
 	c := e.NewContext(req, rec)
 
 	accessChecked := false
-	allowAccess := func(echo.Context) error {
+	allowAccess := func(*echo.Context) error {
 		accessChecked = true
 		return nil
 	}
@@ -330,7 +330,7 @@ func TestGetUIExtensionsRequiresAuthorizationWhenAuthEnabled(t *testing.T) {
 	rec = httptest.NewRecorder()
 	c = e.NewContext(req, rec)
 
-	err = GetUIExtensions(cfgProvider, func(echo.Context) error {
+	err = GetUIExtensions(cfgProvider, func(*echo.Context) error {
 		return echo.NewHTTPError(http.StatusForbidden, "unauthorized")
 	})(c)
 	require.ErrorAs(t, err, &httpErr)

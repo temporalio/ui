@@ -25,7 +25,7 @@ package csrf
 import (
 	"net/http"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 
 	"github.com/temporalio/ui-server/v2/server/config"
 	"github.com/temporalio/ui-server/v2/server/cors"
@@ -45,8 +45,8 @@ const secFetchSiteSameSite = "same-site"
 //
 // Returning (false, nil) means "not pre-approved, validate the token" rather than
 // "allow": the token check still gates the request.
-func AllowConfiguredCORSOrigins(cfgProvider config.ConfigProvider) func(echo.Context) (bool, error) {
-	return func(c echo.Context) (bool, error) {
+func AllowConfiguredCORSOrigins(cfgProvider config.ConfigProvider) func(*echo.Context) (bool, error) {
+	return func(c *echo.Context) (bool, error) {
 		if c.Request().Header.Get(echo.HeaderSecFetchSite) == secFetchSiteSameSite {
 			// Echo's own fallback for same-site requests.
 			return false, nil
@@ -63,7 +63,7 @@ func AllowConfiguredCORSOrigins(cfgProvider config.ConfigProvider) func(echo.Con
 // originAllowedByCORS reports whether the request carries an Origin that the CORS
 // configuration permits. Config is read per request so that changes picked up by
 // config.ConfigProviderWithRefresh take effect, matching cors.CORSMiddleware.
-func originAllowedByCORS(c echo.Context, cfgProvider config.ConfigProvider) bool {
+func originAllowedByCORS(c *echo.Context, cfgProvider config.ConfigProvider) bool {
 	cfg, err := cfgProvider.GetConfig()
 	if err != nil {
 		return false

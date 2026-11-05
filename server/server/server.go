@@ -23,16 +23,18 @@
 package server
 
 import (
+	"context"
 	"crypto/tls"
 	"crypto/x509"
 	"errors"
 	"fmt"
 	"io/fs"
+	"log/slog"
 	"net/http"
 	"os"
 
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+	"github.com/labstack/echo/v5"
+	"github.com/labstack/echo/v5/middleware"
 
 	"github.com/temporalio/ui-server/v2/server/api"
 	"github.com/temporalio/ui-server/v2/server/auth"
@@ -53,6 +55,9 @@ type (
 		httpServer  *echo.Echo
 		options     *server_options.ServerOptions
 		cfgProvider *config.ConfigProviderWithRefresh
+		// stopCtx is cancelled by Stop to shut the HTTP server down.
+		stopCtx context.Context
+		stop    context.CancelFunc
 	}
 )
 
@@ -80,12 +85,13 @@ func NewServer(opts ...server_options.ServerOption) *Server {
 	}
 
 	e := echo.New()
-	e.HideBanner = cfg.HideLogs
-	e.HidePort = cfg.HideLogs
+	if cfg.HideLogs {
+		e.Logger = slog.New(slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelError}))
+	}
 
 	// Middleware
 	if !cfg.HideLogs {
-		e.Use(middleware.Logger())
+		e.Use(middleware.RequestLogger())
 	}
 	e.Use(middleware.Recover())
 	e.Use(middleware.Gzip())
@@ -131,10 +137,13 @@ func NewServer(opts ...server_options.ServerOption) *Server {
 		route.SetRenderRoute(e, "/")
 	}
 
+	stopCtx, stop := context.WithCancel(context.Background())
 	s := &Server{
 		httpServer:  e,
 		options:     serverOpts,
 		cfgProvider: cfgProvider,
+		stopCtx:     stopCtx,
+		stop:        stop,
 	}
 	return s
 }
@@ -147,7 +156,11 @@ func (s *Server) Start() error {
 		return err
 	}
 
-	address := fmt.Sprintf("%s:%d", cfg.Host, cfg.Port)
+	startConfig := echo.StartConfig{
+		Address:    fmt.Sprintf("%s:%d", cfg.Host, cfg.Port),
+		HideBanner: cfg.HideLogs,
+		HidePort:   cfg.HideLogs,
+	}
 	tlsMode, err := cfg.UIServerTLS.Mode()
 	if err != nil {
 		return err
@@ -159,23 +172,33 @@ func (s *Server) Start() error {
 		if buildErr != nil {
 			return buildErr
 		}
-		// StartTLS doesn't allow us to specify the CA, or get the cert reload behavior, set addr and TLS config manually.
-		s.httpServer.TLSServer.Addr = address
-		s.httpServer.TLSServer.TLSConfig = tlsConfig
-		err = s.httpServer.StartServer(s.httpServer.TLSServer)
+		// StartTLS doesn't allow us to specify the CA, or get the cert reload behavior, set the TLS config manually.
+		startConfig.TLSConfig = tlsConfig
+		err = startConfig.Start(s.stopCtx, s.httpServer)
 	case config.ModeStandard:
 		s.httpServer.Logger.Info("Starting UI server with TLS...")
-		err = s.httpServer.StartTLS(address, cfg.UIServerTLS.CertFile, cfg.UIServerTLS.KeyFile)
+		// StartTLS reads through an fs.FS, which rejects absolute paths, and offers only h2.
+		cert, loadErr := tls.LoadX509KeyPair(cfg.UIServerTLS.CertFile, cfg.UIServerTLS.KeyFile)
+		if loadErr != nil {
+			return loadErr
+		}
+		startConfig.TLSConfig = &tls.Config{
+			MinVersion:   tls.VersionTLS12,
+			NextProtos:   []string{"h2", "http/1.1"},
+			Certificates: []tls.Certificate{cert},
+		}
+		err = startConfig.Start(s.stopCtx, s.httpServer)
 	case config.ModeNone:
-		err = s.httpServer.Start(address)
+		err = startConfig.Start(s.stopCtx, s.httpServer)
 	case config.ModeUnknown:
 		err = errors.New("could not determine valid TLS mode from config")
 	default:
 		err = fmt.Errorf("unsupported TLS mode: %s", tlsMode)
 	}
 
-	if err != http.ErrServerClosed {
-		s.httpServer.Logger.Fatal(err)
+	if err != nil && !errors.Is(err, http.ErrServerClosed) && !errors.Is(err, context.Canceled) {
+		s.httpServer.Logger.Error("UI server failed", "error", err)
+		return err
 	}
 	return nil
 }
@@ -214,7 +237,5 @@ func buildMTLSConfig(certFile, keyFile string, mtls config.UIServerMTLS) (*tls.C
 // Stop UI server.
 func (s *Server) Stop() {
 	s.httpServer.Logger.Info("Stopping UI server...")
-	if err := s.httpServer.Close(); err != nil {
-		s.httpServer.Logger.Warn(err)
-	}
+	s.stop()
 }

@@ -40,7 +40,7 @@ import (
 	"github.com/gomarkdown/markdown/html"
 	"github.com/gomarkdown/markdown/parser"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 
 	"github.com/temporalio/ui-server/v2/server/config"
 )
@@ -98,7 +98,7 @@ func buildUIIndexHandler(
 		indexHTMLBytes = []byte(indexHTML)
 	}
 
-	return func(c echo.Context) (err error) {
+	return func(c *echo.Context) (err error) {
 		reqPath, rawQuery := splitRequestURI(c.Request().RequestURI)
 		if hasPublicPath && !hasPathPrefix(reqPath, publicPath) {
 			target := publicPath + path.Clean(reqPath)
@@ -110,11 +110,11 @@ func buildUIIndexHandler(
 
 		cfg, err := cfgProvider.GetConfig()
 		if err != nil {
-			return echo.NewHTTPError(http.StatusInternalServerError, "unable to load UI configuration").SetInternal(err)
+			return echo.NewHTTPError(http.StatusInternalServerError, "unable to load UI configuration").Wrap(err)
 		}
 		frameSources, err := cfg.CustomUI.IframeFrameSources(cfg.Auth.Enabled)
 		if err != nil {
-			return echo.NewHTTPError(http.StatusInternalServerError, "invalid custom UI configuration").SetInternal(err)
+			return echo.NewHTTPError(http.StatusInternalServerError, "invalid custom UI configuration").Wrap(err)
 		}
 		c.Response().Header().Set("Content-Security-Policy", frameSourceCSP(frameSources))
 
@@ -257,7 +257,7 @@ func SetRenderRoute(e *echo.Echo, publicPath string) {
 	// Parse template once at startup
 	tmpl := template.Must(template.New("page").Parse(pageTemplate))
 
-	e.GET(renderPath, func(c echo.Context) error {
+	e.GET(renderPath, func(c *echo.Context) error {
 		content := c.QueryParam("content")
 		theme := c.QueryParam("theme")
 		overrideTheme := c.QueryParam("overrideTheme")
@@ -301,7 +301,7 @@ func SetRenderRoute(e *echo.Echo, publicPath string) {
 		c.Response().Header().Set("Content-Type", "text/html")
 		c.Response().Header().Set("Content-Security-Policy", generateCSP(nonce))
 
-		err := tmpl.Execute(c.Response().Writer, data)
+		err := tmpl.Execute(c.Response(), data)
 		if err != nil {
 			return err
 		}
