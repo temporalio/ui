@@ -10,7 +10,7 @@
   );
 </script>
 
-<section class="flex flex-col gap-5">
+<section class="flex flex-col gap-4">
   <header class="flex flex-col gap-1">
     <h2>{translate('nexus.callbacks')}</h2>
     <p class="text-sm text-secondary">{translate('nexus.callbacks-intro')}</p>
