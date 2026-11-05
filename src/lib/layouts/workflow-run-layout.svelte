@@ -197,8 +197,9 @@
       isRunning: $workflowRun?.workflow?.isRunning,
     });
     const controller = workflowRunController;
-    const identity = historyController?.workflowExecutionIdentity;
-    if (!shouldFetch || !controller || !identity || !historyController) return;
+    const history = historyController;
+    if (!shouldFetch || !controller || !history) return;
+    const identity = history.workflowExecutionIdentity;
 
     // The 10s poll and an action's refetch overlap, so a poll that started
     // before a mutation can resolve after it and write back a pre-mutation

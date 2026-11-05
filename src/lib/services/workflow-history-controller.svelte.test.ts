@@ -62,7 +62,7 @@ const requests: {
 }[] = [];
 const polls: {
   options: LivePollOptions;
-  result: ReturnType<typeof deferred<string>>;
+  result: ReturnType<typeof deferred<void>>;
 }[] = [];
 const controllers: WorkflowHistoryController[] = [];
 
@@ -114,7 +114,7 @@ beforeEach(() => {
   vi.mocked(runLivePoll)
     .mockReset()
     .mockImplementation((options) => {
-      const result = deferred<string>();
+      const result = deferred<void>();
       polls.push({ options, result });
       return result.promise;
     });
@@ -123,7 +123,7 @@ beforeEach(() => {
 afterEach(async () => {
   for (const controller of controllers.splice(0)) controller.dispose();
   for (const { result } of requests) result.resolve();
-  for (const { result } of polls) result.resolve('');
+  for (const { result } of polls) result.resolve();
   await Promise.all([
     ...requests.map(({ result }) => result.promise.catch(() => {})),
     ...polls.map(({ result }) => result.promise.catch(() => {})),
@@ -286,7 +286,7 @@ describe('WorkflowHistoryController', () => {
     expect(poll(0).options.onEvent(makeWorkflowCompleted(10))).toBe(false);
     poll(0).options.onToken?.('stale-token');
     request(0).result.resolve();
-    poll(0).result.resolve('stale-token');
+    poll(0).result.resolve();
     await load;
     await Promise.resolve();
 
@@ -350,7 +350,7 @@ describe('WorkflowHistoryController', () => {
     first.setLiveUpdatesPaused(true);
     expect(poll(0).options.signal.aborted).toBe(true);
     expect(poll(1).options.signal.aborted).toBe(false);
-    poll(0).result.resolve('ignored');
+    poll(0).result.resolve();
     await vi.waitFor(() => expect(polls).toHaveLength(2));
     first.setLiveUpdatesPaused(false);
     await vi.waitFor(() => expect(polls).toHaveLength(3));
@@ -372,7 +372,7 @@ describe('WorkflowHistoryController', () => {
     const retry = controller.retry(workflow('run-1', true));
     controller.updateWorkflow(workflow('run-1', true));
     controller.setLiveUpdatesPaused(false);
-    poll(0).result.resolve('');
+    poll(0).result.resolve();
     await Promise.resolve();
     expect(polls).toHaveLength(1);
     request(1).result.resolve();

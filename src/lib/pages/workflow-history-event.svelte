@@ -11,9 +11,6 @@
 
   interface Props {
     eventId: string;
-    namespace: string;
-    workflowId: string;
-    runId: string;
   }
 
   const { eventId }: Props = $props();
@@ -40,7 +37,7 @@
       .sort((a, b) => Number(a.id) - Number(b.id)),
   );
   const loading = $derived(historyController.loading && !visibleItems.length);
-  const lastEventId = $derived(String(historyController.latestEventId));
+  const lastEventId = $derived(historyController.latestEventId);
 
   const loadPrevious = () => {
     const firstId = parseInt(ids[0]);
@@ -62,7 +59,7 @@
     const start = lastId + 1;
 
     for (let i = 0; i < 10; i++) {
-      if (start + i <= Number(lastEventId ?? 0)) {
+      if (start + i <= lastEventId) {
         nextTen.push((start + i).toString());
       }
     }
@@ -95,7 +92,7 @@
   <table>
     <thead></thead>
     <tbody>
-      {#each visibleItems as event, index}
+      {#each visibleItems as event, index (event.id)}
         <EventSummaryRow
           workflowExecutionIdentity={historyController.workflowExecutionIdentity}
           {event}
@@ -115,7 +112,7 @@
     size="xs"
     LeadingIcon={IconArrowDown}
     onclick={loadNext}
-    disabled={ids[ids.length - 1] === lastEventId || loading}
+    disabled={ids[ids.length - 1] === String(lastEventId) || loading}
     data-testid="load-next">Show Next 10</Button
   >
 </div>

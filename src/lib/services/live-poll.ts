@@ -40,11 +40,6 @@ export type LivePollOptions = {
  * The loop exits cleanly when `signal` is aborted or once it receives the
  * workflow's close event.
  */
-/**
- * Returns the last cursor token when the loop exits (due to abort or close).
- * Rejects if response processing or a callback throws.
- * The caller can save this token and pass it as `startToken` when resuming.
- */
 export async function runLivePoll({
   route,
   runId,
@@ -55,7 +50,7 @@ export async function runLivePoll({
   onToken,
   backoffMs = 2000,
   errorBackoffMs = 5000,
-}: LivePollOptions): Promise<string> {
+}: LivePollOptions): Promise<void> {
   const wait = (delay: number): Promise<void> => {
     if (signal.aborted) return Promise.resolve();
     return new Promise<void>((resolve) => {
@@ -110,5 +105,4 @@ export async function runLivePoll({
       }
     }
   }
-  return token;
 }
