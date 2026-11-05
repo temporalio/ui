@@ -294,6 +294,28 @@ describe('Palette', () => {
     }
   });
 
+  it('returns focus to the sheet button when the opener left the page', async () => {
+    setup();
+    const trigger = document.createElement('button');
+    trigger.setAttribute('aria-controls', 'test-sheet');
+    const sheet = document.createElement('div');
+    sheet.id = 'test-sheet';
+    const opener = document.createElement('button');
+    sheet.append(opener);
+    document.body.append(trigger, sheet);
+    opener.focus();
+
+    try {
+      const input = await openPalette();
+      sheet.remove();
+      await fireEvent.keyDown(input, { key: 'Escape' });
+
+      expect(document.activeElement).toBe(trigger);
+    } finally {
+      trigger.remove();
+    }
+  });
+
   it('reads a confirm prompt from the live region', async () => {
     setup();
     const input = await openPalette();

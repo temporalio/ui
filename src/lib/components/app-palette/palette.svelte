@@ -126,7 +126,6 @@
   // A click closes the palette only when it also started on the backdrop, so
   // a text selection dragged out of the panel does not close it.
   let pressedBackdrop = false;
-  let returnFocus: Element | null = null;
   let statusTimer: ReturnType<typeof setTimeout> | undefined;
   const savedFrames: { query: string; selected: number }[] = [];
 
@@ -659,31 +658,39 @@
     toggleActions();
   }
 
-  // An opener inside a menu is hidden once the menu closes, so focus goes to
-  // the button that controls that menu.
-  function restoreFocus(target: Element | null) {
-    if (!(target instanceof HTMLElement) || !target.isConnected) return;
-    target.focus();
-    if (document.activeElement === target) return;
-
-    const menu = target.closest('[role="menu"], [role="dialog"]');
-    if (!menu?.id) return;
-    const trigger = [
+  // The element whose aria-controls names the closest region around the
+  // node, such as the button that opens a menu or a sheet.
+  function controllerOf(node: Element | null): HTMLElement | undefined {
+    if (!node) return undefined;
+    if (!node.id) return controllerOf(node.parentElement);
+    const controller = [
       ...document.querySelectorAll<HTMLElement>('[aria-controls]'),
-    ].find((element) => element.getAttribute('aria-controls') === menu.id);
-    trigger?.focus();
+    ].find(
+      (element) =>
+        element.getAttribute('aria-controls') === node.id &&
+        !node.contains(element),
+    );
+    return controller ?? controllerOf(node.parentElement);
+  }
+
+  function focusIfPossible(element: Element | null | undefined) {
+    if (!(element instanceof HTMLElement) || !element.isConnected) return false;
+    element.focus();
+    return document.activeElement === element;
   }
 
   // showModal() traps focus and makes the page behind inert. The palette
   // can open from the hotkey or from a menu, so focus returns to whatever
-  // had it.
+  // had it. An opener inside a menu or a sheet can be hidden or gone once
+  // that closes, so the button that controls it is saved while it is open.
   function modal(node: HTMLDialogElement) {
-    returnFocus = document.activeElement;
+    const returnFocus = document.activeElement;
+    const fallbackFocus = controllerOf(returnFocus?.parentElement ?? null);
     node.showModal();
     return () => {
       node.close();
-      restoreFocus(returnFocus);
-      returnFocus = null;
+      if (focusIfPossible(returnFocus)) return;
+      focusIfPossible(fallbackFocus);
     };
   }
 

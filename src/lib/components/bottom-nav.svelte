@@ -80,6 +80,9 @@
     class: className = '',
   }: Props = $props();
 
+  const uid = $props.id();
+  const settingsId = `${uid}-settings`;
+
   let viewLinks = $state(false);
   let viewNamespaces = $state(false);
   let viewSettings = $state(false);
@@ -169,7 +172,7 @@
     {:else}
       <BottomNavNamespaces open={viewNamespaces} {namespaceList} />
     {/if}
-    <BottomNavSettings open={viewSettings}>
+    <BottomNavSettings id={settingsId} open={viewSettings}>
       {@render children?.()}
     </BottomNavSettings>
   </div>
@@ -234,6 +237,8 @@
     class="nav-button"
     data-testid="nav-profile-button"
     class:active-shadow={viewSettings}
+    aria-expanded={viewSettings}
+    aria-controls={settingsId}
     type="button"
     onclick={onSettingsClick}
   >
