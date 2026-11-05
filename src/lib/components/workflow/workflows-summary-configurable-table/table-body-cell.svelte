@@ -29,7 +29,6 @@
   import {
     routeForWorkerDeployment,
     routeForWorkflow,
-    routeForWorkflowChainRedirect,
   } from '$lib/utilities/route-for';
   import {
     TRUNCATE_LENGTH,
@@ -65,13 +64,6 @@
   );
 
   const hrefFor = (value: QuickFilterValue) => {
-    if (label === 'Workflow ID' && !archival) {
-      return routeForWorkflowChainRedirect({
-        namespace,
-        workflow: workflow.id,
-        run: workflow.runId,
-      });
-    }
     if (['Type', 'Workflow ID', 'Run ID'].includes(label)) {
       return routeForWorkflow({
         namespace,

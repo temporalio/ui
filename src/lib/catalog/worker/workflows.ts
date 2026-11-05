@@ -4,7 +4,6 @@ export { retryWorkflow } from './examples/activity-retry/workflow.js';
 export { timeoutWorkflow } from './examples/activity-timeout/workflow.js';
 export { childFanOut } from './examples/child-fan-out/workflow.js';
 export { childWorkflowTest } from './examples/child-workflows/workflow.js';
-export { continueAsNewChain } from './examples/continue-as-new/workflow.js';
 export { hello } from './examples/hello/workflow.js';
 export { highEventCountWorkflow } from './examples/high-event-count/workflow.js';
 export { largeHistory } from './examples/large-history/workflow.js';

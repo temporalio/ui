@@ -23,7 +23,7 @@ type HistoryLoadSession = {
   livePollController: AbortController | null;
   livePollTask: Promise<void> | null;
   lastPollToken: string;
-  workflowIsRunning: boolean;
+  workflowWasRunning: boolean;
   historyClosed: boolean;
 };
 
@@ -109,7 +109,7 @@ export class WorkflowHistoryController {
       livePollController: null,
       livePollTask: null,
       lastPollToken: '',
-      workflowIsRunning: workflow.isRunning,
+      workflowWasRunning: workflow.isRunning,
       historyClosed: false,
     };
     this.session = session;
@@ -161,11 +161,7 @@ export class WorkflowHistoryController {
     );
     const session = this.session;
     if (!session) return;
-    session.workflowIsRunning = workflow.isRunning;
-    if (!workflow.isRunning) {
-      session.livePollController?.abort();
-      return;
-    }
+    session.workflowWasRunning ||= workflow.isRunning;
     this.startLivePoll(session);
   }
 
@@ -218,7 +214,7 @@ export class WorkflowHistoryController {
     return (
       this.isCurrent(session) &&
       !this.liveUpdatesPaused &&
-      session.workflowIsRunning &&
+      session.workflowWasRunning &&
       !session.historyClosed
     );
   }
