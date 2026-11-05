@@ -1,3 +1,8 @@
+import type {
+  CatalogScenario,
+  CatalogWorkspaceMetadata,
+} from './metadata-schema';
+
 export type JsonValue =
   | boolean
   | null
@@ -24,6 +29,7 @@ export type BrowserCatalogMetadata = {
   input: RuntimeJsonDocument;
   startOptions: RuntimeJsonDocument;
   setupMarkdown?: string;
+  scenarios?: CatalogScenario[];
 };
 
 export type BrowserExecutionWorkspace = {
@@ -69,7 +75,12 @@ export type BrowserCatalogDescriptor = BrowserCatalogMetadata & {
   execution: BrowserCatalogExecution;
 };
 
+export type BrowserCatalogWorkspace = CatalogWorkspaceMetadata & {
+  id: string;
+};
+
 export type BrowserCatalogArtifact = {
   sourceHash: string;
+  workspaces: BrowserCatalogWorkspace[];
   descriptors: BrowserCatalogDescriptor[];
 };

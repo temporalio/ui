@@ -2,10 +2,16 @@ import { isDeepStrictEqual, types as nodeTypes } from 'node:util';
 
 import type { ServiceHandler } from 'nexus-rpc';
 
+import {
+  catalogScenariosSchema,
+  type CatalogWorkspaceMetadata,
+  catalogWorkspaceMetadataSchema,
+} from '../browser/metadata-schema.js';
 import { withSharedCatalogStartOptions } from '../browser/start-options.js';
 import type {
   BrowserCatalogDescriptor,
   BrowserCatalogMetadata,
+  BrowserCatalogWorkspace,
   JsonObject,
   JsonSchema,
   RuntimeJsonDocument,
@@ -19,7 +25,9 @@ type BrowserCatalogDescriptorWithoutSource = Omit<
 export type WorkflowImplementation = (...args: never[]) => unknown;
 export type ActivityImplementation = (...args: never[]) => unknown;
 
-export type CatalogWorkspace = {
+export type CatalogWorkspaceDefinition = CatalogWorkspaceMetadata;
+
+export type CatalogWorkspace = CatalogWorkspaceDefinition & {
   id: string;
   namespace: string;
   taskQueue: string;
@@ -262,8 +270,17 @@ const exampleFields = new Set([
   'input',
   'startOptions',
   'setupMarkdown',
+  'scenarios',
   'execution',
 ]);
+
+const workspaceMetadataFields = [
+  'title',
+  'description',
+  'docsUrl',
+  'controls',
+  'eject',
+] as const;
 
 const workspaceFields = new Set([
   'id',
@@ -271,7 +288,17 @@ const workspaceFields = new Set([
   'taskQueue',
   'workflowsPath',
   'workflowExports',
+  ...workspaceMetadataFields,
 ]);
+
+const workspaceMetadata = (
+  workspace: CatalogWorkspace,
+): CatalogWorkspaceMetadata =>
+  Object.fromEntries(
+    workspaceMetadataFields
+      .filter((field) => workspace[field] !== undefined)
+      .map((field) => [field, workspace[field]]),
+  );
 
 const workflowExecutionFields = new Set([
   'kind',
@@ -366,6 +393,15 @@ export const generateCatalog = (registry: CatalogRegistry) => {
         `Catalog workspace "${workspace.id}" has invalid workflow exports`,
       );
     }
+
+    if (
+      !catalogWorkspaceMetadataSchema.safeParse(workspaceMetadata(workspace))
+        .success
+    ) {
+      throw new Error(
+        `Catalog workspace "${workspace.id}" has invalid metadata fields`,
+      );
+    }
   }
 
   for (const example of registry.examples) {
@@ -396,6 +432,13 @@ export const generateCatalog = (registry: CatalogRegistry) => {
       throw new Error(
         `Catalog example "${example.id}" has invalid metadata fields`,
       );
+    }
+
+    if (
+      example.scenarios !== undefined &&
+      !catalogScenariosSchema.safeParse(example.scenarios).success
+    ) {
+      throw new Error(`Catalog example "${example.id}" has invalid scenarios`);
     }
 
     if (!hasOnlyEnumerableDataProperties(example.execution)) {
@@ -707,5 +750,16 @@ export const generateCatalog = (registry: CatalogRegistry) => {
     (descriptor) => JSON.parse(JSON.stringify(descriptor)) as typeof descriptor,
   );
 
-  return { browserDescriptors: browserSnapshots, workerBindings };
+  const browserWorkspaces: BrowserCatalogWorkspace[] = workerBindings.map(
+    ({ workspace }) =>
+      JSON.parse(
+        JSON.stringify({ id: workspace.id, ...workspaceMetadata(workspace) }),
+      ),
+  );
+
+  return {
+    browserDescriptors: browserSnapshots,
+    browserWorkspaces,
+    workerBindings,
+  };
 };

@@ -89,6 +89,7 @@ export type CatalogAssemblyExample = CatalogComposedExample & {
   definitionImportPath: string;
   workflowExport?: string;
   workflowImportPath?: string;
+  workspaceImportPath?: string;
 };
 
 export type CatalogAuthoringAdapter = {
@@ -422,6 +423,14 @@ export const renderCatalogSourceAssembly = ({
     if (example.workflowImportPath) {
       assertExplicitRelativePath(example.workflowImportPath);
     }
+    if (example.workspaceImportPath && !isPerFolder(workspace)) {
+      throw new Error(
+        `Catalog workspace metadata needs a per-folder workspace: ${example.id}`,
+      );
+    }
+    if (example.workspaceImportPath) {
+      assertExplicitRelativePath(example.workspaceImportPath);
+    }
   }
   const imports = ordered.map(
     (example, index) =>
@@ -435,13 +444,18 @@ export const renderCatalogSourceAssembly = ({
   const workflowsUrl = (path: string) =>
     `new URL('${moduleSpecifier(source.registrationOutputPath, path).replace(/\.js$/, '.ts')}', import.meta.url).href`;
   const workerImports = isPerFolder(workspace)
-    ? ordered.flatMap((example, index) =>
-        example.workflowExport && example.workflowImportPath
+    ? ordered.flatMap((example, index) => [
+        ...(example.workflowExport && example.workflowImportPath
           ? [
               `import { ${example.workflowExport} as workflow${index} } from '${moduleSpecifier(source.registrationOutputPath, example.workflowImportPath)}';`,
             ]
-          : [],
-      )
+          : []),
+        ...(example.workspaceImportPath
+          ? [
+              `import { catalogWorkspace as workspace${index} } from '${moduleSpecifier(source.registrationOutputPath, example.workspaceImportPath)}';`,
+            ]
+          : []),
+      ])
     : [
         `import * as workflows from '${moduleSpecifier(source.registrationOutputPath, workspace.workflowsModulePath)}';`,
       ];
@@ -458,7 +472,7 @@ export const renderCatalogSourceAssembly = ({
         `    registry.registerExample({ ...example${index}, workspaceId: '${workspace.id}' });`,
     ),
   ];
-  const perExampleRegistrations = ordered.flatMap((example, index) => {
+  const perFolderRegistrations = ordered.flatMap((example, index) => {
     const workspaceId = perFolderWorkspaceId(workspace, example.id);
     const hasWorkflow = Boolean(
       example.workflowExport && example.workflowImportPath,
@@ -466,6 +480,7 @@ export const renderCatalogSourceAssembly = ({
     const workflowType = example.workflowType ?? example.workflowExport;
     return [
       '    registry.registerWorkspace({',
+      ...(example.workspaceImportPath ? [`      ...workspace${index},`] : []),
       `      id: '${workspaceId}',`,
       `      namespace: '${workspace.defaultNamespace}',`,
       `      taskQueue: '${perFolderTaskQueue(workspace, example.id)}',`,
@@ -487,7 +502,7 @@ export const renderCatalogSourceAssembly = ({
     ...sourceFiles,
     '  ],',
     '  register: (registry) => {',
-    ...(isPerFolder(workspace) ? perExampleRegistrations : sharedRegistrations),
+    ...(isPerFolder(workspace) ? perFolderRegistrations : sharedRegistrations),
     '  },',
     '};',
     '',

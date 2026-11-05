@@ -463,6 +463,7 @@ describe('catalog artifacts', () => {
     expect(secondContent).toBe(firstContent);
     expect(JSON.parse(firstContent)).toEqual({
       sourceHash: expect.stringMatching(/^[a-f0-9]{64}$/),
+      workspaces: [],
       descriptors: [],
     });
   });

@@ -21,6 +21,7 @@ import {
   createCatalogRegistry,
   generateCatalog,
 } from '../../src/lib/catalog/worker/registry';
+import { assertScenarioInputs } from '../../src/lib/catalog/worker/scenario-inputs';
 
 export type CatalogSourceContentOverrides = ReadonlyMap<
   string,
@@ -134,13 +135,16 @@ const buildCatalogArtifact = async ({
   source,
 }: CatalogArtifactOptions) => {
   assertCatalogSource(source);
-  const { browserDescriptors, workerBindings } = generateCatalog(registry);
+  const { browserDescriptors, browserWorkspaces, workerBindings } =
+    generateCatalog(registry);
+  await assertScenarioInputs(browserDescriptors);
   const artifact: BrowserCatalogArtifact = {
     sourceHash: await calculateSourceHash(
       rootDirectory,
       sourceFiles,
       sourceContentOverrides,
     ),
+    workspaces: browserWorkspaces,
     descriptors: browserDescriptors.map((descriptor) => ({
       ...descriptor,
       source,

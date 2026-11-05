@@ -672,6 +672,130 @@ describe('generateCatalog', () => {
     ]);
   });
 
+  describe('workspace metadata', () => {
+    const registerGreeting = (
+      registry: ReturnType<typeof createCatalogRegistry>,
+      example: Record<string, unknown> = {},
+    ) =>
+      registry.registerExample({
+        id: 'greeting',
+        title: 'Greeting',
+        description: 'Runs a standalone greeting activity.',
+        workspaceId: 'money-transfer',
+        capabilityTags: [],
+        expectedEvidence: [],
+        input: {
+          defaultValue: { amount: 100 },
+          schema: { type: 'object' },
+        },
+        startOptions: { defaultValue: {}, schema: { type: 'object' } },
+        execution: {
+          kind: 'standalone-activity',
+          activityType: 'greetingActivity',
+          activity: () => 'hello',
+          timeouts: {},
+          policies: {},
+        },
+        ...example,
+      });
+    const workspace = {
+      id: 'money-transfer',
+      namespace: 'default',
+      taskQueue: 'money-transfer',
+      workflowsPath: './workflows',
+      workflowExports: {},
+    };
+
+    it('lists each running workspace with its metadata', () => {
+      const registry = createCatalogRegistry();
+      registry.registerWorkspace({
+        ...workspace,
+        title: 'Money transfer',
+        docsUrl: 'https://docs.temporal.io/',
+        controls: ['crash', 'stop'],
+        eject: { sdks: ['typescript'] },
+      });
+      registry.registerWorkspace({
+        ...workspace,
+        id: 'idle',
+        taskQueue: 'idle',
+      });
+      registerGreeting(registry);
+
+      expect(generateCatalog(registry).browserWorkspaces).toEqual([
+        {
+          id: 'money-transfer',
+          title: 'Money transfer',
+          docsUrl: 'https://docs.temporal.io/',
+          controls: ['crash', 'stop'],
+          eject: { sdks: ['typescript'] },
+        },
+      ]);
+    });
+
+    it('lists a workspace without metadata by id', () => {
+      const registry = createCatalogRegistry();
+      registry.registerWorkspace(workspace);
+      registerGreeting(registry);
+
+      expect(generateCatalog(registry).browserWorkspaces).toEqual([
+        { id: 'money-transfer' },
+      ]);
+    });
+
+    it.each([
+      ['an unknown control', { controls: ['reboot'] }],
+      ['a repeated control', { controls: ['crash', 'crash'] }],
+      ['an http docs link', { docsUrl: 'http://docs.temporal.io/' }],
+      ['an empty title', { title: '' }],
+      ['an eject without SDKs', { eject: { sdks: [] } }],
+    ])('rejects %s', (_name, metadata) => {
+      const registry = createCatalogRegistry();
+      registry.registerWorkspace({ ...workspace, ...metadata } as never);
+      registerGreeting(registry);
+
+      expect(() => generateCatalog(registry)).toThrowError(
+        'Catalog workspace "money-transfer" has invalid metadata fields',
+      );
+    });
+
+    it('carries example scenarios into the browser descriptor', () => {
+      const registry = createCatalogRegistry();
+      const scenarios = [
+        { id: 'happy-path', title: 'Happy path', input: { amount: 100 } },
+      ];
+      registry.registerWorkspace(workspace);
+      registerGreeting(registry, { scenarios });
+
+      expect(generateCatalog(registry).browserDescriptors[0].scenarios).toEqual(
+        scenarios,
+      );
+    });
+
+    it.each([
+      ['no scenarios', []],
+      [
+        'repeated scenario ids',
+        [
+          { id: 'same', title: 'One', input: {} },
+          { id: 'same', title: 'Two', input: {} },
+        ],
+      ],
+      [
+        'an invalid scenario id',
+        [{ id: 'Happy Path', title: 'Happy', input: {} }],
+      ],
+    ])('rejects %s', (_name, scenarios) => {
+      const registry = createCatalogRegistry();
+      registry.registerWorkspace(workspace);
+      registerGreeting(registry, { scenarios });
+
+      expect(() => generateCatalog(registry)).toThrowError(
+        'Catalog example "greeting" has invalid scenarios',
+      );
+    });
+  });
+
   it('fails when browser metadata cannot be serialized as JSON', () => {
     const cyclicInput: Record<string, unknown> = {};
     cyclicInput.self = cyclicInput;

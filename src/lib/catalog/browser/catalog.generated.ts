@@ -3,6 +3,7 @@ import type { BrowserCatalogArtifact } from './types';
 export const catalogArtifact: BrowserCatalogArtifact = {
   sourceHash:
     'cae30b226b8ff1bd1cf3bb9c179fa7731add510cf81befc0037234143ead6e17',
+  workspaces: [{ id: 'shared-workflows' }],
   descriptors: [
     {
       id: 'activity-heartbeat',

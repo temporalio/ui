@@ -1633,7 +1633,7 @@ try {
   });
 });
 
-describe('per-example catalog workspaces', () => {
+describe('per-folder catalog workspaces', () => {
   const source = {
     examplesPath: 'demos/examples',
     id: 'demos',
@@ -1717,6 +1717,48 @@ describe('per-example catalog workspaces', () => {
     expect(content).not.toContain("taskQueue: 'demos',");
   });
 
+  it("spreads a folder's workspace metadata under its derived identity", () => {
+    const [registration] = renderCatalogSourceAssembly({
+      examples: [
+        {
+          ...workflowExample('money-transfer', 'moneyTransfer'),
+          workspaceImportPath: 'demos/examples/money-transfer/workspace.ts',
+        },
+      ],
+      source,
+      workspace,
+    });
+    const content = String(registration.content);
+
+    expect(content).toContain(
+      "import { catalogWorkspace as workspace0 } from './examples/money-transfer/workspace.js';",
+    );
+    expect(content).toContain(
+      [
+        '    registry.registerWorkspace({',
+        '      ...workspace0,',
+        "      id: 'demos-money-transfer',",
+      ].join('\n'),
+    );
+  });
+
+  it('rejects workspace metadata on a shared workspace', () => {
+    expect(() =>
+      renderCatalogSourceAssembly({
+        examples: [
+          {
+            ...workflowExample('money-transfer', 'moneyTransfer'),
+            workspaceImportPath: 'demos/examples/money-transfer/workspace.ts',
+          },
+        ],
+        source,
+        workspace: { ...workspace, grouping: 'shared' as const },
+      }),
+    ).toThrow(
+      'Catalog workspace metadata needs a per-folder workspace: money-transfer',
+    );
+  });
+
   it('keeps the shared registration unchanged when grouping is omitted', () => {
     const sharedWorkspace = { ...workspace, grouping: undefined };
     const explicitShared = { ...workspace, grouping: 'shared' as const };
@@ -1740,7 +1782,7 @@ describe('per-example catalog workspaces', () => {
     expect(String(omitted[0].content)).toContain("taskQueue: 'demos',");
   });
 
-  it('allows the same workflow type in two per-example demos', () => {
+  it('allows the same workflow type in two per-folder demos', () => {
     expect(() =>
       validateCatalogAuthoringGraph(graph, [
         workflowExample('first-demo', 'demoWorkflow'),
