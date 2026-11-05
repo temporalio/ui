@@ -1,5 +1,10 @@
 <script lang="ts">
+  import { tick } from 'svelte';
+
+  import { page } from '$app/state';
+
   import NoQueryResults from '$lib/components/empty-states/no-query-results.svelte';
+  import IconButton from '$lib/holocene/icon-button.svelte';
   import Link from '$lib/holocene/link.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/paginated.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
@@ -7,6 +12,7 @@
   import { translate } from '$lib/i18n/translate';
   import Badge from '$lib/io/badge/badge.svelte';
   import IconChevronDown from '$lib/io/icon/icons/chevron-down.svelte';
+  import IconChevronUp from '$lib/io/icon/icons/chevron-up.svelte';
   import IconDotnetColorblock from '$lib/io/icon/icons/dotnet-colorblock.svelte';
   import IconGoColorblock from '$lib/io/icon/icons/go-colorblock.svelte';
   import IconJavaColorblock from '$lib/io/icon/icons/java-colorblock.svelte';
@@ -24,6 +30,9 @@
     callbackTargetName,
     callbackTargetTypeLabel,
   } from '$lib/utilities/nexus-operation-callbacks';
+  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
+
+  import NexusOperationCallbackDetails from './nexus-operation-callback-details.svelte';
 
   let {
     callbacks,
@@ -32,6 +41,54 @@
     callbacks: Callback[];
     namespace: string;
   } = $props();
+
+  const PAGE_PARAMETER = 'callbacks-page';
+  const PER_PAGE_PARAMETER = 'callbacks-per-page';
+  const DEFAULT_PER_PAGE = 100;
+
+  const expanded = $state<Record<string, boolean>>({});
+  let deepLinkedRequestId: string | undefined;
+
+  const rowKey = (callback: Callback) =>
+    callback.requestId || `index-${callbacks.indexOf(callback)}`;
+  const rowId = (key: string) => `callback-row-${key}`;
+  const detailsId = (key: string) => `callback-details-${key}`;
+
+  const toggle = (key: string) => {
+    expanded[key] = !expanded[key];
+  };
+
+  const scrollToRow = async (key: string) => {
+    await tick();
+    document.getElementById(rowId(key))?.scrollIntoView({ block: 'center' });
+  };
+
+  $effect(() => {
+    const requestId = page.url.searchParams.get('requestId');
+    if (!requestId || requestId === deepLinkedRequestId) return;
+    const index = callbacks.findIndex(
+      (callback) => callback.requestId === requestId,
+    );
+    if (index === -1) return;
+
+    deepLinkedRequestId = requestId;
+    expanded[requestId] = true;
+
+    const perPage =
+      Number(page.url.searchParams.get(PER_PAGE_PARAMETER)) || DEFAULT_PER_PAGE;
+    const targetPage = Math.floor(index / perPage) + 1;
+    const currentPage = Number(page.url.searchParams.get(PAGE_PARAMETER)) || 1;
+
+    if (targetPage === currentPage) {
+      scrollToRow(requestId);
+      return;
+    }
+    updateQueryParameters({
+      parameter: PAGE_PARAMETER,
+      value: targetPage,
+      url: page.url,
+    }).then(() => scrollToRow(requestId));
+  });
 
   const SDKS: {
     id: string;
@@ -107,8 +164,8 @@
   nextPageButtonLabel={translate('common.next-page')}
   previousPageButtonLabel={translate('common.previous-page')}
   pageButtonLabel={(p) => translate('common.go-to-page', { page: p })}
-  pageParameter="callbacks-page"
-  perPageParameter="callbacks-per-page"
+  pageParameter={PAGE_PARAMETER}
+  perPageParameter={PER_PAGE_PARAMETER}
   items={callbacks}
 >
   {#snippet caption()}
@@ -126,13 +183,15 @@
     </TableHeaderRow>
   {/snippet}
   {#snippet rows({ visibleItems })}
-    {#each visibleItems as callback, index (callback.requestId || index)}
+    {#each visibleItems as callback (rowKey(callback))}
+      {@const key = rowKey(callback)}
+      {@const isExpanded = Boolean(expanded[key])}
       {@const deliveryState = callbackDeliveryState(
         callback.state as unknown as string,
       )}
       {@const handler = callback.callback?.nexusHandler}
       {@const target = toTarget(callback)}
-      <TableRow data-testid="callback-row">
+      <TableRow id={rowId(key)} data-testid="callback-row">
         <td data-testid="callback-delivery-state">
           <Badge
             text={deliveryState.label}
@@ -166,9 +225,25 @@
           {target?.event ?? ''}
         </td>
         <td data-testid="callback-expand">
-          <IconChevronDown />
+          <IconButton
+            Icon={isExpanded ? IconChevronUp : IconChevronDown}
+            label={isExpanded
+              ? translate('events.collapse-details')
+              : translate('events.expand-details')}
+            aria-expanded={isExpanded}
+            aria-controls={isExpanded ? detailsId(key) : undefined}
+            class="h-6 w-6"
+            onclick={() => toggle(key)}
+          />
         </td>
       </TableRow>
+      {#if isExpanded}
+        <tr id={detailsId(key)} class="expanded">
+          <td class="!p-0" colspan={7}>
+            <NexusOperationCallbackDetails {callback} />
+          </td>
+        </tr>
+      {/if}
     {/each}
   {/snippet}
   {#snippet empty()}
