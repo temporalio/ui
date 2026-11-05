@@ -30,7 +30,8 @@ Copy the example file to `.env.catalog.local` and uncomment what you need. Only 
 | ---------------------------- | ------------------------------------------------------------------- |
 | `TEMPORAL_ADDRESS`           | Server address. Defaults to `127.0.0.1:7233`.                       |
 | `TEMPORAL_NAMESPACE`         | Namespace the worker registers and polls in. Defaults to `default`. |
-| `CATALOG_WORKSPACE_ID` | Optional. Run one workspace instead of all of them.                    |
+| `CATALOG_WORKSPACE_ID`       | Optional. Run one workspace instead of all of them.                 |
+| `CATALOG_CONTROL`            | Optional. `on` lets workspaces that declare `crash` exit the worker. |
 
 Prefer `127.0.0.1` over `localhost`. On some machines `localhost` resolves to IPv6 and reaches a different Temporal server than the UI is reading — for example a container publishing the same port — which appears as a healthy worker the catalog cannot see.
 
@@ -66,20 +67,73 @@ An API key cannot be combined with any TLS variable. The CA certificate and serv
 
 ## The worker
 
-A workspace is a worker specification: a namespace, a task queue, a workflow bundle, and its activities. The catalog runs **one worker per workspace**, all in a single process sharing one connection. Starting the worker with two workspaces registered starts two workers.
+A workspace is an isolated worker: a namespace, a task queue, a workflow bundle, and its activities. Examples are entry points into a workspace. The catalog runs **one worker per workspace**, all in a single process sharing one connection. Starting the worker with two workspaces registered starts two workers.
 
 ### Grouping examples into workspaces
 
 An authoring workspace declares how its examples map to workers with `grouping`:
 
-| Grouping                | Workers                 | Task queue                    | Workflow bundle             | Same activity name in two examples |
-| ----------------------- | ----------------------- | ----------------------------- | --------------------------- | ---------------------------------- |
-| `shared` (the default)  | One for all examples    | `defaultTaskQueue`            | The generated workflows module | An error                        |
-| `per-example`           | One for each example    | `<defaultTaskQueue>-<example>` | The example's own `workflow.ts` | Allowed                       |
+| Grouping               | Workspaces          | Task queue                    | Workflow bundle                | Same activity name in two examples |
+| ---------------------- | ------------------- | ----------------------------- | ------------------------------ | ---------------------------------- |
+| `shared` (the default) | One for the source  | `defaultTaskQueue`            | The generated workflows module | An error                           |
+| `per-folder`           | One for each folder | `<defaultTaskQueue>-<folder>` | The folder's own `workflow.ts` | Allowed                            |
 
-Use `shared` for many small examples that exercise primitives. Use `per-example` when each example must have clear boundaries: its own task queue, bundle, and activities. Both groupings run in the same process. The generated catalog lists each example's task queue, so the browser does not need to know which grouping produced it.
+Use `shared` for many small examples that exercise primitives. Use `per-folder` when each demo must have clear boundaries: its own task queue, bundle, and activities. Both groupings run in the same process. The generated catalog lists each example's task queue, so the browser does not need to know which grouping produced it.
 
-A `per-example` workspace registers workspaces named `<workspace id>-<example id>`. Validation fails when a derived workspace ID or task queue collides with another workspace. Moving an example to a workspace with a different grouping changes its task queue.
+A `per-folder` workspace registers workspaces named `<workspace id>-<folder>`. Validation fails when a derived workspace ID or task queue collides with another workspace. Moving an example to a workspace with a different grouping changes its task queue.
+
+### Workspace metadata
+
+A `per-folder` folder can describe its workspace in an optional `workspace.ts`:
+
+```ts
+export const catalogWorkspace = {
+  title: 'Money transfer',
+  description:
+    'Move money between accounts, and undo the withdrawal if the deposit fails.',
+  docsUrl: 'https://docs.temporal.io/',
+  controls: ['crash'],
+  eject: { sdks: ['typescript'] },
+} satisfies CatalogWorkspaceDefinition;
+```
+
+Every field is optional. The ID, namespace and task queue come from the folder, so the file cannot set them. Generation validates the metadata with the Zod schema in `browser/metadata-schema.ts` and writes a `workspaces` list into the generated catalog. Each descriptor's `execution.workspaceId` points into that list.
+
+### Scenarios
+
+An example can declare named preset inputs:
+
+```ts
+scenarios: [
+  { id: 'happy-path', title: 'Happy path', input: { amount: 100 } },
+  {
+    id: 'deposit-fails',
+    title: 'Deposit fails',
+    input: { amount: 100, to: 'closed-account' },
+  },
+],
+```
+
+Generation fails when a scenario's input does not match the example's input schema.
+
+### Crashing the worker
+
+A demo can let the user crash its worker and watch the run recover. The workflow registers the `crashWorker` update:
+
+```ts
+import { handleCrashWorker } from '../worker/crash-workflow';
+
+export async function moneyTransfer(input: TransferInput) {
+  handleCrashWorker();
+  // ...
+}
+```
+
+The update runs the `crashCatalogWorker` activity. On its first attempt, the activity exits the worker process with code 1. The host restarts the process. The activity's heartbeat timeout expires, Temporal retries it on the new worker, and the retry returns. The update result reports the recovery, and the run continues.
+
+Crash is on only when the workspace declares `controls: ['crash']` and the runtime sets `CATALOG_CONTROL=on`. Otherwise the activity fails without retrying, and the update returns that failure. A serverless runtime should not set it, because it cannot restart a process.
+
+The exit ends the whole process, so every workspace in it restarts. Run the worker under something that restarts it after a non-zero exit. A worker with crash enabled sets a 1-second sticky queue timeout, so the restarted worker picks up the run within a few seconds.
 
 The worker waits for the server rather than exiting if it starts first, printing progress while it retries. Non-connection failures, such as an invalid API key, still fail immediately.
 

@@ -5,8 +5,16 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { operation, service, serviceHandler } from 'nexus-rpc';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createCatalogRegistry, generateCatalog } from './registry';
-import { startCatalogRunner } from './runner';
+import {
+  type CatalogWorkerBinding,
+  createCatalogRegistry,
+  generateCatalog,
+} from './registry';
+import { type CatalogWorkerOptions, startCatalogRunner } from './runner';
+
+vi.mock('@temporalio/activity', () => ({
+  Context: { current: () => ({ info: { attempt: 1 } }) },
+}));
 
 const createNexusHandler = (name: string) => {
   const definition = service(name, {
@@ -117,7 +125,10 @@ describe('catalog runner', () => {
         namespace: 'catalog-namespace',
         taskQueue: 'catalog-task-queue',
         workflowsPath: expect.stringMatching(/\/catalog-workflows\.js$/),
-        activities: { catalogActivity: activity },
+        activities: {
+          catalogActivity: activity,
+          crashCatalogWorker: expect.any(Function),
+        },
         nexusServices: [nexusService],
       }),
     );
@@ -564,6 +575,112 @@ describe('catalog runner', () => {
     expect(connectionFactory).toHaveBeenCalledOnce();
     expect(workerConnections).toEqual([connection, connection]);
     expect(connection.close).toHaveBeenCalledOnce();
+  });
+
+  describe('worker crash', () => {
+    const crashBindings = () =>
+      createActivityBindings('demo').map((binding) => ({
+        ...binding,
+        workspace: { ...binding.workspace, controls: ['crash' as const] },
+      }));
+    const startWithCrash = async (
+      bindings: CatalogWorkerBinding[],
+      controls: 'crash'[],
+    ) => {
+      const exit = vi.fn();
+      const createWorker = vi.fn(async (_options: CatalogWorkerOptions) => ({
+        run: async () => undefined,
+        shutdown: vi.fn(),
+      }));
+      const runner = await startCatalogRunner({
+        bindings,
+        connection: { close: vi.fn(async () => undefined) },
+        createWorker,
+        controls,
+        exit,
+      });
+      await runner.completion;
+      const activities = createWorker.mock.calls[0][0].activities as {
+        crashCatalogWorker: () => Promise<string>;
+      };
+
+      return { activities, exit };
+    };
+
+    it('lets a workspace that declares crash exit the process when the runtime provides it', async () => {
+      const { activities, exit } = await startWithCrash(crashBindings(), [
+        'crash',
+      ]);
+
+      await activities.crashCatalogWorker();
+
+      expect(exit).toHaveBeenCalledWith(1);
+    });
+
+    it('shortens the sticky queue timeout so a restarted Worker picks up the run quickly', async () => {
+      const createWorker = vi.fn(async (_options: CatalogWorkerOptions) => ({
+        run: async () => undefined,
+        shutdown: vi.fn(),
+      }));
+
+      for (const controls of [['crash' as const], []]) {
+        const runner = await startCatalogRunner({
+          bindings: crashBindings(),
+          connection: { close: vi.fn(async () => undefined) },
+          createWorker,
+          controls,
+        });
+        await runner.completion;
+      }
+
+      expect(createWorker.mock.calls[0][0]).toMatchObject({
+        stickyQueueScheduleToStartTimeout: '1s',
+      });
+      expect(createWorker.mock.calls[1][0]).not.toHaveProperty(
+        'stickyQueueScheduleToStartTimeout',
+      );
+    });
+
+    it('refuses to crash when the runtime does not provide the control', async () => {
+      const { activities, exit } = await startWithCrash(crashBindings(), []);
+
+      await expect(activities.crashCatalogWorker()).rejects.toMatchObject({
+        type: 'CatalogCrashDisabled',
+      });
+      expect(exit).not.toHaveBeenCalled();
+    });
+
+    it('refuses to crash a workspace that does not declare the control', async () => {
+      const { activities, exit } = await startWithCrash(
+        createActivityBindings('demo'),
+        ['crash'],
+      );
+
+      await expect(activities.crashCatalogWorker()).rejects.toMatchObject({
+        type: 'CatalogCrashDisabled',
+      });
+      expect(exit).not.toHaveBeenCalled();
+    });
+
+    it('rejects a workspace activity that uses the reserved crash name', async () => {
+      const bindings = createActivityBindings('demo').map((binding) => ({
+        ...binding,
+        activities: { ...binding.activities, crashCatalogWorker: () => 'mine' },
+      }));
+
+      await expect(
+        startCatalogRunner({
+          bindings,
+          connection: { close: vi.fn(async () => undefined) },
+          createWorker: vi.fn(async () => ({
+            run: async () => undefined,
+            shutdown: vi.fn(),
+          })),
+        }),
+      ).rejects.toThrow(
+        'Catalog workspace "demo" registers the reserved activity "crashCatalogWorker"',
+      );
+    });
   });
 
   it('rejects an empty catalog before creating an owned connection', async () => {

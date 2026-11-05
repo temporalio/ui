@@ -12,6 +12,7 @@ import { loadProjectCatalogWorkerBindings } from './project-artifacts';
 import { createCatalogWorkerFactory } from './worker-factory';
 import { parseCatalogConnectionConfig } from '../../src/lib/catalog/worker/connection-config';
 import { connectWithRetry } from '../../src/lib/catalog/worker/connection-retry';
+import { catalogControlsFromEnvironment } from '../../src/lib/catalog/worker/crash';
 import { runCatalogDevelopment } from '../../src/lib/catalog/worker/development';
 import {
   declaredNexusEndpoints,
@@ -148,6 +149,7 @@ try {
       }),
     createWorker: createCatalogWorkerFactory(Worker),
     events: emitCatalogEvent,
+    controls: catalogControlsFromEnvironment(process.env),
     signals: process,
   });
 } catch (error) {

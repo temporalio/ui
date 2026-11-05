@@ -3,7 +3,13 @@ import { fileURLToPath } from 'node:url';
 
 import type { ServiceHandler } from 'nexus-rpc';
 
+import {
+  crashCatalogWorkerActivityName,
+  createCrashCatalogWorkerActivity,
+  effectiveCatalogControls,
+} from './crash.js';
 import type { CatalogWorkerBinding } from './registry';
+import type { CatalogWorkspaceControl } from '../browser/metadata-schema';
 
 export type CatalogConnection = {
   close: () => Promise<void>;
@@ -35,6 +41,7 @@ export type CatalogWorkerOptions<
   workflowsPath: string;
   activities: object;
   nexusServices: ServiceHandler[];
+  stickyQueueScheduleToStartTimeout?: string;
 };
 
 type CatalogRunnerConnectionOptions<Connection extends CatalogConnection> =
@@ -56,7 +63,26 @@ type StartCatalogRunnerOptions<Connection extends CatalogConnection> =
       options: CatalogWorkerOptions<Connection>,
     ) => Promise<CatalogWorker>;
     events?: (event: CatalogRunnerEvent) => void;
+    controls?: readonly CatalogWorkspaceControl[];
+    exit?: (code: number) => void;
   };
+
+const workspaceActivities = (
+  binding: CatalogWorkerBinding,
+  crashEnabled: boolean,
+  exit: (code: number) => void,
+) => {
+  if (Object.hasOwn(binding.activities, crashCatalogWorkerActivityName)) {
+    throw new Error(
+      `Catalog workspace "${binding.workspace.id}" registers the reserved activity "${crashCatalogWorkerActivityName}"`,
+    );
+  }
+
+  return {
+    ...binding.activities,
+    ...createCrashCatalogWorkerActivity({ enabled: crashEnabled, exit }),
+  };
+};
 
 export const startCatalogRunner = async <Connection extends CatalogConnection>(
   options: StartCatalogRunnerOptions<Connection>,
@@ -103,6 +129,10 @@ export const startCatalogRunner = async <Connection extends CatalogConnection>(
     for (const binding of bindings) {
       emit({ type: 'workspace-creating', workspaceId: binding.workspace.id });
       try {
+        const crashEnabled = effectiveCatalogControls(
+          binding.workspace.controls,
+          options.controls ?? [],
+        ).includes('crash');
         const packagedWorkflowsPath = fileURLToPath(
           new URL(binding.workspace.workflowsPath, import.meta.url),
         );
@@ -120,8 +150,13 @@ export const startCatalogRunner = async <Connection extends CatalogConnection>(
             existsSync(sourceWorkflowsPath)
               ? sourceWorkflowsPath
               : packagedWorkflowsPath,
-          activities: binding.activities,
+          activities: workspaceActivities(
+            binding,
+            crashEnabled,
+            options.exit ?? ((code) => process.exit(code)),
+          ),
           nexusServices: binding.nexusServices,
+          ...(crashEnabled ? { stickyQueueScheduleToStartTimeout: '1s' } : {}),
         });
         workers.push({ workspaceId: binding.workspace.id, worker });
         emit({ type: 'workspace-created', workspaceId: binding.workspace.id });

@@ -6,6 +6,7 @@ import {
   type CatalogWorkerOptions,
   startCatalogRunner,
 } from './runner.js';
+import type { CatalogWorkspaceControl } from '../browser/metadata-schema.js';
 
 type CatalogSignals = {
   once: (signal: 'SIGINT' | 'SIGTERM', listener: () => void) => unknown;
@@ -20,6 +21,7 @@ type RunCatalogDevelopmentOptions<Connection extends CatalogConnection> = {
     options: CatalogWorkerOptions<Connection>,
   ) => Promise<CatalogWorker>;
   events?: (event: CatalogRunnerEvent) => void;
+  controls?: readonly CatalogWorkspaceControl[];
   signals: CatalogSignals;
 };
 
@@ -31,6 +33,7 @@ export const runCatalogDevelopment = async <
   connectionFactory,
   createWorker,
   events,
+  controls,
   signals,
 }: RunCatalogDevelopmentOptions<Connection>) => {
   const selectedBindings = workspaceId
@@ -56,6 +59,7 @@ export const runCatalogDevelopment = async <
     connectionFactory,
     createWorker,
     events,
+    controls,
   });
   let shutdown: Promise<void> | undefined;
   const handleSignal = () => {

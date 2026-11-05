@@ -712,7 +712,7 @@ describe('generateCatalog', () => {
         ...workspace,
         title: 'Money transfer',
         docsUrl: 'https://docs.temporal.io/',
-        controls: ['crash', 'stop'],
+        controls: ['crash'],
         eject: { sdks: ['typescript'] },
       });
       registry.registerWorkspace({
@@ -727,7 +727,7 @@ describe('generateCatalog', () => {
           id: 'money-transfer',
           title: 'Money transfer',
           docsUrl: 'https://docs.temporal.io/',
-          controls: ['crash', 'stop'],
+          controls: ['crash'],
           eject: { sdks: ['typescript'] },
         },
       ]);

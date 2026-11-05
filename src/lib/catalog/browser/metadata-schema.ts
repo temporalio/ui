@@ -10,7 +10,7 @@ const uniqueValues = <Schema extends z.ZodType<string>>(schema: Schema) =>
       message: 'Values must be unique',
     });
 
-export const catalogWorkspaceControlSchema = z.enum(['crash', 'stop', 'start']);
+export const catalogWorkspaceControlSchema = z.enum(['crash']);
 
 export const catalogWorkspaceMetadataSchema = z.strictObject({
   title: nonEmptyString.optional(),
