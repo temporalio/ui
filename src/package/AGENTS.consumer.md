@@ -13,16 +13,7 @@ itself, import via `$lib/...` and follow `io/AGENTS.md` instead.
 
 ### io
 
-| Component                           | Import                           |
-| ----------------------------------- | -------------------------------- |
-| `Button`, `ButtonLink`              | `@temporalio/ui/io/button`       |
-| `Badge`                             | `@temporalio/ui/io/badge`        |
-| `BadgeCount`                        | `@temporalio/ui/io/badge-count`  |
-| `BadgeStatus`                       | `@temporalio/ui/io/badge-status` |
-| `Chip`                              | `@temporalio/ui/io/chip`         |
-| `ChipStatus`                        | `@temporalio/ui/io/chip-status`  |
-| `Tag`                               | `@temporalio/ui/io/tag`          |
-| Icons (`IconAdd`, `IconArchive`, …) | `@temporalio/ui/io/icon`         |
+<!-- io-components -->
 
 ### Holocene
 
