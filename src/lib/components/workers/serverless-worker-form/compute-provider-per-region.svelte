@@ -17,6 +17,7 @@
     regionPreview,
     resourceRegion,
     resourceValue,
+    type ScalingGroupSlot,
     suggestRegionalArn,
   } from './multi-region';
   import {
@@ -64,6 +65,10 @@
     initialPrimary?: ComputeInitialValues;
     /** The replica's saved values, when editing a Version that has one. */
     initialReplica?: ComputeInitialValues;
+    /** Where the primary saves, when editing. A new Version saves `default`. */
+    primaryGroup?: ScalingGroupSlot;
+    /** Where the replica saves, when editing. A new one is named for its region. */
+    replicaGroup?: ScalingGroupSlot;
   }
 
   let {
@@ -78,6 +83,8 @@
     enabledRegionIds = [],
     initialPrimary,
     initialReplica,
+    primaryGroup,
+    replicaGroup,
   }: Props = $props();
 
   let provider = $state<ComputeProviderValue>(
@@ -359,7 +366,8 @@
     {
       regionId: primaryRegion.id,
       values: formValues(primary, primary),
-      scoped: false,
+      scoped: primaryGroup?.scoped ?? false,
+      name: primaryGroup?.name,
     },
     ...(replicated
       ? [
@@ -371,6 +379,8 @@
               gcpRegion: replica.gcpRegion,
               gcpWorkerPool: replica.gcpWorkerPool,
             }),
+            scoped: replicaGroup?.scoped ?? true,
+            name: replicaGroup?.name,
           },
         ]
       : []),

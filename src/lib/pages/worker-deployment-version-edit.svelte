@@ -9,6 +9,7 @@
   import EditVersionForm from '$lib/components/workers/serverless-worker-form/edit-version-form.svelte';
   import {
     computeRegionsFor,
+    scalingGroupSlots,
     scalingGroupsToRemove,
     splitHighAvailabilityGroups,
   } from '$lib/components/workers/serverless-worker-form/multi-region';
@@ -55,6 +56,9 @@
   const gcpRegions = $derived(deployRegionsFor(providerConfig, 'cloud-run'));
   const namespaceRegions = $derived(configuredRegions(providerConfig));
 
+  const primaryRegionId = $derived(
+    namespaceRegions.find(({ role }) => role !== 'replica')?.regionId,
+  );
   const replicaRegionId = $derived(
     namespaceRegions.find(({ role }) => role === 'replica')?.regionId,
   );
@@ -74,16 +78,23 @@
   <SkeletonTable rows={6} />
 {:then versionResponse}
   {@const info = versionResponse.workerDeploymentVersionInfo}
-  <!-- The unscoped group is the primary, and the group scoped to the
-       Namespace's replica is the replica. -->
-  {@const groups = splitHighAvailabilityGroups(
-    info.computeConfig,
+  <!-- Each role takes the group scoped to its region, then the unscoped one. -->
+  {@const groups = splitHighAvailabilityGroups(info.computeConfig, {
+    primaryRegionId,
     replicaRegionId,
-  )}
+  })}
+  {@const slots = primaryRegionId
+    ? scalingGroupSlots(groups, { primaryRegionId, replicaRegionId })
+    : undefined}
   {@const primaryValues = formValuesFromGroup(groups.primary?.group)}
+  {@const replicaValues = groups.replica
+    ? formValuesFromGroup(groups.replica.group)
+    : undefined}
   <!-- A Version's provider cannot be changed, so the picker shows only the one
-       in use rather than offering alternatives that cannot be applied. -->
-  {@const configuredProvider = primaryValues.provider ?? 'lambda'}
+       in use rather than offering alternatives that cannot be applied. A
+       Version with compute only in the replica takes the replica's. -->
+  {@const configuredProvider =
+    primaryValues.provider ?? replicaValues?.provider ?? 'lambda'}
   <div class="flex max-w-[45rem] flex-col gap-4">
     <Link href={backHref} LeadingIcon={IconChevronLeft}>
       {translate('workers.back-to-deployment', { deployment })}
@@ -96,10 +107,10 @@
       computeProviders={lockProvidersTo(configuredProvider, computeProviders)}
       {gcpRegions}
       {templates}
-      initialData={primaryValues}
-      initialReplicaData={groups.replica
-        ? formValuesFromGroup(groups.replica.group)
-        : undefined}
+      initialData={{ ...primaryValues, provider: configuredProvider }}
+      initialReplicaData={replicaValues}
+      primaryGroup={slots?.primary}
+      replicaGroup={slots?.replica}
       enabledRegionIds={groups.replica && replicaRegionId
         ? [replicaRegionId]
         : []}

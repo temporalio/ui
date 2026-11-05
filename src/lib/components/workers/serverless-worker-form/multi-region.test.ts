@@ -6,6 +6,7 @@ import {
   regionServerErrors,
   replicaRegionFor,
   resourceRegion,
+  scalingGroupSlots,
   scalingGroupsToRemove,
   shortResourceName,
   splitHighAvailabilityGroups,
@@ -257,7 +258,9 @@ describe('replicaRegionFor', () => {
 });
 
 describe('splitHighAvailabilityGroups', () => {
+  const EAST = 'aws-us-east-1';
   const WEST = 'aws-us-west-2';
+  const regions = { primaryRegionId: EAST, replicaRegionId: WEST };
   const config = (groups: Record<string, { regionIds?: string[] }>) => ({
     scalingGroups: groups,
   });
@@ -265,7 +268,7 @@ describe('splitHighAvailabilityGroups', () => {
   it('reads the unscoped group as the primary and the scoped one as the replica', () => {
     const { primary, replica } = splitHighAvailabilityGroups(
       config({ default: {}, secondary: { regionIds: [WEST] } }),
-      WEST,
+      regions,
     );
     expect(primary?.name).toBe('default');
     expect(replica?.name).toBe('secondary');
@@ -274,7 +277,7 @@ describe('splitHighAvailabilityGroups', () => {
   it('has no replica when no group names the Namespace replica', () => {
     const { primary, replica } = splitHighAvailabilityGroups(
       config({ default: {} }),
-      WEST,
+      regions,
     );
     expect(primary?.name).toBe('default');
     expect(replica).toBeUndefined();
@@ -283,22 +286,85 @@ describe('splitHighAvailabilityGroups', () => {
   it('takes a group scoped elsewhere as the primary when none is unscoped', () => {
     const { primary, replica } = splitHighAvailabilityGroups(
       config({
-        east: { regionIds: ['aws-us-east-1'] },
+        central: { regionIds: ['aws-us-central-1'] },
         west: { regionIds: [WEST] },
       }),
-      WEST,
+      regions,
     );
-    expect(primary?.name).toBe('east');
+    expect(primary?.name).toBe('central');
     expect(replica?.name).toBe('west');
   });
 
   it('reads a single-region Namespace as a primary only', () => {
     const { primary, replica } = splitHighAvailabilityGroups(
       config({ default: {} }),
-      undefined,
+      { primaryRegionId: EAST },
     );
     expect(primary?.name).toBe('default');
     expect(replica).toBeUndefined();
+  });
+
+  it('reads a group named default but scoped to the replica as the replica', () => {
+    const { primary, replica } = splitHighAvailabilityGroups(
+      config({ default: { regionIds: [WEST] } }),
+      regions,
+    );
+    expect(primary).toBeUndefined();
+    expect(replica?.name).toBe('default');
+  });
+
+  it('gives the unscoped group to the replica when the primary has its own', () => {
+    const { primary, replica } = splitHighAvailabilityGroups(
+      config({ default: {}, 'aws-us-west-2': { regionIds: [WEST] } }),
+      { primaryRegionId: WEST, replicaRegionId: EAST },
+    );
+    expect(primary?.name).toBe('aws-us-west-2');
+    expect(replica?.name).toBe('default');
+  });
+});
+
+describe('scalingGroupSlots', () => {
+  const EAST = 'aws-us-east-1';
+  const WEST = 'aws-us-west-2';
+  const regions = { primaryRegionId: EAST, replicaRegionId: WEST };
+  const entry = (name: string, regionIds: string[] = []) => ({
+    name,
+    regionIds,
+    group: {},
+  });
+
+  it('saves a new Version as an unscoped default and a scoped replica', () => {
+    expect(scalingGroupSlots({}, regions)).toEqual({
+      primary: { name: 'default', scoped: false },
+      replica: { name: WEST, scoped: true },
+    });
+  });
+
+  it('keeps the name and scope of each saved group', () => {
+    expect(
+      scalingGroupSlots(
+        { primary: entry('east', [EAST]), replica: entry('default') },
+        regions,
+      ),
+    ).toEqual({
+      primary: { name: 'east', scoped: true },
+      replica: { name: 'default', scoped: false },
+    });
+  });
+
+  it('scopes a new primary under its region when the replica holds default', () => {
+    expect(
+      scalingGroupSlots({ replica: entry('default', [WEST]) }, regions),
+    ).toEqual({
+      primary: { name: EAST, scoped: true },
+      replica: { name: 'default', scoped: true },
+    });
+  });
+
+  it('has no replica slot without a Namespace replica', () => {
+    expect(scalingGroupSlots({}, { primaryRegionId: EAST })).toEqual({
+      primary: { name: 'default', scoped: false },
+    });
   });
 });
 
