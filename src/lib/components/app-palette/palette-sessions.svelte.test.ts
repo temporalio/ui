@@ -197,6 +197,33 @@ describe('Palette sessions', () => {
     expect(enable).not.toHaveBeenCalled();
   });
 
+  it('runs the confirmed action on a second click after the item rebuilds', async () => {
+    const disable = vi.fn();
+    const enable = vi.fn();
+    let enabled = $state(true);
+    const items = (): PaletteItem[] => [
+      {
+        id: 'toggle',
+        title: 'Toggle',
+        actions: [
+          enabled
+            ? { title: 'Disable', confirm: 'Disable it?', run: disable }
+            : { title: 'Enable', run: enable },
+        ],
+      },
+    ];
+    mount(oneSet(items));
+
+    await openPalette();
+    await fireEvent.click(screen.getByRole('option'));
+    enabled = false;
+    flushSync();
+    await fireEvent.click(screen.getByRole('option'));
+
+    expect(disable).toHaveBeenCalledOnce();
+    expect(enable).not.toHaveBeenCalled();
+  });
+
   it('gives a dev set its dev context, so its views keep the dev tag', async () => {
     let seen: PaletteContext | undefined;
     const view: PaletteView = { id: 'v', title: 'Dev view', items: () => [] };

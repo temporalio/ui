@@ -399,6 +399,12 @@
 
   function runAction(item: PaletteItem | null | undefined, index: number) {
     if (!item) return;
+    // A second click on a pending action runs the action that was confirmed,
+    // even if the item rebuilt its actions since.
+    if (isPending(item.id, index)) {
+      confirmPending();
+      return;
+    }
     if (running) {
       showStatus(translate('palette.still-working'));
       return;
@@ -417,7 +423,7 @@
 
     actionsOpen = false;
     actionsItem = null;
-    if (action.confirm && !isPending(item.id, index)) {
+    if (action.confirm) {
       pendingConfirm = {
         itemId: item.id,
         actionIndex: index,
