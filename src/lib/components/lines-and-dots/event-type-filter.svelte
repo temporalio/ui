@@ -85,13 +85,10 @@
   };
 
   const onPendingClick = () => {
+    const statusFilter = !$eventStatusFilter;
     $eventTypeFilter = defaultOptions;
-    $eventStatusFilter = !$eventStatusFilter;
-    updateEventFilterParams(
-      page.url,
-      { categories: null, statusFilter: !$eventStatusFilter },
-      goto,
-    );
+    $eventStatusFilter = statusFilter;
+    updateEventFilterParams(page.url, { categories: null, statusFilter }, goto);
   };
 
   const onNoneClick = () => {
@@ -105,7 +102,7 @@
   };
 
   const filterActive = $derived(
-    $eventTypeFilter.length < defaultOptions.length,
+    $eventStatusFilter || $eventTypeFilter.length < defaultOptions.length,
   );
 </script>
 
@@ -157,7 +154,7 @@
           <Checkbox
             onChange={onPendingClick}
             checked={$eventStatusFilter}
-            label={translate('common.all')}
+            label={translate('common.pending-and-failed')}
             labelHidden
             class="mt-px"
           />

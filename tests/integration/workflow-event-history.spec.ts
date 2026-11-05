@@ -186,4 +186,31 @@ test.describe('Workflow History view with pending activities and filters', () =>
       0,
     );
   });
+
+  test('shows the filter as active when filtering to pending and failed', async ({
+    page,
+  }) => {
+    const filterButton = page.locator(
+      'button[aria-controls="event-type-filter"]',
+    );
+    const activeIndicator = filterButton.locator('.bg-interactive-primary');
+    await expect(activeIndicator).toHaveCount(0);
+
+    await filterButton.click();
+    await page
+      .locator('#event-type-filter')
+      .getByTestId('Pending and Failed')
+      .click();
+
+    await expect(activeIndicator).toHaveCount(1);
+    await expect(page).toHaveURL(/[?&]status=pending/);
+
+    await page
+      .locator('#event-type-filter')
+      .getByTestId('Pending and Failed')
+      .click();
+
+    await expect(activeIndicator).toHaveCount(0);
+    await expect(page).not.toHaveURL(/[?&]status=/);
+  });
 });
