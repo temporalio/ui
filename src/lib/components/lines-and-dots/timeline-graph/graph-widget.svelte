@@ -4,6 +4,8 @@
   import { groupEvents } from '$lib/models/event-groups';
   import type { EventGroups } from '$lib/models/event-groups/event-groups';
   import { fetchAllEvents } from '$lib/services/events-service';
+  import { materializeGroup } from '$lib/services/grouped-event-buffer';
+  import type { ExecutionHistory } from '$lib/services/grouped-event-buffer.svelte';
   import { fetchWorkflow } from '$lib/services/workflow-service';
   import type { WorkflowExecution } from '$lib/types/workflows';
 
@@ -29,11 +31,17 @@
     class: className = '',
   }: Props = $props();
 
-  let snapshot = $state<{ workflow: WorkflowExecution; groups: EventGroups }>();
+  let snapshot = $state<{
+    workflow: WorkflowExecution;
+    groups: EventGroups;
+    history: ExecutionHistory;
+    namespace: string;
+  }>();
 
   const getWorkflowAndEventHistory = async () => {
     if (!workflowId || !runId) return;
 
+    const executionNamespace = namespace;
     const [{ workflow }, history] = await Promise.all([
       fetchWorkflow({ namespace, workflowId, runId }),
       fetchAllEvents({ namespace, workflowId, runId }),
@@ -42,8 +50,13 @@
 
     const pendingActivities = workflow?.pendingActivities ?? [];
     return {
+      namespace: executionNamespace,
       workflow,
       groups: groupEvents(history, 'ascending', pendingActivities),
+      history: {
+        events: history,
+        materializeGroup,
+      },
     };
   };
 
@@ -73,10 +86,14 @@
     class="cursor-pointer overflow-auto {className}"
     style:max-height="{viewportHeight}px"
   >
-    <TimelineGraph
-      workflow={snapshot.workflow}
-      lazyGroups={snapshot.groups}
-      readOnly
-    />
+    {#key JSON.stringify( [snapshot.namespace, snapshot.workflow.id, snapshot.workflow.runId], )}
+      <TimelineGraph
+        namespace={snapshot.namespace}
+        workflow={snapshot.workflow}
+        history={snapshot.history}
+        lazyGroups={snapshot.groups}
+        readOnly
+      />
+    {/key}
   </div>
 {/if}

@@ -1,7 +1,11 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { resolveSystemNexusEvent } from '$lib/system-nexus-endpoints';
-  import type { WorkflowEvent } from '$lib/types/events';
+  import type { PendingActivity, WorkflowEvent } from '$lib/types/events';
+  import type { WorkflowExecutionIdentity } from '$lib/types/workflows';
+  import { isActivityTaskScheduledEvent } from '$lib/utilities/is-event-type';
 
   import PendingActivityCard from '../workflow/pending-activity/pending-activity-card.svelte';
   import PendingNexusOperationCard from '../workflow/pending-nexus-operation/pending-nexus-operation-card.svelte';
@@ -13,12 +17,16 @@
     event = undefined,
     lazy = false,
     groupRow = false,
+    workflowExecutionIdentity,
+    activityActions,
   }: {
     group?: EventGroup;
     event?: WorkflowEvent;
     lazy?: boolean;
     /** The row that opened this represents the whole group, not one event. */
     groupRow?: boolean;
+    workflowExecutionIdentity: WorkflowExecutionIdentity;
+    activityActions?: Snippet<[PendingActivity]>;
   } = $props();
 
   const pendingEvent = $derived(
@@ -46,12 +54,19 @@
 {#if showEventGroup}
   <div class="flex flex-col overflow-hidden">
     {#if group?.pendingActivity}
-      <PendingActivityCard activity={group.pendingActivity} />
+      <PendingActivityCard
+        activity={group.pendingActivity}
+        actions={activityActions}
+        scheduledEvent={isActivityTaskScheduledEvent(group.initialEvent)
+          ? group.initialEvent
+          : undefined}
+      />
     {:else if group?.pendingNexusOperation}
       <PendingNexusOperationCard operation={group.pendingNexusOperation} />
     {/if}
     {#each group?.eventList ?? [] as groupEvent (groupEvent.id)}
       <EventCard
+        {workflowExecutionIdentity}
         event={groupEvent}
         initiatingEvent={group?.initialEvent}
         {lazy}
@@ -59,5 +74,10 @@
     {/each}
   </div>
 {:else if event}
-  <EventCard {event} initiatingEvent={group?.initialEvent} {lazy} />
+  <EventCard
+    {event}
+    {workflowExecutionIdentity}
+    initiatingEvent={group?.initialEvent}
+    {lazy}
+  />
 {/if}

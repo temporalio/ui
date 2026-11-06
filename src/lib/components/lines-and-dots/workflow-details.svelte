@@ -4,10 +4,9 @@
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { IconFilter, IconInfo } from '$lib/io/icon';
-  import { eventBuffer } from '$lib/services/grouped-event-buffer.svelte';
+  import type { EventBufferView } from '$lib/services/grouped-event-buffer.svelte';
   import { fetchWorkflow } from '$lib/services/workflow-service';
   import { isCloud } from '$lib/stores/advanced-visibility';
-  import { sdkInfo } from '$lib/stores/events';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { formatBytes } from '$lib/utilities/format-bytes';
@@ -38,10 +37,11 @@
 
   interface Props {
     workflow: WorkflowExecution;
+    history: EventBufferView;
     next?: string;
   }
 
-  let { workflow, next }: Props = $props();
+  let { workflow, history, next }: Props = $props();
 
   let latestRunId = $state<string | undefined>(undefined);
 
@@ -83,12 +83,12 @@
       : '',
   );
   let totalActions = $derived(
-    eventBuffer.events
+    history.events
       .reduce((acc, event) => (event?.billableActions ?? 0) + acc, 0)
       .toString(),
   );
 
-  const { sdk, version: sdkVersion } = $derived($sdkInfo);
+  const { sdk, version: sdkVersion } = $derived(history.sdkInfo);
 
   const fetchLatestRun = async () => {
     const result = await fetchWorkflow({

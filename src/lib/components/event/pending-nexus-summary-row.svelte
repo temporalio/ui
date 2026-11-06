@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import type { Snippet } from 'svelte';
 
   import { timestamp } from '$lib/components/timestamp.svelte';
   import PendingAttemptBadge from '$lib/components/workflow/pending-attempt-badge/pending-attempt-badge.svelte';
@@ -8,7 +8,11 @@
   import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { isCloud } from '$lib/stores/advanced-visibility';
-  import type { PendingNexusOperation } from '$lib/types/events';
+  import type {
+    PendingActivity,
+    PendingNexusOperation,
+  } from '$lib/types/events';
+  import type { WorkflowExecutionIdentity } from '$lib/types/workflows';
   import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
 
   import { eventTypeStyle } from './event-styles';
@@ -17,23 +21,29 @@
   import EventDetailsFull from './event-details-full.svelte';
 
   interface Props {
+    workflowExecutionIdentity: WorkflowExecutionIdentity;
     event: PendingNexusOperation;
     group: EventGroup | undefined;
     index: number;
     expanded?: boolean;
     onRowClick?: () => void;
+    activityActions?: Snippet<[PendingActivity]>;
   }
 
   const {
+    workflowExecutionIdentity,
     event,
     group,
     index,
     expanded: expandedProp = false,
     onRowClick = () => {},
+    activityActions,
   }: Props = $props();
 
   let expanded = $state(expandedProp);
-  let { workflow, run, namespace } = $derived($page.params);
+  const namespace = $derived(workflowExecutionIdentity.namespace);
+  const workflow = $derived(workflowExecutionIdentity.workflowId);
+  const run = $derived(workflowExecutionIdentity.runId);
   let href = $derived(
     routeForEventHistoryEvent({
       eventId: String(event.scheduledEventId),
@@ -121,7 +131,7 @@
 {#if expanded}
   <tr class="w-full px-2 text-sm no-underline">
     <td class="!p-0" colspan={$isCloud ? 5 : 4}>
-      <EventDetailsFull {group} />
+      <EventDetailsFull {group} {activityActions} {workflowExecutionIdentity} />
     </td>
   </tr>
 {/if}

@@ -10,10 +10,17 @@
   import { translate } from '$lib/i18n/translate';
   import { IconChevronLeft } from '$lib/io/icon';
   import { groupEvents } from '$lib/models/event-groups';
+  import type { WorkflowExecutionIdentity } from '$lib/types/workflows';
+  import { isWorkflowExecutionStartedEvent } from '$lib/utilities/is-event-type';
   import { routeForArchivalWorkflows } from '$lib/utilities/route-for';
 
   let { data }: { data: PageData } = $props();
 
+  const workflowExecutionIdentity: WorkflowExecutionIdentity = $derived({
+    namespace: page.params.namespace,
+    workflowId: page.params.workflow,
+    runId: page.params.run,
+  });
   const workflowId = $derived(page.params.workflow);
   const workflowsHref = $derived(
     routeForArchivalWorkflows({ namespace: page.params.namespace }),
@@ -43,7 +50,12 @@
   <SkeletonWorkflow />
 {:then history}
   {@const groups = groupEvents(history, 'ascending', [], [])}
-  <EventSummaryTable items={history} {groups} />
+  <EventSummaryTable
+    initialEvent={history.find(isWorkflowExecutionStartedEvent)}
+    items={history}
+    {groups}
+    {workflowExecutionIdentity}
+  />
 {:catch error}
   <div class="text-center align-middle">
     <h1 class="leading-0 text-[12rem] font-semibold">

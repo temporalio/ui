@@ -1,7 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-
-  import { page } from '$app/stores';
+  import { onMount, type Snippet } from 'svelte';
 
   import EventDetailsFull from '$lib/components/event/event-details-full.svelte';
   import EventStatusBadge, {
@@ -11,7 +9,8 @@
   import { translate } from '$lib/i18n/translate';
   import { IconClock, IconClose } from '$lib/io/icon';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
-  import { setActiveGroup } from '$lib/stores/active-events';
+  import type { PendingActivity } from '$lib/types/events';
+  import type { WorkflowExecutionIdentity } from '$lib/types/workflows';
   import { formatEventGroupDuration } from '$lib/utilities/event-group-duration';
   import { isChildWorkflowExecutionStartedEvent } from '$lib/utilities/is-event-type';
 
@@ -25,6 +24,9 @@
     y: number;
     // Reports panel height so timeline-graph can shift the rows below it.
     onHeight?: (h: number) => void;
+    onClose?: () => void;
+    workflowExecutionIdentity: WorkflowExecutionIdentity;
+    activityActions?: Snippet<[PendingActivity]>;
   };
 
   let {
@@ -34,6 +36,9 @@
     x = 0,
     y,
     onHeight,
+    onClose,
+    workflowExecutionIdentity,
+    activityActions,
   }: Props = $props();
 
   // ResizeObserver so the height re-measures when CodeMirror lazily swaps in.
@@ -53,7 +58,7 @@
     return () => observer.disconnect();
   });
 
-  const namespace = $derived($page.params.namespace);
+  const namespace = $derived(workflowExecutionIdentity.namespace);
   const title = $derived(group.displayName);
 
   const childWorkflowStartedEvent = $derived(
@@ -96,7 +101,7 @@
         {/if}
       </div>
       <div class="flex items-center gap-4">
-        <Button variant="ghost" size="xs" onclick={() => setActiveGroup(group)}
+        <Button variant="ghost" size="xs" onclick={onClose}
           >{translate('common.close')} <IconClose /></Button
         >
       </div>
@@ -104,6 +109,8 @@
     <div class="bg-surface-primary text-primary">
       <EventDetailsFull
         {group}
+        {workflowExecutionIdentity}
+        {activityActions}
         event={group.initialEvent}
         lazy={true}
         groupRow={true}

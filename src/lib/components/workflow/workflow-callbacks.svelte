@@ -1,13 +1,14 @@
 <script lang="ts">
   import AccordionLight from '$lib/holocene/accordion/accordion-light.svelte';
-  import { fullEventHistory } from '$lib/stores/events';
+  import type { WorkflowEvent } from '$lib/types/events';
   import type { Callback } from '$lib/types/nexus';
 
   import WorkflowCallback from './workflow-callback.svelte';
 
-  let { callbacks }: { callbacks: Callback[] } = $props();
-
-  const initialEvent = $derived($fullEventHistory[0]);
+  let {
+    callbacks,
+    initialEvent,
+  }: { callbacks: Callback[]; initialEvent?: WorkflowEvent } = $props();
   const link = $derived(initialEvent?.links?.[0]);
   const firstCallback = $derived(callbacks[0]);
 </script>

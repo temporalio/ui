@@ -1,8 +1,13 @@
 <script lang="ts">
+  import ActivityCommands from '$lib/components/activity/activity-commands.svelte';
   import PendingActivityCard from '$lib/components/workflow/pending-activity/pending-activity-card.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { workflowRun } from '$lib/stores/workflow-run';
+  import { getWorkflowHistoryController } from '$lib/services/workflow-history-controller.svelte.js';
+  import { triggerRefresh, workflowRun } from '$lib/stores/workflow-run';
+
+  const historyController = getWorkflowHistoryController();
+  const workflow = $derived($workflowRun.workflow);
 
   const pendingActivities = $derived(
     $workflowRun.workflow?.pendingActivities?.sort((a, b) => {
@@ -21,7 +26,22 @@
         <PendingActivityCard
           {activity}
           totalPending={pendingActivities.length}
-        />
+          scheduledEvent={historyController.history.pendingActivityScheduledEvent(
+            activity.activityId,
+          )}
+        >
+          {#snippet actions(actionActivity)}
+            {#if workflow}
+              <ActivityCommands
+                activity={actionActivity}
+                workflowExecutionIdentity={historyController.workflowExecutionIdentity}
+                {workflow}
+                onRefresh={triggerRefresh}
+                class="justify-end"
+              />
+            {/if}
+          {/snippet}
+        </PendingActivityCard>
       {/each}
     </div>
   {:else}

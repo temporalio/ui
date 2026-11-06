@@ -1,9 +1,10 @@
 <script lang="ts">
-  import { getContext, onMount } from 'svelte';
+  import { onMount } from 'svelte';
 
   import { beforeNavigate, goto } from '$app/navigation';
   import { page } from '$app/state';
 
+  import ActivityCommands from '$lib/components/activity/activity-commands.svelte';
   import EventGroupFilter from '$lib/components/lines-and-dots/event-group-filter/event-group-filter.svelte';
   import EventHistoryLegend from '$lib/components/lines-and-dots/event-history-legend.svelte';
   import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
@@ -13,10 +14,6 @@
   import DownloadEventHistoryModal from '$lib/components/workflow/download-event-history-modal.svelte';
   import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
   import WorkflowCallbacks from '$lib/components/workflow/workflow-callbacks.svelte';
-  import {
-    HISTORY_CTX,
-    type HistoryContext,
-  } from '$lib/contexts/history-context';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -26,12 +23,11 @@
     IconCollapse,
     IconDownload,
   } from '$lib/io/icon';
-  import { eventBuffer } from '$lib/services/grouped-event-buffer.svelte';
-  import { clearActives } from '$lib/stores/active-events';
+  import { getWorkflowHistoryController } from '$lib/services/workflow-history-controller.svelte.js';
   import { collapseIdleTime, eventFilterSort } from '$lib/stores/event-view';
   import { pauseLiveUpdates } from '$lib/stores/events';
-  import { eventTypeFilter } from '$lib/stores/filters';
-  import { workflowRun } from '$lib/stores/workflow-run';
+  import { eventStatusFilter, eventTypeFilter } from '$lib/stores/filters';
+  import { triggerRefresh, workflowRun } from '$lib/stores/workflow-run';
   import type {
     WorkflowTaskFailedEvent,
     WorkflowTaskTimedOutEvent,
@@ -42,7 +38,7 @@
   } from '$lib/utilities/event-filter-params';
   import { getTimelineGroups } from '$lib/utilities/sort-timeline-groups';
 
-  const historyCtx = getContext<HistoryContext>(HISTORY_CTX);
+  const historyController = getWorkflowHistoryController();
 
   const namespace = $derived(page.params.namespace);
   const workflow = $derived($workflowRun.workflow);
@@ -63,10 +59,12 @@
 
   const reverseSort = $derived($eventFilterSort === 'descending');
 
-  const bufferLazyGroups = $derived(eventBuffer.lazyGroupsWithoutWorkflowTasks);
+  const bufferLazyGroups = $derived(
+    historyController.history.lazyGroupsWithoutWorkflowTasks,
+  );
 
   const eventGroupMatcher = $derived(
-    eventBuffer.eventGroupMatcher(urlParams.eventGroups),
+    historyController.history.eventGroupMatcher(urlParams.eventGroups),
   );
 
   const filteredBufferLazyGroups = $derived.by(() => {
@@ -82,14 +80,14 @@
     getTimelineGroups(
       filteredBufferLazyGroups,
       reverseSort,
-      historyCtx.fetchComplete,
-      historyCtx.descMinId,
+      historyController.fetchComplete,
+      historyController.descMinId,
     ),
   );
 
   const workflowTaskFailedError = $derived.by(() => {
-    if (!historyCtx.fetchComplete) return undefined;
-    return eventBuffer.workflowTaskFailedEvent as
+    if (historyController.loading) return undefined;
+    return historyController.history.workflowTaskFailedEvent as
       | WorkflowTaskFailedEvent
       | WorkflowTaskTimedOutEvent
       | undefined;
@@ -99,8 +97,10 @@
     Boolean(workflow && !workflow?.isRunning && !workflow?.isPaused),
   );
 
+  let activeGroupId = $state<string>();
+
   beforeNavigate(() => {
-    clearActives();
+    activeGroupId = undefined;
   });
 
   let showDownloadPrompt = $state(false);
@@ -115,14 +115,12 @@
   // virtualizes internally via IntersectionObserver, so there's no bounded
   // scroll container, no scroll-offset bridge, and no height plumbing here.
   const estimatedTotalGroups = $derived.by(() => {
-    if (historyCtx.fetchComplete) return lazyGroups.length;
-    const totalEvents = historyCtx.totalExpectedEvents ?? 0;
+    if (historyController.fetchComplete) return lazyGroups.length;
+    const totalEvents = historyController.totalExpectedEvents;
     return Math.max(lazyGroups.length, Math.ceil(totalEvents * 0.5));
   });
 
-  onMount(() => {
-    historyCtx.resume();
-  });
+  onMount(() => historyController.resume());
 
   let timeline = $state<Timeline>();
 
@@ -142,7 +140,7 @@
   };
 </script>
 
-<InputAndResults />
+<InputAndResults events={historyController.history.events} />
 <div class="flex flex-col gap-2">
   {#if workflowTaskFailedError}
     <WorkflowError
@@ -151,7 +149,10 @@
     />
   {/if}
   {#if workflow?.callbacks?.length}
-    <WorkflowCallbacks callbacks={workflow.callbacks} />
+    <WorkflowCallbacks
+      callbacks={workflow.callbacks}
+      initialEvent={historyController.history.initialEvent}
+    />
   {/if}
 </div>
 
@@ -182,8 +183,8 @@
         <ToggleButton
           LeadingIcon={IconCollapse}
           data-testid="toggle-idle-time"
-          loading={!historyCtx.fetchComplete}
-          disabled={!historyCtx.fetchComplete ||
+          loading={historyController.loading}
+          disabled={!historyController.fetchComplete ||
             !timeline?.hasCollapsibleSegments}
           onclick={onToggleIdleTime}
           size="sm"
@@ -194,7 +195,9 @@
             : translate('workflows.hide-idle-time')}
         </ToggleButton>
         <EventTypeFilter compact={false} />
-        <EventGroupFilter options={eventBuffer.eventGroupOptions} />
+        <EventGroupFilter
+          options={historyController.history.eventGroupOptions}
+        />
         <ToggleButton
           disabled={isNotPending}
           data-testid="pause"
@@ -232,15 +235,30 @@
 -->
   {#if workflow}
     <TimelineGraph
+      {namespace}
       {workflow}
+      history={historyController.history}
       {lazyGroups}
       {reverseSort}
-      loading={!historyCtx.fetchComplete}
+      bind:activeGroupId
+      collapseIdleTime={$collapseIdleTime === 'on'}
+      failedOrPendingOnly={$eventStatusFilter}
+      loading={historyController.loading}
       totalExpectedEvents={estimatedTotalGroups}
-      descMinId={historyCtx.descMinId}
+      descMinId={historyController.descMinId}
       error={Boolean(workflowTaskFailedError)}
       onTimelineInit={handleTimelineInit}
-    />
+    >
+      {#snippet activityActions(activity)}
+        <ActivityCommands
+          {activity}
+          workflowExecutionIdentity={historyController.workflowExecutionIdentity}
+          {workflow}
+          onRefresh={triggerRefresh}
+          class="justify-end"
+        />
+      {/snippet}
+    </TimelineGraph>
   {/if}
 </div>
 <!-- end wrapper -->

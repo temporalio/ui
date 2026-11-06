@@ -18,6 +18,7 @@ export type LivePollOptions = {
   onEvent: (ev: HistoryEvent) => boolean;
   /** Optional hook, called once per poll iteration that added new events. */
   onNewEvents?: () => void;
+  onToken?: (token: string) => void;
   /** ms to wait when a long-poll times out with no new events. Default 2000. */
   backoffMs?: number;
   /** ms to wait after a network error before retrying. Default 5000. */
@@ -39,10 +40,6 @@ export type LivePollOptions = {
  * The loop exits cleanly when `signal` is aborted or once it receives the
  * workflow's close event.
  */
-/**
- * Returns the last cursor token when the loop exits (due to abort or error).
- * The caller can save this token and pass it as `startToken` when resuming.
- */
 export async function runLivePoll({
   route,
   runId,
@@ -50,14 +47,30 @@ export async function runLivePoll({
   signal,
   onEvent,
   onNewEvents,
+  onToken,
   backoffMs = 2000,
   errorBackoffMs = 5000,
-}: LivePollOptions): Promise<string> {
+}: LivePollOptions): Promise<void> {
+  const wait = (delay: number): Promise<void> => {
+    if (signal.aborted) return Promise.resolve();
+    return new Promise<void>((resolve) => {
+      const finish = () => {
+        clearTimeout(timer);
+        signal.removeEventListener('abort', finish);
+        resolve();
+      };
+      const timer = setTimeout(finish, delay);
+      signal.addEventListener('abort', finish, { once: true });
+    });
+  };
+
   let token: string = startToken;
   while (!signal.aborted) {
+    let response: GetWorkflowExecutionHistoryResponse | undefined;
     try {
-      const response =
-        await requestFromAPI<GetWorkflowExecutionHistoryResponse>(route, {
+      response = await requestFromAPI<GetWorkflowExecutionHistoryResponse>(
+        route,
+        {
           token: token || undefined,
           request: fetch,
           params: {
@@ -65,28 +78,31 @@ export async function runLivePoll({
             waitNewEvent: 'true',
           },
           options: { signal },
-        });
-      const events = (response?.history?.events ?? []) as HistoryEvent[];
-      let added = 0;
-      for (const ev of events) {
-        if (onEvent(ev)) added++;
-      }
-      if (added > 0) onNewEvents?.();
-      if (isWorkflowCloseEvent(events.at(-1))) break;
-
-      if (response?.nextPageToken) {
-        token = response.nextPageToken as unknown as string;
-      } else {
-        token = '';
-        if (added === 0) {
-          await new Promise((r) => setTimeout(r, backoffMs));
-        }
-      }
+        },
+      );
     } catch {
       if (!signal.aborted) {
-        await new Promise((r) => setTimeout(r, errorBackoffMs));
+        await wait(errorBackoffMs);
+      }
+      continue;
+    }
+    const events = response?.history?.events ?? [];
+    let added = 0;
+    for (const ev of events) {
+      if (onEvent(ev)) added++;
+    }
+    if (added > 0) onNewEvents?.();
+    if (isWorkflowCloseEvent(events.at(-1))) break;
+
+    if (response?.nextPageToken) {
+      token = String(response.nextPageToken);
+      onToken?.(token);
+    } else {
+      token = '';
+      onToken?.(token);
+      if (added === 0) {
+        await wait(backoffMs);
       }
     }
   }
-  return token;
 }

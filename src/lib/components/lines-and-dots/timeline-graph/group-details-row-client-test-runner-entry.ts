@@ -26,7 +26,16 @@ export function render(group: EventGroup) {
   mounted.push(
     mount(GroupDetailsRow, {
       target,
-      props: { group, canvasWidth: 600, y: 0 },
+      props: {
+        group,
+        canvasWidth: 600,
+        y: 0,
+        workflowExecutionIdentity: {
+          namespace: 'test-namespace',
+          workflowId: 'test-workflow',
+          runId: 'test-run',
+        },
+      },
     }),
   );
   flushSync();

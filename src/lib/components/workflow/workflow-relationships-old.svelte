@@ -2,8 +2,8 @@
   import { page } from '$app/state';
 
   import { fetchAllChildWorkflows } from '$lib/services/workflow-service';
-  import { fullEventHistory } from '$lib/stores/events';
   import { workflowRun } from '$lib/stores/workflow-run';
+  import type { WorkflowEvents } from '$lib/types/events';
   import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
 
   import ChildWorkflowsTable from './child-workflows-table.svelte';
@@ -12,13 +12,19 @@
   import ParentWorkflowTable from './parent-workflow-table.svelte';
   import SchedulerTable from './scheduler-table.svelte';
 
+  interface Props {
+    events: WorkflowEvents;
+  }
+
+  let { events }: Props = $props();
+
   const namespace = $derived(page.params.namespace);
   const workflowId = $derived(page.params.workflow);
   const runId = $derived(page.params.run);
   const workflow = $derived($workflowRun.workflow);
 
   const workflowRelationships = $derived(
-    getWorkflowRelationships(workflow, $fullEventHistory, page.data.namespace),
+    getWorkflowRelationships(workflow, events, page.data.namespace),
   );
 
   const hasChildren = $derived(workflowRelationships.hasChildren);
