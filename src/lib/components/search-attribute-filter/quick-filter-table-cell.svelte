@@ -17,6 +17,10 @@
     type SearchAttributeType,
   } from '$lib/types/workflows';
   import {
+    isAtQueryLimit,
+    replaceAttributeFilters,
+  } from '$lib/utilities/query/column-filter';
+  import {
     createQuickFilter,
     getQuickFilterConditional,
     isQuickFilterActive,
@@ -26,7 +30,6 @@
     toQuickFilterValue,
   } from '$lib/utilities/query/quick-filter';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
-  import { MAX_QUERY_LENGTH } from '$lib/utilities/request-from-api';
 
   import FilterEditor from './filter-editor.svelte';
 
@@ -83,17 +86,12 @@
   const quickFilterCellId = $props.id();
   const menuId = $derived(`quick-filter-${quickFilterCellId}-${attribute}`);
 
-  const atQueryLimit = $derived(
-    (page.url.searchParams.get('query') ?? '').length >= MAX_QUERY_LENGTH,
-  );
+  const atQueryLimit = $derived(isAtQueryLimit(page.url));
 
   const replaceFilter = (filter: SearchAttributeFilter) => {
     // Replace rather than append, so a multi-status group collapses and
     // combineFilters can recompute the parentheses from scratch.
-    $filters = [
-      ...$filters.filter((f) => f.attribute !== filter.attribute),
-      filter,
-    ];
+    $filters = replaceAttributeFilters($filters, filter.attribute, [filter]);
     updateQueryParamsFromFilter(page.url, $filters);
   };
 

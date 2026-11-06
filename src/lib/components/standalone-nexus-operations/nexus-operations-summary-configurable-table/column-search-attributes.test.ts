@@ -4,6 +4,7 @@ import type { NexusOperationExecutionListInfo } from '$lib/types/nexus-operation
 import { sortTableItems } from '$lib/utilities/table-sort';
 
 import {
+  getNexusOperationColumnFilter,
   getNexusOperationColumnValue,
   getNexusOperationSortColumns,
 } from './column-search-attributes';
@@ -64,5 +65,39 @@ describe('getNexusOperationColumnValue', () => {
     expect(getNexusOperationColumnValue('CustomKeywordField', operation)).toBe(
       'my-keyword',
     );
+  });
+});
+
+describe('getNexusOperationColumnFilter', () => {
+  const attributes = {
+    Endpoint: 'Keyword',
+    ExecutionStatus: 'Keyword',
+    CustomIntField: 'Int',
+  } as const;
+
+  it('resolves a column to the search attribute and type it filters on', () => {
+    expect(getNexusOperationColumnFilter('Endpoint', attributes)).toEqual({
+      attribute: 'Endpoint',
+      type: 'Keyword',
+    });
+    expect(getNexusOperationColumnFilter('Status', attributes)).toEqual({
+      attribute: 'ExecutionStatus',
+      type: 'Keyword',
+    });
+  });
+
+  it('resolves a custom search attribute column by its name', () => {
+    expect(getNexusOperationColumnFilter('CustomIntField', attributes)).toEqual(
+      {
+        attribute: 'CustomIntField',
+        type: 'Int',
+      },
+    );
+  });
+
+  it('offers no filter for a column with no known search attribute type', () => {
+    expect(
+      getNexusOperationColumnFilter('Operation ID', attributes),
+    ).toBeUndefined();
   });
 });
