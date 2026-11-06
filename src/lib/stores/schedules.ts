@@ -193,6 +193,7 @@ export async function submitDeleteSchedule(context: ScheduleContext) {
     serverError.set(
       translate('schedules.delete-schedule-error', {
         error: getErrorMessage(error),
+        escapeValue: false,
       }),
     );
   }
@@ -233,6 +234,7 @@ export async function submitPauseSchedule(
           : 'schedules.pause-schedule-error',
         {
           error: getErrorMessage(error),
+          escapeValue: false,
         },
       ),
     );
@@ -273,6 +275,7 @@ export async function submitTriggerImmediatelySchedule(
     serverError.set(
       translate('schedules.trigger-schedule-error', {
         error: getErrorMessage(error),
+        escapeValue: false,
       }),
     );
   }
@@ -320,6 +323,7 @@ export async function submitBackfillSchedule(
     serverError.set(
       translate('schedules.backfill-schedule-error', {
         error: getErrorMessage(error),
+        escapeValue: false,
       }),
     );
   }

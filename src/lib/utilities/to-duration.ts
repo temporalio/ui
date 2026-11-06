@@ -127,55 +127,17 @@ export const fromDate = (
   return intervalToDuration({ start, end });
 };
 
-export type SecondsDurationUnit =
-  | 'year-365'
-  | 'month-30'
-  | 'day'
-  | 'hour'
-  | 'minute'
-  | 'second'
-  | 'millisecond';
-
-interface SecondsDurationOptions {
-  delimiter?: string;
-  units?: readonly SecondsDurationUnit[];
-}
-
-const DEFAULT_SECONDS_DURATION_UNITS: readonly SecondsDurationUnit[] = [
-  'day',
-  'hour',
-  'minute',
-  'second',
-  'millisecond',
-];
-
-const SECONDS_DURATION_UNITS: readonly {
-  unit: SecondsDurationUnit;
-  key: keyof Duration;
-  seconds: number;
-}[] = [
-  { unit: 'year-365', key: 'years', seconds: 365 * 86400 },
-  { unit: 'month-30', key: 'months', seconds: 30 * 86400 },
-  { unit: 'day', key: 'days', seconds: 86400 },
-  { unit: 'hour', key: 'hours', seconds: 3600 },
-  { unit: 'minute', key: 'minutes', seconds: 60 },
-  { unit: 'second', key: 'seconds', seconds: 1 },
-];
-
 /**
- * Uses arithmetic rather than calendar dates to avoid timezone-dependent durations.
- * Defaults to days and smaller units; 365-day years and 30-day months are opt-in estimates.
+ * Formats absolute elapsed time using days and smaller units. Arithmetic avoids
+ * timezone-dependent calendar decomposition and ambiguous month/year lengths.
  */
 export const fromSeconds = (
   seconds: string,
-  {
-    delimiter = ', ',
-    units = DEFAULT_SECONDS_DURATION_UNITS,
-  }: SecondsDurationOptions = {},
+  { delimiter = ', ' } = {},
 ): string => {
   if (!seconds) return '';
 
-  const parsedSeconds = parseInt(seconds);
+  const parsedSeconds = Math.abs(parseInt(seconds));
   const parsedDecimal = parseFloat(`.${seconds.split('.')[1] ?? 0}`);
 
   if (
@@ -186,22 +148,21 @@ export const fromSeconds = (
     return '';
   }
 
-  const duration: Duration = {};
-  let remainingSeconds = parsedSeconds;
+  const SECONDS_PER_DAY = 86400;
+  const SECONDS_PER_HOUR = 3600;
+  const SECONDS_PER_MINUTE = 60;
 
-  for (const { unit, key, seconds: unitSeconds } of SECONDS_DURATION_UNITS) {
-    if (!units.includes(unit)) continue;
-
-    duration[key] = Math.floor(remainingSeconds / unitSeconds);
-    remainingSeconds %= unitSeconds;
-  }
-
+  const duration: Duration = {
+    days: Math.floor(parsedSeconds / SECONDS_PER_DAY),
+    hours: Math.floor((parsedSeconds % SECONDS_PER_DAY) / SECONDS_PER_HOUR),
+    minutes: Math.floor(
+      (parsedSeconds % SECONDS_PER_HOUR) / SECONDS_PER_MINUTE,
+    ),
+    seconds: parsedSeconds % SECONDS_PER_MINUTE,
+  };
   const durationString = durationToString(duration, { delimiter });
-  if (!units.includes('millisecond')) return durationString;
-
   const milliseconds =
-    Math.round((remainingSeconds + parsedDecimal) * 1000 * 1000000000) /
-    1000000000;
+    Math.round(parsedDecimal * 1000 * 1000000000) / 1000000000;
 
   if (!milliseconds) {
     return durationString;

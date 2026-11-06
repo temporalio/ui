@@ -483,54 +483,24 @@ describe('fromSeconds fixed-duration formatting', () => {
   );
 });
 
-describe('fromSeconds unit selection', () => {
-  it('requires explicit opt-in for fixed month and year estimates', () => {
-    expect(fromSeconds('31536000s')).toBe('365 days');
-    expect(fromSeconds('31536000s', { units: ['year-365', 'day'] })).toBe(
-      '1 year',
-    );
-    expect(fromSeconds('2592000s', { units: ['month-30', 'day'] })).toBe(
-      '1 month',
-    );
-    expect(fromSeconds('2678400s', { units: ['month-30', 'day'] })).toBe(
-      '1 month, 1 day',
-    );
-    expect(
-      fromSeconds('36892800s', { units: ['year-365', 'month-30', 'day'] }),
-    ).toBe('1 year, 2 months, 2 days');
-  });
-
-  it('rolls omitted units into smaller selected units', () => {
-    expect(
-      fromSeconds('31708800s', {
-        units: ['hour', 'minute', 'second', 'millisecond'],
-      }),
-    ).toBe('8808 hours');
-    expect(fromSeconds('3661s', { units: ['minute', 'second'] })).toBe(
-      '61 minutes, 1 second',
-    );
-    expect(fromSeconds('61s', { units: ['millisecond'] })).toBe(
-      '61000 milliseconds',
-    );
-  });
-
-  it('orders units largest first and ignores duplicates', () => {
-    expect(
-      fromSeconds('90061s', {
-        units: ['second', 'day', 'minute', 'hour', 'day'],
-      }),
-    ).toBe('1 day, 1 hour, 1 minute, 1 second');
-  });
-
-  it('omits milliseconds when they are not selected', () => {
-    expect(fromSeconds('6.412s', { units: ['second'] })).toBe('6 seconds');
-    expect(fromSeconds('0.412s', { units: ['second'] })).toBe('');
-  });
-
-  it('omits remainders smaller than the selected units', () => {
-    expect(fromSeconds('3661s', { units: ['hour'] })).toBe('1 hour');
-    expect(fromSeconds('3599s', { units: ['hour'] })).toBe('');
-    expect(fromSeconds('3661s', { units: [] })).toBe('');
+describe('fromSeconds negative durations', () => {
+  it.each([
+    ['-0s', ''],
+    ['-1s', '1 second'],
+    ['-60s', '1 minute'],
+    ['-61s', '1 minute, 1 second'],
+    ['-3600s', '1 hour'],
+    ['-90061s', '1 day, 1 hour, 1 minute, 1 second'],
+    ['-31708800s', '367 days'],
+    ['-0.001s', '1 millisecond'],
+    ['-0.5s', '500 milliseconds'],
+    ['-0.000000001s', '0.000001 milliseconds'],
+    ['-1.5s', '1 second, 500 milliseconds'],
+    ['-59.32322s', '59 seconds, 323 milliseconds'],
+    ['-60.123s', '1 minute'],
+    ['-61.123s', '1 minute, 1 second'],
+  ])('formats the absolute magnitude of %s', (input, expected) => {
+    expect(fromSeconds(input)).toBe(expected);
   });
 });
 
