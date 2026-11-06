@@ -1,6 +1,5 @@
 <script lang="ts">
   import { appPalette } from '$lib/components/app-palette/app-palette-state.svelte';
-  import { MOD } from '$lib/components/app-palette/keys';
   import DarkModeMenu from '$lib/components/dark-mode-menu.svelte';
   import {
     Menu,
@@ -85,7 +84,11 @@
         <div class="flex w-full items-center justify-start gap-4">
           <IconKeyboard />
           {translate('palette.label')}
-          <kbd class="ml-auto font-mono text-xs text-secondary">{MOD}K</kbd>
+          {#if appPalette.shortcutLabel}
+            <kbd class="ml-auto font-mono text-xs text-secondary"
+              >{appPalette.shortcutLabel}</kbd
+            >
+          {/if}
         </div>
       </MenuItem>
       <MenuDivider />

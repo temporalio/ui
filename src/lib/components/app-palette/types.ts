@@ -79,8 +79,8 @@ export interface PaletteItem {
   // Shows the item but blocks its actions, with this text as the reason.
   disabled?: string;
   rules?: PaletteRules;
-  // Enter runs the first action, Mod+Enter runs the second, and Mod+K lists
-  // all of them.
+  // Enter runs the first action, Mod+Enter runs the second, and the palette
+  // shortcut lists all of them.
   actions: PaletteAction[];
 }
 
@@ -98,6 +98,10 @@ export interface PaletteView {
   emptyText?: string;
   onOpen?: () => void;
   onClose?: () => void;
+  // Sees each key in the search field before the palette, including the
+  // palette shortcut. Return true to take the key. Esc should go through, so
+  // the user can leave the view.
+  onKeydown?: (event: KeyboardEvent, ctx: PaletteContext) => boolean;
 }
 
 // `local` is the Vite dev server.

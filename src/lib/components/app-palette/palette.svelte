@@ -13,7 +13,14 @@
   import { toaster } from '$lib/stores/toaster';
 
   import { filterPaletteItems } from './filter';
-  import { IS_MAC, MOD } from './keys';
+  import {
+    DEFAULT_SHORTCUT,
+    hasMod,
+    matchesShortcut,
+    MOD,
+    type PaletteShortcut,
+    shortcutLabel,
+  } from './keys';
   import {
     loadRecent,
     recencyBoost,
@@ -55,6 +62,9 @@
     // Checked against item rules in pushed views. Root items are already
     // filtered by the app. Without facts, view items are not filtered.
     facts?: PaletteFacts;
+    // Opens the palette from anywhere on the page. Null turns it off. Inside
+    // the open palette, the same keys list the selected item's actions.
+    shortcut?: PaletteShortcut | null;
   }
 
   let {
@@ -63,7 +73,12 @@
     open = $bindable(false),
     recentKey = 'palette-recent',
     facts,
+    shortcut = DEFAULT_SHORTCUT,
   }: Props = $props();
+
+  // With the shortcut off, the default keys still list actions, but only
+  // while the palette is open.
+  const actionsShortcut = $derived(shortcut ?? DEFAULT_SHORTCUT);
 
   const uid = $props.id();
   const listboxId = `${uid}-list`;
@@ -504,36 +519,36 @@
     selected = (selectedIndex + delta + count) % count;
   }
 
-  function hasMod(event: KeyboardEvent) {
-    return IS_MAC ? event.metaKey : event.ctrlKey;
-  }
-
-  // Non-Latin layouts report another letter for K, so the physical key also
-  // counts. Latin layouts such as Dvorak keep their own K.
-  function isK(event: KeyboardEvent) {
-    const key = event.key.toLowerCase();
-    if (key === 'k') return true;
-    return !/^[a-z]$/.test(key) && event.code === 'KeyK';
-  }
-
-  // Only Mod+K, with no Alt or Shift. AltGr sends Ctrl+Alt on Windows, and
-  // AltGr+K types a letter on some layouts.
-  function isModK(event: KeyboardEvent) {
-    if (event.altKey || event.shiftKey) return false;
-    return hasMod(event) && isK(event);
-  }
-
-  // Runs in the capture phase, so Mod+K always opens the palette, even in a
-  // field that handles its own keys.
+  // Runs in the capture phase, so the shortcut always opens the palette, even
+  // in a field that handles its own keys. A view that reads keys, such as
+  // one that records a new shortcut, gets every key in the search field
+  // instead.
   function onWindowKeydown(event: KeyboardEvent) {
-    if (!isModK(event)) return;
-    event.preventDefault();
-    event.stopPropagation();
     if (open) {
-      toggleActions();
+      toggleActionsOnShortcut(event);
       return;
     }
+    openOnShortcut(event);
+  }
+
+  function toggleActionsOnShortcut(event: KeyboardEvent) {
+    if (currentView?.onKeydown) return;
+    if (!matchesShortcut(event, actionsShortcut)) return;
+    event.preventDefault();
+    event.stopPropagation();
+    toggleActions();
+  }
+
+  function openOnShortcut(event: KeyboardEvent) {
+    if (!shortcut || !matchesShortcut(event, shortcut)) return;
+    event.preventDefault();
+    event.stopPropagation();
     show();
+  }
+
+  function viewTakesKey(event: KeyboardEvent) {
+    if (!currentView?.onKeydown || !currentFrame) return false;
+    return currentView.onKeydown(event, contextFor(currentFrame.variant));
   }
 
   // Esc undoes the innermost thing first: picker, confirm, actions, view.
@@ -602,6 +617,11 @@
   function onInputKeydown(event: KeyboardEvent) {
     // Keys that commit or move inside an IME composition belong to the IME.
     if (event.isComposing) return;
+    if (viewTakesKey(event)) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
     switch (event.key) {
       case 'ArrowDown':
         event.preventDefault();
@@ -983,7 +1003,7 @@
                       >
                     {/if}
                     {#if item.actions.length > 1 && !item.disabled && (coarse.current || isSelected)}
-                      <!-- Keyboard users press Mod+K. Screen readers on touch screens use this button. -->
+                      <!-- Keyboard users press the shortcut. Screen readers on touch screens use this button. -->
                       <button
                         type="button"
                         tabindex="-1"
@@ -1100,7 +1120,7 @@
                 {/if}
                 {#if selectedItem && selectedItem.actions.length > 1 && !selectedItem.disabled}
                   {translate('palette.actions')}
-                  {@render kbd(`${MOD}K`)}
+                  {@render kbd(shortcutLabel(actionsShortcut))}
                 {/if}
                 {#if frames.length > 0}
                   {translate('palette.back')}

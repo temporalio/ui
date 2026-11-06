@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { DEFAULT_SHORTCUT, type PaletteShortcut } from './keys';
   import { sortToolSets } from './root-items';
   import { visibleToolSets } from './rules';
   import type { PaletteFacts } from './types';
@@ -11,14 +12,29 @@
     facts: PaletteFacts;
     recentKey?: string;
     label?: string;
+    // The app's shortcut, Cmd+K by default. Each user can replace it or turn
+    // it off with the palette shortcut tool.
+    shortcut?: PaletteShortcut;
   }
 
-  let { facts, recentKey, label }: Props = $props();
+  let {
+    facts,
+    recentKey,
+    label,
+    shortcut = DEFAULT_SHORTCUT,
+  }: Props = $props();
 
   $effect.pre(function publishFacts() {
     appPalette.facts = facts;
     return () => {
       appPalette.facts = undefined;
+    };
+  });
+
+  $effect.pre(function publishShortcut() {
+    appPalette.appShortcut = shortcut;
+    return () => {
+      appPalette.appShortcut = DEFAULT_SHORTCUT;
     };
   });
 
@@ -35,5 +51,12 @@
 </script>
 
 {#if toolSets.length > 0}
-  <Palette {toolSets} {facts} {recentKey} {label} bind:open={appPalette.open} />
+  <Palette
+    {toolSets}
+    {facts}
+    {recentKey}
+    {label}
+    shortcut={appPalette.shortcut}
+    bind:open={appPalette.open}
+  />
 {/if}

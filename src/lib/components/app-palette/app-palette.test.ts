@@ -6,6 +6,7 @@ vi.mock('$app/state', () => ({ page: { params: {}, data: {} } }));
 
 import '$lib/test-utilities/jsdom-browser-apis';
 
+import { paletteShortcutTool } from './shortcut-tool';
 import type { PaletteToolSet } from './types';
 
 import { appPalette } from './app-palette-state.svelte';
@@ -33,6 +34,7 @@ describe('AppPalette', () => {
   afterEach(() => {
     unregister.splice(0).forEach((remove) => remove());
     appPalette.open = false;
+    appPalette.setUserShortcut(undefined);
   });
 
   it('opens with the hotkey and shows registered sets that match the facts', async () => {
@@ -75,6 +77,83 @@ describe('AppPalette', () => {
     render(AppPalette, { props: { facts: { env: 'local' } } });
 
     expect(appPalette.available).toBe(false);
+  });
+
+  it("opens with the app's shortcut instead of the default", async () => {
+    unregister.push(registerToolSet(devSet));
+    render(AppPalette, {
+      props: {
+        facts: { env: 'local' },
+        shortcut: { key: 'j', code: 'KeyJ', shift: true },
+      },
+    });
+    expect(appPalette.shortcutLabel).toBe('Ctrl+Shift+J');
+
+    await fireEvent.keyDown(window, { key: 'k', ctrlKey: true });
+    expect(screen.queryByRole('dialog')).toBeNull();
+
+    await fireEvent.keyDown(window, {
+      key: 'J',
+      code: 'KeyJ',
+      ctrlKey: true,
+      shiftKey: true,
+    });
+    expect(await screen.findByText('Toggle flags')).toBeTruthy();
+  });
+
+  it("uses the user's shortcut, and none when the user turned it off", async () => {
+    unregister.push(registerToolSet(devSet));
+    render(AppPalette, { props: { facts: { env: 'local' } } });
+
+    appPalette.setUserShortcut('off');
+    await tick();
+    expect(appPalette.shortcutLabel).toBeUndefined();
+    await fireEvent.keyDown(window, { key: 'k', ctrlKey: true });
+    expect(screen.queryByRole('dialog')).toBeNull();
+
+    appPalette.setUserShortcut({ key: 'j', code: 'KeyJ' });
+    await tick();
+    await fireEvent.keyDown(window, { key: 'j', code: 'KeyJ', ctrlKey: true });
+    expect(await screen.findByText('Toggle flags')).toBeTruthy();
+  });
+
+  it('records a new shortcut with the palette shortcut tool', async () => {
+    unregister.push(
+      registerToolSet({
+        id: 'help',
+        label: 'Help',
+        key: 'h',
+        tools: [paletteShortcutTool],
+      }),
+    );
+    render(AppPalette, { props: { facts: { env: 'local' } } });
+
+    await fireEvent.keyDown(window, { key: 'k', ctrlKey: true });
+    expect(await screen.findByText('Palette shortcut')).toBeTruthy();
+    const input = screen.getByRole('combobox');
+    await fireEvent.keyDown(input, { key: 'Enter' });
+    expect(await screen.findAllByText('Press the new shortcut')).toBeTruthy();
+
+    await fireEvent.keyDown(input, { key: 'k', code: 'KeyK', ctrlKey: true });
+    expect(appPalette.userShortcut).toEqual({
+      key: 'k',
+      code: 'KeyK',
+      shift: false,
+      alt: false,
+    });
+
+    await fireEvent.keyDown(input, { key: 'Enter' });
+    await fireEvent.keyDown(input, {
+      key: 'J',
+      code: 'KeyJ',
+      ctrlKey: true,
+      shiftKey: true,
+    });
+    expect(appPalette.shortcutLabel).toBe('Ctrl+Shift+J');
+    expect(
+      await screen.findAllByText('The palette now opens with Ctrl+Shift+J'),
+    ).toBeTruthy();
+    expect(localStorage.getItem('palette-shortcut')).toContain('KeyJ');
   });
 
   it('drops a request to open while no set is visible', async () => {
