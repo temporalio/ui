@@ -64,14 +64,10 @@ test.describe('Timeline event groups', () => {
     await page
       .getByRole('img', { name: `Workflow ${workflowId}: Running` })
       .scrollIntoViewIfNeeded();
-    await expect(eventRow(page, 'UngroupedActivity')).toBeVisible();
+    await expect(groupRow(page, 'satellite:A')).toBeVisible();
   });
 
-  test('shows one row per event group when toggled on', async ({ page }) => {
-    await expect(toggle(page)).toHaveText('Show Event Groups');
-
-    await toggle(page).click();
-
+  test('shows one row per event group by default', async ({ page }) => {
     await expect(toggle(page)).toHaveText('Hide Event Groups');
     await expect(groupRow(page, 'satellite:A')).toContainText('5 events');
     await expect(groupRow(page, 'satellite:B')).toContainText('3 events');
@@ -82,10 +78,14 @@ test.describe('Timeline event groups', () => {
     await expect(toggle(page)).toHaveText('Show Event Groups');
     await expect(groupRow(page, 'satellite:A')).toHaveCount(0);
     await expect(eventRow(page, 'UngroupedActivity')).toBeVisible();
+
+    await toggle(page).click();
+
+    await expect(toggle(page)).toHaveText('Hide Event Groups');
+    await expect(groupRow(page, 'satellite:A')).toBeVisible();
   });
 
   test('expands and closes an event group', async ({ page }) => {
-    await toggle(page).click();
     const row = groupRow(page, 'satellite:A');
     await expect(row).toHaveAttribute('aria-expanded', 'false');
 
@@ -110,7 +110,6 @@ test.describe('Timeline event groups', () => {
   test('hides the duration when every event shares a timestamp', async ({
     page,
   }) => {
-    await toggle(page).click();
     await groupRow(page, 'satellite:A').click();
 
     await expect(page.getByTestId('selected-event-group-header')).toBeVisible();
@@ -120,8 +119,6 @@ test.describe('Timeline event groups', () => {
   });
 
   test('narrows event groups with the event group filter', async ({ page }) => {
-    await toggle(page).click();
-
     await page
       .locator('button[aria-controls="event-group-filter-menu"]')
       .click();
@@ -138,7 +135,6 @@ test.describe('Timeline event groups', () => {
   test('narrows event groups to their pending and failed lifecycles', async ({
     page,
   }) => {
-    await toggle(page).click();
     await expect(groupRow(page, 'satellite:C')).toContainText('4 events');
 
     await page.locator('button[aria-controls="event-type-filter"]').click();
@@ -166,22 +162,22 @@ test.describe('Timeline event groups', () => {
     await page
       .getByRole('img', { name: `Workflow ${workflowId}: Running` })
       .scrollIntoViewIfNeeded();
-    await toggle(page).click();
 
     await expect(groupRow(page, 'satellite:C')).toContainText('1 event');
     await expect(groupRow(page, 'satellite:A')).toHaveCount(0);
   });
 
-  test('stays on when switching to History and back', async ({ page }) => {
+  test('stays off when switching to History and back', async ({ page }) => {
     await toggle(page).click();
-    await expect(groupRow(page, 'satellite:A')).toBeVisible();
+    await expect(eventRow(page, 'UngroupedActivity')).toBeVisible();
 
     await page.getByTestId('history-tab').click();
     await expect(page.getByTestId('event-summary-table')).toBeVisible();
     await page.getByTestId('timeline-tab').click();
 
-    await expect(toggle(page)).toHaveText('Hide Event Groups');
-    await expect(groupRow(page, 'satellite:A')).toBeVisible();
+    await expect(toggle(page)).toHaveText('Show Event Groups');
+    await expect(groupRow(page, 'satellite:A')).toHaveCount(0);
+    await expect(eventRow(page, 'UngroupedActivity')).toBeVisible();
   });
 });
 
@@ -205,6 +201,9 @@ test.describe('Timeline event groups only on workflow tasks', () => {
       nextPageToken: null,
     });
     await page.goto(timelineUrl);
+    await page
+      .getByRole('img', { name: `Workflow ${workflowId}: Running` })
+      .scrollIntoViewIfNeeded();
     await expect(eventRow(page, 'UngroupedActivity')).toBeVisible();
 
     await expect(
