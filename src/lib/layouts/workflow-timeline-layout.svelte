@@ -90,6 +90,9 @@
     );
   });
 
+  const hasTimelineEventGroups = $derived(
+    eventBuffer.timelineEventGroups.length > 0,
+  );
   const timelineEventGroups = $derived(
     $showTimelineEventGroups ? eventBuffer.timelineEventGroups : [],
   );
@@ -303,21 +306,25 @@
         <EventTypeFilter compact={false} />
       </ToggleButtons>
       <ToggleButtons
-        class="empty:hidden max-xl:[&>:last-child_.menu-button-anchor>button]:rounded-r"
+        class={hasTimelineEventGroups
+          ? 'empty:hidden max-xl:[&>:last-child_.menu-button-anchor>button]:rounded-r'
+          : 'empty:hidden max-xl:[&_.menu-button-anchor>button]:rounded max-xl:[&_.menu-button-anchor>button]:border-l'}
       >
         <EventGroupControls options={eventBuffer.eventGroupOptions}>
           {#snippet toggle()}
-            <ToggleButton
-              data-testid="toggle-event-groups"
-              size="sm"
-              variant="tertiary"
-              class="max-xl:rounded-l xl:border-l-0 [&:not(:last-child)]:border-r"
-              onclick={onEventGroupsToggle}
-            >
-              {$showTimelineEventGroups
-                ? translate('workflows.hide-event-groups')
-                : translate('workflows.show-event-groups')}
-            </ToggleButton>
+            {#if hasTimelineEventGroups}
+              <ToggleButton
+                data-testid="toggle-event-groups"
+                size="sm"
+                variant="tertiary"
+                class="max-xl:rounded-l xl:border-l-0 [&:not(:last-child)]:border-r"
+                onclick={onEventGroupsToggle}
+              >
+                {$showTimelineEventGroups
+                  ? translate('workflows.hide-event-groups')
+                  : translate('workflows.show-event-groups')}
+              </ToggleButton>
+            {/if}
           {/snippet}
         </EventGroupControls>
       </ToggleButtons>

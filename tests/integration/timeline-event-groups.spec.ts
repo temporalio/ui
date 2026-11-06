@@ -7,6 +7,9 @@ import {
   makeTimerFired,
   makeTimerStarted,
   makeWorkflowStarted,
+  makeWorkflowTaskCompleted,
+  makeWorkflowTaskScheduled,
+  makeWorkflowTaskStarted,
 } from '$src/lib/services/test-helpers/synthetic-events';
 import {
   mockEventHistoryApi,
@@ -154,5 +157,34 @@ test.describe('Timeline event groups', () => {
 
     await expect(toggle(page)).toHaveText('Hide Event Groups');
     await expect(groupRow(page, 'satellite:A')).toBeVisible();
+  });
+});
+
+test.describe('Timeline event groups only on workflow tasks', () => {
+  test('hides the toggle but keeps the event group filter', async ({
+    page,
+  }) => {
+    await mockWorkflowApis(page);
+    await mockEventHistoryApi(page, {
+      history: {
+        events: [
+          makeWorkflowStarted(1),
+          makeWorkflowTaskScheduled(2),
+          makeWorkflowTaskStarted(3, 2),
+          inGroup(makeWorkflowTaskCompleted(4, 2), 'satellite:A'),
+          makeActivityScheduled(5, 'UngroupedActivity'),
+          makeActivityStarted(6, 5),
+          makeActivityCompleted(7, 5, 6),
+        ],
+      },
+      nextPageToken: null,
+    });
+    await page.goto(timelineUrl);
+    await expect(eventRow(page, 'UngroupedActivity')).toBeVisible();
+
+    await expect(
+      page.locator('button[aria-controls="event-group-filter-menu"]'),
+    ).toBeVisible();
+    await expect(toggle(page)).toHaveCount(0);
   });
 });
