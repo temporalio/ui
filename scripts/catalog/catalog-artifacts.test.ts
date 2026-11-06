@@ -1454,6 +1454,7 @@ registry.registerExample({
           'src/lib/io/badge-count',
           'src/lib/io/badge-status',
           'src/lib/io/icon',
+          'src/lib/io/roundness-group',
           'src/lib/io/tag',
           'src/lib/io/types.ts',
           'src/lib/holocene/icon-button.svelte',
