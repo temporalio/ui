@@ -127,7 +127,7 @@ describe('catalog runner', () => {
         workflowsPath: expect.stringMatching(/\/catalog-workflows\.js$/),
         activities: {
           catalogActivity: activity,
-          crashCatalogWorker: expect.any(Function),
+          dangerousOperation: expect.any(Function),
         },
         nexusServices: [nexusService],
       }),
@@ -601,7 +601,7 @@ describe('catalog runner', () => {
       });
       await runner.completion;
       const activities = createWorker.mock.calls[0][0].activities as {
-        crashCatalogWorker: () => Promise<string>;
+        dangerousOperation: () => Promise<string>;
       };
 
       return { activities, exit };
@@ -612,7 +612,7 @@ describe('catalog runner', () => {
         'crash',
       ]);
 
-      await activities.crashCatalogWorker();
+      await activities.dangerousOperation();
 
       expect(exit).toHaveBeenCalledWith(75);
     });
@@ -644,7 +644,7 @@ describe('catalog runner', () => {
     it('refuses to crash when the runtime does not provide the control', async () => {
       const { activities, exit } = await startWithCrash(crashBindings(), []);
 
-      await expect(activities.crashCatalogWorker()).rejects.toMatchObject({
+      await expect(activities.dangerousOperation()).rejects.toMatchObject({
         type: 'CatalogCrashDisabled',
       });
       expect(exit).not.toHaveBeenCalled();
@@ -656,7 +656,7 @@ describe('catalog runner', () => {
         ['crash'],
       );
 
-      await expect(activities.crashCatalogWorker()).rejects.toMatchObject({
+      await expect(activities.dangerousOperation()).rejects.toMatchObject({
         type: 'CatalogCrashDisabled',
       });
       expect(exit).not.toHaveBeenCalled();
@@ -665,7 +665,7 @@ describe('catalog runner', () => {
     it('rejects a workspace activity that uses the reserved crash name', async () => {
       const bindings = createActivityBindings('demo').map((binding) => ({
         ...binding,
-        activities: { ...binding.activities, crashCatalogWorker: () => 'mine' },
+        activities: { ...binding.activities, dangerousOperation: () => 'mine' },
       }));
 
       await expect(
@@ -678,7 +678,7 @@ describe('catalog runner', () => {
           })),
         }),
       ).rejects.toThrow(
-        'Catalog workspace "demo" registers the reserved activity "crashCatalogWorker"',
+        'Catalog workspace "demo" registers the reserved activity "dangerousOperation"',
       );
     });
   });

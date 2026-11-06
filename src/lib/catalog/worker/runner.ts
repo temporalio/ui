@@ -4,8 +4,8 @@ import { fileURLToPath } from 'node:url';
 import type { ServiceHandler } from 'nexus-rpc';
 
 import {
-  crashCatalogWorkerActivityName,
-  createCrashCatalogWorkerActivity,
+  crashActivityName,
+  createCrashActivity,
   effectiveCatalogControls,
 } from './crash.js';
 import type { CatalogWorkerBinding } from './registry';
@@ -72,15 +72,15 @@ const workspaceActivities = (
   crashEnabled: boolean,
   exit: (code: number) => void,
 ) => {
-  if (Object.hasOwn(binding.activities, crashCatalogWorkerActivityName)) {
+  if (Object.hasOwn(binding.activities, crashActivityName)) {
     throw new Error(
-      `Catalog workspace "${binding.workspace.id}" registers the reserved activity "${crashCatalogWorkerActivityName}"`,
+      `Catalog workspace "${binding.workspace.id}" registers the reserved activity "${crashActivityName}"`,
     );
   }
 
   return {
     ...binding.activities,
-    ...createCrashCatalogWorkerActivity({ enabled: crashEnabled, exit }),
+    ...createCrashActivity({ enabled: crashEnabled, exit }),
   };
 };
 

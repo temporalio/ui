@@ -6,8 +6,8 @@ import {
 
 export const crashWorkerUpdate = defineUpdate<string>('crashWorker');
 
-const { crashCatalogWorker } = proxyActivities<{
-  crashCatalogWorker: () => Promise<string>;
+const { dangerousOperation } = proxyActivities<{
+  dangerousOperation: () => Promise<string>;
 }>({
   startToCloseTimeout: '10 seconds',
   heartbeatTimeout: '2 seconds',
@@ -15,4 +15,4 @@ const { crashCatalogWorker } = proxyActivities<{
 });
 
 export const handleCrashWorker = () =>
-  setHandler(crashWorkerUpdate, () => crashCatalogWorker());
+  setHandler(crashWorkerUpdate, () => dangerousOperation());

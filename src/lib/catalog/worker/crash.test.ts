@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
   catalogControlsFromEnvironment,
-  createCrashCatalogWorkerActivity,
+  createCrashActivity,
   effectiveCatalogControls,
 } from './crash';
 
@@ -36,13 +36,13 @@ describe('catalog Worker crash', () => {
   it('exits the process on the first attempt', async () => {
     const exit = vi.fn();
     const log = vi.fn();
-    const { crashCatalogWorker } = createCrashCatalogWorkerActivity({
+    const { dangerousOperation } = createCrashActivity({
       enabled: true,
       exit,
       log,
     });
 
-    await crashCatalogWorker();
+    await dangerousOperation();
 
     expect(exit).toHaveBeenCalledWith(75);
     expect(log).toHaveBeenCalledWith(
@@ -53,12 +53,12 @@ describe('catalog Worker crash', () => {
   it('reports recovery instead of exiting again on a retry', async () => {
     const exit = vi.fn();
     activityInfo.attempt = 2;
-    const { crashCatalogWorker } = createCrashCatalogWorkerActivity({
+    const { dangerousOperation } = createCrashActivity({
       enabled: true,
       exit,
     });
 
-    await expect(crashCatalogWorker()).resolves.toBe(
+    await expect(dangerousOperation()).resolves.toBe(
       'Worker recovered. Attempt 2 ran on a new Worker.',
     );
     expect(exit).not.toHaveBeenCalled();
@@ -66,12 +66,12 @@ describe('catalog Worker crash', () => {
 
   it('fails without retrying when the crash control is off', async () => {
     const exit = vi.fn();
-    const { crashCatalogWorker } = createCrashCatalogWorkerActivity({
+    const { dangerousOperation } = createCrashActivity({
       enabled: false,
       exit,
     });
 
-    await expect(crashCatalogWorker()).rejects.toMatchObject({
+    await expect(dangerousOperation()).rejects.toMatchObject({
       nonRetryable: true,
       type: 'CatalogCrashDisabled',
     });

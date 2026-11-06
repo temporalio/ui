@@ -131,7 +131,7 @@ export async function moneyTransfer(input: TransferInput) {
 }
 ```
 
-The update runs the `crashCatalogWorker` activity. On its first attempt, the activity exits the worker process with code 75. The host restarts the process. The activity's heartbeat timeout expires, Temporal retries it on the new worker, and the retry returns. The update result reports the recovery, and the run continues.
+The update runs the `dangerousOperation` activity. On its first attempt, the activity exits the worker process with code 75. The host restarts the process. The activity's heartbeat timeout expires, Temporal retries it on the new worker, and the retry returns. The update result reports the recovery, and the run continues.
 
 Crash is on only when the workspace declares `controls: ['crash']` and the runtime sets `CATALOG_CONTROL=on`. Otherwise the activity fails without retrying, and the update returns that failure. A serverless runtime should not set it, because it cannot restart a process.
 

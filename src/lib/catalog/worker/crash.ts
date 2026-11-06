@@ -3,11 +3,11 @@ import { ApplicationFailure } from '@temporalio/common';
 
 import type { CatalogWorkspaceControl } from '../browser/metadata-schema.js';
 
-export const crashCatalogWorkerActivityName = 'crashCatalogWorker';
+export const crashActivityName = 'dangerousOperation';
 
 export const catalogCrashExitCode = 75;
 
-export type CrashCatalogWorkerOptions = {
+export type CrashActivityOptions = {
   enabled: boolean;
   exit: (code: number) => void;
   log?: (message: string) => void;
@@ -24,12 +24,12 @@ export const effectiveCatalogControls = (
 ): CatalogWorkspaceControl[] =>
   (declared ?? []).filter((control) => provided.includes(control));
 
-export const createCrashCatalogWorkerActivity = ({
+export const createCrashActivity = ({
   enabled,
   exit,
   log = console.warn,
-}: CrashCatalogWorkerOptions) => ({
-  [crashCatalogWorkerActivityName]: async (): Promise<string> => {
+}: CrashActivityOptions) => ({
+  [crashActivityName]: async (): Promise<string> => {
     if (!enabled) {
       throw ApplicationFailure.nonRetryable(
         'This Worker cannot be crashed. The workspace must declare the crash control and the runtime must set CATALOG_CONTROL=on.',
