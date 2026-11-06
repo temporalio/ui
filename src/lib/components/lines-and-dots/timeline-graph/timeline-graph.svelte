@@ -662,9 +662,7 @@
   const eventGroupStatusBadges = $derived.by(() => {
     if (!selectedEventGroup) return [];
     const summary = summarizeLifecycleGroups(
-      selectedEventGroup.lifecycleGroups.map((group) =>
-        eventBuffer.materializeGroup(group),
-      ),
+      selectedEventGroup.lifecycleGroups.map(materializeGroup),
     );
 
     const badges: EventGroupStatusBadge[] = [];

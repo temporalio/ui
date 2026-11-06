@@ -240,6 +240,7 @@ let timelineEventGroupsByKey = new Map<
   TimelineEventGroup<LazyGroup>
 >();
 const dirtyTimelineEventGroupKeys = new Set<EventGroupKey>();
+let timelineEventGroupCount = 0;
 let cachedTimelineEventGroups: TimelineEventGroup<LazyGroup>[] | null = null;
 let cachedTimelineEventGroupsRevision = -1;
 
@@ -405,6 +406,7 @@ function isTimelineLifecycle(record: GroupRecord): boolean {
 function addLifecycle(entry: EventGroupIndexEntry, record: GroupRecord): void {
   const last = entry.lifecycle[entry.lifecycle.length - 1];
   if (last && last.headSlot > record.headSlot) entry.lifecycleSorted = false;
+  if (!last) timelineEventGroupCount++;
   entry.lifecycle.push(record);
 }
 
@@ -558,6 +560,7 @@ export function reset(historyLength: number): void {
   cachedEventGroupOptions = null;
   timelineEventGroupsByKey = new Map();
   dirtyTimelineEventGroupKeys.clear();
+  timelineEventGroupCount = 0;
   cachedTimelineEventGroups = null;
 
   revision++;
@@ -767,6 +770,10 @@ export function getEventGroupOptions(): EventGroupOption[] {
   cachedEventGroupOptions = result;
   cachedEventGroupOptionsRevision = revision;
   return result;
+}
+
+export function hasTimelineEventGroups(): boolean {
+  return timelineEventGroupCount > 0;
 }
 
 export function getTimelineEventGroups(): TimelineEventGroup<LazyGroup>[] {

@@ -21,6 +21,7 @@ import {
   getPendingActivityScheduledEvent,
   getTimelineEventGroups,
   getWorkflowTaskFailedEvent,
+  hasTimelineEventGroups,
   ingestHistoryEvent,
   isWorkflowTaskGroup,
   type LazyGroup,
@@ -1968,16 +1969,29 @@ describe('event group index', () => {
 
       expect(getEventGroupOptions()).toHaveLength(1);
       expect(getTimelineEventGroups()).toEqual([]);
+      expect(hasTimelineEventGroups()).toBe(false);
     });
 
     it('clears on reset', () => {
       const [timerStarted] = makeTimerGroup(1);
       ingestHistoryEvent(withMarkers(timerStarted, [marker('a')]));
       expect(getTimelineEventGroups()).toHaveLength(1);
+      expect(hasTimelineEventGroups()).toBe(true);
 
       reset(0);
 
       expect(getTimelineEventGroups()).toEqual([]);
+      expect(hasTimelineEventGroups()).toBe(false);
+    });
+
+    it('reports timeline event groups once a marked lifecycle head arrives', () => {
+      const [timerStarted, timerFired] = makeTimerGroup(1);
+      ingestHistoryEvent(withMarkers(timerFired, [marker('a')]));
+      expect(hasTimelineEventGroups()).toBe(false);
+
+      ingestHistoryEvent(timerStarted);
+      expect(hasTimelineEventGroups()).toBe(true);
+      expect(getTimelineEventGroups()).toHaveLength(1);
     });
   });
 });

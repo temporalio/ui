@@ -91,9 +91,7 @@
     );
   });
 
-  const hasTimelineEventGroups = $derived(
-    eventBuffer.timelineEventGroups.length > 0,
-  );
+  const hasTimelineEventGroups = $derived(eventBuffer.hasTimelineEventGroups);
   const timelineEventGroups = $derived(
     $showTimelineEventGroups ? eventBuffer.timelineEventGroups : [],
   );
