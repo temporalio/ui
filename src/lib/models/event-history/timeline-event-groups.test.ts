@@ -184,7 +184,7 @@ describe('isTimelineEventGroup', () => {
 });
 
 describe('summarizeLifecycleGroups', () => {
-  it('counts failures (including failed local activities), timeouts, retries and terminal states per group', () => {
+  it('counts failures (including failed updates and local activities), timeouts, retries and terminal states per group', () => {
     const groups = [
       {
         eventList: [
@@ -222,10 +222,22 @@ describe('summarizeLifecycleGroups', () => {
         isCanceled: false,
         isTerminated: false,
       },
+      {
+        eventList: [
+          event('7', {
+            classification: 'Completed',
+            workflowExecutionUpdateCompletedEventAttributes: {
+              outcome: { failure: { message: 'rejected' } },
+            },
+          } as Partial<WorkflowEvent>),
+        ],
+        isCanceled: false,
+        isTerminated: false,
+      },
     ] as unknown as EventGroup[];
 
     expect(summarizeLifecycleGroups(groups)).toEqual({
-      failed: 2,
+      failed: 3,
       timedOut: 1,
       retries: 3,
       canceled: 1,

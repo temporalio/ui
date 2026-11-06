@@ -2,6 +2,7 @@ import type { EventGroup } from '$lib/models/event-groups/event-groups';
 import type { WorkflowEvent } from '$lib/types/events';
 import {
   isActivityTaskStartedEvent,
+  isFailedWorkflowExecutionUpdateCompletedEvent,
   isLocalActivityMarkerEvent,
 } from '$lib/utilities/is-event-type';
 
@@ -217,6 +218,7 @@ export const summarizeLifecycleGroups = (
     for (const event of group.eventList) {
       failed ||=
         event.classification === 'Failed' ||
+        isFailedWorkflowExecutionUpdateCompletedEvent(event) ||
         Boolean(
           isLocalActivityMarkerEvent(event) &&
           event.markerRecordedEventAttributes?.failure,
