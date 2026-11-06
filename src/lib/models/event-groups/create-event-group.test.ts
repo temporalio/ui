@@ -156,6 +156,12 @@ describe('createEventGroup', () => {
 describe('groupIsPending', () => {
   const head = (event: Partial<WorkflowEvent>) => event as WorkflowEvent;
 
+  it('is true when an activity has only its scheduled event without pending metadata', () => {
+    expect(groupIsPending(scheduledEvent, 1, undefined, undefined)).toBe(true);
+    expect(groupIsPending(scheduledEvent, 2, undefined, undefined)).toBe(false);
+    expect(groupIsPending(scheduledEvent, 3, undefined, undefined)).toBe(false);
+  });
+
   it('is true while a timer has only its started event', () => {
     const timer = head({
       eventType: 'TimerStarted',
