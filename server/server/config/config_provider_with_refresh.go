@@ -73,7 +73,7 @@ func (s *ConfigProviderWithRefresh) refreshConfig() {
 	for {
 		select {
 		case <-s.stop:
-			break
+			return
 		case <-s.ticker.C:
 		}
 
