@@ -845,6 +845,13 @@
         </ul>
 
         {#if selectedEventGroup && eventGroupBounds}
+          {@const eventGroupDuration = formatDistanceAbbreviated({
+            start: selectedEventGroup.initialEvent.eventTime,
+            end: selectedEventGroup.isPending
+              ? currentEndTime
+              : selectedEventGroup.lastEvent.eventTime,
+            includeMilliseconds: true,
+          })}
           <div
             data-testid="selected-event-group-header"
             bind:this={eventGroupHeaderEl}
@@ -862,16 +869,15 @@
                 fallback={selectedEventGroup.displayName}
                 class="min-w-0 max-w-full whitespace-normal break-words"
               />
-              <span class="flex shrink-0 items-center gap-1">
-                <IconClock />
-                {formatDistanceAbbreviated({
-                  start: selectedEventGroup.initialEvent.eventTime,
-                  end: selectedEventGroup.isPending
-                    ? currentEndTime
-                    : selectedEventGroup.lastEvent.eventTime,
-                  includeMilliseconds: true,
-                })}
-              </span>
+              {#if eventGroupDuration}
+                <span
+                  data-testid="selected-event-group-duration"
+                  class="flex shrink-0 items-center gap-1"
+                >
+                  <IconClock />
+                  {eventGroupDuration}
+                </span>
+              {/if}
               {#each eventGroupStatusBadges as badge (badge.key)}
                 <Badge
                   text={badge.label}

@@ -205,6 +205,13 @@ test.describe('Workflow History view with pending activities and filters', () =>
     await expect(activeIndicator).toHaveCount(1);
     await expect(page).toHaveURL(/[?&]status=pending/);
 
+    await page.getByTestId('json').click();
+    await expect(activeIndicator).toHaveCount(0);
+    await page.getByTestId('feed').click();
+    await expect(activeIndicator).toHaveCount(1);
+
+    await filterButton.click();
+
     await page
       .locator('#event-type-filter')
       .getByTestId('Pending and Failed')

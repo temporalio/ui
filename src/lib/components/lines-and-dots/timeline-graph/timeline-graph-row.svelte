@@ -424,8 +424,8 @@
             {:else if retried}
               {retryAttempt} •&nbsp; {@render summary(decodedValue)}
             {:else if eventGroup}
-              {decodedValue}
-              <span class="ml-1 text-secondary">
+              <span class="min-w-0 truncate">{decodedValue}</span>
+              <span class="ml-1 shrink-0 whitespace-nowrap text-secondary">
                 {translate('workflows.event-group-event-count', {
                   count: eventGroup.eventCount,
                 })}

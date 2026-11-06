@@ -107,6 +107,18 @@ test.describe('Timeline event groups', () => {
     await expect(row).toBeFocused();
   });
 
+  test('hides the duration when every event shares a timestamp', async ({
+    page,
+  }) => {
+    await toggle(page).click();
+    await groupRow(page, 'satellite:A').click();
+
+    await expect(page.getByTestId('selected-event-group-header')).toBeVisible();
+    await expect(page.getByTestId('selected-event-group-duration')).toHaveCount(
+      0,
+    );
+  });
+
   test('narrows event groups with the event group filter', async ({ page }) => {
     await toggle(page).click();
 

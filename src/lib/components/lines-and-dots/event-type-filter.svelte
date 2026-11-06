@@ -102,7 +102,8 @@
   };
 
   const filterActive = $derived(
-    $eventStatusFilter || $eventTypeFilter.length < defaultOptions.length,
+    ($eventStatusFilter && $eventViewType !== 'json') ||
+      $eventTypeFilter.length < defaultOptions.length,
   );
 </script>
 
