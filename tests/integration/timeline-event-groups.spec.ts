@@ -159,6 +159,19 @@ test.describe('Timeline event groups', () => {
     await expect(eventRows(page)).toHaveCount(1);
   });
 
+  test('restores the pending and failed filter from the URL', async ({
+    page,
+  }) => {
+    await page.goto(`${timelineUrl}?status=pending`);
+    await page
+      .getByRole('img', { name: `Workflow ${workflowId}: Running` })
+      .scrollIntoViewIfNeeded();
+    await toggle(page).click();
+
+    await expect(groupRow(page, 'satellite:C')).toContainText('1 event');
+    await expect(groupRow(page, 'satellite:A')).toHaveCount(0);
+  });
+
   test('stays on when switching to History and back', async ({ page }) => {
     await toggle(page).click();
     await expect(groupRow(page, 'satellite:A')).toBeVisible();

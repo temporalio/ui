@@ -37,7 +37,11 @@
   import { clearActives } from '$lib/stores/active-events';
   import { eventFilterSort, eventViewType } from '$lib/stores/event-view';
   import { pauseLiveUpdates } from '$lib/stores/events';
-  import { eventCategoryFilter, eventTypeFilter } from '$lib/stores/filters';
+  import {
+    eventCategoryFilter,
+    eventStatusFilter,
+    eventTypeFilter,
+  } from '$lib/stores/filters';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type {
     EventTypeCategory,
@@ -60,6 +64,7 @@
     const urlParams = parseEventFilterParams(page.url);
     $eventFilterSort = urlParams.sort;
     $pauseLiveUpdates = urlParams.refresh_off;
+    $eventStatusFilter = urlParams.statusFilter;
   });
 
   $effect(() => {

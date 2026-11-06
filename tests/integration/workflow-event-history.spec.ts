@@ -220,4 +220,24 @@ test.describe('Workflow History view with pending activities and filters', () =>
     await expect(activeIndicator).toHaveCount(0);
     await expect(page).not.toHaveURL(/[?&]status=/);
   });
+
+  test('restores the pending and failed filter from the URL', async ({
+    page,
+  }) => {
+    const filterButton = page.locator(
+      'button[aria-controls="event-type-filter"]',
+    );
+    await page.goto(`${workflowUrl}?status=pending`);
+
+    await expect(filterButton.locator('.bg-interactive-primary')).toHaveCount(
+      1,
+    );
+    await filterButton.click();
+    await expect(
+      page
+        .locator('#event-type-filter')
+        .getByTestId('Pending and Failed')
+        .getByRole('checkbox'),
+    ).toBeChecked();
+  });
 });

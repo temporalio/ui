@@ -63,6 +63,7 @@
   $effect(() => {
     $eventFilterSort = urlParams.sort;
     $pauseLiveUpdates = urlParams.refresh_off;
+    $eventStatusFilter = urlParams.statusFilter;
   });
 
   const onAutoRefreshToggle = () => {
