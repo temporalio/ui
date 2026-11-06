@@ -35,6 +35,10 @@ const events = [
   makeActivityScheduled(10, 'UngroupedActivity'),
   makeActivityStarted(11, 10),
   makeActivityCompleted(12, 10, 11),
+  inGroup(makeActivityScheduled(13, 'DockActivity'), 'satellite:C'),
+  makeActivityStarted(14, 13),
+  makeActivityCompleted(15, 13, 14),
+  inGroup(makeTimerStarted(16), 'satellite:C'),
 ];
 
 const timeline = (page: Page) => page.locator('#event-history-timeline-graph');
@@ -114,6 +118,30 @@ test.describe('Timeline event groups', () => {
 
     await expect(groupRow(page, 'satellite:B')).toBeVisible();
     await expect(groupRow(page, 'satellite:A')).toHaveCount(0);
+  });
+
+  test('narrows event groups to their pending and failed lifecycles', async ({
+    page,
+  }) => {
+    await toggle(page).click();
+    await expect(groupRow(page, 'satellite:C')).toContainText('4 events');
+
+    await page.locator('button[aria-controls="event-type-filter"]').click();
+    await page
+      .locator('#event-type-filter')
+      .getByTestId('Pending and Failed')
+      .click();
+    await page.keyboard.press('Escape');
+
+    await expect(groupRow(page, 'satellite:A')).toHaveCount(0);
+    const row = groupRow(page, 'satellite:C');
+    await expect(row).toContainText('1 event');
+
+    await row.click();
+
+    const header = page.getByTestId('selected-event-group-header');
+    await expect(header).toContainText('1 event');
+    await expect(eventRows(page)).toHaveCount(1);
   });
 
   test('stays on when switching to History and back', async ({ page }) => {

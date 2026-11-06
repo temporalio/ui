@@ -41,7 +41,7 @@
     showTimelineEventGroups,
   } from '$lib/stores/event-view';
   import { pauseLiveUpdates } from '$lib/stores/events';
-  import { eventTypeFilter } from '$lib/stores/filters';
+  import { eventStatusFilter, eventTypeFilter } from '$lib/stores/filters';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type {
     WorkflowTaskFailedEvent,
@@ -51,6 +51,7 @@
     parseEventFilterParams,
     updateEventFilterParams,
   } from '$lib/utilities/event-filter-params';
+  import { isFailedOrPendingGroup } from '$lib/utilities/get-failed-or-pending';
   import { getTimelineGroups } from '$lib/utilities/sort-timeline-groups';
 
   const historyCtx = getContext<HistoryContext>(HISTORY_CTX);
@@ -106,6 +107,7 @@
 
   const filteredEventGroups = $derived.by(() => {
     const active = $eventTypeFilter;
+    const statusFilter = $eventStatusFilter;
     const selectedKeys =
       selectedEventGroupKeys.size &&
       eventBuffer.eventGroupOptions.some(({ group }) =>
@@ -117,7 +119,9 @@
       selectedKeys
         ? timelineEventGroups.filter((group) => selectedKeys.has(group.key))
         : timelineEventGroups,
-      (lifecycleGroup) => active.includes(lifecycleGroup.category),
+      (lifecycleGroup) =>
+        active.includes(lifecycleGroup.category) &&
+        (!statusFilter || isFailedOrPendingGroup(lifecycleGroup)),
     );
   });
 

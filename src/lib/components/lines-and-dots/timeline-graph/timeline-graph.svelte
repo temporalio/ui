@@ -193,10 +193,9 @@
 
   const filteredLazyGroups = $derived(
     $eventStatusFilter
-      ? lazyGroups.filter((group) =>
-          isTimelineEventGroup(group)
-            ? group.lifecycleGroups.some(isFailedOrPendingGroup)
-            : isFailedOrPendingGroup(group),
+      ? lazyGroups.filter(
+          (group) =>
+            isTimelineEventGroup(group) || isFailedOrPendingGroup(group),
         )
       : lazyGroups,
   );
