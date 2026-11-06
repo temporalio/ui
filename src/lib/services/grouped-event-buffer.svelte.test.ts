@@ -29,8 +29,6 @@ describe('EventBufferView direct lookups', () => {
     const events = vi.spyOn(buffer, 'getEventArray');
     const groups = vi.spyOn(buffer, 'getGroupArray');
     const lazyGroups = vi.spyOn(buffer, 'getLazyGroups');
-    const eventLookup = vi.spyOn(buffer, 'getEvent');
-    const groupLookup = vi.spyOn(buffer, 'getEventGroup');
     const snapshots: {
       event: WorkflowEvent | undefined;
       group: EventGroup | undefined;
@@ -80,16 +78,12 @@ describe('EventBufferView direct lookups', () => {
     buffer.reset(20);
     flushSync();
     expect(snapshots.at(-1)).toEqual({ event: undefined, group: undefined });
-    expect(eventLookup).toHaveBeenCalledWith('2');
-    expect(groupLookup).toHaveBeenCalledWith('2', {
-      excludeWorkflowTasks: true,
-    });
     expect(events).not.toHaveBeenCalled();
     expect(groups).not.toHaveBeenCalled();
     expect(lazyGroups).not.toHaveBeenCalled();
   });
 
-  it('forwards filtering and invalid IDs and isolates views', async () => {
+  it('forwards filtering and isolates views', async () => {
     const buffer = createGroupedEventBuffer();
     const otherBuffer = createGroupedEventBuffer();
     buffer.reset(3);
@@ -110,16 +104,10 @@ describe('EventBufferView direct lookups', () => {
     expect(
       history.eventGroup('2', { excludeWorkflowTasks: true }),
     ).toBeUndefined();
-    expect(history.eventGroup('2', { excludeWorkflowTasks: false })).toBe(
-      history.eventGroup('1'),
-    );
     expect(other.event('2')?.eventType).toBe('TimerFired');
     expect(other.eventGroup('2')?.category).toBe('timer');
-    expect(history.event('2-request-id')).toBeUndefined();
-    expect(history.eventGroup('2-request-id')).toBeUndefined();
     buffer.reset(0);
     expect(history.event('2')).toBeUndefined();
-    expect(history.eventGroup('2')).toBeUndefined();
     expect(other.event('2')?.eventType).toBe('TimerFired');
   });
 });

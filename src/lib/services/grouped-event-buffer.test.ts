@@ -219,7 +219,7 @@ describe('direct event lookups', () => {
           buffer.getEventGroup(event.id, { excludeWorkflowTasks }),
         ).toEqual(expected.get(event.id));
       }
-      for (const group of expected.values()) {
+      for (const group of new Set(expected.values())) {
         for (const event of group.eventList) {
           expect(buffer.getEventGroup(event.id, { excludeWorkflowTasks })).toBe(
             buffer.getEventGroup(group.initialEvent.id, {

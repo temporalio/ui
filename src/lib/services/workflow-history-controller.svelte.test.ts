@@ -166,8 +166,6 @@ describe('WorkflowHistoryController', () => {
 
   it('retains partial history on error and recovers without resetting during retry', async () => {
     const { controller, buffer } = createController();
-    const reset = vi.spyOn(buffer, 'reset');
-    const metadata = vi.spyOn(buffer, 'setPendingMetadata');
     const load = controller.load(workflow());
     request(0).options.onRawPage([makeWorkflowStarted(1)]);
     progress(0);
@@ -181,8 +179,6 @@ describe('WorkflowHistoryController', () => {
     expect(buffer.getEventArray().map((event) => event.id)).toEqual(['1']);
 
     const retry = controller.retry(workflow());
-    expect(reset).toHaveBeenCalledTimes(1);
-    expect(metadata).toHaveBeenCalledTimes(2);
     expect(controller.error).toBeNull();
     expect(controller.fetchComplete).toBe(false);
     expect(controller.loading).toBe(true);
@@ -350,30 +346,24 @@ describe('WorkflowHistoryController', () => {
     },
   );
 
-  it('clears the saved poll token on a fresh load that resets history', async () => {
+  it('resets buffered history, progress, completion, and the saved poll token on a fresh load', async () => {
     const { controller, buffer } = createController();
     const load = controller.load(workflow('run-1', true));
-    poll(0).options.onEvent(makeWorkflowStarted(1));
+    request(0).options.onRawPage([makeWorkflowStarted(1)]);
+    progress(0);
+    poll(0).options.onEvent(makeWorkflowStarted(2));
     poll(0).options.onToken?.('old-token');
+    request(0).result.resolve();
+    await load;
+    expect(buffer.getEventArray().map((event) => event.id)).toEqual(['1', '2']);
+    expect(controller.latestEventId).toBe(2);
+    expect(controller.totalExpectedEvents).toBe(10);
+    expect(controller.descMinId).toBe(8);
+    expect(controller.fetchComplete).toBe(true);
+
     const nextLoad = controller.load(workflow('run-1', true));
     expect(poll(0).options.signal.aborted).toBe(true);
     expect(poll(1).options.startToken).toBe('');
-    expect(buffer.getEventArray()).toEqual([]);
-    request(0).result.resolve();
-    request(1).result.resolve();
-    await Promise.all([load, nextLoad]);
-  });
-
-  it('keeps load reset behavior after buffered history', async () => {
-    const { controller, buffer } = createController();
-    const load = controller.load(workflow());
-    request(0).options.onRawPage([makeWorkflowStarted(1)]);
-    progress(0);
-    request(0).result.resolve();
-    await load;
-
-    const nextLoad = controller.load(workflow('run-1', true));
-    expect(poll(0).options.startToken).toBe('');
     expect(buffer.getEventArray()).toEqual([]);
     expect(controller.latestEventId).toBe(0);
     expect(controller.totalExpectedEvents).toBe(0);

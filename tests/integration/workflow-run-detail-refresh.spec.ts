@@ -111,29 +111,7 @@ async function openHistory(page: Page, refreshOff: boolean) {
 }
 
 test.describe('Workflow run detail refresh', () => {
-  test('loads initial history with refresh off without live history or ambient Describe polls', async ({
-    page,
-  }) => {
-    const { requests, liveResponse } = await mockRunDetail(page, []);
-    try {
-      await openHistory(page, true);
-      await expect(page.getByTestId('pause')).toHaveText('Auto Refresh Off');
-      expect(requests.initial).toBeGreaterThan(0);
-      expect(requests.reverse).toBeGreaterThan(0);
-      expect(requests.describe).toBe(1);
-      expect(requests.live).toBe(0);
-
-      const before = { ...requests };
-      await page.clock.runFor(30_000);
-
-      expect(requests).toEqual(before);
-      await expect(page.getByTestId('event-summary-row')).toHaveCount(3);
-    } finally {
-      liveResponse.release();
-    }
-  });
-
-  test('receives a live completion after enabling refresh and stops requests when disabled again', async ({
+  test('loads history with refresh off, receives a live completion when enabled, and stops requests when disabled again', async ({
     page,
   }) => {
     const { requests, liveRequested, liveResponse } = await mockRunDetail(
@@ -142,6 +120,17 @@ test.describe('Workflow run detail refresh', () => {
     );
     try {
       await openHistory(page, true);
+      await expect(page.getByTestId('pause')).toHaveText('Auto Refresh Off');
+      expect(requests.initial).toBeGreaterThan(0);
+      expect(requests.reverse).toBeGreaterThan(0);
+      expect(requests.describe).toBe(1);
+      expect(requests.live).toBe(0);
+
+      const initiallyOff = { ...requests };
+      await page.clock.runFor(30_000);
+      expect(requests).toEqual(initiallyOff);
+      await expect(page.getByTestId('event-summary-row')).toHaveCount(3);
+
       await page.getByTestId('pause').click();
       await expect(page.getByTestId('pause')).toHaveText('Auto Refresh On');
       await expect(page).not.toHaveURL(/refresh_off=true/);

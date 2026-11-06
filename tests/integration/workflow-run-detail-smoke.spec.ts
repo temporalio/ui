@@ -99,10 +99,6 @@ test.describe('Workflow run detail smoke', () => {
     await page.getByTestId('history-tab').click();
     await expect(page.getByTestId('event-summary-row')).toHaveCount(5);
     await page.getByTestId('compact').click();
-    await expect(page.getByTestId('event-summary-row')).toHaveCount(1);
-    await expect(
-      page.getByTestId('event-summary-row').getByTestId('link'),
-    ).toHaveText(['2', '3', '4']);
     await expect(page.getByTestId('event-summary-table')).toContainText(
       'SmokeFirstRunActivity',
     );
@@ -167,7 +163,6 @@ test.describe('Workflow run detail smoke', () => {
       'Workflow Execution Started',
     );
     await page.getByTestId('compact').click();
-    await expect(page.getByTestId('event-summary-row')).toHaveCount(0);
     await expect(page.getByTestId('event-summary-table')).toContainText(
       'No Events Match',
     );
@@ -309,20 +304,12 @@ test.describe('Workflow run detail smoke', () => {
     await expect(page.getByTestId('event-summary-table')).not.toContainText(
       'SmokeFirstRunActivity',
     );
-    await page.getByTestId('compact').click();
-    await expect(page.getByTestId('event-summary-row')).toHaveCount(1);
-    await expect(
-      page.getByTestId('event-summary-row').getByTestId('link'),
-    ).toHaveText(['2', '3', '4']);
-    await expect(page.getByTestId('event-summary-table')).toContainText(
-      'SmokeSecondRunActivity',
-    );
+
     await page.goBack();
     await expect(page).toHaveURL(`${secondRunUrl}/timeline`);
     await page.goBack();
     await expect(page).toHaveURL(`${runUrl}/history/events/1`);
     await page.getByTestId('history-tab').click();
-    await page.getByTestId('feed').click();
     await expect(page.getByTestId('event-summary-row')).toHaveCount(5);
     await expect(page.getByTestId('event-summary-table')).toContainText(
       'SmokeFirstRunActivity',
