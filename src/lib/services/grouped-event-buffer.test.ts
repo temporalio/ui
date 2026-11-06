@@ -1753,6 +1753,25 @@ describe('event group index', () => {
   });
 
   describe('getTimelineEventGroups', () => {
+    it('renames a row when its signal event is ingested after the row was built', () => {
+      const [timerStarted, timerFired] = makeTimerGroup(4);
+      const signalMarker = { inboundEvent: { inboundEventId: 3 } };
+      ingestHistoryEvent({
+        ...timerStarted,
+        eventGroupMarkers: [signalMarker],
+      } as unknown as HistoryEvent);
+      ingestHistoryEvent(timerFired);
+      expect(getTimelineEventGroups()[0].displayName).toBe('3');
+
+      ingestHistoryEvent({
+        eventId: '3',
+        eventTime: timerStarted.eventTime,
+        eventType: 'WorkflowExecutionSignaled',
+        workflowExecutionSignaledEventAttributes: { signalName: 'launchHold' },
+      } as unknown as HistoryEvent);
+      expect(getTimelineEventGroups()[0].displayName).toBe('launchHold (3)');
+    });
+
     it('builds one row per event group spanning its lifecycle groups', () => {
       const [scheduled, started, completed] = makeActivityGroup(1);
       const [timerStarted, timerFired] = makeTimerGroup(4);

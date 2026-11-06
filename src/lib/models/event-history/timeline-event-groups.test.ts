@@ -157,6 +157,23 @@ describe('createTimelineEventGroupFilter', () => {
 
     expect(filter([group], isTimer)[0]).toBe(filter([group], isTimer)[0]);
   });
+
+  it('rebuilds the filtered group when its label gains a name', () => {
+    const filter = createTimelineEventGroupFilter();
+    const signalLabel: EventGroupLabel = {
+      key: 'event:3',
+      kind: 'event',
+      id: '3',
+    };
+    const signalGroup = createTimelineEventGroup({
+      label: signalLabel,
+      lifecycleGroups: [timer, activity],
+    })!;
+    expect(filter([signalGroup], isTimer)[0].name).toBe('3');
+
+    signalLabel.name = 'launchHold';
+    expect(filter([signalGroup], isTimer)[0].name).toBe('launchHold (3)');
+  });
 });
 
 describe('isTimelineEventGroup', () => {

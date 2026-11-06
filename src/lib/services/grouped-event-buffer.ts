@@ -224,7 +224,11 @@ let failedEvent: HistoryEvent | null = null;
 // and the live poll — the direction an event arrives from is a fetch detail,
 // and one workflow task's markers bill once however they were loaded.
 const processedWorkflowTaskIds = new Set<string>();
-let eventGroupLabels = createEventGroupLabelRegistry();
+const createLabelRegistry = () =>
+  createEventGroupLabelRegistry({
+    onLabelChange: (key) => dirtyTimelineEventGroupKeys.add(key),
+  });
+let eventGroupLabels = createLabelRegistry();
 
 // Event group key -> the events carrying that marker and the lifecycle groups
 // they belong to, so the event group filter is a set lookup per row.
@@ -549,7 +553,7 @@ export function reset(historyLength: number): void {
 
   failedEvent = null;
   processedWorkflowTaskIds.clear();
-  eventGroupLabels = createEventGroupLabelRegistry();
+  eventGroupLabels = createLabelRegistry();
   eventGroupIndex = new Map();
   cachedEventGroupOptions = null;
   timelineEventGroupsByKey = new Map();

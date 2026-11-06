@@ -141,6 +141,7 @@ export const createTimelineEventGroup = <
     previous &&
     previous.version === version &&
     previous.eventGroupLabel === label &&
+    previous.name === formatEventGroupName(label) &&
     previous.lifecycleGroups.length === lifecycleGroups.length &&
     previous.lifecycleGroups.every(
       (group, index) => group === lifecycleGroups[index],
