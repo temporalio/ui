@@ -24,6 +24,11 @@
     formatRetryExpiration,
   } from '$lib/utilities/format-event-attributes';
   import { formatDuration, getDuration } from '$lib/utilities/format-time';
+  import { getPendingActivityElapsed } from '$lib/utilities/pending-activity-elapsed';
+  import {
+    getPendingActivityTimeouts,
+    hasPopulatedActivityOptions,
+  } from '$lib/utilities/pending-activity-timeouts';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
   let {
@@ -47,6 +52,17 @@
       activity.activityOptions,
       scheduledEvent?.activityTaskScheduledEventAttributes,
     ),
+  );
+
+  const timeouts = $derived(
+    getPendingActivityTimeouts(
+      hasPopulatedActivityOptions(activity.activityOptions)
+        ? activity.activityOptions
+        : scheduledEvent?.activityTaskScheduledEventAttributes,
+    ),
+  );
+  const elapsed = $derived(
+    getPendingActivityElapsed(activity, scheduledEvent?.timestamp),
   );
 
   let coreUser = coreUserStore();
@@ -90,6 +106,21 @@
         )}
       {/if}
       {@render detail(translate('workflows.attempt'), attempts)}
+      {#each timeouts as timeout (timeout.field)}
+        {@render detail(
+          translate(timeout.label),
+          timeout.formatted || translate('workflows.timeout-not-set'),
+        )}
+      {/each}
+      {#if elapsed.currentAttempt}
+        {@render detail(
+          translate('workflows.current-attempt-elapsed'),
+          elapsed.currentAttempt,
+        )}
+      {/if}
+      {#if elapsed.total}
+        {@render detail(translate('workflows.total-elapsed'), elapsed.total)}
+      {/if}
       {#if activity.scheduledTime}
         {@const timeDifference = toTimeDifference({
           date: activity.scheduledTime,
