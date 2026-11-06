@@ -1,7 +1,7 @@
 import { translate } from '$lib/i18n/translate';
 import { IconKeyboard } from '$lib/io/icon';
 
-import { MOD, recordShortcut, shortcutLabel } from './keys';
+import { IS_MAC, recordShortcut, shortcutLabel } from './keys';
 import type {
   PaletteAction,
   PaletteContext,
@@ -12,8 +12,6 @@ import type {
 
 import { appPalette } from './app-palette-state.svelte';
 
-const MOD_NAME = MOD.replace('+', '');
-
 // Reads the next key press as the new shortcut. Problems show in the footer,
 // so the user can try again or press Esc.
 function onRecordKeydown(event: KeyboardEvent, ctx: PaletteContext): boolean {
@@ -21,9 +19,17 @@ function onRecordKeydown(event: KeyboardEvent, ctx: PaletteContext): boolean {
 
   const result = recordShortcut(event);
   if (result.kind === 'waiting') return true;
+  if (result.kind === 'needs-key') {
+    ctx.toast(translate('palette.shortcut-needs-key'), 'warning');
+    return true;
+  }
   if (result.kind === 'needs-mod') {
     ctx.toast(
-      translate('palette.shortcut-needs-mod', { mod: MOD_NAME }),
+      translate(
+        IS_MAC
+          ? 'palette.shortcut-needs-mod-mac'
+          : 'palette.shortcut-needs-mod',
+      ),
       'warning',
     );
     return true;
@@ -56,7 +62,11 @@ function recordView(): PaletteView {
       {
         id: 'palette-shortcut-record-hint',
         title: translate('palette.shortcut-record-prompt'),
-        subtitle: translate('palette.shortcut-record-hint', { mod: MOD_NAME }),
+        subtitle: translate(
+          IS_MAC
+            ? 'palette.shortcut-record-hint-mac'
+            : 'palette.shortcut-record-hint',
+        ),
         actions: [],
       },
     ],

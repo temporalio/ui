@@ -12,12 +12,23 @@ import {
 const press = (init: KeyboardEventInit) => new KeyboardEvent('keydown', init);
 
 describe('shortcutLabel', () => {
-  it('writes the modifier, Alt, Shift and the key', () => {
+  it('writes each modifier and the key', () => {
     expect(shortcutLabel(DEFAULT_SHORTCUT)).toBe('Ctrl+K');
     expect(
-      shortcutLabel({ key: 'p', code: 'KeyP', shift: true, alt: true }),
+      shortcutLabel({
+        key: 'p',
+        code: 'KeyP',
+        ctrl: true,
+        alt: true,
+        shift: true,
+      }),
     ).toBe('Ctrl+Alt+Shift+P');
-    expect(shortcutLabel({ key: ' ', code: 'Space' })).toBe('Ctrl+Space');
+    expect(shortcutLabel({ key: '1', code: 'Digit1', alt: true })).toBe(
+      'Alt+1',
+    );
+    expect(shortcutLabel({ key: 'k', code: 'KeyK', meta: true })).toBe(
+      'Meta+K',
+    );
   });
 });
 
@@ -29,8 +40,8 @@ describe('matchesShortcut', () => {
     expect(matchesShortcut(press({ key: 'k' }), DEFAULT_SHORTCUT)).toBe(false);
   });
 
-  it('needs Shift and Alt exactly as the shortcut sets them', () => {
-    const shifted = { key: 'p', code: 'KeyP', shift: true };
+  it('needs every modifier exactly as the shortcut sets it', () => {
+    const shifted = { key: 'p', code: 'KeyP', ctrl: true, shift: true };
     expect(
       matchesShortcut(
         press({ key: 'P', ctrlKey: true, shiftKey: true }),
@@ -44,6 +55,25 @@ describe('matchesShortcut', () => {
       matchesShortcut(
         press({ key: 'k', ctrlKey: true, altKey: true }),
         DEFAULT_SHORTCUT,
+      ),
+    ).toBe(false);
+    expect(
+      matchesShortcut(
+        press({ key: 'k', ctrlKey: true, metaKey: true }),
+        DEFAULT_SHORTCUT,
+      ),
+    ).toBe(false);
+  });
+
+  it('matches an Alt shortcut by its physical key when Alt types a symbol', () => {
+    const alt = { key: 'k', code: 'KeyK', alt: true };
+    expect(
+      matchesShortcut(press({ key: '˚', code: 'KeyK', altKey: true }), alt),
+    ).toBe(true);
+    expect(
+      matchesShortcut(
+        press({ key: 'k', code: 'KeyK', altKey: true, ctrlKey: true }),
+        alt,
       ),
     ).toBe(false);
   });
@@ -71,29 +101,75 @@ describe('recordShortcut', () => {
     });
   });
 
-  it('needs the modifier', () => {
+  it('needs Cmd, Ctrl or Alt, and Shift alone is not enough', () => {
     expect(recordShortcut(press({ key: 'j', code: 'KeyJ' }))).toEqual({
       kind: 'needs-mod',
     });
+    expect(
+      recordShortcut(press({ key: 'J', code: 'KeyJ', shiftKey: true })),
+    ).toEqual({ kind: 'needs-mod' });
   });
 
-  it('refuses keys the browser or the palette keeps', () => {
+  it('needs a letter or a number', () => {
+    expect(
+      recordShortcut(press({ key: 'Enter', code: 'Enter', ctrlKey: true })),
+    ).toEqual({ kind: 'needs-key' });
+    expect(
+      recordShortcut(press({ key: ' ', code: 'Space', ctrlKey: true })),
+    ).toEqual({ kind: 'needs-key' });
+    expect(
+      recordShortcut(press({ key: '/', code: 'Slash', ctrlKey: true })),
+    ).toEqual({ kind: 'needs-key' });
+  });
+
+  it('refuses keys the browser keeps with the platform modifier', () => {
     expect(
       recordShortcut(press({ key: 't', code: 'KeyT', ctrlKey: true })),
     ).toEqual({ kind: 'reserved', label: 'Ctrl+T' });
     expect(
-      recordShortcut(press({ key: 'Enter', code: 'Enter', ctrlKey: true })),
-    ).toEqual({ kind: 'reserved', label: 'Ctrl+Enter' });
+      recordShortcut(press({ key: 't', code: 'KeyT', altKey: true })),
+    ).toEqual({
+      kind: 'recorded',
+      shortcut: {
+        key: 't',
+        code: 'KeyT',
+        meta: false,
+        ctrl: false,
+        alt: true,
+        shift: false,
+      },
+    });
   });
 
-  it('records the key, its code and the modifiers', () => {
+  it('records the key, its code and every modifier', () => {
     expect(
       recordShortcut(
         press({ key: 'J', code: 'KeyJ', ctrlKey: true, shiftKey: true }),
       ),
     ).toEqual({
       kind: 'recorded',
-      shortcut: { key: 'j', code: 'KeyJ', shift: true, alt: false },
+      shortcut: {
+        key: 'j',
+        code: 'KeyJ',
+        meta: false,
+        ctrl: true,
+        alt: false,
+        shift: true,
+      },
+    });
+  });
+
+  it('records the physical key when Alt or Shift types a symbol', () => {
+    expect(
+      recordShortcut(press({ key: '˚', code: 'KeyK', altKey: true })),
+    ).toMatchObject({ kind: 'recorded', shortcut: { key: 'k', alt: true } });
+    expect(
+      recordShortcut(
+        press({ key: '!', code: 'Digit1', ctrlKey: true, shiftKey: true }),
+      ),
+    ).toMatchObject({
+      kind: 'recorded',
+      shortcut: { key: '1', ctrl: true, shift: true },
     });
   });
 });
@@ -102,10 +178,14 @@ describe('shortcut setting storage', () => {
   afterEach(() => localStorage.clear());
 
   it('saves, loads and clears a setting', () => {
-    saveShortcutSetting('test-shortcut', { key: 'j', code: 'KeyJ' });
+    saveShortcutSetting('test-shortcut', { key: 'j', code: 'KeyJ', alt: true });
     expect(loadShortcutSetting('test-shortcut')).toEqual({
       key: 'j',
       code: 'KeyJ',
+      meta: false,
+      ctrl: false,
+      alt: true,
+      shift: false,
     });
 
     saveShortcutSetting('test-shortcut', 'off');
@@ -115,7 +195,31 @@ describe('shortcut setting storage', () => {
     expect(loadShortcutSetting('test-shortcut')).toBeUndefined();
   });
 
+  it('reads a shortcut saved before each modifier was stored as the platform modifier', () => {
+    localStorage.setItem(
+      'test-shortcut',
+      '{"key":"j","code":"KeyJ","shift":true,"alt":false}',
+    );
+    expect(loadShortcutSetting('test-shortcut')).toEqual({
+      key: 'j',
+      code: 'KeyJ',
+      meta: false,
+      ctrl: true,
+      alt: false,
+      shift: true,
+    });
+  });
+
   it('ignores a stored value it cannot read', () => {
+    localStorage.setItem(
+      'test-shortcut',
+      '{"key":"j","code":"KeyJ","meta":false,"ctrl":false,"shift":true}',
+    );
+    expect(loadShortcutSetting('test-shortcut')).toBeUndefined();
+
+    localStorage.setItem('test-shortcut', '{"key":" ","code":"Space"}');
+    expect(loadShortcutSetting('test-shortcut')).toBeUndefined();
+
     localStorage.setItem('test-shortcut', '{"key":1}');
     expect(loadShortcutSetting('test-shortcut')).toBeUndefined();
 

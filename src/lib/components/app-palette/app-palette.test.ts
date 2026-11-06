@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/svelte';
+import { fireEvent, render, screen, waitFor } from '@testing-library/svelte';
 import { tick } from 'svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -84,7 +84,7 @@ describe('AppPalette', () => {
     render(AppPalette, {
       props: {
         facts: { env: 'local' },
-        shortcut: { key: 'j', code: 'KeyJ', shift: true },
+        shortcut: { key: 'j', code: 'KeyJ', ctrl: true, shift: true },
       },
     });
     expect(appPalette.shortcutLabel).toBe('Ctrl+Shift+J');
@@ -111,7 +111,7 @@ describe('AppPalette', () => {
     await fireEvent.keyDown(window, { key: 'k', ctrlKey: true });
     expect(screen.queryByRole('dialog')).toBeNull();
 
-    appPalette.setUserShortcut({ key: 'j', code: 'KeyJ' });
+    appPalette.setUserShortcut({ key: 'j', code: 'KeyJ', ctrl: true });
     await tick();
     await fireEvent.keyDown(window, { key: 'j', code: 'KeyJ', ctrlKey: true });
     expect(await screen.findByText('Toggle flags')).toBeTruthy();
@@ -138,8 +138,10 @@ describe('AppPalette', () => {
     expect(appPalette.userShortcut).toEqual({
       key: 'k',
       code: 'KeyK',
-      shift: false,
+      meta: false,
+      ctrl: true,
       alt: false,
+      shift: false,
     });
 
     await fireEvent.keyDown(input, { key: 'Enter' });
@@ -154,6 +156,34 @@ describe('AppPalette', () => {
       await screen.findAllByText('The palette now opens with Ctrl+Shift+J'),
     ).toBeTruthy();
     expect(localStorage.getItem('palette-shortcut')).toContain('KeyJ');
+  });
+
+  it('records an Alt shortcut and opens with it', async () => {
+    unregister.push(
+      registerToolSet({
+        id: 'help',
+        label: 'Help',
+        key: 'h',
+        tools: [paletteShortcutTool],
+      }),
+    );
+    render(AppPalette, { props: { facts: { env: 'local' } } });
+
+    await fireEvent.keyDown(window, { key: 'k', ctrlKey: true });
+    const input = await screen.findByRole('combobox');
+    expect(await screen.findAllByText('Palette shortcut')).toBeTruthy();
+    await fireEvent.keyDown(input, { key: 'Enter' });
+    await fireEvent.keyDown(input, { key: '˚', code: 'KeyK', altKey: true });
+    expect(appPalette.shortcutLabel).toBe('Alt+K');
+
+    await fireEvent.keyDown(input, { key: 'Escape' });
+    await fireEvent.keyDown(input, { key: 'Escape' });
+    await waitFor(() => expect(screen.queryByRole('combobox')).toBeNull());
+
+    await fireEvent.keyDown(window, { key: 'k', ctrlKey: true });
+    expect(screen.queryByRole('combobox')).toBeNull();
+    await fireEvent.keyDown(window, { key: '˚', code: 'KeyK', altKey: true });
+    expect(await screen.findByRole('combobox')).toBeTruthy();
   });
 
   it('drops a request to open while no set is visible', async () => {

@@ -36,10 +36,16 @@ export const Strings = {
   'shortcut-turn-on': 'Turn on shortcut',
   'shortcut-reset': 'Reset to {{shortcut}}',
   'shortcut-record-prompt': 'Press the new shortcut',
-  'shortcut-record-hint': 'Hold {{mod}} and press a key. Esc cancels.',
-  'shortcut-needs-mod': 'Hold {{mod}}, so the shortcut does not block typing',
-  'shortcut-reserved':
-    'The browser or the palette keeps {{shortcut}}. Try other keys.',
+  'shortcut-record-hint':
+    'Hold Ctrl or Alt, and Shift if you like, then press a letter or number. Esc cancels.',
+  'shortcut-record-hint-mac':
+    'Hold ⌘, ⌃ or ⌥, and ⇧ if you like, then press a letter or number. Esc cancels.',
+  'shortcut-needs-mod':
+    'Hold Ctrl or Alt, so the shortcut does not block typing',
+  'shortcut-needs-mod-mac':
+    'Hold ⌘, ⌃ or ⌥, so the shortcut does not block typing',
+  'shortcut-needs-key': 'Use a letter or a number',
+  'shortcut-reserved': 'The browser keeps {{shortcut}}. Try other keys.',
   'shortcut-saved': 'The palette now opens with {{shortcut}}',
   'shortcut-turned-off': 'The shortcut is off. Open the palette from the menu.',
 } as const;
