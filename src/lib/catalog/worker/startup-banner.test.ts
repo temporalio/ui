@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { formatCatalogBanner, supportsAnsiColor } from './startup-banner';
 
-const targets = [
+const workspaces = [
   {
     id: 'shared-workflows',
     namespace: 'default',
@@ -20,8 +20,8 @@ const stripAnsi = (value: string) =>
   value.replace(/\[\d+m/g, '');
 
 describe('formatCatalogBanner', () => {
-  it('frames the catalog URL and every running target in one block', () => {
-    const banner = formatCatalogBanner({ targets });
+  it('frames the catalog URL and every running workspace in one block', () => {
+    const banner = formatCatalogBanner({ workspaces });
     const lines = banner.split('\n');
 
     expect(lines[0]).toBe('');
@@ -38,7 +38,7 @@ describe('formatCatalogBanner', () => {
 
   it('keeps every framed line the same width', () => {
     const widths = new Set(
-      formatCatalogBanner({ targets })
+      formatCatalogBanner({ workspaces })
         .split('\n')
         .filter((line) => line.length > 0)
         .map((line) => [...line].length),
@@ -49,8 +49,8 @@ describe('formatCatalogBanner', () => {
 
   it('lists one catalog URL per namespace in play', () => {
     const banner = formatCatalogBanner({
-      targets: [
-        targets[0],
+      workspaces: [
+        workspaces[0],
         { id: 'other', namespace: 'staging', taskQueue: 'queue' },
       ],
     });
@@ -61,12 +61,12 @@ describe('formatCatalogBanner', () => {
 
   it('accepts a custom UI origin', () => {
     expect(
-      formatCatalogBanner({ targets, origin: 'http://localhost:4000' }),
+      formatCatalogBanner({ workspaces, origin: 'http://localhost:4000' }),
     ).toContain('http://localhost:4000/namespaces/default/catalog');
   });
 
   it('colors the heading, URL, and frame when color is enabled', () => {
-    const banner = formatCatalogBanner({ targets, color: true });
+    const banner = formatCatalogBanner({ workspaces, color: true });
 
     expect(banner).toContain('[1m[32mCATALOG READY');
     expect(banner).toContain(
@@ -78,7 +78,7 @@ describe('formatCatalogBanner', () => {
 
   it('keeps the frame aligned by measuring visible text only', () => {
     const widths = new Set(
-      formatCatalogBanner({ targets, color: true })
+      formatCatalogBanner({ workspaces, color: true })
         .split('\n')
         .filter((line) => line.length > 0)
         .map((line) => [...stripAnsi(line)].length),
@@ -88,8 +88,8 @@ describe('formatCatalogBanner', () => {
   });
 
   it('produces identical visible text with and without color', () => {
-    expect(stripAnsi(formatCatalogBanner({ targets, color: true }))).toBe(
-      formatCatalogBanner({ targets, color: false }),
+    expect(stripAnsi(formatCatalogBanner({ workspaces, color: true }))).toBe(
+      formatCatalogBanner({ workspaces, color: false }),
     );
   });
 });

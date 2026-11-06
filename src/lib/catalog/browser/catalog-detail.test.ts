@@ -146,7 +146,7 @@ const descriptor: BrowserCatalogDescriptor = {
   },
   execution: {
     kind: 'workflow',
-    targetId: 'catalog',
+    workspaceId: 'catalog',
     namespace: 'default',
     taskQueue: 'catalog-tasks',
     workflowType: 'OrderLifecycle',
@@ -862,7 +862,7 @@ describe('CatalogDetail', () => {
       capabilityTags: ['Standalone Activity'],
       execution: {
         kind: 'standalone-activity',
-        targetId: 'catalog',
+        workspaceId: 'catalog',
         namespace: 'default',
         taskQueue: 'catalog-tasks',
         activityType: 'CreateOrder',
@@ -875,7 +875,7 @@ describe('CatalogDetail', () => {
       capabilityTags: [],
       execution: {
         kind: 'standalone-nexus-operation',
-        targetId: 'catalog',
+        workspaceId: 'catalog',
         namespace: 'default',
         taskQueue: 'catalog-tasks',
         endpoint: 'orders',

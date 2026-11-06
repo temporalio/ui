@@ -77,7 +77,7 @@ export type WorkbenchHostDependencies = {
 };
 
 const targetFor = (execution: BrowserCatalogExecution): LaunchTarget => ({
-  targetId: execution.targetId,
+  workspaceId: execution.workspaceId,
   namespace: execution.namespace,
   taskQueue: execution.taskQueue,
 });
@@ -311,7 +311,7 @@ export const assembleWorkbenchHost = ({
         !request.reference.attempt.attemptId ||
         !request.reference.attempt.executionId ||
         !request.reference.runId ||
-        target.targetId !== expectedTarget?.targetId ||
+        target.workspaceId !== expectedTarget?.workspaceId ||
         target.namespace !== expectedTarget?.namespace ||
         target.taskQueue !== expectedTarget?.taskQueue
       ) {

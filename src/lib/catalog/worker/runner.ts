@@ -3,7 +3,13 @@ import { fileURLToPath } from 'node:url';
 
 import type { ServiceHandler } from 'nexus-rpc';
 
+import {
+  crashActivityName,
+  createCrashActivity,
+  effectiveCatalogControls,
+} from './crash.js';
 import type { CatalogWorkerBinding } from './registry';
+import type { CatalogWorkspaceControl } from '../browser/metadata-schema';
 
 export type CatalogConnection = {
   close: () => Promise<void>;
@@ -16,13 +22,13 @@ export type CatalogWorker = {
 
 export type CatalogRunnerEvent =
   | { type: 'connection-acquired'; mode: 'owned' | 'provided' }
-  | { type: 'target-creating'; targetId: string }
-  | { type: 'target-created'; targetId: string }
-  | { type: 'target-running'; targetId: string }
-  | { type: 'target-stopped'; targetId: string }
+  | { type: 'workspace-creating'; workspaceId: string }
+  | { type: 'workspace-created'; workspaceId: string }
+  | { type: 'workspace-running'; workspaceId: string }
+  | { type: 'workspace-stopped'; workspaceId: string }
   | {
-      type: 'target-failed';
-      targetId: string;
+      type: 'workspace-failed';
+      workspaceId: string;
       phase: 'creation' | 'run';
     };
 
@@ -35,6 +41,7 @@ export type CatalogWorkerOptions<
   workflowsPath: string;
   activities: object;
   nexusServices: ServiceHandler[];
+  stickyQueueScheduleToStartTimeout?: string;
 };
 
 type CatalogRunnerConnectionOptions<Connection extends CatalogConnection> =
@@ -56,7 +63,26 @@ type StartCatalogRunnerOptions<Connection extends CatalogConnection> =
       options: CatalogWorkerOptions<Connection>,
     ) => Promise<CatalogWorker>;
     events?: (event: CatalogRunnerEvent) => void;
+    controls?: readonly CatalogWorkspaceControl[];
+    exit?: (code: number) => void;
   };
+
+const workspaceActivities = (
+  binding: CatalogWorkerBinding,
+  crashEnabled: boolean,
+  exit: (code: number) => void,
+) => {
+  if (Object.hasOwn(binding.activities, crashActivityName)) {
+    throw new Error(
+      `Catalog workspace "${binding.workspace.id}" registers the reserved activity "${crashActivityName}"`,
+    );
+  }
+
+  return {
+    ...binding.activities,
+    ...createCrashActivity({ enabled: crashEnabled, exit }),
+  };
+};
 
 export const startCatalogRunner = async <Connection extends CatalogConnection>(
   options: StartCatalogRunnerOptions<Connection>,
@@ -70,7 +96,7 @@ export const startCatalogRunner = async <Connection extends CatalogConnection>(
     }
   };
   if (bindings.length === 0) {
-    throw new Error('Catalog has no runnable targets');
+    throw new Error('Catalog has no runnable workspaces');
   }
 
   let connection: Connection;
@@ -96,15 +122,19 @@ export const startCatalogRunner = async <Connection extends CatalogConnection>(
     }
   };
   const workers: {
-    targetId: string;
+    workspaceId: string;
     worker: CatalogWorker;
   }[] = [];
   try {
     for (const binding of bindings) {
-      emit({ type: 'target-creating', targetId: binding.target.id });
+      emit({ type: 'workspace-creating', workspaceId: binding.workspace.id });
       try {
+        const crashEnabled = effectiveCatalogControls(
+          binding.workspace.controls,
+          options.controls ?? [],
+        ).includes('crash');
         const packagedWorkflowsPath = fileURLToPath(
-          new URL(binding.target.workflowsPath, import.meta.url),
+          new URL(binding.workspace.workflowsPath, import.meta.url),
         );
         const sourceWorkflowsPath = packagedWorkflowsPath.replace(
           /\.js$/,
@@ -112,23 +142,27 @@ export const startCatalogRunner = async <Connection extends CatalogConnection>(
         );
         const worker = await createWorker({
           connection,
-          namespace: binding.target.namespace,
-          taskQueue: binding.target.taskQueue,
+          namespace: binding.workspace.namespace,
+          taskQueue: binding.workspace.taskQueue,
           workflowsPath:
-            binding.target.workflowsPath === './workflows.js' &&
             !existsSync(packagedWorkflowsPath) &&
             existsSync(sourceWorkflowsPath)
               ? sourceWorkflowsPath
               : packagedWorkflowsPath,
-          activities: binding.activities,
+          activities: workspaceActivities(
+            binding,
+            crashEnabled,
+            options.exit ?? ((code) => process.exit(code)),
+          ),
           nexusServices: binding.nexusServices,
+          ...(crashEnabled ? { stickyQueueScheduleToStartTimeout: '1s' } : {}),
         });
-        workers.push({ targetId: binding.target.id, worker });
-        emit({ type: 'target-created', targetId: binding.target.id });
+        workers.push({ workspaceId: binding.workspace.id, worker });
+        emit({ type: 'workspace-created', workspaceId: binding.workspace.id });
       } catch (error) {
         emit({
-          type: 'target-failed',
-          targetId: binding.target.id,
+          type: 'workspace-failed',
+          workspaceId: binding.workspace.id,
           phase: 'creation',
         });
         throw error;
@@ -142,26 +176,26 @@ export const startCatalogRunner = async <Connection extends CatalogConnection>(
   const startedWorkers: typeof workers = [];
   const runs: Promise<void>[] = [];
   const shutdownStartedWorkers = () => {
-    for (const { targetId, worker } of startedWorkers) {
+    for (const { workspaceId, worker } of startedWorkers) {
       try {
         worker.shutdown();
       } catch (cleanupError) {
         void cleanupError;
       }
-      emit({ type: 'target-stopped', targetId });
+      emit({ type: 'workspace-stopped', workspaceId });
     }
   };
 
   try {
     for (const worker of workers) {
       startedWorkers.push(worker);
-      emit({ type: 'target-running', targetId: worker.targetId });
+      emit({ type: 'workspace-running', workspaceId: worker.workspaceId });
       try {
         runs.push(
           worker.worker.run().catch((error: unknown) => {
             emit({
-              type: 'target-failed',
-              targetId: worker.targetId,
+              type: 'workspace-failed',
+              workspaceId: worker.workspaceId,
               phase: 'run',
             });
             throw error;
@@ -169,8 +203,8 @@ export const startCatalogRunner = async <Connection extends CatalogConnection>(
         );
       } catch (error) {
         emit({
-          type: 'target-failed',
-          targetId: worker.targetId,
+          type: 'workspace-failed',
+          workspaceId: worker.workspaceId,
           phase: 'run',
         });
         throw error;

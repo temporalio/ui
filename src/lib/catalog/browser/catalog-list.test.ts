@@ -70,7 +70,7 @@ const descriptor: BrowserCatalogDescriptor = {
   },
   execution: {
     kind: 'workflow',
-    targetId: 'catalog',
+    workspaceId: 'catalog',
     namespace: 'default',
     taskQueue: 'catalog-tasks',
     workflowType: 'OrderLifecycle',

@@ -2,10 +2,16 @@ import { isDeepStrictEqual, types as nodeTypes } from 'node:util';
 
 import type { ServiceHandler } from 'nexus-rpc';
 
+import {
+  catalogScenariosSchema,
+  type CatalogWorkspaceMetadata,
+  catalogWorkspaceMetadataSchema,
+} from '../browser/metadata-schema.js';
 import { withSharedCatalogStartOptions } from '../browser/start-options.js';
 import type {
   BrowserCatalogDescriptor,
   BrowserCatalogMetadata,
+  BrowserCatalogWorkspace,
   JsonObject,
   JsonSchema,
   RuntimeJsonDocument,
@@ -19,7 +25,9 @@ type BrowserCatalogDescriptorWithoutSource = Omit<
 export type WorkflowImplementation = (...args: never[]) => unknown;
 export type ActivityImplementation = (...args: never[]) => unknown;
 
-export type CatalogTarget = {
+export type CatalogWorkspaceDefinition = CatalogWorkspaceMetadata;
+
+export type CatalogWorkspace = CatalogWorkspaceDefinition & {
   id: string;
   namespace: string;
   taskQueue: string;
@@ -28,7 +36,7 @@ export type CatalogTarget = {
 };
 
 type ExampleMetadata = BrowserCatalogMetadata & {
-  targetId: string;
+  workspaceId: string;
 };
 
 type WorkflowExecution = {
@@ -76,20 +84,20 @@ export type CatalogExampleRegistration =
 
 export type CatalogExampleDefinition =
   CatalogExampleRegistration extends infer Registration
-    ? Registration extends { targetId: string }
-      ? Omit<Registration, 'targetId'>
+    ? Registration extends { workspaceId: string }
+      ? Omit<Registration, 'workspaceId'>
       : never
     : never;
 
 export type CatalogRegistry = {
-  registerTarget: (target: CatalogTarget) => void;
+  registerWorkspace: (workspace: CatalogWorkspace) => void;
   registerExample: (example: CatalogExampleRegistration) => void;
-  readonly targets: readonly CatalogTarget[];
+  readonly workspaces: readonly CatalogWorkspace[];
   readonly examples: readonly CatalogExampleRegistration[];
 };
 
 export type CatalogWorkerBinding = {
-  target: CatalogTarget;
+  workspace: CatalogWorkspace;
   examples: {
     id: string;
     execution: CatalogExampleRegistration['execution'];
@@ -256,22 +264,41 @@ const exampleFields = new Set([
   'id',
   'title',
   'description',
-  'targetId',
+  'workspaceId',
   'capabilityTags',
   'expectedEvidence',
   'input',
   'startOptions',
   'setupMarkdown',
+  'scenarios',
   'execution',
 ]);
 
-const targetFields = new Set([
+const workspaceMetadataFields = [
+  'title',
+  'description',
+  'docsUrl',
+  'controls',
+  'eject',
+] as const;
+
+const workspaceFields = new Set([
   'id',
   'namespace',
   'taskQueue',
   'workflowsPath',
   'workflowExports',
+  ...workspaceMetadataFields,
 ]);
+
+const workspaceMetadata = (
+  workspace: CatalogWorkspace,
+): CatalogWorkspaceMetadata =>
+  Object.fromEntries(
+    workspaceMetadataFields
+      .filter((field) => workspace[field] !== undefined)
+      .map((field) => [field, workspace[field]]),
+  );
 
 const workflowExecutionFields = new Set([
   'kind',
@@ -306,49 +333,51 @@ const executionKinds = new Set([
 ]);
 
 export const createCatalogRegistry = (): CatalogRegistry => {
-  const targets: CatalogTarget[] = [];
+  const workspaces: CatalogWorkspace[] = [];
   const examples: CatalogExampleRegistration[] = [];
 
   return {
-    registerTarget: (target) => targets.push(target),
+    registerWorkspace: (workspace) => workspaces.push(workspace),
     registerExample: (example) => examples.push(example),
-    targets,
+    workspaces,
     examples,
   };
 };
 
 export const generateCatalog = (registry: CatalogRegistry) => {
-  for (const target of registry.targets) {
-    if (!hasOnlyEnumerableDataProperties(target)) {
+  for (const workspace of registry.workspaces) {
+    if (!hasOnlyEnumerableDataProperties(workspace)) {
       throw new Error(
-        'Catalog target registrations must use enumerable data properties',
+        'Catalog workspace registrations must use enumerable data properties',
       );
     }
 
-    if (!hasOnlyKnownFields(target, targetFields)) {
-      throw new Error(`Catalog target "${target.id}" contains unknown fields`);
+    if (!hasOnlyKnownFields(workspace, workspaceFields)) {
+      throw new Error(
+        `Catalog workspace "${workspace.id}" contains unknown fields`,
+      );
     }
 
     if (
-      !isNonEmptyString(target.id) ||
-      !isNonEmptyString(target.namespace) ||
-      !isNonEmptyString(target.taskQueue)
+      !isNonEmptyString(workspace.id) ||
+      !isNonEmptyString(workspace.namespace) ||
+      !isNonEmptyString(workspace.taskQueue)
     ) {
       throw new Error(
-        `Catalog target "${target.id}" has invalid identity or routing fields`,
+        `Catalog workspace "${workspace.id}" has invalid identity or routing fields`,
       );
     }
 
-    if (!isNonEmptyString(target.workflowsPath)) {
+    if (!isNonEmptyString(workspace.workflowsPath)) {
       throw new Error(
-        `Catalog target "${target.id}" has an invalid packaged workflowsPath`,
+        `Catalog workspace "${workspace.id}" has an invalid packaged workflowsPath`,
       );
     }
 
     if (
-      typeof target.workflowExports !== 'object' ||
-      target.workflowExports === null ||
-      !hasOnlyEnumerableDataProperties(target.workflowExports)
+      typeof workspace.workflowExports !== 'object' ||
+      workspace.workflowExports === null ||
+      !hasOnlyEnumerableDataProperties(workspace.workflowExports)
     ) {
       throw new Error(
         'Catalog workflow exports must use enumerable data properties',
@@ -356,12 +385,21 @@ export const generateCatalog = (registry: CatalogRegistry) => {
     }
 
     if (
-      !Object.values(target.workflowExports).every(
+      !Object.values(workspace.workflowExports).every(
         (workflow) => typeof workflow === 'function',
       )
     ) {
       throw new Error(
-        `Catalog target "${target.id}" has invalid workflow exports`,
+        `Catalog workspace "${workspace.id}" has invalid workflow exports`,
+      );
+    }
+
+    if (
+      !catalogWorkspaceMetadataSchema.safeParse(workspaceMetadata(workspace))
+        .success
+    ) {
+      throw new Error(
+        `Catalog workspace "${workspace.id}" has invalid metadata fields`,
       );
     }
   }
@@ -383,7 +421,7 @@ export const generateCatalog = (registry: CatalogRegistry) => {
       !isNonEmptyString(example.id) ||
       !isNonEmptyString(example.title) ||
       !isNonEmptyString(example.description) ||
-      !isNonEmptyString(example.targetId) ||
+      !isNonEmptyString(example.workspaceId) ||
       !isStringArray(example.capabilityTags) ||
       !isStringArray(example.expectedEvidence) ||
       !isRuntimeJsonDocument(example.input) ||
@@ -394,6 +432,13 @@ export const generateCatalog = (registry: CatalogRegistry) => {
       throw new Error(
         `Catalog example "${example.id}" has invalid metadata fields`,
       );
+    }
+
+    if (
+      example.scenarios !== undefined &&
+      !catalogScenariosSchema.safeParse(example.scenarios).success
+    ) {
+      throw new Error(`Catalog example "${example.id}" has invalid scenarios`);
     }
 
     if (!hasOnlyEnumerableDataProperties(example.execution)) {
@@ -521,59 +566,61 @@ export const generateCatalog = (registry: CatalogRegistry) => {
     }
   }
 
-  const targetIds = new Set<string>();
+  const workspaceIds = new Set<string>();
 
-  for (const { id } of registry.targets) {
-    if (targetIds.has(id)) {
-      throw new Error(`Duplicate catalog target id "${id}"`);
+  for (const { id } of registry.workspaces) {
+    if (workspaceIds.has(id)) {
+      throw new Error(`Duplicate catalog workspace id "${id}"`);
     }
 
-    targetIds.add(id);
+    workspaceIds.add(id);
   }
 
   const exampleIds = new Set<string>();
 
-  for (const { execution, id, targetId } of registry.examples) {
+  for (const { execution, id, workspaceId } of registry.examples) {
     if (exampleIds.has(id)) {
       throw new Error(`Duplicate catalog example id "${id}"`);
     }
 
     exampleIds.add(id);
 
-    const target = registry.targets.find((target) => target.id === targetId);
+    const workspace = registry.workspaces.find(
+      (workspace) => workspace.id === workspaceId,
+    );
 
-    if (!target) {
+    if (!workspace) {
       throw new Error(
-        `Unknown catalog target id "${targetId}" for example "${id}"`,
+        `Unknown catalog workspace id "${workspaceId}" for example "${id}"`,
       );
     }
 
     if (
       execution.kind === 'workflow' &&
-      !Object.hasOwn(target.workflowExports, execution.workflowType)
+      !Object.hasOwn(workspace.workflowExports, execution.workflowType)
     ) {
       throw new Error(
-        `Workflow type "${execution.workflowType}" for example "${id}" is not exported by target "${targetId}"`,
+        `Workflow type "${execution.workflowType}" for example "${id}" is not exported by workspace "${workspaceId}"`,
       );
     }
 
     if (
       execution.kind === 'workflow' &&
-      target.workflowExports[execution.workflowType] !== execution.workflow
+      workspace.workflowExports[execution.workflowType] !== execution.workflow
     ) {
       throw new Error(
-        `Workflow implementation "${execution.workflowType}" for example "${id}" does not match target "${targetId}" static export`,
+        `Workflow implementation "${execution.workflowType}" for example "${id}" does not match workspace "${workspaceId}" static export`,
       );
     }
   }
 
-  const workerBindings: CatalogWorkerBinding[] = registry.targets
-    .filter((target) =>
-      registry.examples.some((example) => example.targetId === target.id),
+  const workerBindings: CatalogWorkerBinding[] = registry.workspaces
+    .filter((workspace) =>
+      registry.examples.some((example) => example.workspaceId === workspace.id),
     )
-    .map((target) => {
+    .map((workspace) => {
       const examples = registry.examples.filter(
-        (example) => example.targetId === target.id,
+        (example) => example.workspaceId === workspace.id,
       );
       const activities: Record<string, ActivityImplementation> = {};
       const nexusServices: ServiceHandler[] = [];
@@ -586,7 +633,7 @@ export const generateCatalog = (registry: CatalogRegistry) => {
 
         if (existing && existing !== implementation) {
           throw new Error(
-            `Activity "${activityType}" has conflicting implementations on target "${target.id}"`,
+            `Activity "${activityType}" has conflicting implementations on workspace "${workspace.id}"`,
           );
         }
 
@@ -599,7 +646,7 @@ export const generateCatalog = (registry: CatalogRegistry) => {
 
         if (existing && existing !== handler) {
           throw new Error(
-            `Catalog Nexus service "${name}" has conflicting handlers on target "${target.id}"`,
+            `Catalog Nexus service "${name}" has conflicting handlers on workspace "${workspace.id}"`,
           );
         }
 
@@ -628,7 +675,7 @@ export const generateCatalog = (registry: CatalogRegistry) => {
       }
 
       return {
-        target,
+        workspace,
         examples: examples.map(({ id, execution }) => ({ id, execution })),
         activities,
         nexusServices,
@@ -636,17 +683,19 @@ export const generateCatalog = (registry: CatalogRegistry) => {
     });
 
   const browserDescriptors: BrowserCatalogDescriptorWithoutSource[] =
-    registry.examples.map(({ targetId, execution, ...metadata }) => {
-      const target = registry.targets.find(({ id }) => id === targetId)!;
+    registry.examples.map(({ workspaceId, execution, ...metadata }) => {
+      const workspace = registry.workspaces.find(
+        ({ id }) => id === workspaceId,
+      )!;
 
       if (execution.kind === 'standalone-activity') {
         return {
           ...metadata,
           execution: {
             kind: execution.kind,
-            targetId: target.id,
-            namespace: target.namespace,
-            taskQueue: target.taskQueue,
+            workspaceId: workspace.id,
+            namespace: workspace.namespace,
+            taskQueue: workspace.taskQueue,
             activityType: execution.activityType,
             timeouts: execution.timeouts,
             policies: execution.policies,
@@ -659,9 +708,9 @@ export const generateCatalog = (registry: CatalogRegistry) => {
           ...metadata,
           execution: {
             kind: execution.kind,
-            targetId: target.id,
-            namespace: target.namespace,
-            taskQueue: target.taskQueue,
+            workspaceId: workspace.id,
+            namespace: workspace.namespace,
+            taskQueue: workspace.taskQueue,
             endpoint: execution.endpoint,
             service: execution.service,
             operation: execution.operation,
@@ -678,9 +727,9 @@ export const generateCatalog = (registry: CatalogRegistry) => {
         },
         execution: {
           kind: execution.kind,
-          targetId: target.id,
-          namespace: target.namespace,
-          taskQueue: target.taskQueue,
+          workspaceId: workspace.id,
+          namespace: workspace.namespace,
+          taskQueue: workspace.taskQueue,
           workflowType: execution.workflowType,
           ...(execution.nexusEndpoints?.length
             ? { nexusEndpoints: [...execution.nexusEndpoints] }
@@ -701,5 +750,16 @@ export const generateCatalog = (registry: CatalogRegistry) => {
     (descriptor) => JSON.parse(JSON.stringify(descriptor)) as typeof descriptor,
   );
 
-  return { browserDescriptors: browserSnapshots, workerBindings };
+  const browserWorkspaces: BrowserCatalogWorkspace[] = workerBindings.map(
+    ({ workspace }) =>
+      JSON.parse(
+        JSON.stringify({ id: workspace.id, ...workspaceMetadata(workspace) }),
+      ),
+  );
+
+  return {
+    browserDescriptors: browserSnapshots,
+    browserWorkspaces,
+    workerBindings,
+  };
 };

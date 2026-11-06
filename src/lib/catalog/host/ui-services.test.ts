@@ -22,7 +22,7 @@ const descriptor: BrowserCatalogDescriptor = {
   startOptions: { defaultValue: {}, schema: {} },
   execution: {
     kind: 'workflow',
-    targetId: 'catalog',
+    workspaceId: 'catalog',
     namespace: 'catalog-demo',
     taskQueue: 'catalog-queue',
     workflowType: 'orderWorkflow',
@@ -34,7 +34,7 @@ const activityDescriptor: BrowserCatalogDescriptor = {
   id: 'priority-activity',
   execution: {
     kind: 'standalone-activity',
-    targetId: 'catalog',
+    workspaceId: 'catalog',
     namespace: 'catalog-demo',
     taskQueue: 'catalog-queue',
     activityType: 'priorityActivity',
@@ -48,7 +48,7 @@ const nexusDescriptor: BrowserCatalogDescriptor = {
   id: 'nexus-greeting',
   execution: {
     kind: 'standalone-nexus-operation',
-    targetId: 'nexus-caller',
+    workspaceId: 'nexus-caller',
     namespace: 'caller-demo',
     taskQueue: 'caller-queue',
     endpoint: 'greeting-endpoint',
@@ -667,7 +667,7 @@ describe('createApiWorkbenchHost', () => {
         kind: 'workflow',
         attempt: { attemptId: 'attempt-6', executionId: 'workflow-6' },
         target: {
-          targetId: 'catalog',
+          workspaceId: 'catalog',
           namespace: 'catalog-demo',
           taskQueue: 'catalog-queue',
         },
@@ -702,7 +702,7 @@ describe('createApiWorkbenchHost', () => {
           kind,
           attempt: { attemptId: 'attempt-7', executionId: 'execution-7' },
           target: {
-            targetId: 'catalog',
+            workspaceId: 'catalog',
             namespace: 'catalog-demo',
             taskQueue: 'catalog-queue',
           },
@@ -738,7 +738,7 @@ describe('createApiWorkbenchHost', () => {
             executionId: 'workflow-observe',
           },
           target: {
-            targetId: 'catalog',
+            workspaceId: 'catalog',
             namespace: 'catalog-demo',
             taskQueue: 'catalog-queue',
           },
@@ -782,7 +782,7 @@ describe('createApiWorkbenchHost', () => {
             executionId: 'activity-observe',
           },
           target: {
-            targetId: 'catalog',
+            workspaceId: 'catalog',
             namespace: 'catalog-demo',
             taskQueue: 'catalog-queue',
           },
@@ -826,7 +826,7 @@ describe('createApiWorkbenchHost', () => {
             executionId: 'activity-first',
           },
           target: {
-            targetId: 'catalog',
+            workspaceId: 'catalog',
             namespace: 'catalog-demo',
             taskQueue: 'catalog-queue',
           },
@@ -865,7 +865,7 @@ describe('createApiWorkbenchHost', () => {
             executionId: 'nexus-observe',
           },
           target: {
-            targetId: 'nexus-caller',
+            workspaceId: 'nexus-caller',
             namespace: 'caller-demo',
             taskQueue: 'caller-queue',
           },
@@ -911,7 +911,7 @@ describe('createApiWorkbenchHost', () => {
             executionId: 'workflow-delay',
           },
           target: {
-            targetId: 'catalog',
+            workspaceId: 'catalog',
             namespace: 'catalog-demo',
             taskQueue: 'catalog-queue',
           },
@@ -951,7 +951,7 @@ describe('createApiWorkbenchHost', () => {
             executionId: 'workflow-abort-delay',
           },
           target: {
-            targetId: 'catalog',
+            workspaceId: 'catalog',
             namespace: 'catalog-demo',
             taskQueue: 'catalog-queue',
           },
@@ -987,7 +987,7 @@ describe('createApiWorkbenchHost', () => {
               executionId: 'workflow-forbidden',
             },
             target: {
-              targetId: 'catalog',
+              workspaceId: 'catalog',
               namespace: 'catalog-demo',
               taskQueue: 'catalog-queue',
             },
@@ -1028,7 +1028,7 @@ describe('createApiWorkbenchHost', () => {
                 executionId: `workflow-${status}`,
               },
               target: {
-                targetId: 'catalog',
+                workspaceId: 'catalog',
                 namespace: 'catalog-demo',
                 taskQueue: 'catalog-queue',
               },
@@ -1058,7 +1058,7 @@ describe('createApiWorkbenchHost', () => {
               executionId: 'workflow-transport',
             },
             target: {
-              targetId: 'catalog',
+              workspaceId: 'catalog',
               namespace: 'catalog-demo',
               taskQueue: 'catalog-queue',
             },

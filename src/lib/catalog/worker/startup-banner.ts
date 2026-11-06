@@ -5,7 +5,7 @@ const GREEN = `${ESC}[32m`;
 const CYAN = `${ESC}[36m`;
 const GRAY = `${ESC}[90m`;
 
-export type CatalogBannerTarget = {
+export type CatalogBannerWorkspace = {
   id: string;
   namespace: string;
   taskQueue: string;
@@ -31,15 +31,15 @@ export const supportsAnsiColor = ({
 };
 
 export const formatCatalogBanner = ({
-  targets,
+  workspaces,
   origin = 'http://localhost:3000',
   color = false,
 }: {
-  targets: readonly CatalogBannerTarget[];
+  workspaces: readonly CatalogBannerWorkspace[];
   origin?: string;
   color?: boolean;
 }): string => {
-  const namespaces = [...new Set(targets.map(({ namespace }) => namespace))];
+  const namespaces = [...new Set(workspaces.map(({ namespace }) => namespace))];
   const lines: BannerLine[] = [
     { text: 'CATALOG READY', style: `${BOLD}${GREEN}` },
     { text: '', style: '' },
@@ -48,7 +48,7 @@ export const formatCatalogBanner = ({
       style: CYAN,
     })),
     { text: '', style: '' },
-    ...targets.map(({ id, namespace, taskQueue }) => ({
+    ...workspaces.map(({ id, namespace, taskQueue }) => ({
       text: `${id} → ${namespace} / ${taskQueue}`,
       style: '',
     })),

@@ -6,6 +6,7 @@ import {
   type CatalogWorkerOptions,
   startCatalogRunner,
 } from './runner.js';
+import type { CatalogWorkspaceControl } from '../browser/metadata-schema.js';
 
 type CatalogSignals = {
   once: (signal: 'SIGINT' | 'SIGTERM', listener: () => void) => unknown;
@@ -14,12 +15,13 @@ type CatalogSignals = {
 
 type RunCatalogDevelopmentOptions<Connection extends CatalogConnection> = {
   bindings: readonly CatalogWorkerBinding[];
-  targetId?: string;
+  workspaceId?: string;
   connectionFactory: () => Promise<Connection>;
   createWorker: (
     options: CatalogWorkerOptions<Connection>,
   ) => Promise<CatalogWorker>;
   events?: (event: CatalogRunnerEvent) => void;
+  controls?: readonly CatalogWorkspaceControl[];
   signals: CatalogSignals;
 };
 
@@ -27,27 +29,28 @@ export const runCatalogDevelopment = async <
   Connection extends CatalogConnection,
 >({
   bindings,
-  targetId,
+  workspaceId,
   connectionFactory,
   createWorker,
   events,
+  controls,
   signals,
 }: RunCatalogDevelopmentOptions<Connection>) => {
-  const selectedBindings = targetId
-    ? bindings.filter((binding) => binding.target.id === targetId)
+  const selectedBindings = workspaceId
+    ? bindings.filter((binding) => binding.workspace.id === workspaceId)
     : bindings;
 
-  if (targetId && selectedBindings.length === 0) {
+  if (workspaceId && selectedBindings.length === 0) {
     throw new Error(
-      `Catalog target "${targetId}" was not found; available targets: ${bindings
-        .map((binding) => binding.target.id)
+      `Catalog workspace "${workspaceId}" was not found; available workspaces: ${bindings
+        .map((binding) => binding.workspace.id)
         .join(', ')}`,
     );
   }
 
   if (selectedBindings.length === 0) {
     throw new Error(
-      'Catalog has no runnable targets; register an example before starting the development runner',
+      'Catalog has no runnable workspaces; register an example before starting the development runner',
     );
   }
 
@@ -56,6 +59,7 @@ export const runCatalogDevelopment = async <
     connectionFactory,
     createWorker,
     events,
+    controls,
   });
   let shutdown: Promise<void> | undefined;
   const handleSignal = () => {

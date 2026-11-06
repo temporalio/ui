@@ -19,7 +19,7 @@ export const declaredNexusEndpoints = (
 ): DeclaredNexusEndpoint[] => {
   const byName = new Map<string, DeclaredNexusEndpoint>();
 
-  for (const { target, examples } of bindings) {
+  for (const { workspace, examples } of bindings) {
     for (const { execution } of examples) {
       const endpoints =
         execution.kind === 'standalone-nexus-operation'
@@ -33,8 +33,8 @@ export const declaredNexusEndpoints = (
 
         byName.set(endpoint, {
           name: endpoint,
-          namespace: target.namespace,
-          taskQueue: target.taskQueue,
+          namespace: workspace.namespace,
+          taskQueue: workspace.taskQueue,
         });
       }
     }
