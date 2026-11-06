@@ -17,6 +17,7 @@
     perPageKey,
   } from '$lib/stores/pagination';
   import { getFloatStyle } from '$lib/utilities/get-float-style';
+  import { isEditableTarget } from '$lib/utilities/is-editable-target';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
   type PaginationScope = {
@@ -129,6 +130,7 @@
   const floatStyle = $derived(getFloatStyle({ width, height, screenWidth }));
 
   async function handleKeydown(event: KeyboardEvent) {
+    if (isEditableTarget(event)) return;
     switch (event.code) {
       case 'ArrowRight':
       case 'KeyL':
