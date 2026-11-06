@@ -23,21 +23,22 @@
 package csrf
 
 import (
+	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestSkipOnAuthorizationHeader(t *testing.T) {
 	e := echo.New()
-	req := httptest.NewRequest(echo.GET, "/api/v1/settings", nil)
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/settings", nil)
 	rec := httptest.NewRecorder()
 
 	tests := map[string]struct {
-		ctx                 echo.Context
+		ctx                 *echo.Context
 		authorizationHeader string
 		expected            bool
 	}{

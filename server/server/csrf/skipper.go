@@ -23,9 +23,9 @@
 package csrf
 
 import (
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 )
 
-func SkipOnAuthorizationHeader(c echo.Context) bool {
+func SkipOnAuthorizationHeader(c *echo.Context) bool {
 	return c.Request().Header.Get(echo.HeaderAuthorization) != ""
 }

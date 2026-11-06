@@ -24,11 +24,12 @@ package auth_test
 
 import (
 	_ "embed"
+	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/temporalio/ui-server/v2/server/auth"
 	"github.com/temporalio/ui-server/v2/server/config"
@@ -62,12 +63,12 @@ import (
 
 func TestSetUser(t *testing.T) {
 	e := echo.New()
-	req := httptest.NewRequest(echo.GET, "/", nil)
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 
 	tests := map[string]struct {
 		user    auth.User
-		ctx     echo.Context
+		ctx     *echo.Context
 		wantErr bool
 	}{
 		"user empty": {
@@ -118,7 +119,7 @@ func TestSetUserSecureFlag(t *testing.T) {
 	for name, secure := range map[string]bool{"secure=true": true, "secure=false": false} {
 		t.Run(name, func(t *testing.T) {
 			e := echo.New()
-			req := httptest.NewRequest(echo.GET, "/auth/sso/callback", nil)
+			req := httptest.NewRequest(http.MethodGet, "/auth/sso/callback", nil)
 			c := e.NewContext(req, httptest.NewRecorder())
 			user := auth.User{OAuth2Token: &oauth2.Token{AccessToken: "AAA", RefreshToken: "RRR"}}
 
@@ -201,7 +202,7 @@ func TestValidateAuthHeaderExists(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// Setup
 			e := echo.New()
-			req := httptest.NewRequest(echo.GET, "/", nil)
+			req := httptest.NewRequest(http.MethodGet, "/", nil)
 			if tt.authHeader != "" {
 				req.Header.Set(echo.HeaderAuthorization, tt.authHeader)
 			}

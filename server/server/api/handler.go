@@ -28,7 +28,7 @@ import (
 	"net/http/httptest"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
@@ -130,10 +130,10 @@ type IframeExtensionSizingResponse struct {
 	MaxWidth      int
 }
 
-type AccessCheck func(echo.Context) error
+type AccessCheck func(*echo.Context) error
 
 func TemporalAPIHandler(cfgProvider *config.ConfigProviderWithRefresh, apiMiddleware []Middleware, conn *grpc.ClientConn) echo.HandlerFunc {
-	return func(c echo.Context) error {
+	return func(c *echo.Context) error {
 		err := auth.ValidateAuthHeaderExists(c, cfgProvider)
 		if err != nil {
 			return err
@@ -211,10 +211,10 @@ func customUIResponse(customUI config.CustomUI) *CustomUIResponse {
 // to the local header/JWT check because supported custom-auth deployments rely
 // on Temporal's claim mapper and authorizer to validate access tokens.
 func TemporalAccessCheck(conn *grpc.ClientConn, apiMiddleware []Middleware) AccessCheck {
-	return func(c echo.Context) error {
+	return func(c *echo.Context) error {
 		mux, err := getTemporalClientMux(c, conn, apiMiddleware)
 		if err != nil {
-			return echo.NewHTTPError(http.StatusBadGateway, "unable to verify Temporal API access").SetInternal(err)
+			return echo.NewHTTPError(http.StatusBadGateway, "unable to verify Temporal API access").Wrap(err)
 		}
 
 		request := c.Request().Clone(c.Request().Context())
@@ -241,8 +241,8 @@ func TemporalAccessCheck(conn *grpc.ClientConn, apiMiddleware []Middleware) Acce
 // GetUIExtensions returns the effective inline extension registry. Unlike the
 // public bootstrap settings, this endpoint verifies access through the same
 // Temporal API authority when authentication is enabled.
-func GetUIExtensions(cfgProvider *config.ConfigProviderWithRefresh, accessCheck AccessCheck) func(echo.Context) error {
-	return func(c echo.Context) error {
+func GetUIExtensions(cfgProvider *config.ConfigProviderWithRefresh, accessCheck AccessCheck) func(*echo.Context) error {
+	return func(c *echo.Context) error {
 		c.Response().Header().Set("Cache-Control", "no-store")
 		c.Response().Header().Set("Vary", echo.HeaderAuthorization)
 
@@ -263,15 +263,15 @@ func GetUIExtensions(cfgProvider *config.ConfigProviderWithRefresh, accessCheck 
 			}
 		}
 		if err := cfg.CustomUI.Validate(cfg.Auth.Enabled); err != nil {
-			return echo.NewHTTPError(http.StatusInternalServerError, "invalid custom UI configuration").SetInternal(err)
+			return echo.NewHTTPError(http.StatusInternalServerError, "invalid custom UI configuration").Wrap(err)
 		}
 
 		return c.JSON(http.StatusOK, customUIResponse(cfg.CustomUI))
 	}
 }
 
-func GetSettings(cfgProvider *config.ConfigProviderWithRefresh) func(echo.Context) error {
-	return func(c echo.Context) error {
+func GetSettings(cfgProvider *config.ConfigProviderWithRefresh) func(*echo.Context) error {
+	return func(c *echo.Context) error {
 		cfg, err := cfgProvider.GetConfig()
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, err)
@@ -362,7 +362,7 @@ func errorHandler(
 	_, _ = w.Write(buf)
 }
 
-func getTemporalClientMux(c echo.Context, temporalConn *grpc.ClientConn, apiMiddleware []Middleware) (*runtime.ServeMux, error) {
+func getTemporalClientMux(c *echo.Context, temporalConn *grpc.ClientConn, apiMiddleware []Middleware) (*runtime.ServeMux, error) {
 	var muxOpts []runtime.ServeMuxOption
 	for _, m := range apiMiddleware {
 		muxOpts = append(muxOpts, m(c))

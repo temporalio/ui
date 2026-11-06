@@ -29,7 +29,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/temporalio/ui-server/v2/server/config"
 )
@@ -62,7 +62,7 @@ func TestCORSMiddleware_StaticOrigins(t *testing.T) {
 		ConfigProvider:   &mockConfigProvider{cfg: cfg},
 	})
 
-	handler := middleware(func(c echo.Context) error {
+	handler := middleware(func(c *echo.Context) error {
 		return c.String(http.StatusOK, "test")
 	})
 
@@ -92,7 +92,7 @@ func TestCORSMiddleware_UnsafeAllowAllOrigins(t *testing.T) {
 		ConfigProvider:   &mockConfigProvider{cfg: cfg},
 	})
 
-	handler := middleware(func(c echo.Context) error {
+	handler := middleware(func(c *echo.Context) error {
 		return c.String(http.StatusOK, "test")
 	})
 
@@ -122,7 +122,7 @@ func TestCORSMiddleware_StaticOrigins_NotAllowed(t *testing.T) {
 		ConfigProvider:   &mockConfigProvider{cfg: cfg},
 	})
 
-	handler := middleware(func(c echo.Context) error {
+	handler := middleware(func(c *echo.Context) error {
 		return c.String(http.StatusOK, "test")
 	})
 
@@ -151,7 +151,7 @@ func TestCORSMiddleware_PreflightRequest(t *testing.T) {
 		ConfigProvider:   &mockConfigProvider{cfg: cfg},
 	})
 
-	handler := middleware(func(c echo.Context) error {
+	handler := middleware(func(c *echo.Context) error {
 		return c.String(http.StatusOK, "should not reach here")
 	})
 

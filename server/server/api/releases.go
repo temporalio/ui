@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/Masterminds/semver/v3"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"github.com/temporalio/ui-server/v2/server/config"
 )
 
@@ -241,8 +241,8 @@ func normalizeReleaseTag(tag string) string {
 
 // GetLatestReleases returns the latest release of the configured
 // distribution. A failed lookup returns no releases.
-func GetLatestReleases(cfgProvider *config.ConfigProviderWithRefresh, checker *ReleaseChecker) func(echo.Context) error {
-	return func(c echo.Context) error {
+func GetLatestReleases(cfgProvider *config.ConfigProviderWithRefresh, checker *ReleaseChecker) func(*echo.Context) error {
+	return func(c *echo.Context) error {
 		cfg, err := cfgProvider.GetConfig()
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, err)

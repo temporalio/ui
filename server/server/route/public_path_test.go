@@ -5,14 +5,14 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"github.com/stretchr/testify/assert"
 )
 
 func newEchoWithPublicPath(prefix string) *echo.Echo {
 	e := echo.New()
 	e.Pre(PublicPath(prefix))
-	e.GET("/*", func(c echo.Context) error {
+	e.GET("/*", func(c *echo.Context) error {
 		return c.String(http.StatusOK, c.Request().URL.Path)
 	})
 	return e

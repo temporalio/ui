@@ -28,7 +28,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"github.com/temporalio/ui-server/v2/server/config"
 )
 
@@ -43,7 +43,7 @@ type CORSConfig struct {
 // unsafe allow all origins configuration
 func CORSMiddleware(config CORSConfig) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
+		return func(c *echo.Context) error {
 			cfg, err := config.ConfigProvider.GetConfig()
 			if err != nil {
 				return next(c)
@@ -73,7 +73,7 @@ func IsOriginAllowed(origin string, allowOrigins []string) bool {
 }
 
 // handleStaticCORS handles standard CORS with predefined allowed origins
-func handleStaticCORS(c echo.Context, next echo.HandlerFunc, allowOrigins []string, config CORSConfig) error {
+func handleStaticCORS(c *echo.Context, next echo.HandlerFunc, allowOrigins []string, config CORSConfig) error {
 	origin := c.Request().Header.Get("Origin")
 
 	if IsOriginAllowed(origin, allowOrigins) {
@@ -89,7 +89,7 @@ func handleStaticCORS(c echo.Context, next echo.HandlerFunc, allowOrigins []stri
 }
 
 // handleDynamicCORS handles unsafe allow all origins by using the request origin
-func handleDynamicCORS(c echo.Context, next echo.HandlerFunc, config CORSConfig) error {
+func handleDynamicCORS(c *echo.Context, next echo.HandlerFunc, config CORSConfig) error {
 	origin := c.Request().Header.Get("Origin")
 
 	// Only set CORS headers if origin is present
@@ -106,7 +106,7 @@ func handleDynamicCORS(c echo.Context, next echo.HandlerFunc, config CORSConfig)
 }
 
 // setCORSHeaders sets the appropriate CORS headers
-func setCORSHeaders(c echo.Context, origin string, config CORSConfig) {
+func setCORSHeaders(c *echo.Context, origin string, config CORSConfig) {
 	c.Response().Header().Set("Access-Control-Allow-Origin", origin)
 
 	if config.AllowCredentials {
