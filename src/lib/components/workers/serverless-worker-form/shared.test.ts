@@ -9,6 +9,7 @@ import {
   getInitialComputeProvider,
   interpolateTerraformTemplate,
   msToScaleDownStabilization,
+  savesRegionGroups,
   scaleDownStabilizationToMs,
   validateRegionValues,
 } from './shared';
@@ -390,6 +391,35 @@ describe('validateRegionValues', () => {
       },
     ]);
     expect(errors.replica?.lambdaArn).toEqual(['Invalid Lambda ARN format']);
+  });
+});
+
+describe('savesRegionGroups', () => {
+  const entry = (regionId: string, scoped?: boolean) => ({
+    regionId,
+    values: { provider: 'lambda' as const } as never,
+    scoped,
+  });
+
+  it('saves a single unscoped primary as a single-region Version', () => {
+    expect(savesRegionGroups([entry('aws-us-east-1', false)])).toBe(false);
+  });
+
+  it('saves a primary and a replica as region groups', () => {
+    expect(
+      savesRegionGroups([
+        entry('aws-us-east-1', false),
+        entry('aws-us-west-2', true),
+      ]),
+    ).toBe(true);
+  });
+
+  it('saves a replica on its own as a region group', () => {
+    expect(savesRegionGroups([entry('aws-us-west-2', true)])).toBe(true);
+  });
+
+  it('reads an entry with no scope as scoped, as the builder does', () => {
+    expect(savesRegionGroups([entry('aws-us-west-2')])).toBe(true);
   });
 });
 

@@ -132,14 +132,14 @@
     <div
       class={merge(
         'input-container',
-        'relative box-border inline-flex w-full items-center rounded border border-primary bg-background-primary text-sm text-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-interactive-primary focus-within:ring-offset-2 focus-within:ring-offset-background-primary',
+        'relative box-border inline-flex w-full items-center rounded border border-primary bg-background-primary text-sm text-primary has-[.input:focus]:outline-none has-[.input:focus]:ring-2 has-[.input:focus]:ring-interactive-primary has-[.input:focus]:ring-offset-2 has-[.input:focus]:ring-offset-background-primary',
         heights[size],
         focusRing === 'inner' &&
-          'focus-within:ring-inset focus-within:ring-offset-0',
+          'has-[.input:focus]:ring-inset has-[.input:focus]:ring-offset-0',
         !isDisabled &&
           !readonly &&
           !showError &&
-          'focus-within:border-secondary hover:border-brand focus-within:hover:border-secondary',
+          'hover:border-brand has-[.input:focus]:border-secondary has-[.input:focus]:hover:border-secondary',
         value && !isDisabled && !showError && 'border-secondary',
         readonly &&
           !isDisabled &&
@@ -216,7 +216,10 @@
           LeadingIcon={IconClose}
           variant="ghost"
           data-testid="clear-input"
-          class={suffix ? 'rounded-none' : 'rounded-l-none'}
+          class={merge(
+            'h-full focus-visible:ring-inset focus-visible:ring-offset-0',
+            suffix ? 'rounded-none' : 'rounded-l-none',
+          )}
         />
       {/if}
       {#if suffix}
@@ -245,7 +248,7 @@
     </span>
     {#if maxLength && !isDisabled && !hideCount}
       <span
-        class="invisible text-right text-xs tracking-widest group-focus-within:visible"
+        class="invisible text-right text-xs tracking-widest group-has-[.input:focus]:visible"
       >
         <span
           class={merge(
@@ -266,7 +269,7 @@
   .input-container {
     &.error,
     &.invalid {
-      @apply border-danger focus-within:border-danger;
+      @apply border-danger has-[.input:focus]:border-danger;
     }
   }
 

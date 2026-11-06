@@ -70,7 +70,15 @@ export const getQuickFilterConditional = ({
 // Status filters render as a multi-select chip rather than the operator form —
 // isTextFilter even refuses them — so a status cell applies `=` in one click and
 // every other cell asks which operator it meant.
-export const STATUS_ATTRIBUTES = new Set(['ExecutionStatus', 'WorkerStatus']);
+const STATUS_ATTRIBUTE_NAMES = ['ExecutionStatus', 'WorkerStatus'] as const;
+
+export type StatusAttribute = (typeof STATUS_ATTRIBUTE_NAMES)[number];
+
+export const STATUS_ATTRIBUTES = new Set<string>(STATUS_ATTRIBUTE_NAMES);
+
+export const isStatusAttribute = (
+  attribute: string,
+): attribute is StatusAttribute => STATUS_ATTRIBUTES.has(attribute);
 
 export const requiresOperatorChoice = ({
   attribute,
