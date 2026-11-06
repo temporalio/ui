@@ -4,6 +4,10 @@ import { flushSync, mount, unmount } from 'svelte';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
+import {
+  type StatusFilter,
+  workflowStatusFilter,
+} from '$lib/models/status-filter';
 import type { SearchAttributeType } from '$lib/types/workflows';
 import { createFilter } from '$lib/utilities/query/to-list-workflow-filters';
 
@@ -41,18 +45,27 @@ const mountFilter = ({
   type = 'Keyword',
   filters = [],
   conditionals,
+  statusFilter,
 }: {
   attribute?: string;
   type?: SearchAttributeType;
   filters?: SearchAttributeFilter[];
   conditionals?: string[];
+  statusFilter?: StatusFilter;
 } = {}) => {
   const store: Writable<SearchAttributeFilter[]> = writable(filters);
   const target = document.createElement('div');
   document.body.appendChild(target);
   component = mount(ColumnHeaderFilter, {
     target,
-    props: { attribute, type, label: attribute, filters: store, conditionals },
+    props: {
+      attribute,
+      type,
+      label: attribute,
+      filters: store,
+      conditionals,
+      statusFilter,
+    },
   });
   flushSync();
 
@@ -309,8 +322,11 @@ describe('ColumnHeaderFilter', () => {
     expect(document.body.textContent).toContain('Not equal to');
   });
 
-  it('opens the status editor for a status attribute', () => {
-    const { store, open } = mountFilter({ attribute: 'ExecutionStatus' });
+  it('opens the status editor when given a status filter', () => {
+    const { store, open } = mountFilter({
+      attribute: 'ExecutionStatus',
+      statusFilter: workflowStatusFilter,
+    });
 
     open();
 
@@ -330,7 +346,10 @@ describe('ColumnHeaderFilter', () => {
   });
 
   it('keeps status changes made elsewhere while the menu is open', () => {
-    const { store, open } = mountFilter({ attribute: 'ExecutionStatus' });
+    const { store, open } = mountFilter({
+      attribute: 'ExecutionStatus',
+      statusFilter: workflowStatusFilter,
+    });
 
     open();
     store.set([

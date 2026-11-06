@@ -8,7 +8,13 @@ import {
   type MenuContext,
 } from '$lib/holocene/menu/menu-container.svelte';
 import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
-import type { StatusAttribute } from '$lib/utilities/query/quick-filter';
+import {
+  activityStatusFilter,
+  nexusOperationStatusFilter,
+  type StatusFilter,
+  workerStatusFilter,
+  workflowStatusFilter,
+} from '$lib/models/status-filter';
 import { createFilter } from '$lib/utilities/query/to-list-workflow-filters';
 
 import StatusFilterEditor from './status-filter-editor.svelte';
@@ -16,14 +22,14 @@ import StatusFilterEditor from './status-filter-editor.svelte';
 let component: ReturnType<typeof mount> | undefined;
 
 const mountEditor = ({
-  attribute = 'ExecutionStatus',
+  statusFilter = workflowStatusFilter,
   filters = [],
 }: {
-  attribute?: StatusAttribute;
+  statusFilter?: StatusFilter;
   filters?: SearchAttributeFilter[];
 } = {}) => {
   const props = $state({
-    attribute,
+    statusFilter,
     filters,
     onUpdate: vi.fn((next: SearchAttributeFilter[]) => {
       props.filters = next;
@@ -71,12 +77,70 @@ afterEach(() => {
 
 describe('StatusFilterEditor', () => {
   it.each([
-    ['ExecutionStatus', 'Filter by Execution Status'],
-    ['WorkerStatus', 'Filter by Worker Status'],
-  ] as const)('labels the %s editor', (attribute, heading) => {
-    const { target } = mountEditor({ attribute });
+    ['ExecutionStatus', workflowStatusFilter, 'Filter by Execution Status'],
+    ['WorkerStatus', workerStatusFilter, 'Filter by Worker Status'],
+  ])('labels the %s editor', (_, statusFilter, heading) => {
+    const { target } = mountEditor({ statusFilter });
 
     expect(target.querySelector('h3')?.textContent?.trim()).toBe(heading);
+  });
+
+  it.each([
+    [
+      'workflow',
+      workflowStatusFilter,
+      [
+        'All',
+        'Running',
+        'Paused',
+        'TimedOut',
+        'Completed',
+        'Failed',
+        'ContinuedAsNew',
+        'Canceled',
+        'Terminated',
+      ],
+    ],
+    [
+      'activity',
+      activityStatusFilter,
+      [
+        'All',
+        'Running',
+        'Paused',
+        'Completed',
+        'Failed',
+        'Canceled',
+        'Terminated',
+        'TimedOut',
+      ],
+    ],
+    [
+      'Nexus operation',
+      nexusOperationStatusFilter,
+      [
+        'All',
+        'Running',
+        'Completed',
+        'Failed',
+        'Canceled',
+        'Terminated',
+        'TimedOut',
+      ],
+    ],
+    ['worker', workerStatusFilter, ['All', 'Running', 'ShuttingDown']],
+  ])('offers only %s statuses', (_, statusFilter, expected) => {
+    const { target } = mountEditor({ statusFilter });
+
+    const options = Array.from(
+      target.querySelectorAll('[data-testid^="status-dropdown-filter-chip-"]'),
+    ).map((el) =>
+      el
+        .getAttribute('data-testid')
+        ?.replace('status-dropdown-filter-chip-', ''),
+    );
+
+    expect(options).toEqual(expected);
   });
 
   it('checks All when no status is selected', () => {

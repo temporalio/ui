@@ -3,12 +3,12 @@
 
   import { Menu, MenuButton, MenuContainer } from '$lib/holocene/menu';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
-  import type { StatusAttribute } from '$lib/utilities/query/quick-filter';
+  import type { StatusFilter } from '$lib/models/status-filter';
 
   import StatusFilterEditor from './status-filter-editor.svelte';
 
   interface Props {
-    attribute: StatusAttribute;
+    statusFilter: StatusFilter;
     filters: SearchAttributeFilter[];
     onUpdate: (updatedFilter: SearchAttributeFilter[]) => void;
     index?: number;
@@ -16,7 +16,7 @@
   }
 
   let {
-    attribute,
+    statusFilter,
     filters,
     onUpdate,
     index = 0,
@@ -24,6 +24,8 @@
   }: Props = $props();
 
   const open = writable(false);
+
+  const attribute = $derived(statusFilter.attribute);
 
   const controlsId = $derived(
     `dropdown-filter-chip-${attribute.toLowerCase()}`,
@@ -53,6 +55,6 @@
   </MenuButton>
 
   <Menu id={controlsId} usePortal class="max-h-fit w-80 max-w-fit p-4" keepOpen>
-    <StatusFilterEditor {attribute} {filters} {onUpdate} />
+    <StatusFilterEditor {statusFilter} {filters} {onUpdate} />
   </Menu>
 </MenuContainer>
