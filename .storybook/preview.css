@@ -33,6 +33,21 @@ body.sb-show-main,
   overflow-x: auto;
 }
 
+.io-docs-page-actions {
+  position: relative;
+  float: right;
+  margin: 0 0 12px 16px;
+}
+
+.io-docs-page-actions-status {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  width: max-content;
+  max-width: 280px;
+  font-size: 12px;
+}
+
 /* Keep Storybook's controls, hiding the reference columns in this panel only. */
 .io-docs-adjust-props .docblock-argstable tr > :nth-child(2),
 .io-docs-adjust-props .docblock-argstable tr > :nth-child(3),

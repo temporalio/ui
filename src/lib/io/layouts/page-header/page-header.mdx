@@ -9,10 +9,14 @@ import {
   Title,
 } from '@storybook/addon-docs/blocks';
 
+import { PageActions } from '../../../../../.storybook/blocks/page-actions';
+
 import ComponentStories from './page-header.stories.svelte';
 import documentation from './page-header.md?raw';
 
 <Meta of={ComponentStories} />
+
+<PageActions documentation={documentation} />
 
 <Title />
 

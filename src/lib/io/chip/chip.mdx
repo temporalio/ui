@@ -9,10 +9,14 @@ import {
   Title,
 } from '@storybook/addon-docs/blocks';
 
+import { PageActions } from '../../../../.storybook/blocks/page-actions';
+
 import ComponentStories from './chip.stories.svelte';
 import documentation from './chip.md?raw';
 
 <Meta of={ComponentStories} />
+
+<PageActions documentation={documentation} />
 
 <Title />
 
