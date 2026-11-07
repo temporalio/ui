@@ -237,6 +237,27 @@ describe('createEventGroupLabelRegistry', () => {
       registry.resolve(signaled('3', 'launchHold'));
       expect(formatEventGroupName(group)).toBe('launchHold (3)');
     });
+
+    it('reports a label whose name changes after it was resolved', () => {
+      const onLabelChange = vi.fn();
+      const registry = createEventGroupLabelRegistry({ onLabelChange });
+      resolveOne(registry, '6', [signalMarker('3')]);
+
+      registry.resolve(signaled('3', 'launchHold'));
+      expect(onLabelChange).toHaveBeenCalledExactlyOnceWith('event:3');
+
+      registry.resolve(signaled('3', 'launchHold'));
+      expect(onLabelChange).toHaveBeenCalledOnce();
+    });
+
+    it('does not report a label named before it was resolved', () => {
+      const onLabelChange = vi.fn();
+      const registry = createEventGroupLabelRegistry({ onLabelChange });
+      registry.resolve(signaled('3', 'launchHold'));
+      resolveOne(registry, '6', [signalMarker('3')]);
+
+      expect(onLabelChange).not.toHaveBeenCalled();
+    });
   });
 
   describe('implicit update markers', () => {
