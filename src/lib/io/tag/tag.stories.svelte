@@ -29,6 +29,12 @@
       class: { table: { disable: true } },
     },
     parameters: {
+      docs: {
+        description: {
+          component:
+            'A non-interactive metadata label with a tag icon and optional extension.',
+        },
+      },
       layout: 'padded',
     },
     render: template,

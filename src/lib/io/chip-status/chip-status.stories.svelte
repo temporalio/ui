@@ -33,6 +33,12 @@
       class: { table: { disable: true } },
     },
     parameters: {
+      docs: {
+        description: {
+          component:
+            'An interactive workflow status label with optional count and change indicator.',
+        },
+      },
       layout: 'padded',
     },
     render: template,

@@ -27,7 +27,15 @@
       },
       children: { control: false },
     },
-    parameters: { layout: 'padded' },
+    parameters: {
+      docs: {
+        description: {
+          component:
+            'A layout primitive that coordinates the corners and borders of adjoining segments.',
+        },
+      },
+      layout: 'padded',
+    },
   });
 </script>
 

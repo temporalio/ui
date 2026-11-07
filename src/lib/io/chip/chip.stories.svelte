@@ -32,6 +32,12 @@
       class: { table: { disable: true } },
     },
     parameters: {
+      docs: {
+        description: {
+          component:
+            'An interactive label for filters or compact actions, with an optional extension.',
+        },
+      },
       layout: 'padded',
     },
     render: template,

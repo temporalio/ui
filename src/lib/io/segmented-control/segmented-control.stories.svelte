@@ -32,7 +32,15 @@
       children: { control: false },
       class: { table: { disable: true } },
     },
-    parameters: { layout: 'padded' },
+    parameters: {
+      docs: {
+        description: {
+          component:
+            'A compact group of related actions or navigation destinations.',
+        },
+      },
+      layout: 'padded',
+    },
   });
 </script>
 

@@ -25,6 +25,11 @@
       class: { table: { disable: true } },
     },
     parameters: {
+      docs: {
+        description: {
+          component: 'A compact count, optionally displayed against a total.',
+        },
+      },
       layout: 'padded',
     },
     render: template,

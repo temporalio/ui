@@ -40,6 +40,12 @@
       class: { table: { disable: true } },
     },
     parameters: {
+      docs: {
+        description: {
+          component:
+            'A compact, non-interactive label for metadata, with optional adjoining extensions.',
+        },
+      },
       layout: 'padded',
     },
     render: template,

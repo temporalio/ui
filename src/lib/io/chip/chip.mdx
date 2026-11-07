@@ -1,56 +1,10 @@
-import {
-  ArgTypes,
-  Canvas,
-  Controls,
-  Heading,
-  Markdown,
-  Meta,
-  Stories,
-  Title,
-} from '@storybook/addon-docs/blocks';
+import { Meta } from '@storybook/addon-docs/blocks';
 
-import { PageActions } from '../../../../.storybook/blocks/page-actions';
+import { ComponentDocs } from '../../../../.storybook/blocks/component-docs';
 
 import ComponentStories from './chip.stories.svelte';
 import documentation from './chip.md?raw';
 
 <Meta of={ComponentStories} />
 
-<PageActions documentation={documentation} />
-
-<Title />
-
-An interactive label for filters or compact actions, with an optional extension.
-
-## Playground
-
-<div className="io-docs-playground">
-  <div className="io-docs-canvas">
-    <Canvas withToolbar sourceState="shown" />
-  </div>
-  <section className="io-docs-adjust-props" aria-label="Adjust props">
-    <Controls
-      exclude={Object.entries(ComponentStories.argTypes ?? {})
-        .filter(
-          ([, argType]) =>
-            argType.control === false || argType.control?.disable,
-        )
-        .map(([name]) => name)}
-    />
-  </section>
-</div>
-
-<Stories title={<Heading>Examples</Heading>} includePrimary={false} />
-
-<Markdown>{documentation}</Markdown>
-
-## API Reference
-
-<div
-  className="io-docs-api-reference"
-  role="region"
-  aria-label="API reference table"
-  tabIndex={0}
->
-  <ArgTypes />
-</div>
+<ComponentDocs documentation={documentation} />

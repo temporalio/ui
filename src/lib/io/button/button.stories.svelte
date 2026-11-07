@@ -52,7 +52,15 @@
       children: { control: false },
       class: { table: { disable: true } },
     },
-    parameters: { layout: 'padded' },
+    parameters: {
+      docs: {
+        description: {
+          component:
+            'Triggers an action, with shared sizes, color schemes, icons, and loading feedback.',
+        },
+      },
+      layout: 'padded',
+    },
   });
 </script>
 

@@ -30,7 +30,15 @@
       children: { control: false },
       class: { table: { disable: true } },
     },
-    parameters: { layout: 'padded' },
+    parameters: {
+      docs: {
+        description: {
+          component:
+            'An inline navigation link with optional leading and trailing icons.',
+        },
+      },
+      layout: 'padded',
+    },
   });
 </script>
 

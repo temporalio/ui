@@ -50,7 +50,15 @@
       metadata: { control: false },
       class: { table: { disable: true } },
     },
-    parameters: { layout: 'padded' },
+    parameters: {
+      docs: {
+        description: {
+          component:
+            'A responsive page heading with slots for actions, tags, filters, and metadata.',
+        },
+      },
+      layout: 'padded',
+    },
     render: template,
   });
 </script>

@@ -6,6 +6,14 @@
   const { Story } = defineMeta({
     title: 'IO/Components/Icon',
     component: IconSvgWrapper,
+    parameters: {
+      docs: {
+        description: {
+          component:
+            'The shared IO icon library, including optical variants for adjusted visual sizing.',
+        },
+      },
+    },
     argTypes: {
       title: { name: 'Accessible label', control: 'text' },
       class: { table: { disable: true } },

@@ -55,6 +55,12 @@
       class: { table: { disable: true } },
     },
     parameters: {
+      docs: {
+        description: {
+          component:
+            'A non-interactive workflow status label with consistent colors and translated text.',
+        },
+      },
       layout: 'padded',
     },
     render: template,
