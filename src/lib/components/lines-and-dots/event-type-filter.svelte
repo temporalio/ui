@@ -17,7 +17,6 @@
     compactEventTypeOptions,
   } from '$lib/models/event-history/get-event-categorization';
   import { clearActiveGroups } from '$lib/stores/active-events';
-  import { eventViewType } from '$lib/stores/event-view';
   import { eventStatusFilter, eventTypeFilter } from '$lib/stores/filters';
   import { temporalVersion } from '$lib/stores/versions';
   import { updateEventFilterParams } from '$lib/utilities/event-filter-params';
@@ -28,9 +27,10 @@
 
   interface Props {
     compact?: boolean;
+    statusFilterAvailable?: boolean;
   }
 
-  let { compact = false }: Props = $props();
+  let { compact = false, statusFilterAvailable = true }: Props = $props();
 
   const open = writable(false);
 
@@ -102,7 +102,7 @@
   };
 
   const filterActive = $derived(
-    ($eventStatusFilter && $eventViewType !== 'json') ||
+    ($eventStatusFilter && statusFilterAvailable) ||
       $eventTypeFilter.length < defaultOptions.length,
   );
 </script>
@@ -144,7 +144,7 @@
       {/snippet}
       {translate('common.all')}
     </MenuItem>
-    {#if $eventViewType !== 'json'}
+    {#if statusFilterAvailable}
       <MenuItem
         data-testid={translate('common.pending-and-failed')}
         description={translate('common.pending-and-failed-description')}

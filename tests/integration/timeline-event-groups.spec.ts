@@ -167,6 +167,28 @@ test.describe('Timeline event groups', () => {
     await expect(groupRow(page, 'satellite:A')).toHaveCount(0);
   });
 
+  test('shows the pending and failed filter after History was left on JSON', async ({
+    page,
+  }) => {
+    await page.getByTestId('history-tab').click();
+    await page.getByTestId('json').click();
+    await page.goto(`${timelineUrl}?status=pending`);
+
+    const filterButton = page.locator(
+      'button[aria-controls="event-type-filter"]',
+    );
+    await expect(filterButton.locator('.bg-interactive-primary')).toHaveCount(
+      1,
+    );
+    await filterButton.click();
+    await expect(
+      page
+        .locator('#event-type-filter')
+        .getByTestId('Pending and Failed')
+        .getByRole('checkbox'),
+    ).toBeChecked();
+  });
+
   test('stays off when switching to History and back', async ({ page }) => {
     await toggle(page).click();
     await expect(eventRow(page, 'UngroupedActivity')).toBeVisible();

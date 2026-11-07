@@ -284,7 +284,10 @@
               : translate('common.ascending')}
           </ToggleButton>
         {/if}
-        <EventTypeFilter {compact} />
+        <EventTypeFilter
+          {compact}
+          statusFilterAvailable={$eventViewType !== 'json'}
+        />
       </ToggleButtons>
       <ToggleButtons
         class="empty:hidden max-xl:[&_.menu-button-anchor>button]:rounded max-xl:[&_.menu-button-anchor>button]:border-l"
