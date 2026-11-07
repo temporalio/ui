@@ -67,7 +67,7 @@
   </div>
 {/snippet}
 
-<Story name="Playground" />
+<Story tags={['!dev']} name="Playground" />
 
 <Story name="With trail icon" args={{ TrailIcon: IconHeartbeat }} />
 

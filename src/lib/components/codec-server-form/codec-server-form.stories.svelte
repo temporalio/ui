@@ -55,7 +55,7 @@
   }
 
   const { Story } = defineMeta({
-    title: 'Forms/Codec Server Form',
+    title: 'Application/Forms/Codec Server Form',
     component: CodecServerForm,
     args: {
       onSave: fn(),

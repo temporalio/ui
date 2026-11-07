@@ -12,7 +12,7 @@
   type RadioArgs = ComponentProps<typeof RadioInput> & { name: string };
 
   const { Story } = defineMeta({
-    title: 'Radio Input',
+    title: 'Holocene/Components/Radio Input',
     component: RadioInput,
     args: {
       label: 'Radio Input Label',

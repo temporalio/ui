@@ -5,7 +5,7 @@
   import ComputeProviderPicker from './compute-provider-picker.svelte';
 
   const { Story } = defineMeta({
-    title: 'Workers/Cloud Run Latency Notice',
+    title: 'Application/Workers/Cloud Run Latency Notice',
     component: CloudRunLatencyNotice,
   });
 </script>

@@ -37,7 +37,7 @@
   </div>
 {/snippet}
 
-<Story name="Playground" />
+<Story tags={['!dev']} name="Playground" />
 
 <Story name="Error" args={{ value: 12, colorScheme: 'error' }} />
 

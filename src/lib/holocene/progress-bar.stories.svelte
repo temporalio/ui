@@ -4,7 +4,7 @@
   import ProgressBar from '$lib/holocene/progress-bar.svelte';
 
   const { Story } = defineMeta({
-    title: 'Progress Bar',
+    title: 'Holocene/Components/Progress Bar',
     component: ProgressBar,
   });
 </script>

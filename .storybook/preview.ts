@@ -35,6 +35,24 @@ const preview: Preview = {
     }),
   ],
   parameters: {
+    options: {
+      storySort: {
+        method: 'alphabetical',
+        order: [
+          'IO',
+          ['Guides', ['Forms', 'Theme'], 'Components'],
+          'Holocene',
+          ['Components'],
+          'Application',
+          '*',
+        ],
+      },
+    },
+    docs: {
+      toc: {
+        headingSelector: 'h2, h3',
+      },
+    },
     backgrounds: {
       disable: true,
     },

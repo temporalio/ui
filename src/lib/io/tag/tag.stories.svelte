@@ -41,7 +41,7 @@
   </div>
 {/snippet}
 
-<Story name="Playground" />
+<Story tags={['!dev']} name="Playground" />
 
 <Story name="With extension" args={{ extension: { text: 'extension' } }} />
 

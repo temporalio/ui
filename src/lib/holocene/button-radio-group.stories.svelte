@@ -5,7 +5,7 @@
   import ButtonRadioGroup from '$lib/holocene/button-radio-group.svelte';
 
   const { Story } = defineMeta({
-    title: 'Button Radio Group',
+    title: 'Holocene/Components/Button Radio Group',
     component: ButtonRadioGroup,
     args: {
       label: 'Recurrence',

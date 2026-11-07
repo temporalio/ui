@@ -42,7 +42,7 @@
   </div>
 {/snippet}
 
-<Story name="Text only" {template} />
+<Story tags={['!dev']} name="Text only" {template} />
 <Story name="Leading icon" args={{ LeadingIcon: IconAdd }} {template} />
 <Story
   name="Trailing icon"

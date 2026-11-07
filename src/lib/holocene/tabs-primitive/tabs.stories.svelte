@@ -5,7 +5,7 @@
   import Tabs from '$lib/holocene/tabs-primitive/tabs.svelte';
 
   const { Story } = defineMeta({
-    title: 'Tabs (Primitive)',
+    title: 'Holocene/Components/Tabs (Primitive)',
     component: Tabs,
     args: {
       onSelectedTabChange: fn(),

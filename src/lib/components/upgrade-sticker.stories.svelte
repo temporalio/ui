@@ -18,7 +18,7 @@
   };
 
   const { Story } = defineMeta({
-    title: 'Upgrade Sticker',
+    title: 'Application/Upgrade Sticker',
     component: UpgradeSticker,
     args: {
       distribution: 'cli',

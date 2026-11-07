@@ -10,7 +10,7 @@
   import ToggleButtons from './toggle-buttons.svelte';
 
   const { Story } = defineMeta({
-    title: 'Toggle Button',
+    title: 'Holocene/Components/Toggle Button',
     component: ToggleButton,
     argTypes: {
       group: { table: { disable: true } },

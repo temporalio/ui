@@ -1,0 +1,19 @@
+import { Meta, Stories, Title } from '@storybook/addon-docs/blocks';
+
+import Theme from './theme.stories.svelte';
+
+<Meta of={Theme} />
+
+<Title />
+
+IO components use semantic theme tokens for color, spacing, and interaction states.
+Use the theme toolbar to preview components across the available themes.
+
+Import the theme preset from `@temporalio/ui/theme/preset` when configuring a consuming
+application. Prefer semantic classes such as `text-primary`, `bg-surface-primary`,
+and `border-primary` so components follow the selected theme.
+
+The following references are rendered directly from the theme definitions. Changes
+to tokens, scales, and themes appear here automatically.
+
+<Stories title="Token reference" />

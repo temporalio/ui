@@ -7,3 +7,61 @@ body.sb-show-main,
 #storybook-root {
   min-height: 100vh;
 }
+
+.sbdocs-content:has(.io-docs-playground) h2:not(.docs-story h2) {
+  border-bottom: 0;
+}
+
+.io-docs-playground {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 320px);
+  align-items: start;
+  gap: 24px;
+}
+
+.io-docs-canvas,
+.io-docs-adjust-props {
+  min-width: 0;
+}
+
+.io-docs-canvas .sbdocs-preview {
+  margin-top: 0;
+  box-sizing: border-box;
+}
+
+.io-docs-api-reference {
+  overflow-x: auto;
+}
+
+/* Keep Storybook's controls, hiding the reference columns in this panel only. */
+.io-docs-adjust-props .docblock-argstable tr > :nth-child(2),
+.io-docs-adjust-props .docblock-argstable tr > :nth-child(3),
+.io-docs-adjust-props .docblock-argstable tr:has(> [colspan]) {
+  display: none;
+}
+
+.io-docs-playground .io-docs-adjust-props .docblock-argstable {
+  width: 100%;
+  margin: 0;
+  table-layout: fixed;
+  font-size: 12px;
+}
+
+.io-docs-adjust-props .docblock-argstable th:first-child {
+  width: 38%;
+}
+
+.io-docs-adjust-props .docblock-argstable th:last-child {
+  width: 62%;
+}
+
+.io-docs-adjust-props .docblock-argstable :is(th, td) {
+  padding: 8px;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 1100px) {
+  .io-docs-playground {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

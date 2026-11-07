@@ -37,6 +37,16 @@
   const sizes = [16, 20, 48];
 </script>
 
+<Story
+  tags={['!dev']}
+  name="Playground"
+  args={{ title: 'Add', width: 24, height: 24 }}
+>
+  {#snippet template(args)}
+    <icons.IconAdd {...args} />
+  {/snippet}
+</Story>
+
 <Story name="Contact Sheet">
   {#snippet template()}
     <div class="text-primary">

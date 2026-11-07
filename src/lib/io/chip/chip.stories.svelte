@@ -44,7 +44,7 @@
   </div>
 {/snippet}
 
-<Story name="Playground" />
+<Story tags={['!dev']} name="Playground" />
 
 <Story name="Color schemes">
   {#snippet template()}

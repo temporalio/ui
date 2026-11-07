@@ -49,7 +49,7 @@
   </div>
 {/snippet}
 
-<Story name="Playground" {template} />
+<Story tags={['!dev']} name="Playground" {template} />
 
 <Story name="Default">
   {#snippet template()}

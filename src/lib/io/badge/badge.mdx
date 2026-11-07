@@ -1,0 +1,52 @@
+import {
+  ArgTypes,
+  Canvas,
+  Controls,
+  Heading,
+  Markdown,
+  Meta,
+  Stories,
+  Title,
+} from '@storybook/addon-docs/blocks';
+
+import ComponentStories from './badge.stories.svelte';
+import documentation from './badge.md?raw';
+
+<Meta of={ComponentStories} />
+
+<Title />
+
+A compact, non-interactive label for metadata, with optional adjoining extensions.
+
+## Playground
+
+<div className="io-docs-playground">
+  <div className="io-docs-canvas">
+    <Canvas withToolbar sourceState="shown" />
+  </div>
+  <section className="io-docs-adjust-props" aria-label="Adjust props">
+    <Controls
+      exclude={Object.entries(ComponentStories.argTypes ?? {})
+        .filter(
+          ([, argType]) =>
+            argType.control === false || argType.control?.disable,
+        )
+        .map(([name]) => name)}
+    />
+  </section>
+</div>
+
+<Stories title={<Heading>Examples</Heading>} includePrimary={false} />
+
+<Markdown>{documentation}</Markdown>
+
+## API Reference
+
+<div
+  className="io-docs-api-reference"
+  role="region"
+  aria-label="API reference table"
+  tabIndex={0}
+>
+  <ArgTypes />
+</div>

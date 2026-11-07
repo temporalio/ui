@@ -37,7 +37,7 @@
   </div>
 {/snippet}
 
-<Story name="Short trail" {template} />
+<Story tags={['!dev']} name="Short trail" {template} />
 
 <Story
   name="Multi-level trail"

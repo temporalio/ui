@@ -10,7 +10,7 @@
   import Drawer from './drawer.svelte';
 
   const { Story } = defineMeta({
-    title: 'Drawer',
+    title: 'Holocene/Components/Drawer',
     component: Drawer,
     args: {
       open: true,
