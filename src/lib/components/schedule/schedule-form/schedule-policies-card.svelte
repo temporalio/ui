@@ -6,7 +6,7 @@
   import Card from '$lib/holocene/card.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { formatDuration } from '$lib/utilities/format-time';
+  import { fromSeconds } from '$lib/utilities/to-duration';
 
   import { getOverlapPolicyContent } from '../constants';
   import type { FormScheduleSchema } from '../schema/form';
@@ -77,7 +77,7 @@
         </dt>
         <dd>
           {$form.catchupWindow
-            ? formatDuration($form.catchupWindow)
+            ? fromSeconds($form.catchupWindow)
             : translate('schedules.catchup-window-default')}
         </dd>
       </div>

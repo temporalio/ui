@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { workflowStatusFilter } from '$lib/models/status-filter';
 import {
   SEARCH_ATTRIBUTE_TYPE,
   type SearchAttributes,
@@ -77,6 +78,34 @@ describe('getColumnFilter', () => {
     expect(
       getColumnFilter(columns, 'Nothing', searchAttributes),
     ).toBeUndefined();
+  });
+
+  describe('with a status filter', () => {
+    const withStatus = { ...columns, statusFilter: workflowStatusFilter };
+
+    it('attaches the status filter to the column on its attribute', () => {
+      expect(getColumnFilter(withStatus, 'Status', searchAttributes)).toEqual({
+        attribute: 'ExecutionStatus',
+        type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+        statusFilter: workflowStatusFilter,
+      });
+    });
+
+    it('leaves every other column without one', () => {
+      expect(
+        getColumnFilter(withStatus, 'Start', searchAttributes),
+      ).not.toHaveProperty('statusFilter');
+    });
+
+    it('offers no filter when the status attribute has no known type', () => {
+      expect(getColumnFilter(withStatus, 'Status', {})).toBeUndefined();
+    });
+  });
+
+  it('attaches no status filter when the table has none', () => {
+    expect(
+      getColumnFilter(columns, 'Status', searchAttributes),
+    ).not.toHaveProperty('statusFilter');
   });
 });
 

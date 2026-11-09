@@ -1,3 +1,4 @@
+import { nexusOperationStatusFilter } from '$lib/models/status-filter';
 import type { NexusOperationExecutionListInfo } from '$lib/types/nexus-operation-execution';
 import type { SearchAttributes } from '$lib/types/workflows';
 import {
@@ -66,6 +67,7 @@ export const NEXUS_OPERATION_QUICK_FILTER_COLUMNS: QuickFilterColumns<NexusOpera
   {
     attributes: NEXUS_OPERATION_COLUMN_ATTRIBUTE,
     getValue: getNexusOperationColumnValue,
+    statusFilter: nexusOperationStatusFilter,
   };
 
 export const getNexusOperationColumnFilter = (

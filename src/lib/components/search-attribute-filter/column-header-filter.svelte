@@ -10,16 +10,14 @@
   import { translate } from '$lib/i18n/translate';
   import { IconFilterLines } from '$lib/io/icon';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
+  import type { StatusFilter } from '$lib/models/status-filter';
   import type { SearchAttributeType } from '$lib/types/workflows';
   import {
     isAppliedFilter,
     isAtQueryLimit,
     replaceAttributeFilters,
   } from '$lib/utilities/query/column-filter';
-  import {
-    getDefaultConditional,
-    isStatusAttribute,
-  } from '$lib/utilities/query/quick-filter';
+  import { getDefaultConditional } from '$lib/utilities/query/quick-filter';
   import {
     createFilter,
     updateQueryParamsFromFilter,
@@ -34,9 +32,11 @@
     label: string;
     filters: Writable<SearchAttributeFilter[]>;
     conditionals?: string[];
+    statusFilter?: StatusFilter;
   }
 
-  let { attribute, type, label, filters, conditionals }: Props = $props();
+  let { attribute, type, label, filters, conditionals, statusFilter }: Props =
+    $props();
 
   const open = writable(false);
   const uid = $props.id();
@@ -48,7 +48,6 @@
     ),
   );
   const filtered = $derived(appliedFilters.length > 0);
-  const isStatus = $derived(isStatusAttribute(attribute));
 
   const atQueryLimit = $derived(isAtQueryLimit(page.url));
 
@@ -61,7 +60,7 @@
     });
 
   const initialFilter = $derived(
-    $open && !isStatus ? untrack(createInitialFilter) : undefined,
+    $open && !statusFilter ? untrack(createInitialFilter) : undefined,
   );
 
   const hasMultipleFilters = $derived(appliedFilters.length > 1);
@@ -128,15 +127,17 @@
   <Menu
     id={controlsId}
     usePortal
-    keepOpen={isStatus}
+    keepOpen={!!statusFilter}
     class={[
       'max-h-fit p-4',
-      isStatus ? 'w-80 max-w-fit' : 'w-min min-w-0 max-w-[calc(100dvw-1rem)]',
+      statusFilter
+        ? 'w-80 max-w-fit'
+        : 'w-min min-w-0 max-w-[calc(100dvw-1rem)]',
     ]}
   >
-    {#if isStatusAttribute(attribute)}
+    {#if statusFilter}
       <StatusFilterEditor
-        {attribute}
+        {statusFilter}
         filters={appliedFilters}
         onUpdate={(updated) =>
           setFilters(replaceAttributeFilters($filters, attribute, updated))}

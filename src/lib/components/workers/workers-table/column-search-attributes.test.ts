@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
+import { workerStatusFilter } from '$lib/models/status-filter';
+
 import { getWorkerColumnFilter } from './column-search-attributes';
 
 describe('getWorkerColumnFilter', () => {
@@ -14,6 +16,7 @@ describe('getWorkerColumnFilter', () => {
     expect(getWorkerColumnFilter('Status', attributes)).toEqual({
       attribute: 'WorkerStatus',
       type: 'Keyword',
+      statusFilter: workerStatusFilter,
     });
     expect(getWorkerColumnFilter('Instance', attributes)).toEqual({
       attribute: 'WorkerInstanceKey',
