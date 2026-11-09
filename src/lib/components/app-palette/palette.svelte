@@ -9,7 +9,7 @@
   import { page } from '$app/state';
 
   import { translate } from '$lib/i18n/translate';
-  import { IconClose, IconEllipsisVertical } from '$lib/io/icon';
+  import { IconClose, IconEllipsisVertical, IconSpinner } from '$lib/io/icon';
   import { toaster } from '$lib/stores/toaster';
 
   import { filterPaletteItems } from './filter';
@@ -1108,11 +1108,18 @@
                 >
               {/if}
             {:else}
-              <span class="truncate">
-                {running
-                  ? translate('palette.working')
-                  : (currentView?.title ?? label)}
-              </span>
+              {#if running}
+                <span class="flex min-w-0 items-center gap-1.5">
+                  <IconSpinner
+                    class="shrink-0 motion-safe:animate-spin"
+                    width={12}
+                    height={12}
+                  />
+                  <span class="truncate">{translate('palette.working')}</span>
+                </span>
+              {:else}
+                <span class="truncate">{currentView?.title ?? label}</span>
+              {/if}
               <span class="flex shrink-0 items-center gap-2">
                 {#if selectedItem?.actions[0] && !selectedItem.disabled}
                   {selectedItem.actions[0].title}
