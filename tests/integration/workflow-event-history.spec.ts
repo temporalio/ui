@@ -18,13 +18,13 @@ const workflowUrl = `/namespaces/default/workflows/${mockWorkflow.workflowExecut
 
 test.describe('Workflow History', () => {
   test.beforeEach(async ({ page }) => {
+    await mockWorkflowApis(page);
     await page.goto(workflowUrl);
   });
 
   test('Workflow Execution shows WorkflowId and all sections and event history', async ({
     page,
   }) => {
-    await mockWorkflowApis(page);
     await expect(page.getByTestId('workflow-id-heading')).toHaveText(
       '09db15_Running Click to copy content',
     );
@@ -55,7 +55,6 @@ test.describe('Workflow History', () => {
   });
 
   test('Workflow Execution links to specific event', async ({ page }) => {
-    await mockWorkflowApis(page);
     await expect(page.getByTestId('workflow-id-heading')).toHaveText(
       '09db15_Running Click to copy content',
     );
@@ -204,6 +203,9 @@ test.describe('Workflow History view with pending activities and filters', () =>
 
     await expect(activeIndicator).toHaveCount(1);
     await expect(page).toHaveURL(/[?&]status=pending/);
+
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#event-type-filter')).toBeHidden();
 
     await page.getByTestId('json').click();
     await expect(activeIndicator).toHaveCount(0);
