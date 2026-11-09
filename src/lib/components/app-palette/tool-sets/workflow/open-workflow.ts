@@ -34,7 +34,7 @@ export async function openWorkflow(
   }
   if (!sessionOpen()) return;
 
-  ctx.close();
+  // The palette stays open, showing that it is working, until the page loads.
   await goto(
     routeForEventHistory({
       namespace,
@@ -42,4 +42,5 @@ export async function openWorkflow(
       run: workflow.runId,
     }),
   );
+  if (sessionOpen()) ctx.close();
 }
