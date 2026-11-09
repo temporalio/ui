@@ -1,4 +1,7 @@
-import type { CatalogWorkerBinding } from './registry';
+import {
+  type CatalogWorkerBinding,
+  resolveCatalogWorkflowExecution,
+} from './registry';
 
 export type DeclaredNexusEndpoint = {
   name: string;
@@ -24,9 +27,7 @@ export const declaredNexusEndpoints = (
       const endpoints =
         execution.kind === 'standalone-nexus-operation'
           ? [execution.endpoint]
-          : execution.kind === 'workflow'
-            ? (execution.nexusEndpoints ?? [])
-            : [];
+          : (resolveCatalogWorkflowExecution(execution)?.nexusEndpoints ?? []);
 
       for (const endpoint of endpoints) {
         if (byName.has(endpoint)) continue;

@@ -32,6 +32,7 @@ const sessionStateLabels: Record<CatalogSessionState, string> = {
   'launch-uncertain': 'Start not confirmed',
   'observation-paused': 'Status checks paused',
   observing: 'Running',
+  'resource-ready': 'Created',
   starting: 'Starting',
   stopped: 'Status checks stopped',
 };

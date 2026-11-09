@@ -1,5 +1,6 @@
 import { describe, expect, expectTypeOf, it } from 'vitest';
 
+import type { BrowserCatalogDescriptor } from './types';
 import {
   catalogStartAllowed,
   createAttemptIdentity,
@@ -8,24 +9,38 @@ import {
   type StartCommand,
 } from './workbench-host';
 
-const workflowDescriptor = {
+const workflowDescriptor: Pick<BrowserCatalogDescriptor, 'execution'> = {
   execution: {
-    kind: 'workflow' as const,
+    kind: 'workflow',
     namespace: 'catalog-demo',
+    targetId: 'catalog',
+    taskQueue: 'catalog-tasks',
+    workflowType: 'CatalogWorkflow',
   },
 };
 
-const activityDescriptor = {
+const activityDescriptor: Pick<BrowserCatalogDescriptor, 'execution'> = {
   execution: {
-    kind: 'standalone-activity' as const,
+    kind: 'standalone-activity',
     namespace: 'catalog-demo',
+    targetId: 'catalog',
+    taskQueue: 'catalog-tasks',
+    activityType: 'CatalogActivity',
+    timeouts: {},
+    policies: {},
   },
 };
 
-const nexusDescriptor = {
+const nexusDescriptor: Pick<BrowserCatalogDescriptor, 'execution'> = {
   execution: {
-    kind: 'standalone-nexus-operation' as const,
+    kind: 'standalone-nexus-operation',
     namespace: 'catalog-demo',
+    targetId: 'catalog',
+    taskQueue: 'catalog-tasks',
+    endpoint: 'catalog-endpoint',
+    service: 'CatalogService',
+    operation: 'catalogOperation',
+    policies: {},
   },
 };
 

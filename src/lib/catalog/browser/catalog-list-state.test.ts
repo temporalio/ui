@@ -62,6 +62,7 @@ describe('catalogFacets', () => {
     expect(counts(options.kind)).toEqual({
       all: 4,
       workflow: 2,
+      schedule: 0,
       'standalone-activity': 1,
       'standalone-nexus-operation': 1,
     });
@@ -107,6 +108,7 @@ describe('catalogFacets', () => {
     expect(counts(options.kind)).toEqual({
       all: 2,
       workflow: 1,
+      schedule: 0,
       'standalone-activity': 0,
       'standalone-nexus-operation': 1,
     });
@@ -154,8 +156,8 @@ describe('catalog filter changes', () => {
 
   it('rejects an execution kind that is not registered', () => {
     expect(() =>
-      toggleCatalogFilter(emptyCatalogFilters, 'kind', 'schedule'),
-    ).toThrow('Unknown catalog execution kind "schedule"');
+      toggleCatalogFilter(emptyCatalogFilters, 'kind', 'unknown-kind'),
+    ).toThrow('Unknown catalog execution kind "unknown-kind"');
   });
 
   it('clears the given filters, or all filters, and keeps the search query', () => {
@@ -219,7 +221,9 @@ describe('catalog filter URLs', () => {
 
   it('ignores an unknown execution kind in the URL', () => {
     expect(
-      catalogFiltersFromSearchParams(new URLSearchParams('kind=schedule&q=')),
+      catalogFiltersFromSearchParams(
+        new URLSearchParams('kind=unknown-kind&q='),
+      ),
     ).toEqual(emptyCatalogFilters);
   });
 });

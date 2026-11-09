@@ -1,4 +1,4 @@
-import type { Payload, PollerInfo, TaskQueueResponse } from '$lib/types';
+import type { PollerInfo, TaskQueueResponse } from '$lib/types';
 import type { DescribeWorkerDeploymentResponse } from '$lib/types/deployments';
 import { deploymentHasComputeConfig } from '$lib/utilities/deployment-has-compute-config';
 import { encodePayloads } from '$lib/utilities/encode-payload';
@@ -6,6 +6,7 @@ import { validTimeToDate } from '$lib/utilities/format-time';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import {
+  routeForSchedule,
   routeForStandaloneActivityDetails,
   routeForStandaloneNexusOperationDetails,
   routeForWorkflow,
@@ -19,27 +20,26 @@ import {
   toWorkflowObservation,
 } from './observation';
 import {
+  type EncodeCatalogInput,
+  encodeScheduleAction,
+} from './schedule-action';
+import {
   type ApiLaunchRequest,
   type ApiLaunchResult,
   assembleWorkbenchHost,
 } from './workbench-host';
 import type { BrowserCatalogDescriptor, JsonValue } from '../browser/types';
 import type {
+  AcceptedLaunchReference,
   ExecutionObservation,
-  LaunchReference,
   ObservationRequest,
   WorkerAvailability,
 } from '../browser/workbench-host';
 
-type EncodeInput = (
-  input: JsonValue,
-  positional: boolean,
-) => Promise<Payload[]>;
-
 type ApiWorkbenchHostOptions = {
   descriptors: readonly BrowserCatalogDescriptor[];
   request?: typeof fetch;
-  encodeInput?: EncodeInput;
+  encodeInput?: EncodeCatalogInput;
   getIdentity?: () => string | undefined;
   createRequestId?: () => string;
 };
@@ -51,7 +51,7 @@ const isActivePoller = (poller: PollerInfo) =>
   Date.now() - validTimeToDate(poller.lastAccessTime).getTime() <=
     ACTIVE_POLLER_WINDOW_MS;
 
-const defaultEncodeInput: EncodeInput = async (input, positional) => {
+const defaultEncodeInput: EncodeCatalogInput = async (input, positional) => {
   const values = positional && Array.isArray(input) ? input : [input];
   const encoded = await Promise.all(
     values.map((value) =>
@@ -189,11 +189,13 @@ const knownRejection = (error: unknown): ApiLaunchResult | undefined => {
   return undefined;
 };
 
-const evidenceHref = (
-  reference: LaunchReference & { runId: string },
-): string => {
+const evidenceHref = (reference: AcceptedLaunchReference): string => {
   const { namespace } = reference.target;
   const executionId = reference.attempt.executionId;
+
+  if (reference.kind === 'schedule') {
+    return routeForSchedule({ namespace, scheduleId: executionId });
+  }
 
   if (reference.kind === 'workflow') {
     return routeForWorkflow({
@@ -245,7 +247,36 @@ export const createApiWorkbenchHost = ({
     let body: string;
 
     try {
-      if (launchRequest.kind === 'workflow') {
+      if (launchRequest.kind === 'schedule') {
+        const spec = asRecord(launchRequest.spec);
+        const policies = asRecord(launchRequest.policies);
+        const state = asRecord(launchRequest.state);
+
+        if (!spec || !policies || !state) {
+          return { status: 'rejected', reason: 'invalid-request' };
+        }
+
+        const action = await encodeScheduleAction({
+          action: launchRequest.action,
+          input: launchRequest.input,
+          scheduleId: launchRequest.scheduleId,
+          taskQueue: launchRequest.target.taskQueue,
+          encodeInput,
+        });
+        route = routeForApi('schedule', {
+          namespace: launchRequest.target.namespace,
+          scheduleId: launchRequest.scheduleId,
+        });
+        body = stringifyWithBigInt({
+          ...requestMetadata(),
+          schedule: {
+            spec,
+            policies,
+            state,
+            action,
+          },
+        });
+      } else if (launchRequest.kind === 'workflow') {
         const payloads = await encodeInput(launchRequest.input, true);
         route = routeForApi('workflow', {
           namespace: launchRequest.target.namespace,
@@ -335,6 +366,24 @@ export const createApiWorkbenchHost = ({
     signal: AbortSignal,
   ): Promise<ExecutionObservation> => {
     const { reference } = observationRequest;
+
+    if (reference.kind === 'schedule') {
+      const route = routeForApi('schedule', {
+        namespace: reference.target.namespace,
+        scheduleId: reference.attempt.executionId,
+      });
+      const response = await requestFromAPI<JsonValue>(route, {
+        request,
+        notifyOnError: false,
+        options: { signal },
+      });
+
+      if (!asRecord(asRecord(response ?? null)?.schedule ?? null)) {
+        throw new ApiObservationError('invalid-response');
+      }
+
+      return { state: 'ready', snapshot: response ?? null };
+    }
 
     if (reference.kind === 'workflow') {
       await waitForObservationDelay(observationRequest.continuation, signal);

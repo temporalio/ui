@@ -23,6 +23,7 @@ export type CatalogSessionState =
   | 'launch-uncertain'
   | 'observation-paused'
   | 'observing'
+  | 'resource-ready'
   | 'starting'
   | 'stopped';
 
@@ -99,10 +100,7 @@ const cloneReference = (reference: LaunchReference): LaunchReference => ({
 
 const cloneAcceptedReference = (
   reference: AcceptedLaunchOutcome['reference'],
-): AcceptedLaunchOutcome['reference'] => ({
-  ...cloneReference(reference),
-  runId: reference.runId,
-});
+): AcceptedLaunchOutcome['reference'] => structuredClone(reference);
 
 const targetFingerprint = (
   target: Pick<LaunchTarget, 'targetId' | 'namespace' | 'taskQueue'>,
@@ -194,6 +192,16 @@ export const createCatalogSessionStore = (
         }
 
         snapshot = cloneJson(observation.snapshot);
+        if (observation.state === 'ready') {
+          observationControllers.delete(attemptId);
+          update(attemptId, (current) => ({
+            ...current,
+            snapshot,
+            state: 'resource-ready',
+          }));
+          return;
+        }
+
         if (observation.state === 'terminal') {
           logObservationTerminal(reference, observation.status);
           observationControllers.delete(attemptId);
