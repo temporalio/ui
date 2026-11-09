@@ -4,6 +4,8 @@
 
   import { IconAdd, IconChevronDown } from '$lib/io/icon';
 
+  import usage from './button.usage.md?raw';
+
   import Button, {
     type ButtonColorScheme,
     type ButtonSize,
@@ -22,6 +24,7 @@
 
   const { Story } = defineMeta({
     title: 'IO/Components/Button',
+    tags: ['autodocs'],
     component: Button,
     args: {
       colorScheme: 'primary',
@@ -32,7 +35,14 @@
     argTypes: {
       colorScheme: { control: 'select', options: colorSchemes },
       size: { control: 'select', options: sizes },
-      disabled: { control: 'boolean' },
+      disabled: {
+        control: 'boolean',
+        table: {
+          category: 'properties',
+          type: { summary: 'boolean' },
+          defaultValue: { summary: 'false' },
+        },
+      },
       isLoading: { control: 'boolean' },
       tracking: {
         control: 'object',
@@ -49,7 +59,10 @@
         options: ['None', 'Chevron down'],
         mapping: { None: undefined, 'Chevron down': IconChevronDown },
       },
-      children: { control: false },
+      children: {
+        control: false,
+        table: { category: 'properties', type: { summary: 'Snippet' } },
+      },
       class: { table: { disable: true } },
     },
     parameters: {
@@ -58,6 +71,7 @@
           component:
             'Triggers an action, with shared sizes, color schemes, icons, and loading feedback.',
         },
+        usage,
       },
       layout: 'padded',
     },

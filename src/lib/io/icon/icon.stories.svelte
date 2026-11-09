@@ -1,10 +1,13 @@
 <script lang="ts" module>
   import { defineMeta } from '@storybook/addon-svelte-csf';
 
+  import usage from './icon.usage.md?raw';
+
   import IconSvgWrapper from './icon-svg-wrapper.svelte';
 
   const { Story } = defineMeta({
     title: 'IO/Components/Icon',
+    tags: ['autodocs'],
     component: IconSvgWrapper,
     parameters: {
       docs: {
@@ -12,6 +15,7 @@
           component:
             'The shared IO icon library, including optical variants for adjusted visual sizing.',
         },
+        usage,
       },
     },
     argTypes: {

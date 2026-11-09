@@ -2,6 +2,8 @@
   import { defineMeta } from '@storybook/addon-svelte-csf';
   import type { ComponentProps } from 'svelte';
 
+  import usage from './chip-status.usage.md?raw';
+
   import type { ChipStatusValue } from './chip-status.svelte';
   import ChipStatus from './chip-status.svelte';
 
@@ -18,6 +20,7 @@
 
   const { Story } = defineMeta({
     title: 'IO/Components/Chip Status',
+    tags: ['autodocs'],
     component: ChipStatus,
     args: {
       status: 'Running',
@@ -29,7 +32,14 @@
       status: { control: 'select', options: statuses },
       count: { control: 'number' },
       extension: { control: 'number' },
-      disabled: { control: 'boolean' },
+      disabled: {
+        control: 'boolean',
+        table: {
+          category: 'properties',
+          type: { summary: 'boolean' },
+          defaultValue: { summary: 'false' },
+        },
+      },
       class: { table: { disable: true } },
     },
     parameters: {
@@ -38,6 +48,7 @@
           component:
             'An interactive workflow status label with optional count and change indicator.',
         },
+        usage,
       },
       layout: 'padded',
     },

@@ -2,10 +2,13 @@
   import { defineMeta } from '@storybook/addon-svelte-csf';
   import type { ComponentProps } from 'svelte';
 
+  import usage from './roundness-group.usage.md?raw';
+
   import RoundnessGroup from './roundness-group.svelte';
 
   const { Story } = defineMeta({
     title: 'IO/Components/Roundness Group',
+    tags: ['autodocs'],
     component: RoundnessGroup,
     args: {
       roundness: 'full',
@@ -25,7 +28,10 @@
         control: 'select',
         options: ['none', 'erase', 'collapse'],
       },
-      children: { control: false },
+      children: {
+        control: false,
+        table: { category: 'properties', type: { summary: 'Snippet' } },
+      },
     },
     parameters: {
       docs: {
@@ -33,6 +39,7 @@
           component:
             'A layout primitive that coordinates the corners and borders of adjoining segments.',
         },
+        usage,
       },
       layout: 'padded',
     },

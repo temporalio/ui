@@ -13,6 +13,7 @@ body.sb-show-main,
 }
 
 .io-docs-playground {
+  --io-docs-controls-header-height: 36px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(260px, 320px);
   align-items: start;
@@ -27,6 +28,10 @@ body.sb-show-main,
 .io-docs-canvas .sbdocs-preview {
   margin-top: 0;
   box-sizing: border-box;
+}
+
+.io-docs-examples .sbdocs-preview-actions {
+  margin-bottom: 16px;
 }
 
 .io-docs-api-reference {
@@ -75,8 +80,21 @@ body.sb-show-main,
   overflow-wrap: anywhere;
 }
 
+.io-docs-adjust-props .docblock-argstable thead th {
+  box-sizing: border-box;
+  height: var(--io-docs-controls-header-height);
+}
+
+.io-docs-playground .io-docs-canvas {
+  margin-top: var(--io-docs-controls-header-height);
+}
+
 @media (max-width: 1100px) {
   .io-docs-playground {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .io-docs-playground .io-docs-canvas {
+    margin-top: 0;
   }
 }

@@ -5,6 +5,8 @@
   import { IconTag } from '$lib/io/icon';
   import { Tag, type TagColorScheme } from '$lib/io/tag';
 
+  import usage from './tag.usage.md?raw';
+
   const colorSchemes: TagColorScheme[] = [
     'neutral',
     'info',
@@ -16,6 +18,7 @@
 
   const { Story } = defineMeta({
     title: 'IO/Components/Tag',
+    tags: ['autodocs'],
     component: Tag,
     args: {
       text: 'tag',
@@ -34,6 +37,7 @@
           component:
             'A non-interactive metadata label with a tag icon and optional extension.',
         },
+        usage,
       },
       layout: 'padded',
     },

@@ -22,6 +22,8 @@
   } from '$lib/io/icon';
   import Tag from '$lib/io/tag/tag.svelte';
 
+  import usage from './page-header.usage.md?raw';
+
   import PageHeader from './page-header.svelte';
 
   const statuses: ChipStatusValue[] = [
@@ -36,7 +38,8 @@
   ];
 
   const { Story } = defineMeta({
-    title: 'IO/Components/Page Header',
+    title: 'IO/Layouts/Page Header',
+    tags: ['autodocs'],
     component: PageHeader,
     args: { heading },
     argTypes: {
@@ -56,6 +59,7 @@
           component:
             'A responsive page heading with slots for actions, tags, filters, and metadata.',
         },
+        usage,
       },
       layout: 'padded',
     },

@@ -4,6 +4,8 @@
 
   import { IconAdd } from '$lib/io/icon';
 
+  import usage from './segmented-control.usage.md?raw';
+
   import SegmentLink from './segment-link.svelte';
   import Segment from './segment.svelte';
   import SegmentedControl from './segmented-control.svelte';
@@ -12,6 +14,7 @@
 
   const { Story } = defineMeta({
     title: 'IO/Components/Segmented Control',
+    tags: ['autodocs'],
     component: Segment,
     args: {
       selected: false,
@@ -21,7 +24,14 @@
     },
     argTypes: {
       selected: { control: 'boolean' },
-      disabled: { control: 'boolean' },
+      disabled: {
+        control: 'boolean',
+        table: {
+          category: 'properties',
+          type: { summary: 'boolean' },
+          defaultValue: { summary: 'false' },
+        },
+      },
       isLoading: { control: 'boolean' },
       count: { control: 'number' },
       Icon: {
@@ -29,7 +39,10 @@
         options: ['None', 'Add'],
         mapping: { None: undefined, Add: IconAdd },
       },
-      children: { control: false },
+      children: {
+        control: false,
+        table: { category: 'properties', type: { summary: 'Snippet' } },
+      },
       class: { table: { disable: true } },
     },
     parameters: {
@@ -38,6 +51,7 @@
           component:
             'A compact group of related actions or navigation destinations.',
         },
+        usage,
       },
       layout: 'padded',
     },

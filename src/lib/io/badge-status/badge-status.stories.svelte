@@ -13,6 +13,8 @@
     IconHeartbeat,
   } from '$lib/io/icon';
 
+  import usage from './badge-status.usage.md?raw';
+
   const sizes: BadgeStatusSize[] = ['sm', 'md'];
   const counts: {
     label: string;
@@ -37,6 +39,7 @@
 
   const { Story } = defineMeta({
     title: 'IO/Components/Badge Status',
+    tags: ['autodocs'],
     component: BadgeStatus,
     args: {
       status: 'Running',
@@ -60,6 +63,7 @@
           component:
             'A non-interactive workflow status label with consistent colors and translated text.',
         },
+        usage,
       },
       layout: 'padded',
     },
