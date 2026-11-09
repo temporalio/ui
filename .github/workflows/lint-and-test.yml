@@ -44,3 +44,17 @@ jobs:
 
       - name: Run Unit Tests
         run: pnpm test
+  consumer-agents:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Checkout and Setup Node
+        uses: ./.github/actions/setup-node
+      - name: Generate consumer AGENTS.md
+        run: pnpm package && node scripts/generate-consumer-agents.mjs
+      - name: Check the io component table
+        run: |
+          if ! grep -q '^| .*`@temporalio/ui/io/' dist/AGENTS.md; then
+            echo "::error file=src/package/AGENTS.consumer.md::dist/AGENTS.md has no io component rows. Check src/lib/io/*/index.ts and the generator."
+            exit 1
+          fi
