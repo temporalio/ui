@@ -1072,7 +1072,7 @@
           {/if}
 
           <div
-            class="flex items-center justify-between gap-3 border-t border-secondary px-4 py-2 text-xs text-secondary"
+            class="flex min-h-10 items-center justify-between gap-3 border-t border-secondary px-4 py-2 text-xs text-secondary"
           >
             {#if pendingConfirm}
               <span class="truncate text-danger">{pendingConfirm.message}</span>
