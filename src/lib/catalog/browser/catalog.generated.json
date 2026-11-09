@@ -1,5 +1,5 @@
 {
-  "sourceHash": "ab1d28559cd8149433f8505b38591843db129021116c4f63f3a2a9f5e2b9f690",
+  "sourceHash": "f2304f8ec6295cba71d06720d7853faf131cffd4f6ea30433882c18c542d5b48",
   "descriptors": [
     {
       "id": "activity-heartbeat",
@@ -141,10 +141,84 @@
       "source": { "id": "oss", "label": "OSS" }
     },
     {
+      "id": "bank-account-entity",
+      "title": "Bank account entity",
+      "description": "Keeps one long-lived workflow per bank account that changes its balance through deposit and withdraw Updates, answers a balance Query, and continues as new every few operations.",
+      "capabilityTags": [
+        "updates",
+        "queries",
+        "signals",
+        "continue-as-new",
+        "long-running"
+      ],
+      "patternTags": ["entity-workflow"],
+      "expectedEvidence": [
+        "Accepted and completed `deposit` and `withdraw` update events, each returning the new balance.",
+        "A `withdraw` larger than the balance is rejected by its validator and leaves no update events in history.",
+        "The `balance` query returns the current balance in cents.",
+        "After the configured number of operations, the run continues as new and the next run starts with the carried-over balance.",
+        "A `close-account` signal completes the workflow with a final balance."
+      ],
+      "setupMarkdown": "The workflow is the account, so its Workflow ID is the account ID. Set **Workflow ID** to something like `account-1001` before running.\n\nAmounts are whole numbers of cents.\n\n1. Send an **update** named `deposit` with `2500`. It returns the new balance.\n2. Send an **update** named `withdraw` with `999999`. The validator rejects it as an overdraft.\n3. Send a **query** named `balance` to read the current balance.\n4. Keep sending updates. After **Operations before Continue-As-New** accepted updates, the workflow continues as new with the same balance.\n5. Send a **signal** named `close-account` with no input to complete the workflow.",
+      "input": {
+        "defaultValue": [{ "balanceCents": 10000, "continueAsNewEvery": 5 }],
+        "schema": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "title": "Account",
+              "type": "object",
+              "properties": {
+                "balanceCents": {
+                  "title": "Opening balance in cents",
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 100000000
+                },
+                "continueAsNewEvery": {
+                  "title": "Operations before Continue-As-New",
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 100
+                }
+              },
+              "required": ["balanceCents", "continueAsNewEvery"],
+              "additionalProperties": false
+            }
+          ],
+          "items": false,
+          "minItems": 1,
+          "maxItems": 1
+        }
+      },
+      "startOptions": {
+        "defaultValue": {},
+        "schema": {
+          "type": "object",
+          "properties": {
+            "details": { "type": "string" },
+            "searchAttributes": { "type": "object" },
+            "summary": { "type": "string" },
+            "workflowStartDelay": { "type": "string" },
+            "workflowId": { "type": "string", "minLength": 1 }
+          }
+        }
+      },
+      "execution": {
+        "kind": "workflow",
+        "targetId": "shared-workflows",
+        "namespace": "default",
+        "taskQueue": "ui-catalog",
+        "workflowType": "bankAccountEntity"
+      },
+      "source": { "id": "oss", "label": "OSS" }
+    },
+    {
       "id": "child-fan-out",
       "title": "Child workflow fan-out",
       "description": "Starts 100 child workflows, each of which starts 10 child workflows of its own, for 1,101 workflows in total.",
       "capabilityTags": ["child-workflows", "concurrency"],
+      "patternTags": ["batch-processing"],
       "expectedEvidence": [
         "A parent workflow with the configured number of child workflows, each with its own grandchild workflows.",
         "Child workflow IDs extend the parent ID, for example `<parent>-3` and `<parent>-3-7`.",
@@ -502,6 +576,90 @@
         "taskQueue": "ui-catalog",
         "workflowType": "nexusGreeting",
         "nexusEndpoints": ["ui-catalog"]
+      },
+      "source": { "id": "oss", "label": "OSS" }
+    },
+    {
+      "id": "order-saga",
+      "title": "Order fulfillment saga",
+      "description": "Reserves inventory, charges payment, and creates a shipment. When a step fails, the completed steps are undone in reverse order.",
+      "capabilityTags": ["activities", "retries", "sequencing"],
+      "patternTags": ["saga"],
+      "expectedEvidence": [
+        "With `failAt` set to `none`, the Reserve inventory, Charge payment, and Create shipment activities complete and the workflow returns that the order shipped.",
+        "With `failAt` set to `create-shipment`, the shipment fails, then Compensate: refund payment runs before Compensate: release inventory, and the workflow fails with the shipment error.",
+        "With `failAt` set to `charge-payment`, only Compensate: release inventory runs before the workflow fails.",
+        "With `failAt` set to `reserve-inventory`, no compensations run because nothing completed."
+      ],
+      "setupMarkdown": "Choose which step fails with **Fail at step**. Each step shows as an activity with a summary in the timeline.\n\n| Fail at step | What runs |\n| --- | --- |\n| `none` | Reserve → Charge → Ship. The order ships. |\n| `reserve-inventory` | Reserve fails. Nothing to undo. |\n| `charge-payment` | Reserve → Charge fails → Release inventory. |\n| `create-shipment` | Reserve → Charge → Ship fails → Refund payment → Release inventory. |\n\nTry `none` first, then the default `create-shipment` to see compensations run in reverse order. Set **Workflow ID** to an order ID such as `order-1001`; activities use it as the order ID.",
+      "input": {
+        "defaultValue": [
+          {
+            "sku": "SKU-123",
+            "quantity": 2,
+            "amountCents": 4999,
+            "failAt": "create-shipment"
+          }
+        ],
+        "schema": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "title": "Order",
+              "type": "object",
+              "properties": {
+                "sku": { "title": "SKU", "type": "string", "minLength": 1 },
+                "quantity": {
+                  "title": "Quantity",
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 100
+                },
+                "amountCents": {
+                  "title": "Amount in cents",
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 100000000
+                },
+                "failAt": {
+                  "title": "Fail at step",
+                  "type": "string",
+                  "enum": [
+                    "none",
+                    "reserve-inventory",
+                    "charge-payment",
+                    "create-shipment"
+                  ]
+                }
+              },
+              "required": ["sku", "quantity", "amountCents", "failAt"],
+              "additionalProperties": false
+            }
+          ],
+          "items": false,
+          "minItems": 1,
+          "maxItems": 1
+        }
+      },
+      "startOptions": {
+        "defaultValue": {},
+        "schema": {
+          "type": "object",
+          "properties": {
+            "details": { "type": "string" },
+            "searchAttributes": { "type": "object" },
+            "summary": { "type": "string" },
+            "workflowStartDelay": { "type": "string" },
+            "workflowId": { "type": "string", "minLength": 1 }
+          }
+        }
+      },
+      "execution": {
+        "kind": "workflow",
+        "targetId": "shared-workflows",
+        "namespace": "default",
+        "taskQueue": "ui-catalog",
+        "workflowType": "orderSaga"
       },
       "source": { "id": "oss", "label": "OSS" }
     },
@@ -1243,6 +1401,66 @@
         "namespace": "default",
         "taskQueue": "ui-catalog",
         "workflowType": "scheduleWorkflow"
+      },
+      "source": { "id": "oss", "label": "OSS" }
+    },
+    {
+      "id": "unpaid-order-auto-cancel",
+      "title": "Unpaid order auto-cancel",
+      "description": "Holds an order until a deadline and cancels it if it is not paid. Signals move the deadline later or earlier, or mark the order paid.",
+      "capabilityTags": ["timers", "signals", "queries", "activities"],
+      "patternTags": ["updatable-timer"],
+      "expectedEvidence": [
+        "Without signals, the timer fires after the hold time and the Cancel unpaid order activity runs.",
+        "Each `adjustHold` signal cancels the current timer and starts a new one for the moved deadline.",
+        "A negative `adjustHold` that moves the deadline into the past cancels the order straight away.",
+        "A `paid` signal cancels the timer and completes the workflow without running the cancel activity."
+      ],
+      "setupMarkdown": "The order cancels itself after **Hold time in seconds** unless it is paid. Set **Workflow ID** to an order ID such as `order-1001`.\n\n1. Run it and wait for the hold time to see the auto-cancel.\n2. Run it again and send a **signal** named `adjustHold` with `30` to push the deadline 30 seconds later, or `-30` to pull it 30 seconds earlier.\n3. Send a **query** named `holdStatus` to see the new deadline and the seconds remaining.\n4. Send a **signal** named `paid` with no input to stop the timer and complete the order.\n\nFrom the CLI:\n\n```\ntemporal workflow signal --workflow-id order-1001 --name adjustHold --input 30\ntemporal workflow query --workflow-id order-1001 --type holdStatus\ntemporal workflow signal --workflow-id order-1001 --name paid\n```",
+      "input": {
+        "defaultValue": [{ "holdSeconds": 60 }],
+        "schema": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "title": "Order hold",
+              "type": "object",
+              "properties": {
+                "holdSeconds": {
+                  "title": "Hold time in seconds",
+                  "type": "integer",
+                  "minimum": 10,
+                  "maximum": 600
+                }
+              },
+              "required": ["holdSeconds"],
+              "additionalProperties": false
+            }
+          ],
+          "items": false,
+          "minItems": 1,
+          "maxItems": 1
+        }
+      },
+      "startOptions": {
+        "defaultValue": {},
+        "schema": {
+          "type": "object",
+          "properties": {
+            "details": { "type": "string" },
+            "searchAttributes": { "type": "object" },
+            "summary": { "type": "string" },
+            "workflowStartDelay": { "type": "string" },
+            "workflowId": { "type": "string", "minLength": 1 }
+          }
+        }
+      },
+      "execution": {
+        "kind": "workflow",
+        "targetId": "shared-workflows",
+        "namespace": "default",
+        "taskQueue": "ui-catalog",
+        "workflowType": "unpaidOrderAutoCancel"
       },
       "source": { "id": "oss", "label": "OSS" }
     },

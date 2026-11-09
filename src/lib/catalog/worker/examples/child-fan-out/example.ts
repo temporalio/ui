@@ -38,6 +38,7 @@ export const catalogExample: CatalogExampleDefinition = {
   description:
     'Starts 100 child workflows, each of which starts 10 child workflows of its own, for 1,101 workflows in total.',
   capabilityTags: ['child-workflows', 'concurrency'],
+  patternTags: ['batch-processing'],
   expectedEvidence: [
     'A parent workflow with the configured number of child workflows, each with its own grandchild workflows.',
     'Child workflow IDs extend the parent ID, for example `<parent>-3` and `<parent>-3-7`.',

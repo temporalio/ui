@@ -258,6 +258,7 @@ const exampleFields = new Set([
   'description',
   'targetId',
   'capabilityTags',
+  'patternTags',
   'expectedEvidence',
   'input',
   'startOptions',
@@ -385,6 +386,8 @@ export const generateCatalog = (registry: CatalogRegistry) => {
       !isNonEmptyString(example.description) ||
       !isNonEmptyString(example.targetId) ||
       !isStringArray(example.capabilityTags) ||
+      (example.patternTags !== undefined &&
+        !isStringArray(example.patternTags)) ||
       !isStringArray(example.expectedEvidence) ||
       !isRuntimeJsonDocument(example.input) ||
       !isRuntimeJsonDocument(example.startOptions) ||
