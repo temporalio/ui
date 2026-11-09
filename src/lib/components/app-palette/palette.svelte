@@ -138,6 +138,7 @@
   const coarse = new MediaQuery('pointer: coarse');
 
   let input = $state<HTMLInputElement>();
+  let list = $state<HTMLDivElement>();
   // A click closes the palette only when it also started on the backdrop, so
   // a text selection dragged out of the panel does not close it.
   let pressedBackdrop = false;
@@ -499,8 +500,10 @@
     actionsOpen = true;
   }
 
+  // The pointer crosses other rows on its way to the footer, so a pending
+  // confirm keeps its row until a key or a click changes it.
   function select(index: number) {
-    if (actionsOpen || index === selectedIndex) return;
+    if (actionsOpen || pendingConfirm || index === selectedIndex) return;
     selected = index;
     pendingConfirm = null;
   }
@@ -651,10 +654,21 @@
     }
   }
 
+  // The list can take focus so it can scroll. Its keys work as in the
+  // search field, and focus goes back there.
+  const LIST_KEYS = new Set(['ArrowDown', 'ArrowUp', 'Enter', 'Escape']);
+
+  function onListKeydown(event: KeyboardEvent) {
+    if (!LIST_KEYS.has(event.key)) return;
+    input?.focus();
+    onInputKeydown(event);
+  }
+
   // Keys typed in the palette are not page shortcuts. Holocene inputs stop
   // them the same way.
-  function stopPageShortcuts(event: KeyboardEvent) {
+  function onDialogKeydown(event: KeyboardEvent) {
     event.stopPropagation();
+    if (event.target === list) onListKeydown(event);
   }
 
   function onInput() {
@@ -788,7 +802,7 @@
     {@attach modal}
     aria-label={label}
     class="m-0 h-full max-h-none w-full max-w-none overflow-visible border-0 bg-transparent p-0 backdrop:bg-transparent"
-    onkeydown={stopPageShortcuts}
+    onkeydown={onDialogKeydown}
     oncancel={(event) => {
       event.preventDefault();
       handleEscape();
@@ -918,9 +932,13 @@
             </div>
           {/if}
 
-          <!-- Keyboard users can focus it to scroll (axe scrollable-region-focusable). Rows are reached from the input. -->
+          <!-- Keyboard users can focus it to scroll (axe scrollable-region-focusable). Its keys move the selection, as in the input. -->
           <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
-          <div class="min-h-72 flex-1 overflow-y-auto p-2" tabindex="0">
+          <div
+            bind:this={list}
+            class="min-h-72 flex-1 overflow-y-auto p-2"
+            tabindex="0"
+          >
             {#if loading}
               <p class="px-3 py-2 text-sm text-secondary" role="status">
                 {translate('palette.loading')}
