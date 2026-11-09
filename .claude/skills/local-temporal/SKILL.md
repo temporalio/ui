@@ -1,6 +1,6 @@
 ---
 name: local-temporal
-description: Instructions for running the UI against a local Temporal server build instead of the built-in CLI dev server. Use when asked how to start the dev environment, run the UI locally, or connect to a local Temporal repo.
+description: "Set up and connect the Temporal UI to a locally built Temporal server by starting the server via make start, running pnpm dev:local-temporal, and syncing go.temporal.io/api proto versions between the server branch and server/go.mod. Use when asked how to start the dev environment, run the UI locally, connect to a local Temporal repo, or troubleshoot proto version mismatches."
 ---
 
 # Local Temporal Dev Setup
@@ -37,13 +37,11 @@ This loads `.env.local-temporal` which points the UI at the local server instead
 
 ## Why not `pnpm dev`?
 
-`pnpm dev` (aliased to `pnpm dev:ui-server`) starts a bundled Temporal server alongside the UI. `pnpm dev:local-temporal` skips that and connects to whatever is already running on the configured ports.
+`pnpm dev` starts a bundled Temporal server alongside the UI. `pnpm dev:local-temporal` skips that and connects to whatever is already running on the configured ports.
 
-## Keeping the ui-server in sync with the Temporal server branch
+## Keeping the ui-server proto versions in sync
 
-This is **critical** when working on unreleased features. The ui-server (`server/`) is a separate Go binary that acts as a grpc-gateway — it decodes HTTP/JSON into proto messages and forwards them to the Temporal server over gRPC. Its proto descriptors are baked in at compile time from its own `server/go.mod`.
-
-If the Temporal server branch uses a newer `go.temporal.io/api` version than `server/go.mod`, the ui-server will reject any new HTTP fields as "unknown field" before the request ever reaches the Temporal server.
+**Critical when working on unreleased features.** The ui-server (`server/`) bakes proto descriptors from its own `server/go.mod` at compile time. If the Temporal server branch uses a newer `go.temporal.io/api` than `server/go.mod`, the ui-server rejects new HTTP fields as "unknown field" before they reach the server.
 
 **When switching to a Temporal branch with API changes:**
 
