@@ -165,18 +165,45 @@ describe('Palette', () => {
     expect(destroy).toHaveBeenCalledTimes(2);
   });
 
-  it('drops a pending confirm when the mouse selects another row', async () => {
+  it('keeps a pending confirm while the mouse crosses other rows', async () => {
     const { destroy } = setup();
     const input = await openPalette();
 
     await fireEvent.keyDown(input, { key: 'ArrowDown' });
     await fireEvent.keyDown(input, { key: 'Enter' });
+    await fireEvent.mouseMove(screen.getByText('Open Detail'));
     expect(shown('Really delete?')).toBe(true);
 
-    await fireEvent.mouseMove(screen.getByText('Open Detail'));
-    expect(shown('Really delete?')).toBe(false);
+    await fireEvent.click(screen.getByRole('button', { name: /Confirm/ }));
+    expect(destroy).toHaveBeenCalledTimes(1);
+  });
+
+  it('drops a pending confirm when a key moves the selection', async () => {
+    const { destroy } = setup();
+    const input = await openPalette();
+
+    await fireEvent.keyDown(input, { key: 'ArrowDown' });
     await fireEvent.keyDown(input, { key: 'Enter' });
+    await fireEvent.keyDown(input, { key: 'ArrowUp' });
+    expect(shown('Really delete?')).toBe(false);
     expect(destroy).not.toHaveBeenCalled();
+  });
+
+  it('moves the selection with the arrow keys when the list has focus', async () => {
+    const { destroy } = setup();
+    const input = await openPalette();
+    const list = input
+      .closest('dialog')
+      ?.querySelector<HTMLElement>('.overflow-y-auto[tabindex="0"]');
+    if (!list) throw new Error('No list');
+    list.focus();
+
+    await fireEvent.keyDown(list, { key: 'ArrowDown' });
+    expect(document.activeElement).toBe(input);
+    await fireEvent.keyDown(list, { key: 'Enter' });
+    expect(shown('Really delete?')).toBe(true);
+    await fireEvent.keyDown(input, { key: 'Enter' });
+    expect(destroy).toHaveBeenCalledTimes(1);
   });
 
   it('keeps focus in the search input when a row is pressed', async () => {
