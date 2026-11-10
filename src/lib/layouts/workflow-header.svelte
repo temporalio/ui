@@ -13,6 +13,7 @@
   import ExtensionSlot from '$lib/components/extensions/extension-slot.svelte';
   import WorkflowDetails from '$lib/components/lines-and-dots/workflow-details.svelte';
   import NoWorkersPollingAlert from '$lib/components/workers/no-workers-polling-alert.svelte';
+  import CallbackBanner from '$lib/components/workflow/callback-banner.svelte';
   import WorkflowStatusBadge from '$lib/components/workflow/workflow-status-badge.svelte';
   import WorkflowActions from '$lib/components/workflow-actions.svelte';
   import Alert from '$lib/holocene/alert.svelte';
@@ -25,12 +26,16 @@
   import { Badge } from '$lib/io/badge';
   import { BadgeCount } from '$lib/io/badge-count';
   import { IconCanceled, IconChevronLeft, IconInfo } from '$lib/io/icon';
-  import { getVisibleInboundNexusLinkEvents } from '$lib/runes/inbound-nexus-links.svelte';
+  import {
+    getInboundLinkForEvent,
+    getVisibleInboundNexusLinkEvents,
+  } from '$lib/runes/inbound-nexus-links.svelte';
   import { workflowViewPreference } from '$lib/stores/event-view';
   import { fullEventHistory } from '$lib/stores/events';
   import { resetWorkflows } from '$lib/stores/reset-workflows';
   import { workflowRun } from '$lib/stores/workflow-run';
   import { workflowsSearchParams } from '$lib/stores/workflows';
+  import type { EventLink } from '$lib/types';
   import { isCancelInProgress } from '$lib/utilities/cancel-in-progress';
   import { isWorkflowDelayed } from '$lib/utilities/delayed-workflows';
   import { getSharedFilterParams } from '$lib/utilities/event-filter-params';
@@ -113,6 +118,12 @@
   );
   const inboundLinks = $derived(visibleInboundLinks.events?.length || 0);
   const linkCount = $derived(outboundLinks + inboundLinks);
+  const workerCallbackLinks = $derived(
+    visibleInboundLinks.events
+      .map(getInboundLinkForEvent)
+      .filter((link): link is EventLink => Boolean(link && link.callback)),
+  );
+  const callbackFallbackLink = $derived($fullEventHistory[0]?.links?.[0]);
   const sharedFilterParams = $derived(getSharedFilterParams(page.url));
   const taskQueue = $derived(workflow?.taskQueue ?? '');
 </script>
@@ -289,6 +300,13 @@
     {taskQueue}
     {runningWithNoWorkers}
     deployment={workerDeployment}
+  />
+  <CallbackBanner
+    callbacks={workflow?.callbacks ?? []}
+    {workerCallbackLinks}
+    fallbackLink={callbackFallbackLink}
+    linksHref={linkCount > 0 ? routeForNexusLinks(routeParameters) : undefined}
+    {linkCount}
   />
   <Tabs>
     <TabList label="workflow detail">

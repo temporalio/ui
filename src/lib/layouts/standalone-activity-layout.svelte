@@ -7,6 +7,7 @@
   import ActivityHeaderLoading from '$lib/components/standalone-activities/activity-header-loading.svelte';
   import ActivityExecutionHeader from '$lib/components/standalone-activities/activity-header.svelte';
   import NoWorkersPollingAlert from '$lib/components/workers/no-workers-polling-alert.svelte';
+  import CallbackBanner from '$lib/components/workflow/callback-banner.svelte';
   import ErrorComponent from '$lib/holocene/error.svelte';
   import Link from '$lib/holocene/link.svelte';
   import TabList from '$lib/holocene/tab/tab-list.svelte';
@@ -158,6 +159,13 @@
     />
   {:else if loading}
     <ActivityHeaderLoading />
+  {/if}
+
+  {#if $activityExecution}
+    <CallbackBanner
+      callbacks={$activityExecution.callbacks ?? []}
+      perspective="caller"
+    />
   {/if}
 
   <Tabs>

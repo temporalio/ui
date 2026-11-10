@@ -12,7 +12,6 @@
   import WorkflowError from '$lib/components/lines-and-dots/workflow-error.svelte';
   import DownloadEventHistoryModal from '$lib/components/workflow/download-event-history-modal.svelte';
   import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
-  import WorkflowCallbacks from '$lib/components/workflow/workflow-callbacks.svelte';
   import {
     HISTORY_CTX,
     type HistoryContext,
@@ -149,9 +148,6 @@
       error={workflowTaskFailedError}
       pendingTask={workflow?.pendingWorkflowTask}
     />
-  {/if}
-  {#if workflow?.callbacks?.length}
-    <WorkflowCallbacks callbacks={workflow.callbacks} />
   {/if}
 </div>
 

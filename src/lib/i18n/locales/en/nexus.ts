@@ -55,15 +55,6 @@ export const Strings = {
   'selected-namespaces_other': '{{count}} Namespaces selected',
   'empty-state': 'No Nexus Endpoints found, try a new search.',
   'nexus-callback': 'Nexus Callback',
-  callback: {
-    standby: 'Nexus Callback is standing by, waiting to be triggered.',
-    scheduled:
-      'Nexus Callback is in the queue waiting to be executed or is currently executing.',
-    'backing-off':
-      'Nexus Callback has failed with a retryable error and is backing off before the next attempt.',
-    failed: 'Nexus Callback has failed.',
-    succeeded: 'Nexus Callback has succeeded.',
-  },
   'callback-url': 'Callback URL',
   callbacks: 'Callbacks',
   'callbacks-intro':
@@ -77,6 +68,31 @@ export const Strings = {
     blocked: 'Blocked',
     unspecified: 'Unspecified',
   },
+  'callback-banner': {
+    standby: 'Callback is standing by, waiting to be triggered.',
+    scheduled:
+      'Callback is in the queue waiting to be executed or is currently executing.',
+    'backing-off':
+      'Callback has failed with a retryable error and is backing off before the next attempt.',
+    blocked: 'Callback is blocked.',
+    failed: 'Callback has failed.',
+    succeeded: 'Callback has succeeded.',
+    unspecified: 'Callback',
+  },
+  'callback-summary-state': {
+    standby: 'Standing by, awaiting trigger',
+    scheduled: 'Scheduled',
+    'backing-off': 'Backing off',
+    blocked: 'Blocked',
+    succeeded: 'Completed successfully',
+    failed: 'Failed',
+  },
+  'callback-summary-title': 'Callback Links ready for review.',
+  'callback-summary-review-links':
+    'Review all Links related to this Workflow Execution',
+  'callback-summary-view-links': 'View Links',
+  'callback-summary-view-links-count_one': 'View {{count}} Link',
+  'callback-summary-view-links-count_other': 'View {{count}} Links',
   'delivery-state': 'Delivery State',
   'nexus-endpoint-column': 'Nexus Endpoint',
   'target-event': 'Target Event',
