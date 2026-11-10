@@ -178,6 +178,55 @@ describe('Palette', () => {
     expect(destroy).toHaveBeenCalledTimes(1);
   });
 
+  it('selects the row that a click moves the confirm to', async () => {
+    const deleteOne = vi.fn();
+    const deleteTwo = vi.fn();
+    setup([
+      {
+        id: 'dev',
+        label: 'Dev',
+        key: 'd',
+        tools: [
+          {
+            id: 'test',
+            section: 'Testing',
+            items: () => [
+              {
+                id: 'one',
+                title: 'One',
+                actions: [
+                  { title: 'Delete', confirm: 'Delete one?', run: deleteOne },
+                ],
+              },
+              {
+                id: 'two',
+                title: 'Two',
+                actions: [
+                  { title: 'Delete', confirm: 'Delete two?', run: deleteTwo },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ]);
+    const input = await openPalette();
+
+    await fireEvent.click(screen.getByText('One'));
+    expect(shown('Delete one?')).toBe(true);
+    await fireEvent.mouseMove(screen.getByText('Two'));
+    await fireEvent.click(screen.getByText('Two'));
+    expect(shown('Delete two?')).toBe(true);
+
+    const two = screen.getByText('Two').closest('[role="option"]');
+    expect(two?.getAttribute('aria-selected')).toBe('true');
+    expect(input.getAttribute('aria-activedescendant')).toBe(two?.id);
+
+    await fireEvent.keyDown(input, { key: 'Enter' });
+    expect(deleteTwo).toHaveBeenCalledTimes(1);
+    expect(deleteOne).not.toHaveBeenCalled();
+  });
+
   it('drops a pending confirm when a key moves the selection', async () => {
     const { destroy } = setup();
     const input = await openPalette();

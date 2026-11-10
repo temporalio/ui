@@ -984,7 +984,10 @@
                     ]}
                     onmousedown={keepInputFocus}
                     onmousemove={() => select(index)}
-                    onclick={() => runAction(item, 0)}
+                    onclick={() => {
+                      selected = index;
+                      runAction(item, 0);
+                    }}
                   >
                     {#if showIcons}
                       {@const Icon = item.icon}

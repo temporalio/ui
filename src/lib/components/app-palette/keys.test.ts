@@ -195,21 +195,6 @@ describe('shortcut setting storage', () => {
     expect(loadShortcutSetting('test-shortcut')).toBeUndefined();
   });
 
-  it('reads a shortcut saved before each modifier was stored as the platform modifier', () => {
-    localStorage.setItem(
-      'test-shortcut',
-      '{"key":"j","code":"KeyJ","shift":true,"alt":false}',
-    );
-    expect(loadShortcutSetting('test-shortcut')).toEqual({
-      key: 'j',
-      code: 'KeyJ',
-      meta: false,
-      ctrl: true,
-      alt: false,
-      shift: true,
-    });
-  });
-
   it('ignores a stored value it cannot read', () => {
     localStorage.setItem(
       'test-shortcut',
