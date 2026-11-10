@@ -6,7 +6,6 @@
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { Badge } from '$lib/io/badge';
   import { BadgeCount } from '$lib/io/badge-count';
   import { IconTemporalNexus } from '$lib/io/icon';
   import type { EventLink as EventLinkType } from '$lib/types';
@@ -106,10 +105,7 @@
         >
           <p class="flex items-center gap-2">
             {translate('common.state')}
-            <Badge
-              text={deliveryState.label}
-              colorScheme={deliveryState.colorScheme}
-            />
+            {@render value(deliveryState.label)}
           </p>
           {#if callback.attempt}
             <p class="flex items-center gap-2">
