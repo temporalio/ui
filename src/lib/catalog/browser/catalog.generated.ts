@@ -2,7 +2,7 @@ import type { BrowserCatalogArtifact } from './types';
 
 export const catalogArtifact: BrowserCatalogArtifact = {
   sourceHash:
-    'ed7ac9ffd5fbdb01af9699e6b9cb5bbcc4f5179f5f50175e10cf095c64e1306c',
+    '86b8003beee09d3769829774e8b06e4140d05405e90e30bf3fbe06a28fa4b543',
   workspaces: [{ id: 'shared-workflows', controls: ['crash'] }],
   descriptors: [
     {
@@ -1278,7 +1278,7 @@ export const catalogArtifact: BrowserCatalogArtifact = {
         },
       },
       setupMarkdown:
-        'Start the worker with `CATALOG_CONTROL=on`. The worker then restarts after it exits.\n\nWhile the run waits, send the `crashWorker` update:\n\n```\ntemporal workflow update execute --name crashWorker --workflow-id <workflow id>\n```\n\nThe worker process exits and restarts. The update returns once the crash activity succeeds on the new worker. Without `CATALOG_CONTROL=on`, the update fails and the worker keeps running.',
+        'Start the worker with `pnpm catalog worker` or `pnpm catalog dev`. The command restarts the worker after it exits.\n\nWhile the run waits, send the `crashWorker` update:\n\n```\ntemporal workflow update execute --name crashWorker --workflow-id <workflow id>\n```\n\nThe worker process exits and restarts. The update returns once the crash activity succeeds on the new worker.',
       execution: {
         kind: 'workflow',
         workspaceId: 'shared-workflows',

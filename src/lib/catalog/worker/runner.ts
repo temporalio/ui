@@ -3,13 +3,8 @@ import { fileURLToPath } from 'node:url';
 
 import type { ServiceHandler } from 'nexus-rpc';
 
-import {
-  crashActivityName,
-  createCrashActivity,
-  effectiveCatalogControls,
-} from './crash.js';
+import { crashActivityName, createCrashActivity } from './crash.js';
 import type { CatalogWorkerBinding } from './registry';
-import type { CatalogWorkspaceControl } from '../browser/metadata-schema';
 
 export type CatalogConnection = {
   close: () => Promise<void>;
@@ -63,7 +58,6 @@ type StartCatalogRunnerOptions<Connection extends CatalogConnection> =
       options: CatalogWorkerOptions<Connection>,
     ) => Promise<CatalogWorker>;
     events?: (event: CatalogRunnerEvent) => void;
-    controls?: readonly CatalogWorkspaceControl[];
     exit?: (code: number) => void;
   };
 
@@ -129,10 +123,8 @@ export const startCatalogRunner = async <Connection extends CatalogConnection>(
     for (const binding of bindings) {
       emit({ type: 'workspace-creating', workspaceId: binding.workspace.id });
       try {
-        const crashEnabled = effectiveCatalogControls(
-          binding.workspace.controls,
-          options.controls ?? [],
-        ).includes('crash');
+        const crashEnabled =
+          binding.workspace.controls?.includes('crash') ?? false;
         const packagedWorkflowsPath = fileURLToPath(
           new URL(binding.workspace.workflowsPath, import.meta.url),
         );

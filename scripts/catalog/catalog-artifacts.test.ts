@@ -23,7 +23,7 @@ import {
   verifyCatalogArtifact,
   verifyCatalogProjectBoundaries,
 } from './catalog-artifacts';
-import { catalogWorkerEntry, runCatalogWorkerDevelopment } from './catalog-cli';
+import { catalogWorkerEntry } from './catalog-cli';
 import { createInRepoTemporaryDirectory } from './test-temp-root';
 import { catalogRegistrationSource as localRegistrationFallback } from '../../src/lib/catalog/worker/local-registration-fallback';
 import { createCatalogRegistry } from '../../src/lib/catalog/worker/registry';
@@ -1763,36 +1763,6 @@ registry.registerExample({
     },
     catalogCommandTestTimeoutMs,
   );
-
-  it('restarts the worker development entry when the modules it loaded change', async () => {
-    const spawned: { args: readonly string[]; command: string }[] = [];
-    const listeners = new Map<string, (value: never) => void>();
-    const development = runCatalogWorkerDevelopment(
-      (command, args) => {
-        spawned.push({ args, command });
-        return {
-          once: (event: string, listener: (value: never) => void) =>
-            listeners.set(event, listener),
-        } as never;
-      },
-      { environment: {}, rootDirectory: '/nonexistent-catalog-root' },
-    );
-
-    listeners.get('exit')?.(0 as never);
-    await expect(development).resolves.toBeUndefined();
-    expect(spawned).toEqual([
-      {
-        command: 'pnpm',
-        args: [
-          'exec',
-          'esno',
-          '--watch',
-          '--watch-preserve-output',
-          catalogWorkerEntry,
-        ],
-      },
-    ]);
-  });
 
   it(
     'reports the first worker development preflight failure clearly',

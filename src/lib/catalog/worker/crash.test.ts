@@ -1,10 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import {
-  catalogControlsFromEnvironment,
-  createCrashActivity,
-  effectiveCatalogControls,
-} from './crash';
+import { createCrashActivity } from './crash';
 
 const activityInfo = vi.hoisted(() => ({ attempt: 1 }));
 
@@ -15,22 +11,6 @@ vi.mock('@temporalio/activity', () => ({
 describe('catalog Worker crash', () => {
   beforeEach(() => {
     activityInfo.attempt = 1;
-  });
-
-  it('provides the crash control only when the runtime turns it on', () => {
-    expect(catalogControlsFromEnvironment({ CATALOG_CONTROL: 'on' })).toEqual([
-      'crash',
-    ]);
-    expect(catalogControlsFromEnvironment({})).toEqual([]);
-    expect(catalogControlsFromEnvironment({ CATALOG_CONTROL: 'true' })).toEqual(
-      [],
-    );
-  });
-
-  it('enables only controls that the workspace declares and the runtime provides', () => {
-    expect(effectiveCatalogControls(['crash'], ['crash'])).toEqual(['crash']);
-    expect(effectiveCatalogControls(['crash'], [])).toEqual([]);
-    expect(effectiveCatalogControls(undefined, ['crash'])).toEqual([]);
   });
 
   it('exits the process on the first attempt', async () => {
@@ -64,7 +44,7 @@ describe('catalog Worker crash', () => {
     expect(exit).not.toHaveBeenCalled();
   });
 
-  it('fails without retrying when the crash control is off', async () => {
+  it('fails without retrying when the workspace does not declare the crash control', async () => {
     const exit = vi.fn();
     const { dangerousOperation } = createCrashActivity({
       enabled: false,

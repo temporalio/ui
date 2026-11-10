@@ -1,13 +1,11 @@
 import { execFile } from 'node:child_process';
-import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
-import { tmpdir } from 'node:os';
+import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { promisify } from 'node:util';
 
 import { describe, expect, it, vi } from 'vitest';
 
 import {
-  catalogControlSetting,
   catalogHelp,
   catalogWorkerEntry,
   isCatalogSourceChange,
@@ -172,7 +170,6 @@ describe('catalog CLI', () => {
         } as never;
       });
       const options = {
-        environment: { CATALOG_CONTROL: 'on' },
         rootDirectory: '/catalog-root',
         log: () => undefined,
         spawnWorker,
@@ -205,14 +202,9 @@ describe('catalog CLI', () => {
         watchedPaths,
       };
     };
-    const spawnProcess = vi.fn();
-
-    it('restarts the worker without watch mode after a crash exit', async () => {
+    it('restarts the worker after a crash exit', async () => {
       const harness = createHarness();
-      const development = runCatalogWorkerDevelopment(
-        spawnProcess,
-        harness.options,
-      );
+      const development = runCatalogWorkerDevelopment(harness.options);
 
       harness.exits[0](75);
       harness.exits[1](0);
@@ -222,15 +214,11 @@ describe('catalog CLI', () => {
         ['exec', 'esno', catalogWorkerEntry],
         ['exec', 'esno', catalogWorkerEntry],
       ]);
-      expect(spawnProcess).not.toHaveBeenCalled();
     });
 
     it('stops on any other failure instead of restarting', async () => {
       const harness = createHarness();
-      const development = runCatalogWorkerDevelopment(
-        spawnProcess,
-        harness.options,
-      );
+      const development = runCatalogWorkerDevelopment(harness.options);
 
       harness.exits[0](1);
 
@@ -244,7 +232,7 @@ describe('catalog CLI', () => {
 
     it('watches the catalog sources under the project root', () => {
       const harness = createHarness();
-      void runCatalogWorkerDevelopment(spawnProcess, harness.options);
+      void runCatalogWorkerDevelopment(harness.options);
 
       expect(harness.watchedPaths).toEqual([
         '/catalog-root/src/lib/catalog',
@@ -257,10 +245,7 @@ describe('catalog CLI', () => {
       vi.useFakeTimers();
       try {
         const harness = createHarness();
-        const development = runCatalogWorkerDevelopment(
-          spawnProcess,
-          harness.options,
-        );
+        const development = runCatalogWorkerDevelopment(harness.options);
 
         harness.change('worker/examples/hello/workflow.ts');
         harness.change('browser/catalog.generated.json');
@@ -284,7 +269,7 @@ describe('catalog CLI', () => {
       vi.useFakeTimers();
       try {
         const harness = createHarness();
-        void runCatalogWorkerDevelopment(spawnProcess, harness.options);
+        void runCatalogWorkerDevelopment(harness.options);
 
         harness.change('README.md');
         harness.change('worker/.workflow.ts.swp');
@@ -299,10 +284,7 @@ describe('catalog CLI', () => {
 
     it('forwards an interrupt to the worker and stops without restarting', async () => {
       const harness = createHarness();
-      const development = runCatalogWorkerDevelopment(
-        spawnProcess,
-        harness.options,
-      );
+      const development = runCatalogWorkerDevelopment(harness.options);
 
       harness.signal('SIGINT');
       expect(harness.kills).toEqual(['SIGINT']);
@@ -322,29 +304,6 @@ describe('catalog CLI', () => {
       expect(isCatalogSourceChange('examples/index.mjs')).toBe(true);
       expect(isCatalogSourceChange('README.md')).toBe(false);
       expect(isCatalogSourceChange('node_modules/x/index.js')).toBe(false);
-    });
-
-    it('reads the crash control from the environment, then the local env file, then the defaults', async () => {
-      const rootDirectory = await mkdtemp(join(tmpdir(), 'catalog-control-'));
-
-      try {
-        await writeFile(
-          join(rootDirectory, '.env.catalog'),
-          'CATALOG_CONTROL=off\n',
-        );
-        expect(catalogControlSetting(rootDirectory, {})).toBe('off');
-
-        await writeFile(
-          join(rootDirectory, '.env.catalog.local'),
-          'CATALOG_CONTROL=on\n',
-        );
-        expect(catalogControlSetting(rootDirectory, {})).toBe('on');
-        expect(
-          catalogControlSetting(rootDirectory, { CATALOG_CONTROL: 'off' }),
-        ).toBe('off');
-      } finally {
-        await rm(rootDirectory, { recursive: true, force: true });
-      }
     });
   });
 });

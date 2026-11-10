@@ -1,8 +1,7 @@
 import { spawn } from 'node:child_process';
-import { existsSync, readFileSync, watch } from 'node:fs';
+import { existsSync, watch } from 'node:fs';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { parseEnv } from 'node:util';
 
 import { getProjectRoot } from '../get-project-root.js';
 import { migrateLegacyCatalogLocalState } from './local-migration.js';
@@ -26,15 +25,6 @@ const isReportedCatalogCliError = (error: unknown) => {
 
 export const catalogWorkerEntry = 'scripts/catalog/dev.ts';
 
-/**
- * Node restarts the worker whenever a module it loaded changes, so scaffolding,
- * promoting, demoting, or editing an example reaches the running worker.
- */
-export const catalogWorkerWatchArguments = [
-  '--watch',
-  '--watch-preserve-output',
-] as const;
-
 type CatalogDevelopmentChild = {
   once: {
     (event: 'error', listener: (error: Error) => void): unknown;
@@ -42,28 +32,9 @@ type CatalogDevelopmentChild = {
   };
 };
 
-export type SpawnCatalogDevelopmentProcess = (
-  command: string,
-  args: readonly string[],
-) => CatalogDevelopmentChild;
-
-const spawnCatalogDevelopmentProcess: SpawnCatalogDevelopmentProcess = (
-  command,
-  args,
-) => spawn(command, [...args], { stdio: 'inherit' });
-
-const runCatalogDevelopmentEntry = (
-  script: string,
-  nodeArguments: readonly string[] = [],
-  spawnProcess: SpawnCatalogDevelopmentProcess = spawnCatalogDevelopmentProcess,
-) =>
+const runCatalogDevelopmentEntry = (script: string) =>
   new Promise<void>((resolve, reject) => {
-    const child = spawnProcess('pnpm', [
-      'exec',
-      'esno',
-      ...nodeArguments,
-      script,
-    ]);
+    const child = spawn('pnpm', ['exec', 'esno', script], { stdio: 'inherit' });
 
     child.once('error', reject);
     child.once('exit', (code) => {
@@ -72,24 +43,6 @@ const runCatalogDevelopmentEntry = (
         reject(new Error(`${script} exited with status ${code ?? 'unknown'}`));
     });
   });
-
-const readEnvironmentFile = (path: string) => {
-  try {
-    return parseEnv(readFileSync(path, 'utf8'));
-  } catch (error) {
-    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return {};
-    throw error;
-  }
-};
-
-export const catalogControlSetting = (
-  rootDirectory: string,
-  environment: Readonly<Record<string, string | undefined>> = process.env,
-) =>
-  environment.CATALOG_CONTROL ??
-  readEnvironmentFile(join(rootDirectory, '.env.catalog.local'))
-    .CATALOG_CONTROL ??
-  readEnvironmentFile(join(rootDirectory, '.env.catalog')).CATALOG_CONTROL;
 
 export type CatalogWorkerProcess = CatalogDevelopmentChild & {
   kill: (signal: NodeJS.Signals) => unknown;
@@ -154,21 +107,27 @@ const watchCatalogSources: WatchCatalogSources = (paths, onChange) => {
   };
 };
 
-const runCrashableCatalogWorker = ({
-  rootDirectory,
-  spawnWorker,
-  watchSources,
-  signals,
-  log,
-  debounceMs,
+/**
+ * Restarts the worker after a crash exit and when a catalog source changes, so
+ * crash demos recover and scaffolding, promoting, demoting, or editing an
+ * example reaches the running worker. Node's --watch cannot restart a process
+ * that exits, so the command watches the sources itself.
+ */
+export const runCatalogWorkerDevelopment = ({
+  rootDirectory = getProjectRoot(),
+  log = console.info,
+  spawnWorker = spawnCatalogWorkerProcess,
+  watchSources = watchCatalogSources,
+  signals = process,
+  debounceMs = 200,
 }: {
-  rootDirectory: string;
-  spawnWorker: SpawnCatalogWorkerProcess;
-  watchSources: WatchCatalogSources;
-  signals: CatalogSignals;
-  log: (message: string) => void;
-  debounceMs: number;
-}) =>
+  rootDirectory?: string;
+  log?: (message: string) => void;
+  spawnWorker?: SpawnCatalogWorkerProcess;
+  watchSources?: WatchCatalogSources;
+  signals?: CatalogSignals;
+  debounceMs?: number;
+} = {}) =>
   new Promise<void>((resolve, reject) => {
     let child: CatalogWorkerProcess | undefined;
     let restarting = false;
@@ -245,46 +204,9 @@ const runCrashableCatalogWorker = ({
     signals.on('SIGINT', forwardInterrupt);
     signals.on('SIGTERM', forwardTerminate);
 
-    log(
-      'Crash control is on: the worker restarts after a crash or a source change.',
-    );
+    log('The worker restarts after a crash or a source change.');
     start();
   });
-
-export const runCatalogWorkerDevelopment = (
-  spawnProcess: SpawnCatalogDevelopmentProcess = spawnCatalogDevelopmentProcess,
-  {
-    rootDirectory = getProjectRoot(),
-    environment = process.env,
-    log = console.info,
-    spawnWorker = spawnCatalogWorkerProcess,
-    watchSources = watchCatalogSources,
-    signals = process,
-    debounceMs = 200,
-  }: {
-    rootDirectory?: string;
-    environment?: Readonly<Record<string, string | undefined>>;
-    log?: (message: string) => void;
-    spawnWorker?: SpawnCatalogWorkerProcess;
-    watchSources?: WatchCatalogSources;
-    signals?: CatalogSignals;
-    debounceMs?: number;
-  } = {},
-) =>
-  catalogControlSetting(rootDirectory, environment) === 'on'
-    ? runCrashableCatalogWorker({
-        rootDirectory,
-        spawnWorker,
-        watchSources,
-        signals,
-        log,
-        debounceMs,
-      })
-    : runCatalogDevelopmentEntry(
-        catalogWorkerEntry,
-        catalogWorkerWatchArguments,
-        spawnProcess,
-      );
 
 export const prepareCatalogCommand = async ({
   rootDirectory = getProjectRoot(),

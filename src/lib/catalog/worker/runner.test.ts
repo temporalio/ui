@@ -583,10 +583,7 @@ describe('catalog runner', () => {
         ...binding,
         workspace: { ...binding.workspace, controls: ['crash' as const] },
       }));
-    const startWithCrash = async (
-      bindings: CatalogWorkerBinding[],
-      controls: 'crash'[],
-    ) => {
+    const startWithCrash = async (bindings: CatalogWorkerBinding[]) => {
       const exit = vi.fn();
       const createWorker = vi.fn(async (_options: CatalogWorkerOptions) => ({
         run: async () => undefined,
@@ -596,7 +593,6 @@ describe('catalog runner', () => {
         bindings,
         connection: { close: vi.fn(async () => undefined) },
         createWorker,
-        controls,
         exit,
       });
       await runner.completion;
@@ -607,10 +603,8 @@ describe('catalog runner', () => {
       return { activities, exit };
     };
 
-    it('lets a workspace that declares crash exit the process when the runtime provides it', async () => {
-      const { activities, exit } = await startWithCrash(crashBindings(), [
-        'crash',
-      ]);
+    it('lets a workspace that declares crash exit the process', async () => {
+      const { activities, exit } = await startWithCrash(crashBindings());
 
       await activities.dangerousOperation();
 
@@ -623,12 +617,14 @@ describe('catalog runner', () => {
         shutdown: vi.fn(),
       }));
 
-      for (const controls of [['crash' as const], []]) {
+      for (const bindings of [
+        crashBindings(),
+        createActivityBindings('demo'),
+      ]) {
         const runner = await startCatalogRunner({
-          bindings: crashBindings(),
+          bindings,
           connection: { close: vi.fn(async () => undefined) },
           createWorker,
-          controls,
         });
         await runner.completion;
       }
@@ -641,19 +637,9 @@ describe('catalog runner', () => {
       );
     });
 
-    it('refuses to crash when the runtime does not provide the control', async () => {
-      const { activities, exit } = await startWithCrash(crashBindings(), []);
-
-      await expect(activities.dangerousOperation()).rejects.toMatchObject({
-        type: 'CatalogCrashDisabled',
-      });
-      expect(exit).not.toHaveBeenCalled();
-    });
-
     it('refuses to crash a workspace that does not declare the control', async () => {
       const { activities, exit } = await startWithCrash(
         createActivityBindings('demo'),
-        ['crash'],
       );
 
       await expect(activities.dangerousOperation()).rejects.toMatchObject({

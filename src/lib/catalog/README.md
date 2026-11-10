@@ -31,7 +31,6 @@ Copy the example file to `.env.catalog.local` and uncomment what you need. Only 
 | `TEMPORAL_ADDRESS`           | Server address. Defaults to `127.0.0.1:7233`.                       |
 | `TEMPORAL_NAMESPACE`         | Namespace the worker registers and polls in. Defaults to `default`. |
 | `CATALOG_WORKSPACE_ID`       | Optional. Run one workspace instead of all of them.                 |
-| `CATALOG_CONTROL`            | Optional. `on` lets workspaces that declare `crash` exit the worker. |
 
 Prefer `127.0.0.1` over `localhost`. On some machines `localhost` resolves to IPv6 and reaches a different Temporal server than the UI is reading — for example a container publishing the same port — which appears as a healthy worker the catalog cannot see.
 
@@ -133,16 +132,16 @@ export async function moneyTransfer(input: TransferInput) {
 
 The update runs the `dangerousOperation` activity. On its first attempt, the activity exits the worker process with code 75. The host restarts the process. The activity's heartbeat timeout expires, Temporal retries it on the new worker, and the retry returns. The update result reports the recovery, and the run continues.
 
-Crash is on only when the workspace declares `controls: ['crash']` and the runtime sets `CATALOG_CONTROL=on`. Otherwise the activity fails without retrying, and the update returns that failure. A serverless runtime should not set it, because it cannot restart a process.
+Crash is on only when the workspace declares `controls: ['crash']`. Otherwise the activity fails without retrying, and the update returns that failure. Declare it only for a workspace whose runtime starts a new Worker after the process exits. A local restart loop, a restarted container and a new serverless invocation all do.
 
 The exit ends the whole process, so every workspace in it restarts. Run the worker under something that restarts it after a non-zero exit. A worker with crash enabled sets a 1-second sticky queue timeout, so the restarted worker picks up the run within a few seconds.
 
-Locally, `pnpm catalog worker` and `pnpm catalog dev` restart the worker after a crash when `CATALOG_CONTROL=on`, from the environment or an env file. They restart only on the crash exit code, 75. Any other failure stops the command. Node's `--watch` cannot restart a process that exits, so with crash control on, the command watches `src/lib/catalog`, `scripts/catalog` and `catalog.local` itself. A change to a `.ts`, `.js` or `.json` file restarts the worker, including a new example or workspace.
+Locally, `pnpm catalog worker` and `pnpm catalog dev` restart the worker after a crash. They restart only on the crash exit code, 75. Any other failure stops the command. Node's `--watch` cannot restart a process that exits, so the command watches `src/lib/catalog`, `scripts/catalog` and `catalog.local` itself. A change to a `.ts`, `.js` or `.json` file restarts the worker, including a new example or workspace.
 
 The shared catalog declares the crash control. Its `worker-crash` example waits for a set time so you can crash the worker during the run:
 
 ```sh
-CATALOG_CONTROL=on pnpm catalog dev
+pnpm catalog dev
 temporal workflow update execute --name crashWorker --workflow-id <workflow id>
 ```
 

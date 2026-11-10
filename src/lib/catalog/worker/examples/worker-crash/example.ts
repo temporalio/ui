@@ -39,7 +39,7 @@ export const catalogExample: CatalogExampleDefinition = {
   input,
   startOptions,
   setupMarkdown: [
-    'Start the worker with `CATALOG_CONTROL=on`. The worker then restarts after it exits.',
+    'Start the worker with `pnpm catalog worker` or `pnpm catalog dev`. The command restarts the worker after it exits.',
     '',
     'While the run waits, send the `crashWorker` update:',
     '',
@@ -47,7 +47,7 @@ export const catalogExample: CatalogExampleDefinition = {
     'temporal workflow update execute --name crashWorker --workflow-id <workflow id>',
     '```',
     '',
-    'The worker process exits and restarts. The update returns once the crash activity succeeds on the new worker. Without `CATALOG_CONTROL=on`, the update fails and the worker keeps running.',
+    'The worker process exits and restarts. The update returns once the crash activity succeeds on the new worker.',
   ].join('\n'),
   execution: {
     kind: 'workflow',
