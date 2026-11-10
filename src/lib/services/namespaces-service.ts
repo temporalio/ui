@@ -5,6 +5,7 @@ import type {
   ListNamespacesResponse,
 } from '$lib/types';
 import type { NextPageToken, Replace, Settings } from '$lib/types/global';
+import { isForbidden } from '$lib/utilities/handle-error';
 import { paginated } from '$lib/utilities/paginated';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
@@ -68,11 +69,13 @@ export async function fetchNamespaces(
         (await requestFromAPI<PaginatedNamespacesResponse>(route, {
           request,
           token: token as string,
-          onError: () =>
+          onError: (error) => {
+            if (isForbidden(error)) return;
             toaster.push({
               variant: 'error',
               message: 'Unable to fetch namespaces',
-            }),
+            });
+          },
         })) ?? {},
     );
 

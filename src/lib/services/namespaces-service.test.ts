@@ -30,11 +30,11 @@ const createSuccessfulRequest = () =>
     }),
   ) as unknown as typeof fetch;
 
-const createUnsuccessfulRequest = () =>
+const createUnsuccessfulRequest = (status = 500) =>
   vi.fn(() =>
     Promise.resolve({
       ok: false,
-      status: 500,
+      status,
       statusText: 'error',
       json: () => Promise.resolve({}),
     }),
@@ -87,6 +87,15 @@ describe('fetchNamespaces', () => {
       message: 'Unable to fetch namespaces',
       variant: 'error',
     });
+  });
+
+  it('should not display a toast message if the request is forbidden', async () => {
+    const request = createUnsuccessfulRequest(403);
+
+    await fetchNamespaces({ runtimeEnvironment: { isCloud: false } }, request);
+
+    expect(namespaces.set).toHaveBeenCalledWith([]);
+    expect(toaster.push).not.toHaveBeenCalled();
   });
 
   it('should not include "temporal-system" if showTemporalSystemNamespace is false', async () => {
