@@ -80,7 +80,7 @@ describe('isWorkflowDelayed', () => {
         ...workflow,
         workflowExtendedInfo: {
           timeSkippingInfo: {
-            currentTime: { seconds: Date.parse(later) / 1000, nanos: 0 },
+            currentTime: later,
           },
         },
       }),
@@ -95,7 +95,7 @@ describe('isWorkflowDelayed', () => {
         executionTime: later,
         workflowExtendedInfo: {
           timeSkippingInfo: {
-            currentTime: { seconds: Date.parse(future) / 1000 + 60, nanos: 0 },
+            currentTime: new Date(Date.parse(future) + 60_000).toISOString(),
           },
         },
       }),
@@ -108,7 +108,7 @@ describe('isWorkflowDelayed', () => {
         ...workflow,
         workflowExtendedInfo: {
           timeSkippingInfo: {
-            currentTime: { seconds: Date.parse(future) / 1000, nanos: 0 },
+            currentTime: future,
           },
         },
       }),
@@ -123,7 +123,7 @@ describe('isWorkflowDelayed', () => {
         executionTime: later,
         workflowExtendedInfo: {
           timeSkippingInfo: {
-            currentTime: { seconds: Date.parse(now) / 1000, nanos: 0 },
+            currentTime: now,
           },
         },
       }),

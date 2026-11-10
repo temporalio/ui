@@ -97,6 +97,17 @@ describe('formatDate', () => {
     );
   });
 
+  it('uses an explicit now for both relative distance and direction', () => {
+    const now = '2030-01-01T12:00:00.000Z';
+
+    expect(
+      formatDate('2030-01-01T11:59:00.000Z', 'local', { relative: true, now }),
+    ).toBe('1 minute ago');
+    expect(
+      formatDate('2030-01-01T12:01:00.000Z', 'local', { relative: true, now }),
+    ).toBe('1 minute from now');
+  });
+
   it('should not format other timezones as relative', () => {
     expect(formatDate(date, 'UTC', { relative: true })).toEqual(
       'Apr 13, 2022, 4:29:35.63 PM UTC',

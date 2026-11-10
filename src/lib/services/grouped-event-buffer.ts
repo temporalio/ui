@@ -21,6 +21,7 @@ import type {
   PendingNexusOperation,
   WorkflowEvent,
 } from '$lib/types/events';
+import { getValidTimeMs } from '$lib/utilities/format-time';
 import {
   isFailedTaskEvent,
   isTimedOutTaskEvent,
@@ -202,6 +203,7 @@ let events: (WorkflowEvent | null)[] = [];
 let headGroup = new Int32Array(0); // head slot -> record index + 1 (0 = none)
 let records: GroupRecord[] = [];
 let maxSlot = -1;
+let latestEventTimeMs: number | undefined;
 
 let failedEvent: HistoryEvent | null = null;
 
@@ -325,6 +327,19 @@ function toWorkflowEvent(raw: HistoryEvent): WorkflowEvent {
     processedWorkflowTaskIds,
     eventGroupLabels,
   });
+}
+
+function updateLatestEventTime(event: WorkflowEvent): void {
+  const eventTimeMs = getValidTimeMs(event.eventTime);
+  if (eventTimeMs === undefined) {
+    return;
+  }
+
+  if (latestEventTimeMs !== undefined && eventTimeMs <= latestEventTimeMs) {
+    return;
+  }
+
+  latestEventTimeMs = eventTimeMs;
 }
 
 // An event whose head is unknown (malformed attributes) heads its own group.
@@ -452,6 +467,7 @@ export function reset(historyLength: number): void {
   pendingByActivityId = new Map();
   pendingByNexusScheduledId = new Map();
   maxSlot = -1;
+  latestEventTimeMs = undefined;
 
   failedEvent = null;
   processedWorkflowTaskIds.clear();
@@ -497,10 +513,15 @@ export function ingestHistoryEvent(raw: HistoryEvent): boolean {
 
   recordFor(headSlot).addMember(slot, event);
   indexEventGroups(event, slot, headSlot);
+  updateLatestEventTime(event);
   revision++;
 
   notifyChanged();
   return true;
+}
+
+export function getLatestEventTimeMs(): number | undefined {
+  return latestEventTimeMs;
 }
 
 /**

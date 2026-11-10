@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { untrack } from 'svelte';
   import { twMerge } from 'tailwind-merge';
 
   import {
@@ -19,6 +20,7 @@
   import { isWorkflowDelayed } from '$lib/utilities/delayed-workflows';
   import { type ValidTime, validTimeToDate } from '$lib/utilities/format-time';
   import { getFailedOrPendingGroups } from '$lib/utilities/get-failed-or-pending';
+  import { getWorkflowLatestTime } from '$lib/utilities/workflow-time-skipping';
 
   import EndTimeInterval from '../end-time-interval.svelte';
   import { GUTTER, RADIUS, ROW_HEIGHT } from './constants';
@@ -49,6 +51,7 @@
     // Filtering, sorting and segment layout need no EventGroup, so only the
     // pooled rows below materialize one.
     lazyGroups: LazyGroup[];
+    latestEventTimeMs?: number;
     readOnly?: boolean;
     error?: boolean;
     reverseSort?: boolean;
@@ -62,6 +65,7 @@
   let {
     workflow,
     lazyGroups,
+    latestEventTimeMs,
     readOnly = false,
     error = false,
     reverseSort = false,
@@ -116,13 +120,17 @@
 
   const timelineWidth = $derived(canvasWidth - 2 * GUTTER);
 
-  let nowMs = $state(Date.now());
+  let currentTime = $state(
+    untrack(() =>
+      getWorkflowLatestTime(workflow, Date.now(), latestEventTimeMs),
+    ),
+  );
 
   const timeline = new Timeline({
     getFullEventHistory: () => $fullEventHistory,
     getWorkflow: () => workflow,
     getLazyGroups: () => lazyGroups,
-    getCurrentTimeMs: () => nowMs,
+    getCurrentTimeMs: () => currentTime,
     getLoading: () => loading,
     getShouldCollapseByDefault: () => $collapseIdleTime === 'on',
   });
@@ -498,7 +506,7 @@
   style:height="{svgHeight}px"
   bind:this={containerEl}
 >
-  <EndTimeInterval {workflow} {startTime} bind:currentTime={nowMs}>
+  <EndTimeInterval {workflow} {startTime} {latestEventTimeMs} bind:currentTime>
     {#snippet children({ endTime })}
       <div
         class="pointer-events-none sticky top-[120px]"
@@ -617,7 +625,7 @@
             y={panelY}
             group={activeGroup}
             {canvasWidth}
-            endTime={workflow?.endTime ? endTime : nowMs}
+            {endTime}
             onHeight={(height) => {
               panelHeight = height;
             }}

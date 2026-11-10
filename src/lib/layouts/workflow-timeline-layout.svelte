@@ -234,6 +234,7 @@
     <TimelineGraph
       {workflow}
       {lazyGroups}
+      latestEventTimeMs={eventBuffer.latestEventTimeMs}
       {reverseSort}
       loading={!historyCtx.fetchComplete}
       totalExpectedEvents={estimatedTotalGroups}

@@ -19,6 +19,7 @@
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
   import { routeForPendingActivities } from '$lib/utilities/route-for';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
+  import { getWorkflowCurrentTime } from '$lib/utilities/workflow-time-skipping';
 
   const workflow = $derived($workflowRun.workflow);
   const pendingActivities = $derived(workflow?.pendingActivities ?? []);
@@ -110,6 +111,7 @@
                   {#if failed && pendingActivity.scheduledTime}
                     {@const timeDifference = toTimeDifference({
                       date: pendingActivity.scheduledTime,
+                      now: getWorkflowCurrentTime($workflowRun?.workflow),
                       negativeDefault: '',
                     })}
                     {#if timeDifference}
@@ -129,7 +131,7 @@
                       pendingActivity.maximumAttempts ?? 0,
                       formatDuration(
                         getDuration({
-                          start: Date.now(),
+                          start: getWorkflowCurrentTime($workflowRun?.workflow),
                           end: pendingActivity.expirationTime,
                         }) ?? '',
                       ),
