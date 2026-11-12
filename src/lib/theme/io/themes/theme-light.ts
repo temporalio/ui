@@ -12,7 +12,7 @@ export const lightTheme = {
       brand: colorScales.indigo[9],
       primary: colorScales.slate[12],
       secondary: colorScales.slate[10],
-      tertiary: colorScales.slate[8],
+      tertiary: colorScales.neutral[5],
       information: colorScales.blue[12],
       success: colorScales.green[12],
       warning: colorScales.amber[12],

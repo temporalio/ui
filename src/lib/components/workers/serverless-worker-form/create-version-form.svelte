@@ -30,6 +30,7 @@
     getInitialComputeProvider,
     multiRegionCreateVersionSchema,
     type RegionComputeValues,
+    savesRegionGroups,
     validateRegionValues,
   } from './shared';
 
@@ -149,7 +150,7 @@
           }
           // Without high availability the one region saves what a
           // single-region Version saves.
-          if (regionValues.length > 1) {
+          if (savesRegionGroups(regionValues)) {
             await onSubmit(form.data, regionValues);
           } else {
             await onSubmit({ ...form.data, ...regionValues[0]?.values });

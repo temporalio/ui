@@ -16,6 +16,7 @@
   import { translate } from '$lib/i18n/translate';
   import { IconFilter, IconSearch } from '$lib/io/icon';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
+  import type { StatusFilter } from '$lib/models/status-filter';
   import type { SearchAttributeOption } from '$lib/stores/search-attributes';
   import type { SearchAttributeType } from '$lib/types/workflows';
   import { getDefaultConditional } from '$lib/utilities/query/quick-filter';
@@ -33,10 +34,12 @@
   interface Props {
     options: SearchAttributeOption[];
     filters: Writable<SearchAttributeFilter[]>;
-    statusAttribute?: string;
+    statusFilter?: StatusFilter;
   }
 
-  let { options, filters, statusAttribute }: Props = $props();
+  let { options, filters, statusFilter }: Props = $props();
+
+  const statusAttribute = $derived(statusFilter?.attribute);
 
   const query = $derived(page.url.searchParams.get('query') ?? '');
   let searchAttributeValue = $state('');
@@ -120,8 +123,7 @@
         onclick={() => {
           handleNewQuery(value, type);
         }}
-        disabled={Boolean(statusAttribute) &&
-          value === statusAttribute &&
+        disabled={value === statusAttribute &&
           !!$filters.find((f) => f.attribute === statusAttribute)}
       >
         <div>

@@ -7,6 +7,7 @@
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import { routeForWorkflow } from '$lib/utilities/route-for';
+  import { isWorkflowTimeSkippingEnabled } from '$lib/utilities/workflow-time-skipping';
 
   import { showFullTree } from '../workflow-relationships.svelte';
 
@@ -51,7 +52,10 @@
   >
     <div class="flex items-center gap-2 lg:min-w-0 lg:flex-1">
       <div class="w-32 leading-4">
-        <WorkflowStatusBadge status={workflow.status} />
+        <WorkflowStatusBadge
+          status={workflow.status}
+          timeSkippingEnabled={isWorkflowTimeSkippingEnabled(workflow)}
+        />
       </div>
       <div class="w-full min-w-0 break-words leading-4">
         {#if isRootWorkflow}

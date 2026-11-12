@@ -29,6 +29,7 @@
     getInitialComputeProvider,
     multiRegionCreateDeploymentSchema,
     type RegionComputeValues,
+    savesRegionGroups,
     validateRegionValues,
   } from './shared';
 
@@ -144,7 +145,8 @@
         try {
           // Without high availability the one region saves what a
           // single-region Version saves.
-          const replicated = offersHighAvailability && regionValues.length > 1;
+          const replicated =
+            offersHighAvailability && savesRegionGroups(regionValues);
           const fieldErrors = await onSubmit(
             offersHighAvailability && !replicated
               ? { ...form.data, ...regionValues[0]?.values }
