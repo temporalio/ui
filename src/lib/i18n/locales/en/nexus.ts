@@ -58,7 +58,7 @@ export const Strings = {
   'callback-url': 'Callback URL',
   callbacks: 'Callbacks',
   'callbacks-intro':
-    'Use callbacks to send this Standalone Nexus Operation’s result anywhere you need, without needing a Workflow.',
+    'Callbacks allow you to dispatch this Standalone Nexus Operation’s result to a worker to trigger follow-on actions in this Namespace.',
   'callback-state': {
     standby: 'Standby',
     scheduled: 'Scheduled',
@@ -94,7 +94,6 @@ export const Strings = {
   'callback-summary-view-links-count_one': 'View {{count}} Link',
   'callback-summary-view-links-count_other': 'View {{count}} Links',
   'delivery-state': 'Delivery State',
-  'nexus-endpoint-column': 'Nexus Endpoint',
   'target-event': 'Target Event',
   'target-type-workflow-execution': 'Workflow Execution',
   'target-type-batch-job': 'Batch Job',

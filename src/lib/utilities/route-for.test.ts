@@ -34,7 +34,6 @@ import {
   routeForSchedule,
   routeForScheduleCreate,
   routeForSchedules,
-  routeForStandaloneActivityLinks,
   routeForStandaloneNexusOperationCallbacks,
   routeForTaskQueue,
   routeForWorkerDeploymentCreate,
@@ -89,18 +88,6 @@ describe('routeFor', () => {
     });
     expect(path).toBe(
       `${base}/namespaces/default/nexus-operations/operation-1/run-1/callbacks?requestId=req-1`,
-    );
-  });
-
-  it('should route to a standalone activity "links" tab with query params', () => {
-    const path = routeForStandaloneActivityLinks({
-      namespace: 'default',
-      activityId: 'activity-1',
-      runId: 'run-1',
-      queryParams: { tab: 'callbacks' },
-    });
-    expect(path).toBe(
-      `${base}/namespaces/default/activities/activity-1/run-1/links?tab=callbacks`,
     );
   });
 

@@ -78,7 +78,7 @@ describe('StandaloneNexusOperationCallbacks', () => {
 
     expect(target.querySelector('h2')?.textContent?.trim()).toBe('Callbacks');
     expect(target.textContent).toContain(
-      'Use callbacks to send this Standalone Nexus Operation’s result anywhere you need, without needing a Workflow.',
+      'Callbacks allow you to dispatch this Standalone Nexus Operation’s result to a worker to trigger follow-on actions in this Namespace.',
     );
     expect(target.textContent).not.toContain('Learn more');
   });
@@ -197,7 +197,7 @@ describe('StandaloneNexusOperationCallbacks filter', () => {
       menuItems(document.querySelector('#callbacks-add-filter-menu')).map(
         (item) => item.textContent?.trim(),
       ),
-    ).toEqual(['Nexus Endpoint', 'Nexus Service', 'Nexus Operation']);
+    ).toEqual(['Task Queue', 'Nexus Service', 'Nexus Operation']);
   });
 
   it('opens a dropdown of the field’s values, with counts, when a field is picked', () => {
@@ -227,7 +227,7 @@ describe('StandaloneNexusOperationCallbacks filter', () => {
 
     expect(rows(target)).toHaveLength(1);
     expect(rows(target)[0].textContent).toContain('update-workflow');
-    expect(text(chipButton('endpoint'))).toBe('Nexus Endpoint = orders-tq');
+    expect(text(chipButton('endpoint'))).toBe('Task Queue = orders-tq');
     expect(text(chipButton('operation'))).toBe(
       'Nexus Operation = update-workflow',
     );
@@ -241,7 +241,7 @@ describe('StandaloneNexusOperationCallbacks filter', () => {
 
     const endpoint = menuItems(
       document.querySelector('#callbacks-add-filter-menu'),
-    ).find((item) => item.textContent?.trim() === 'Nexus Endpoint');
+    ).find((item) => item.textContent?.trim() === 'Task Queue');
     expect(endpoint?.getAttribute('aria-disabled')).toBe('true');
   });
 
@@ -249,7 +249,7 @@ describe('StandaloneNexusOperationCallbacks filter', () => {
     const { goto } = await import('$app/navigation');
     renderCallbacks(callbacks, '?callbacks-page=2');
     vi.mocked(goto).mockClear();
-    addFilter('Nexus Endpoint');
+    addFilter('Task Queue');
 
     pickValue('endpoint', 'billing-tq');
     pickValue('endpoint', 'orders-tq');
@@ -312,7 +312,7 @@ describe('StandaloneNexusOperationCallbacks filter', () => {
 
   it('narrows the field’s values with the search box', () => {
     renderCallbacks(callbacks);
-    addFilter('Nexus Endpoint');
+    addFilter('Task Queue');
     const menu = chipMenu('endpoint');
     const search = menu?.querySelector<HTMLInputElement>(
       'input[type="search"]',

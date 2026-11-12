@@ -6,6 +6,7 @@ import { page } from '$app/state';
 
 import type { EventLink } from '$lib/types';
 import type { Callback } from '$lib/types/nexus';
+import { routeForWorkflow } from '$lib/utilities/route-for';
 
 import NexusOperationCallbacksTable from './nexus-operation-callbacks-table.svelte';
 
@@ -98,7 +99,7 @@ describe('NexusOperationCallbacksTable', () => {
 
     expect(headers).toEqual([
       'Delivery State',
-      'Nexus Endpoint',
+      'Task Queue',
       'Nexus Service',
       'Nexus Operation',
       'Target Execution',
@@ -107,7 +108,7 @@ describe('NexusOperationCallbacksTable', () => {
     ]);
   });
 
-  it('shows the handler task queue under Nexus Endpoint, then the service and operation', () => {
+  it('shows the handler task queue under Task Queue, then the service and operation', () => {
     const target = mountTable([
       makeCallback('Standby', [], 0),
       makeCallback('Scheduled', [], 1),
@@ -145,18 +146,48 @@ describe('NexusOperationCallbacksTable', () => {
     },
   );
 
-  it('links a spawned workflow by its ID and names the event as plain text', () => {
+  it('links a spawned workflow to its execution and the target event to the event', () => {
     const target = mountTable([makeCallback('Succeeded', [workflowEventLink])]);
     const [row] = rows(target);
     const execution = cell(row, 'callback-target-execution');
     const event = cell(row, 'callback-target-event');
 
     expect(execution?.querySelector('a')?.getAttribute('href')).toBe(
-      `${base}/namespaces/default/workflows/spawned-wf/spawned-run/history/events/1`,
+      routeForWorkflow({
+        namespace: 'default',
+        workflow: 'spawned-wf',
+        run: 'spawned-run',
+      }),
     );
     expect(text(execution?.querySelector('a') ?? null)).toBe('spawned-wf');
     expect(execution?.textContent).toContain('Workflow Execution');
-    expect(text(event)).toBe('WorkflowExecutionStarted');
+    expect(event?.querySelector('a')?.getAttribute('href')).toBe(
+      `${base}/namespaces/default/workflows/spawned-wf/spawned-run/history/events/1`,
+    );
+    expect(text(event?.querySelector('a') ?? null)).toBe(
+      'WorkflowExecutionStarted (1)',
+    );
+  });
+
+  it('names the target event as plain text when the link has no event ID', () => {
+    const target = mountTable([
+      makeCallback('Succeeded', [
+        {
+          workflowEvent: {
+            namespace: 'default',
+            workflowId: 'spawned-wf',
+            runId: 'spawned-run',
+            requestIdRef: {
+              requestId: 'req-1',
+              eventType: 'EVENT_TYPE_WORKFLOW_EXECUTION_UPDATE_ACCEPTED',
+            },
+          },
+        } as unknown as EventLink,
+      ]),
+    ]);
+    const event = cell(rows(target)[0], 'callback-target-event');
+
+    expect(text(event)).toBe('WorkflowExecutionUpdateAccepted');
     expect(event?.querySelector('a')).toBeNull();
   });
 
@@ -358,6 +389,24 @@ describe('NexusOperationCallbacksTable expanded details', () => {
     ]);
     const link =
       cell(rows(target)[0], 'callback-target-execution')?.querySelector('a') ??
+      null;
+
+    expect(link).not.toBeNull();
+    link?.click();
+    flushSync();
+
+    expect(details(target)).toBeNull();
+  });
+
+  it('follows a target event link without expanding the row', () => {
+    const target = mountTable([
+      detailedCallback({
+        state: 'Succeeded',
+        callback: makeCallback('Succeeded', [workflowEventLink]).callback,
+      }),
+    ]);
+    const link =
+      cell(rows(target)[0], 'callback-target-event')?.querySelector('a') ??
       null;
 
     expect(link).not.toBeNull();

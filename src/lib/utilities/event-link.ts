@@ -5,7 +5,6 @@ import {
   routeForEventHistoryEvent,
   routeForNamespace,
   routeForStandaloneActivityDetails,
-  routeForStandaloneActivityLinks,
   routeForStandaloneNexusOperationCallbacks,
   routeForStandaloneNexusOperationDetails,
   routeForWorkflow,
@@ -117,11 +116,10 @@ const callbackLinkHref = (callback: CallbackLink): string | undefined => {
         }),
       });
     case 'EXECUTION_TYPE_ACTIVITY':
-      return routeForStandaloneActivityLinks({
+      return routeForStandaloneActivityDetails({
         namespace,
         activityId: businessId,
         runId,
-        queryParams: { tab: 'callbacks', ...requestIdParam },
       });
     case 'EXECUTION_TYPE_WORKFLOW': {
       const [component, updateId] = callback.componentPath ?? [];

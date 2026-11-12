@@ -219,20 +219,6 @@ export const routeForStandaloneActivityMetadata = (
   return `${routeForStandaloneActivityBase(parameters)}/metadata`;
 };
 
-export const routeForStandaloneActivityLinks = ({
-  queryParams,
-  ...parameters
-}: NamespaceParameter & {
-  activityId: string;
-  runId: string;
-  queryParams?: Record<string, string>;
-}): ResolvedPathname => {
-  return toURL(
-    `${routeForStandaloneActivityBase(parameters)}/links`,
-    queryParams,
-  );
-};
-
 export const routeForStandaloneNexusOperations = (
   parameters: NamespaceParameter,
 ): ResolvedPathname => {
