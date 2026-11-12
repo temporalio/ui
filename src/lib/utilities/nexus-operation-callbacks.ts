@@ -5,6 +5,10 @@ import type {
   EventLinkVariant,
   EventLinkView,
 } from '$lib/utilities/event-link';
+import {
+  routeForEventHistoryEvent,
+  routeForWorkflow,
+} from '$lib/utilities/route-for';
 import { fromScreamingEnum } from '$lib/utilities/screaming-enums';
 
 export type CallbackDeliveryState = {
@@ -78,11 +82,47 @@ export const callbackTargetName = (
   );
 };
 
-export const callbackTargetEvent = (link: EventLink): string | undefined => {
+export type CallbackTargetEvent = {
+  label: string;
+  href?: string;
+};
+
+const workflowRoute = (link: EventLink) => {
+  const namespace = link.workflowEvent?.namespace;
+  const workflow = link.workflowEvent?.workflowId;
+  const run = link.workflowEvent?.runId;
+  if (!namespace || !workflow || !run) return undefined;
+  return { namespace, workflow, run };
+};
+
+export const callbackTargetHref = (
+  link: EventLink,
+  view: EventLinkView,
+): string | undefined => {
+  if (!link.workflowEvent) return view.href;
+
+  const route = workflowRoute(link);
+  return route ? routeForWorkflow(route) : undefined;
+};
+
+export const callbackTargetEvent = (
+  link: EventLink,
+): CallbackTargetEvent | undefined => {
   const eventType =
     link.workflowEvent?.eventRef?.eventType ??
     link.workflowEvent?.requestIdRef?.eventType;
   if (!eventType) return undefined;
 
-  return String(fromScreamingEnum(eventType, 'EventType'));
+  const name = String(fromScreamingEnum(eventType, 'EventType'));
+  const eventId = link.workflowEvent?.eventRef?.eventId;
+  if (!eventId) return { label: name };
+
+  const label = `${name} (${String(eventId)})`;
+  const route = workflowRoute(link);
+  if (!route) return { label };
+
+  return {
+    label,
+    href: routeForEventHistoryEvent({ ...route, eventId: String(eventId) }),
+  };
 };

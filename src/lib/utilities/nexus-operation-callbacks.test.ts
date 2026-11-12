@@ -1,11 +1,15 @@
 import { describe, expect, it } from 'vitest';
 
+import { base } from '$app/paths';
+
 import type { EventLink } from '$lib/types';
 import { toEventLinkView } from '$lib/utilities/event-link';
+import { routeForWorkflow } from '$lib/utilities/route-for';
 
 import {
   callbackDeliveryState,
   callbackTargetEvent,
+  callbackTargetHref,
   callbackTargetName,
   callbackTargetTypeLabel,
 } from './nexus-operation-callbacks';
@@ -97,33 +101,93 @@ describe('callbackTargetName', () => {
   });
 });
 
-describe('callbackTargetEvent', () => {
-  it('names the referenced event without its ID', () => {
+const workflowEventLink = (
+  ref: Record<string, unknown>,
+  workflowEvent: Record<string, unknown> = {
+    namespace: 'default',
+    workflowId: 'wf',
+    runId: 'run',
+  },
+) => ({ workflowEvent: { ...workflowEvent, ...ref } }) as unknown as EventLink;
+
+describe('callbackTargetHref', () => {
+  const hrefFor = (link: EventLink) =>
+    callbackTargetHref(link, toEventLinkView(link, { namespace: 'default' }));
+
+  it('links a workflow event to the workflow execution, not the event', () => {
     expect(
-      callbackTargetEvent({
-        workflowEvent: {
-          workflowId: 'wf',
+      hrefFor(
+        workflowEventLink({
           eventRef: {
-            eventId: '1',
-            eventType: 'EVENT_TYPE_WORKFLOW_EXECUTION_STARTED',
+            eventId: '8',
+            eventType: 'EVENT_TYPE_WORKFLOW_EXECUTION_UPDATE_ACCEPTED',
           },
-        },
-      } as unknown as EventLink),
-    ).toBe('WorkflowExecutionStarted');
+        }),
+      ),
+    ).toBe(
+      routeForWorkflow({ namespace: 'default', workflow: 'wf', run: 'run' }),
+    );
   });
 
-  it('names an event referenced by request ID', () => {
+  it('has no link for a workflow event without route fields', () => {
     expect(
-      callbackTargetEvent({
-        workflowEvent: {
-          workflowId: 'wf',
+      hrefFor(
+        workflowEventLink({ eventRef: { eventId: '8' } }, { workflowId: 'wf' }),
+      ),
+    ).toBeUndefined();
+  });
+
+  it('uses the link view href for other link types', () => {
+    expect(hrefFor({ batchJob: { jobId: 'job-1' } })).toBe(
+      `${base}/namespaces/default/batch-operations/job-1`,
+    );
+  });
+});
+
+describe('callbackTargetEvent', () => {
+  it('links to the event and shows its ID when the link has an event ID', () => {
+    expect(
+      callbackTargetEvent(
+        workflowEventLink({
+          eventRef: {
+            eventId: '8',
+            eventType: 'EVENT_TYPE_WORKFLOW_EXECUTION_UPDATE_ACCEPTED',
+          },
+        }),
+      ),
+    ).toEqual({
+      label: 'WorkflowExecutionUpdateAccepted (8)',
+      href: `${base}/namespaces/default/workflows/wf/run/history/events/8`,
+    });
+  });
+
+  it('names an event referenced by request ID without a link', () => {
+    expect(
+      callbackTargetEvent(
+        workflowEventLink({
           requestIdRef: {
             requestId: 'req-1',
             eventType: 'EVENT_TYPE_WORKFLOW_EXECUTION_UPDATE_ACCEPTED',
           },
-        },
-      } as unknown as EventLink),
-    ).toBe('WorkflowExecutionUpdateAccepted');
+        }),
+      ),
+    ).toEqual({ label: 'WorkflowExecutionUpdateAccepted' });
+  });
+
+  it('shows the event ID without a link when the route fields are missing', () => {
+    expect(
+      callbackTargetEvent(
+        workflowEventLink(
+          {
+            eventRef: {
+              eventId: '1',
+              eventType: 'EVENT_TYPE_WORKFLOW_EXECUTION_STARTED',
+            },
+          },
+          { workflowId: 'wf' },
+        ),
+      ),
+    ).toEqual({ label: 'WorkflowExecutionStarted (1)' });
   });
 
   it('has no event for workflow, activity and batch job links', () => {

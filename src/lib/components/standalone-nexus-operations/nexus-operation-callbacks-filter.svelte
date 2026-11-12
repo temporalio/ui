@@ -28,7 +28,7 @@
   let addedField = $state<CallbackFilterField | null>(null);
 
   const fieldLabels: Record<CallbackFilterField, string> = {
-    endpoint: translate('nexus.nexus-endpoint-column'),
+    endpoint: translate('common.task-queue'),
     service: translate('nexus.nexus-service'),
     operation: translate('nexus.nexus-operation'),
   };

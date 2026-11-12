@@ -37,7 +37,6 @@ import {
   routeForStandaloneActivities,
   routeForStandaloneActivitiesWithQuery,
   routeForStandaloneActivityDetails,
-  routeForStandaloneActivityLinks,
   routeForStandaloneActivityMetadata,
   routeForStandaloneActivitySearchAttributes,
   routeForStandaloneActivityWorkers,
@@ -205,10 +204,6 @@ describe('routeFor functions should resolve the base path exactly once', () => {
     [
       'routeForStandaloneActivityMetadata',
       () => routeForStandaloneActivityMetadata(activityParams),
-    ],
-    [
-      'routeForStandaloneActivityLinks',
-      () => routeForStandaloneActivityLinks(activityParams),
     ],
     [
       'routeForStandaloneNexusOperations',
@@ -476,10 +471,6 @@ describe('routeFor functions with prefix should resolve base + prefix correctly'
     [
       'routeForStandaloneActivityMetadata',
       () => routeForStandaloneActivityMetadata(activityParams),
-    ],
-    [
-      'routeForStandaloneActivityLinks',
-      () => routeForStandaloneActivityLinks(activityParams),
     ],
     [
       'routeForStandaloneNexusOperations',

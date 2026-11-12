@@ -21,6 +21,7 @@
   import {
     callbackDeliveryState,
     callbackTargetEvent,
+    callbackTargetHref,
     callbackTargetName,
     callbackTargetTypeLabel,
   } from '$lib/utilities/nexus-operation-callbacks';
@@ -96,7 +97,7 @@
     if (!link) return undefined;
     const view = toEventLinkView(link, { namespace });
     return {
-      href: view.href,
+      href: callbackTargetHref(link, view),
       name: callbackTargetName(link, view),
       typeLabel: callbackTargetTypeLabel(view.variant),
       event: callbackTargetEvent(link),
@@ -123,7 +124,7 @@
   {#snippet headers()}
     <TableHeaderRow>
       <th>{translate('nexus.delivery-state')}</th>
-      <th>{translate('nexus.nexus-endpoint-column')}</th>
+      <th>{translate('common.task-queue')}</th>
       <th>{translate('nexus.nexus-service')}</th>
       <th>{translate('nexus.nexus-operation')}</th>
       <th>{translate('nexus.target-execution')}</th>
@@ -176,7 +177,13 @@
           {/if}
         </td>
         <td class="truncate" data-testid="callback-target-event">
-          {target?.event ?? ''}
+          {#if target?.event?.href}
+            <Link href={target.event.href} class="truncate"
+              >{target.event.label}</Link
+            >
+          {:else}
+            {target?.event?.label ?? ''}
+          {/if}
         </td>
         <td data-testid="callback-expand">
           <IconButton

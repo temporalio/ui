@@ -272,11 +272,11 @@ describe('toEventLinkView', () => {
       });
     });
 
-    it('routes a standalone activity source to its Links › Callbacks tab', () => {
+    it('routes a standalone activity source to its details page', () => {
       const view = toEventLinkView(callbackLink('EXECUTION_TYPE_ACTIVITY'));
 
       expect(view.href).toBe(
-        `${base}/namespaces/source-ns/activities/source-id/source-run/links?tab=callbacks&requestId=callback-request`,
+        `${base}/namespaces/source-ns/activities/source-id/source-run/details`,
       );
     });
 
