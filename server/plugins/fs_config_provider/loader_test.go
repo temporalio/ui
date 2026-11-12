@@ -288,3 +288,23 @@ func TestDockerConfigSessionDurationsFromEnv(t *testing.T) {
 	require.Len(t, cfg.Auth.Providers, 1)
 	require.Equal(t, 24*time.Hour, cfg.Auth.Providers[0].RefreshTokenDuration)
 }
+
+func TestDockerConfigAuthOptions(t *testing.T) {
+	t.Setenv("TEMPORAL_AUTH_ENABLED", "true")
+
+	cfg, err := LoadConfig("../../config", "docker")
+	require.NoError(t, err)
+	require.Len(t, cfg.Auth.Providers, 1)
+	require.Empty(t, cfg.Auth.Providers[0].Options)
+
+	t.Setenv("TEMPORAL_AUTH_OPTIONS", "max_age=0,prompt=login,audience=https://x/?a=b&c=d")
+
+	cfg, err = LoadConfig("../../config", "docker")
+	require.NoError(t, err)
+	require.Len(t, cfg.Auth.Providers, 1)
+	require.Equal(t, map[string]interface{}{
+		"max_age":  "0",
+		"prompt":   "login",
+		"audience": "https://x/?a=b&c=d",
+	}, cfg.Auth.Providers[0].Options)
+}
