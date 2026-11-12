@@ -556,10 +556,12 @@ export const fieldValuesWith = (
 
 export type ComputeInitialValues = {
   provider?: ComputeProviderValue;
-  lambdaArn: string;
+  // Every field is optional: a provider supplies only its own, so a saved
+  // Modal group carries no Lambda ARN and no role.
+  lambdaArn?: string;
   agentCoreEndpointArn?: string;
-  iamRoleArn: string;
-  roleExternalId: string;
+  iamRoleArn?: string;
+  roleExternalId?: string;
   gcpProject?: string;
   gcpRegion?: string;
   gcpWorkerPool?: string;
