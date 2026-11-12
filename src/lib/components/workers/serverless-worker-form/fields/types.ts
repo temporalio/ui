@@ -1,6 +1,7 @@
-import type { Component } from 'svelte';
+import type { Component, Snippet } from 'svelte';
 
 import type { ComputeProviderTemplates } from '../compute-providers';
+import type { ComputeRegion } from '../multi-region';
 import type { ComputeFieldErrors, ComputeFieldValues } from '../shared';
 
 /**
@@ -46,3 +47,30 @@ export interface ComputeSectionProps {
 }
 
 export type ComputeSection = Component<ComputeSectionProps>;
+
+/**
+ * What a provider that draws its own section is given.
+ *
+ * The region-shaped layout is the form's default, not every provider's truth.
+ * A Modal Function is named by App and Function and has no region of its own,
+ * so a replica toggle and a failover strip offer it a choice it cannot make.
+ * A provider that declares a section replaces that layout with its own.
+ *
+ * It is handed the fields rather than rendering them, which keeps the registry
+ * free of a cycle: a section that imported ComputeFields would import the
+ * registry back through it, and COMPUTE_PROVIDERS would be undefined by the
+ * time shared.ts read it.
+ */
+export interface ComputeProviderSectionProps {
+  /** This provider's fields, already built by the form. */
+  fields: Snippet;
+  /**
+   * The Namespace region the worker controller runs in. A section names it
+   * only where it means something; the group saves it either way.
+   */
+  region?: ComputeRegion;
+  /** A server error that named this section's region. */
+  serverError?: string;
+}
+
+export type ComputeProviderSection = Component<ComputeProviderSectionProps>;

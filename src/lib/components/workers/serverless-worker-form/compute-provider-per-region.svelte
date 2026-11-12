@@ -9,6 +9,7 @@
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
 
+  import { COMPUTE_PROVIDERS } from './compute-providers';
   import type { ComputeSection } from './fields/types';
   import { motion } from './motion';
   import {
@@ -197,7 +198,15 @@
     replicaRegion ? (replicaRegion.label ?? replicaRegion.id) : '',
   );
   const replicaKey = $derived(replicaRegion?.id ?? 'replica');
-  const replicated = $derived(highAvailability && !!replicaRegion);
+  /**
+   * The provider's own section, when the region-shaped layout does not
+   * describe it. It replaces the regions heading, the failover preview and
+   * both region blocks, and with it there is no replica to configure.
+   */
+  const ProviderSection = $derived(COMPUTE_PROVIDERS[provider]?.section);
+  const replicated = $derived(
+    highAvailability && !!replicaRegion && !ProviderSection,
+  );
   const primaryLabel = $derived(primaryRegion.label ?? primaryRegion.id);
   /**
    * One region always runs Serverless Workers, so the toggle of the only one
@@ -460,6 +469,17 @@
   });
 </script>
 
+{#snippet providerFields()}
+  <ComputeFields
+    {provider}
+    leadingDivider={false}
+    idPrefix={primaryRegion.id}
+    bind:values={primary}
+    {credentials}
+    errors={regionErrors[primaryRegion.id]}
+  />
+{/snippet}
+
 {#snippet serverError(regionId: string)}
   {#if regionServerErrors[regionId]}
     <Alert
@@ -481,187 +501,74 @@
 
   <hr class="my-5 border-primary" />
 
-  <!-- Always present, so turning high availability on adds a region to the
-  line rather than a heading to the page. -->
-  <RegionsHeading regions={shownRegions} />
-  <FailoverPreview
-    {namespace}
-    {provider}
-    regions={previewRegions}
-    {deploymentName}
-    {buildId}
-  />
+  {#if ProviderSection}
+    <ProviderSection
+      region={primaryRegion}
+      serverError={regionServerErrors[primaryRegion.id]}
+      fields={providerFields}
+    />
+  {:else}
+    <!-- Always present, so turning high availability on adds a region to the
+    line rather than a heading to the page. -->
+    <RegionsHeading regions={shownRegions} />
+    <FailoverPreview
+      {namespace}
+      {provider}
+      regions={previewRegions}
+      {deploymentName}
+      {buildId}
+    />
 
-  <div class="flex flex-col gap-4">
-    <!-- With high availability on, the headers name the Namespace regions the
+    <div class="flex flex-col gap-4">
+      <!-- With high availability on, the headers name the Namespace regions the
     worker controller runs in, which is what region_ids means and what the
     config saves. A resource's own region does not change them. -->
-    <RegionBlock
-      region={replicated ? primaryRegion : undefined}
-      title={translate('workers.region-role-primary')}
-      showRole
-      bodyClass={runsInPrimary ? '' : 'py-3'}
-    >
-      {#snippet action()}
-        {#if replicaRegion}
-          <Tooltip
-            text={translate('workers.region-compute-last')}
-            hide={!primaryIsLast}
-            bottomRight
-            width={260}
-          >
-            <ToggleSwitch
-              id="primary-compute"
-              label={translate('workers.region-compute')}
-              labelPosition="left"
-              disabled={primaryIsLast}
-              bind:checked={() => runsInPrimary, setRunsInPrimary}
-            />
-          </Tooltip>
-        {/if}
-      {/snippet}
-      {#if runsInPrimary}
-        <div
-          class="flow-root"
-          in:slide={motion('reveal')}
-          out:slide={motion('conceal')}
-        >
-          {@render serverError(primaryRegion.id)}
-          <!-- A new provider brings new labels (Function, Worker Pool). The fade
-          shows the fields changed; a slide would move every field twice. -->
-          {#key provider}
-            <div in:fade={motion('swap')}>
-              <ComputeFields
-                {provider}
-                leadingDivider={false}
-                idPrefix={primaryRegion.id}
-                bind:values={primary}
-                {credentials}
-                lambdaArnPlaceholder={lambdaArnPlaceholderFor(
-                  primaryRegion.providerRegion,
-                )}
-                errors={regionErrors[primaryRegion.id]}
-              />
-            </div>
-          {/key}
-        </div>
-      {:else}
-        <p
-          class="text-sm text-secondary"
-          in:slide={motion('reveal')}
-          out:slide={motion('conceal')}
-        >
-          {translate('workers.region-compute-off-primary', {
-            region: primaryLabel,
-            replica: replicaLabel,
-          })}
-        </p>
-      {/if}
-    </RegionBlock>
-
-    {#if replicaRegion}
       <RegionBlock
-        region={replicated ? replicaRegion : undefined}
-        title={translate('workers.region-role-replica')}
+        region={replicated ? primaryRegion : undefined}
+        title={translate('workers.region-role-primary')}
         showRole
-        roleTooltip={translate('workers.region-role-replica-tooltip', {
-          region: replicaLabel,
-        })}
-        bodyClass={highAvailability ? '' : 'py-3'}
+        bodyClass={runsInPrimary ? '' : 'py-3'}
       >
         {#snippet action()}
-          <Tooltip
-            text={translate('workers.region-compute-last')}
-            hide={!replicaIsLast}
-            bottomRight
-            width={260}
-          >
-            <ToggleSwitch
-              id="replica-compute"
-              label={translate('workers.region-compute')}
-              labelPosition="left"
-              disabled={replicaIsLast}
-              bind:checked={highAvailability}
-            />
-          </Tooltip>
+          {#if replicaRegion}
+            <Tooltip
+              text={translate('workers.region-compute-last')}
+              hide={!primaryIsLast}
+              bottomRight
+              width={260}
+            >
+              <ToggleSwitch
+                id="primary-compute"
+                label={translate('workers.region-compute')}
+                labelPosition="left"
+                disabled={primaryIsLast}
+                bind:checked={() => runsInPrimary, setRunsInPrimary}
+              />
+            </Tooltip>
+          {/if}
         {/snippet}
-        <!-- Each branch grows down from the toggle, so nothing above it moves.
-        flow-root keeps the children's margins inside the sliding box. -->
-        {#if replicated}
+        {#if runsInPrimary}
           <div
             class="flow-root"
             in:slide={motion('reveal')}
             out:slide={motion('conceal')}
           >
+            {@render serverError(primaryRegion.id)}
+            <!-- A new provider brings new labels (Function, Worker Pool). The fade
+          shows the fields changed; a slide would move every field twice. -->
             {#key provider}
               <div in:fade={motion('swap')}>
-                {@render serverError(replicaKey)}
                 <ComputeFields
                   {provider}
                   leadingDivider={false}
-                  sections={['resource']}
-                  idPrefix="replica"
+                  idPrefix={primaryRegion.id}
+                  bind:values={primary}
                   {credentials}
-                  bind:values={() => replicaValues, () => {}}
                   lambdaArnPlaceholder={lambdaArnPlaceholderFor(
-                    replicaRegion?.providerRegion,
+                    primaryRegion.providerRegion,
                   )}
-                  errors={replicaErrors}
+                  errors={regionErrors[primaryRegion.id]}
                 />
-                <!-- Mounted while the replica shows, so a screen reader announces
-          the warning when it appears. -->
-                <div aria-live="polite">
-                  {#if shownSameRegionWarning}
-                    <div
-                      class="pt-3"
-                      in:slide={motion('reveal')}
-                      out:slide={motion('conceal')}
-                    >
-                      <Alert intent="warning" title={shownSameRegionWarning} />
-                    </div>
-                  {/if}
-                </div>
-                {#if isSuggested}
-                  <p
-                    class="mt-2 text-xs text-secondary"
-                    in:fade={motion('swap')}
-                  >
-                    {translate('workers.region-arn-suggested-from-primary')}
-                    <span class="font-medium text-primary">{replicaLabel}</span
-                    >.
-                  </p>
-                {/if}
-                {#if inheritsPrimary}
-                  <hr class="my-5 border-primary" />
-                  <div class="flex flex-col items-start gap-3">
-                    <p class="text-sm text-secondary">
-                      {translate('workers.region-inherits-primary')}
-                      {translate('workers.region-the-primary')}
-                    </p>
-                    <Button
-                      variant="tertiary"
-                      size="sm"
-                      onclick={customizeAndFocus}
-                    >
-                      {translate('workers.region-customize')}
-                    </Button>
-                  </div>
-                {:else}
-                  <div
-                    class="flow-root"
-                    bind:this={replicaSettings}
-                    in:slide={motion('reveal')}
-                  >
-                    <ComputeFields
-                      {provider}
-                      sections={['access', 'scaling']}
-                      {credentials}
-                      idPrefix="replica"
-                      bind:values={() => replicaValues, () => {}}
-                      errors={replicaErrors}
-                    />
-                  </div>
-                {/if}
               </div>
             {/key}
           </div>
@@ -671,12 +578,137 @@
             in:slide={motion('reveal')}
             out:slide={motion('conceal')}
           >
-            {translate('workers.region-compute-off-replica', {
-              region: replicaLabel,
+            {translate('workers.region-compute-off-primary', {
+              region: primaryLabel,
+              replica: replicaLabel,
             })}
           </p>
         {/if}
       </RegionBlock>
-    {/if}
-  </div>
+
+      {#if replicaRegion}
+        <RegionBlock
+          region={replicated ? replicaRegion : undefined}
+          title={translate('workers.region-role-replica')}
+          showRole
+          roleTooltip={translate('workers.region-role-replica-tooltip', {
+            region: replicaLabel,
+          })}
+          bodyClass={highAvailability ? '' : 'py-3'}
+        >
+          {#snippet action()}
+            <Tooltip
+              text={translate('workers.region-compute-last')}
+              hide={!replicaIsLast}
+              bottomRight
+              width={260}
+            >
+              <ToggleSwitch
+                id="replica-compute"
+                label={translate('workers.region-compute')}
+                labelPosition="left"
+                disabled={replicaIsLast}
+                bind:checked={highAvailability}
+              />
+            </Tooltip>
+          {/snippet}
+          <!-- Each branch grows down from the toggle, so nothing above it moves.
+        flow-root keeps the children's margins inside the sliding box. -->
+          {#if replicated}
+            <div
+              class="flow-root"
+              in:slide={motion('reveal')}
+              out:slide={motion('conceal')}
+            >
+              {#key provider}
+                <div in:fade={motion('swap')}>
+                  {@render serverError(replicaKey)}
+                  <ComputeFields
+                    {provider}
+                    leadingDivider={false}
+                    sections={['resource']}
+                    idPrefix="replica"
+                    {credentials}
+                    bind:values={() => replicaValues, () => {}}
+                    lambdaArnPlaceholder={lambdaArnPlaceholderFor(
+                      replicaRegion?.providerRegion,
+                    )}
+                    errors={replicaErrors}
+                  />
+                  <!-- Mounted while the replica shows, so a screen reader announces
+          the warning when it appears. -->
+                  <div aria-live="polite">
+                    {#if shownSameRegionWarning}
+                      <div
+                        class="pt-3"
+                        in:slide={motion('reveal')}
+                        out:slide={motion('conceal')}
+                      >
+                        <Alert
+                          intent="warning"
+                          title={shownSameRegionWarning}
+                        />
+                      </div>
+                    {/if}
+                  </div>
+                  {#if isSuggested}
+                    <p
+                      class="mt-2 text-xs text-secondary"
+                      in:fade={motion('swap')}
+                    >
+                      {translate('workers.region-arn-suggested-from-primary')}
+                      <span class="font-medium text-primary"
+                        >{replicaLabel}</span
+                      >.
+                    </p>
+                  {/if}
+                  {#if inheritsPrimary}
+                    <hr class="my-5 border-primary" />
+                    <div class="flex flex-col items-start gap-3">
+                      <p class="text-sm text-secondary">
+                        {translate('workers.region-inherits-primary')}
+                        {translate('workers.region-the-primary')}
+                      </p>
+                      <Button
+                        variant="tertiary"
+                        size="sm"
+                        onclick={customizeAndFocus}
+                      >
+                        {translate('workers.region-customize')}
+                      </Button>
+                    </div>
+                  {:else}
+                    <div
+                      class="flow-root"
+                      bind:this={replicaSettings}
+                      in:slide={motion('reveal')}
+                    >
+                      <ComputeFields
+                        {provider}
+                        sections={['access', 'scaling']}
+                        {credentials}
+                        idPrefix="replica"
+                        bind:values={() => replicaValues, () => {}}
+                        errors={replicaErrors}
+                      />
+                    </div>
+                  {/if}
+                </div>
+              {/key}
+            </div>
+          {:else}
+            <p
+              class="text-sm text-secondary"
+              in:slide={motion('reveal')}
+              out:slide={motion('conceal')}
+            >
+              {translate('workers.region-compute-off-replica', {
+                region: replicaLabel,
+              })}
+            </p>
+          {/if}
+        </RegionBlock>
+      {/if}
+    </div>
+  {/if}
 </div>

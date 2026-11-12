@@ -13,7 +13,7 @@ import {
 } from '$lib/services/deployments-service';
 import type { ComputeConfig } from '$lib/types/deployments';
 
-import type { ComputeSection } from './fields/types';
+import type { ComputeProviderSection, ComputeSection } from './fields/types';
 import defaultAgentCoreTerraform from './serverless-worker-agentcore.tf?raw';
 import defaultCloudRunTerraform from './serverless-worker-cloud-run.tf?raw';
 import defaultLambdaTerraform from './serverless-worker-lambda.tf?raw';
@@ -28,6 +28,7 @@ import CloudRunAccessFields from './fields/cloud-run-access.svelte';
 import CloudRunResourceFields from './fields/cloud-run-resource.svelte';
 import LambdaResourceFields from './fields/lambda-resource.svelte';
 import ModalResourceFields from './fields/modal-resource.svelte';
+import ModalSection from './fields/modal-section.svelte';
 
 /**
  * Everything the UI knows about a compute provider, in one place.
@@ -141,6 +142,16 @@ export type ComputeProviderDefinition = {
     /** Absent for a provider that asks for no credentials of its own. */
     access?: ComputeSection;
   };
+  /**
+   * This provider's whole section, when the region-shaped default does not
+   * describe it.
+   *
+   * Absent for every provider whose compute is regional, which is the form's
+   * default layout. Modal declares one because a Function has no region to
+   * fail over to, so the replica toggle and the failover strip offered it a
+   * choice it cannot make.
+   */
+  section?: ComputeProviderSection;
   /**
    * What a saved Version shows for this provider, as labelled rows.
    *
@@ -339,6 +350,7 @@ export const COMPUTE_PROVIDERS: Record<
     // No access section: the worker controller resolves Modal credentials
     // itself, so there is nothing for the form to collect.
     fields: { resource: ModalResourceFields },
+    section: ModalSection,
     details: (computeConfig) => {
       const {
         modalAppName,
