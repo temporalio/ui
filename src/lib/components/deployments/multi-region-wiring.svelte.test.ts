@@ -1,3 +1,7 @@
+// The compute provider registry now reaches a layout component, and through
+// it prefersReducedMotion, which jsdom has no matchMedia for.
+import '$lib/test-utilities/jsdom-browser-apis';
+
 import { msNumberToTs } from '@temporalio/common';
 import {
   afterAll,
