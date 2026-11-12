@@ -44,6 +44,8 @@ export const load: LayoutLoad = async function ({
     fetch,
   );
 
+  cluster.serverVersion ??= systemInfo.serverVersion;
+
   return {
     user,
     settings,
