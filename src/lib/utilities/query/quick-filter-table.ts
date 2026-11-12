@@ -1,3 +1,4 @@
+import type { StatusFilter } from '$lib/models/status-filter';
 import {
   SEARCH_ATTRIBUTE_TYPE,
   type SearchAttributes,
@@ -14,8 +15,7 @@ export type QuickFilterColumns<Row> = {
   attributes: Record<string, string>;
   // The value behind the cell, which is not always the text the cell renders.
   getValue: (label: string, row: Row) => QuickFilterValue;
-  // Labels that must never offer a filter, whatever their value.
-  unfilterable?: readonly string[];
+  statusFilter?: StatusFilter;
 };
 
 export type ResolvedQuickFilter = {
@@ -31,6 +31,27 @@ export const getColumnAttribute = (
   attributes: Record<string, string>,
   label: string,
 ): string => attributes[label] ?? label;
+
+export type ColumnFilter = {
+  attribute: string;
+  type: SearchAttributeType;
+  statusFilter?: StatusFilter;
+};
+
+export const getColumnFilter = (
+  columns: { attributes: Record<string, string>; statusFilter?: StatusFilter },
+  label: string,
+  searchAttributes: SearchAttributes,
+): ColumnFilter | undefined => {
+  const attribute = getColumnAttribute(columns.attributes, label);
+  const type = searchAttributes[attribute];
+
+  if (!type) return undefined;
+
+  return columns.statusFilter?.attribute === attribute
+    ? { attribute, type, statusFilter: columns.statusFilter }
+    : { attribute, type };
+};
 
 export const resolveQuickFilter = <Row>({
   columns,
@@ -53,7 +74,7 @@ export const resolveQuickFilter = <Row>({
     type,
     value,
     filterValue,
-    filterable: filterValue !== null && !columns.unfilterable?.includes(label),
+    filterable: filterValue !== null,
     // A Datetime cell displays and copies the normalized value, so the text in
     // the cell and the value the filter uses cannot drift apart. A cell with no
     // value stays undefined, so it renders nothing rather than an empty badge.

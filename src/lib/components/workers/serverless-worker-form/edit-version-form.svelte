@@ -16,6 +16,7 @@
     lambdaArnPlaceholderFor,
     regionPreview,
     regionServerErrors,
+    type ScalingGroupSlot,
   } from './multi-region';
   import {
     type ComputeFieldErrors,
@@ -44,6 +45,12 @@
     initialReplicaData?: ComputeInitialValues;
     /** Replica regions that already have a group, so high availability starts on. */
     enabledRegionIds?: readonly string[];
+    /** Where the primary saves. See scalingGroupSlots. */
+    primaryGroup?: ScalingGroupSlot;
+    /** Where the replica saves. See scalingGroupSlots. */
+    replicaGroup?: ScalingGroupSlot;
+    /** False when the Version has compute only in the replica. */
+    initialRunsInPrimary?: boolean;
     onSubmit: (
       data: EditVersionFormData,
       regions?: RegionComputeValues[],
@@ -80,6 +87,9 @@
     initialData,
     initialReplicaData,
     enabledRegionIds = [],
+    primaryGroup,
+    replicaGroup,
+    initialRunsInPrimary,
     onSubmit,
     onDelete,
     cancelHref,
@@ -200,6 +210,9 @@
           {enabledRegionIds}
           initialPrimary={initialData}
           initialReplica={initialReplicaData}
+          {primaryGroup}
+          {replicaGroup}
+          {initialRunsInPrimary}
           regionServerErrors={errorsByRegion}
         />
       {:else}

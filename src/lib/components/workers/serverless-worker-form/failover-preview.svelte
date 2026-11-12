@@ -47,8 +47,16 @@
       : deploymentName || translate('workers.name-placeholder'),
   );
 
-  /** The preview shows the primary as the active Region. */
-  const activeIndex = 0;
+  /**
+   * The preview routes to the primary, or to the replica when only the
+   * replica runs Serverless Workers.
+   */
+  const activeIndex = $derived(
+    Math.max(
+      0,
+      regions.findIndex(({ serverless }) => serverless),
+    ),
+  );
 
   const multiRegion = $derived(regions.length > 1);
   const active = $derived(regions[activeIndex] ?? regions[0]);

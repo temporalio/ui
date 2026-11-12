@@ -5,7 +5,7 @@ import {
   type ScalingGroupEntry,
 } from '$lib/utilities/compute-regions';
 
-import type { ComputeProviderValue } from './shared';
+import { type ComputeProviderValue, DEFAULT_SCALING_GROUP } from './shared';
 
 /**
  * Multi-region (highly available namespace) support for Serverless Workers.
@@ -232,21 +232,97 @@ export const replicaRegionFor = (
     : undefined;
 
 /**
- * A saved config as the high availability form sees it: the primary is the
- * unscoped group, and the replica is the group scoped to the Namespace's
- * replica. A config saved another way still reads: a group scoped to some
- * other region stands in for the primary.
+ * The saved groups a new config leaves out. The form writes at most two
+ * groups, `default` and the replica's, so an edit removes every other group:
+ * one saved under another name, or one made through the API. The saved config
+ * then matches what the form shows.
+ */
+export const scalingGroupsToRemove = (
+  saved: ComputeConfig | undefined,
+  next: ComputeConfig,
+): string[] =>
+  Object.keys(saved?.scalingGroups ?? {}).filter(
+    (name) => !(name in (next.scalingGroups ?? {})),
+  );
+
+/**
+ * A saved config as the high availability form sees it. Each role takes the
+ * group scoped to its region first. The unscoped group, the catch-all, goes
+ * to the primary, or to the replica when the primary has its own group, as it
+ * does after a failover swaps the roles. A config saved another way still
+ * reads: a group scoped to some other region stands in for the primary.
  */
 export const splitHighAvailabilityGroups = (
   computeConfig: ComputeConfig | undefined,
-  replicaRegionId: string | undefined,
+  {
+    primaryRegionId,
+    replicaRegionId,
+  }: { primaryRegionId?: string; replicaRegionId?: string },
 ): { primary?: ScalingGroupEntry; replica?: ScalingGroupEntry } => {
   const groups = getScalingGroups(computeConfig);
-  const replica = replicaRegionId
-    ? groups.find(({ regionIds }) => regionIds.includes(replicaRegionId))
-    : undefined;
-  const others = groups.filter((group) => group !== replica);
-  const primary =
-    others.find(({ regionIds }) => regionIds.length === 0) ?? others[0];
+  const scopedTo = (regionId: string | undefined) =>
+    regionId
+      ? groups.find(({ regionIds }) => regionIds.includes(regionId))
+      : undefined;
+  const replicaScoped = scopedTo(replicaRegionId);
+  const primaryScoped = groups.find(
+    (group) =>
+      group !== replicaScoped &&
+      !!primaryRegionId &&
+      group.regionIds.includes(primaryRegionId),
+  );
+  const catchAll = groups.find(({ regionIds }) => regionIds.length === 0);
+
+  if (primaryScoped) {
+    return {
+      primary: primaryScoped,
+      replica: replicaScoped ?? (replicaRegionId ? catchAll : undefined),
+    };
+  }
+  const others = groups.filter((group) => group !== replicaScoped);
+  return { primary: catchAll ?? others[0], replica: replicaScoped };
+};
+
+/** The name a region's group saves under, and whether it names its region. */
+export interface ScalingGroupSlot {
+  name: string;
+  scoped: boolean;
+}
+
+const slotFor = (group: ScalingGroupEntry): ScalingGroupSlot => ({
+  name: group.name,
+  scoped: group.regionIds.length > 0,
+});
+
+const primarySlot = (
+  groups: { primary?: ScalingGroupEntry; replica?: ScalingGroupEntry },
+  primaryRegionId: string,
+): ScalingGroupSlot => {
+  if (groups.primary) return slotFor(groups.primary);
+  if (groups.replica?.name === DEFAULT_SCALING_GROUP) {
+    return { name: primaryRegionId, scoped: true };
+  }
+  return { name: DEFAULT_SCALING_GROUP, scoped: false };
+};
+
+/**
+ * Where each role saves. A saved group keeps its name and its scope, so an
+ * edit updates it in place rather than adding a second group for the same
+ * region. A new primary is the unscoped `default`, unless the replica already
+ * holds that name; it is then scoped to its own region under that region's id.
+ * A new replica is scoped to its region under that region's id.
+ */
+export const scalingGroupSlots = (
+  groups: { primary?: ScalingGroupEntry; replica?: ScalingGroupEntry },
+  {
+    primaryRegionId,
+    replicaRegionId,
+  }: { primaryRegionId: string; replicaRegionId?: string },
+): { primary: ScalingGroupSlot; replica?: ScalingGroupSlot } => {
+  const primary = primarySlot(groups, primaryRegionId);
+  if (!replicaRegionId) return { primary };
+  const replica = groups.replica
+    ? slotFor(groups.replica)
+    : { name: replicaRegionId, scoped: true };
   return { primary, replica };
 };

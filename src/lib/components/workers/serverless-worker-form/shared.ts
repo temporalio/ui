@@ -308,6 +308,15 @@ export type ComputeFieldErrors = Partial<
  * Validates each region with the same rules as a single-region Version.
  * Returns the field errors of each region that fails, keyed by region.
  */
+/**
+ * Whether the regions save as region groups. One unscoped entry is a
+ * single-region Version; a replica on its own is scoped, so it still saves
+ * as a group for its region.
+ */
+export const savesRegionGroups = (
+  entries: readonly RegionComputeValues[],
+): boolean => entries.length > 1 || entries.some(({ scoped = true }) => scoped);
+
 export const validateRegionValues = (
   entries: readonly RegionComputeValues[],
 ): Record<string, ComputeFieldErrors> =>

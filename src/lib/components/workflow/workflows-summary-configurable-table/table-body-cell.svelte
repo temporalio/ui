@@ -10,7 +10,6 @@
   import Link from '$lib/holocene/link.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { Badge } from '$lib/io/badge';
   import type { ConfigurableTableHeader } from '$lib/stores/configurable-table-columns';
   import { workflowFilters } from '$lib/stores/filters';
   import { searchAttributes } from '$lib/stores/search-attributes';
@@ -37,7 +36,7 @@
   import { isWorkflowTaskFailure } from '$lib/utilities/workflow-task-failures';
 
   import {
-    ARCHIVAL_FILTERABLE_COLUMNS,
+    isArchivalUnfilterable,
     WORKFLOW_QUICK_FILTER_COLUMNS,
   } from './column-search-attributes';
 
@@ -59,9 +58,7 @@
 
   // Archival visibility accepts a narrower query surface than standard, so it
   // keeps only the columns it supported before.
-  const noFilter = $derived(
-    archival && !ARCHIVAL_FILTERABLE_COLUMNS.includes(label),
-  );
+  const noFilter = $derived(isArchivalUnfilterable(label, archival));
 
   const hrefFor = (value: QuickFilterValue) => {
     if (['Type', 'Workflow ID', 'Run ID'].includes(label)) {

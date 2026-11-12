@@ -127,34 +127,57 @@ export const fromDate = (
   return intervalToDuration({ start, end });
 };
 
+/**
+ * Formats absolute elapsed time using days and smaller units. Arithmetic avoids
+ * timezone-dependent calendar decomposition and ambiguous month/year lengths.
+ */
 export const fromSeconds = (
   seconds: string,
   { delimiter = ', ' } = {},
 ): string => {
   if (!seconds) return '';
 
-  const parsedSeconds = parseInt(seconds);
+  const parsedSeconds = Math.abs(parseInt(seconds));
   const parsedDecimal = parseFloat(`.${seconds.split('.')[1] ?? 0}`);
 
-  if (!seconds.endsWith('s')) return '';
-  if (isNaN(parsedSeconds) || isNaN(parsedDecimal)) return '';
+  if (
+    !seconds.endsWith('s') ||
+    !Number.isFinite(parsedSeconds) ||
+    !Number.isFinite(parsedDecimal)
+  ) {
+    return '';
+  }
 
-  const start = new Date(Date.UTC(0, 0, 0, 0, 0, 0));
-  const end = new Date(Date.UTC(0, 0, 0, 0, 0, parsedSeconds));
-  const duration = intervalToDuration({ start, end });
+  const SECONDS_PER_DAY = 86400;
+  const SECONDS_PER_HOUR = 3600;
+  const SECONDS_PER_MINUTE = 60;
+
+  const duration: Duration = {
+    days: Math.floor(parsedSeconds / SECONDS_PER_DAY),
+    hours: Math.floor((parsedSeconds % SECONDS_PER_DAY) / SECONDS_PER_HOUR),
+    minutes: Math.floor(
+      (parsedSeconds % SECONDS_PER_HOUR) / SECONDS_PER_MINUTE,
+    ),
+    seconds: parsedSeconds % SECONDS_PER_MINUTE,
+  };
   const durationString = durationToString(duration, { delimiter });
   const milliseconds =
-    Math.round(parsedDecimal * 1000 * 1000000000) / 1000000000; // round to nanoseconds
+    Math.round(parsedDecimal * 1000 * 1000000000) / 1000000000;
 
-  if (!milliseconds) return durationString;
-  if (!durationString)
+  if (!milliseconds) {
+    return durationString;
+  }
+
+  if (!durationString) {
     return `${milliseconds} ${pluralize('millisecond', milliseconds)}`;
+  }
+
   if (parsedSeconds < 60) {
-    return `${durationString}, ${milliseconds.toFixed(0)} ${pluralize(
+    return `${durationString}${delimiter}${milliseconds.toFixed(0)} ${pluralize(
       'millisecond',
       milliseconds,
     )}`;
   }
 
-  return `${durationString}`;
+  return durationString;
 };

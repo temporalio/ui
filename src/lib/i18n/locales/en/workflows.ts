@@ -364,6 +364,7 @@ export const Strings = {
   'workflow-start-delay': 'Workflow Start Delay',
   delayed: 'Delayed',
   'task-failure': 'Task Failure',
+  'time-skipping-enabled': 'Time Skipping Enabled',
   'execution-start': 'Execution Start',
   'workflow-timeout': 'Workflow Timeout',
   'scheduled-by': 'Scheduled By',
