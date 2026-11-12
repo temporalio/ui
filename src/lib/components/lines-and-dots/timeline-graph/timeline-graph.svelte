@@ -1,12 +1,24 @@
 <script lang="ts">
-  import { untrack } from 'svelte';
+  import { tick, untrack } from 'svelte';
   import { twMerge } from 'tailwind-merge';
 
   import {
     dotColors,
     getStatusStrokeColor,
   } from '$lib/components/lines-and-dots/colors';
+  import PayloadSummary from '$lib/components/payload/payload-summary.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
+  import type { I18nKey } from '$lib/i18n';
+  import { translate } from '$lib/i18n/translate';
+  import { Badge, type BadgeColorScheme } from '$lib/io/badge';
+  import { Button } from '$lib/io/button';
+  import { IconClock, IconClose } from '$lib/io/icon';
+  import type { EventGroup } from '$lib/models/event-groups/event-groups';
+  import {
+    isTimelineEventGroup,
+    summarizeLifecycleGroups,
+    type TimelineEventGroup,
+  } from '$lib/models/event-history/timeline-event-groups';
   import {
     type LazyGroup,
     materializeGroup,
@@ -18,12 +30,26 @@
   import { eventStatusFilter } from '$lib/stores/filters';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { isWorkflowDelayed } from '$lib/utilities/delayed-workflows';
-  import { type ValidTime, validTimeToDate } from '$lib/utilities/format-time';
-  import { getFailedOrPendingGroups } from '$lib/utilities/get-failed-or-pending';
+  import {
+    formatDistanceAbbreviated,
+    type ValidTime,
+    validTimeToDate,
+  } from '$lib/utilities/format-time';
+  import { isFailedOrPendingGroup } from '$lib/utilities/get-failed-or-pending';
   import { getWorkflowLatestTime } from '$lib/utilities/workflow-time-skipping';
 
   import EndTimeInterval from '../end-time-interval.svelte';
-  import { GUTTER, RADIUS, ROW_HEIGHT } from './constants';
+  import {
+    EVENT_GROUP_BORDER_WIDTH,
+    EVENT_GROUP_FOOTER_SPACING,
+    EVENT_GROUP_HEADER_MIN_HEIGHT,
+    EVENT_GROUP_HEADER_SPACING,
+    EVENT_GROUP_INSET,
+    EVENT_GROUP_ROW_OVERFLOW,
+    GUTTER,
+    RADIUS,
+    ROW_HEIGHT,
+  } from './constants';
   import {
     getDescStart,
     getPendingBlockY,
@@ -52,10 +78,15 @@
     // pooled rows below materialize one.
     lazyGroups: LazyGroup[];
     latestEventTimeMs?: number;
+    scaleGroups?: LazyGroup[];
+    selectedEventGroup?: TimelineEventGroup<LazyGroup>;
+    onSelectGroup?: (group: EventGroup) => void;
+    onCloseEventGroup?: () => void;
     readOnly?: boolean;
     error?: boolean;
     reverseSort?: boolean;
     loading?: boolean;
+    showLoadingRows?: boolean;
     totalExpectedEvents?: number;
     descMinId?: number;
     panelHeight?: number;
@@ -66,10 +97,15 @@
     workflow,
     lazyGroups,
     latestEventTimeMs,
+    scaleGroups,
+    selectedEventGroup,
+    onSelectGroup,
+    onCloseEventGroup,
     readOnly = false,
     error = false,
     reverseSort = false,
     loading = false,
+    showLoadingRows = true,
     totalExpectedEvents = 0,
     descMinId = 0,
     panelHeight = $bindable(0),
@@ -119,6 +155,8 @@
   });
 
   const timelineWidth = $derived(canvasWidth - 2 * GUTTER);
+  const eventGroupLeft = GUTTER - EVENT_GROUP_INSET;
+  const eventGroupWidth = $derived(timelineWidth + 2 * EVENT_GROUP_INSET);
 
   let currentTime = $state(
     untrack(() =>
@@ -129,7 +167,7 @@
   const timeline = new Timeline({
     getFullEventHistory: () => $fullEventHistory,
     getWorkflow: () => workflow,
-    getLazyGroups: () => lazyGroups,
+    getLazyGroups: () => scaleGroups ?? lazyGroups,
     getCurrentTimeMs: () => currentTime,
     getLoading: () => loading,
     getShouldCollapseByDefault: () => $collapseIdleTime === 'on',
@@ -161,13 +199,18 @@
   };
 
   const filteredLazyGroups = $derived(
-    getFailedOrPendingGroups(lazyGroups, $eventStatusFilter),
+    $eventStatusFilter
+      ? lazyGroups.filter(
+          (group) =>
+            isTimelineEventGroup(group) || isFailedOrPendingGroup(group),
+        )
+      : lazyGroups,
   );
 
   // Unfetched skeleton rows. totalExpectedEvents is already a density-adjusted
   // group count, so subtracting the loaded count is correct.
   const pendingGroupCount = $derived.by(() => {
-    if (!loading) return 0;
+    if (!loading || !showLoadingRows) return 0;
     if (!totalExpectedEvents) {
       return filteredLazyGroups.length === 0 ? 50 : 0;
     }
@@ -312,6 +355,76 @@
     return shifted ? panelHeight : 0;
   }
 
+  let eventGroupHeaderEl = $state<HTMLDivElement | null>(null);
+  let eventGroupHeaderHeight = $state(EVENT_GROUP_HEADER_MIN_HEIGHT);
+
+  const hasSelectedEventGroup = $derived(Boolean(selectedEventGroup));
+
+  $effect(() => {
+    if (!hasSelectedEventGroup || !eventGroupHeaderEl) {
+      eventGroupHeaderHeight = EVENT_GROUP_HEADER_MIN_HEIGHT;
+      return;
+    }
+
+    const observer = new ResizeObserver(([entry]) => {
+      eventGroupHeaderHeight = Math.max(
+        EVENT_GROUP_HEADER_MIN_HEIGHT,
+        Math.ceil(entry.contentRect.height),
+      );
+    });
+    observer.observe(eventGroupHeaderEl);
+    return () => observer.disconnect();
+  });
+
+  const eventGroupHeaderIndex = $derived(
+    selectedEventGroup ? (groupIndexMap.get(selectedEventGroup.id) ?? -1) : -1,
+  );
+
+  const eventGroupBottomIndex = $derived.by(() => {
+    if (!selectedEventGroup || eventGroupHeaderIndex < 0) return -1;
+    let bottomIndex = eventGroupHeaderIndex;
+    for (const lifecycleGroup of selectedEventGroup.lifecycleGroups) {
+      const index = groupIndexMap.get(lifecycleGroup.id);
+      if (index === undefined) continue;
+      if (reverseSort ? index < bottomIndex : index > bottomIndex) {
+        bottomIndex = index;
+      }
+    }
+    return bottomIndex;
+  });
+
+  const eventGroupExpansionHeight = $derived(
+    eventGroupHeaderIndex >= 0
+      ? EVENT_GROUP_ROW_OVERFLOW +
+          eventGroupHeaderHeight +
+          EVENT_GROUP_HEADER_SPACING
+      : 0,
+  );
+
+  const windowOverscan = $derived(
+    OVERSCAN +
+      (eventGroupHeaderIndex >= 0
+        ? Math.ceil(
+            (eventGroupExpansionHeight + EVENT_GROUP_FOOTER_SPACING) /
+              ROW_HEIGHT,
+          )
+        : 0),
+  );
+
+  const isBelow = (i: number, index: number): boolean =>
+    index >= 0 && (reverseSort ? i < index : i > index);
+
+  function eventGroupShiftFor(i: number): number {
+    return (
+      (isBelow(i, eventGroupHeaderIndex) ? eventGroupExpansionHeight : 0) +
+      (isBelow(i, eventGroupBottomIndex) ? EVENT_GROUP_FOOTER_SPACING : 0)
+    );
+  }
+
+  function rowShiftFor(i: number): number {
+    return shiftFor(i) + eventGroupShiftFor(i);
+  }
+
   const descStart = $derived(
     getDescStart(filteredLazyGroups, descMinId, loading, pendingGroupCount),
   );
@@ -328,6 +441,7 @@
           totalForY,
           reverseSort,
         }) +
+          eventGroupShiftFor(activeIdx) +
           1.33 * RADIUS
       : null,
   );
@@ -338,7 +452,11 @@
     Math.max(
       ROW_HEIGHT * (filteredLazyGroups.length + pendingGroupCount + 2),
       120,
-    ) + panelHeight,
+    ) +
+      panelHeight +
+      (eventGroupHeaderIndex >= 0
+        ? eventGroupExpansionHeight + EVENT_GROUP_FOOTER_SPACING
+        : 0),
   );
   const AXIS_LABEL_ZONE = 150;
   const svgHeight = $derived(timelineHeight + AXIS_LABEL_ZONE);
@@ -444,7 +562,7 @@
       bandTop: rowWindowBand.bandTop,
       bandHeight: rowWindowBand.bandHeight,
       total: filteredLazyGroups.length,
-      overscan: OVERSCAN,
+      overscan: windowOverscan,
       reverseSort,
       descStart,
       pendingCount: pendingGroupCount,
@@ -460,7 +578,7 @@
   const poolSize = $derived.by(() => {
     return (
       Math.ceil(rowWindowBand.bandHeight / ROW_HEIGHT) +
-      2 * OVERSCAN +
+      2 * windowOverscan +
       POOL_SLACK
     );
   });
@@ -491,6 +609,121 @@
           reverseSort,
         }),
   );
+
+  const eventGroupBounds = $derived.by(() => {
+    if (!selectedEventGroup || eventGroupHeaderIndex < 0) return undefined;
+
+    const headerTop =
+      getY(eventGroupHeaderIndex) +
+      shiftFor(eventGroupHeaderIndex) +
+      ROW_HEIGHT / 2 +
+      EVENT_GROUP_ROW_OVERFLOW;
+    let bottom = headerTop + eventGroupHeaderHeight;
+    if (eventGroupBottomIndex !== eventGroupHeaderIndex) {
+      bottom = Math.max(
+        bottom,
+        getY(eventGroupBottomIndex) +
+          rowShiftFor(eventGroupBottomIndex) +
+          ROW_HEIGHT / 2 +
+          4,
+      );
+    }
+    if (
+      activePanelY !== null &&
+      panelHeight > 0 &&
+      isBelow(activeIdx, eventGroupHeaderIndex) &&
+      !isBelow(activeIdx, eventGroupBottomIndex)
+    ) {
+      bottom = Math.max(bottom, activePanelY + panelHeight + 4);
+    }
+
+    return {
+      headerTop,
+      outlineTop: headerTop + eventGroupHeaderHeight,
+      outlineHeight: Math.max(0, bottom - headerTop - eventGroupHeaderHeight),
+    };
+  });
+
+  const selectGroup = async (group: EventGroup) => {
+    onSelectGroup?.(group);
+    if (!isTimelineEventGroup(group)) return;
+    await tick();
+    if (selectedEventGroup?.id === group.id) {
+      eventGroupHeaderEl?.querySelector('button')?.focus();
+    }
+  };
+
+  const closeEventGroup = async () => {
+    const groupId = selectedEventGroup?.id;
+    onCloseEventGroup?.();
+    await tick();
+    if (groupId) document.getElementById(groupId)?.focus();
+  };
+
+  type EventGroupStatusBadge = {
+    key: string;
+    label: string;
+    colorScheme: BadgeColorScheme;
+  };
+
+  const eventGroupStatusBadges = $derived.by(() => {
+    if (!selectedEventGroup) return [];
+    const summary = summarizeLifecycleGroups(
+      selectedEventGroup.lifecycleGroups.map(materializeGroup),
+    );
+
+    const badges: EventGroupStatusBadge[] = [];
+    const addBadge = (
+      key: string,
+      labelKey: I18nKey,
+      count: number,
+      colorScheme: BadgeColorScheme,
+    ) => {
+      if (!count) return;
+      badges.push({
+        key,
+        label: translate(labelKey, { count }),
+        colorScheme,
+      });
+    };
+    addBadge(
+      'failed',
+      'workflows.event-group-failed-count',
+      summary.failed,
+      'danger',
+    );
+    addBadge(
+      'timed-out',
+      'workflows.event-group-timed-out-count',
+      summary.timedOut,
+      'warning',
+    );
+    addBadge(
+      'retry',
+      'workflows.event-group-retry-count',
+      summary.retries,
+      'warning',
+    );
+    addBadge(
+      'terminated',
+      'workflows.event-group-terminated-count',
+      summary.terminated,
+      'danger',
+    );
+    addBadge(
+      'canceled',
+      'workflows.event-group-canceled-count',
+      summary.canceled,
+      'neutral',
+    );
+    addBadge(
+      'paused',
+      'workflows.event-group-paused-count',
+      summary.paused,
+      'warning',
+    );
+    return badges;
+  });
 
   // Border rails span the full timeline height so they meet the bottom axis.
   const lineTop = 0;
@@ -574,6 +807,17 @@
           </div>
         {/if}
 
+        {#if eventGroupBounds?.outlineHeight}
+          <div
+            data-testid="event-group-row-backdrop"
+            class="pointer-events-none absolute rounded-b-lg border-x-2 border-b-2 border-brand bg-alpha-indigo-30"
+            style:left="{eventGroupLeft}px"
+            style:top="{eventGroupBounds.outlineTop}px"
+            style:width="{eventGroupWidth}px"
+            style:height="{eventGroupBounds.outlineHeight}px"
+          ></div>
+        {/if}
+
         <!-- Keyed by slot index so Svelte reuses the <li>s in place; the <li>
            persists when its slot is null, only the inner row toggles.
            pointer-events-none so clicks fall through to the collapse toggles;
@@ -586,7 +830,7 @@
               style:height="{ROW_HEIGHT}px"
               style:contain="layout"
               style:transform={slot
-                ? `translateY(${getY(slot.index) - ROW_HEIGHT / 2 + shiftFor(slot.index)}px)`
+                ? `translateY(${getY(slot.index) - ROW_HEIGHT / 2 + rowShiftFor(slot.index)}px)`
                 : undefined}
             >
               {#if slot}
@@ -596,11 +840,73 @@
                   {canvasWidth}
                   project={projectX}
                   {readOnly}
+                  expanded={slot.lazy.id === selectedEventGroup?.id}
+                  onSelect={onSelectGroup ? selectGroup : undefined}
                 />
               {/if}
             </li>
           {/each}
         </ul>
+
+        {#if selectedEventGroup && eventGroupBounds}
+          {@const eventGroupDuration = formatDistanceAbbreviated({
+            start: selectedEventGroup.initialEvent.eventTime,
+            end: selectedEventGroup.isPending
+              ? endTime
+              : selectedEventGroup.lastEvent.eventTime,
+            includeMilliseconds: true,
+          })}
+          <div
+            data-testid="selected-event-group-header"
+            bind:this={eventGroupHeaderEl}
+            class="absolute z-10 box-content flex min-w-0 items-start justify-between rounded-t-lg border-2 border-b-0 border-brand bg-surface-secondary text-sm"
+            style:left="{eventGroupLeft}px"
+            style:top="{eventGroupBounds.headerTop}px"
+            style:width="{eventGroupWidth - 2 * EVENT_GROUP_BORDER_WIDTH}px"
+            style:min-height="{EVENT_GROUP_HEADER_MIN_HEIGHT}px"
+          >
+            <div
+              class="flex min-h-8 min-w-0 flex-1 flex-wrap items-center gap-x-4 gap-y-1 px-2 py-1"
+            >
+              <PayloadSummary
+                value={selectedEventGroup.eventGroupLabel.label}
+                fallback={selectedEventGroup.displayName}
+                class="min-w-0 max-w-full whitespace-normal break-words"
+              />
+              {#if eventGroupDuration}
+                <span
+                  data-testid="selected-event-group-duration"
+                  class="flex shrink-0 items-center gap-1"
+                >
+                  <IconClock />
+                  {eventGroupDuration}
+                </span>
+              {/if}
+              {#each eventGroupStatusBadges as badge (badge.key)}
+                <Badge
+                  text={badge.label}
+                  colorScheme={badge.colorScheme}
+                  class="shrink-0"
+                />
+              {/each}
+              <span class="shrink-0 text-secondary">
+                {translate('workflows.event-group-event-count', {
+                  count: selectedEventGroup.eventCount,
+                })}
+              </span>
+            </div>
+            <Button
+              data-testid="close-event-group"
+              colorScheme="ghost"
+              size="xs"
+              class="m-1"
+              TrailingIcon={IconClose}
+              onclick={closeEventGroup}
+            >
+              {translate('common.close')}
+            </Button>
+          </div>
+        {/if}
 
         {#if loading && pendingGroupCount > 0}
           {@const rectY = getPendingBlockY({
@@ -620,7 +926,8 @@
 
         <!-- Last child so it paints above rows; onHeight feeds shiftFor. -->
         {#if !readOnly && activeGroup}
-          {@const panelY = getY(activeIdx) + 1.33 * RADIUS}
+          {@const panelY =
+            getY(activeIdx) + eventGroupShiftFor(activeIdx) + 1.33 * RADIUS}
           <GroupDetailsRow
             y={panelY}
             group={activeGroup}
@@ -651,6 +958,10 @@
   .canvas :global(.tl-line) {
     border-radius: 9999px;
     background-color: var(--tl-line-color);
+  }
+
+  .canvas :global(.tl-line--square) {
+    border-radius: 0;
   }
 
   .canvas :global(.tl-line--gradient) {

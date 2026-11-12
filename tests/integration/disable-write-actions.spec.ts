@@ -9,8 +9,8 @@ const schedulesUrl = '/namespaces/default/schedules';
 
 test.describe('Enable write actions by default', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto(workflowUrl);
     await mockWorkflowApis(page);
+    await page.goto(workflowUrl);
   });
 
   test('Cancel workflow button enabled', async ({ page }) => {
@@ -25,9 +25,9 @@ test.describe('Enable write actions by default', () => {
 
 test.describe('Disable write actions on workflow actions', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto(workflowUrl);
     await mockWorkflowApis(page);
     await mockSettingsApi(page, { DisableWriteActions: true });
+    await page.goto(workflowUrl);
   });
 
   test('Cancel workflow button disabled', async ({ page }) => {
@@ -40,7 +40,6 @@ test.describe('Disable write actions on workflow actions', () => {
 
 test.describe('Disable write actions on empty schedules list actions', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto(schedulesUrl);
     await mockSchedulesApis(page, true, true);
     await mockSettingsApi(page, { DisableWriteActions: true });
   });
