@@ -135,8 +135,9 @@
   <Menu
     id="event-group-filter-menu"
     keepOpen
+    usePortal
     position="right"
-    class="w-[280px] min-w-0 max-w-[calc(100dvw-1rem)] md:w-[380px]"
+    class="w-[280px] min-w-0 md:w-[380px]"
   >
     {#if $open}
       <li role="none" class="p-2">
@@ -161,13 +162,18 @@
       {#if matchingOptions.length}
         {#each visibleOptions as option (option.group.key)}
           {@const label = labelFor(option)}
-          <MenuItem onclick={() => toggle(option.group.key)} class="min-w-0">
+          <MenuItem
+            onclick={() => toggle(option.group.key)}
+            class="min-w-0"
+            data-track-text="event-group"
+          >
             {#snippet leading()}
               <Checkbox
                 onclick={() => toggle(option.group.key)}
                 checked={selectedKeys.has(option.group.key)}
                 {label}
                 labelHidden
+                data-track-text="event-group"
               />
             {/snippet}
             <div class="flex min-w-0 flex-1 items-center gap-2">

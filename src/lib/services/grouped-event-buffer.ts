@@ -14,6 +14,10 @@ import {
   type EventGroupKey,
   type EventGroupLabel,
 } from '$lib/models/event-history/event-group-markers';
+import {
+  type TimelineEventGroup,
+  toTimelineEventGroup,
+} from '$lib/models/event-history/timeline-event-groups';
 import type {
   CommonHistoryEvent,
   HistoryEvent,
@@ -127,6 +131,10 @@ class GroupRecord implements LazyGroup {
   headsGroup = false;
   hasTerminalActivity = false;
   hasTerminalNexus = false;
+  eventGroupKeys: EventGroupKey[] | undefined;
+  syncedVersion = 0;
+  syncedEventCount = 0;
+  syncedPending = false;
   private lastSlot = -1;
 
   constructor(readonly headSlot: number) {
@@ -183,6 +191,13 @@ export type EventGroupOption = {
 
 type EventGroupIndexEntry = EventGroupOption & {
   headSlots: Set<number>;
+  lifecycle: GroupRecord[];
+  lifecycleSorted: boolean;
+  lifecycleEventCount: number;
+  lifecycleVersion: number;
+  pendingCount: number;
+  initialEvent: WorkflowEvent | undefined;
+  lastEvent: WorkflowEvent | undefined;
 };
 
 export type EventGroupMatcher = {
@@ -209,13 +224,25 @@ let failedEvent: HistoryEvent | null = null;
 // and the live poll — the direction an event arrives from is a fetch detail,
 // and one workflow task's markers bill once however they were loaded.
 const processedWorkflowTaskIds = new Set<string>();
-let eventGroupLabels = createEventGroupLabelRegistry();
+const createLabelRegistry = () =>
+  createEventGroupLabelRegistry({
+    onLabelChange: (key) => dirtyTimelineEventGroupKeys.add(key),
+  });
+let eventGroupLabels = createLabelRegistry();
 
 // Event group key -> the events carrying that marker and the lifecycle groups
 // they belong to, so the event group filter is a set lookup per row.
 let eventGroupIndex = new Map<EventGroupKey, EventGroupIndexEntry>();
 let cachedEventGroupOptions: EventGroupOption[] | null = null;
 let cachedEventGroupOptionsRevision = -1;
+let timelineEventGroupsByKey = new Map<
+  EventGroupKey,
+  TimelineEventGroup<LazyGroup>
+>();
+const dirtyTimelineEventGroupKeys = new Set<EventGroupKey>();
+let timelineEventGroupCount = 0;
+let cachedTimelineEventGroups: TimelineEventGroup<LazyGroup>[] | null = null;
+let cachedTimelineEventGroupsRevision = -1;
 
 // Bumped by every write. Read caches hold the revision they were built at, so
 // invalidation is a single counter rather than scattered cache-busting calls.
@@ -333,13 +360,16 @@ function headSlotFor(event: WorkflowEvent, slot: number): number {
   return parsedHeadSlot >= 0 ? parsedHeadSlot : slot;
 }
 
+const NO_EVENT_GROUP_KEYS: readonly EventGroupKey[] = [];
+
 function indexEventGroups(
   event: WorkflowEvent,
   slot: number,
-  headSlot: number,
-): void {
-  if (!event.eventGroups) return;
+  record: GroupRecord,
+): readonly EventGroupKey[] {
+  if (!event.eventGroups) return NO_EVENT_GROUP_KEYS;
   const eventId = slot + 1;
+  let linkedKeys: EventGroupKey[] | undefined;
   for (const group of event.eventGroups) {
     let entry = eventGroupIndex.get(group.key);
     if (!entry) {
@@ -348,13 +378,83 @@ function indexEventGroups(
         eventCount: 0,
         firstEventId: eventId,
         headSlots: new Set(),
+        lifecycle: [],
+        lifecycleSorted: true,
+        lifecycleEventCount: 0,
+        lifecycleVersion: 0,
+        pendingCount: 0,
+        initialEvent: undefined,
+        lastEvent: undefined,
       };
       eventGroupIndex.set(group.key, entry);
     }
     entry.eventCount++;
     if (eventId < entry.firstEventId) entry.firstEventId = eventId;
-    entry.headSlots.add(headSlot);
+    if (!entry.headSlots.has(record.headSlot)) {
+      entry.headSlots.add(record.headSlot);
+      (record.eventGroupKeys ??= []).push(group.key);
+      (linkedKeys ??= []).push(group.key);
+    }
   }
+  return linkedKeys ?? NO_EVENT_GROUP_KEYS;
+}
+
+function isTimelineLifecycle(record: GroupRecord): boolean {
+  return record.headsGroup && !isWorkflowTaskGroup(record);
+}
+
+function addLifecycle(entry: EventGroupIndexEntry, record: GroupRecord): void {
+  const last = entry.lifecycle[entry.lifecycle.length - 1];
+  if (last && last.headSlot > record.headSlot) entry.lifecycleSorted = false;
+  if (!last) timelineEventGroupCount++;
+  entry.lifecycle.push(record);
+}
+
+function isLaterEvent(
+  event: WorkflowEvent,
+  than: WorkflowEvent | undefined,
+): boolean {
+  return !than || Number(event.id) > Number(than.id);
+}
+
+function syncEventGroupTotals(
+  record: GroupRecord,
+  linkedKeys: readonly EventGroupKey[] = NO_EVENT_GROUP_KEYS,
+): void {
+  const keys = record.eventGroupKeys;
+  if (!keys || !isTimelineLifecycle(record)) return;
+
+  const eventCount = record.eventCount;
+  const isPending = record.isPending;
+  for (const key of keys) {
+    const entry = eventGroupIndex.get(key);
+    if (!entry) continue;
+
+    if (!record.syncedVersion || linkedKeys.includes(key)) {
+      addLifecycle(entry, record);
+      entry.lifecycleEventCount += eventCount;
+      entry.lifecycleVersion += record.version + 1;
+      entry.pendingCount += Number(isPending);
+      if (
+        !entry.initialEvent ||
+        Number(record.initialEvent.id) < Number(entry.initialEvent.id)
+      ) {
+        entry.initialEvent = record.initialEvent;
+      }
+    } else {
+      entry.lifecycleEventCount += eventCount - record.syncedEventCount;
+      entry.lifecycleVersion += record.version - record.syncedVersion;
+      entry.pendingCount += Number(isPending) - Number(record.syncedPending);
+    }
+    if (isLaterEvent(record.lastEvent, entry.lastEvent)) {
+      entry.lastEvent = record.lastEvent;
+    }
+    dirtyTimelineEventGroupKeys.add(key);
+  }
+
+  record.syncedVersion = record.version;
+  record.syncedEventCount = eventCount;
+  record.syncedPending = isPending;
 }
 
 function recordFor(headSlot: number): GroupRecord {
@@ -455,9 +555,13 @@ export function reset(historyLength: number): void {
 
   failedEvent = null;
   processedWorkflowTaskIds.clear();
-  eventGroupLabels = createEventGroupLabelRegistry();
+  eventGroupLabels = createLabelRegistry();
   eventGroupIndex = new Map();
   cachedEventGroupOptions = null;
+  timelineEventGroupsByKey = new Map();
+  dirtyTimelineEventGroupKeys.clear();
+  timelineEventGroupCount = 0;
+  cachedTimelineEventGroups = null;
 
   revision++;
   cachedGroups = null;
@@ -495,8 +599,9 @@ export function ingestHistoryEvent(raw: HistoryEvent): boolean {
   const headSlot = headSlotFor(event, slot);
   grow(headSlot);
 
-  recordFor(headSlot).addMember(slot, event);
-  indexEventGroups(event, slot, headSlot);
+  const record = recordFor(headSlot);
+  record.addMember(slot, event);
+  syncEventGroupTotals(record, indexEventGroups(event, slot, record));
   revision++;
 
   notifyChanged();
@@ -530,6 +635,7 @@ export function setPendingMetadata(
   for (const record of records) {
     if (!record.headsGroup) continue;
     if (applyPendingMetadataTo(record)) {
+      syncEventGroupTotals(record);
       revision++;
       changed = true;
     }
@@ -663,6 +769,56 @@ export function getEventGroupOptions(): EventGroupOption[] {
 
   cachedEventGroupOptions = result;
   cachedEventGroupOptionsRevision = revision;
+  return result;
+}
+
+export function hasTimelineEventGroups(): boolean {
+  return timelineEventGroupCount > 0;
+}
+
+export function getTimelineEventGroups(): TimelineEventGroup<LazyGroup>[] {
+  if (
+    cachedTimelineEventGroups &&
+    (cachedTimelineEventGroupsRevision === revision ||
+      !dirtyTimelineEventGroupKeys.size)
+  ) {
+    cachedTimelineEventGroupsRevision = revision;
+    return cachedTimelineEventGroups;
+  }
+
+  for (const key of dirtyTimelineEventGroupKeys) {
+    const entry = eventGroupIndex.get(key);
+    if (!entry?.initialEvent || !entry.lastEvent) continue;
+    const previous = timelineEventGroupsByKey.get(key);
+    if (!entry.lifecycleSorted) {
+      entry.lifecycle.sort((a, b) => a.headSlot - b.headSlot);
+      entry.lifecycleSorted = true;
+    }
+    const lifecycleGroups: LazyGroup[] =
+      previous?.lifecycleGroups.length !== entry.lifecycle.length
+        ? entry.lifecycle.slice()
+        : previous.lifecycleGroups;
+    timelineEventGroupsByKey.set(
+      key,
+      toTimelineEventGroup(entry.group, lifecycleGroups, {
+        initialEvent: entry.initialEvent,
+        lastEvent: entry.lastEvent,
+        eventCount: entry.lifecycleEventCount,
+        isPending: entry.pendingCount > 0,
+        version: entry.lifecycleVersion,
+      }),
+    );
+  }
+  dirtyTimelineEventGroupKeys.clear();
+
+  const result = [...timelineEventGroupsByKey.values()].sort(
+    (a, b) =>
+      Number(a.initialEvent.id) - Number(b.initialEvent.id) ||
+      a.key.localeCompare(b.key),
+  );
+
+  cachedTimelineEventGroups = result;
+  cachedTimelineEventGroupsRevision = revision;
   return result;
 }
 

@@ -17,7 +17,6 @@
     compactEventTypeOptions,
   } from '$lib/models/event-history/get-event-categorization';
   import { clearActiveGroups } from '$lib/stores/active-events';
-  import { eventViewType } from '$lib/stores/event-view';
   import { eventStatusFilter, eventTypeFilter } from '$lib/stores/filters';
   import { temporalVersion } from '$lib/stores/versions';
   import { updateEventFilterParams } from '$lib/utilities/event-filter-params';
@@ -28,9 +27,10 @@
 
   interface Props {
     compact?: boolean;
+    statusFilterAvailable?: boolean;
   }
 
-  let { compact = false }: Props = $props();
+  let { compact = false, statusFilterAvailable = true }: Props = $props();
 
   const open = writable(false);
 
@@ -85,13 +85,10 @@
   };
 
   const onPendingClick = () => {
+    const statusFilter = !$eventStatusFilter;
     $eventTypeFilter = defaultOptions;
-    $eventStatusFilter = !$eventStatusFilter;
-    updateEventFilterParams(
-      page.url,
-      { categories: null, statusFilter: !$eventStatusFilter },
-      goto,
-    );
+    $eventStatusFilter = statusFilter;
+    updateEventFilterParams(page.url, { categories: null, statusFilter }, goto);
   };
 
   const onNoneClick = () => {
@@ -105,13 +102,14 @@
   };
 
   const filterActive = $derived(
-    $eventTypeFilter.length < defaultOptions.length,
+    ($eventStatusFilter && statusFilterAvailable) ||
+      $eventTypeFilter.length < defaultOptions.length,
   );
 </script>
 
 <MenuContainer {open}>
   <MenuButton
-    controls="status-menu"
+    controls="event-type-filter"
     size="sm"
     variant="tertiary"
     class="rounded-none"
@@ -127,10 +125,11 @@
     <span class="hidden text-sm md:block">{translate('common.filter')}</span>
   </MenuButton>
   <Menu
-    id="event-type-menu"
+    id="event-type-filter"
     keepOpen
+    usePortal
     position="right"
-    class="w-[220px] md:w-[360px]"
+    class="w-[220px] min-w-0 md:w-[360px]"
   >
     <MenuItem data-testid={translate('common.all')} onclick={onAllClick}>
       {#snippet leading()}
@@ -145,7 +144,7 @@
       {/snippet}
       {translate('common.all')}
     </MenuItem>
-    {#if $eventViewType !== 'json'}
+    {#if statusFilterAvailable}
       <MenuItem
         data-testid={translate('common.pending-and-failed')}
         description={translate('common.pending-and-failed-description')}
@@ -156,7 +155,7 @@
           <Checkbox
             onChange={onPendingClick}
             checked={$eventStatusFilter}
-            label={translate('common.all')}
+            label={translate('common.pending-and-failed')}
             labelHidden
             class="mt-px"
           />
