@@ -96,6 +96,25 @@ describe('getInboundNexusLinkEvents', () => {
     expect(events).toEqual([]);
   });
 
+  it('includes signals and Updates sent by a Nexus operation', () => {
+    const nexusCallerLink = {
+      workflowEvent: {
+        ...workflowEventLink.workflowEvent,
+        eventRef: {
+          eventId: '5',
+          eventType: 'EVENT_TYPE_NEXUS_OPERATION_SCHEDULED',
+        },
+      },
+    };
+    const events = getInboundNexusLinkEvents([
+      startedEvent(),
+      signaledEvent('6', [nexusCallerLink]),
+      updateAcceptedEvent('8', [nexusCallerLink]),
+    ]);
+
+    expect(events.map((event) => event.id)).toEqual(['6', '8']);
+  });
+
   it('keeps the workflow start’s Nexus caller link', () => {
     const events = getInboundNexusLinkEvents([
       startedEvent([workflowEventLink]),

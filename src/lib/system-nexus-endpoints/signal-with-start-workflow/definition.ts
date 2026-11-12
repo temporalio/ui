@@ -1,6 +1,6 @@
 import type { DescMessage } from '@bufbuild/protobuf';
 
-import type { Payload } from '$lib/types';
+import type { EventLink, Payload } from '$lib/types';
 import type { WorkflowEvent } from '$lib/types/events';
 import { decodeBinaryProtobuf } from '$lib/utilities/decode-binary-protobuf';
 import {
@@ -119,6 +119,18 @@ export const signalWithStartWorkflow: SystemNexusOperationDefinition = {
         ? { key: 'signalName', value: signalName }
         : undefined,
     };
+  },
+
+  targetLink: (event: WorkflowEvent) => {
+    if (!isNexusOperationCompletedEvent(event)) return undefined;
+    const result = event.nexusOperationCompletedEventAttributes?.result;
+    const decoded = result
+      ? decodeWith(result as Payload, responseSchema)
+      : null;
+
+    if (targetFromSignalLink(decoded?.signalLink))
+      return decoded?.signalLink as EventLink;
+    return event.links?.find((link) => link?.workflowEvent) ?? undefined;
   },
 
   describeTerminal: (event: WorkflowEvent, context: SystemNexusContext) => {

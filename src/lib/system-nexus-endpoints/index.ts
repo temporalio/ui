@@ -1,4 +1,4 @@
-import type { Payload } from '$lib/types';
+import type { EventLink, Payload } from '$lib/types';
 import type { WorkflowEvent } from '$lib/types/events';
 import { binaryProtobufMessageType } from '$lib/utilities/decode-binary-protobuf';
 import {
@@ -127,6 +127,28 @@ export const resolveSystemNexusEvent = (
  */
 export const isSystemNexusScheduledEvent = (event: WorkflowEvent): boolean =>
   isNexusOperationScheduledEvent(event) && isSystemEndpoint(event);
+
+/** The operation name of a system Nexus scheduled event, or null. */
+export const systemNexusEventType = (event: WorkflowEvent): string | null =>
+  operationForScheduled(event)?.operationName ?? null;
+
+/**
+ * The execution a system Nexus operation acted on. Only a completed operation
+ * knows its target, and the scheduled event vouches that it is a system one.
+ */
+export const systemNexusTargetLink = (
+  scheduledEvent: WorkflowEvent,
+  terminalEvent: WorkflowEvent | undefined,
+): EventLink | undefined => {
+  const operation = operationForScheduled(scheduledEvent);
+  if (!operation || !terminalEvent) return undefined;
+  if (
+    operationFor(terminalEvent, { initiatingEvent: scheduledEvent }) !==
+    operation
+  )
+    return undefined;
+  return operation.targetLink(terminalEvent);
+};
 
 /** The group label for a system Nexus operation, or null to use the default. */
 export const systemNexusGroupLabel = (event: WorkflowEvent): string | null =>

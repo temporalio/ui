@@ -41,12 +41,12 @@ const cacheKey = ({ namespace, workflowId, runId, eventId }: CallerEventRef) =>
   `${namespace}/${workflowId}/${runId}/${eventId}`;
 
 /**
- * Shared so the header's tab count and the links table resolve one link once
- * between them, rather than one request each.
+ * Shared so each caller event is read once, however often the links table
+ * renders.
  */
-const resolved = new Map<string, Promise<boolean>>();
+const resolved = new Map<string, Promise<string | null>>();
 
-const readEndpoint = async (ref: CallerEventRef): Promise<boolean> => {
+const readOperation = async (ref: CallerEventRef): Promise<string | null> => {
   const events = await fetchPartialRawEvents({
     namespace: ref.namespace,
     workflowId: ref.workflowId,
@@ -59,37 +59,33 @@ const readEndpoint = async (ref: CallerEventRef): Promise<boolean> => {
     (event) => Number(event.eventId) === ref.eventId,
   );
 
-  return (
-    String(
-      callerEvent?.nexusOperationScheduledEventAttributes?.endpoint ?? '',
-    ) === SYSTEM_NEXUS_ENDPOINT
-  );
+  const attributes = callerEvent?.nexusOperationScheduledEventAttributes;
+  if (String(attributes?.endpoint ?? '') !== SYSTEM_NEXUS_ENDPOINT) return null;
+  return attributes?.operation || null;
 };
 
 /**
- * Whether an inbound link was made by an operation on the system endpoint.
+ * The system operation that made an inbound link, or null when the link was
+ * made by a tenant's own endpoint or the caller cannot be read.
  *
  * A link records which caller event points here, never which endpoint that
  * event used, and a handler workflow started through a tenant's own endpoint
  * produces a link of the same shape. Only the caller's own history can tell
  * them apart, so this reads the caller event and looks at its endpoint.
- *
- * Answers false whenever the caller cannot be read. An unreadable caller must
- * leave a genuine Nexus link on screen rather than hide it.
  */
-export const isSystemNexusCallerLink = (
+export const systemNexusCallerOperation = (
   link: EventLink | undefined | false,
-): Promise<boolean> => {
-  if (!link) return Promise.resolve(false);
+): Promise<string | null> => {
+  if (!link) return Promise.resolve(null);
 
   const ref = callerEventRef(link);
-  if (!ref) return Promise.resolve(false);
+  if (!ref) return Promise.resolve(null);
 
   const key = cacheKey(ref);
   const pending = resolved.get(key);
   if (pending) return pending;
 
-  const request = readEndpoint(ref).catch(() => false);
+  const request = readOperation(ref).catch(() => null);
   resolved.set(key, request);
   return request;
 };
