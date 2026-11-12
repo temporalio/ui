@@ -126,7 +126,6 @@ export const Strings = {
   'inbound-links': 'Inbound',
   'outbound-links': 'Outbound',
   'nexus-service': 'Nexus Service',
-  'nexus-endpoint-simple': 'Nexus Endpoint',
   'nexus-operation': 'Nexus Operation',
   'target-execution': 'Target Execution',
   'initiated-event-id': 'Initiated Event ID',

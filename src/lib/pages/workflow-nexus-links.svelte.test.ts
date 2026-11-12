@@ -1,5 +1,5 @@
-import { flushSync, mount, unmount } from 'svelte';
-import { afterEach, describe, expect, it } from 'vitest';
+import { flushSync, mount, tick, unmount } from 'svelte';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { base } from '$app/paths';
 import { page } from '$app/state';
@@ -9,6 +9,14 @@ import { workflowRun } from '$lib/stores/workflow-run';
 import type { WorkflowEvent } from '$lib/types/events';
 
 import WorkflowNexusLinks from './workflow-nexus-links.svelte';
+
+const systemCallerOperation = vi.hoisted(() =>
+  vi.fn<() => Promise<string | null>>(() => Promise.resolve(null)),
+);
+
+vi.mock('$lib/services/system-nexus-caller-link', () => ({
+  systemNexusCallerOperation: systemCallerOperation,
+}));
 
 class ResizeObserverStub {
   observe() {}
@@ -195,6 +203,72 @@ describe('WorkflowNexusLinks', () => {
       'Workflow Execution',
     );
     expect(text(cell(workerCallback, 'caller-event'))).toBe('callback-request');
+  });
+
+  it('labels the outbound columns Source Event, Event Type, Target Namespace, Target Execution and Target Event', () => {
+    const target = renderLinks([outboundScheduledEvent()], '?links=outbound');
+    const headers = Array.from(
+      target.querySelectorAll('#outbound-nexus-links thead th'),
+    ).map(text);
+
+    expect(headers).toEqual([
+      'Source Event',
+      'Event Type',
+      'Target Namespace',
+      'Target Execution',
+      'Target Event',
+    ]);
+  });
+
+  it('shows a Nexus operation as an outbound row', () => {
+    const target = renderLinks([outboundScheduledEvent()], '?links=outbound');
+    const [row] = Array.from(
+      target.querySelectorAll('[data-testid="outbound-link-row"]'),
+    );
+
+    expect(text(cell(row, 'source-event'))).toBe('12');
+    expect(
+      cell(row, 'source-event')?.querySelector('a')?.getAttribute('href'),
+    ).toBe(
+      `${base}/namespaces/default/workflows/target-wf/target-run/history/events/12`,
+    );
+    expect(text(cell(row, 'event-type'))).toBe('NexusOperationScheduled');
+    expect(text(cell(row, 'target-namespace'))).toBe('handler-ns');
+    expect(text(cell(row, 'target-execution'))).toBe(
+      'handler-wf Workflow Execution',
+    );
+  });
+
+  it('shows a signal from a system Nexus operation as an inbound row named by the operation', async () => {
+    systemCallerOperation.mockResolvedValueOnce(
+      'SignalWithStartWorkflowExecution',
+    );
+    const signaled = {
+      id: '6',
+      eventId: '6',
+      name: 'WorkflowExecutionSignaled',
+      eventType: 'EVENT_TYPE_WORKFLOW_EXECUTION_SIGNALED',
+      category: 'signal',
+      links: [callerWorkflowLink],
+      workflowExecutionSignaledEventAttributes: {},
+      attributes: {},
+    } as unknown as WorkflowEvent;
+
+    const target = renderLinks([startedEvent(), signaled], '?links=inbound');
+    await tick();
+    await tick();
+    flushSync();
+    const [row] = inboundRows(target);
+
+    expect(text(cell(row, 'caller-event'))).toBe(
+      'SignalWithStartWorkflowExecution',
+    );
+    expect(text(cell(row, 'caller-execution'))).toBe(
+      'caller-wf Workflow Execution',
+    );
+    expect(text(cell(row, 'target-event'))).toBe(
+      'WorkflowExecutionSignaled (6)',
+    );
   });
 
   it('shows the inbound empty state with SDK links when only outbound links exist', () => {

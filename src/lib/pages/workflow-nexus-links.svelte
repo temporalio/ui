@@ -13,59 +13,42 @@
   import { translate } from '$lib/i18n/translate';
   import Segment from '$lib/io/segmented-control/segment.svelte';
   import SegmentedControl from '$lib/io/segmented-control/segmented-control.svelte';
-  import { groupEvents } from '$lib/models/event-groups';
   import {
     getInboundLinkForEvent,
-    getVisibleInboundNexusLinkEvents,
+    getInboundNexusLinkEvents,
+    getSystemNexusCallerOperations,
   } from '$lib/runes/inbound-nexus-links.svelte';
   import { fullEventHistory } from '$lib/stores/events';
-  import { workflowRun } from '$lib/stores/workflow-run';
-  import { isSystemNexusScheduledEvent } from '$lib/system-nexus-endpoints';
-  import {
-    type EventLinkDisplay,
-    eventLinkTargetTypeLabel,
-    toEventLinkView,
-  } from '$lib/utilities/event-link';
+  import type { EventLinkDisplay } from '$lib/utilities/event-link';
   import { toInboundLinkRow } from '$lib/utilities/inbound-link-row';
-  import { isNexusOperationScheduledEvent } from '$lib/utilities/is-event-type';
   import {
     getNexusLinksView,
     type NexusLinksView,
     nexusLinksViewKey,
     nexusLinksViews,
   } from '$lib/utilities/nexus-links-view';
+  import { outboundLinkRows } from '$lib/utilities/outbound-link-row';
   import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
   const { namespace, workflow: workflowId, run } = $derived(page.params);
-  const { workflow } = $derived($workflowRun);
-  const pendingActivities = $derived(workflow?.pendingActivities);
-  const pendingNexusOperations = $derived(workflow?.pendingNexusOperations);
-
-  const groups = $derived(
-    groupEvents(
-      $fullEventHistory,
-      'ascending',
-      pendingActivities,
-      pendingNexusOperations,
-    ),
+  const outboundRows = $derived(
+    outboundLinkRows($fullEventHistory, {
+      namespace,
+      workflow: workflowId,
+      run,
+    }),
   );
-  const nexusGroups = $derived(
-    groups.filter(
-      (group) =>
-        group.category === 'nexus' &&
-        group.links?.length &&
-        !group.eventList.some((event) => isSystemNexusScheduledEvent(event)),
-    ),
+  const inboundLinkEvents = $derived(
+    getInboundNexusLinkEvents($fullEventHistory),
   );
-  const inboundLinks = getVisibleInboundNexusLinkEvents(
-    () => $fullEventHistory,
+  const systemCallerOperations = getSystemNexusCallerOperations(
+    () => inboundLinkEvents,
   );
-  const inboundLinkEvents = $derived(inboundLinks.events);
 
   const counts = $derived({
     inbound: inboundLinkEvents?.length ?? 0,
-    outbound: nexusGroups.length,
+    outbound: outboundRows.length,
   });
   const selectedView = $derived(
     getNexusLinksView(page.url.searchParams.get(nexusLinksViewKey), counts),
@@ -134,6 +117,7 @@
         {@const row = toInboundLinkRow(
           (event && getInboundLinkForEvent(event)) || undefined,
           namespace,
+          systemCallerOperations.get(event?.id),
         )}
         <TableRow data-testid="inbound-link-row">
           <td class="break-all text-left" data-testid="caller-event">
@@ -192,7 +176,7 @@
     pageButtonLabel={(p) => translate('common.go-to-page', { page: p })}
     pageParameter="outbound-page"
     perPageParameter="outbound-per-page"
-    items={nexusGroups}
+    items={outboundRows}
   >
     {#snippet caption()}
       <caption class="sr-only">{translate('nexus.outbound-links')}</caption>
@@ -200,61 +184,40 @@
     {#snippet headers()}
       <TableHeaderRow>
         <th>{translate('nexus.source-event')}</th>
-        <th>{translate('nexus.nexus-endpoint-simple')}</th>
-        <th>{translate('nexus.nexus-service')}</th>
-        <th>{translate('nexus.nexus-operation')}</th>
-        <th>{translate('nexus.handler-namespace')}</th>
-        <th>{translate('nexus.handler-target')}</th>
-        <th>{translate('nexus.handler-event')}</th>
+        <th>{translate('common.event-type')}</th>
+        <th>{translate('nexus.target-namespace')}</th>
+        <th>{translate('nexus.target-execution')}</th>
+        <th>{translate('nexus.target-event')}</th>
       </TableHeaderRow>
     {/snippet}
     {#snippet rows({ visibleItems })}
-      {#each visibleItems as group (group.id)}
-        {@const link = group.links?.[0]}
-        {@const linkView = toEventLinkView(link, { namespace })}
-        {@const targetTypeLabel = eventLinkTargetTypeLabel(linkView.variant)}
-        {@const scheduledEvent = group.eventList.find((e) =>
-          isNexusOperationScheduledEvent(e),
-        )}
-        <TableRow data-testid="worker-row">
-          <td class="break-all text-left" data-testid="link-event">
-            <Link
-              href={routeForEventHistoryEvent({
-                namespace,
-                workflow: workflowId,
-                run,
-                eventId: scheduledEvent?.id,
-              })}>{scheduledEvent?.id}</Link
-            >
+      {#each visibleItems as row (row.sourceEvent.value)}
+        <TableRow data-testid="outbound-link-row">
+          <td class="break-all text-left" data-testid="source-event">
+            {@render linkDisplay(row.sourceEvent)}
           </td>
-          <td class="break-all text-left" data-testid="link-endpoint">
-            {scheduledEvent?.nexusOperationScheduledEventAttributes?.endpoint}
+          <td class="break-all text-left" data-testid="event-type">
+            {row.eventType}
           </td>
-          <td class="break-all text-left" data-testid="link-service">
-            {scheduledEvent?.nexusOperationScheduledEventAttributes?.service}
-          </td>
-          <td class="break-all text-left" data-testid="link-operation">
-            {scheduledEvent?.nexusOperationScheduledEventAttributes?.operation}
-          </td>
-          <td class="break-all text-left" data-testid="link-namespace">
-            {#if linkView.namespace}
-              {@render linkDisplay(linkView.namespace)}
+          <td class="break-all text-left" data-testid="target-namespace">
+            {#if row.targetNamespace}
+              {@render linkDisplay(row.targetNamespace)}
             {/if}
           </td>
-          <td class="break-all text-left" data-testid="link-href">
-            {@render linkDisplay(linkView)}
-            {#if targetTypeLabel}
-              <p
-                class="text-xs text-secondary opacity-80"
-                data-testid="link-target-type"
-              >
-                {targetTypeLabel}
+          <td class="break-all text-left" data-testid="target-execution">
+            {@render linkDisplay(row.targetExecution)}
+            {#if row.targetExecution.typeLabel}
+              <p class="text-xs text-secondary opacity-80">
+                {row.targetExecution.typeLabel}
               </p>
             {/if}
           </td>
-          <td class="break-all text-left" data-testid="link-href">
-            {#if linkView.event}
-              {@render linkDisplay(linkView.event)}
+          <td class="break-all text-left" data-testid="target-event">
+            {#if row.targetEvent}
+              {@render linkDisplay({
+                value: row.targetEvent.label,
+                href: row.targetEvent.href,
+              })}
             {/if}
           </td>
         </TableRow>
