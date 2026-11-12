@@ -63,21 +63,22 @@ auth:
 The bundled `docker.yaml` maps each auth setting to an environment variable, so a
 Docker deployment can be configured without supplying a custom config file.
 
-| Environment Variable                   | Config Field                                 | Default           |
-| -------------------------------------- | -------------------------------------------- | ----------------- |
-| `TEMPORAL_AUTH_ENABLED`                | `auth.enabled`                               | `false`           |
-| `TEMPORAL_AUTH_REDIRECT_TO_PROVIDER`   | `auth.redirectToProvider`                    | `false`           |
-| `TEMPORAL_MAX_SESSION_DURATION`        | `auth.maxSessionDuration`                    | unset (unlimited) |
-| `TEMPORAL_AUTH_LABEL`                  | `auth.providers[0].label`                    | `sso`             |
-| `TEMPORAL_AUTH_TYPE`                   | `auth.providers[0].type`                     | `oidc`            |
-| `TEMPORAL_AUTH_PROVIDER_URL`           | `auth.providers[0].providerUrl`              | unset             |
-| `TEMPORAL_AUTH_ISSUER_URL`             | `auth.providers[0].issuerUrl`                | unset             |
-| `TEMPORAL_AUTH_CLIENT_ID`              | `auth.providers[0].clientId`                 | unset             |
-| `TEMPORAL_AUTH_CLIENT_SECRET`          | `auth.providers[0].clientSecret`             | unset             |
-| `TEMPORAL_AUTH_CALLBACK_URL`           | `auth.providers[0].callbackUrl`              | unset             |
-| `TEMPORAL_AUTH_SCOPES`                 | `auth.providers[0].scopes` (comma separated) | unset             |
-| `TEMPORAL_AUTH_USE_ID_TOKEN_AS_BEARER` | `auth.providers[0].useIdTokenAsBearer`       | `false`           |
-| `TEMPORAL_AUTH_REFRESH_TOKEN_DURATION` | `auth.providers[0].refreshTokenDuration`     | unset             |
+| Environment Variable                   | Config Field                                              | Default           |
+| -------------------------------------- | --------------------------------------------------------- | ----------------- |
+| `TEMPORAL_AUTH_ENABLED`                | `auth.enabled`                                            | `false`           |
+| `TEMPORAL_AUTH_REDIRECT_TO_PROVIDER`   | `auth.redirectToProvider`                                 | `false`           |
+| `TEMPORAL_MAX_SESSION_DURATION`        | `auth.maxSessionDuration`                                 | unset (unlimited) |
+| `TEMPORAL_AUTH_LABEL`                  | `auth.providers[0].label`                                 | `sso`             |
+| `TEMPORAL_AUTH_TYPE`                   | `auth.providers[0].type`                                  | `oidc`            |
+| `TEMPORAL_AUTH_PROVIDER_URL`           | `auth.providers[0].providerUrl`                           | unset             |
+| `TEMPORAL_AUTH_ISSUER_URL`             | `auth.providers[0].issuerUrl`                             | unset             |
+| `TEMPORAL_AUTH_CLIENT_ID`              | `auth.providers[0].clientId`                              | unset             |
+| `TEMPORAL_AUTH_CLIENT_SECRET`          | `auth.providers[0].clientSecret`                          | unset             |
+| `TEMPORAL_AUTH_CALLBACK_URL`           | `auth.providers[0].callbackUrl`                           | unset             |
+| `TEMPORAL_AUTH_SCOPES`                 | `auth.providers[0].scopes` (comma separated)              | unset             |
+| `TEMPORAL_AUTH_USE_ID_TOKEN_AS_BEARER` | `auth.providers[0].useIdTokenAsBearer`                    | `false`           |
+| `TEMPORAL_AUTH_REFRESH_TOKEN_DURATION` | `auth.providers[0].refreshTokenDuration`                  | unset             |
+| `TEMPORAL_AUTH_OPTIONS`                | `auth.providers[0].options` (comma separated `key=value`) | unset             |
 
 ## Session Duration Management
 
