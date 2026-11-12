@@ -15,11 +15,12 @@
   import { viewDataEncoderSettings } from './data-encoder-settings.svelte';
 
   interface Props {
+    id?: string;
     open?: boolean;
     children?: Snippet;
   }
 
-  let { open = false, children }: Props = $props();
+  let { id, open = false, children }: Props = $props();
 
   const testId = $derived.by(() => {
     const base = 'mobile-data-encoder-status';
@@ -56,7 +57,10 @@
 </script>
 
 {#if open}
-  <div class="flex h-full flex-col justify-start gap-6 overflow-auto px-4 py-8">
+  <div
+    {id}
+    class="flex h-full flex-col justify-start gap-6 overflow-auto px-4 py-8"
+  >
     <div class="flex items-center justify-between">
       <p>Timezone</p>
       <TimezoneSelect size="sm" />
