@@ -147,7 +147,6 @@ function flag(value: object, name: string): boolean {
   return Object.getOwnPropertyDescriptor(value, name)?.value === true;
 }
 
-// Shortcuts saved before each modifier was stored always used MOD.
 function readShortcut(value: unknown): PaletteShortcut | undefined {
   if (typeof value !== 'object' || value === null) return undefined;
   if (!('key' in value) || !('code' in value)) return undefined;
@@ -164,9 +163,6 @@ function readShortcut(value: unknown): PaletteShortcut | undefined {
     alt: flag(value, 'alt'),
     shift: flag(value, 'shift'),
   };
-  if (!('meta' in value) && !('ctrl' in value)) {
-    return { ...shortcut, ...MOD_FLAGS };
-  }
   return hasTypingGuard(shortcut) ? shortcut : undefined;
 }
 
@@ -184,7 +180,7 @@ export function loadShortcutSetting(
   }
 }
 
-// Every flag is written, so a load can tell this format from the old one.
+// Writes only the shortcut fields, with every flag set.
 function storedSetting(
   setting: PaletteShortcutSetting,
 ): PaletteShortcutSetting {
