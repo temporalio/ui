@@ -18,13 +18,30 @@ const SHORTCUT_STORAGE_KEY = 'palette-shortcut';
 // palette only when `available` is true, so the item and the palette never
 // disagree. Show `shortcutLabel` next to it, so the hint matches the key.
 class AppPaletteState {
-  open = $state(false);
+  #open = $state(false);
+  #closes = 0;
   facts = $state.raw<PaletteFacts>();
   // The app's shortcut. A user's own choice replaces it.
   appShortcut = $state.raw<PaletteShortcut>(DEFAULT_SHORTCUT);
   userShortcut = $state.raw<PaletteShortcutSetting | undefined>(
     loadShortcutSetting(SHORTCUT_STORAGE_KEY),
   );
+
+  get open(): boolean {
+    return this.#open;
+  }
+
+  set open(value: boolean) {
+    if (this.#open && !value) this.#closes += 1;
+    this.#open = value;
+  }
+
+  // For an action that navigates after an await: the check turns false once
+  // the user closes the palette, even if they open it again.
+  sessionCheck(): () => boolean {
+    const owner = this.#closes;
+    return () => this.#open && owner === this.#closes;
+  }
 
   get available(): boolean {
     if (!this.facts) return false;
