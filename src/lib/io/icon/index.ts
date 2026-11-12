@@ -154,6 +154,7 @@ export { default as IconRustColorblock } from './icons/rust-colorblock.svelte';
 export { default as IconSearch } from './icons/search.svelte';
 export { default as IconShield } from './icons/shield.svelte';
 export { default as IconSlack } from './icons/slack.svelte';
+export { default as IconSlashForward } from './icons/slash-forward.svelte';
 export { default as IconSliders } from './icons/sliders.svelte';
 export { default as IconSpinner } from './icons/spinner.svelte';
 export { default as IconStar } from './icons/star.svelte';

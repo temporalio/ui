@@ -14,9 +14,9 @@
   } from '$lib/io/icon';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
 
-  import IconButton from '../icon-button.svelte';
+  import Button from '../button.svelte';
 
-  interface Props extends HTMLInputAttributes {
+  interface Props extends Omit<HTMLInputAttributes, 'size'> {
     id: string;
     value: string;
     label: string;
@@ -30,6 +30,8 @@
     maxLength?: number;
     hideCount?: boolean;
     noBorder?: boolean;
+    size?: 'xs' | 'sm' | 'md';
+    focusRing?: 'outer' | 'inner';
     autoFocus?: boolean;
     error?: boolean;
     autocomplete?: FullAutoFill;
@@ -67,6 +69,8 @@
     hideCount = false,
     spellcheck = undefined,
     noBorder = false,
+    size = 'md',
+    focusRing = 'outer',
     autoFocus = false,
     error = false,
     required = false,
@@ -88,6 +92,12 @@
   const errorId = $derived(`${id}-error`);
   const hintId = $derived(`${id}-hint`);
   const showError = $derived(error || !valid);
+
+  const heights = {
+    xs: 'h-8',
+    sm: 'h-9',
+    md: 'h-10',
+  } as const;
 
   function callFocus(input: HTMLInputElement) {
     if (autoFocus && input) input.focus();
@@ -122,11 +132,14 @@
     <div
       class={merge(
         'input-container',
-        'relative box-border inline-flex h-10 w-full items-center rounded border border-primary bg-background-primary text-sm text-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-interactive-primary focus-within:ring-offset-2 focus-within:ring-offset-background-primary',
+        'relative box-border inline-flex w-full items-center rounded border border-primary bg-background-primary text-sm text-primary has-[.input:focus]:outline-none has-[.input:focus]:ring-2 has-[.input:focus]:ring-interactive-primary has-[.input:focus]:ring-offset-2 has-[.input:focus]:ring-offset-background-primary',
+        heights[size],
+        focusRing === 'inner' &&
+          'has-[.input:focus]:ring-inset has-[.input:focus]:ring-offset-0',
         !isDisabled &&
           !readonly &&
           !showError &&
-          'focus-within:border-secondary hover:border-brand focus-within:hover:border-secondary',
+          'hover:border-brand has-[.input:focus]:border-secondary has-[.input:focus]:hover:border-secondary',
         value && !isDisabled && !showError && 'border-secondary',
         readonly &&
           !isDisabled &&
@@ -196,13 +209,18 @@
           <IconLock />
         </div>
       {:else if clearable && value}
-        <div class="clear-icon-container" data-testid="clear-input">
-          <IconButton
-            label={clearButtonLabel}
-            onclick={handleClear}
-            Icon={IconClose}
-          />
-        </div>
+        <Button
+          aria-label={clearButtonLabel}
+          onclick={handleClear}
+          {size}
+          LeadingIcon={IconClose}
+          variant="ghost"
+          data-testid="clear-input"
+          class={merge(
+            'h-full focus-visible:ring-inset focus-visible:ring-offset-0',
+            suffix ? 'rounded-none' : 'rounded-l-none',
+          )}
+        />
       {/if}
       {#if suffix}
         <div class="suffix">
@@ -230,7 +248,7 @@
     </span>
     {#if maxLength && !isDisabled && !hideCount}
       <span
-        class="invisible text-right text-xs tracking-widest group-focus-within:visible"
+        class="invisible text-right text-xs tracking-widest group-has-[.input:focus]:visible"
       >
         <span
           class={merge(
@@ -251,7 +269,7 @@
   .input-container {
     &.error,
     &.invalid {
-      @apply border-danger focus-within:border-danger;
+      @apply border-danger has-[.input:focus]:border-danger;
     }
   }
 
@@ -281,10 +299,6 @@
 
   .disabled-icon-container {
     @apply flex h-full w-9 items-center justify-center px-1;
-  }
-
-  .clear-icon-container {
-    @apply mr-2 flex w-6 cursor-pointer items-center justify-center;
   }
 
   .hint-text {

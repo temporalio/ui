@@ -4,8 +4,8 @@
   import { timestamp } from '$lib/components/timestamp.svelte';
   import Accordion from '$lib/holocene/accordion/accordion.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { formatDuration } from '$lib/utilities/format-time';
   import { fromScreamingEnum } from '$lib/utilities/screaming-enums';
+  import { fromSeconds } from '$lib/utilities/to-duration';
 
   import { summarizeScheduleSpec } from '../utilities/summarize';
 
@@ -83,7 +83,7 @@
       </dt>
       <dd>
         {policies?.catchupWindow != null
-          ? formatDuration(policies.catchupWindow.toString())
+          ? fromSeconds(policies.catchupWindow.toString())
           : translate('common.none')}
       </dd>
     </div>
