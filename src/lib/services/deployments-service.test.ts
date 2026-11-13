@@ -6,11 +6,13 @@ import {
   buildAgentCoreComputeConfig,
   buildGcpCloudRunComputeConfig,
   buildLambdaComputeConfig,
+  buildModalComputeConfig,
   createWorkerDeployment,
   createWorkerDeploymentVersion,
   decodeAgentCoreProviderDetails,
   decodeGcpCloudRunProviderDetails,
   decodeLambdaProviderDetails,
+  decodeModalProviderDetails,
   decodeScalerDetails,
   deleteWorkerDeployment,
   deleteWorkerDeploymentVersion,
@@ -607,6 +609,23 @@ describe('deployments service', () => {
         initial_count: 0,
         utilization_target: 0.8,
         no_sync_quiet_ms: 90_000,
+      });
+    });
+
+    test('round-trips Modal provider details', () => {
+      const config = buildModalComputeConfig(
+        'temporal-sprint-demo',
+        'temporal_worker',
+        'compute-testing',
+        '',
+        '3',
+      );
+
+      expect(decodeModalProviderDetails(config)).toEqual({
+        modalAppName: 'temporal-sprint-demo',
+        modalFunctionName: 'temporal_worker',
+        modalEnvironment: 'compute-testing',
+        modalAppVersion: '3',
       });
     });
 

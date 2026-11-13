@@ -1,12 +1,11 @@
 <script lang="ts">
+  import {
+    COMPUTE_PROVIDER_VALUES,
+    COMPUTE_PROVIDERS,
+  } from '$lib/components/workers/serverless-worker-form/compute-providers';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import { translate } from '$lib/i18n/translate';
-  import {
-    decodeAgentCoreProviderDetails,
-    decodeGcpCloudRunProviderDetails,
-    decodeLambdaProviderDetails,
-    decodeScalerDetails,
-  } from '$lib/services/deployments-service';
+  import { decodeScalerDetails } from '$lib/services/deployments-service';
   import type { ComputeConfig } from '$lib/types/deployments';
   import {
     formatDurationMs,
@@ -95,19 +94,18 @@
     getScalingGroups(computeConfig).map(
       ({ name, regionIds, providerType, group }) => {
         const single: ComputeConfig = { scalingGroups: { [name]: group } };
-        const lambda = decodeLambdaProviderDetails(single);
-        const agentCore = decodeAgentCoreProviderDetails(single);
+        // The provider says what it saved. Nothing here names a provider, so
+        // adding one cannot leave this rendering an empty panel.
+        const definition = COMPUTE_PROVIDER_VALUES.map(
+          (value) => COMPUTE_PROVIDERS[value],
+        ).find((candidate) => candidate.providerType === providerType);
+
         return {
           name,
           regionIds,
           providerType,
-          lambda,
-          agentCore,
-          gcp: decodeGcpCloudRunProviderDetails(single),
+          details: definition?.details(single) ?? [],
           scaler: decodeScalerDetails(single),
-          // Lambda and AgentCore share the assumed-role fields; only one decodes.
-          iamRoleArn: lambda.iamRoleArn ?? agentCore.iamRoleArn,
-          roleExternalId: lambda.roleExternalId ?? agentCore.roleExternalId,
         };
       },
     ),
@@ -115,13 +113,11 @@
 
   const isMultiRegion = $derived(hasRegionScopedGroups(computeConfig));
 
+  // Anything the provider said it saved. Previously a hand-written list of
+  // every provider's marker field, which is what made a Modal Version render
+  // an empty panel.
   const isCompute = $derived(
-    perGroup.some(
-      (r) =>
-        !!r.lambda.lambdaArn ||
-        !!r.agentCore.agentCoreEndpointArn ||
-        !!r.gcp.gcpWorkerPool,
-    ),
+    perGroup.some((r) => r.details.some(({ value }) => !!value)),
   );
 
   type Cell = { text: string; full?: string };
@@ -140,30 +136,21 @@
       label: string,
       cell: (group: (typeof perGroup)[number]) => Cell | undefined,
     ): Row => ({ label, cells: perGroup.map(cell) });
+
+    // One row per label any group declared, in the order the providers list
+    // them, so a multi-region version with different providers per region
+    // still lines its settings up.
+    const labelKeys = [
+      ...new Set(perGroup.flatMap((g) => g.details.map((d) => d.labelKey))),
+    ];
+
     return [
-      row(translate('workers.preview-resource-lambda'), (g) =>
-        resource(g.lambda.lambdaArn),
-      ),
-      row(translate('workers.preview-resource-agentcore'), (g) =>
-        resource(g.agentCore.agentCoreEndpointArn),
-      ),
-      row(translate('workers.gcp-worker-pool-label'), (g) =>
-        resource(g.gcp.gcpWorkerPool),
-      ),
-      row(translate('workers.gcp-project-label'), (g) =>
-        plain(g.gcp.gcpProject),
-      ),
-      row(translate('workers.gcp-region-label'), (g) => plain(g.gcp.gcpRegion)),
-      row(translate('workers.preview-access-aws'), (g) =>
-        resource(g.iamRoleArn),
-      ),
-      row(translate('workers.gcp-service-account-label'), (g) =>
-        resource(g.gcp.gcpServiceAccount),
-      ),
-      row(translate('deployments.role-external-id'), (g) =>
-        g.roleExternalId
-          ? { text: g.roleExternalId, full: g.roleExternalId }
-          : undefined,
+      ...labelKeys.map((labelKey) =>
+        row(translate(labelKey), (g) => {
+          const detail = g.details.find((d) => d.labelKey === labelKey);
+          if (!detail?.value) return undefined;
+          return detail.truncate ? resource(detail.value) : plain(detail.value);
+        }),
       ),
       row(translate('deployments.scale-up-cooloff'), (g) =>
         duration(g.scaler.scaleUpCooloffMs),

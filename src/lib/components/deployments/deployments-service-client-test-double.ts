@@ -40,6 +40,10 @@ export function decodeGcpCloudRunProviderDetails() {
   return {};
 }
 
+export function decodeModalProviderDetails() {
+  return {};
+}
+
 export function decodeScalerDetails() {
   return {};
 }

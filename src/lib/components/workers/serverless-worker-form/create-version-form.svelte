@@ -11,9 +11,10 @@
   import type { VersionSummary } from '$lib/types/deployments';
 
   import {
-    type ComputeProviderTemplates,
+    type ComputeProviderTemplateMap,
     type ComputeProviderValue,
   } from './compute-providers';
+  import type { ComputeSection } from './fields/types';
   import { revealFirstProblem } from './motion';
   import {
     type ComputeRegion,
@@ -54,6 +55,8 @@
     computeProviders?: readonly ComputeProviderOption[];
     initialProvider?: ComputeProviderOption['value'];
     gcpRegions?: string[];
+    /** Credential components supplied by the consumer, keyed by provider. */
+    credentials?: Partial<Record<ComputeProviderValue, ComputeSection>>;
     /**
      * The templates offered per provider. Defaults to the ones bundled here,
      * which is what a self-hosted deployment wants. A consumer overrides them
@@ -61,7 +64,7 @@
      * adding a provider fails the consumer's type check until it supplies
      * templates for it.
      */
-    templates?: Record<ComputeProviderValue, ComputeProviderTemplates>;
+    templates?: ComputeProviderTemplateMap;
     /**
      * Regions this namespace runs in. When more than one is provided (a highly
      * available namespace), the form collects a compute provider per region.
@@ -81,6 +84,7 @@
     computeProviders,
     initialProvider,
     gcpRegions,
+    credentials,
     templates,
     regions,
     namespace = '',
@@ -121,6 +125,11 @@
       gcpRegion: '',
       gcpWorkerPool: '',
       gcpServiceAccount: '',
+      modalAppName: '',
+      modalFunctionName: '',
+      modalEnvironment: '',
+      modalWorkspaceId: '',
+      modalAppVersion: '',
       minReplicas: 0,
       maxReplicas: 30,
       initialReplicas: 0,
@@ -205,6 +214,7 @@
           {namespace}
           {regions}
           {computeProviders}
+          {credentials}
           {deploymentName}
           buildId={$form.buildId}
           bind:regionValues
@@ -238,6 +248,7 @@
               regions?.[0]?.providerRegion,
             )}
             {gcpRegions}
+            {credentials}
             {templates}
             errors={$errors}
           />

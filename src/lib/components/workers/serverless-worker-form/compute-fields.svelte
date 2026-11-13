@@ -14,6 +14,7 @@
     defaultComputeProviderTemplates,
     TERRAFORM_MODULES,
   } from './compute-providers';
+  import type { ComputeSection } from './fields/types';
   import { GCP_REGIONS } from './gcp-regions';
   import {
     type ComputeFieldValues,
@@ -25,6 +26,11 @@
     /** Every provider field, as one object. See ComputeFieldValues. */
     values: ComputeFieldValues;
     gcpRegions?: string[];
+    /**
+     * Credential components supplied by the consumer, keyed by provider. One
+     * here takes the place of that provider's own Access section.
+     */
+    credentials?: Partial<Record<ComputeProviderValue, ComputeSection>>;
     /**
      * The templates offered per provider. Defaults to the ones bundled here,
      * which is what a self-hosted deployment wants. A consumer overrides them
@@ -50,6 +56,11 @@
       gcpRegion?: string[];
       gcpWorkerPool?: string[];
       gcpServiceAccount?: string[];
+      modalAppName?: string[];
+      modalFunctionName?: string[];
+      modalEnvironment?: string[];
+      modalWorkspaceId?: string[];
+      modalAppVersion?: string[];
       minReplicas?: string[];
       maxReplicas?: string[];
       initialReplicas?: string[];
@@ -66,6 +77,7 @@
     provider = 'lambda',
     values = $bindable(),
     gcpRegions = [...GCP_REGIONS],
+    credentials,
     templates = defaultComputeProviderTemplates,
     lambdaArnPlaceholder = translate('workers.lambda-arn-placeholder'),
     leadingDivider = true,
@@ -90,8 +102,22 @@
   );
   // Absent for a provider that collects no credentials: the whole Access
   // section, heading and dividers included, then goes with it.
+  // A consumer's component wins over the provider's own. Temporal Cloud
+  // swaps Modal's credential fields for an OAuth connection picker; a
+  // self-hosted install passes none and gets what the provider declares.
   const AccessFields = $derived(
-    providerValue ? COMPUTE_PROVIDERS[providerValue].fields.access : undefined,
+    providerValue
+      ? (credentials?.[providerValue] ??
+          COMPUTE_PROVIDERS[providerValue].fields.access)
+      : undefined,
+  );
+  // A provider that declares no Access section loses the heading and the
+  // dividers with it, rather than showing an empty one.
+  const hasAccessFields = $derived(!!AccessFields);
+  // The resource section needs this too: a consumer that owns the credentials
+  // may own a resource field with them.
+  const credentialsSupplied = $derived(
+    !!providerValue && !!credentials?.[providerValue],
   );
 
   const providerTemplates = $derived(
@@ -122,17 +148,18 @@
       bind:values
       {errors}
       {fieldId}
+      {credentialsSupplied}
       resourcePlaceholder={lambdaArnPlaceholder}
       deployRegions={gcpRegions}
     />
   {/if}
 {/if}
 
-{#if sections.includes('resource') && sections.includes('access')}
+{#if sections.includes('resource') && sections.includes('access') && hasAccessFields}
   <hr class="my-5 border-primary" />
 {/if}
 
-{#if sections.includes('access')}
+{#if sections.includes('access') && hasAccessFields}
   <h2 class="text-base font-medium">
     {translate('workers.access-section')}
   </h2>
@@ -152,7 +179,7 @@
   {/if}
 {/if}
 
-{#if (sections.includes('resource') || sections.includes('access')) && sections.includes('scaling')}
+{#if (sections.includes('resource') || (sections.includes('access') && hasAccessFields)) && sections.includes('scaling')}
   <hr class="my-5 border-primary" />
 {/if}
 
@@ -177,7 +204,9 @@
         : translate('workers.show-defaults')}
     </Button>
   </div>
-  {#if showScaling && (provider === 'lambda' || provider === 'agentcore')}
+  <!-- Modal joins the invoke-based providers: it pairs with the same `no-sync`
+  scaler, and these are the four knobs the Modal demo tuned. -->
+  {#if showScaling && (provider === 'lambda' || provider === 'agentcore' || provider === 'modal')}
     <div class="mt-4 flex flex-col gap-4">
       <Input
         value={values.scaleUpCooloffMs !== undefined

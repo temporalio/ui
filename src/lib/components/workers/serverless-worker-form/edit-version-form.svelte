@@ -8,7 +8,8 @@
   import Card from '$lib/holocene/card.svelte';
   import { translate } from '$lib/i18n/translate';
 
-  import { type ComputeProviderTemplates } from './compute-providers';
+  import { type ComputeProviderTemplateMap } from './compute-providers';
+  import type { ComputeSection } from './fields/types';
   import { revealFirstProblem } from './motion';
   import {
     type ComputeRegion,
@@ -59,6 +60,8 @@
     error?: string;
     computeProviders?: readonly ComputeProviderOption[];
     gcpRegions?: string[];
+    /** Credential components supplied by the consumer, keyed by provider. */
+    credentials?: Partial<Record<ComputeProviderValue, ComputeSection>>;
     /**
      * The templates offered per provider. Defaults to the ones bundled here,
      * which is what a self-hosted deployment wants. A consumer overrides them
@@ -66,7 +69,7 @@
      * adding a provider fails the consumer's type check until it supplies
      * templates for it.
      */
-    templates?: Record<ComputeProviderValue, ComputeProviderTemplates>;
+    templates?: ComputeProviderTemplateMap;
     /**
      * Regions this namespace runs in. When more than one is provided (a highly
      * available namespace), the form edits a compute provider per region.
@@ -93,6 +96,7 @@
     error,
     computeProviders,
     gcpRegions,
+    credentials,
     templates,
     regions,
     namespace = '',
@@ -125,14 +129,19 @@
         provider: initialData.provider ?? 'lambda',
         providers: untrack(() => computeProviders),
       }),
-      lambdaArn: initialData.lambdaArn,
+      lambdaArn: initialData.lambdaArn ?? '',
       agentCoreEndpointArn: initialData.agentCoreEndpointArn ?? '',
-      iamRoleArn: initialData.iamRoleArn,
+      iamRoleArn: initialData.iamRoleArn ?? '',
       roleExternalId: initialData.roleExternalId ?? '',
       gcpProject: initialData.gcpProject ?? '',
       gcpRegion: initialData.gcpRegion ?? '',
       gcpWorkerPool: initialData.gcpWorkerPool ?? '',
       gcpServiceAccount: initialData.gcpServiceAccount ?? '',
+      modalAppName: initialData.modalAppName ?? '',
+      modalFunctionName: initialData.modalFunctionName ?? '',
+      modalEnvironment: initialData.modalEnvironment ?? '',
+      modalWorkspaceId: initialData.modalWorkspaceId ?? '',
+      modalAppVersion: initialData.modalAppVersion ?? '',
       minReplicas: initialData.minReplicas ?? 0,
       maxReplicas: initialData.maxReplicas ?? 30,
       initialReplicas: initialData.initialReplicas ?? 0,
@@ -193,6 +202,7 @@
           {namespace}
           {regions}
           {computeProviders}
+          {credentials}
           {deploymentName}
           {buildId}
           bind:regionValues
@@ -231,6 +241,7 @@
               regions?.[0]?.providerRegion,
             )}
             {gcpRegions}
+            {credentials}
             {templates}
             errors={$errors}
           />

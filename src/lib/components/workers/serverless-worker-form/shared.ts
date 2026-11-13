@@ -11,10 +11,9 @@ import {
   buildAgentCoreComputeConfig,
   buildGcpCloudRunComputeConfig,
   buildLambdaComputeConfig,
-  decodeAgentCoreProviderDetails,
-  decodeGcpCloudRunProviderDetails,
-  decodeLambdaProviderDetails,
+  buildModalComputeConfig,
   decodeScalerDetails,
+  providerTypeOf,
 } from '$lib/services/deployments-service';
 import type {
   ComputeConfig,
@@ -24,6 +23,7 @@ import type {
 import {
   COMPUTE_PROVIDER_VALUES,
   COMPUTE_PROVIDERS,
+  computeProviderForType,
   type ComputeProviderReleaseStage,
   type ComputeProviderValue,
 } from './compute-providers';
@@ -86,6 +86,11 @@ const providerFields = {
   gcpRegion: z.string().default(''),
   gcpWorkerPool: z.string().default(''),
   gcpServiceAccount: z.string().default(''),
+  modalAppName: z.string().default(''),
+  modalFunctionName: z.string().default(''),
+  modalEnvironment: z.string().default(''),
+  modalWorkspaceId: z.string().default(''),
+  modalAppVersion: z.string().default(''),
   minReplicas: z.number().int().min(0).max(2_147_483_647).default(0),
   maxReplicas: z.number().int().min(1).max(2_147_483_647).default(30),
   initialReplicas: z.number().int().min(0).max(2_147_483_647).default(0),
@@ -157,6 +162,35 @@ const validateProviderFields = (
       });
     }
     validateAwsAccessFields(data, ctx);
+  } else if (data.provider === 'modal') {
+    // app_name, function_name and environment are all required by the worker
+    // controller, which rejects a config missing any of them. workspace_id and
+    // version are optional: blank means "whatever the credential owns" and
+    // "the App's current deployment".
+    if (!data.modalAppName)
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['modalAppName'],
+        message: 'App Name is required',
+      });
+    if (!data.modalFunctionName)
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['modalFunctionName'],
+        message: 'Function Name is required',
+      });
+    if (!data.modalEnvironment)
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['modalEnvironment'],
+        message: 'Environment is required',
+      });
+    if (data.modalAppVersion && !/^\d+$/.test(data.modalAppVersion))
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['modalAppVersion'],
+        message: 'Version must be a non-negative whole number',
+      });
   } else if (data.provider === 'cloud-run') {
     if (!data.gcpProject)
       ctx.addIssue({
@@ -332,6 +366,17 @@ export const buildComputeConfigFromForm = (
     metricsPollIntervalMs: data.metricsPollIntervalMs,
   };
 
+  if (data.provider === 'modal') {
+    return buildModalComputeConfig(
+      data.modalAppName,
+      data.modalFunctionName,
+      data.modalEnvironment,
+      data.modalWorkspaceId,
+      data.modalAppVersion,
+      invokeScaling,
+    );
+  }
+
   if (data.provider === 'agentcore') {
     return buildAgentCoreComputeConfig(
       data.agentCoreEndpointArn,
@@ -405,6 +450,7 @@ export const defaultReleaseStage: Record<
   lambda: COMPUTE_PROVIDERS.lambda.releaseStage,
   agentcore: COMPUTE_PROVIDERS.agentcore.releaseStage,
   'cloud-run': COMPUTE_PROVIDERS['cloud-run'].releaseStage,
+  modal: COMPUTE_PROVIDERS.modal.releaseStage,
 };
 
 interface InitialComputeProviderOptions {
@@ -453,6 +499,11 @@ export type ComputeFieldValues = {
   gcpRegion: string;
   gcpWorkerPool: string;
   gcpServiceAccount: string;
+  modalAppName: string;
+  modalFunctionName: string;
+  modalEnvironment: string;
+  modalWorkspaceId: string;
+  modalAppVersion: string;
   minReplicas: number;
   maxReplicas: number;
   initialReplicas: number;
@@ -505,14 +556,21 @@ export const fieldValuesWith = (
 
 export type ComputeInitialValues = {
   provider?: ComputeProviderValue;
-  lambdaArn: string;
+  // Every field is optional: a provider supplies only its own, so a saved
+  // Modal group carries no Lambda ARN and no role.
+  lambdaArn?: string;
   agentCoreEndpointArn?: string;
-  iamRoleArn: string;
-  roleExternalId: string;
+  iamRoleArn?: string;
+  roleExternalId?: string;
   gcpProject?: string;
   gcpRegion?: string;
   gcpWorkerPool?: string;
   gcpServiceAccount?: string;
+  modalAppName?: string;
+  modalFunctionName?: string;
+  modalEnvironment?: string;
+  modalWorkspaceId?: string;
+  modalAppVersion?: string;
   minReplicas?: number;
   maxReplicas?: number;
   initialReplicas?: number;
@@ -529,25 +587,17 @@ export const formValuesFromGroup = (
   group: ComputeConfigScalingGroup | undefined,
 ): ComputeInitialValues => {
   const config: ComputeConfig = { scalingGroups: group ? { group } : {} };
-  const lambda = decodeLambdaProviderDetails(config);
-  const agentCore = decodeAgentCoreProviderDetails(config);
-  const gcp = decodeGcpCloudRunProviderDetails(config);
   const scaler = decodeScalerDetails(config);
+
+  // The group names its provider, so nothing here infers one from which
+  // fields are filled. That inference is what read a saved Modal group as
+  // Lambda and emptied every field the customer had entered.
+  const definition =
+    computeProviderForType(providerTypeOf(group)) ?? COMPUTE_PROVIDERS.lambda;
+
   return {
-    // A saved provider decides which fields it filled.
-    provider: agentCore.agentCoreEndpointArn
-      ? 'agentcore'
-      : gcp.gcpWorkerPool
-        ? 'cloud-run'
-        : 'lambda',
-    lambdaArn: lambda.lambdaArn ?? '',
-    agentCoreEndpointArn: agentCore.agentCoreEndpointArn ?? '',
-    iamRoleArn: lambda.iamRoleArn ?? agentCore.iamRoleArn ?? '',
-    roleExternalId: lambda.roleExternalId ?? agentCore.roleExternalId ?? '',
-    gcpProject: gcp.gcpProject,
-    gcpRegion: gcp.gcpRegion,
-    gcpWorkerPool: gcp.gcpWorkerPool,
-    gcpServiceAccount: gcp.gcpServiceAccount,
+    provider: definition.value,
+    ...definition.formValues(config),
     scaleUpCooloffMs: scaler.scaleUpCooloffMs,
     scaleUpBacklogThreshold: scaler.scaleUpBacklogThreshold,
     maxWorkerLifetimeMs: scaler.maxWorkerLifetimeMs,

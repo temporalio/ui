@@ -1,6 +1,6 @@
 <script lang="ts">
   import {
-    type ComputeProviderTemplates,
+    type ComputeProviderTemplateMap,
     type ComputeProviderValue,
   } from '$lib/components/workers/serverless-worker-form/compute-providers';
   import { computeRegionsFor } from '$lib/components/workers/serverless-worker-form/multi-region';
@@ -25,6 +25,7 @@
   import {
     type ComputeProviderConfig,
     configuredRegions,
+    credentialOverrides,
     deployRegionsFor,
   } from '$lib/utilities/compute-provider-config';
   import { routeForWorkers } from '$lib/utilities/route-for';
@@ -32,7 +33,7 @@
   interface Props {
     namespace: string;
     onSuccess: () => void;
-    templates?: Record<ComputeProviderValue, ComputeProviderTemplates>;
+    templates?: ComputeProviderTemplateMap;
     /**
      * The providers this Namespace may use and the regions it lives in. Two
      * or more regions turn on high availability.
@@ -49,6 +50,7 @@
 
   const computeProviders = $derived(providerConfig?.providers);
   const gcpRegions = $derived(deployRegionsFor(providerConfig, 'cloud-run'));
+  const credentials = $derived(credentialOverrides(providerConfig));
   const namespaceRegions = $derived(configuredRegions(providerConfig));
 
   const regions = $derived(
@@ -210,6 +212,7 @@
   {templates}
   {computeProviders}
   {gcpRegions}
+  {credentials}
   {regions}
   {namespace}
 />
