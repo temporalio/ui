@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { tick } from 'svelte';
+  import { tick, untrack } from 'svelte';
   import { twMerge } from 'tailwind-merge';
 
   import {
@@ -36,6 +36,7 @@
     validTimeToDate,
   } from '$lib/utilities/format-time';
   import { isFailedOrPendingGroup } from '$lib/utilities/get-failed-or-pending';
+  import { getWorkflowLatestTime } from '$lib/utilities/workflow-time-skipping';
 
   import EndTimeInterval from '../end-time-interval.svelte';
   import {
@@ -76,6 +77,7 @@
     // Filtering, sorting and segment layout need no EventGroup, so only the
     // pooled rows below materialize one.
     lazyGroups: LazyGroup[];
+    latestEventTimeMs?: number;
     scaleGroups?: LazyGroup[];
     selectedEventGroup?: TimelineEventGroup<LazyGroup>;
     onSelectGroup?: (group: EventGroup) => void;
@@ -94,6 +96,7 @@
   let {
     workflow,
     lazyGroups,
+    latestEventTimeMs,
     scaleGroups,
     selectedEventGroup,
     onSelectGroup,
@@ -155,13 +158,17 @@
   const eventGroupLeft = GUTTER - EVENT_GROUP_INSET;
   const eventGroupWidth = $derived(timelineWidth + 2 * EVENT_GROUP_INSET);
 
-  let nowMs = $state(Date.now());
+  let currentTime = $state(
+    untrack(() =>
+      getWorkflowLatestTime(workflow, Date.now(), latestEventTimeMs),
+    ),
+  );
 
   const timeline = new Timeline({
     getFullEventHistory: () => $fullEventHistory,
     getWorkflow: () => workflow,
     getLazyGroups: () => scaleGroups ?? lazyGroups,
-    getCurrentTimeMs: () => nowMs,
+    getCurrentTimeMs: () => currentTime,
     getLoading: () => loading,
     getShouldCollapseByDefault: () => $collapseIdleTime === 'on',
   });
@@ -732,9 +739,8 @@
   style:height="{svgHeight}px"
   bind:this={containerEl}
 >
-  <EndTimeInterval {workflow} {startTime} bind:currentTime={nowMs}>
+  <EndTimeInterval {workflow} {startTime} {latestEventTimeMs} bind:currentTime>
     {#snippet children({ endTime })}
-      {@const currentEndTime = workflow?.endTime ? endTime : nowMs}
       <div
         class="pointer-events-none sticky top-[120px]"
         class:invisible={!!$activeGroups.length}
@@ -846,7 +852,7 @@
           {@const eventGroupDuration = formatDistanceAbbreviated({
             start: selectedEventGroup.initialEvent.eventTime,
             end: selectedEventGroup.isPending
-              ? currentEndTime
+              ? endTime
               : selectedEventGroup.lastEvent.eventTime,
             includeMilliseconds: true,
           })}
@@ -926,7 +932,7 @@
             y={panelY}
             group={activeGroup}
             {canvasWidth}
-            endTime={currentEndTime}
+            {endTime}
             onHeight={(height) => {
               panelHeight = height;
             }}

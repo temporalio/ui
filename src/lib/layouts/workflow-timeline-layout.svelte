@@ -367,6 +367,7 @@
     <TimelineGraph
       {workflow}
       {lazyGroups}
+      latestEventTimeMs={eventBuffer.latestEventTimeMs}
       scaleGroups={filteredBufferLazyGroups}
       {selectedEventGroup}
       {onSelectGroup}

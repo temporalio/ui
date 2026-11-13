@@ -17,6 +17,7 @@ import {
   getEventGroupMatcher,
   getEventGroupOptions,
   getGroupArray,
+  getLatestEventTimeMs,
   getLazyGroups,
   getPendingActivityScheduledEvent,
   getTimelineEventGroups,
@@ -160,6 +161,33 @@ describe('non-terminal workflow: new events beyond initial historyLength', () =>
 // ---------------------------------------------------------------------------
 // 4. Navigation reset
 // ---------------------------------------------------------------------------
+describe('latest received event time', () => {
+  it('keeps the maximum across out-of-order arrivals and clears it for the next run', () => {
+    const latestTime = '2027-11-09T12:08:00.000Z';
+    expect(getLatestEventTimeMs()).toBeUndefined();
+
+    ingestHistoryEvent({ ...makeWorkflowStarted(2), eventTime: latestTime });
+    ingestHistoryEvent({
+      ...makeWorkflowStarted(1),
+      eventTime: '2027-11-09T12:02:00.000Z',
+    });
+    ingestHistoryEvent({
+      ...makeWorkflowStarted(3),
+      eventTime: '2027-11-09T12:05:00.000Z',
+    });
+    expect(getLatestEventTimeMs()).toBe(Date.parse(latestTime));
+
+    reset(0);
+    expect(getLatestEventTimeMs()).toBeUndefined();
+    const nextRunStartTime = '2026-11-09T12:00:00.000Z';
+    ingestHistoryEvent({
+      ...makeWorkflowStarted(1),
+      eventTime: nextRunStartTime,
+    });
+    expect(getLatestEventTimeMs()).toBe(Date.parse(nextRunStartTime));
+  });
+});
+
 describe('navigation reset', () => {
   it('reset() zeroes pool entries and reuses them for the next workflow', async () => {
     const events1 = makeSyntheticEvents(30);

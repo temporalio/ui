@@ -12,6 +12,7 @@ import {
   getEventGroupMatcher,
   getEventGroupOptions,
   getGroupArray,
+  getLatestEventTimeMs,
   getLazyGroups,
   getPendingActivityScheduledEvent,
   getTimelineEventGroups,
@@ -66,6 +67,11 @@ class EventBufferView {
   /** Bumped once per batch of buffer writes. */
   get version(): number {
     return this._version;
+  }
+
+  get latestEventTimeMs(): number | undefined {
+    void this._version;
+    return getLatestEventTimeMs();
   }
 
   /**

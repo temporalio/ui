@@ -23,6 +23,7 @@
     eventOrGroupIsTerminated,
   } from '$lib/models/event-groups/get-event-in-group';
   import { isCloud } from '$lib/stores/advanced-visibility';
+  import { workflowRun } from '$lib/stores/workflow-run';
   import { resolveSystemNexusEvent } from '$lib/system-nexus-endpoints';
   import type { IterableEvent, WorkflowEvent } from '$lib/types/events';
   import { decodeLocalActivity } from '$lib/utilities/decode-local-activity';
@@ -43,6 +44,10 @@
     isWorkflowExecutionSignaledEvent,
   } from '$lib/utilities/is-event-type';
   import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
+  import {
+    getWorkflowCurrentTime,
+    getWorkflowLatestTime,
+  } from '$lib/utilities/workflow-time-skipping';
 
   import { eventTypeStyle } from './event-styles';
   import { CategoryIcon } from '../lines-and-dots/constants';
@@ -108,6 +113,7 @@
     isEventGroup(event)
       ? formatEventGroupDuration({
           group: event,
+          endTime: getWorkflowLatestTime($workflowRun?.workflow),
           includeMillisecondsForUnderSecond: true,
         })
       : '',
@@ -355,6 +361,7 @@
       {#if pendingAttempt}
         <PendingAttemptBadge
           attempt={pendingAttempt}
+          now={getWorkflowCurrentTime($workflowRun?.workflow)}
           maximumAttempts={isPendingActivity
             ? (isPendingActivity.maximumAttempts ?? null)
             : undefined}

@@ -25,6 +25,7 @@
   } from '$lib/utilities/format-event-attributes';
   import { formatDuration, getDuration } from '$lib/utilities/format-time';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
+  import { getWorkflowCurrentTime } from '$lib/utilities/workflow-time-skipping';
 
   let {
     activity,
@@ -93,6 +94,7 @@
       {#if activity.scheduledTime}
         {@const timeDifference = toTimeDifference({
           date: activity.scheduledTime,
+          now: getWorkflowCurrentTime($workflowRun?.workflow),
           negativeDefault: '',
         })}
         {#if timeDifference}
@@ -112,7 +114,7 @@
             activity.maximumAttempts ?? 0,
             formatDuration(
               getDuration({
-                start: Date.now(),
+                start: getWorkflowCurrentTime($workflowRun?.workflow),
                 end: activity.expirationTime,
               }) ?? '',
             ),

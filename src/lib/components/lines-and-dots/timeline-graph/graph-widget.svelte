@@ -6,6 +6,7 @@
   import { fetchAllEvents } from '$lib/services/events-service';
   import { fetchWorkflow } from '$lib/services/workflow-service';
   import type { WorkflowExecution } from '$lib/types/workflows';
+  import { getValidTimeMs } from '$lib/utilities/format-time';
 
   import TimelineGraph from './timeline-graph.svelte';
 
@@ -29,7 +30,11 @@
     class: className = '',
   }: Props = $props();
 
-  let snapshot = $state<{ workflow: WorkflowExecution; groups: EventGroups }>();
+  let snapshot = $state<{
+    workflow: WorkflowExecution;
+    groups: EventGroups;
+    latestEventTimeMs: number | undefined;
+  }>();
 
   const getWorkflowAndEventHistory = async () => {
     if (!workflowId || !runId) return;
@@ -41,9 +46,16 @@
     if (!workflow) return;
 
     const pendingActivities = workflow?.pendingActivities ?? [];
+    const firstEventTimeMs = getValidTimeMs(history.at(0)?.eventTime);
+    const lastEventTimeMs = getValidTimeMs(history.at(-1)?.eventTime);
+    const latestEventTimeMs =
+      firstEventTimeMs === undefined
+        ? lastEventTimeMs
+        : Math.max(firstEventTimeMs, lastEventTimeMs ?? firstEventTimeMs);
     return {
       workflow,
       groups: groupEvents(history, 'ascending', pendingActivities),
+      latestEventTimeMs,
     };
   };
 
@@ -76,6 +88,7 @@
     <TimelineGraph
       workflow={snapshot.workflow}
       lazyGroups={snapshot.groups}
+      latestEventTimeMs={snapshot.latestEventTimeMs}
       readOnly
     />
   </div>
