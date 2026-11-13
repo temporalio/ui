@@ -1,6 +1,7 @@
 import { flushSync, mount, unmount } from 'svelte';
 
 import type { EventGroup } from '$lib/models/event-groups/event-groups';
+import type { WorkflowExecution } from '$lib/types/workflows';
 
 import GroupDetailsRow from './group-details-row.svelte';
 
@@ -26,7 +27,20 @@ export function render(group: EventGroup) {
   mounted.push(
     mount(GroupDetailsRow, {
       target,
-      props: { group, canvasWidth: 600, y: 0 },
+      props: {
+        group,
+        canvasWidth: 600,
+        y: 0,
+        workflowExecutionIdentity: {
+          namespace: 'test-namespace',
+          workflowId: 'test-workflow',
+          runId: 'test-run',
+        },
+        workflow: {
+          id: 'test-workflow',
+          runId: 'test-run',
+        } as WorkflowExecution,
+      },
     }),
   );
   flushSync();

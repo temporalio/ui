@@ -2,9 +2,11 @@
 
 ## Core Principle: Events Are Canonical, Groups Are Derived
 
-All event data lives in a **single module-level singleton** (`grouped-event-buffer.ts`).
-Events are stored once, in a flat array indexed by `eventId - 1`. Groups are not
-stored at all — they are described by lightweight records and built on demand.
+Each `WorkflowHistoryController` owns a **buffer instance** created by
+`createGroupedEventBuffer()` (`grouped-event-buffer.ts`) and an `EventBufferView`
+exposed as `history`. Events are stored once, in a flat array indexed by
+`eventId - 1`. Groups are not stored at all — they are described by lightweight
+records and built on demand.
 
 The flat array works because Temporal event IDs are a gapless sequence from 1, so
 the ID _is_ the position. That buys more than storage: a follower references its
@@ -17,7 +19,7 @@ skips empty slots — costing memory rather than correctness.
 flowchart LR
     API["Bidirectional fetch<br/>+ live poll"] -->|ingestHistoryEvent| BUF
 
-    subgraph BUF["grouped-event-buffer.ts (singleton, plain TS)"]
+    subgraph BUF["grouped-event-buffer.ts (controller-owned instance, plain TS)"]
         direction TB
         EV["events[]<br/>slot = eventId - 1, one copy"]
         HG["headGroup: Int32Array<br/>head slot → record"]
@@ -29,7 +31,7 @@ flowchart LR
     BUF -->|getEventArray| FLAT["Flat event consumers"]
 
     BUF -->|onChange| FACADE["grouped-event-buffer.svelte.ts"]
-    FACADE -->|eventBuffer.*| VIEW
+    FACADE -->|controller.history.*| VIEW
 ```
 
 ### Key tenets
@@ -113,15 +115,16 @@ flowchart TD
     W["ingestHistoryEvent / setPendingMetadata / reset"] -->|notifyChanged| OC["onChange listeners"]
     OC --> FV["EventBufferView.scheduleUpdate()"]
     FV -->|coalesce onto a microtask| VER["_version++ ($state)"]
-    VER --> D1["eventBuffer.lazyGroupsWithoutWorkflowTasks"]
-    VER --> D2["eventBuffer.events"]
-    VER --> D3["bufferVersion store (legacy derived stores)"]
+    VER --> D1["history.lazyGroupsWithoutWorkflowTasks"]
+    VER --> D2["history.events"]
+    VER --> D3["history.event(id) / history.eventGroup(id, opts)"]
 ```
 
 Consumers read a value:
 
 ```svelte
-const lazyGroups = $derived(eventBuffer.lazyGroupsWithoutWorkflowTasks);
+const lazyGroups =
+$derived(historyController.history.lazyGroupsWithoutWorkflowTasks);
 ```
 
 No subscribe / throttle / re-read effect at the call site, and **producers never
@@ -133,8 +136,13 @@ announce their own writes** — the buffer reports them.
   leave a run opened in a background tab with an empty history until focused.
 - **`reset` propagates immediately** rather than coalescing, so navigating between
   runs cannot leave the previous run's groups on screen for a tick.
-- **`bufferVersion`** survives as a store mirror of `eventBuffer.version`, for the
-  pre-runes `derived()` stores in `$lib/stores/events`. Prefer `eventBuffer` in new code.
+- **`_version` is private to the view**, with no public version getter or store
+  mirror. Reactive reads use the controller's `history` surface; disposing the
+  view unsubscribes it and prevents queued microtasks from updating it.
+- **`history.event(id)` and `history.eventGroup(id, opts)` use indexed lookups**
+  through the buffer's `getEvent` and `getEventGroup`, without flattening events
+  or listing every group. Both track `_version`; group lookups materialize only
+  the matching group and retain per-group version memoization.
 
 ### The identity invariant
 

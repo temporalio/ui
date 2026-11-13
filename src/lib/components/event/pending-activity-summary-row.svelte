@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import type { Snippet } from 'svelte';
 
   import { timestamp } from '$lib/components/timestamp.svelte';
   import PendingAttemptBadge from '$lib/components/workflow/pending-attempt-badge/pending-attempt-badge.svelte';
@@ -8,8 +8,11 @@
   import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { isCloud } from '$lib/stores/advanced-visibility';
-  import { workflowRun } from '$lib/stores/workflow-run';
   import type { PendingActivity } from '$lib/types/events';
+  import type {
+    WorkflowExecution,
+    WorkflowExecutionIdentity,
+  } from '$lib/types/workflows';
   import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
   import { getWorkflowCurrentTime } from '$lib/utilities/workflow-time-skipping';
 
@@ -20,29 +23,34 @@
   import EventDetailsRow from './event-details-row.svelte';
 
   interface Props {
+    workflowExecutionIdentity: WorkflowExecutionIdentity;
+    workflow: WorkflowExecution | null;
     event: PendingActivity;
     group: EventGroup | undefined;
     index: number;
     expanded?: boolean;
     onRowClick?: () => void;
+    activityActions?: Snippet<[PendingActivity]>;
   }
 
   const {
+    workflowExecutionIdentity,
+    workflow,
     event,
     group,
     index,
     expanded: expandedProp = false,
     onRowClick = () => {},
+    activityActions,
   }: Props = $props();
 
   let expanded = $state(expandedProp);
-  let { workflow, run, namespace } = $derived($page.params);
   let href = $derived(
     routeForEventHistoryEvent({
       eventId: group?.id,
-      namespace,
-      workflow,
-      run,
+      namespace: workflowExecutionIdentity.namespace,
+      workflow: workflowExecutionIdentity.workflowId,
+      run: workflowExecutionIdentity.runId,
     }),
   );
 
@@ -111,13 +119,14 @@
     <div class="flex items-center gap-1">
       <PendingAttemptBadge
         attempt={event.attempt ?? 0}
-        now={getWorkflowCurrentTime($workflowRun?.workflow)}
+        now={getWorkflowCurrentTime(workflow)}
         maximumAttempts={event.maximumAttempts ?? null}
         paused={Boolean(event.paused)}
         nextRetryTime={event.scheduledTime}
         class="mr-1"
       />
       <EventDetailsRow
+        {workflowExecutionIdentity}
         key="activityType"
         value={event.activityType ?? null}
         showKey
@@ -132,7 +141,12 @@
 {#if expanded}
   <tr class="w-full px-2 text-sm no-underline">
     <td class="!p-0" colspan={$isCloud ? 5 : 4}>
-      <EventDetailsFull {group} />
+      <EventDetailsFull
+        {group}
+        {activityActions}
+        {workflowExecutionIdentity}
+        {workflow}
+      />
     </td>
   </tr>
 {/if}

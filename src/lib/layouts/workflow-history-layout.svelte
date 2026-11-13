@@ -1,9 +1,10 @@
 <script lang="ts">
-  import { getContext, onMount } from 'svelte';
+  import { onMount } from 'svelte';
 
-  import { beforeNavigate, goto } from '$app/navigation';
+  import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
+  import ActivityCommands from '$lib/components/activity/activity-commands.svelte';
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
   import EventGroupControls from '$lib/components/lines-and-dots/event-group-filter/event-group-controls.svelte';
   import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
@@ -11,10 +12,6 @@
   import DownloadEventHistoryModal from '$lib/components/workflow/download-event-history-modal.svelte';
   import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
   import WorkflowCallbacks from '$lib/components/workflow/workflow-callbacks.svelte';
-  import {
-    HISTORY_CTX,
-    type HistoryContext,
-  } from '$lib/contexts/history-context';
   import TabButton from '$lib/holocene/tab-buttons/tab-button.svelte';
   import TabButtons from '$lib/holocene/tab-buttons/tab-buttons.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
@@ -33,8 +30,8 @@
     isCategoryType,
   } from '$lib/models/event-history/get-event-categorization';
   import WorkflowHistoryJson from '$lib/pages/workflow-history-json.svelte';
-  import { eventBuffer } from '$lib/services/grouped-event-buffer.svelte';
-  import { clearActives } from '$lib/stores/active-events';
+  import type { LazyGroup } from '$lib/services/grouped-event-buffer';
+  import { getWorkflowHistoryController } from '$lib/services/workflow-history-controller.svelte.js';
   import { eventFilterSort, eventViewType } from '$lib/stores/event-view';
   import { pauseLiveUpdates } from '$lib/stores/events';
   import {
@@ -42,7 +39,7 @@
     eventStatusFilter,
     eventTypeFilter,
   } from '$lib/stores/filters';
-  import { workflowRun } from '$lib/stores/workflow-run';
+  import { triggerRefresh, workflowRun } from '$lib/stores/workflow-run';
   import type {
     EventTypeCategory,
     WorkflowEvent,
@@ -55,9 +52,8 @@
   } from '$lib/utilities/event-filter-params';
   import { orderGroupsByPending } from '$lib/utilities/order-groups-by-pending';
 
-  const historyCtx = getContext<HistoryContext>(HISTORY_CTX);
+  const historyController = getWorkflowHistoryController();
 
-  const { namespace } = $derived(page.params);
   const { workflow } = $derived($workflowRun);
 
   $effect(() => {
@@ -79,19 +75,19 @@
 
   // Enough to filter, sort and paginate; only the rendered page is materialized.
   // The feed view needs full groups, read lazily in tableProps below.
-  const bufferLazyGroups = $derived(eventBuffer.lazyGroupsWithoutWorkflowTasks);
-  const bufferEvents = $derived(eventBuffer.events);
-  let updating = $derived(!historyCtx.fetchComplete);
+  const bufferLazyGroups = $derived(
+    historyController.history.lazyGroupsWithoutWorkflowTasks,
+  );
+  const bufferEvents = $derived(historyController.history.events);
+  let updating = $derived(historyController.loading);
 
-  onMount(() => {
-    historyCtx.resume();
-  });
+  onMount(() => historyController.resume());
 
   const selectedEventGroups = $derived(
     parseEventFilterParams(page.url).eventGroups,
   );
   const eventGroupMatcher = $derived(
-    eventBuffer.eventGroupMatcher(selectedEventGroups),
+    historyController.history.eventGroupMatcher(selectedEventGroups),
   );
 
   const isCategoryVisible = $derived.by(() => {
@@ -118,8 +114,8 @@
   );
 
   const workflowTaskFailedError = $derived.by(() => {
-    if (!historyCtx.fetchComplete) return undefined;
-    return eventBuffer.workflowTaskFailedEvent as
+    if (historyController.loading) return undefined;
+    return historyController.history.workflowTaskFailedEvent as
       | WorkflowTaskFailedEvent
       | WorkflowTaskTimedOutEvent
       | undefined;
@@ -144,7 +140,9 @@
       activities: isCategoryVisible(CATEGORIES.ACTIVITY)
         ? (workflow?.pendingActivities ?? []).filter(({ activityId }) =>
             isInSelectedGroups(
-              eventBuffer.pendingActivityScheduledEvent(activityId)?.id,
+              historyController.history.pendingActivityScheduledEvent(
+                activityId,
+              )?.id,
             ),
           )
         : [],
@@ -161,28 +159,21 @@
 
   // EventSummaryTable's props are a union on `compact`, so the pair travels as
   // one object. Keeps the materialized groups on the feed branch too.
-  const tableProps = $derived(
-    compact
+  const tableProps = $derived.by(() => {
+    const view = historyController.history;
+    return compact
       ? {
           compact: true as const,
           items: orderGroupsByPending(lazyGroups, reverseSort),
+          materializeGroup: (group: LazyGroup) => view.materializeGroup(group),
         }
       : {
           compact: false as const,
           items: reverseSort
             ? [...pending.nexusOperations, ...pending.activities, ...history]
             : [...history, ...pending.activities, ...pending.nexusOperations],
-          groups: eventBuffer.groupsWithoutWorkflowTasks,
-        },
-  );
-
-  $effect(() => {
-    $eventViewType;
-    clearActives();
-  });
-
-  beforeNavigate(() => {
-    clearActives();
+          groups: view.groupsWithoutWorkflowTasks,
+        };
   });
 
   $effect(() => {
@@ -219,7 +210,7 @@
   };
 </script>
 
-<InputAndResults />
+<InputAndResults events={historyController.history.events} />
 <div class="flex flex-col gap-2">
   {#if workflowTaskFailedError}
     <WorkflowError
@@ -228,7 +219,10 @@
     />
   {/if}
   {#if workflow?.callbacks?.length}
-    <WorkflowCallbacks callbacks={workflow.callbacks} />
+    <WorkflowCallbacks
+      callbacks={workflow.callbacks}
+      initialEvent={historyController.history.initialEvent}
+    />
   {/if}
 </div>
 <div class="relative">
@@ -292,7 +286,9 @@
       <ToggleButtons
         class="empty:hidden max-xl:[&_.menu-button-anchor>button]:rounded max-xl:[&_.menu-button-anchor>button]:border-l"
       >
-        <EventGroupControls options={eventBuffer.eventGroupOptions} />
+        <EventGroupControls
+          options={historyController.history.eventGroupOptions}
+        />
       </ToggleButtons>
       <ToggleButtons>
         <ToggleButton
@@ -331,14 +327,30 @@
       </div>
     {:else}
       <div data-testid="event-summary-table">
-        <EventSummaryTable {updating} {...tableProps} />
+        <EventSummaryTable
+          initialEvent={historyController.history.initialEvent}
+          workflowExecutionIdentity={historyController.workflowExecutionIdentity}
+          {workflow}
+          {updating}
+          {...tableProps}
+        >
+          {#snippet activityActions(activity)}
+            {#if workflow}
+              <ActivityCommands
+                {activity}
+                workflowExecutionIdentity={historyController.workflowExecutionIdentity}
+                {workflow}
+                onRefresh={triggerRefresh}
+                class="justify-end"
+              />
+            {/if}
+          {/snippet}
+        </EventSummaryTable>
       </div>
     {/if}
   </div>
 </div>
 <DownloadEventHistoryModal
   bind:open={showDownloadPrompt}
-  {namespace}
-  workflowId={workflow?.id ?? ''}
-  runId={workflow?.runId ?? ''}
+  {...historyController.workflowExecutionIdentity}
 />

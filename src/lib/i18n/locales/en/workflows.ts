@@ -1,6 +1,10 @@
 export const Namespace = 'workflows' as const;
 
 export const Strings = {
+  'history-load-error': 'Unable to load the full event history.',
+  'history-load-error-description':
+    'Loaded events are still available. Retry to load the remaining history.',
+  'history-load-retry': 'Retry history loading',
   'loading-workflows': 'Loading workflows',
   'recent-workflows': 'Recent Workflows',
   'recent-workflows-link': 'View Recent Workflows',

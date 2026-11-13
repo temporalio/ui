@@ -1,8 +1,6 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, type Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
-
-  import { page } from '$app/state';
 
   import PayloadSummary from '$lib/components/payload/payload-summary.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
@@ -23,9 +21,16 @@
     eventOrGroupIsTerminated,
   } from '$lib/models/event-groups/get-event-in-group';
   import { isCloud } from '$lib/stores/advanced-visibility';
-  import { workflowRun } from '$lib/stores/workflow-run';
   import { resolveSystemNexusEvent } from '$lib/system-nexus-endpoints';
-  import type { IterableEvent, WorkflowEvent } from '$lib/types/events';
+  import type {
+    IterableEvent,
+    PendingActivity,
+    WorkflowEvent,
+  } from '$lib/types/events';
+  import type {
+    WorkflowExecution,
+    WorkflowExecutionIdentity,
+  } from '$lib/types/workflows';
   import { decodeLocalActivity } from '$lib/utilities/decode-local-activity';
   import { formatEventGroupDuration } from '$lib/utilities/event-group-duration';
   import { toEventLinkView } from '$lib/utilities/event-link';
@@ -57,17 +62,22 @@
   import EventLink from './event-link.svelte';
 
   interface Props {
+    workflowExecutionIdentity: WorkflowExecutionIdentity;
+    workflow: WorkflowExecution | null;
     event: IterableEvent;
     group: EventGroup | undefined;
-    initialItem: WorkflowEvent;
+    initialItem: WorkflowEvent | undefined;
     index: number;
     compact?: boolean;
     expanded?: boolean;
     hoveredEventId?: string | undefined;
     onRowClick?: () => void;
+    activityActions?: Snippet<[PendingActivity]>;
   }
 
   let {
+    workflowExecutionIdentity,
+    workflow,
     event,
     group,
     initialItem,
@@ -76,6 +86,7 @@
     expanded: expandedProp = false,
     onRowClick = () => {},
     hoveredEventId = $bindable(),
+    activityActions,
   }: Props = $props();
 
   let expanded = $state(expandedProp);
@@ -85,10 +96,17 @@
     isEventGroup(event) ? event.eventList[0]?.id : event.id,
   );
 
-  const { workflow, run, namespace } = $derived(page.params);
+  const namespace = $derived(workflowExecutionIdentity.namespace);
+  const workflowId = $derived(workflowExecutionIdentity.workflowId);
+  const run = $derived(workflowExecutionIdentity.runId);
 
   const href = $derived(
-    routeForEventHistoryEvent({ eventId: event.id, namespace, workflow, run }),
+    routeForEventHistoryEvent({
+      eventId: event.id,
+      namespace,
+      workflow: workflowId,
+      run,
+    }),
   );
 
   const attributes = $derived(formatAttributes(event));
@@ -113,7 +131,7 @@
     isEventGroup(event)
       ? formatEventGroupDuration({
           group: event,
-          endTime: getWorkflowLatestTime($workflowRun?.workflow),
+          endTime: getWorkflowLatestTime(workflow),
           includeMillisecondsForUnderSecond: true,
         })
       : '',
@@ -126,7 +144,12 @@
   const systemNexus = $derived(
     resolveSystemNexusEvent(
       isEventGroup(event) ? event.initialEvent : (event as WorkflowEvent),
-      { namespace, workflow, run, initiatingEvent: group?.initialEvent },
+      {
+        namespace,
+        workflow: workflowId,
+        run,
+        initiatingEvent: group?.initialEvent,
+      },
     ),
   );
 
@@ -290,7 +313,7 @@
               href={routeForEventHistoryEvent({
                 eventId: groupEvent.id,
                 namespace,
-                workflow,
+                workflow: workflowId,
                 run,
               })}
             >
@@ -361,7 +384,7 @@
       {#if pendingAttempt}
         <PendingAttemptBadge
           attempt={pendingAttempt}
-          now={getWorkflowCurrentTime($workflowRun?.workflow)}
+          now={getWorkflowCurrentTime(workflow)}
           maximumAttempts={isPendingActivity
             ? (isPendingActivity.maximumAttempts ?? null)
             : undefined}
@@ -375,12 +398,17 @@
       {#if !primaryLocalAttribute && primaryAttribute?.key}
         <EventDetailsRow
           {...primaryAttribute}
+          {workflowExecutionIdentity}
           {attributes}
           tooltip={primaryAttributeTooltip}
         />
       {/if}
       {#if primaryLocalAttribute && primaryLocalAttribute.key}
-        <EventDetailsRow {...primaryLocalAttribute} {attributes} />
+        <EventDetailsRow
+          {...primaryLocalAttribute}
+          {attributes}
+          {workflowExecutionIdentity}
+        />
       {/if}
       {#if currentEvent?.userMetadata?.summary}
         <div
@@ -404,6 +432,7 @@
       {/if}
       {#if systemNexus?.summaryAttribute}
         <EventDetailsRow
+          {workflowExecutionIdentity}
           key={systemNexus.summaryAttribute.key}
           value={systemNexus.summaryAttribute.value}
           {attributes}
@@ -433,13 +462,18 @@
       {/if}
       {#if nonPendingActivityAttempt}
         <EventDetailsRow
+          {workflowExecutionIdentity}
           key="attempt"
           value={nonPendingActivityAttempt.toString()}
           {attributes}
         />
       {/if}
       {#if showSecondaryAttribute}
-        <EventDetailsRow {...secondaryAttribute} {attributes} />
+        <EventDetailsRow
+          {...secondaryAttribute}
+          {attributes}
+          {workflowExecutionIdentity}
+        />
       {/if}
     </div>
   </td>
@@ -466,9 +500,12 @@
   >
     <td class="!p-0" colspan={$isCloud ? 5 : 4}>
       <EventDetailsFull
+        {workflowExecutionIdentity}
+        {workflow}
         {group}
         event={currentEvent}
         groupRow={isEventGroup(event)}
+        {activityActions}
       />
     </td>
   </tr>

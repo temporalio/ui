@@ -195,6 +195,51 @@ describe('runLivePoll — waitNewEvent long-poll', () => {
 // Event delivery
 // ---------------------------------------------------------------------------
 
+describe('runLivePoll — callback failures', () => {
+  it.each<{
+    callback: 'onEvent' | 'onNewEvents' | 'onToken';
+    nextPageToken: string;
+  }>([
+    { callback: 'onEvent', nextPageToken: 'next-token' },
+    { callback: 'onNewEvents', nextPageToken: 'next-token' },
+    { callback: 'onToken', nextPageToken: 'next-token' },
+    { callback: 'onToken', nextPageToken: '' },
+  ])(
+    'rejects without retrying when $callback throws (token: "$nextPageToken")',
+    async ({ callback, nextPageToken }) => {
+      const ctrl = new AbortController();
+      const failure = new Error('processing failed');
+      const callbacks = {
+        onEvent: vi.fn(() => true),
+        onNewEvents: vi.fn(),
+        onToken: vi.fn(),
+      };
+      callbacks[callback].mockImplementation(() => {
+        throw failure;
+      });
+      requestFromAPI
+        .mockResolvedValueOnce(pollResponse([1], nextPageToken))
+        .mockImplementation(() => {
+          ctrl.abort();
+          return Promise.resolve(pollResponse([]));
+        });
+
+      await expect(
+        runLivePoll({
+          route: '/api/events',
+          runId: 'run-1',
+          startToken: 'start-tok',
+          signal: ctrl.signal,
+          ...callbacks,
+          ...FAST,
+        }),
+      ).rejects.toBe(failure);
+      expect(requestFromAPI).toHaveBeenCalledTimes(1);
+      expect(ctrl.signal.aborted).toBe(false);
+    },
+  );
+});
+
 describe('runLivePoll — event delivery', () => {
   it('calls onEvent for each event in the response', async () => {
     const { onEvent, done } = startPoll([pollResponse([1, 2, 3])]);
@@ -541,102 +586,104 @@ describe('runLivePoll — abort', () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// Pause / resume — returned cursor
-//
-// runLivePoll resolves with the last cursor token it held when aborted.
-// The caller saves this and passes it as startToken when resuming, so the
-// server picks up exactly where polling left off instead of re-fetching from
-// the start.
-// ---------------------------------------------------------------------------
-
 describe('runLivePoll — pause/resume cursor', () => {
-  it('returns empty string when aborted before any request', async () => {
+  it('does not publish a cursor when aborted before any request', async () => {
     const ctrl = new AbortController();
+    const onToken = vi.fn();
     ctrl.abort();
 
-    const token = await runLivePoll({
+    await runLivePoll({
       route: '/api/events',
       runId: 'run-1',
       startToken: '',
       signal: ctrl.signal,
       onEvent: vi.fn(),
       onNewEvents: vi.fn(),
+      onToken,
       ...FAST,
     });
 
-    expect(token).toBe('');
+    expect(onToken).not.toHaveBeenCalled();
+    expect(requestFromAPI).not.toHaveBeenCalled();
   });
 
-  it('returns the startToken when aborted mid-request with no new token received', async () => {
+  it('publishes an empty cursor when a response has no nextPageToken', async () => {
     const ctrl = new AbortController();
+    const onToken = vi.fn();
     requestFromAPI.mockImplementationOnce(() => {
       ctrl.abort();
       return Promise.resolve(pollResponse([]));
     });
 
-    const token = await runLivePoll({
+    await runLivePoll({
       route: '/api/events',
       runId: 'run-1',
       startToken: 'resume-tok',
       signal: ctrl.signal,
       onEvent: vi.fn(),
       onNewEvents: vi.fn(),
+      onToken,
       ...FAST,
     });
 
-    // No nextPageToken in the response so token reset to ''.
-    expect(token).toBe('');
+    expect(requestFromAPI.mock.calls[0]?.[1]?.token).toBe('resume-tok');
+    expect(onToken).toHaveBeenCalledExactlyOnceWith('');
   });
 
-  it('returns the latest nextPageToken when aborted while mid-page', async () => {
+  it('publishes successive cursors and resets at the frontier', async () => {
     const ctrl = new AbortController();
-    // First response has a nextPageToken → token advances.
+    const onToken = vi.fn();
     requestFromAPI.mockImplementationOnce(() =>
       Promise.resolve(pollResponse([], 'page-2-tok')),
     );
-    // Second request (following the token) is where abort fires.
+
     requestFromAPI.mockImplementationOnce(() => {
       ctrl.abort();
       return Promise.resolve(pollResponse([]));
     });
 
-    const token = await runLivePoll({
+    await runLivePoll({
       route: '/api/events',
       runId: 'run-1',
       startToken: '',
       signal: ctrl.signal,
       onEvent: vi.fn(),
       onNewEvents: vi.fn(),
+      onToken,
       ...FAST,
     });
 
-    // After following 'page-2-tok', the second response has no nextPageToken
-    // so token resets to ''.
-    expect(token).toBe('');
+    expect(onToken).toHaveBeenCalledTimes(2);
+    expect(onToken).toHaveBeenNthCalledWith(1, 'page-2-tok');
+    expect(onToken).toHaveBeenNthCalledWith(2, '');
+    expect(requestFromAPI.mock.calls[1]?.[1]?.token).toBe('page-2-tok');
   });
 
-  it('can be resumed from the returned cursor without re-fetching old events', async () => {
-    // Simulate pausing mid-stream: first poll run is aborted after two pages.
+  it('can be resumed from the onToken cursor without re-fetching old events', async () => {
     const ctrl1 = new AbortController();
+    let resumeToken = '';
     requestFromAPI
       .mockImplementationOnce(() => Promise.resolve(pollResponse([1], 'tok-a')))
       .mockImplementationOnce(() => {
         ctrl1.abort();
-        return Promise.resolve(pollResponse([2]));
+        return Promise.resolve(pollResponse([2], 'tok-b'));
       });
 
-    const resumeToken = await runLivePoll({
+    await runLivePoll({
       route: '/api/events',
       runId: 'run-1',
       startToken: '',
       signal: ctrl1.signal,
+      onToken: (token) => {
+        resumeToken = token;
+      },
       onEvent: vi.fn().mockReturnValue(true),
       onNewEvents: vi.fn(),
       ...FAST,
     });
 
-    // Resume: second poll run starts from the saved cursor.
+    expect(resumeToken).toBe('tok-b');
+
     const ctrl2 = new AbortController();
     requestFromAPI.mockImplementationOnce(() => {
       ctrl2.abort();
@@ -654,10 +701,8 @@ describe('runLivePoll — pause/resume cursor', () => {
       ...FAST,
     });
 
-    // The resumed poll sent the saved cursor as its first token.
     const secondCallToken = requestFromAPI.mock.calls[2]?.[1]?.token;
-    expect(secondCallToken).toBe(resumeToken || undefined);
-    // It delivered only the new event (event 3).
+    expect(secondCallToken).toBe('tok-b');
     expect(onEvent2).toHaveBeenCalledTimes(1);
     expect(onEvent2.mock.calls[0][0].eventId).toBe('3');
   });

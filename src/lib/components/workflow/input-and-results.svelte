@@ -4,8 +4,8 @@
     createDecodedPayload,
     type DecodedPayloadState,
   } from '$lib/runes/decoded-payload.svelte';
-  import { fullEventHistory } from '$lib/stores/events';
   import { workflowRun } from '$lib/stores/workflow-run';
+  import type { WorkflowEvents } from '$lib/types/events';
   import { isParsedPayload } from '$lib/utilities/decode-payload';
   import {
     getWorkflowStartedCompletedAndTaskFailedEvents,
@@ -16,8 +16,10 @@
   import InputAndResultsPayload from './input-and-results-payload.svelte';
   import PayloadPreview from './payload-preview.svelte';
 
+  let { events }: { events: WorkflowEvents } = $props();
+
   const workflowEvents = $derived(
-    getWorkflowStartedCompletedAndTaskFailedEvents($fullEventHistory),
+    getWorkflowStartedCompletedAndTaskFailedEvents(events),
   );
   const isPending = $derived(
     $workflowRun.workflow?.isRunning ||
