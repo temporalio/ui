@@ -8,7 +8,7 @@
   const iconOptions: Record<string, unknown> = { ...ioIcons };
 
   const { Story } = defineMeta({
-    title: 'Number Input',
+    title: 'Holocene/Components/Number Input',
     component: NumberInput,
     args: {
       label: 'Number Input',

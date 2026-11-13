@@ -5,7 +5,7 @@
   import FileInput from './file-input.svelte';
 
   const { Story } = defineMeta({
-    title: 'File Input',
+    title: 'Holocene/Components/File Input',
     component: FileInput,
     args: {
       id: 'file-input',

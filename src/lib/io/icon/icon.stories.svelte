@@ -1,11 +1,23 @@
 <script lang="ts" module>
   import { defineMeta } from '@storybook/addon-svelte-csf';
 
+  import usage from './icon.usage.md?raw';
+
   import IconSvgWrapper from './icon-svg-wrapper.svelte';
 
   const { Story } = defineMeta({
     title: 'IO/Components/Icon',
+    tags: ['autodocs'],
     component: IconSvgWrapper,
+    parameters: {
+      docs: {
+        description: {
+          component:
+            'The shared IO icon library, including optical variants for adjusted visual sizing.',
+        },
+        usage,
+      },
+    },
     argTypes: {
       title: { name: 'Accessible label', control: 'text' },
       class: { table: { disable: true } },
@@ -36,6 +48,16 @@
 
   const sizes = [16, 20, 48];
 </script>
+
+<Story
+  tags={['!dev']}
+  name="Playground"
+  args={{ title: 'Add', width: 24, height: 24 }}
+>
+  {#snippet template(args)}
+    <icons.IconAdd {...args} />
+  {/snippet}
+</Story>
 
 <Story name="Contact Sheet">
   {#snippet template()}

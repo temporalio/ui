@@ -8,7 +8,7 @@
   const iconOptions: Record<string, unknown> = { ...ioIcons };
 
   const { Story } = defineMeta({
-    title: 'Empty State',
+    title: 'Holocene/Components/Empty State',
     component: EmptyState,
     args: {
       title: 'No Resources Found',

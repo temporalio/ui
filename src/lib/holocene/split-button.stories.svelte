@@ -9,7 +9,7 @@
   const iconOptions: Record<string, unknown> = { ...ioIcons };
 
   const { Story } = defineMeta({
-    title: 'Split Button',
+    title: 'Holocene/Components/Split Button',
     component: SplitButton,
     args: {
       label: 'Split Button',

@@ -19,7 +19,7 @@
   };
 
   const { Story } = defineMeta({
-    title: 'Workers/Multi-Region/Forms',
+    title: 'Application/Workers/Multi-Region/Forms',
     args: { namespace: 'multi' },
     argTypes: {
       namespace: {

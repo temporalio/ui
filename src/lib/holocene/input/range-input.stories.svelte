@@ -5,7 +5,7 @@
   import RangeInput from '$lib/holocene/input/range-input.svelte';
 
   const { Story } = defineMeta({
-    title: 'Range Input',
+    title: 'Holocene/Components/Range Input',
     component: RangeInput,
     args: {
       value: 50,

@@ -5,7 +5,7 @@
   import Card from './card.svelte';
 
   const { Story } = defineMeta({
-    title: 'Card',
+    title: 'Holocene/Components/Card',
     component: Card,
     render: template,
   });

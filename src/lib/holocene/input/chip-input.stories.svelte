@@ -7,7 +7,7 @@
   import { isEmail } from '$lib/utilities/is-email';
 
   const { Story } = defineMeta({
-    title: 'Chip Input',
+    title: 'Holocene/Components/Chip Input',
     component: ChipInput,
     args: {
       label: 'Chip Input',

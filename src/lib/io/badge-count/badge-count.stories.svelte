@@ -4,6 +4,8 @@
 
   import { BadgeCount, type BadgeCountSize } from '$lib/io/badge-count';
 
+  import usage from './badge-count.usage.md?raw';
+
   const sizes: BadgeCountSize[] = ['sm', 'md'];
   const colorSchemes: NonNullable<
     ComponentProps<typeof BadgeCount>['colorScheme']
@@ -11,6 +13,7 @@
 
   const { Story } = defineMeta({
     title: 'IO/Components/Badge Count',
+    tags: ['autodocs'],
     component: BadgeCount,
     args: {
       value: '12',
@@ -25,6 +28,12 @@
       class: { table: { disable: true } },
     },
     parameters: {
+      docs: {
+        description: {
+          component: 'A compact count, optionally displayed against a total.',
+        },
+        usage,
+      },
       layout: 'padded',
     },
     render: template,
@@ -37,7 +46,7 @@
   </div>
 {/snippet}
 
-<Story name="Playground" />
+<Story tags={['!dev']} name="Playground" />
 
 <Story name="Error" args={{ value: 12, colorScheme: 'error' }} />
 

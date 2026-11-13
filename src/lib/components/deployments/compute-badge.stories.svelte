@@ -8,7 +8,7 @@
   import ConnectionBadge from './connection-badge.svelte';
 
   const { Story } = defineMeta({
-    title: 'Deployments/Compute Badge',
+    title: 'Application/Deployments/Compute Badge',
     component: ComputeBadge,
     args: {
       type: 'aws-lambda',

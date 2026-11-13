@@ -4,7 +4,7 @@
   import Example from './api-paginated-sort-harness.svelte';
 
   const { Story } = defineMeta({
-    title: 'Table/API Paginated',
+    title: 'Holocene/Components/Table/API Paginated',
     component: Example,
     parameters: {
       sveltekit_experimental: {

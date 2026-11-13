@@ -4,7 +4,7 @@
   import Loading from './loading.svelte';
 
   const { Story } = defineMeta({
-    title: 'Loading',
+    title: 'Holocene/Components/Loading',
     component: Loading,
     args: {},
     argTypes: {},

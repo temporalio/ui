@@ -7,3 +7,94 @@ body.sb-show-main,
 #storybook-root {
   min-height: 100vh;
 }
+
+.sbdocs-content:has(.io-docs-playground) h2:not(.docs-story h2) {
+  border-bottom: 0;
+}
+
+.io-docs-playground {
+  --io-docs-controls-header-height: 36px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 320px);
+  align-items: start;
+  gap: 24px;
+}
+
+.io-docs-canvas,
+.io-docs-adjust-props {
+  min-width: 0;
+}
+
+.io-docs-canvas .sbdocs-preview {
+  margin-top: 0;
+  box-sizing: border-box;
+}
+
+.io-docs-examples .sbdocs-preview-actions {
+  margin-bottom: 16px;
+}
+
+.io-docs-api-reference {
+  overflow-x: auto;
+}
+
+.io-docs-page-actions {
+  position: relative;
+  float: right;
+  margin: 0 0 12px 16px;
+}
+
+.io-docs-page-actions-status {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  width: max-content;
+  max-width: 280px;
+  font-size: 12px;
+}
+
+/* Keep Storybook's controls, hiding the reference columns in this panel only. */
+.io-docs-adjust-props .docblock-argstable tr > :nth-child(2),
+.io-docs-adjust-props .docblock-argstable tr > :nth-child(3),
+.io-docs-adjust-props .docblock-argstable tr:has(> [colspan]) {
+  display: none;
+}
+
+.io-docs-playground .io-docs-adjust-props .docblock-argstable {
+  width: 100%;
+  margin: 0;
+  table-layout: fixed;
+  font-size: 12px;
+}
+
+.io-docs-adjust-props .docblock-argstable th:first-child {
+  width: 38%;
+}
+
+.io-docs-adjust-props .docblock-argstable th:last-child {
+  width: 62%;
+}
+
+.io-docs-adjust-props .docblock-argstable :is(th, td) {
+  padding: 8px;
+  overflow-wrap: anywhere;
+}
+
+.io-docs-adjust-props .docblock-argstable thead th {
+  box-sizing: border-box;
+  height: var(--io-docs-controls-header-height);
+}
+
+.io-docs-playground .io-docs-canvas {
+  margin-top: var(--io-docs-controls-header-height);
+}
+
+@media (max-width: 1100px) {
+  .io-docs-playground {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .io-docs-playground .io-docs-canvas {
+    margin-top: 0;
+  }
+}

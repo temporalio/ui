@@ -4,18 +4,31 @@
 
   import { IconAdd, IconArrowUpRight } from '$lib/io/icon';
 
+  import usage from './text-link.usage.md?raw';
+
   import TextLink from './text-link.svelte';
 
   const { Story } = defineMeta({
     title: 'IO/Components/Text Link',
+    tags: ['autodocs'],
     component: TextLink,
     args: {
       href: 'https://docs.temporal.io',
       disabled: false,
     },
     argTypes: {
-      href: { control: 'text' },
-      target: { control: 'select', options: ['_self', '_blank'] },
+      href: {
+        control: 'text',
+        table: { category: 'properties', type: { summary: 'string' } },
+      },
+      target: {
+        control: 'select',
+        options: ['_self', '_blank'],
+        table: {
+          category: 'properties',
+          type: { summary: 'string' },
+        },
+      },
       disabled: { control: 'boolean' },
       LeadingIcon: {
         control: 'select',
@@ -27,10 +40,22 @@
         options: ['None', 'Arrow up right'],
         mapping: { None: undefined, 'Arrow up right': IconArrowUpRight },
       },
-      children: { control: false },
+      children: {
+        control: false,
+        table: { category: 'properties', type: { summary: 'Snippet' } },
+      },
       class: { table: { disable: true } },
     },
-    parameters: { layout: 'padded' },
+    parameters: {
+      docs: {
+        description: {
+          component:
+            'An inline navigation link with optional leading and trailing icons.',
+        },
+        usage,
+      },
+      layout: 'padded',
+    },
   });
 </script>
 
@@ -42,7 +67,7 @@
   </div>
 {/snippet}
 
-<Story name="Text only" {template} />
+<Story tags={['!dev']} name="Text only" {template} />
 <Story name="Leading icon" args={{ LeadingIcon: IconAdd }} {template} />
 <Story
   name="Trailing icon"

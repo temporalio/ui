@@ -9,7 +9,7 @@
   import Textarea from './textarea.svelte';
 
   const { Story } = defineMeta({
-    title: 'Textarea',
+    title: 'Holocene/Components/Textarea',
     component: Textarea,
     args: {
       label: 'Label',

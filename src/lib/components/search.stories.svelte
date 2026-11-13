@@ -5,7 +5,7 @@
   import Search from './search.svelte';
 
   const { Story } = defineMeta({
-    title: 'Search',
+    title: 'Application/Search',
     component: Search,
     render: template,
   });
