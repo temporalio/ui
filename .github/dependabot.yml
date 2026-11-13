@@ -13,3 +13,19 @@ updates:
       interval: 'weekly'
     cooldown:
       default-days: 14
+
+  - package-ecosystem: 'gomod'
+    directory: '/server'
+    schedule:
+      interval: 'weekly'
+    cooldown:
+      default-days: 14
+    ignore:
+      # Temporal dependencies are bumped manually since go.temporal.io/api
+      # changes require a coordinated ui-server release
+      - dependency-name: 'go.temporal.io/*'
+    groups:
+      go-minor-patch:
+        update-types:
+          - 'minor'
+          - 'patch'
