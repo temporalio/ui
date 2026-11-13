@@ -1,0 +1,39 @@
+import * as Activities from './activities';
+import * as Batch from './batch';
+import * as CodecServer from './codec-server';
+import * as Common from './common';
+import * as DataEncoder from './data-encoder';
+import * as DatePicker from './date-picker';
+import * as Deployments from './deployments';
+import * as Events from './events';
+import * as Namespaces from './namespaces';
+import * as Nexus from './nexus';
+import * as Schedules from './schedules';
+import * as SearchAttributes from './search-attributes';
+import * as StandaloneActivities from './standalone-activities';
+import * as StandaloneNexusOperations from './standalone-nexus-operations';
+import * as TypedErrors from './typed-errors';
+import * as Workers from './workers';
+import * as Workflows from './workflows';
+
+export const ZH = 'zh' as const;
+
+export const Chinese = {
+  [Activities.Namespace]: Activities.Strings,
+  [Batch.Namespace]: Batch.Strings,
+  [CodecServer.Namespace]: CodecServer.Strings,
+  [Common.Namespace]: Common.Strings,
+  [DataEncoder.Namespace]: DataEncoder.Strings,
+  [DatePicker.Namespace]: DatePicker.Strings,
+  [Deployments.Namespace]: Deployments.Strings,
+  [Events.Namespace]: Events.Strings,
+  [Namespaces.Namespace]: Namespaces.Strings,
+  [Nexus.Namespace]: Nexus.Strings,
+  [Schedules.Namespace]: Schedules.Strings,
+  [SearchAttributes.Namespace]: SearchAttributes.Strings,
+  [StandaloneActivities.Namespace]: StandaloneActivities.Strings,
+  [StandaloneNexusOperations.Namespace]: StandaloneNexusOperations.Strings,
+  [TypedErrors.Namespace]: TypedErrors.Strings,
+  [Workers.Namespace]: Workers.Strings,
+  [Workflows.Namespace]: Workflows.Strings,
+} as const;
