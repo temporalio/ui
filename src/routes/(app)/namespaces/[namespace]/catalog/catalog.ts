@@ -42,7 +42,7 @@ const routingForNamespace = (
 ): CatalogRouting =>
   Object.fromEntries(
     descriptors.map(({ execution }) => [
-      execution.targetId,
+      execution.workspaceId,
       { namespace, taskQueue: execution.taskQueue },
     ]),
   );

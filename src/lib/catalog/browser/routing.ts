@@ -1,35 +1,39 @@
-export type CatalogTargetRouting = {
+export type CatalogWorkspaceRouting = {
   namespace: string;
   taskQueue: string;
 };
 
-export type CatalogRouting = Readonly<Record<string, CatalogTargetRouting>>;
+export type CatalogRouting = Readonly<Record<string, CatalogWorkspaceRouting>>;
 
-export type CatalogRoutableTarget = CatalogTargetRouting & {
-  targetId: string;
+export type CatalogRoutableWorkspace = CatalogWorkspaceRouting & {
+  workspaceId: string;
 };
 
-export const resolveCatalogRouting = <Target extends CatalogRoutableTarget>(
-  targets: readonly Target[],
+export const resolveCatalogRouting = <
+  Workspace extends CatalogRoutableWorkspace,
+>(
+  workspaces: readonly Workspace[],
   routing: CatalogRouting,
-): Target[] => {
-  const targetIds = new Set(targets.map(({ targetId }) => targetId));
+): Workspace[] => {
+  const workspaceIds = new Set(
+    workspaces.map(({ workspaceId }) => workspaceId),
+  );
 
-  for (const targetId of Object.keys(routing)) {
-    if (!targetIds.has(targetId)) {
-      throw new Error(`Unknown catalog routing target "${targetId}"`);
+  for (const workspaceId of Object.keys(routing)) {
+    if (!workspaceIds.has(workspaceId)) {
+      throw new Error(`Unknown catalog routing workspace "${workspaceId}"`);
     }
   }
 
-  return targets.map((target) => {
-    const resolved = routing[target.targetId];
+  return workspaces.map((workspace) => {
+    const resolved = routing[workspace.workspaceId];
 
     return resolved
       ? {
-          ...target,
+          ...workspace,
           namespace: resolved.namespace,
           taskQueue: resolved.taskQueue,
         }
-      : { ...target };
+      : { ...workspace };
   });
 };

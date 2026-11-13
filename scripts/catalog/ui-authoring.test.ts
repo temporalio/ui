@@ -88,11 +88,14 @@ describe('UI catalog authoring adapter', () => {
     ).resolves.toBeDefined();
     await expect(authoring.verify()).resolves.toBeUndefined();
 
-    const indexPath = join(
+    const registrationPath = join(
       rootDirectory,
-      'src/lib/catalog/worker/examples/index.ts',
+      'src/lib/catalog/worker/shared-registrations.ts',
     );
-    await writeFile(indexPath, `${await readFile(indexPath, 'utf8')}\n`);
+    await writeFile(
+      registrationPath,
+      `${await readFile(registrationPath, 'utf8')}\n`,
+    );
     await expect(authoring.verify()).rejects.toThrow(
       'has generated output drift',
     );

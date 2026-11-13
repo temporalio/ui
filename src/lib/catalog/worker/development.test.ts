@@ -5,13 +5,13 @@ import { describe, expect, it, vi } from 'vitest';
 import { runCatalogDevelopment } from './development';
 
 describe('runCatalogDevelopment', () => {
-  it('runs only the explicitly selected catalog target', async () => {
+  it('runs only the explicitly selected catalog workspace', async () => {
     const createdTaskQueues: string[] = [];
 
     await runCatalogDevelopment({
       bindings: [
         {
-          target: {
+          workspace: {
             id: 'shared-workflows',
             namespace: 'staging-namespace',
             taskQueue: 'ui-catalog',
@@ -23,7 +23,7 @@ describe('runCatalogDevelopment', () => {
           nexusServices: [],
         },
         {
-          target: {
+          workspace: {
             id: 'local-catalog',
             namespace: 'default',
             taskQueue: 'catalog',
@@ -35,7 +35,7 @@ describe('runCatalogDevelopment', () => {
           nexusServices: [],
         },
       ],
-      targetId: 'shared-workflows',
+      workspaceId: 'shared-workflows',
       connectionFactory: async () => ({ close: async () => undefined }),
       createWorker: async ({ taskQueue }) => {
         createdTaskQueues.push(taskQueue);
@@ -47,7 +47,7 @@ describe('runCatalogDevelopment', () => {
     expect(createdTaskQueues).toEqual(['ui-catalog']);
   });
 
-  it('rejects an unknown catalog target before connecting', async () => {
+  it('rejects an unknown catalog workspace before connecting', async () => {
     const connectionFactory = vi.fn(async () => ({
       close: async () => undefined,
     }));
@@ -56,7 +56,7 @@ describe('runCatalogDevelopment', () => {
       runCatalogDevelopment({
         bindings: [
           {
-            target: {
+            workspace: {
               id: 'shared-workflows',
               namespace: 'staging-namespace',
               taskQueue: 'ui-catalog',
@@ -68,13 +68,13 @@ describe('runCatalogDevelopment', () => {
             nexusServices: [],
           },
         ],
-        targetId: 'missing-target',
+        workspaceId: 'missing-target',
         connectionFactory,
         createWorker: vi.fn(),
         signals: new EventEmitter(),
       }),
     ).rejects.toThrowError(
-      'Catalog target "missing-target" was not found; available targets: shared-workflows',
+      'Catalog workspace "missing-target" was not found; available workspaces: shared-workflows',
     );
     expect(connectionFactory).not.toHaveBeenCalled();
   });
@@ -86,7 +86,7 @@ describe('runCatalogDevelopment', () => {
     await runCatalogDevelopment({
       bindings: [
         {
-          target: {
+          workspace: {
             id: 'catalog',
             namespace: 'catalog-namespace',
             taskQueue: 'catalog-queue',
@@ -123,7 +123,7 @@ describe('runCatalogDevelopment', () => {
         signals: new EventEmitter(),
       }),
     ).rejects.toThrowError(
-      'Catalog has no runnable targets; register an example before starting the development runner',
+      'Catalog has no runnable workspaces; register an example before starting the development runner',
     );
     expect(emptyConnectionFactory).not.toHaveBeenCalled();
 
@@ -134,7 +134,7 @@ describe('runCatalogDevelopment', () => {
     const running = runCatalogDevelopment({
       bindings: [
         {
-          target: {
+          workspace: {
             id: 'catalog',
             namespace: 'catalog-namespace',
             taskQueue: 'catalog-queue',

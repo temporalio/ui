@@ -6,7 +6,7 @@ import {
 } from './routing-config';
 
 describe('catalogRoutingFromEnvironment', () => {
-  it('routes the shared target to the configured namespace by default', () => {
+  it('routes the shared workspace to the configured namespace by default', () => {
     expect(
       catalogRoutingFromEnvironment({
         TEMPORAL_NAMESPACE: 'runtime-namespace',
@@ -19,13 +19,13 @@ describe('catalogRoutingFromEnvironment', () => {
     });
   });
 
-  it('routes every registered target to the configured namespace with its registered task queue', () => {
+  it('routes every registered workspace to the configured namespace with its registered task queue', () => {
     expect(
       catalogRoutingFromEnvironment(
         { TEMPORAL_NAMESPACE: 'runtime-namespace' },
         [
-          { targetId: 'shared-workflows', taskQueue: 'ui-catalog' },
-          { targetId: 'local-workflows', taskQueue: 'local-queue' },
+          { workspaceId: 'shared-workflows', taskQueue: 'ui-catalog' },
+          { workspaceId: 'local-workflows', taskQueue: 'local-queue' },
         ],
       ),
     ).toEqual({
@@ -44,7 +44,7 @@ describe('catalogRoutingFromEnvironment', () => {
     expect(catalogRoutingFromEnvironment({})).toEqual({});
     expect(
       catalogRoutingFromEnvironment({}, [
-        { targetId: 'local-workflows', taskQueue: 'local-queue' },
+        { workspaceId: 'local-workflows', taskQueue: 'local-queue' },
       ]),
     ).toEqual({});
   });

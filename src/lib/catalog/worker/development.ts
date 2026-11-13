@@ -14,7 +14,7 @@ type CatalogSignals = {
 
 type RunCatalogDevelopmentOptions<Connection extends CatalogConnection> = {
   bindings: readonly CatalogWorkerBinding[];
-  targetId?: string;
+  workspaceId?: string;
   connectionFactory: () => Promise<Connection>;
   createWorker: (
     options: CatalogWorkerOptions<Connection>,
@@ -27,27 +27,27 @@ export const runCatalogDevelopment = async <
   Connection extends CatalogConnection,
 >({
   bindings,
-  targetId,
+  workspaceId,
   connectionFactory,
   createWorker,
   events,
   signals,
 }: RunCatalogDevelopmentOptions<Connection>) => {
-  const selectedBindings = targetId
-    ? bindings.filter((binding) => binding.target.id === targetId)
+  const selectedBindings = workspaceId
+    ? bindings.filter((binding) => binding.workspace.id === workspaceId)
     : bindings;
 
-  if (targetId && selectedBindings.length === 0) {
+  if (workspaceId && selectedBindings.length === 0) {
     throw new Error(
-      `Catalog target "${targetId}" was not found; available targets: ${bindings
-        .map((binding) => binding.target.id)
+      `Catalog workspace "${workspaceId}" was not found; available workspaces: ${bindings
+        .map((binding) => binding.workspace.id)
         .join(', ')}`,
     );
   }
 
   if (selectedBindings.length === 0) {
     throw new Error(
-      'Catalog has no runnable targets; register an example before starting the development runner',
+      'Catalog has no runnable workspaces; register an example before starting the development runner',
     );
   }
 

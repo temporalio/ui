@@ -2,7 +2,8 @@ import type { BrowserCatalogArtifact } from './types';
 
 export const catalogArtifact: BrowserCatalogArtifact = {
   sourceHash:
-    'ab1d28559cd8149433f8505b38591843db129021116c4f63f3a2a9f5e2b9f690',
+    '86b8003beee09d3769829774e8b06e4140d05405e90e30bf3fbe06a28fa4b543',
+  workspaces: [{ id: 'shared-workflows', controls: ['crash'] }],
   descriptors: [
     {
       id: 'activity-heartbeat',
@@ -50,7 +51,7 @@ export const catalogArtifact: BrowserCatalogArtifact = {
       },
       execution: {
         kind: 'workflow',
-        targetId: 'shared-workflows',
+        workspaceId: 'shared-workflows',
         namespace: 'default',
         taskQueue: 'ui-catalog',
         workflowType: 'heartbeatWorkflow',
@@ -96,7 +97,7 @@ export const catalogArtifact: BrowserCatalogArtifact = {
       },
       execution: {
         kind: 'workflow',
-        targetId: 'shared-workflows',
+        workspaceId: 'shared-workflows',
         namespace: 'default',
         taskQueue: 'ui-catalog',
         workflowType: 'retryWorkflow',
@@ -137,7 +138,7 @@ export const catalogArtifact: BrowserCatalogArtifact = {
       },
       execution: {
         kind: 'workflow',
-        targetId: 'shared-workflows',
+        workspaceId: 'shared-workflows',
         namespace: 'default',
         taskQueue: 'ui-catalog',
         workflowType: 'timeoutWorkflow',
@@ -192,7 +193,7 @@ export const catalogArtifact: BrowserCatalogArtifact = {
       },
       execution: {
         kind: 'workflow',
-        targetId: 'shared-workflows',
+        workspaceId: 'shared-workflows',
         namespace: 'default',
         taskQueue: 'ui-catalog',
         workflowType: 'childFanOut',
@@ -226,7 +227,7 @@ export const catalogArtifact: BrowserCatalogArtifact = {
       },
       execution: {
         kind: 'workflow',
-        targetId: 'shared-workflows',
+        workspaceId: 'shared-workflows',
         namespace: 'default',
         taskQueue: 'ui-catalog',
         workflowType: 'childWorkflowTest',
@@ -265,7 +266,7 @@ export const catalogArtifact: BrowserCatalogArtifact = {
       },
       execution: {
         kind: 'workflow',
-        targetId: 'shared-workflows',
+        workspaceId: 'shared-workflows',
         namespace: 'default',
         taskQueue: 'ui-catalog',
         workflowType: 'hello',
@@ -318,7 +319,7 @@ export const catalogArtifact: BrowserCatalogArtifact = {
       },
       execution: {
         kind: 'workflow',
-        targetId: 'shared-workflows',
+        workspaceId: 'shared-workflows',
         namespace: 'default',
         taskQueue: 'ui-catalog',
         workflowType: 'highEventCountWorkflow',
@@ -374,7 +375,7 @@ export const catalogArtifact: BrowserCatalogArtifact = {
       },
       execution: {
         kind: 'workflow',
-        targetId: 'shared-workflows',
+        workspaceId: 'shared-workflows',
         namespace: 'default',
         taskQueue: 'ui-catalog',
         workflowType: 'largeHistory',
@@ -413,7 +414,7 @@ export const catalogArtifact: BrowserCatalogArtifact = {
       },
       execution: {
         kind: 'workflow',
-        targetId: 'shared-workflows',
+        workspaceId: 'shared-workflows',
         namespace: 'default',
         taskQueue: 'ui-catalog',
         workflowType: 'localActivityWorkflow',
@@ -459,7 +460,7 @@ export const catalogArtifact: BrowserCatalogArtifact = {
       },
       execution: {
         kind: 'workflow',
-        targetId: 'shared-workflows',
+        workspaceId: 'shared-workflows',
         namespace: 'default',
         taskQueue: 'ui-catalog',
         workflowType: 'longActivity',
@@ -501,7 +502,7 @@ export const catalogArtifact: BrowserCatalogArtifact = {
         'The workflow calls the `greet` operation on the `catalog-greeting` service through the `ui-catalog` Nexus endpoint.\n\n- **Local development:** the catalog worker creates the endpoint automatically when it starts.\n- **Other environments:** create the endpoint yourself before running, adjusting the address for your server:\n\n```\ntemporal operator nexus endpoint create --name ui-catalog --target-namespace <namespace> --target-task-queue ui-catalog\n```',
       execution: {
         kind: 'workflow',
-        targetId: 'shared-workflows',
+        workspaceId: 'shared-workflows',
         namespace: 'default',
         taskQueue: 'ui-catalog',
         workflowType: 'nexusGreeting',
@@ -541,7 +542,7 @@ export const catalogArtifact: BrowserCatalogArtifact = {
       },
       execution: {
         kind: 'workflow',
-        targetId: 'shared-workflows',
+        workspaceId: 'shared-workflows',
         namespace: 'default',
         taskQueue: 'ui-catalog',
         workflowType: 'parallelActivities',
@@ -596,7 +597,7 @@ export const catalogArtifact: BrowserCatalogArtifact = {
       },
       execution: {
         kind: 'workflow',
-        targetId: 'shared-workflows',
+        workspaceId: 'shared-workflows',
         namespace: 'default',
         taskQueue: 'ui-catalog',
         workflowType: 'pendingActivitiesWorkflow',
@@ -646,7 +647,7 @@ export const catalogArtifact: BrowserCatalogArtifact = {
       },
       execution: {
         kind: 'workflow',
-        targetId: 'shared-workflows',
+        workspaceId: 'shared-workflows',
         namespace: 'default',
         taskQueue: 'ui-catalog',
         workflowType: 'pendingNexus',
@@ -703,7 +704,7 @@ export const catalogArtifact: BrowserCatalogArtifact = {
       },
       execution: {
         kind: 'workflow',
-        targetId: 'shared-workflows',
+        workspaceId: 'shared-workflows',
         namespace: 'default',
         taskQueue: 'ui-catalog',
         workflowType: 'priorityFairnessWorkflow',
@@ -777,7 +778,7 @@ export const catalogArtifact: BrowserCatalogArtifact = {
       },
       execution: {
         kind: 'workflow',
-        targetId: 'shared-workflows',
+        workspaceId: 'shared-workflows',
         namespace: 'default',
         taskQueue: 'ui-catalog',
         workflowType: 'satelliteLaunchEventGroups',
@@ -816,7 +817,7 @@ export const catalogArtifact: BrowserCatalogArtifact = {
       },
       execution: {
         kind: 'workflow',
-        targetId: 'shared-workflows',
+        workspaceId: 'shared-workflows',
         namespace: 'default',
         taskQueue: 'ui-catalog',
         workflowType: 'sequentialActivities',
@@ -865,7 +866,7 @@ export const catalogArtifact: BrowserCatalogArtifact = {
       },
       execution: {
         kind: 'workflow',
-        targetId: 'shared-workflows',
+        workspaceId: 'shared-workflows',
         namespace: 'default',
         taskQueue: 'ui-catalog',
         workflowType: 'sequentialMarkdownActivities',
@@ -913,7 +914,7 @@ export const catalogArtifact: BrowserCatalogArtifact = {
       },
       execution: {
         kind: 'workflow',
-        targetId: 'shared-workflows',
+        workspaceId: 'shared-workflows',
         namespace: 'default',
         taskQueue: 'ui-catalog',
         workflowType: 'sequentialMultilineSummaryActivities',
@@ -960,7 +961,7 @@ export const catalogArtifact: BrowserCatalogArtifact = {
       },
       execution: {
         kind: 'workflow',
-        targetId: 'shared-workflows',
+        workspaceId: 'shared-workflows',
         namespace: 'default',
         taskQueue: 'ui-catalog',
         workflowType: 'sequentialNoSummaryActivities',
@@ -1008,7 +1009,7 @@ export const catalogArtifact: BrowserCatalogArtifact = {
       },
       execution: {
         kind: 'workflow',
-        targetId: 'shared-workflows',
+        workspaceId: 'shared-workflows',
         namespace: 'default',
         taskQueue: 'ui-catalog',
         workflowType: 'sequentialPlainTextActivities',
@@ -1058,7 +1059,7 @@ export const catalogArtifact: BrowserCatalogArtifact = {
       },
       execution: {
         kind: 'workflow',
-        targetId: 'shared-workflows',
+        workspaceId: 'shared-workflows',
         namespace: 'default',
         taskQueue: 'ui-catalog',
         workflowType: 'signalCollector',
@@ -1104,7 +1105,7 @@ export const catalogArtifact: BrowserCatalogArtifact = {
       },
       execution: {
         kind: 'workflow',
-        targetId: 'shared-workflows',
+        workspaceId: 'shared-workflows',
         namespace: 'default',
         taskQueue: 'ui-catalog',
         workflowType: 'signalWorkflow',
@@ -1148,7 +1149,7 @@ export const catalogArtifact: BrowserCatalogArtifact = {
       },
       execution: {
         kind: 'standalone-nexus-operation',
-        targetId: 'shared-workflows',
+        workspaceId: 'shared-workflows',
         namespace: 'default',
         taskQueue: 'ui-catalog',
         endpoint: 'ui-catalog-slow-nexus',
@@ -1181,7 +1182,7 @@ export const catalogArtifact: BrowserCatalogArtifact = {
       },
       execution: {
         kind: 'standalone-activity',
-        targetId: 'shared-workflows',
+        workspaceId: 'shared-workflows',
         namespace: 'default',
         taskQueue: 'ui-catalog',
         activityType: 'standalone-activity',
@@ -1230,10 +1231,60 @@ export const catalogArtifact: BrowserCatalogArtifact = {
       },
       execution: {
         kind: 'workflow',
-        targetId: 'shared-workflows',
+        workspaceId: 'shared-workflows',
         namespace: 'default',
         taskQueue: 'ui-catalog',
         workflowType: 'scheduleWorkflow',
+      },
+      source: { id: 'oss', label: 'OSS' },
+    },
+    {
+      id: 'worker-crash',
+      title: 'Worker crash and recovery',
+      description:
+        'Exits the Worker process on request, then continues the run on the restarted Worker.',
+      capabilityTags: ['updates', 'activities', 'retries', 'workers'],
+      expectedEvidence: [
+        'The crashWorker update returns that attempt 2 ran on a new Worker.',
+        'The run completes after the Worker restarts.',
+      ],
+      input: {
+        defaultValue: [120],
+        schema: {
+          type: 'array',
+          prefixItems: [
+            {
+              title: 'Run duration in seconds',
+              type: 'integer',
+              minimum: 10,
+              maximum: 600,
+            },
+          ],
+          items: false,
+          maxItems: 1,
+        },
+      },
+      startOptions: {
+        defaultValue: {},
+        schema: {
+          type: 'object',
+          properties: {
+            details: { type: 'string' },
+            searchAttributes: { type: 'object' },
+            summary: { type: 'string' },
+            workflowStartDelay: { type: 'string' },
+            workflowId: { type: 'string', minLength: 1 },
+          },
+        },
+      },
+      setupMarkdown:
+        'Start the worker with `pnpm catalog worker` or `pnpm catalog dev`. The command restarts the worker after it exits.\n\nWhile the run waits, send the `crashWorker` update:\n\n```\ntemporal workflow update execute --name crashWorker --workflow-id <workflow id>\n```\n\nThe worker process exits and restarts. The update returns once the crash activity succeeds on the new worker.',
+      execution: {
+        kind: 'workflow',
+        workspaceId: 'shared-workflows',
+        namespace: 'default',
+        taskQueue: 'ui-catalog',
+        workflowType: 'workerCrashWorkflow',
       },
       source: { id: 'oss', label: 'OSS' },
     },
@@ -1288,7 +1339,7 @@ export const catalogArtifact: BrowserCatalogArtifact = {
       },
       execution: {
         kind: 'workflow',
-        targetId: 'shared-workflows',
+        workspaceId: 'shared-workflows',
         namespace: 'default',
         taskQueue: 'ui-catalog',
         workflowType: 'featureTourWorkflow',
@@ -1328,7 +1379,7 @@ export const catalogArtifact: BrowserCatalogArtifact = {
       },
       execution: {
         kind: 'workflow',
-        targetId: 'shared-workflows',
+        workspaceId: 'shared-workflows',
         namespace: 'default',
         taskQueue: 'ui-catalog',
         workflowType: 'patchWorkflow',

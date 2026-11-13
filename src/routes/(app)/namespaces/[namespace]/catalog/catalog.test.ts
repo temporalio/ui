@@ -23,7 +23,7 @@ const { localDescriptor } = vi.hoisted<{
     startOptions: { defaultValue: {}, schema: {} },
     execution: {
       kind: 'workflow',
-      targetId: 'local-worker',
+      workspaceId: 'local-worker',
       namespace: 'default',
       taskQueue: 'local-orders',
       workflowType: 'localOrder',
@@ -49,7 +49,7 @@ describe('catalog route catalog', () => {
     expect(
       routeCatalog.find(({ id }) => id === localDescriptor.id)?.execution,
     ).toMatchObject({
-      targetId: 'local-worker',
+      workspaceId: 'local-worker',
       namespace: 'default',
       taskQueue: 'local-orders',
     });
@@ -128,7 +128,7 @@ describe('catalog route catalog', () => {
     expect(
       resolved.find(({ id }) => id === localDescriptor.id)?.execution,
     ).toMatchObject({
-      targetId: 'local-worker',
+      workspaceId: 'local-worker',
       namespace: 'feature-namespace',
       taskQueue: 'local-orders',
     });
