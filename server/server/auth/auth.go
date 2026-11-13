@@ -38,7 +38,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/coreos/go-oidc/v3/oidc"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"github.com/temporalio/ui-server/v2/server/config"
 )
 
@@ -81,7 +81,7 @@ func stripBearerPrefix(token string) string {
 	return strings.TrimPrefix(token, "Bearer ")
 }
 
-func SetUser(c echo.Context, user *User, opts CookieOptions) error {
+func SetUser(c *echo.Context, user *User, opts CookieOptions) error {
 	if user.OAuth2Token == nil {
 		return errors.New("no OAuth2Token")
 	}
@@ -242,7 +242,7 @@ func jwtExp(token string) (time.Time, bool) {
 // SessionExpiresAt reports when the session recorded by the session_start cookie
 // reaches maxSessionDuration. It returns the zero time when no max duration is
 // configured, or when the cookie is missing or unreadable.
-func SessionExpiresAt(c echo.Context, maxSessionDuration time.Duration) time.Time {
+func SessionExpiresAt(c *echo.Context, maxSessionDuration time.Duration) time.Time {
 	if maxSessionDuration <= 0 {
 		return time.Time{}
 	}
@@ -262,7 +262,7 @@ func SessionExpiresAt(c echo.Context, maxSessionDuration time.Duration) time.Tim
 
 // SetSessionStart sets a cookie with the current timestamp to track when the session began.
 // This should only be called on initial login, NOT on token refresh.
-func SetSessionStart(c echo.Context, maxSessionDuration time.Duration, secure bool) {
+func SetSessionStart(c *echo.Context, maxSessionDuration time.Duration, secure bool) {
 	if maxSessionDuration <= 0 {
 		return
 	}
@@ -280,7 +280,7 @@ func SetSessionStart(c echo.Context, maxSessionDuration time.Duration, secure bo
 }
 
 // ValidateSessionDuration checks if the session has exceeded the configured max duration.
-func ValidateSessionDuration(c echo.Context, maxSessionDuration time.Duration) error {
+func ValidateSessionDuration(c *echo.Context, maxSessionDuration time.Duration) error {
 	if maxSessionDuration <= 0 {
 		return nil
 	}
@@ -329,7 +329,7 @@ func validateJWT(ctx context.Context, tokenString string) error {
 // ValidateAuthHeaderExists validates that the autorization header exists if auth is enabled.
 // User autorization should be done in the frontend by claim-mapper and authorizer plugins.
 // See https://docs.temporal.io/security#authentication
-func ValidateAuthHeaderExists(c echo.Context, cfgProvider *config.ConfigProviderWithRefresh) error {
+func ValidateAuthHeaderExists(c *echo.Context, cfgProvider *config.ConfigProviderWithRefresh) error {
 	cfg, err := cfgProvider.GetConfig()
 	if err != nil {
 		return err

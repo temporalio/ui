@@ -29,18 +29,18 @@ import (
 	"strings"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"github.com/temporalio/ui-server/v2/server/api"
 	"google.golang.org/grpc/metadata"
 )
 
 func WithForwardHeaders(headers []string) api.Middleware {
-	return func(c echo.Context) runtime.ServeMuxOption {
+	return func(c *echo.Context) runtime.ServeMuxOption {
 		return runtime.WithMetadata(handleForwardHeaders(c, headers))
 	}
 }
 
-func handleForwardHeaders(c echo.Context, headers []string) func(context.Context, *http.Request) metadata.MD {
+func handleForwardHeaders(c *echo.Context, headers []string) func(context.Context, *http.Request) metadata.MD {
 	return func(ctx context.Context, req *http.Request) metadata.MD {
 		md := metadata.MD{}
 		for _, header := range headers {

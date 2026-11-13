@@ -26,7 +26,7 @@ package api
 
 import (
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 )
 
-type Middleware func(c echo.Context) runtime.ServeMuxOption
+type Middleware func(c *echo.Context) runtime.ServeMuxOption

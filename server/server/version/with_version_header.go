@@ -29,11 +29,11 @@ import (
 	"net/http"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"google.golang.org/grpc/metadata"
 )
 
-func WithVersionHeader(c echo.Context) runtime.ServeMuxOption {
+func WithVersionHeader(c *echo.Context) runtime.ServeMuxOption {
 	return runtime.WithMetadata(
 		func(ctx context.Context, req *http.Request) metadata.MD {
 			md := metadata.MD{}

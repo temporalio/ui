@@ -35,7 +35,7 @@ import (
 
 	"github.com/coreos/go-oidc/v3/oidc"
 	"github.com/gorilla/securecookie"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"github.com/temporalio/ui-server/v2/server/auth"
 	"github.com/temporalio/ui-server/v2/server/config"
 	"golang.org/x/net/context"
@@ -147,11 +147,11 @@ func cookieSecureForCallbackURL(callbackURL string) (bool, error) {
 	}
 }
 
-func authenticate(config *oauth2.Config, options map[string]interface{}, allowedOrigins []string, secure bool) func(echo.Context) error {
-	return func(c echo.Context) error {
+func authenticate(config *oauth2.Config, options map[string]interface{}, allowedOrigins []string, secure bool) func(*echo.Context) error {
+	return func(c *echo.Context) error {
 		state, err := randString()
 		if err != nil {
-			return echo.NewHTTPError(http.StatusInternalServerError, err)
+			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 		}
 		nonce, err := randNonce(c, allowedOrigins)
 		if err != nil {
@@ -185,8 +185,8 @@ func authenticate(config *oauth2.Config, options map[string]interface{}, allowed
 	}
 }
 
-func authenticateCb(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc.Provider, maxSessionDuration time.Duration, refreshTokenDuration time.Duration, secure bool) func(echo.Context) error {
-	return func(c echo.Context) error {
+func authenticateCb(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc.Provider, maxSessionDuration time.Duration, refreshTokenDuration time.Duration, secure bool) func(*echo.Context) error {
+	return func(c *echo.Context) error {
 		user, err := auth.ExchangeCode(ctx, c.Request(), oauthCfg, provider)
 		if err != nil {
 			return err
@@ -230,8 +230,8 @@ func authenticateCb(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc
 
 // refreshTokens exchanges a refresh token (stored in an HttpOnly cookie) for a new access token
 // and optionally a new ID token. It resets the cookies using auth.SetUser and returns 200.
-func refreshTokens(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc.Provider, maxSessionDuration time.Duration, refreshTokenDuration time.Duration, secure bool) func(echo.Context) error {
-	return func(c echo.Context) error {
+func refreshTokens(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc.Provider, maxSessionDuration time.Duration, refreshTokenDuration time.Duration, secure bool) func(*echo.Context) error {
+	return func(c *echo.Context) error {
 		startTime := time.Now()
 		clientIP := c.RealIP()
 
@@ -303,8 +303,8 @@ func refreshTokens(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc.
 }
 
 // logout clears authentication cookies and redirects to root
-func logout(secure bool) func(echo.Context) error {
-	return func(c echo.Context) error {
+func logout(secure bool) func(*echo.Context) error {
+	return func(c *echo.Context) error {
 		log.Printf("[Auth] User logout initiated from %s", c.RealIP())
 
 		// Clear refresh token cookie
@@ -328,7 +328,7 @@ func logout(secure bool) func(echo.Context) error {
 }
 
 // clearCookie sets a cookie with MaxAge=-1 to delete it
-func clearCookie(c echo.Context, name string, secure bool) {
+func clearCookie(c *echo.Context, name string, secure bool) {
 	cookie := &http.Cookie{
 		Name:     name,
 		Value:    "",
@@ -341,7 +341,7 @@ func clearCookie(c echo.Context, name string, secure bool) {
 	c.SetCookie(cookie)
 }
 
-func setCallbackCookie(c echo.Context, name, value string, secure bool) {
+func setCallbackCookie(c *echo.Context, name, value string, secure bool) {
 	// Explicitly expire pre v2.8.0 state and nonce cookies.
 	// As they had different path, they were not being cleared and in some cases result in "state did not match" error.
 	cookiePreV280 := &http.Cookie{
@@ -374,7 +374,7 @@ func randString() (string, error) {
 	return base64.RawURLEncoding.EncodeToString(b), nil
 }
 
-func randNonce(c echo.Context, allowedOrigins []string) (string, error) {
+func randNonce(c *echo.Context, allowedOrigins []string) (string, error) {
 	v, err := randString()
 	if err != nil {
 		return "", err

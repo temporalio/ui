@@ -9,7 +9,7 @@ import (
 
 	"github.com/temporalio/ui-server/v2/server/api"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"go.temporal.io/api/history/v1"
@@ -37,8 +37,11 @@ func TestWorkflowRawHistoryHandler_HappyPath(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
-	c.SetParamNames("namespace", "workflow", "runid")
-	c.SetParamValues("test-namespace", "test-workflow", "test-runid")
+	c.SetPathValues(echo.PathValues{
+		{Name: "namespace", Value: "test-namespace"},
+		{Name: "workflow", Value: "test-workflow"},
+		{Name: "runid", Value: "test-runid"},
+	})
 
 	mockService := new(MockWorkflowService)
 	mockService.On("GetWorkflowExecutionHistory", mock.Anything, mock.Anything).
@@ -67,8 +70,11 @@ func TestWorkflowRawHistoryHandler_URLDecoding(t *testing.T) {
 	c := e.NewContext(req, rec)
 
 	// URL encoded workflow ID (this is "test/workflow+id")
-	c.SetParamNames("namespace", "workflow", "runid")
-	c.SetParamValues("test-namespace", "test%2Fworkflow%2Bid", "test-runid")
+	c.SetPathValues(echo.PathValues{
+		{Name: "namespace", Value: "test-namespace"},
+		{Name: "workflow", Value: "test%2Fworkflow%2Bid"},
+		{Name: "runid", Value: "test-runid"},
+	})
 
 	mockService := new(MockWorkflowService)
 	// Check that the decoded workflow ID is passed to the service
@@ -98,8 +104,11 @@ func TestWorkflowRawHistoryHandler_InvalidURLEncoding(t *testing.T) {
 	c := e.NewContext(req, rec)
 
 	// Invalid URL encoding with incomplete percent encoding
-	c.SetParamNames("namespace", "workflow", "runid")
-	c.SetParamValues("test-namespace", "invalid%2", "test-runid")
+	c.SetPathValues(echo.PathValues{
+		{Name: "namespace", Value: "test-namespace"},
+		{Name: "workflow", Value: "invalid%2"},
+		{Name: "runid", Value: "test-runid"},
+	})
 
 	mockService := new(MockWorkflowService)
 	// The service should not be called because decoding fails

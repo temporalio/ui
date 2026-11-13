@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"go.temporal.io/api/common/v1"
 	"go.temporal.io/api/workflowservice/v1"
 	"golang.org/x/net/context"
@@ -16,7 +16,7 @@ import (
 const WorkflowRawHistoryUrl = "/namespaces/:namespace/workflows/:workflow/run/:runid/history.json"
 
 func WorkflowRawHistoryHandler(service IWorkflowService) echo.HandlerFunc {
-	return func(c echo.Context) error {
+	return func(c *echo.Context) error {
 		// url decode workflow param
 		value := c.Param("workflow")
 		decodedValue, err := url.QueryUnescape(value)
@@ -36,7 +36,7 @@ func WorkflowRawHistoryHandler(service IWorkflowService) echo.HandlerFunc {
 				c.Param("runid"),
 			).
 			SetContext(c.Request().Context()).
-			SetWriter(c.Response().Writer).
+			SetWriter(c.Response()).
 			SetWorkflowService(service).
 			StreamEvents()
 	}

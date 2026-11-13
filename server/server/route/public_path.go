@@ -25,8 +25,8 @@ package route
 import (
 	"regexp"
 
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+	"github.com/labstack/echo/v5"
+	"github.com/labstack/echo/v5/middleware"
 )
 
 // PublicPath returns middleware that strips publicPath from the start of the
