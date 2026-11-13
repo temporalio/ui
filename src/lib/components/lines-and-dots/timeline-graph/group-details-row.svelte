@@ -10,7 +10,10 @@
   import { IconClock, IconClose } from '$lib/io/icon';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import type { PendingActivity } from '$lib/types/events';
-  import type { WorkflowExecutionIdentity } from '$lib/types/workflows';
+  import type {
+    WorkflowExecution,
+    WorkflowExecutionIdentity,
+  } from '$lib/types/workflows';
   import { formatEventGroupDuration } from '$lib/utilities/event-group-duration';
   import { isChildWorkflowExecutionStartedEvent } from '$lib/utilities/is-event-type';
 
@@ -26,6 +29,7 @@
     onHeight?: (h: number) => void;
     onClose?: () => void;
     workflowExecutionIdentity: WorkflowExecutionIdentity;
+    workflow: WorkflowExecution;
     activityActions?: Snippet<[PendingActivity]>;
   };
 
@@ -38,6 +42,7 @@
     onHeight,
     onClose,
     workflowExecutionIdentity,
+    workflow,
     activityActions,
   }: Props = $props();
 
@@ -110,6 +115,7 @@
       <EventDetailsFull
         {group}
         {workflowExecutionIdentity}
+        {workflow}
         {activityActions}
         event={group.initialEvent}
         lazy={true}

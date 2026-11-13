@@ -20,12 +20,13 @@
 </script>
 
 <div class="pb-16">
-  {#if pendingActivities.length}
+  {#if workflow && pendingActivities.length}
     <div class="flex flex-col gap-4">
       {#each pendingActivities as activity (activity.id)}
         <PendingActivityCard
           {activity}
           totalPending={pendingActivities.length}
+          {workflow}
           scheduledEvent={historyController.history.pendingActivityScheduledEvent(
             activity.activityId,
           )}

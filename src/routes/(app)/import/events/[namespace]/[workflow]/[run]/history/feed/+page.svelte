@@ -33,4 +33,5 @@
   initialEvent={$importEvents.find(isWorkflowExecutionStartedEvent)}
   items={filteredEvents}
   {workflowExecutionIdentity}
+  workflow={null}
 />

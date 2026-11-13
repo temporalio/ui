@@ -22,6 +22,7 @@
     routeForWorkflow,
     routeForWorkflowsWithQuery,
   } from '$lib/utilities/route-for';
+  import { getWorkflowLatestTime } from '$lib/utilities/workflow-time-skipping';
 
   import {
     DetailList,
@@ -53,7 +54,7 @@
   const elapsedTime = $derived(
     formatDistanceAbbreviated({
       start: workflow?.startTime,
-      end: workflow?.endTime || Date.now(),
+      end: getWorkflowLatestTime(workflow),
       includeMilliseconds: true,
     }),
   );

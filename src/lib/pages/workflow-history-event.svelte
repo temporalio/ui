@@ -98,6 +98,7 @@
       {#each visibleItems as event, index (event.id)}
         <EventSummaryRow
           workflowExecutionIdentity={historyController.workflowExecutionIdentity}
+          {workflow}
           {event}
           {index}
           expanded={event.id === initialEvent?.id}

@@ -1,6 +1,6 @@
 import {
   differenceInHours,
-  formatDistanceToNowStrict,
+  formatDistanceStrict,
   parseISO,
   parseJSON,
 } from 'date-fns';
@@ -29,6 +29,7 @@ export type FormatDateOptions = {
   relativeLabel?: string;
   flexibleUnits?: boolean;
   hourFormat?: HourFormat;
+  now?: ValidTime;
 };
 
 export const timestampFormats: Record<
@@ -131,22 +132,22 @@ export function formatDate(
       date = timestampToDate(date);
     }
 
+    const currentDate = validTimeToDate(options.now ?? Date.now());
+
     const {
       relative = false,
-      relativeLabel = isFuture(date) ? 'from now' : 'ago',
+      relativeLabel = isFuture(date, currentDate) ? 'from now' : 'ago',
       flexibleUnits = false,
       format = 'medium',
       hourFormat = 'system',
     } = options;
-
-    const currentDate = Date.now();
 
     const parsed = parseJSON(new Date(date));
 
     // Handle relative time first (takes precedence over format)
     if (timeFormat === BASE_TIME_FORMAT_OPTIONS.LOCAL && relative) {
       return (
-        formatDistanceToNowStrict(parsed, {
+        formatDistanceStrict(parsed, currentDate, {
           ...(!flexibleUnits &&
             Math.abs(differenceInHours(currentDate, parsed)) > 24 && {
               unit: 'day',

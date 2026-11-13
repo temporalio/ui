@@ -148,35 +148,30 @@ export function detectActivityErrors(
   const errorIds = new Set<number>();
 
   for (const activity of pendingActivities) {
-    const act = activity as Record<string, unknown>;
-    const retryPolicy = act.retryPolicy as
-      | { maximumAttempts?: number | string }
-      | null
-      | undefined;
+    const options = activity.activityOptions;
+    const maximumAttempts = Number(
+      activity.maximumAttempts || options?.retryPolicy?.maximumAttempts || 0,
+    );
 
-    if (retryPolicy && Number(retryPolicy.maximumAttempts) === 1) {
+    if (maximumAttempts === 1) {
       errorIds.add(14);
     }
 
-    // #13: No explicit retry policy or maximumAttempts is 0 (unlimited)
-    if (
-      !retryPolicy ||
-      !retryPolicy.maximumAttempts ||
-      Number(retryPolicy.maximumAttempts) === 0
-    ) {
+    // #13: maximumAttempts is 0 (unlimited)
+    if (maximumAttempts === 0) {
       errorIds.add(13);
     }
 
     // #15: Activity is retrying — suggest non-retryable error types
-    const attempt = Number(act.attempt);
+    const attempt = Number(activity.attempt);
     if (attempt > 3) {
       errorIds.add(15);
     }
 
-    const startToClose = durationToSeconds(act.startToCloseTimeout);
-    const scheduleToClose = durationToSeconds(act.scheduleToCloseTimeout);
-    const scheduleToStart = durationToSeconds(act.scheduleToStartTimeout);
-    const heartbeat = durationToSeconds(act.heartbeatTimeout);
+    const startToClose = durationToSeconds(options?.startToCloseTimeout);
+    const scheduleToClose = durationToSeconds(options?.scheduleToCloseTimeout);
+    const scheduleToStart = durationToSeconds(options?.scheduleToStartTimeout);
+    const heartbeat = durationToSeconds(options?.heartbeatTimeout);
 
     if (startToClose > 0 && startToClose <= 1) {
       errorIds.add(16);
@@ -215,7 +210,7 @@ export function detectActivityErrors(
     }
 
     // #23: Heartbeat timeout set but no heartbeats detected
-    if (heartbeat > 0 && !act.lastHeartbeatTime) {
+    if (heartbeat > 0 && !activity.lastHeartbeatTime) {
       errorIds.add(23);
     }
   }

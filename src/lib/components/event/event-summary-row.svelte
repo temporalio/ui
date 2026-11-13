@@ -27,7 +27,10 @@
     PendingActivity,
     WorkflowEvent,
   } from '$lib/types/events';
-  import type { WorkflowExecutionIdentity } from '$lib/types/workflows';
+  import type {
+    WorkflowExecution,
+    WorkflowExecutionIdentity,
+  } from '$lib/types/workflows';
   import { decodeLocalActivity } from '$lib/utilities/decode-local-activity';
   import { formatEventGroupDuration } from '$lib/utilities/event-group-duration';
   import { toEventLinkView } from '$lib/utilities/event-link';
@@ -46,6 +49,10 @@
     isWorkflowExecutionSignaledEvent,
   } from '$lib/utilities/is-event-type';
   import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
+  import {
+    getWorkflowCurrentTime,
+    getWorkflowLatestTime,
+  } from '$lib/utilities/workflow-time-skipping';
 
   import { eventTypeStyle } from './event-styles';
   import { CategoryIcon } from '../lines-and-dots/constants';
@@ -56,6 +63,7 @@
 
   interface Props {
     workflowExecutionIdentity: WorkflowExecutionIdentity;
+    workflow: WorkflowExecution | null;
     event: IterableEvent;
     group: EventGroup | undefined;
     initialItem: WorkflowEvent | undefined;
@@ -69,6 +77,7 @@
 
   let {
     workflowExecutionIdentity,
+    workflow,
     event,
     group,
     initialItem,
@@ -88,11 +97,16 @@
   );
 
   const namespace = $derived(workflowExecutionIdentity.namespace);
-  const workflow = $derived(workflowExecutionIdentity.workflowId);
+  const workflowId = $derived(workflowExecutionIdentity.workflowId);
   const run = $derived(workflowExecutionIdentity.runId);
 
   const href = $derived(
-    routeForEventHistoryEvent({ eventId: event.id, namespace, workflow, run }),
+    routeForEventHistoryEvent({
+      eventId: event.id,
+      namespace,
+      workflow: workflowId,
+      run,
+    }),
   );
 
   const attributes = $derived(formatAttributes(event));
@@ -117,6 +131,7 @@
     isEventGroup(event)
       ? formatEventGroupDuration({
           group: event,
+          endTime: getWorkflowLatestTime(workflow),
           includeMillisecondsForUnderSecond: true,
         })
       : '',
@@ -129,7 +144,12 @@
   const systemNexus = $derived(
     resolveSystemNexusEvent(
       isEventGroup(event) ? event.initialEvent : (event as WorkflowEvent),
-      { namespace, workflow, run, initiatingEvent: group?.initialEvent },
+      {
+        namespace,
+        workflow: workflowId,
+        run,
+        initiatingEvent: group?.initialEvent,
+      },
     ),
   );
 
@@ -293,7 +313,7 @@
               href={routeForEventHistoryEvent({
                 eventId: groupEvent.id,
                 namespace,
-                workflow,
+                workflow: workflowId,
                 run,
               })}
             >
@@ -364,6 +384,7 @@
       {#if pendingAttempt}
         <PendingAttemptBadge
           attempt={pendingAttempt}
+          now={getWorkflowCurrentTime(workflow)}
           maximumAttempts={isPendingActivity
             ? (isPendingActivity.maximumAttempts ?? null)
             : undefined}
@@ -480,6 +501,7 @@
     <td class="!p-0" colspan={$isCloud ? 5 : 4}>
       <EventDetailsFull
         {workflowExecutionIdentity}
+        {workflow}
         {group}
         event={currentEvent}
         groupRow={isEventGroup(event)}

@@ -9,8 +9,12 @@
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { isCloud } from '$lib/stores/advanced-visibility';
   import type { PendingActivity } from '$lib/types/events';
-  import type { WorkflowExecutionIdentity } from '$lib/types/workflows';
+  import type {
+    WorkflowExecution,
+    WorkflowExecutionIdentity,
+  } from '$lib/types/workflows';
   import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
+  import { getWorkflowCurrentTime } from '$lib/utilities/workflow-time-skipping';
 
   import { eventTypeStyle } from './event-styles';
   import { CategoryIcon } from '../lines-and-dots/constants';
@@ -20,6 +24,7 @@
 
   interface Props {
     workflowExecutionIdentity: WorkflowExecutionIdentity;
+    workflow: WorkflowExecution | null;
     event: PendingActivity;
     group: EventGroup | undefined;
     index: number;
@@ -30,6 +35,7 @@
 
   const {
     workflowExecutionIdentity,
+    workflow,
     event,
     group,
     index,
@@ -39,15 +45,12 @@
   }: Props = $props();
 
   let expanded = $state(expandedProp);
-  const namespace = $derived(workflowExecutionIdentity.namespace);
-  const workflow = $derived(workflowExecutionIdentity.workflowId);
-  const run = $derived(workflowExecutionIdentity.runId);
   let href = $derived(
     routeForEventHistoryEvent({
       eventId: group?.id,
-      namespace,
-      workflow,
-      run,
+      namespace: workflowExecutionIdentity.namespace,
+      workflow: workflowExecutionIdentity.workflowId,
+      run: workflowExecutionIdentity.runId,
     }),
   );
 
@@ -116,6 +119,7 @@
     <div class="flex items-center gap-1">
       <PendingAttemptBadge
         attempt={event.attempt ?? 0}
+        now={getWorkflowCurrentTime(workflow)}
         maximumAttempts={event.maximumAttempts ?? null}
         paused={Boolean(event.paused)}
         nextRetryTime={event.scheduledTime}
@@ -137,7 +141,12 @@
 {#if expanded}
   <tr class="w-full px-2 text-sm no-underline">
     <td class="!p-0" colspan={$isCloud ? 5 : 4}>
-      <EventDetailsFull {group} {activityActions} {workflowExecutionIdentity} />
+      <EventDetailsFull
+        {group}
+        {activityActions}
+        {workflowExecutionIdentity}
+        {workflow}
+      />
     </td>
   </tr>
 {/if}

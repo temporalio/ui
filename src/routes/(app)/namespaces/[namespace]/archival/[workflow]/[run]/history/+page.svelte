@@ -55,6 +55,7 @@
     items={history}
     {groups}
     {workflowExecutionIdentity}
+    workflow={null}
   />
 {:catch error}
   <div class="text-center align-middle">

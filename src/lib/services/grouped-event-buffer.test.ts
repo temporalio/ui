@@ -11,6 +11,7 @@ import {
 } from '$lib/models/event-groups/create-event-group';
 import type { EventGroup } from '$lib/models/event-groups/event-groups';
 import { toEvent, toEventHistory } from '$lib/models/event-history';
+import { createTimelineEventGroup } from '$lib/models/event-history/timeline-event-groups';
 import type {
   HistoryEvent,
   PendingActivity,
@@ -495,6 +496,36 @@ describe('non-terminal workflow: new events beyond initial historyLength', () =>
 // ---------------------------------------------------------------------------
 // 4. Navigation reset
 // ---------------------------------------------------------------------------
+describe('latest received event time', () => {
+  it('keeps the maximum across out-of-order arrivals and clears it for the next run', () => {
+    const latestTime = '2027-11-09T12:08:00.000Z';
+    expect(buffer.getLatestEventTimeMs()).toBeUndefined();
+
+    buffer.ingestHistoryEvent({
+      ...makeWorkflowStarted(2),
+      eventTime: latestTime,
+    });
+    buffer.ingestHistoryEvent({
+      ...makeWorkflowStarted(1),
+      eventTime: '2027-11-09T12:02:00.000Z',
+    });
+    buffer.ingestHistoryEvent({
+      ...makeWorkflowStarted(3),
+      eventTime: '2027-11-09T12:05:00.000Z',
+    });
+    expect(buffer.getLatestEventTimeMs()).toBe(Date.parse(latestTime));
+
+    buffer.reset(0);
+    expect(buffer.getLatestEventTimeMs()).toBeUndefined();
+    const nextRunStartTime = '2026-11-09T12:00:00.000Z';
+    buffer.ingestHistoryEvent({
+      ...makeWorkflowStarted(1),
+      eventTime: nextRunStartTime,
+    });
+    expect(buffer.getLatestEventTimeMs()).toBe(Date.parse(nextRunStartTime));
+  });
+});
+
 describe('navigation reset', () => {
   it('reset() zeroes pool entries and reuses them for the next workflow', async () => {
     const events1 = makeSyntheticEvents(30);
@@ -2092,5 +2123,250 @@ describe('event group index', () => {
 
     expect(buffer.getEventGroupOptions()).toEqual([]);
     expect(buffer.getEventGroupMatcher(['label:a'])).toBeUndefined();
+  });
+
+  describe('getTimelineEventGroups', () => {
+    it('renames a row when its signal event is ingested after the row was built', () => {
+      const [timerStarted, timerFired] = makeTimerGroup(4);
+      const signalMarker = { inboundEvent: { inboundEventId: 3 } };
+      buffer.ingestHistoryEvent({
+        ...timerStarted,
+        eventGroupMarkers: [signalMarker],
+      } as unknown as HistoryEvent);
+      buffer.ingestHistoryEvent(timerFired);
+      expect(buffer.getTimelineEventGroups()[0].displayName).toBe('3');
+
+      buffer.ingestHistoryEvent({
+        eventId: '3',
+        eventTime: timerStarted.eventTime,
+        eventType: 'WorkflowExecutionSignaled',
+        workflowExecutionSignaledEventAttributes: { signalName: 'launchHold' },
+      } as unknown as HistoryEvent);
+      expect(buffer.getTimelineEventGroups()[0].displayName).toBe(
+        'launchHold (3)',
+      );
+    });
+
+    it('builds one row per event group spanning its lifecycle groups', () => {
+      const [scheduled, started, completed] = makeActivityGroup(1);
+      const [timerStarted, timerFired] = makeTimerGroup(4);
+      const [otherStarted, otherFired] = makeTimerGroup(6);
+      buffer.ingestHistoryEvent(withMarkers(scheduled, [marker('a')]));
+      buffer.ingestHistoryEvent(started);
+      buffer.ingestHistoryEvent(completed);
+      buffer.ingestHistoryEvent(withMarkers(timerStarted, [marker('a')]));
+      buffer.ingestHistoryEvent(timerFired);
+      buffer.ingestHistoryEvent(withMarkers(otherStarted, [marker('b')]));
+      buffer.ingestHistoryEvent(otherFired);
+
+      expect(
+        buffer.getTimelineEventGroups().map((group) => ({
+          id: group.id,
+          key: group.key,
+          eventCount: group.eventCount,
+          lifecycleGroupIds: group.lifecycleGroups.map(({ id }) => id),
+          initialEventId: group.initialEvent.id,
+          lastEventId: group.lastEvent.id,
+          isPending: group.isPending,
+        })),
+      ).toEqual([
+        {
+          id: 'event-group:label:a',
+          key: 'label:a',
+          eventCount: 5,
+          lifecycleGroupIds: ['1', '4'],
+          initialEventId: '1',
+          lastEventId: '5',
+          isPending: false,
+        },
+        {
+          id: 'event-group:label:b',
+          key: 'label:b',
+          eventCount: 2,
+          lifecycleGroupIds: ['6'],
+          initialEventId: '6',
+          lastEventId: '7',
+          isPending: false,
+        },
+      ]);
+    });
+
+    it('orders rows by their first lifecycle event, not their first marked event', () => {
+      const [wftScheduled, wftStarted, wftCompleted] = makeWorkflowTaskGroup(1);
+      const [bStarted, bFired] = makeTimerGroup(4);
+      const [aStarted, aFired] = makeTimerGroup(6);
+      buffer.ingestHistoryEvent(wftScheduled);
+      buffer.ingestHistoryEvent(wftStarted);
+      buffer.ingestHistoryEvent(withMarkers(wftCompleted, [marker('a')]));
+      buffer.ingestHistoryEvent(withMarkers(bStarted, [marker('b')]));
+      buffer.ingestHistoryEvent(bFired);
+      buffer.ingestHistoryEvent(withMarkers(aStarted, [marker('a')]));
+      buffer.ingestHistoryEvent(aFired);
+
+      expect(
+        buffer.getEventGroupOptions().map(({ group }) => group.key),
+      ).toEqual(['label:a', 'label:b']);
+      expect(buffer.getTimelineEventGroups().map(({ key }) => key)).toEqual([
+        'label:b',
+        'label:a',
+      ]);
+    });
+
+    it('counts only events in the lifecycle groups it shows', () => {
+      const [wftScheduled, wftStarted, wftCompleted] = makeWorkflowTaskGroup(1);
+      const [timerStarted, timerFired] = makeTimerGroup(4);
+      buffer.ingestHistoryEvent(withMarkers(wftScheduled, [marker('a')]));
+      buffer.ingestHistoryEvent(withMarkers(wftStarted, [marker('a')]));
+      buffer.ingestHistoryEvent(withMarkers(wftCompleted, [marker('a')]));
+      buffer.ingestHistoryEvent(withMarkers(timerStarted, [marker('a')]));
+      buffer.ingestHistoryEvent(timerFired);
+
+      expect(buffer.getEventGroupOptions()[0].eventCount).toBe(4);
+      expect(buffer.getTimelineEventGroups()[0].eventCount).toBe(2);
+    });
+
+    it('follows pending metadata from the workflow run', () => {
+      const [scheduled, started, completed] = makeActivityGroup(1);
+      buffer.ingestHistoryEvent(withMarkers(scheduled, [marker('a')]));
+      buffer.ingestHistoryEvent(started);
+      expect(buffer.getTimelineEventGroups()[0].isPending).toBe(false);
+
+      buffer.setPendingMetadata(
+        [
+          { activityId: '1', state: 'Started', activityType: 'TestActivity' },
+        ] as Parameters<typeof buffer.setPendingMetadata>[0],
+        [],
+      );
+      expect(buffer.getTimelineEventGroups()[0].isPending).toBe(true);
+
+      buffer.ingestHistoryEvent(completed);
+      expect(buffer.getTimelineEventGroups()[0].isPending).toBe(false);
+    });
+
+    it('matches a from-scratch rebuild whatever order events arrive in', () => {
+      const history: HistoryEvent[] = [];
+      let id = 1;
+      for (let index = 0; index < 30; index++) {
+        const keys = [marker(`k${index % 3}`)];
+        if (index % 7 === 0) keys.push(marker('shared'));
+        if (index % 4 === 0) {
+          const [timerStarted, timerFired] = makeTimerGroup(id);
+          history.push(withMarkers(timerStarted, keys));
+          if (index % 8 !== 0) history.push(timerFired);
+          id += 2;
+        } else {
+          const [scheduled, started, completed] = makeActivityGroup(id);
+          history.push(withMarkers(scheduled, keys), started, completed);
+          id += 3;
+        }
+      }
+
+      let seed = 7;
+      const random = () => {
+        seed = (seed * 16807) % 2147483647;
+        return seed / 2147483647;
+      };
+      const shuffled = [...history].sort(() => random() - 0.5);
+
+      const expectMatchesRebuild = () => {
+        const lazyGroups = buffer.getLazyGroups({ excludeWorkflowTasks: true });
+        for (const group of buffer.getTimelineEventGroups()) {
+          const matcher = buffer.getEventGroupMatcher([group.key])!;
+          const expected = createTimelineEventGroup({
+            label: group.eventGroupLabel,
+            lifecycleGroups: lazyGroups.filter(({ id }) =>
+              matcher.hasGroup(id),
+            ),
+          })!;
+          expect({
+            key: group.key,
+            lifecycleGroupIds: group.lifecycleGroups.map(({ id }) => id),
+            initialEventId: group.initialEvent.id,
+            lastEventId: group.lastEvent.id,
+            eventCount: group.eventCount,
+            isPending: group.isPending,
+            version: group.version,
+          }).toEqual({
+            key: expected.key,
+            lifecycleGroupIds: expected.lifecycleGroups.map(({ id }) => id),
+            initialEventId: expected.initialEvent.id,
+            lastEventId: expected.lastEvent.id,
+            eventCount: expected.eventCount,
+            isPending: expected.isPending,
+            version: expected.version,
+          });
+        }
+      };
+
+      shuffled.forEach((event, index) => {
+        buffer.ingestHistoryEvent(event);
+        if (index % 10 === 0) expectMatchesRebuild();
+      });
+      expectMatchesRebuild();
+      expect(
+        buffer.getTimelineEventGroups().map(({ key }) => key),
+      ).toHaveLength(4);
+    });
+
+    it('is pending while any lifecycle group is pending', () => {
+      const [timerStarted, timerFired] = makeTimerGroup(1);
+      buffer.ingestHistoryEvent(withMarkers(timerStarted, [marker('a')]));
+
+      expect(buffer.getTimelineEventGroups()[0].isPending).toBe(true);
+
+      buffer.ingestHistoryEvent(timerFired);
+
+      expect(buffer.getTimelineEventGroups()[0].isPending).toBe(false);
+    });
+
+    it('keeps an unchanged event group as the same reference', () => {
+      const [timerStarted, timerFired] = makeTimerGroup(1);
+      const [otherStarted, otherFired] = makeTimerGroup(3);
+      buffer.ingestHistoryEvent(withMarkers(timerStarted, [marker('a')]));
+      buffer.ingestHistoryEvent(timerFired);
+      buffer.ingestHistoryEvent(withMarkers(otherStarted, [marker('b')]));
+
+      const [a, b] = buffer.getTimelineEventGroups();
+      buffer.ingestHistoryEvent(otherFired);
+      const [nextA, nextB] = buffer.getTimelineEventGroups();
+
+      expect(nextA).toBe(a);
+      expect(nextB).not.toBe(b);
+      expect(nextB.version).toBeGreaterThan(b.version);
+      expect(nextB.lastEvent.id).toBe('4');
+    });
+
+    it('skips event groups whose events are only in WorkflowTask groups', () => {
+      const [wftScheduled, wftStarted, wftCompleted] = makeWorkflowTaskGroup(1);
+      buffer.ingestHistoryEvent(wftScheduled);
+      buffer.ingestHistoryEvent(wftStarted);
+      buffer.ingestHistoryEvent(withMarkers(wftCompleted, [marker('a')]));
+
+      expect(buffer.getEventGroupOptions()).toHaveLength(1);
+      expect(buffer.getTimelineEventGroups()).toEqual([]);
+      expect(buffer.hasTimelineEventGroups()).toBe(false);
+    });
+
+    it('clears on reset', () => {
+      const [timerStarted] = makeTimerGroup(1);
+      buffer.ingestHistoryEvent(withMarkers(timerStarted, [marker('a')]));
+      expect(buffer.getTimelineEventGroups()).toHaveLength(1);
+      expect(buffer.hasTimelineEventGroups()).toBe(true);
+
+      buffer.reset(0);
+
+      expect(buffer.getTimelineEventGroups()).toEqual([]);
+      expect(buffer.hasTimelineEventGroups()).toBe(false);
+    });
+
+    it('reports timeline event groups once a marked lifecycle head arrives', () => {
+      const [timerStarted, timerFired] = makeTimerGroup(1);
+      buffer.ingestHistoryEvent(withMarkers(timerFired, [marker('a')]));
+      expect(buffer.hasTimelineEventGroups()).toBe(false);
+
+      buffer.ingestHistoryEvent(timerStarted);
+      expect(buffer.hasTimelineEventGroups()).toBe(true);
+      expect(buffer.getTimelineEventGroups()).toHaveLength(1);
+    });
   });
 });

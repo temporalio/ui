@@ -8,6 +8,7 @@
   import type { ExecutionHistory } from '$lib/services/grouped-event-buffer.svelte';
   import { fetchWorkflow } from '$lib/services/workflow-service';
   import type { WorkflowExecution } from '$lib/types/workflows';
+  import { getValidTimeMs } from '$lib/utilities/format-time';
 
   import TimelineGraph from './timeline-graph.svelte';
 
@@ -36,6 +37,7 @@
     groups: EventGroups;
     history: ExecutionHistory;
     namespace: string;
+    latestEventTimeMs: number | undefined;
   }>();
 
   const getWorkflowAndEventHistory = async () => {
@@ -49,6 +51,12 @@
     if (!workflow) return;
 
     const pendingActivities = workflow?.pendingActivities ?? [];
+    const firstEventTimeMs = getValidTimeMs(history.at(0)?.eventTime);
+    const lastEventTimeMs = getValidTimeMs(history.at(-1)?.eventTime);
+    const latestEventTimeMs =
+      firstEventTimeMs === undefined
+        ? lastEventTimeMs
+        : Math.max(firstEventTimeMs, lastEventTimeMs ?? firstEventTimeMs);
     return {
       namespace: executionNamespace,
       workflow,
@@ -57,6 +65,7 @@
         events: history,
         materializeGroup,
       },
+      latestEventTimeMs,
     };
   };
 
@@ -92,6 +101,7 @@
         workflow={snapshot.workflow}
         history={snapshot.history}
         lazyGroups={snapshot.groups}
+        latestEventTimeMs={snapshot.latestEventTimeMs}
         readOnly
       />
     {/key}

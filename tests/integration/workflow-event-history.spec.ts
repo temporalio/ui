@@ -18,13 +18,13 @@ const workflowUrl = `/namespaces/default/workflows/${mockWorkflow.workflowExecut
 
 test.describe('Workflow History', () => {
   test.beforeEach(async ({ page }) => {
+    await mockWorkflowApis(page);
     await page.goto(workflowUrl);
   });
 
   test('Workflow Execution shows WorkflowId and all sections and event history', async ({
     page,
   }) => {
-    await mockWorkflowApis(page);
     await expect(page.getByTestId('workflow-id-heading')).toHaveText(
       '09db15_Running Click to copy content',
     );
@@ -55,7 +55,6 @@ test.describe('Workflow History', () => {
   });
 
   test('Workflow Execution links to specific event', async ({ page }) => {
-    await mockWorkflowApis(page);
     await expect(page.getByTestId('workflow-id-heading')).toHaveText(
       '09db15_Running Click to copy content',
     );
@@ -179,11 +178,68 @@ test.describe('Workflow History view with pending activities and filters', () =>
   test('hides pending activities when activities are filtered out', async ({
     page,
   }) => {
-    await page.locator('button[aria-controls="status-menu"]').click();
-    await page.locator('#event-type-menu').getByTestId('Activity').click();
+    await page.locator('button[aria-controls="event-type-filter"]').click();
+    await page.locator('#event-type-filter').getByTestId('Activity').click();
 
     await expect(page.getByTestId('pending-activity-summary-row')).toHaveCount(
       0,
     );
+  });
+
+  test('shows the filter as active when filtering to pending and failed', async ({
+    page,
+  }) => {
+    const filterButton = page.locator(
+      'button[aria-controls="event-type-filter"]',
+    );
+    const activeIndicator = filterButton.locator('.bg-interactive-primary');
+    await expect(activeIndicator).toHaveCount(0);
+
+    await filterButton.click();
+    await page
+      .locator('#event-type-filter')
+      .getByTestId('Pending and Failed')
+      .click();
+
+    await expect(activeIndicator).toHaveCount(1);
+    await expect(page).toHaveURL(/[?&]status=pending/);
+
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#event-type-filter')).toBeHidden();
+
+    await page.getByTestId('json').click();
+    await expect(activeIndicator).toHaveCount(0);
+    await page.getByTestId('feed').click();
+    await expect(activeIndicator).toHaveCount(1);
+
+    await filterButton.click();
+
+    await page
+      .locator('#event-type-filter')
+      .getByTestId('Pending and Failed')
+      .click();
+
+    await expect(activeIndicator).toHaveCount(0);
+    await expect(page).not.toHaveURL(/[?&]status=/);
+  });
+
+  test('restores the pending and failed filter from the URL', async ({
+    page,
+  }) => {
+    const filterButton = page.locator(
+      'button[aria-controls="event-type-filter"]',
+    );
+    await page.goto(`${workflowUrl}?status=pending`);
+
+    await expect(filterButton.locator('.bg-interactive-primary')).toHaveCount(
+      1,
+    );
+    await filterButton.click();
+    await expect(
+      page
+        .locator('#event-type-filter')
+        .getByTestId('Pending and Failed')
+        .getByRole('checkbox'),
+    ).toBeChecked();
   });
 });

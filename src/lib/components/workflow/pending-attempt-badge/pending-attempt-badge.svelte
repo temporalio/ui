@@ -10,6 +10,7 @@
     maximumAttempts?: number | null;
     paused?: boolean;
     nextRetryTime?: Timestamp | null;
+    now?: number;
     class?: string;
   }
 
@@ -18,6 +19,7 @@
     maximumAttempts,
     paused = false,
     nextRetryTime,
+    now,
     class: className,
   }: Props = $props();
 
@@ -26,6 +28,7 @@
     retrying && nextRetryTime
       ? toTimeDifference({
           date: nextRetryTime,
+          now,
           negativeDefault: '',
         })
       : '',

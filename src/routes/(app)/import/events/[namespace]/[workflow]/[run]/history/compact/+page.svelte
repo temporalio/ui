@@ -34,4 +34,5 @@
   items={filteredEventGroups}
   groups={filteredEventGroups}
   {workflowExecutionIdentity}
+  workflow={null}
 />

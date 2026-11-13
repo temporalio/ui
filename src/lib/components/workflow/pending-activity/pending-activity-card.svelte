@@ -10,6 +10,7 @@
   import { translate } from '$lib/i18n/translate';
   import { BadgeCount } from '$lib/io/badge-count';
   import type { PendingActivity, WorkflowEvent } from '$lib/types/events';
+  import type { WorkflowExecution } from '$lib/types/workflows';
   import { getUpdatedActivityOptions } from '$lib/utilities/activity-options-diff';
   import {
     formatAttemptsLeft,
@@ -18,16 +19,19 @@
   } from '$lib/utilities/format-event-attributes';
   import { formatDuration, getDuration } from '$lib/utilities/format-time';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
+  import { getWorkflowCurrentTime } from '$lib/utilities/workflow-time-skipping';
 
   let {
     activity,
     totalPending,
     scheduledEvent,
+    workflow,
     actions,
   }: {
     activity: PendingActivity;
     totalPending?: number;
     scheduledEvent?: WorkflowEvent;
+    workflow: WorkflowExecution;
     actions?: Snippet<[PendingActivity]>;
   } = $props();
   const failed = $derived(
@@ -73,6 +77,7 @@
       {#if activity.scheduledTime}
         {@const timeDifference = toTimeDifference({
           date: activity.scheduledTime,
+          now: getWorkflowCurrentTime(workflow),
           negativeDefault: '',
         })}
         {#if timeDifference}
@@ -92,7 +97,7 @@
             activity.maximumAttempts ?? 0,
             formatDuration(
               getDuration({
-                start: Date.now(),
+                start: getWorkflowCurrentTime(workflow),
                 end: activity.expirationTime,
               }) ?? '',
             ),

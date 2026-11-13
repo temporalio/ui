@@ -6,7 +6,7 @@
 
   import ActivityCommands from '$lib/components/activity/activity-commands.svelte';
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
-  import EventGroupFilter from '$lib/components/lines-and-dots/event-group-filter/event-group-filter.svelte';
+  import EventGroupControls from '$lib/components/lines-and-dots/event-group-filter/event-group-controls.svelte';
   import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
   import WorkflowError from '$lib/components/lines-and-dots/workflow-error.svelte';
   import DownloadEventHistoryModal from '$lib/components/workflow/download-event-history-modal.svelte';
@@ -34,7 +34,11 @@
   import { getWorkflowHistoryController } from '$lib/services/workflow-history-controller.svelte.js';
   import { eventFilterSort, eventViewType } from '$lib/stores/event-view';
   import { pauseLiveUpdates } from '$lib/stores/events';
-  import { eventCategoryFilter, eventTypeFilter } from '$lib/stores/filters';
+  import {
+    eventCategoryFilter,
+    eventStatusFilter,
+    eventTypeFilter,
+  } from '$lib/stores/filters';
   import { triggerRefresh, workflowRun } from '$lib/stores/workflow-run';
   import type {
     EventTypeCategory,
@@ -56,6 +60,7 @@
     const urlParams = parseEventFilterParams(page.url);
     $eventFilterSort = urlParams.sort;
     $pauseLiveUpdates = urlParams.refresh_off;
+    $eventStatusFilter = urlParams.statusFilter;
   });
 
   $effect(() => {
@@ -222,13 +227,15 @@
 </div>
 <div class="relative">
   <div
-    class="sticky top-0 z-[11] flex flex-wrap items-center justify-between gap-2 bg-background-primary text-primary md:top-[var(--top-nav-height)] md:pt-2 xl:gap-8"
+    class="sticky top-0 z-[11] flex flex-wrap items-center justify-between gap-2 bg-background-primary text-primary md:top-[var(--top-nav-height)] md:pt-2 xl:gap-x-8"
   >
-    <div class="items-bottom flex gap-4 pt-2">
-      <h2>
+    <div class="items-bottom flex gap-4 pt-2 max-2xl:contents">
+      <h2 class="order-1 max-2xl:pt-2 2xl:order-none">
         {translate('workflows.history-tab')}
       </h2>
-      <TabButtons class="relative">
+      <TabButtons
+        class="relative order-3 basis-full 2xl:order-none 2xl:basis-auto"
+      >
         <TabButton
           active={$eventViewType === 'feed'}
           data-testid="feed"
@@ -252,8 +259,12 @@
         >
       </TabButtons>
     </div>
-    <div class="flex items-center gap-2 pb-2">
-      <ToggleButtons>
+    <div
+      class="order-2 flex flex-wrap items-center gap-2 pb-2 xl:gap-x-0 2xl:order-none"
+    >
+      <ToggleButtons
+        class="[&>:first-child_.menu-button-anchor>button]:rounded-l max-xl:[&>:last-child_.menu-button-anchor>button]:rounded-r"
+      >
         {#if $eventViewType !== 'json'}
           <ToggleButton
             LeadingIcon={reverseSort ? IconArrowDescending : IconArrowAscending}
@@ -267,14 +278,23 @@
               : translate('common.ascending')}
           </ToggleButton>
         {/if}
-        <EventTypeFilter {compact} />
-        <EventGroupFilter
+        <EventTypeFilter
+          {compact}
+          statusFilterAvailable={$eventViewType !== 'json'}
+        />
+      </ToggleButtons>
+      <ToggleButtons
+        class="empty:hidden max-xl:[&_.menu-button-anchor>button]:rounded max-xl:[&_.menu-button-anchor>button]:border-l"
+      >
+        <EventGroupControls
           options={historyController.history.eventGroupOptions}
         />
+      </ToggleButtons>
+      <ToggleButtons>
         <ToggleButton
           disabled={isNotPending}
           data-testid="pause"
-          class="border-l-0"
+          class="xl:!rounded-l-none xl:border-l-0"
           size="sm"
           variant="tertiary"
           onclick={onAutoRefreshToggle}
@@ -310,6 +330,7 @@
         <EventSummaryTable
           initialEvent={historyController.history.initialEvent}
           workflowExecutionIdentity={historyController.workflowExecutionIdentity}
+          {workflow}
           {updating}
           {...tableProps}
         >

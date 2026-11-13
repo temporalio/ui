@@ -1,5 +1,6 @@
 import type { EventGroup } from '$lib/models/event-groups/event-groups';
 import type { EventGroupKey } from '$lib/models/event-history/event-group-markers';
+import type { TimelineEventGroup } from '$lib/models/event-history/timeline-event-groups';
 import type { WorkflowEvent } from '$lib/types/events';
 import { getSDKandVersion } from '$lib/utilities/get-sdk-version';
 import {
@@ -68,6 +69,11 @@ export class EventBufferView {
     });
   }
 
+  get latestEventTimeMs(): number | undefined {
+    void this._version;
+    return this.buffer.getLatestEventTimeMs();
+  }
+
   /**
    * Materialize a group, re-running whenever the buffer changes. A GroupRecord's
    * identity is stable for the life of the run, so a caller deriving off the
@@ -110,6 +116,18 @@ export class EventBufferView {
     void this._version;
     return this.buffer.getEventGroupOptions();
   });
+
+  readonly hasTimelineEventGroups: boolean = $derived.by(() => {
+    void this._version;
+    return this.buffer.hasTimelineEventGroups();
+  });
+
+  readonly timelineEventGroups: TimelineEventGroup<LazyGroup>[] = $derived.by(
+    () => {
+      void this._version;
+      return this.buffer.getTimelineEventGroups();
+    },
+  );
 
   /**
    * Matcher for the selected event group keys, re-derived as events arrive.

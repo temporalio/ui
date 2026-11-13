@@ -5,7 +5,7 @@
   import { page } from '$app/state';
 
   import ActivityCommands from '$lib/components/activity/activity-commands.svelte';
-  import EventGroupFilter from '$lib/components/lines-and-dots/event-group-filter/event-group-filter.svelte';
+  import EventGroupControls from '$lib/components/lines-and-dots/event-group-filter/event-group-controls.svelte';
   import EventHistoryLegend from '$lib/components/lines-and-dots/event-history-legend.svelte';
   import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
   import TimelineGraph from '$lib/components/lines-and-dots/timeline-graph/timeline-graph.svelte';
@@ -23,8 +23,18 @@
     IconCollapse,
     IconDownload,
   } from '$lib/io/icon';
+  import type { EventGroupKey } from '$lib/models/event-history/event-group-markers';
+  import {
+    createTimelineEventGroupFilter,
+    type TimelineEventGroup,
+  } from '$lib/models/event-history/timeline-event-groups';
+  import type { LazyGroup } from '$lib/services/grouped-event-buffer';
   import { getWorkflowHistoryController } from '$lib/services/workflow-history-controller.svelte.js';
-  import { collapseIdleTime, eventFilterSort } from '$lib/stores/event-view';
+  import {
+    collapseIdleTime,
+    eventFilterSort,
+    showTimelineEventGroups,
+  } from '$lib/stores/event-view';
   import { pauseLiveUpdates } from '$lib/stores/events';
   import { eventStatusFilter, eventTypeFilter } from '$lib/stores/filters';
   import { triggerRefresh, workflowRun } from '$lib/stores/workflow-run';
@@ -36,6 +46,7 @@
     parseEventFilterParams,
     updateEventFilterParams,
   } from '$lib/utilities/event-filter-params';
+  import { isFailedOrPendingGroup } from '$lib/utilities/get-failed-or-pending';
   import { getTimelineGroups } from '$lib/utilities/sort-timeline-groups';
 
   const historyController = getWorkflowHistoryController();
@@ -47,6 +58,7 @@
   $effect(() => {
     $eventFilterSort = urlParams.sort;
     $pauseLiveUpdates = urlParams.refresh_off;
+    $eventStatusFilter = urlParams.statusFilter;
   });
 
   const onAutoRefreshToggle = () => {
@@ -76,14 +88,106 @@
     );
   });
 
-  const lazyGroups = $derived(
-    getTimelineGroups(
-      filteredBufferLazyGroups,
+  const hasTimelineEventGroups = $derived(
+    historyController.history.hasTimelineEventGroups,
+  );
+  const timelineEventGroups = $derived(
+    $showTimelineEventGroups
+      ? historyController.history.timelineEventGroups
+      : [],
+  );
+  const showEventGroups = $derived(timelineEventGroups.length > 0);
+  let selectedEventGroupKey = $state<EventGroupKey>();
+
+  const filterEventGroupsByType = createTimelineEventGroupFilter<LazyGroup>();
+
+  const selectedEventGroupKeysParam = $derived(
+    JSON.stringify(urlParams.eventGroups),
+  );
+  const selectedEventGroupKeys = $derived(
+    new Set<EventGroupKey>(JSON.parse(selectedEventGroupKeysParam)),
+  );
+
+  const filteredEventGroups = $derived.by(() => {
+    const active = $eventTypeFilter;
+    const statusFilter = $eventStatusFilter;
+    const selectedKeys =
+      selectedEventGroupKeys.size &&
+      historyController.history.eventGroupOptions.some(({ group }) =>
+        selectedEventGroupKeys.has(group.key),
+      )
+        ? selectedEventGroupKeys
+        : undefined;
+    return filterEventGroupsByType(
+      selectedKeys
+        ? timelineEventGroups.filter((group) => selectedKeys.has(group.key))
+        : timelineEventGroups,
+      (lifecycleGroup) =>
+        active.includes(lifecycleGroup.category) &&
+        (!statusFilter || isFailedOrPendingGroup(lifecycleGroup)),
+    );
+  });
+
+  const selectedEventGroup = $derived(
+    showEventGroups && selectedEventGroupKey
+      ? filteredEventGroups.find((group) => group.key === selectedEventGroupKey)
+      : undefined,
+  );
+
+  $effect(() => {
+    if (selectedEventGroupKey && !selectedEventGroup) {
+      selectedEventGroupKey = undefined;
+      activeGroupId = undefined;
+    }
+  });
+
+  const lazyGroups: LazyGroup[] = $derived.by(() => {
+    if (!showEventGroups) {
+      return getTimelineGroups(
+        filteredBufferLazyGroups,
+        reverseSort,
+        historyController.fetchComplete,
+        historyController.descMinId,
+      );
+    }
+
+    const eventGroupRows = getTimelineGroups(
+      filteredEventGroups,
       reverseSort,
       historyController.fetchComplete,
       historyController.descMinId,
-    ),
-  );
+    );
+    if (!selectedEventGroup) return eventGroupRows;
+
+    const lifecycleRows = getTimelineGroups(
+      selectedEventGroup.lifecycleGroups,
+      reverseSort,
+      historyController.fetchComplete,
+      historyController.descMinId,
+    );
+
+    return eventGroupRows.flatMap((group): LazyGroup[] => {
+      if (group !== selectedEventGroup) return [group];
+      return reverseSort
+        ? [...lifecycleRows, group]
+        : [group, ...lifecycleRows];
+    });
+  });
+
+  const onEventGroupsToggle = () => {
+    activeGroupId = undefined;
+    selectedEventGroupKey = undefined;
+    $showTimelineEventGroups = !$showTimelineEventGroups;
+  };
+
+  const onSelectEventGroup = (group: TimelineEventGroup) => {
+    selectedEventGroupKey =
+      selectedEventGroupKey === group.key ? undefined : group.key;
+  };
+
+  const onCloseEventGroup = () => {
+    selectedEventGroupKey = undefined;
+  };
 
   const workflowTaskFailedError = $derived.by(() => {
     if (historyController.loading) return undefined;
@@ -169,8 +273,10 @@
       <h2>{translate('workflows.timeline-tab')}</h2>
       <EventHistoryLegend />
     </div>
-    <div class="flex items-center gap-2">
-      <ToggleButtons>
+    <div class="flex flex-wrap items-center gap-2 xl:gap-x-0">
+      <ToggleButtons
+        class="max-xl:[&>:last-child_.menu-button-anchor>button]:rounded-r"
+      >
         <ToggleButton
           LeadingIcon={reverseSort ? IconArrowDescending : IconArrowAscending}
           data-testid="zoom-in"
@@ -195,13 +301,37 @@
             : translate('workflows.hide-idle-time')}
         </ToggleButton>
         <EventTypeFilter compact={false} />
-        <EventGroupFilter
+      </ToggleButtons>
+      <ToggleButtons
+        class={hasTimelineEventGroups
+          ? 'empty:hidden max-xl:[&>:last-child_.menu-button-anchor>button]:rounded-r'
+          : 'empty:hidden max-xl:[&_.menu-button-anchor>button]:rounded max-xl:[&_.menu-button-anchor>button]:border-l'}
+      >
+        <EventGroupControls
           options={historyController.history.eventGroupOptions}
-        />
+        >
+          {#snippet toggle()}
+            {#if hasTimelineEventGroups}
+              <ToggleButton
+                data-testid="toggle-event-groups"
+                size="sm"
+                variant="tertiary"
+                class="max-xl:rounded-l xl:border-l-0 [&:not(:last-child)]:border-r"
+                onclick={onEventGroupsToggle}
+              >
+                {$showTimelineEventGroups
+                  ? translate('workflows.hide-event-groups')
+                  : translate('workflows.show-event-groups')}
+              </ToggleButton>
+            {/if}
+          {/snippet}
+        </EventGroupControls>
+      </ToggleButtons>
+      <ToggleButtons>
         <ToggleButton
           disabled={isNotPending}
           data-testid="pause"
-          class="border-l-0"
+          class="xl:!rounded-l-none xl:border-l-0"
           size="sm"
           variant="tertiary"
           onclick={onAutoRefreshToggle}
@@ -239,12 +369,18 @@
       {workflow}
       history={historyController.history}
       {lazyGroups}
+      latestEventTimeMs={historyController.history.latestEventTimeMs}
+      scaleGroups={filteredBufferLazyGroups}
+      {selectedEventGroup}
+      {onSelectEventGroup}
+      {onCloseEventGroup}
       {reverseSort}
       bind:activeGroupId
       collapseIdleTime={$collapseIdleTime === 'on'}
       failedOrPendingOnly={$eventStatusFilter}
       loading={historyController.loading}
       totalExpectedEvents={estimatedTotalGroups}
+      showLoadingRows={!showEventGroups}
       descMinId={historyController.descMinId}
       error={Boolean(workflowTaskFailedError)}
       onTimelineInit={handleTimelineInit}

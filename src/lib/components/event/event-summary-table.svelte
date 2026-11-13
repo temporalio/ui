@@ -23,7 +23,10 @@
     PendingActivity,
     WorkflowEvent,
   } from '$lib/types/events';
-  import type { WorkflowExecutionIdentity } from '$lib/types/workflows';
+  import type {
+    WorkflowExecution,
+    WorkflowExecutionIdentity,
+  } from '$lib/types/workflows';
   import {
     getFailedOrPendingEvents,
     getFailedOrPendingGroups,
@@ -41,6 +44,7 @@
   /** Discriminated on `compact` so `items` narrows without a cast. */
   type Props = {
     workflowExecutionIdentity: WorkflowExecutionIdentity;
+    workflow: WorkflowExecution | null;
     initialEvent: WorkflowEvent | undefined;
     updating?: boolean;
     loading?: boolean;
@@ -63,6 +67,7 @@
   // `const` with no default on `compact` — `let` or a default breaks narrowing.
   const {
     workflowExecutionIdentity,
+    workflow,
     initialEvent,
     materializeGroup,
     items,
@@ -154,6 +159,7 @@
             {index}
             {activityActions}
             {workflowExecutionIdentity}
+            {workflow}
             group={row}
             {compact}
             initialItem={initialEvent}
@@ -161,6 +167,7 @@
         {:else if isPendingActivity(row)}
           <PendingActivitySummaryRow
             {workflowExecutionIdentity}
+            {workflow}
             event={row}
             {index}
             {activityActions}
@@ -172,6 +179,7 @@
         {:else if isPendingNexusOperation(row)}
           <PendingNexusSummaryRow
             {workflowExecutionIdentity}
+            {workflow}
             event={row}
             {index}
             {activityActions}
@@ -189,6 +197,7 @@
             {index}
             {activityActions}
             {workflowExecutionIdentity}
+            {workflow}
             group={isEvent(row) ? groupIndex.get(row.id) : undefined}
             {compact}
             initialItem={initialEvent}

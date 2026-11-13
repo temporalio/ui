@@ -4,7 +4,10 @@
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { resolveSystemNexusEvent } from '$lib/system-nexus-endpoints';
   import type { PendingActivity, WorkflowEvent } from '$lib/types/events';
-  import type { WorkflowExecutionIdentity } from '$lib/types/workflows';
+  import type {
+    WorkflowExecution,
+    WorkflowExecutionIdentity,
+  } from '$lib/types/workflows';
   import { isActivityTaskScheduledEvent } from '$lib/utilities/is-event-type';
 
   import PendingActivityCard from '../workflow/pending-activity/pending-activity-card.svelte';
@@ -18,6 +21,7 @@
     lazy = false,
     groupRow = false,
     workflowExecutionIdentity,
+    workflow,
     activityActions,
   }: {
     group?: EventGroup;
@@ -26,6 +30,7 @@
     /** The row that opened this represents the whole group, not one event. */
     groupRow?: boolean;
     workflowExecutionIdentity: WorkflowExecutionIdentity;
+    workflow: WorkflowExecution | null;
     activityActions?: Snippet<[PendingActivity]>;
   } = $props();
 
@@ -53,9 +58,10 @@
 
 {#if showEventGroup}
   <div class="flex flex-col overflow-hidden">
-    {#if group?.pendingActivity}
+    {#if group?.pendingActivity && workflow}
       <PendingActivityCard
         activity={group.pendingActivity}
+        {workflow}
         actions={activityActions}
         scheduledEvent={isActivityTaskScheduledEvent(group.initialEvent)
           ? group.initialEvent
