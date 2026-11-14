@@ -18,6 +18,7 @@ import {
   getTimelineEventGroups,
   getWorkflowTaskFailedEvent,
   hasTimelineEventGroups,
+  hasUserDefinedEventGroups,
   type LazyGroup,
   materializeGroup,
   onChange,
@@ -120,6 +121,11 @@ class EventBufferView {
   readonly hasTimelineEventGroups: boolean = $derived.by(() => {
     void this._version;
     return hasTimelineEventGroups();
+  });
+
+  readonly hasUserDefinedEventGroups: boolean = $derived.by(() => {
+    void this._version;
+    return hasUserDefinedEventGroups();
   });
 
   readonly timelineEventGroups: TimelineEventGroup<LazyGroup>[] = $derived.by(

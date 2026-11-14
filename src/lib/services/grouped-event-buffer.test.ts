@@ -23,6 +23,7 @@ import {
   getTimelineEventGroups,
   getWorkflowTaskFailedEvent,
   hasTimelineEventGroups,
+  hasUserDefinedEventGroups,
   ingestHistoryEvent,
   isWorkflowTaskGroup,
   type LazyGroup,
@@ -2010,6 +2011,23 @@ describe('event group index', () => {
 
       expect(getTimelineEventGroups()).toEqual([]);
       expect(hasTimelineEventGroups()).toBe(false);
+    });
+
+    it('reports user-defined event groups only for label markers', () => {
+      const [timerStarted] = makeTimerGroup(1);
+      const [otherTimerStarted] = makeTimerGroup(3);
+      ingestHistoryEvent({
+        ...timerStarted,
+        eventGroupMarkers: [{ inboundEvent: { inboundEventId: 1 } }],
+      } as unknown as HistoryEvent);
+      expect(hasTimelineEventGroups()).toBe(true);
+      expect(hasUserDefinedEventGroups()).toBe(false);
+
+      ingestHistoryEvent(withMarkers(otherTimerStarted, [marker('a')]));
+      expect(hasUserDefinedEventGroups()).toBe(true);
+
+      reset(0);
+      expect(hasUserDefinedEventGroups()).toBe(false);
     });
 
     it('reports timeline event groups once a marked lifecycle head arrives', () => {
