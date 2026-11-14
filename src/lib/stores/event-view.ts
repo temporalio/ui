@@ -20,7 +20,7 @@ export const collapseIdleTime = persistStore<'on' | 'off'>(
   'on',
 );
 
-export const showTimelineEventGroups = writable(true);
+export const showTimelineEventGroups = writable<boolean | undefined>(undefined);
 
 export const eventViewType = persistStore<EventView>('eventView', 'feed', true);
 

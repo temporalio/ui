@@ -92,8 +92,11 @@
   });
 
   const hasTimelineEventGroups = $derived(eventBuffer.hasTimelineEventGroups);
+  const eventGroupsVisible = $derived(
+    $showTimelineEventGroups ?? eventBuffer.hasUserDefinedEventGroups,
+  );
   const timelineEventGroups = $derived(
-    $showTimelineEventGroups ? eventBuffer.timelineEventGroups : [],
+    eventGroupsVisible ? eventBuffer.timelineEventGroups : [],
   );
   const showEventGroups = $derived(timelineEventGroups.length > 0);
   let selectedEventGroupKey = $state<EventGroupKey>();
@@ -176,7 +179,7 @@
   const onEventGroupsToggle = () => {
     clearActives();
     selectedEventGroupKey = undefined;
-    $showTimelineEventGroups = !$showTimelineEventGroups;
+    $showTimelineEventGroups = !eventGroupsVisible;
   };
 
   const onSelectGroup = (group: EventGroup) => {
@@ -319,7 +322,7 @@
                 class="max-xl:rounded-l xl:border-l-0 [&:not(:last-child)]:border-r"
                 onclick={onEventGroupsToggle}
               >
-                {$showTimelineEventGroups
+                {eventGroupsVisible
                   ? translate('workflows.hide-event-groups')
                   : translate('workflows.show-event-groups')}
               </ToggleButton>
