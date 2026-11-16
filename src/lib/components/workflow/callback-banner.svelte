@@ -7,12 +7,15 @@
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import { IconTemporalNexus } from '$lib/io/icon';
+  import { getNexusOperationExecution } from '$lib/services/standalone-nexus-operations';
   import type { EventLink as EventLinkType } from '$lib/types';
   import type { Callback } from '$lib/types/nexus';
   import {
     callbackBannerKind,
     callbackBannerTitle,
     callbackStateCounts,
+    findSourceCallback,
+    workerCallbackSource,
   } from '$lib/utilities/callback-banner';
   import { toEventLinkViews } from '$lib/utilities/event-link';
   import { callbackDeliveryState } from '$lib/utilities/nexus-operation-callbacks';
@@ -40,17 +43,66 @@
   const kind = $derived(
     callbackBannerKind(callbacks.length, workerCallbackLinks.length),
   );
-  const callback = $derived(callbacks[0]);
-  const state = $derived(callback ? String(callback.state ?? '') : undefined);
-  const deliveryState = $derived(callbackDeliveryState(state));
-  const failed = $derived(state === 'Failed');
+  const ownCallback = $derived(callbacks[0]);
+  const source = $derived(
+    kind === 'single' && !ownCallback
+      ? workerCallbackSource(workerCallbackLinks[0])
+      : undefined,
+  );
+  const sourceNamespace = $derived(source?.namespace);
+  const sourceOperationId = $derived(source?.operationId);
+  const sourceRunId = $derived(source?.runId);
+  const sourceRequestId = $derived(source?.requestId);
+
+  let sourceCallback = $state<Callback | undefined>();
+
+  $effect(() => {
+    sourceCallback = undefined;
+    if (
+      !sourceNamespace ||
+      !sourceOperationId ||
+      !sourceRunId ||
+      !sourceRequestId
+    ) {
+      return;
+    }
+
+    const requestId = sourceRequestId;
+    let current = true;
+    getNexusOperationExecution(
+      sourceNamespace,
+      sourceOperationId,
+      sourceRunId,
+      false,
+    )
+      .then(({ completionCallbacks }) => {
+        if (current) {
+          sourceCallback = findSourceCallback(
+            completionCallbacks ?? [],
+            requestId,
+          );
+        }
+      })
+      .catch(() => {});
+
+    return () => {
+      current = false;
+    };
+  });
+
+  const callback = $derived(ownCallback ?? sourceCallback);
+  const callbackState = $derived(
+    callback ? String(callback.state ?? '') : undefined,
+  );
+  const deliveryState = $derived(callbackDeliveryState(callbackState));
+  const failed = $derived(callbackState === 'Failed');
   const failure = $derived(callback?.lastAttemptFailure?.message);
   const blockedReason = $derived(callback?.blockedReason);
   const completedTime = $derived($timestamp(callback?.lastAttemptCompleteTime));
 
   const singleLinks = $derived.by(() => {
-    if (!callback) return workerCallbackLinks.slice(0, 1);
-    const ownLinks = callback.callback?.links ?? [];
+    if (!ownCallback) return workerCallbackLinks.slice(0, 1);
+    const ownLinks = ownCallback.callback?.links ?? [];
     if (ownLinks.length) return ownLinks;
     return fallbackLink ? [fallbackLink] : [];
   });
@@ -81,7 +133,7 @@
   <Alert
     Icon={IconTemporalNexus}
     intent={failed ? 'error' : 'info'}
-    title={callbackBannerTitle(state)}
+    title={callbackBannerTitle(callbackState)}
     data-testid="callback-banner"
   >
     <div class="flex flex-col gap-2 pt-2">
