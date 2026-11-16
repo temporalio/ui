@@ -15,7 +15,9 @@ body.sb-show-main,
 .io-docs-playground {
   --io-docs-controls-header-height: 36px;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(260px, 320px);
+  /* The canvas is 80% of the width it would have next to a 320px controls
+     column; the controls take the rest. */
+  grid-template-columns: calc((100% - 344px) * 0.8) minmax(260px, 1fr);
   align-items: start;
   gap: 24px;
 }
@@ -29,6 +31,37 @@ body.sb-show-main,
 
 .sbdocs-toc--custom .toc-list-item.is-active-li::before {
   border-left-color: var(--color-content-secondary);
+}
+
+/* Soften Storybook's docs table striping to 10% of its default fill. */
+[data-theme='light']
+  .sbdocs.sbdocs-content
+  table:not(.sb-anchor, .sb-unstyled, .sb-unstyled table)
+  tr:nth-of-type(2n) {
+  background-color: rgb(246 249 252 / 10%);
+}
+
+[data-theme='dark']
+  .sbdocs.sbdocs-content
+  table:not(.sb-anchor, .sb-unstyled, .sb-unstyled table)
+  tr:nth-of-type(2n) {
+  background-color: rgb(69 76 84 / 10%);
+}
+
+/* Keep docs prose near 66 characters per line, never over 75. */
+.sbdocs.sbdocs-content :is(p, li, blockquote):not(table *, .docs-story *) {
+  max-width: 52ch;
+}
+
+/* Two-column docs tables, such as Do / Don't, split evenly and keep each
+   cell to the same 52ch text width (plus 13px padding and a border). */
+.sbdocs.sbdocs-content
+  table:not(.sb-anchor, .sb-unstyled, .sb-unstyled table):has(
+    tr > :nth-child(2):last-child
+  ) {
+  width: 100%;
+  max-width: calc(2 * (52ch + 27px));
+  table-layout: fixed;
 }
 
 .io-docs-canvas,
@@ -45,10 +78,12 @@ body.sb-show-main,
   background-color: var(--color-surface-primary);
 }
 
+/* Center vertically here and horizontally on the story root, so stories that
+   fill the width (such as grids) are not shrunk to their content. */
 :is(.io-docs-canvas, .io-docs-examples) .docs-story > div:first-child {
   display: flex;
   min-height: 86px;
-  align-items: center;
+  flex-direction: column;
   justify-content: center;
 }
 
@@ -57,8 +92,33 @@ body.sb-show-main,
   justify-content: center;
 }
 
-.io-docs-examples .sbdocs-preview-actions {
-  margin-bottom: 16px;
+/* Show code buttons on the heading row for the Playground and each example.
+   The extra class outranks Storybook's margin reset on docs divs. */
+.sbdocs :is(.io-docs-playground-section, .io-docs-example) {
+  position: relative;
+  margin-bottom: 40px;
+}
+
+:is(.io-docs-playground-section, .io-docs-example) .sbdocs-preview {
+  margin-bottom: 0;
+}
+
+:is(.io-docs-playground-section, .io-docs-example) .sbdocs-preview-actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: auto;
+  margin: 0;
+}
+
+/* Center the 40px buttons bar on the 30px example heading, and keep long
+   titles clear of it. */
+.io-docs-example .sbdocs-preview-actions {
+  top: -5px;
+}
+
+.io-docs-example > h3 {
+  padding-right: 220px;
 }
 
 .io-docs-api-reference {
@@ -117,8 +177,10 @@ body.sb-show-main,
 }
 
 @media (max-width: 1100px) {
+  /* Attach the controls to the bottom of the canvas when stacked. */
   .io-docs-playground {
     grid-template-columns: minmax(0, 1fr);
+    row-gap: 0;
   }
 
   .io-docs-playground .io-docs-canvas {
