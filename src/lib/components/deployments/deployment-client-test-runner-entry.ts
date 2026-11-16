@@ -4,6 +4,8 @@ import { flushSync, mount, unmount } from 'svelte';
 
 import { page } from '$app/state';
 
+import ComputeProviderPerRegion from '$lib/components/workers/serverless-worker-form/compute-provider-per-region.svelte';
+import type { ComputeRegion } from '$lib/components/workers/serverless-worker-form/multi-region';
 import { i18nNamespaces } from '$lib/i18n';
 import resources from '$lib/i18n/locales';
 import Deployment from '$lib/pages/deployment.svelte';
@@ -131,6 +133,29 @@ export function renderRows({
       }),
     );
   }
+  flushSync();
+  return target;
+}
+
+export function renderComputePerRegion({
+  regions,
+  enabledRegionIds,
+}: {
+  regions: ComputeRegion[];
+  enabledRegionIds?: string[];
+}) {
+  setPageState();
+  const target = document.body.appendChild(document.createElement('div'));
+  mounted.push(
+    mount(ComputeProviderPerRegion, {
+      target,
+      props: {
+        namespace: 'default',
+        regions,
+        ...(enabledRegionIds === undefined ? {} : { enabledRegionIds }),
+      },
+    }),
+  );
   flushSync();
   return target;
 }

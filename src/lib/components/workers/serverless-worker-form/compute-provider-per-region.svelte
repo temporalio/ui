@@ -57,9 +57,10 @@
     /** A server error that names one region, keyed by region id. */
     regionServerErrors?: Record<string, string>;
     /**
-     * A replica region that starts with high availability on, for example
-     * because the Version being edited already has a group there. Without
-     * one, high availability starts off.
+     * Replica regions that start with Serverless Workers on, for example
+     * because the Version being edited already has a group there. An empty
+     * list starts the replica off. Left out, as on a new Version, the replica
+     * starts on, because a failover to a region without compute is an outage.
      */
     enabledRegionIds?: readonly string[];
     /** The primary's saved values, when editing. */
@@ -86,7 +87,7 @@
     regionValues = $bindable([]),
     regionErrors = {},
     regionServerErrors = {},
-    enabledRegionIds = [],
+    enabledRegionIds,
     initialPrimary,
     initialReplica,
     primaryGroup,
@@ -172,7 +173,9 @@
     }),
   );
 
-  let highAvailability = $state(untrack(() => enabledRegionIds.length > 0));
+  let highAvailability = $state(
+    untrack(() => (enabledRegionIds ? enabledRegionIds.length > 0 : true)),
+  );
   let runsInPrimary = $state(untrack(() => initialRunsInPrimary));
 
   /**

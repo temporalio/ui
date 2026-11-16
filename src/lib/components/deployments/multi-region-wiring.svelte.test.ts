@@ -179,4 +179,47 @@ describe('multi-region wiring', () => {
       expect(rows.innerHTML).not.toContain('data-region-match');
     });
   });
+
+  describe('the per-region compute form', () => {
+    const FORM_REGIONS = [
+      {
+        id: EAST,
+        role: 'primary' as const,
+        providerRegion: 'us-east-1',
+        provider: 'lambda' as const,
+      },
+      {
+        id: WEST,
+        role: 'replica' as const,
+        providerRegion: 'us-west-2',
+        provider: 'lambda' as const,
+      },
+    ];
+    const replicaToggle = (form: HTMLElement) =>
+      form.querySelector<HTMLInputElement>('#replica-compute');
+
+    test('starts with Serverless on in the replica for a new Version', () => {
+      const form = client.renderComputePerRegion({ regions: FORM_REGIONS });
+
+      expect(replicaToggle(form)?.checked).toBe(true);
+    });
+
+    test('starts the replica off when the saved Version has no group there', () => {
+      const form = client.renderComputePerRegion({
+        regions: FORM_REGIONS,
+        enabledRegionIds: [],
+      });
+
+      expect(replicaToggle(form)?.checked).toBe(false);
+    });
+
+    test('starts the replica on when the saved Version has a group there', () => {
+      const form = client.renderComputePerRegion({
+        regions: FORM_REGIONS,
+        enabledRegionIds: [WEST],
+      });
+
+      expect(replicaToggle(form)?.checked).toBe(true);
+    });
+  });
 });
