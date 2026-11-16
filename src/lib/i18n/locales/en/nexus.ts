@@ -128,6 +128,7 @@ export const Strings = {
   'nexus-service': 'Nexus Service',
   'nexus-operation': 'Nexus Operation',
   'target-execution': 'Target Execution',
+  'target-execution-type': 'Target Execution Type',
   'initiated-event-id': 'Initiated Event ID',
   'caller-execution': 'Caller Execution',
   'caller-event': 'Caller Event',

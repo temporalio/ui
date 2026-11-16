@@ -7,6 +7,7 @@
   import {
     appliedCallbackFilterCount,
     callbackFilterUpdate,
+    EMPTY_CALLBACK_FILTERS,
     filterCallbacks,
     parseCallbackFilters,
   } from '$lib/utilities/nexus-operation-callback-filters';
@@ -23,7 +24,7 @@
 
   const clearFilters = () => {
     updateMultipleQueryParameters({
-      ...callbackFilterUpdate({ endpoint: [], service: [], operation: [] }),
+      ...callbackFilterUpdate(EMPTY_CALLBACK_FILTERS),
       url: page.url,
     });
   };
@@ -35,7 +36,7 @@
     <p class="text-sm text-secondary">{translate('nexus.callbacks-intro')}</p>
   </header>
   <div class="flex flex-col">
-    <NexusOperationCallbacksFilter {callbacks} />
+    <NexusOperationCallbacksFilter />
     <NexusOperationCallbacksTable
       class="rounded-t-none"
       callbacks={filteredCallbacks}

@@ -106,17 +106,36 @@ describe('StandaloneNexusOperationCallbacks filter', () => {
     taskQueueName: string,
     service: string,
     operation: string,
+    state = 'Standby',
+    links: unknown[] = [],
   ): Callback =>
     ({
-      state: 'Standby',
+      state,
       requestId: `request-${index}`,
-      callback: { nexusHandler: { taskQueueName, service, operation } },
+      callback: { nexusHandler: { taskQueueName, service, operation }, links },
     }) as unknown as Callback;
 
   const callbacks = [
     handlerCallback(0, 'orders-tq', 'order-service', 'start-workflow'),
-    handlerCallback(1, 'orders-tq', 'order-service', 'update-workflow'),
-    handlerCallback(2, 'billing-tq', 'billing-service', 'start-workflow'),
+    handlerCallback(
+      1,
+      'orders-tq',
+      'order-service',
+      'update-workflow',
+      'Failed',
+    ),
+    handlerCallback(
+      2,
+      'billing-tq',
+      'billing-service',
+      'start-workflow',
+      'Succeeded',
+      [
+        {
+          workflowEvent: { namespace: 'default', workflowId: 'wf', runId: 'r' },
+        },
+      ],
+    ),
   ];
 
   const rows = (target: HTMLElement) =>
@@ -141,23 +160,53 @@ describe('StandaloneNexusOperationCallbacks filter', () => {
   const chipMenu = (field: string) =>
     document.querySelector(`#callbacks-filter-chip-${field}`);
 
-  const pickValue = (field: string, value: string) => {
-    menuItems(chipMenu(field))
-      .find((item) => item.textContent?.includes(value))
-      ?.click();
-    flushSync();
-  };
-
-  const applyButton = (field: string) =>
-    chipMenu(field)?.querySelector<HTMLButtonElement>(
-      '[data-testid="callbacks-filter-apply"]',
-    );
-
   const addFilter = (label: string) => {
     addFilterButton()?.click();
     flushSync();
     menuItems(document.querySelector('#callbacks-add-filter-menu'))
       .find((item) => item.textContent?.trim() === label)
+      ?.click();
+    flushSync();
+  };
+
+  const operatorButtons = (field: string) =>
+    Array.from(
+      chipMenu(field)?.querySelectorAll<HTMLButtonElement>(
+        '[data-testid="callbacks-filter-operator"]',
+      ) ?? [],
+    );
+
+  const pickOperator = (field: string, label: string) => {
+    operatorButtons(field)
+      .find((button) => text(button) === label)
+      ?.click();
+    flushSync();
+  };
+
+  const valueInput = (field: string) =>
+    document.querySelector<HTMLInputElement>(
+      `#callbacks-filter-chip-${field}-value`,
+    );
+
+  const typeValue = (field: string, value: string) => {
+    const input = valueInput(field);
+    if (input) {
+      input.value = value;
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+    flushSync();
+  };
+
+  const clickInChip = (field: string, testId: string) => {
+    chipMenu(field)
+      ?.querySelector<HTMLButtonElement>(`[data-testid="${testId}"]`)
+      ?.click();
+    flushSync();
+  };
+
+  const pickChoice = (field: string, label: string) => {
+    menuItems(chipMenu(field))
+      .find((item) => text(item)?.endsWith(label))
       ?.click();
     flushSync();
   };
@@ -188,7 +237,7 @@ describe('StandaloneNexusOperationCallbacks filter', () => {
     expect(rows(target)).toHaveLength(3);
   });
 
-  it('lists the three filter fields in the Add Filter menu', () => {
+  it('lists the five filter fields in the Add Filter menu', () => {
     renderCallbacks(callbacks);
     addFilterButton()?.click();
     flushSync();
@@ -197,10 +246,16 @@ describe('StandaloneNexusOperationCallbacks filter', () => {
       menuItems(document.querySelector('#callbacks-add-filter-menu')).map(
         (item) => item.textContent?.trim(),
       ),
-    ).toEqual(['Task Queue', 'Nexus Service', 'Nexus Operation']);
+    ).toEqual([
+      'Delivery State',
+      'Task Queue',
+      'Nexus Service',
+      'Nexus Operation',
+      'Target Execution Type',
+    ]);
   });
 
-  it('opens a dropdown of the field’s values, with counts, when a field is picked', () => {
+  it('opens a typed keyword editor with operators when a keyword field is picked', () => {
     renderCallbacks(callbacks);
 
     addFilter('Nexus Service');
@@ -208,98 +263,118 @@ describe('StandaloneNexusOperationCallbacks filter', () => {
     const menu = chipMenu('service');
     expect(chipButton('service')?.getAttribute('aria-expanded')).toBe('true');
     expect(menu?.textContent).toContain('Filter by Nexus Service');
-    const items = menuItems(menu).map((item) => text(item));
-    expect(items).toHaveLength(2);
-    expect(items.find((item) => item?.includes('order-service'))).toMatch(
-      / 2$/,
+    expect(operatorButtons('service').map((button) => text(button))).toEqual([
+      'Equal to',
+      'Not equal to',
+      'Starts with',
+    ]);
+    expect(operatorButtons('service')[0].getAttribute('aria-pressed')).toBe(
+      'true',
     );
-    expect(items.find((item) => item?.includes('billing-service'))).toMatch(
-      / 1$/,
-    );
-    expect(chipMenu('endpoint')).toBeNull();
+    expect(valueInput('service')?.value).toBe('');
+    expect(menuItems(menu)).toHaveLength(0);
   });
 
-  it('shows only the callbacks that match the filters in the URL, with a chip per field', () => {
-    const target = renderCallbacks(
-      callbacks,
-      '?callbacks-endpoint=orders-tq&callbacks-operation=update-workflow',
-    );
-
-    expect(rows(target)).toHaveLength(1);
-    expect(rows(target)[0].textContent).toContain('update-workflow');
-    expect(text(chipButton('endpoint'))).toBe('Task Queue = orders-tq');
-    expect(text(chipButton('operation'))).toBe(
-      'Nexus Operation = update-workflow',
-    );
-    expect(chipButton('service')).toBeNull();
-  });
-
-  it('disables fields that already have a chip in the Add Filter menu', () => {
-    renderCallbacks(callbacks, '?callbacks-endpoint=orders-tq');
-    addFilterButton()?.click();
-    flushSync();
-
-    const endpoint = menuItems(
-      document.querySelector('#callbacks-add-filter-menu'),
-    ).find((item) => item.textContent?.trim() === 'Task Queue');
-    expect(endpoint?.getAttribute('aria-disabled')).toBe('true');
-  });
-
-  it('adds the picked values to the URL and returns to the first page on Apply', async () => {
+  it('writes the typed value and operator to the URL and returns to the first page on Apply', async () => {
     const { goto } = await import('$app/navigation');
     renderCallbacks(callbacks, '?callbacks-page=2');
     vi.mocked(goto).mockClear();
     addFilter('Task Queue');
 
-    pickValue('endpoint', 'billing-tq');
-    pickValue('endpoint', 'orders-tq');
+    pickOperator('taskQueue', 'Starts with');
+    typeValue('taskQueue', '  orders ');
     expect(vi.mocked(goto)).not.toHaveBeenCalled();
 
-    applyButton('endpoint')?.click();
-    flushSync();
+    clickInChip('taskQueue', 'callbacks-filter-apply');
 
     const url = await lastGotoUrl();
-    expect(url.searchParams.get('callbacks-endpoint')).toBe(
-      'billing-tq,orders-tq',
+    expect(url.searchParams.get('callbacks-task-queue')).toBe('orders');
+    expect(url.searchParams.get('callbacks-task-queue-operator')).toBe(
+      'starts-with',
     );
     expect(url.searchParams.has('callbacks-page')).toBe(false);
-    expect(chipButton('endpoint')?.getAttribute('aria-expanded')).toBe('false');
+    expect(chipButton('taskQueue')?.getAttribute('aria-expanded')).toBe(
+      'false',
+    );
   });
 
-  it('removes an applied value on Apply', async () => {
-    renderCallbacks(callbacks, '?callbacks-service=order-service');
+  it('shows only the callbacks that match the keyword filters in the URL, with a chip per field', () => {
+    const target = renderCallbacks(
+      callbacks,
+      '?callbacks-task-queue=orders-tq&callbacks-operation=update&callbacks-operation-operator=starts-with',
+    );
+
+    expect(rows(target)).toHaveLength(1);
+    expect(rows(target)[0].textContent).toContain('update-workflow');
+    expect(text(chipButton('taskQueue'))).toBe('Task Queue = orders-tq');
+    expect(text(chipButton('operation'))).toBe(
+      'Nexus Operation starts with update',
+    );
+    expect(chipButton('service')).toBeNull();
+  });
+
+  it('excludes matching callbacks with the not-equal operator', () => {
+    const target = renderCallbacks(
+      callbacks,
+      '?callbacks-service=order-service&callbacks-service-operator=not-equal',
+    );
+
+    expect(rows(target)).toHaveLength(1);
+    expect(rows(target)[0].textContent).toContain('billing-service');
+    expect(text(chipButton('service'))).toBe('Nexus Service != order-service');
+  });
+
+  it('seeds the editor from the applied filter and removes it with Remove', async () => {
+    renderCallbacks(
+      callbacks,
+      '?callbacks-service=order&callbacks-service-operator=starts-with',
+    );
     chipButton('service')?.click();
     flushSync();
 
-    pickValue('service', 'order-service');
-    applyButton('service')?.click();
-    flushSync();
+    expect(valueInput('service')?.value).toBe('order');
+    expect(
+      operatorButtons('service')
+        .find((button) => text(button) === 'Starts with')
+        ?.getAttribute('aria-pressed'),
+    ).toBe('true');
+
+    clickInChip('service', 'callbacks-filter-remove');
 
     const url = await lastGotoUrl();
     expect(url.searchParams.has('callbacks-service')).toBe(false);
+    expect(url.searchParams.has('callbacks-service-operator')).toBe(false);
   });
 
-  it('discards picked values when the dropdown closes without Apply', async () => {
+  it('removes the filter when applied with a blank value', async () => {
+    renderCallbacks(callbacks, '?callbacks-operation=start-workflow');
+    chipButton('operation')?.click();
+    flushSync();
+
+    typeValue('operation', '   ');
+    clickInChip('operation', 'callbacks-filter-apply');
+
+    const url = await lastGotoUrl();
+    expect(url.searchParams.has('callbacks-operation')).toBe(false);
+  });
+
+  it('discards a typed value when the editor closes without Apply', async () => {
     const { goto } = await import('$app/navigation');
     renderCallbacks(callbacks, '?callbacks-service=order-service');
     chipButton('service')?.click();
     flushSync();
-    pickValue('service', 'billing-service');
+    typeValue('service', 'billing-service');
 
     document.body.click();
     flushSync();
     chipButton('service')?.click();
     flushSync();
 
-    const checked = menuItems(chipMenu('service'))
-      .filter((item) => item.querySelector('input[type="checkbox"]:checked'))
-      .map((item) => text(item));
     expect(vi.mocked(goto)).not.toHaveBeenCalled();
-    expect(checked).toHaveLength(1);
-    expect(checked[0]).toContain('order-service');
+    expect(valueInput('service')?.value).toBe('order-service');
   });
 
-  it('removes a chip with no values when its dropdown closes', () => {
+  it('removes a chip with no filter when its editor closes', () => {
     renderCallbacks(callbacks);
     addFilter('Nexus Operation');
     expect(chipButton('operation')).not.toBeNull();
@@ -310,29 +385,84 @@ describe('StandaloneNexusOperationCallbacks filter', () => {
     expect(chipButton('operation')).toBeNull();
   });
 
-  it('narrows the field’s values with the search box', () => {
-    renderCallbacks(callbacks);
-    addFilter('Task Queue');
-    const menu = chipMenu('endpoint');
-    const search = menu?.querySelector<HTMLInputElement>(
-      'input[type="search"]',
+  it('lists every delivery state as a checkbox and applies a pick immediately', async () => {
+    renderCallbacks(callbacks, '?callbacks-page=2');
+    addFilter('Delivery State');
+
+    const labels = [
+      'Standby',
+      'Scheduled',
+      'Backing Off',
+      'Blocked',
+      'Failed',
+      'Success',
+    ];
+    const items = menuItems(chipMenu('state'));
+    expect(items).toHaveLength(labels.length);
+    items.forEach((item, index) => {
+      expect(item.querySelector('input[type="checkbox"]')).not.toBeNull();
+      expect(text(item)?.endsWith(labels[index])).toBe(true);
+    });
+
+    pickChoice('state', 'Failed');
+    let url = await lastGotoUrl();
+    expect(url.searchParams.get('callbacks-state')).toBe('Failed');
+    expect(url.searchParams.has('callbacks-page')).toBe(false);
+
+    pickChoice('state', 'Blocked');
+    url = await lastGotoUrl();
+    expect(url.searchParams.get('callbacks-state')).toBe('Failed,Blocked');
+  });
+
+  it('shows only the callbacks in the delivery states from the URL', () => {
+    const target = renderCallbacks(
+      callbacks,
+      '?callbacks-state=Failed,Succeeded',
     );
 
-    if (search) {
-      search.value = 'billing';
-      search.dispatchEvent(new Event('input', { bubbles: true }));
-    }
+    expect(rows(target)).toHaveLength(2);
+    expect(text(chipButton('state'))).toBe('Delivery State = Failed, Success');
+  });
+
+  it('filters by the target execution type of succeeded callbacks', () => {
+    const target = renderCallbacks(
+      callbacks,
+      '?callbacks-target-type=workflow',
+    );
+
+    expect(rows(target)).toHaveLength(1);
+    expect(rows(target)[0].textContent).toContain('billing-tq');
+    expect(text(chipButton('targetType'))).toBe(
+      'Target Execution Type = Workflow Execution',
+    );
+  });
+
+  it('removes a checkbox chip with nothing picked when it closes', () => {
+    renderCallbacks(callbacks);
+    addFilter('Target Execution Type');
+    expect(chipButton('targetType')).not.toBeNull();
+
+    document.body.click();
     flushSync();
 
-    expect(search).not.toBeNull();
-    expect(menu?.textContent).toContain('billing-tq');
-    expect(menu?.textContent).not.toContain('orders-tq');
+    expect(chipButton('targetType')).toBeNull();
+  });
+
+  it('disables fields that already have a chip in the Add Filter menu', () => {
+    renderCallbacks(callbacks, '?callbacks-task-queue=orders-tq');
+    addFilterButton()?.click();
+    flushSync();
+
+    const taskQueue = menuItems(
+      document.querySelector('#callbacks-add-filter-menu'),
+    ).find((item) => item.textContent?.trim() === 'Task Queue');
+    expect(taskQueue?.getAttribute('aria-disabled')).toBe('true');
   });
 
   it('clears every filter from the bar', async () => {
     const target = renderCallbacks(
       callbacks,
-      '?callbacks-endpoint=orders-tq&callbacks-service=order-service',
+      '?callbacks-task-queue=orders-tq&callbacks-task-queue-operator=not-equal&callbacks-state=Failed',
     );
     const clearAll = target.querySelector<HTMLButtonElement>(
       '[data-testid="callbacks-clear-all-filters"]',
@@ -343,8 +473,9 @@ describe('StandaloneNexusOperationCallbacks filter', () => {
 
     const url = await lastGotoUrl();
     expect(text(clearAll)).toBe('Clear all');
-    expect(url.searchParams.has('callbacks-endpoint')).toBe(false);
-    expect(url.searchParams.has('callbacks-service')).toBe(false);
+    expect(url.searchParams.has('callbacks-task-queue')).toBe(false);
+    expect(url.searchParams.has('callbacks-task-queue-operator')).toBe(false);
+    expect(url.searchParams.has('callbacks-state')).toBe(false);
   });
 
   it('hides Clear all when nothing is filtered', () => {
@@ -356,7 +487,10 @@ describe('StandaloneNexusOperationCallbacks filter', () => {
   });
 
   it('shows a no-matches state, not the empty state, when filters hide every callback', async () => {
-    const target = renderCallbacks(callbacks, '?callbacks-endpoint=missing-tq');
+    const target = renderCallbacks(
+      callbacks,
+      '?callbacks-task-queue=missing-tq',
+    );
 
     expect(rows(target)).toHaveLength(0);
     expect(
@@ -373,7 +507,7 @@ describe('StandaloneNexusOperationCallbacks filter', () => {
     flushSync();
 
     const url = await lastGotoUrl();
-    expect(url.searchParams.has('callbacks-endpoint')).toBe(false);
+    expect(url.searchParams.has('callbacks-task-queue')).toBe(false);
   });
 
   it('keeps the SDK empty state when the operation has no callbacks', () => {

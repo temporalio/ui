@@ -22,6 +22,7 @@
     callbackDeliveryState,
     callbackTargetEvent,
     callbackTargetHref,
+    callbackTargetLink,
     callbackTargetName,
     callbackTargetTypeLabel,
   } from '$lib/utilities/nexus-operation-callbacks';
@@ -92,8 +93,7 @@
   });
 
   const toTarget = (callback: Callback) => {
-    if (String(callback.state) !== 'Succeeded') return undefined;
-    const link = callback.callback?.links?.[0];
+    const link = callbackTargetLink(callback);
     if (!link) return undefined;
     const view = toEventLinkView(link, { namespace });
     return {

@@ -1,6 +1,7 @@
 import { translate } from '$lib/i18n/translate';
 import type { BadgeColorScheme } from '$lib/io/badge/recipe';
 import type { EventLink } from '$lib/types';
+import type { Callback } from '$lib/types/nexus';
 import type {
   EventLinkVariant,
   EventLinkView,
@@ -43,6 +44,15 @@ const deliveryStates: Record<string, () => CallbackDeliveryState> = {
   }),
 };
 
+export const CALLBACK_DELIVERY_STATES = [
+  'Standby',
+  'Scheduled',
+  'BackingOff',
+  'Blocked',
+  'Failed',
+  'Succeeded',
+];
+
 export const callbackDeliveryState = (
   state: string | null | undefined,
 ): CallbackDeliveryState => {
@@ -53,6 +63,13 @@ export const callbackDeliveryState = (
     label: translate('nexus.callback-state.unspecified'),
     colorScheme: 'neutral',
   };
+};
+
+export const callbackTargetLink = (
+  callback: Callback,
+): EventLink | undefined => {
+  if (String(callback.state) !== 'Succeeded') return undefined;
+  return callback.callback?.links?.[0];
 };
 
 export const callbackTargetTypeLabel = (
