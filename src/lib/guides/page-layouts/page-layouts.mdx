@@ -1,0 +1,117 @@
+import { Canvas, Markdown, Meta } from '@storybook/addon-docs/blocks';
+
+import * as Stories from './page-layouts.stories.svelte';
+
+<Meta of={Stories} />
+
+# Page Layouts and Templates
+
+Every page sits inside the same app shell, and most pages follow one of two
+templates: a list of records, or the details of one record. Start from these
+templates so pages look and behave the same across the product.
+
+## The app shell
+
+The app layout (`src/routes/(app)/+layout.svelte`) provides the side
+navigation, the top navigation, toasts, and the `main` landmark inside
+`MainContentContainer`. Pages render only their own content, so don't add
+navigation or a `main` element of your own.
+
+## How a page is built
+
+Each route stays thin and hands off to a page component:
+
+```svelte
+<!-- src/routes/(app)/namespaces/[namespace]/workflows/+page.svelte -->
+<PageTitle title={`Workflows | ${namespace}`} url={page.url.href} />
+<WorkflowsPage />
+```
+
+- **`+page.svelte`** sets the browser tab title with `PageTitle` and renders a
+  page component from `$lib/pages`.
+- **`$lib/pages/*.svelte`** holds the page itself: header, content, and states.
+- **`+layout.svelte`** wraps a group of pages that share a header and tabs,
+  such as a workflow's details. Put the shared part in `$lib/layouts`, and let
+  each tab's route render only its own content.
+
+## Page header
+
+Use the IO [Page Header](?path=/docs/io-layouts-page-header--docs) at the top
+of every page. It renders the page's `h1` and arranges the rest in slots:
+
+{/* MDX here has no GFM tables; the Markdown block renders them. */}
+
+<Markdown>{`
+| Slot | What goes in it |
+| --- | --- |
+| \`heading\` | The page title. On list pages, include the count, such as "1,248 Workflows". |
+| \`leading\` | A status shown before the title, such as Badge Status on a detail page. |
+| \`headingActions\` | Small icon buttons tied to the title, such as Refresh. |
+| \`tags\` and \`metadata\` | Tags and Chips that describe the record. |
+| \`description\` | One line of context, such as when the data was last refreshed. |
+| \`actions\` | Page actions. Put the primary action last, and use one primary button. |
+| \`filters\` | Chip Status filters for list pages. |
+`}</Markdown>
+
+Page Header is new, and existing pages still use their own headers. Use it for
+new pages and when reworking existing ones.
+
+## List page
+
+A list page shows many records and helps users find one. Use the switcher in
+the example to see each state.
+
+<Canvas of={Stories.ListPage} />
+
+From top to bottom:
+
+1. **Page Header** with the count in the title, a Refresh button, the primary
+   action, and status filters.
+2. **Search,** using `Input` with `type="search"` and a hidden label.
+3. **Table** with a hidden `caption` that names the list. Link each row's main
+   column to the record's detail page with Text Link.
+
+A list page has two different empty states:
+
+- **First run:** nothing exists yet. Replace the whole page with an Empty State
+  that explains what will appear and offers the first action.
+- **No results:** records exist, but the search or filters hide them. Keep the
+  header, search, and table, and show the Empty State inside the table so users
+  can change their search.
+
+## Detail page
+
+A detail page shows one record and its related information. Use the switcher in
+the example to see the loading state.
+
+<Canvas of={Stories.DetailPage} />
+
+From top to bottom:
+
+1. **Back link** to the list, using Text Link with a leading chevron.
+2. **Page Header** with the record's status in `leading`, its ID or name as the
+   title, tags and metadata, and the actions users can take on it. Use
+   `colorScheme="danger"` for destructive actions, and confirm them with a
+   [modal](?path=/docs/io-guides-modals-and-drawers--docs).
+3. **Tabs** for each section. When each tab has its own route, give `Tab` an
+   `href` and set `active` from the current path, and keep the header and tabs
+   in the shared layout.
+4. **Tab content,** with its own loading and error states.
+
+## Loading and errors
+
+- **Loading:** show Skeletons shaped like the content, so the page doesn't jump
+  when data arrives. Keep the back link and tabs in place.
+- **Errors:** if the record can't load, show the error where the content would
+  be, and keep the back link so users can leave.
+- **Refreshing:** keep the current data visible while new data loads, rather
+  than returning to a skeleton.
+
+<Markdown>{`
+| Do | Don't |
+| --- | --- |
+| Start new pages from the list or detail template. | Don't build a one-off header when Page Header has a slot for it. |
+| Use one \`h1\` per page, from Page Header's \`heading\`. | Don't add extra \`h1\` elements in the page content. |
+| Tell first-run empty states apart from no-results states. | Don't show "No results" to users who haven't created anything yet. |
+| Keep shared headers and tabs in a layout, and route each tab. | Don't put tab content for every section in one large page component. |
+`}</Markdown>

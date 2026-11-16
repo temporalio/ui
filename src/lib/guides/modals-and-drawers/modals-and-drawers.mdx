@@ -1,0 +1,138 @@
+import { Canvas, Markdown, Meta } from '@storybook/addon-docs/blocks';
+
+import * as Stories from './modals-and-drawers.stories.svelte';
+
+<Meta of={Stories} />
+
+# Modals and Drawers
+
+Modals and drawers show content on top of the page. They are built from the
+Holocene `Modal` and `Drawer` components, with IO components such as `Button`
+for the actions that open them.
+
+```ts
+import Modal from '$lib/holocene/modal.svelte';
+import Drawer from '$lib/holocene/drawer.svelte';
+import DrawerContent from '$lib/holocene/drawer-content.svelte';
+import { Button } from '$lib/io/button';
+```
+
+## Choosing between them
+
+{/* MDX here has no GFM tables; the Markdown block renders them. */}
+
+<Markdown>{`
+| Use a modal when…                                                               | Use a drawer when…                                                                |
+| ------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| Users must confirm or decide before continuing, such as terminating a workflow. | Users need more room to edit settings or browse details without leaving the page. |
+| The task is short: a message, one or two fields, and a clear action.            | The content is longer, such as a form with several sections or a list of options. |
+| The page behind should be blocked until the user answers.                       | Users benefit from seeing the page behind for context.                            |
+`}</Markdown>
+
+Keep both for focused, temporary tasks. If the content is the main task, give it
+its own page instead.
+
+## Confirmation modal
+
+The most common modal asks users to confirm an action that changes data. The
+modal owns three pieces of state: whether it is `open`, whether a request is
+`loading`, and any `error` from the request.
+
+<Canvas of={Stories.ConfirmationModal} />
+
+The flow:
+
+1. **Open** from a button. Use IO `Button` with `colorScheme="danger"` for
+   destructive actions, and `confirmType="destructive"` on the modal.
+2. **Confirm** runs the request. Set `loading` so the confirm button shows a
+   spinner and both buttons are disabled.
+3. **On success,** close the modal, clear its fields, and tell users what
+   happened, usually with a toast.
+4. **On failure,** keep the modal open and set `error`. The modal shows it under
+   the content with `role="alert"`, and users can try again without retyping.
+
+```svelte
+<script lang="ts">
+  let open = $state(false);
+  let error = $state('');
+  let loading = $state(false);
+
+  const terminate = async () => {
+    error = '';
+    loading = true;
+    try {
+      await terminateWorkflow({ workflow, namespace, reason });
+      open = false;
+      toaster.push({ message: translate('workflows.terminate-success') });
+    } catch (err) {
+      error =
+        isNetworkError(err) && err.message
+          ? err.message
+          : translate('common.unknown-error');
+    } finally {
+      loading = false;
+    }
+  };
+</script>
+
+<Modal
+  id="terminate-confirmation-modal"
+  bind:open
+  bind:error
+  {loading}
+  confirmText={translate('workflows.terminate')}
+  cancelText={translate('common.cancel')}
+  confirmType="destructive"
+  onConfirmModal={terminate}
+>
+  {#snippet titleSnippet()}<h3>…</h3>{/snippet}
+  {#snippet content()}<p>…</p>{/snippet}
+</Modal>
+```
+
+The modal clears `error` whenever it closes, and Escape, the backdrop, the close
+icon, and Cancel all close it the same way. Use `onCancelModal` to reset any
+fields you own.
+
+## Form in a drawer
+
+Drawers suit forms that need more space. Keep the page as the source of truth:
+the drawer edits a copy, and only a valid submit saves it.
+
+<Canvas of={Stories.FormInADrawer} />
+
+The flow:
+
+1. **Seed on open.** Reset the form from the saved values each time the drawer
+   opens, so cancelled edits and old errors don't carry over.
+2. **Validate on submit** with SuperForms and a Zod schema. Show each field's
+   error with the input's `error` and `hintText` props. See the
+   [Forms guide](?path=/docs/io-guides-forms--docs) for more.
+3. **Save and close** only when the form is valid. Otherwise the drawer stays
+   open with the errors showing.
+4. **Cancel** closes the drawer without saving.
+
+Use `position="right"` with `dark={false}` for forms, so the drawer follows the
+selected theme. The drawer otherwise shrinks to fit its content, so set a width
+with `class`, such as `w-[32rem] max-w-full sm:max-w-full`.
+
+## Accessibility
+
+- Give every modal a title. It labels the dialog for screen readers.
+- Write button labels that say what happens, such as "Terminate" rather than
+  "OK". The modal uses `cancelText` to label its close icon too.
+- Give drawers a `closeButtonLabel` that names what closes, such as "Close
+  worker settings".
+- Both components move focus inside when they open and close with Escape.
+  Don't add your own focus handling on top.
+
+{/* MDX here has no GFM tables; the Markdown block renders them. */}
+
+<Markdown>{`
+| Do                                                                                     | Don't                                                                                  |
+| -------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| Keep the modal open and show the error when a request fails.                           | Don't close the modal on failure and leave users guessing whether the action happened. |
+| Use \`confirmType="destructive"\` and a specific label for actions that can't be undone. | Don't use a destructive style for routine confirmations.                               |
+| Reset drawer forms each time they open.                                                | Don't let a cancelled drawer keep half-finished edits.                                 |
+| Confirm success after closing, usually with a toast.                                   | Don't open a modal from inside another modal.                                          |
+`}</Markdown>

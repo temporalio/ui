@@ -22,6 +22,7 @@ Segmented Controls let users switch between a small set of related options or vi
 | Always show one option as selected, so users can see the current view at a glance.                         | Don't use segments for actions such as Save or Delete. Use Button for actions.                          |
 | Use `SegmentLink` with `element="nav"` and an accessible label when segments move between pages.           | Don't mix `Segment` buttons and `SegmentLink` anchors in the same control.                              |
 | Pass `aria-pressed` to `Segment` buttons that change the current view, so the selected state is announced. | Don't rely on counts alone to label segments. Each segment needs a short text label.                    |
+| Let the control sit at its natural width, sized by its segment labels.                                     | Don't stretch a segmented control to fill its container. Segments should stay as wide as their labels.  |
 
 The wrapper provides layout; the parent owns selection and event handling. Set
 `selected` on the active item. Segment supports `isLoading` and `disabled`.
