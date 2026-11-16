@@ -83,6 +83,7 @@ const callerExecution = (
 export const toInboundLinkRow = (
   link: EventLink | undefined,
   namespace?: string,
+  systemOperation?: string,
 ): InboundLinkRow => {
   if (!link) return {};
 
@@ -91,7 +92,10 @@ export const toInboundLinkRow = (
   if (link.workflowEvent) {
     const { workflowEvent } = link;
     return {
-      callerEvent: view.event,
+      callerEvent:
+        view.event && systemOperation
+          ? { ...view.event, value: systemOperation }
+          : view.event,
       callerExecution: callerExecution(
         'workflow',
         workflowEvent.namespace,

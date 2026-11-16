@@ -28,7 +28,7 @@
   import { IconCanceled, IconChevronLeft, IconInfo } from '$lib/io/icon';
   import {
     getInboundLinkForEvent,
-    getVisibleInboundNexusLinkEvents,
+    getInboundNexusLinkEvents,
   } from '$lib/runes/inbound-nexus-links.svelte';
   import { workflowViewPreference } from '$lib/stores/event-view';
   import { fullEventHistory } from '$lib/stores/events';
@@ -40,11 +40,9 @@
   import { isWorkflowDelayed } from '$lib/utilities/delayed-workflows';
   import { getSharedFilterParams } from '$lib/utilities/event-filter-params';
   import { getWorkerDeploymentName } from '$lib/utilities/get-worker-deployment-name';
-  import {
-    getWorkflowNexusLinksFromHistory,
-    getWorkflowRelationships,
-  } from '$lib/utilities/get-workflow-relationships';
+  import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
   import { isRunningWithNoWorkers } from '$lib/utilities/is-running-with-no-workers';
+  import { outboundLinkRows } from '$lib/utilities/outbound-link-row';
   import { pathMatches } from '$lib/utilities/path-matches';
   import {
     routeForCallStack,
@@ -111,15 +109,15 @@
     })}?${$workflowsSearchParams}`,
   );
   const outboundLinks = $derived(
-    getWorkflowNexusLinksFromHistory($fullEventHistory)?.length || 0,
+    outboundLinkRows($fullEventHistory, routeParameters).length,
   );
-  const visibleInboundLinks = getVisibleInboundNexusLinkEvents(
-    () => $fullEventHistory,
+  const inboundLinkEvents = $derived(
+    getInboundNexusLinkEvents($fullEventHistory),
   );
-  const inboundLinks = $derived(visibleInboundLinks.events?.length || 0);
+  const inboundLinks = $derived(inboundLinkEvents.length);
   const linkCount = $derived(outboundLinks + inboundLinks);
   const workerCallbackLinks = $derived(
-    visibleInboundLinks.events
+    inboundLinkEvents
       .map(getInboundLinkForEvent)
       .filter((link): link is EventLink => Boolean(link && link.callback)),
   );

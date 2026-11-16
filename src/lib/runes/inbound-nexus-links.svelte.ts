@@ -1,4 +1,5 @@
-import { isSystemNexusCallerLink } from '$lib/services/system-nexus-caller-link';
+import { systemNexusCallerOperation } from '$lib/services/system-nexus-caller-link';
+import type { EventLink } from '$lib/types';
 import type { WorkflowEvent } from '$lib/types/events';
 import {
   isWorkflowExecutionOptionsUpdatedEvent,
@@ -6,6 +7,11 @@ import {
   isWorkflowExecutionStartedEvent,
   isWorkflowExecutionUpdateAcceptedEvent,
 } from '$lib/utilities/is-event-type';
+
+const NEXUS_OPERATION_SCHEDULED = 'EVENT_TYPE_NEXUS_OPERATION_SCHEDULED';
+
+const isNexusCallerLink = (link: EventLink): boolean =>
+  String(link.workflowEvent?.eventRef?.eventType) === NEXUS_OPERATION_SCHEDULED;
 
 export const getInboundNexusLinkEvents = (history: WorkflowEvent[]) => {
   try {
@@ -21,7 +27,7 @@ export const getInboundNexusLinkEvents = (history: WorkflowEvent[]) => {
         isWorkflowExecutionUpdateAcceptedEvent(event)
       ) {
         const link = getInboundLinkForEvent(event);
-        return Boolean(link && link.callback);
+        return Boolean(link && (link.callback || isNexusCallerLink(link)));
       }
       return false;
     });
@@ -44,31 +50,29 @@ export const getInboundLinkForEvent = (event: WorkflowEvent) => {
 };
 
 /**
- * The inbound link events worth showing, once the ones made by an operation on
- * the system endpoint have been resolved away.
+ * The system Nexus operation behind each inbound link event, by event ID.
  *
- * Resolution needs the caller's history, so it cannot be synchronous. Events
- * start visible and a system caller removes one when its answer arrives, so a
- * genuine Nexus link is never hidden while it is still being confirmed.
+ * Only the caller's history knows its endpoint, so this resolves after render
+ * and fills in as each caller is read.
  */
-export const getVisibleInboundNexusLinkEvents = (
-  history: () => WorkflowEvent[],
+export const getSystemNexusCallerOperations = (
+  events: () => WorkflowEvent[],
 ) => {
-  const events = $derived(getInboundNexusLinkEvents(history()));
-  let systemCallerIds = $state<string[]>([]);
+  let operations = $state<Record<string, string>>({});
 
   $effect(() => {
     let current = true;
 
-    for (const event of events) {
+    for (const event of events()) {
       const id = event?.id;
       if (!id) continue;
 
-      isSystemNexusCallerLink(getInboundLinkForEvent(event)).then((system) => {
-        if (!current || !system) return;
-        if (systemCallerIds.includes(id)) return;
-        systemCallerIds = [...systemCallerIds, id];
-      });
+      systemNexusCallerOperation(getInboundLinkForEvent(event)).then(
+        (operation) => {
+          if (!current || !operation || operations[id] === operation) return;
+          operations = { ...operations, [id]: operation };
+        },
+      );
     }
 
     return () => {
@@ -77,8 +81,6 @@ export const getVisibleInboundNexusLinkEvents = (
   });
 
   return {
-    get events() {
-      return events.filter((event) => !systemCallerIds.includes(event?.id));
-    },
+    get: (eventId: string): string | undefined => operations[eventId],
   };
 };

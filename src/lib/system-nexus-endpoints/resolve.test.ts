@@ -1,3 +1,4 @@
+import { EventType } from '@buf/temporalio_api.bufbuild_es/temporal/api/enums/v1/event_type_pb.js';
 import {
   SignalWithStartWorkflowExecutionRequestSchema,
   SignalWithStartWorkflowExecutionResponseSchema,
@@ -11,6 +12,8 @@ import {
   isSystemNexusScheduledEvent,
   resolveSystemNexusEvent,
   schemaForMessageType,
+  systemNexusEventType,
+  systemNexusTargetLink,
 } from './index';
 import { escapeQueryValue } from './shared';
 
@@ -404,5 +407,91 @@ describe('isSystemNexusScheduledEvent', () => {
         completedEvent({ runId: 'target-run-id', started: true }),
       ),
     ).toBe(false);
+  });
+});
+
+describe('systemNexusEventType', () => {
+  it('names a system operation by its operation name', () => {
+    expect(systemNexusEventType(initiatingEvent)).toBe(
+      'SignalWithStartWorkflowExecution',
+    );
+  });
+
+  it('has no type for a Nexus operation on a user endpoint', () => {
+    expect(
+      systemNexusEventType(
+        scheduledEvent({ workflowId: 'target-workflow-id' }, 'my-endpoint'),
+      ),
+    ).toBeNull();
+  });
+});
+
+describe('systemNexusTargetLink', () => {
+  const signalLink = {
+    variant: {
+      case: 'workflowEvent',
+      value: {
+        namespace: 'target-namespace',
+        workflowId: 'target-workflow-id',
+        runId: 'target-run-id',
+        reference: {
+          case: 'eventRef',
+          value: {
+            eventId: BigInt(7),
+            eventType: EventType.WORKFLOW_EXECUTION_SIGNALED,
+          },
+        },
+      },
+    },
+  };
+
+  it('reads the target from the response signalLink', () => {
+    expect(
+      systemNexusTargetLink(
+        initiatingEvent,
+        completedEvent({ runId: 'target-run-id', signalLink }),
+      ),
+    ).toEqual({
+      workflowEvent: {
+        namespace: 'target-namespace',
+        workflowId: 'target-workflow-id',
+        runId: 'target-run-id',
+        eventRef: {
+          eventId: '7',
+          eventType: 'EVENT_TYPE_WORKFLOW_EXECUTION_SIGNALED',
+        },
+      },
+    });
+  });
+
+  it('falls back to the completed event links', () => {
+    const eventLink = {
+      workflowEvent: {
+        namespace: 'default',
+        workflowId: 'system-nexus-workflow-id',
+        runId: 'target-run-id',
+        requestIdRef: { requestId: 'b580d786' },
+      },
+    };
+
+    expect(
+      systemNexusTargetLink(
+        initiatingEvent,
+        completedEvent({ runId: 'target-run-id' }, '5', [eventLink]),
+      ),
+    ).toEqual(eventLink);
+  });
+
+  it('has no target before the operation completes', () => {
+    expect(systemNexusTargetLink(initiatingEvent, undefined)).toBeUndefined();
+  });
+
+  it('has no target for an operation on a user endpoint', () => {
+    expect(
+      systemNexusTargetLink(
+        scheduledEvent({ workflowId: 'target-workflow-id' }, 'my-endpoint'),
+        completedEvent({ runId: 'target-run-id', signalLink }),
+      ),
+    ).toBeUndefined();
   });
 });

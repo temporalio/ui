@@ -49,6 +49,30 @@ describe('toInboundLinkRow', () => {
     });
   });
 
+  it('names a system Nexus caller event by its operation', () => {
+    const row = toInboundLinkRow(
+      {
+        workflowEvent: {
+          namespace: 'caller-ns',
+          workflowId: 'caller-wf',
+          runId: 'caller-run',
+          eventRef: {
+            eventId: '5',
+            eventType: 'EVENT_TYPE_NEXUS_OPERATION_SCHEDULED',
+          },
+        },
+      } as unknown as EventLink,
+      undefined,
+      'SignalWithStartWorkflowExecution',
+    );
+
+    expect(row.callerEvent).toEqual({
+      label: 'Caller Event',
+      value: 'SignalWithStartWorkflowExecution',
+      href: `${base}/namespaces/caller-ns/workflows/caller-wf/caller-run/history/events/5`,
+    });
+  });
+
   it('shows a workflow link by its workflow ID with no caller event', () => {
     const row = toInboundLinkRow({
       workflow: {

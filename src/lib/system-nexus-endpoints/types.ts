@@ -2,7 +2,7 @@ import type { DescMessage } from '@bufbuild/protobuf';
 import type { Component } from 'svelte';
 
 import type { EventTypeCategory } from '$lib/models/event-history/get-event-categorization';
-import type { Payload } from '$lib/types';
+import type { EventLink, Payload } from '$lib/types';
 import type { WorkflowEvent } from '$lib/types/events';
 
 export const SYSTEM_NEXUS_ENDPOINT = '__temporal_system';
@@ -99,6 +99,8 @@ export type SystemNexusOperationDefinition = {
     SystemNexusPresentation,
     'kind' | 'timelineCategory' | 'expandsIndividually'
   > | null;
+  /** The execution the operation acted on, read off its terminal event. */
+  targetLink: (event: WorkflowEvent) => EventLink | undefined;
   /** Builds the presentation for the operation's terminal event. */
   describeTerminal: (
     event: WorkflowEvent,
