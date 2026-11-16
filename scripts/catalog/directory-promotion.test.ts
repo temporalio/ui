@@ -161,7 +161,7 @@ describe('directory catalog promotion planning', () => {
       },
       {
         example:
-          "export const catalogExample = { id: 'order-lifecycle', targetId: 'local-workflows', sourceFiles: ['local.ts'], execution: { kind: 'workflow', workflowType: 'orderLifecycle' } };\n",
+          "export const catalogExample = { id: 'order-lifecycle', workspaceId: 'local-workflows', sourceFiles: ['local.ts'], execution: { kind: 'workflow', workflowType: 'orderLifecycle' } };\n",
         expected: 'must be environment-neutral',
       },
       {

@@ -8,9 +8,9 @@ The catalog page is reachable only in local development. Every other environment
 
 Two rules answer nearly every configuration question.
 
-**Namespace comes from where you are.** In the browser, it is the namespace in the URL: `/namespaces/staging/catalog` targets `staging`. For the worker, it comes from `TEMPORAL_NAMESPACE`. These are separate settings, so point them at the same namespace — otherwise the catalog shows examples whose readiness reports no worker polling, because the worker is polling somewhere else.
+**Namespace comes from where you are.** In the browser, it is the namespace in the URL: `/namespaces/staging/catalog` workspaces `staging`. For the worker, it comes from `TEMPORAL_NAMESPACE`. These are separate settings, so point them at the same namespace — otherwise the catalog shows examples whose readiness reports no worker polling, because the worker is polling somewhere else.
 
-**Task queues come only from registration.** Each target declares its own task queue in code. No environment variable overrides it. This is deliberate: the UI's readiness check and the worker's polling derive the queue from the same declaration, so they cannot disagree.
+**Task queues come only from registration.** Each workspace declares its own task queue in code. No environment variable overrides it. This is deliberate: the UI's readiness check and the worker's polling derive the queue from the same declaration, so they cannot disagree.
 
 ## Environment files
 
@@ -30,7 +30,7 @@ Copy the example file to `.env.catalog.local` and uncomment what you need. Only 
 | ---------------------------- | ------------------------------------------------------------------- |
 | `TEMPORAL_ADDRESS`           | Server address. Defaults to `127.0.0.1:7233`.                       |
 | `TEMPORAL_NAMESPACE`         | Namespace the worker registers and polls in. Defaults to `default`. |
-| `CATALOG_TARGET_ID` | Optional. Run one target instead of all of them.                    |
+| `CATALOG_WORKSPACE_ID`       | Optional. Run one workspace instead of all of them.                 |
 
 Prefer `127.0.0.1` over `localhost`. On some machines `localhost` resolves to IPv6 and reaches a different Temporal server than the UI is reading — for example a container publishing the same port — which appears as a healthy worker the catalog cannot see.
 
@@ -66,7 +66,84 @@ An API key cannot be combined with any TLS variable. The CA certificate and serv
 
 ## The worker
 
-A target is a worker specification: a namespace, a task queue, a workflow bundle, and its activities. The catalog runs **one worker per target**, all in a single process sharing one connection. Starting the worker with two targets registered starts two workers.
+A workspace is an isolated worker: a namespace, a task queue, a workflow bundle, and its activities. Examples are entry points into a workspace. The catalog runs **one worker per workspace**, all in a single process sharing one connection. Starting the worker with two workspaces registered starts two workers.
+
+### Grouping examples into workspaces
+
+An authoring workspace declares how its examples map to workers with `grouping`:
+
+| Grouping               | Workspaces          | Task queue                    | Workflow bundle                | Same activity name in two examples |
+| ---------------------- | ------------------- | ----------------------------- | ------------------------------ | ---------------------------------- |
+| `shared` (the default) | One for the source  | `defaultTaskQueue`            | The generated workflows module | An error                           |
+| `per-folder`           | One for each folder | `<defaultTaskQueue>-<folder>` | The folder's own `workflow.ts` | Allowed                            |
+
+Use `shared` for many small examples that exercise primitives. Use `per-folder` when each demo must have clear boundaries: its own task queue, bundle, and activities. Both groupings run in the same process. The generated catalog lists each example's task queue, so the browser does not need to know which grouping produced it.
+
+A `per-folder` workspace registers workspaces named `<workspace id>-<folder>`. Validation fails when a derived workspace ID or task queue collides with another workspace. Moving an example to a workspace with a different grouping changes its task queue.
+
+### Workspace metadata
+
+A source names its files explicitly, for example `files: { example: 'example.ts', workflow: 'workflow.ts', workspace: 'workspace.ts' }`. Generation lists the source's folders and checks only for those files. It does not parse them or derive names from them: everything else comes from the modules when they are registered. The generated registration and the generate step both call `registerCatalogSource`, so they register the same workspaces.
+
+A `workspace.ts` describes a workspace. In a `per-folder` source it sits in a folder and describes that folder's workspace. In a `shared` source it sits at the source root and describes the one shared workspace:
+
+```ts
+export const catalogWorkspace = {
+  title: 'Money transfer',
+  description:
+    'Move money between accounts, and undo the withdrawal if the deposit fails.',
+  docsUrl: 'https://docs.temporal.io/',
+  controls: ['crash'],
+  eject: { sdks: ['typescript'] },
+} satisfies CatalogWorkspaceDefinition;
+```
+
+Every field is optional. The ID, namespace and task queue come from the source and folder, so the file cannot set them. A `workspace.ts` in the wrong place fails generation: a folder file in a `shared` source, or a root file in a `per-folder` source. Generation validates the metadata with the Zod schema in `browser/metadata-schema.ts` and writes a `workspaces` list into the generated catalog. Each descriptor's `execution.workspaceId` points into that list.
+
+### Scenarios
+
+An example can declare named preset inputs:
+
+```ts
+scenarios: [
+  { id: 'happy-path', title: 'Happy path', input: { amount: 100 } },
+  {
+    id: 'deposit-fails',
+    title: 'Deposit fails',
+    input: { amount: 100, to: 'closed-account' },
+  },
+],
+```
+
+Generation fails when a scenario's input does not match the example's input schema.
+
+### Crashing the worker
+
+A demo can let the user crash its worker and watch the run recover. The workflow registers the `crashWorker` update:
+
+```ts
+import { handleCrashWorker } from '../worker/crash-workflow';
+
+export async function moneyTransfer(input: TransferInput) {
+  handleCrashWorker();
+  // ...
+}
+```
+
+The update runs the `dangerousOperation` activity. On its first attempt, the activity exits the worker process with code 75. The host restarts the process. The activity's heartbeat timeout expires, Temporal retries it on the new worker, and the retry returns. The update result reports the recovery, and the run continues.
+
+Crash is on only when the workspace declares `controls: ['crash']`. Otherwise the activity fails without retrying, and the update returns that failure. Declare it only for a workspace whose runtime starts a new Worker after the process exits. A local restart loop, a restarted container and a new serverless invocation all do.
+
+The exit ends the whole process, so every workspace in it restarts. Run the worker under something that restarts it after a non-zero exit. A worker with crash enabled sets a 1-second sticky queue timeout, so the restarted worker picks up the run within a few seconds.
+
+Locally, `pnpm catalog worker` and `pnpm catalog dev` restart the worker after a crash. They restart only on the crash exit code, 75. Any other failure stops the command. Node's `--watch` cannot restart a process that exits, so the command watches `src/lib/catalog`, `scripts/catalog` and `catalog.local` itself. A change to a `.ts`, `.js` or `.json` file restarts the worker, including a new example or workspace.
+
+The shared catalog declares the crash control. Its `worker-crash` example waits for a set time so you can crash the worker during the run:
+
+```sh
+pnpm catalog dev
+temporal workflow update execute --name crashWorker --workflow-id <workflow id>
+```
 
 The worker waits for the server rather than exiting if it starts first, printing progress while it retries. Non-connection failures, such as an invalid API key, still fail immediately.
 

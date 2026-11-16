@@ -4,20 +4,20 @@ import { ensureDeclaredNexusEndpoints } from './endpoint-provisioning';
 import type { CatalogWorkerBinding } from './registry';
 
 const binding = (
-  targetId: string,
+  workspaceId: string,
   namespace: string,
   taskQueue: string,
   executions: CatalogWorkerBinding['examples'][number]['execution'][],
 ): CatalogWorkerBinding => ({
-  target: {
-    id: targetId,
+  workspace: {
+    id: workspaceId,
     namespace,
     taskQueue,
     workflowsPath: './workflows',
     workflowExports: {},
   },
   examples: executions.map((execution, index) => ({
-    id: `${targetId}-example-${index}`,
+    id: `${workspaceId}-example-${index}`,
     execution,
   })),
   activities: {},
@@ -46,7 +46,7 @@ const workflowExecution =
   });
 
 describe('ensureDeclaredNexusEndpoints', () => {
-  it('creates each missing declared endpoint against its target', async () => {
+  it('creates each missing declared endpoint against its workspace', async () => {
     const created: unknown[] = [];
     const events: string[] = [];
 
