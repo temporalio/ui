@@ -59,6 +59,7 @@ export class WorkflowHistoryController {
   totalExpectedEvents = $state(0);
   descMinId = $state(0);
   error = $state.raw<Error | NetworkError | null>(null);
+  closeEvent = $state.raw<HistoryEvent | null>(null);
 
   private started = $state(false);
   private disposed = false;
@@ -130,6 +131,7 @@ export class WorkflowHistoryController {
       this.totalExpectedEvents = 0;
       this.descMinId = 0;
       this.historyClosed = false;
+      this.closeEvent = null;
       this.buffer.reset(parseInt(workflow.historyEvents ?? '0') || 0);
     }
     this.buffer.setPendingMetadata(
@@ -377,6 +379,7 @@ export class WorkflowHistoryController {
     );
     if (isWorkflowCloseEvent(event)) {
       this.historyClosed = true;
+      this.closeEvent = event;
       if (!session.catchingUp) session.livePollController?.abort();
     }
     return isNew;

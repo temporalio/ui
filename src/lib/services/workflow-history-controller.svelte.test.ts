@@ -179,7 +179,79 @@ afterEach(async () => {
   ]);
 });
 
+function makeCloseEvent(
+  id: number,
+  eventType: string,
+  attributesKey: string,
+): HistoryEvent {
+  return {
+    eventId: String(id),
+    eventTime: '2024-01-01T00:00:00.000000000Z',
+    eventType,
+    [attributesKey]: {},
+  } as unknown as HistoryEvent;
+}
+
 describe('WorkflowHistoryController', () => {
+  describe('closeEvent', () => {
+    it.each([
+      [
+        'WorkflowExecutionCompleted',
+        'workflowExecutionCompletedEventAttributes',
+      ],
+      ['WorkflowExecutionFailed', 'workflowExecutionFailedEventAttributes'],
+      ['WorkflowExecutionTimedOut', 'workflowExecutionTimedOutEventAttributes'],
+      ['WorkflowExecutionCanceled', 'workflowExecutionCanceledEventAttributes'],
+      [
+        'WorkflowExecutionTerminated',
+        'workflowExecutionTerminatedEventAttributes',
+      ],
+      [
+        'WorkflowExecutionContinuedAsNew',
+        'workflowExecutionContinuedAsNewEventAttributes',
+      ],
+    ])('is set to the %s event', async (eventType, attributesKey) => {
+      const { controller } = createController();
+      const load = controller.load(workflow());
+      request(0).options.onRawPage([makeWorkflowStarted(1)]);
+      expect(controller.closeEvent).toBeNull();
+
+      const closeEvent = makeCloseEvent(10, eventType, attributesKey);
+      request(0).options.onRawPage([closeEvent]);
+      request(0).result.resolve();
+      await load;
+
+      expect(controller.closeEvent).toBe(closeEvent);
+    });
+
+    it('stays null while the Run is open and is set when the poll delivers the close', async () => {
+      const { controller } = createController('run-1', {});
+      const load = controller.load(workflow('run-1', true));
+      tail(0).result.resolve(tailEvents([2, 3]));
+      pollEvents(0, [1, 2, 3], 'token-1');
+      await load;
+      expect(controller.closeEvent).toBeNull();
+
+      const closeEvent = makeWorkflowCompleted(4);
+      poll(0).options.onEvent(closeEvent);
+      expect(controller.closeEvent).toBe(closeEvent);
+    });
+
+    it('resets on a fresh load', async () => {
+      const { controller } = createController();
+      const load = controller.load(workflow());
+      request(0).options.onRawPage([makeWorkflowCompleted(10)]);
+      request(0).result.resolve();
+      await load;
+      expect(controller.closeEvent).not.toBeNull();
+
+      const nextLoad = controller.load(workflow());
+      expect(controller.closeEvent).toBeNull();
+      request(1).result.resolve();
+      await nextLoad;
+    });
+  });
+
   describe('closed Run', () => {
     it('loads history bidirectionally without a tail fetch or live poll', async () => {
       const { controller } = createController();

@@ -193,6 +193,7 @@ export type WorkflowExecution = {
   name: string;
   id: string;
   runId: string;
+  firstRunId?: string;
   startTime: string;
   endTime: string;
   executionTime: string;
