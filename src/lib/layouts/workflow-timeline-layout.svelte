@@ -179,7 +179,7 @@
   const onEventGroupsToggle = () => {
     clearActives();
     selectedEventGroupKey = undefined;
-    $showTimelineEventGroups = !eventGroupsVisible;
+    void showTimelineEventGroups.save(!eventGroupsVisible);
   };
 
   const onSelectGroup = (group: EventGroup) => {

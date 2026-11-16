@@ -4,7 +4,9 @@ import { getUserPreferenceFactory } from '$lib/utilities/core-provider';
 
 import { persistStore } from './persist-store';
 
-export const USER_PREFERENCE_KEYS = [] as const satisfies readonly string[];
+export const USER_PREFERENCE_KEYS = [
+  'showTimelineEventGroups',
+] as const satisfies readonly string[];
 
 export type UserPreferenceKey = (typeof USER_PREFERENCE_KEYS)[number];
 
