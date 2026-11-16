@@ -10,7 +10,7 @@
   import Link from './link.svelte';
 
   const { Story } = defineMeta({
-    title: 'Link',
+    title: 'Holocene/Components/Link',
     component: Link,
     args: {
       href: 'https://temporal.io',

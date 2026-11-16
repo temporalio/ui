@@ -2,3 +2,30 @@
 . "$(dirname -- "$0")/_/husky.sh"
 
 npx lint-staged
+
+docs_sources() {
+  grep -E '^(src/lib/io/.*\.(svelte|ts|usage\.md)|\.storybook/.*\.(svelte|ts)|scripts/generate-io-docs\.ts)$' |
+    grep -vE '\.(test|spec)\.ts$'
+}
+
+if git diff --cached --name-only | docs_sources | grep -q .; then
+  unstaged=$(
+    { git diff --name-only; git ls-files --others --exclude-standard; } |
+      docs_sources |
+      sort -u
+  )
+  if [ -n "$unstaged" ]; then
+    echo "IO component docs are generated from the working tree, but these files have unstaged or untracked changes:"
+    echo "$unstaged" | sed 's/^/  /'
+    echo "Stage or stash them, then commit again."
+    exit 1
+  fi
+
+  if ! node -e "require('@playwright/test').chromium.launch().then((browser) => browser.close())" >/dev/null 2>&1; then
+    echo "Generating IO component docs needs Playwright's Chromium. Run \`npx playwright install chromium\`, then commit again."
+    exit 1
+  fi
+
+  echo "Regenerating IO component docs..."
+  pnpm -s stories:generate-docs --stage
+fi

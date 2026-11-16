@@ -22,7 +22,7 @@
   };
 
   const { Story } = defineMeta({
-    title: 'Menu',
+    title: 'Holocene/Components/Menu',
     component: MenuButton,
     subcomponents: { MenuButton, MenuContainer, MenuItem },
     args: {

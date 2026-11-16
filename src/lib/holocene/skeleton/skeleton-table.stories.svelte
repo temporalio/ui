@@ -5,7 +5,7 @@
   import SkeletonTable from './table.svelte';
 
   const { Story } = defineMeta({
-    title: 'Skeleton Table',
+    title: 'Holocene/Components/Skeleton Table',
     component: SkeletonTable,
     args: {
       rows: 10,

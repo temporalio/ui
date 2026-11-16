@@ -15,7 +15,7 @@
   const iconOptions: Record<string, unknown> = { ...ioIcons };
 
   const { Story } = defineMeta({
-    title: 'Accordion',
+    title: 'Holocene/Components/Accordion',
     component: Accordion,
     args: {
       title: 'Accordion Title',
