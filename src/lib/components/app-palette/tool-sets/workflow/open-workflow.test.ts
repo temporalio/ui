@@ -2,17 +2,12 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('$app/navigation', () => ({ goto: vi.fn() }));
 
-vi.mock('$lib/services/workflow-service', () => ({
-  fetchWorkflow: vi.fn(),
-}));
-
 import { goto } from '$app/navigation';
 
 import { appPalette } from '$lib/components/app-palette/app-palette-state.svelte';
 import type { PaletteContext } from '$lib/components/app-palette/types';
-import { fetchWorkflow } from '$lib/services/workflow-service';
 
-import { openWorkflow } from './open-workflow';
+import { openWorkflow, workflowHref } from './open-workflow';
 
 function ctx(): PaletteContext {
   return {
@@ -28,80 +23,36 @@ function ctx(): PaletteContext {
 describe('openWorkflow', () => {
   beforeEach(() => {
     vi.mocked(goto).mockReset();
-    vi.mocked(fetchWorkflow).mockReset();
     appPalette.open = true;
   });
 
-  it('shows the error when the fetch fails', async () => {
-    vi.mocked(fetchWorkflow).mockResolvedValue({
-      error: {
-        message: 'Request unauthorized',
-        statusCode: 403,
-        statusText: 'Forbidden',
-        response: new Response(null, { status: 403 }),
-      },
-    });
+  it('opens the run without a request first, then closes the palette', async () => {
     const context = ctx();
-    await openWorkflow(context, 'ns', 'order-1');
+    await openWorkflow(context, 'other', 'order-1', 'run-1');
 
-    expect(context.toast).toHaveBeenCalledWith('Request unauthorized', 'error');
-    expect(goto).not.toHaveBeenCalled();
+    expect(goto).toHaveBeenCalledWith(
+      expect.stringMatching(/\/namespaces\/other\/workflows\/order-1\/run-1/),
+    );
+    expect(context.close).toHaveBeenCalled();
+    expect(context.toast).not.toHaveBeenCalled();
   });
 
-  it('says the workflow is not found when there is no workflow', async () => {
-    vi.mocked(fetchWorkflow).mockResolvedValue({});
-    const context = ctx();
-    await openWorkflow(context, 'ns', 'order-1');
-
-    expect(context.toast).toHaveBeenCalledWith(
-      'No workflow order-1 in ns',
-      'warning',
+  it('opens the workflow page, which picks the latest run, without a run ID', () => {
+    expect(workflowHref('ns', 'order/1')).toMatch(
+      /\/namespaces\/ns\/workflows\/order%2F1$/,
     );
   });
 
-  describe('with a workflow', () => {
-    function found() {
-      let resolve: (value: object) => void = () => {};
-      vi.mocked(fetchWorkflow).mockReturnValue(
-        new Promise((done) => (resolve = done)),
-      );
-      return () => resolve({ workflow: { id: 'order-1', runId: 'run-1' } });
-    }
+  it('does not close a palette the user opened again during navigation', async () => {
+    let finish: () => void = () => {};
+    vi.mocked(goto).mockReturnValue(new Promise((done) => (finish = done)));
+    const context = ctx();
+    const opening = openWorkflow(context, 'ns', 'order-1', 'run-1');
+    appPalette.open = false;
+    appPalette.open = true;
+    finish();
+    await opening;
 
-    it('closes the palette and opens the workflow', async () => {
-      const resolve = found();
-      const context = ctx();
-      const opening = openWorkflow(context, 'ns', 'order-1');
-      resolve();
-      await opening;
-
-      expect(context.close).toHaveBeenCalled();
-      expect(goto).toHaveBeenCalledWith(
-        expect.stringMatching(/\/namespaces\/ns\/workflows\/order-1\/run-1/),
-      );
-    });
-
-    it('does not navigate when the user closed the palette during the fetch', async () => {
-      const resolve = found();
-      const context = ctx();
-      const opening = openWorkflow(context, 'ns', 'order-1');
-      appPalette.open = false;
-      resolve();
-      await opening;
-
-      expect(goto).not.toHaveBeenCalled();
-    });
-
-    it('does not navigate when the user closed and opened the palette again', async () => {
-      const resolve = found();
-      const context = ctx();
-      const opening = openWorkflow(context, 'ns', 'order-1');
-      appPalette.open = false;
-      appPalette.open = true;
-      resolve();
-      await opening;
-
-      expect(goto).not.toHaveBeenCalled();
-    });
+    expect(context.close).not.toHaveBeenCalled();
   });
 });

@@ -9,7 +9,6 @@ export const Strings = {
   'open-here': 'Open workflow here',
   'open-elsewhere': 'Open in another namespace…',
   'choose-namespace': 'Choose a namespace',
-  'not-found': 'No workflow {{workflowId}} in {{namespace}}',
   'current-section': 'This workflow',
   copy: 'Copy',
   copied: 'Copied',
@@ -45,4 +44,5 @@ export const Strings = {
   'blocked-not-allowed': 'You cannot change workflows in {{namespace}}',
   'blocked-loading': 'The workflow is still loading',
   'blocked-not-running': 'The workflow is not running',
+  'blocked-cancel-requested': 'A cancel request was already sent',
 } as const;

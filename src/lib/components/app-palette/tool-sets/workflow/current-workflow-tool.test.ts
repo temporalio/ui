@@ -3,8 +3,13 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 interface FakeWorkflow {
   id: string;
   runId: string;
+  status?: string;
   isRunning: boolean;
   isPaused?: boolean;
+}
+
+interface FakeEvent {
+  eventType: string;
 }
 
 const state = vi.hoisted(() => {
@@ -13,7 +18,20 @@ const state = vi.hoisted(() => {
     metadata?: { definition: { signalDefinitions: { name: string }[] } };
   } = { workflow: null };
   const subscribers = new Set<(value: typeof run) => void>();
+  let events: FakeEvent[] = [];
+  const historySubscribers = new Set<(value: FakeEvent[]) => void>();
   return {
+    history: {
+      subscribe(fn: (value: FakeEvent[]) => void) {
+        historySubscribers.add(fn);
+        fn(events);
+        return () => historySubscribers.delete(fn);
+      },
+      set(value: FakeEvent[]) {
+        events = value;
+        historySubscribers.forEach((fn) => fn(events));
+      },
+    },
     settings: { disableWriteActions: false },
     pauseEnabled: false,
     writeDisabled: false,
@@ -64,6 +82,11 @@ vi.mock('$lib/stores/workflow-run', () => ({
   triggerRefresh: vi.fn(),
 }));
 
+vi.mock('$lib/stores/events', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('$lib/stores/events')>()),
+  fullEventHistory: state.history,
+}));
+
 vi.mock('$lib/utilities/request-from-api', () => ({
   requestFromAPI: vi.fn(),
 }));
@@ -106,7 +129,13 @@ const subject: PaletteSubject = {
 
 function load(isRunning: boolean, isPaused = false) {
   state.workflowRun.set({
-    workflow: { id: 'order-1', runId: 'run-1', isRunning, isPaused },
+    workflow: {
+      id: 'order-1',
+      runId: 'run-1',
+      status: isRunning ? 'Running' : 'Completed',
+      isRunning,
+      isPaused,
+    },
   });
 }
 
@@ -119,6 +148,7 @@ describe('current workflow tool', () => {
     state.settings = { disableWriteActions: false };
     state.pauseEnabled = false;
     state.writeDisabled = false;
+    state.history.set([]);
     load(true);
   });
 
@@ -156,6 +186,14 @@ describe('current workflow tool', () => {
     expect(item('terminate')?.actions[0].disabled).toBe(
       'You cannot change workflows in ns',
     );
+  });
+
+  it('blocks a second cancel after a cancel was requested', () => {
+    state.history.set([{ eventType: 'WorkflowExecutionCancelRequested' }]);
+    expect(item('cancel')?.actions[0].disabled).toBe(
+      'A cancel request was already sent',
+    );
+    expect(item('terminate')?.actions[0].disabled).toBeUndefined();
   });
 
   it('disables write actions for a closed workflow', () => {

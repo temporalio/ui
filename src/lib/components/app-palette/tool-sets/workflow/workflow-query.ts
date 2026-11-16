@@ -82,7 +82,11 @@ export interface WriteActionFacts {
   accepts: boolean | undefined;
 }
 
-export type WriteActionBlock = 'not-allowed' | 'loading' | 'not-running';
+export type WriteActionBlock =
+  | 'not-allowed'
+  | 'loading'
+  | 'not-running'
+  | 'cancel-requested';
 
 // Why a cancel, terminate or signal cannot run here, or undefined when it can.
 export function writeActionBlock({

@@ -22,10 +22,14 @@ import {
   cancelWorkflow,
   terminateWorkflow,
 } from '$lib/services/workflow-service';
-import { downloadEventHistorySetting } from '$lib/stores/events';
+import {
+  downloadEventHistorySetting,
+  fullEventHistory,
+} from '$lib/stores/events';
 import { triggerRefresh, workflowRun } from '$lib/stores/workflow-run';
 import type { Settings } from '$lib/types/global';
 import type { WorkflowExecution } from '$lib/types/workflows';
+import { isCancelInProgress } from '$lib/utilities/cancel-in-progress';
 import { workflowCancelEnabled } from '$lib/utilities/workflow-cancel-enabled';
 import { workflowSignalEnabled } from '$lib/utilities/workflow-signal-enabled';
 import { workflowTerminateEnabled } from '$lib/utilities/workflow-terminate-enabled';
@@ -42,6 +46,7 @@ import {
 } from './workflow-query';
 
 const run = fromStore(workflowRun);
+const history = fromStore(fullEventHistory);
 
 async function copy(ctx: PaletteContext, text: string, done: string) {
   try {
@@ -101,10 +106,14 @@ function currentWorkflowItems(
   const pauseEnabled =
     !!page.data.namespace?.namespaceInfo?.capabilities?.workflowPause;
   const accepts = acceptsWriteActions(workflow, pauseEnabled);
-  const cancelBlock = writeActionBlock({
-    allowed: !!settings && workflowCancelEnabled(namespace, settings),
-    accepts,
-  });
+  // The page also blocks a second cancel while the first one is pending.
+  const cancelRequested =
+    !!workflow && isCancelInProgress(workflow.status, history.current);
+  const cancelBlock =
+    writeActionBlock({
+      allowed: !!settings && workflowCancelEnabled(namespace, settings),
+      accepts,
+    }) ?? (cancelRequested ? 'cancel-requested' : undefined);
   const terminateBlock = writeActionBlock({
     allowed: !!settings && workflowTerminateEnabled(namespace, settings),
     accepts,
