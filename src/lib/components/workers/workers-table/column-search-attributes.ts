@@ -1,4 +1,5 @@
 import { translate } from '$lib/i18n/translate';
+import { workerStatusFilter } from '$lib/models/status-filter';
 import type { WorkerHeartbeat, WorkerListInfo } from '$lib/types';
 import type { SearchAttributes } from '$lib/types/workflows';
 import { formatSDKName } from '$lib/utilities/get-sdk-version';
@@ -86,4 +87,9 @@ export const getWorkerColumnFilter = (
   columnAttributes: Record<string, string> = getWorkerColumnAttributes(
     getWorkerColumns(),
   ),
-) => getColumnFilter({ attributes: columnAttributes }, label, attributes);
+) =>
+  getColumnFilter(
+    { attributes: columnAttributes, statusFilter: workerStatusFilter },
+    label,
+    attributes,
+  );

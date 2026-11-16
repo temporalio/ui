@@ -46,7 +46,11 @@ export default {
     },
     csp: {
       mode: 'auto',
-      directives: { 'script-src': ['strict-dynamic'] },
+      // 'self' rather than 'strict-dynamic': the static build gets a hash, not
+      // a nonce, and hashes don't propagate to the bootstrap's import() of the
+      // entry chunks. Chrome 158+ blocks those imports under 'strict-dynamic'
+      // (crbug.com/515948871). See temporalio/ui#4125.
+      directives: { 'script-src': ['self'] },
     },
   },
 };

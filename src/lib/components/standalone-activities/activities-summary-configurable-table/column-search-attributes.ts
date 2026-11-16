@@ -1,3 +1,4 @@
+import { activityStatusFilter } from '$lib/models/status-filter';
 import type { ActivityExecutionListInfo } from '$lib/types/activity-execution';
 import type { SearchAttributes } from '$lib/types/workflows';
 import {
@@ -66,6 +67,7 @@ export const ACTIVITY_QUICK_FILTER_COLUMNS: QuickFilterColumns<ActivityExecution
   {
     attributes: ACTIVITY_COLUMN_ATTRIBUTE,
     getValue: getActivityColumnValue,
+    statusFilter: activityStatusFilter,
   };
 
 export const getActivityColumnFilter = (

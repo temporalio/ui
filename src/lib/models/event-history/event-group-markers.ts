@@ -94,7 +94,11 @@ const getInboundSource = (
   }
 };
 
-export const createEventGroupLabelRegistry = (): EventGroupLabelRegistry => {
+export const createEventGroupLabelRegistry = ({
+  onLabelChange,
+}: {
+  onLabelChange?: (key: EventGroupKey) => void;
+} = {}): EventGroupLabelRegistry => {
   const entries = new Map<EventGroupKey, EventGroupLabel>();
   const pendingSources = new Map<EventGroupKey, InboundSourceDetails>();
 
@@ -117,7 +121,15 @@ export const createEventGroupLabelRegistry = (): EventGroupLabelRegistry => {
     eventType: string,
   ) => {
     const key = toEventGroupKey(kind, id);
-    let details = entries.get(key) ?? pendingSources.get(key);
+    const entry = entries.get(key);
+    if (entry) {
+      const previousName = formatEventGroupName(entry);
+      if (name) entry.name = name;
+      entry.sourceEventType ??= eventType;
+      if (formatEventGroupName(entry) !== previousName) onLabelChange?.(key);
+      return;
+    }
+    let details = pendingSources.get(key);
     if (!details) {
       details = {};
       pendingSources.set(key, details);

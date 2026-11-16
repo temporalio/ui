@@ -15,7 +15,7 @@
     'justify-center',
     'gap-1',
     'whitespace-nowrap',
-    'rounded',
+    'rounded-sm',
     'border',
     'border-transparent',
     'px-[3px]',

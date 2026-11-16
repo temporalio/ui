@@ -8,8 +8,8 @@
   import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
+  import type { StatusFilter } from '$lib/models/status-filter';
   import { replaceAttributeFilters } from '$lib/utilities/query/column-filter';
-  import type { StatusAttribute } from '$lib/utilities/query/quick-filter';
   import { createFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
 
@@ -22,10 +22,12 @@
 
   interface Props {
     filters: Writable<SearchAttributeFilter[]>;
-    statusAttribute?: StatusAttribute;
+    statusFilter?: StatusFilter;
   }
 
-  let { filters, statusAttribute }: Props = $props();
+  let { filters, statusFilter }: Props = $props();
+
+  const statusAttribute = $derived(statusFilter?.attribute);
 
   const matchesStatusAttribute = (f: SearchAttributeFilter) =>
     statusAttribute ? f.attribute === statusAttribute : false;
@@ -94,9 +96,9 @@
 {#if visibleFilters.length > 0}
   <div class="flex min-w-0 flex-wrap items-center gap-2">
     {#each visibleFilters as filterItem, i (filterItem.id)}
-      {#if statusAttribute && matchesStatusAttribute(filterItem) && i === firstExecutionStatusIndex}
+      {#if statusFilter && matchesStatusAttribute(filterItem) && i === firstExecutionStatusIndex}
         <StatusFilterChip
-          attribute={statusAttribute}
+          {statusFilter}
           filters={statusFilters}
           index={i}
           openIndex={$chipOpenIndex}

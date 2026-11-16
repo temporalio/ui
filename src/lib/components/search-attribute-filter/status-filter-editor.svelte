@@ -6,47 +6,21 @@
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
-  import type {
-    WorkerFilters,
-    WorkerStatus as WorkerStatusType,
-  } from '$lib/models/worker-status';
-  import { workerStatusFilters } from '$lib/models/worker-status';
-  import {
-    isWorkflowStatusType,
-    type WorkflowFilters,
-    workflowStatusFilters,
-  } from '$lib/models/workflow-status';
-  import type { StatusAttribute } from '$lib/utilities/query/quick-filter';
+  import type { StatusFilter } from '$lib/models/status-filter';
+  import { isWorkerStatusType } from '$lib/models/worker-status';
+  import { isWorkflowStatusType } from '$lib/models/workflow-status';
   import { createFilter } from '$lib/utilities/query/to-list-workflow-filters.js';
 
   interface Props {
-    attribute: StatusAttribute;
+    statusFilter: StatusFilter;
     filters: SearchAttributeFilter[];
     onUpdate: (updatedFilter: SearchAttributeFilter[]) => void;
   }
 
-  let { attribute, filters, onUpdate }: Props = $props();
+  let { statusFilter, filters, onUpdate }: Props = $props();
 
-  const statuses: Record<
-    StatusAttribute,
-    { label: string; filters: WorkflowFilters | WorkerFilters }
-  > = {
-    ExecutionStatus: {
-      label: translate('common.execution-status'),
-      filters: workflowStatusFilters,
-    },
-    WorkerStatus: {
-      label: translate('common.worker-status'),
-      filters: workerStatusFilters,
-    },
-  };
-
-  const isWorkerStatusType = (
-    status: string | null,
-  ): status is WorkerStatusType =>
-    status === 'Unspecified' ||
-    status === 'Running' ||
-    status === 'ShuttingDown';
+  const attribute = $derived(statusFilter.attribute);
+  const options = $derived(['All', ...statusFilter.statuses]);
 
   function handleStatusSelect(status: string | null) {
     if (filters.some((f) => f.value === status)) {
@@ -96,12 +70,12 @@
   <div class="flex items-center justify-between">
     <h3 class="text-sm font-medium">
       {translate('common.filter-by-column', {
-        column: statuses[attribute].label,
+        column: translate(statusFilter.labelKey),
       })}
     </h3>
   </div>
 
-  {#each statuses[attribute].filters as status (status)}
+  {#each options as status (status)}
     {@const checked =
       filters.some((filter) => filter.value === status) ||
       (status === 'All' &&
@@ -123,7 +97,7 @@
         <Translate key="workflows.all-statuses" />
       {:else if attribute === 'ExecutionStatus' && status && isWorkflowStatusType(status)}
         <WorkflowStatusBadge {status} />
-      {:else if attribute === 'WorkerStatus' && isWorkerStatusType(status)}
+      {:else if attribute === 'WorkerStatus' && status && isWorkerStatusType(status)}
         <WorkerStatus {status} />
       {/if}
     </MenuItem>

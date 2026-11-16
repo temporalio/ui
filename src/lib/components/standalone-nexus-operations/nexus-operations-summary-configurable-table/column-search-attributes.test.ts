@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { nexusOperationStatusFilter } from '$lib/models/status-filter';
 import type { NexusOperationExecutionListInfo } from '$lib/types/nexus-operation-execution';
 import { sortTableItems } from '$lib/utilities/table-sort';
 
@@ -83,6 +84,7 @@ describe('getNexusOperationColumnFilter', () => {
     expect(getNexusOperationColumnFilter('Status', attributes)).toEqual({
       attribute: 'ExecutionStatus',
       type: 'Keyword',
+      statusFilter: nexusOperationStatusFilter,
     });
   });
 

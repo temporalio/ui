@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { activityStatusFilter } from '$lib/models/status-filter';
 import type { ActivityExecutionListInfo } from '$lib/types/activity-execution';
 import { sortTableItems } from '$lib/utilities/table-sort';
 
@@ -87,6 +88,7 @@ describe('getActivityColumnFilter', () => {
     expect(getActivityColumnFilter('Status', attributes)).toEqual({
       attribute: 'ExecutionStatus',
       type: 'Keyword',
+      statusFilter: activityStatusFilter,
     });
   });
 

@@ -1,3 +1,4 @@
+import { workflowStatusFilter } from '$lib/models/status-filter';
 import type { SearchAttributes, WorkflowExecution } from '$lib/types/workflows';
 import {
   getMillisecondDuration,
@@ -102,6 +103,7 @@ export const WORKFLOW_QUICK_FILTER_COLUMNS: QuickFilterColumns<WorkflowExecution
   {
     attributes: WORKFLOW_COLUMN_ATTRIBUTE,
     getValue: getWorkflowColumnValue,
+    statusFilter: workflowStatusFilter,
   };
 
 export const getWorkflowSortColumns = (

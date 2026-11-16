@@ -9,9 +9,12 @@
   import { translate } from '$lib/i18n/translate';
   import { IconCode } from '$lib/io/icon';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
+  import {
+    type StatusFilter,
+    workflowStatusFilter,
+  } from '$lib/models/status-filter';
   import type { SearchAttributeOption } from '$lib/stores/search-attributes';
   import type { SearchAttributes } from '$lib/types/workflows';
-  import type { StatusAttribute } from '$lib/utilities/query/quick-filter';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
 
   import Filter from './filter.svelte';
@@ -22,7 +25,7 @@
     options: SearchAttributeOption[];
     searchAttributes: SearchAttributes;
     id: string;
-    statusAttribute?: StatusAttribute;
+    statusFilter?: StatusFilter;
     onManualSearch?: (query: string) => void;
   }
 
@@ -31,7 +34,7 @@
     options,
     searchAttributes,
     id,
-    statusAttribute = 'ExecutionStatus',
+    statusFilter = workflowStatusFilter,
     onManualSearch,
   }: Props = $props();
 
@@ -53,7 +56,7 @@
   <div
     class="flex w-full flex-wrap items-end justify-between gap-2 border-t border-primary bg-surface-primary p-1.5"
   >
-    <Filter {filters} {options} {id} {statusAttribute} />
+    <Filter {filters} {options} {id} {statusFilter} />
     <div class="flex shrink-0 items-center gap-1">
       <Tooltip
         text={viewManualQuery

@@ -1,3 +1,4 @@
+import type { StatusFilter } from '$lib/models/status-filter';
 import {
   SEARCH_ATTRIBUTE_TYPE,
   type SearchAttributes,
@@ -14,6 +15,7 @@ export type QuickFilterColumns<Row> = {
   attributes: Record<string, string>;
   // The value behind the cell, which is not always the text the cell renders.
   getValue: (label: string, row: Row) => QuickFilterValue;
+  statusFilter?: StatusFilter;
 };
 
 export type ResolvedQuickFilter = {
@@ -30,15 +32,25 @@ export const getColumnAttribute = (
   label: string,
 ): string => attributes[label] ?? label;
 
+export type ColumnFilter = {
+  attribute: string;
+  type: SearchAttributeType;
+  statusFilter?: StatusFilter;
+};
+
 export const getColumnFilter = (
-  columns: { attributes: Record<string, string> },
+  columns: { attributes: Record<string, string>; statusFilter?: StatusFilter },
   label: string,
   searchAttributes: SearchAttributes,
-): { attribute: string; type: SearchAttributeType } | undefined => {
+): ColumnFilter | undefined => {
   const attribute = getColumnAttribute(columns.attributes, label);
   const type = searchAttributes[attribute];
 
-  return type ? { attribute, type } : undefined;
+  if (!type) return undefined;
+
+  return columns.statusFilter?.attribute === attribute
+    ? { attribute, type, statusFilter: columns.statusFilter }
+    : { attribute, type };
 };
 
 export const resolveQuickFilter = <Row>({

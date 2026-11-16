@@ -91,6 +91,7 @@
             <ColumnHeaderFilter
               attribute={columnFilter.attribute}
               type={columnFilter.type}
+              statusFilter={columnFilter.statusFilter}
               {label}
               filters={workerFilters}
             />

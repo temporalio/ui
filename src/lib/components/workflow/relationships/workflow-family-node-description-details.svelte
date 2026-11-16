@@ -7,7 +7,10 @@
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import { routeForWorkflow } from '$lib/utilities/route-for';
-  import { isWorkflowTimeSkippingEnabled } from '$lib/utilities/workflow-time-skipping';
+  import {
+    getWorkflowLatestTime,
+    isWorkflowTimeSkippingEnabled,
+  } from '$lib/utilities/workflow-time-skipping';
 
   import { showFullTree } from '../workflow-relationships.svelte';
 
@@ -32,7 +35,7 @@
   const elapsedTime = $derived(
     formatDistanceAbbreviated({
       start: workflow?.startTime,
-      end: workflow?.endTime || Date.now(),
+      end: getWorkflowLatestTime(workflow),
       includeMilliseconds: true,
     }),
   );

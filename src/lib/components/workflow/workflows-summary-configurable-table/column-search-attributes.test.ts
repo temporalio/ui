@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { workflowStatusFilter } from '$lib/models/status-filter';
 import type { WorkflowExecution } from '$lib/types/workflows';
 import { getColumnAttribute } from '$lib/utilities/query/quick-filter-table';
 import { sortTableItems } from '$lib/utilities/table-sort';
@@ -177,6 +178,7 @@ describe('getWorkflowColumnFilter', () => {
     expect(getWorkflowColumnFilter('Status', attributes)).toEqual({
       attribute: 'ExecutionStatus',
       type: 'Keyword',
+      statusFilter: workflowStatusFilter,
     });
     expect(getWorkflowColumnFilter('Start', attributes)).toEqual({
       attribute: 'StartTime',

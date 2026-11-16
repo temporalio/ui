@@ -34,6 +34,7 @@
       type={columnFilter.type}
       {label}
       filters={nexusOperationFilters}
+      statusFilter={columnFilter.statusFilter}
     />
   {/if}
 {/snippet}

@@ -34,6 +34,7 @@
       type={columnFilter.type}
       {label}
       filters={activityFilters}
+      statusFilter={columnFilter.statusFilter}
     />
   {/if}
 {/snippet}
