@@ -4,12 +4,12 @@ import type { Callback } from '$lib/types/nexus';
 
 import {
   appliedCallbackFilterCount,
-  CALLBACK_FILTER_PARAMETERS,
-  callbackFilterOptions,
+  type CallbackFilters,
   callbackFilterUpdate,
+  callbackTargetType,
+  EMPTY_CALLBACK_FILTERS,
   filterCallbacks,
-  limitCallbackFilterOptions,
-  matchesCallbackFilterSearch,
+  matchesCallbackKeyword,
   parseCallbackFilters,
 } from './nexus-operation-callback-filters';
 
@@ -17,17 +17,37 @@ const callback = (
   taskQueueName: string,
   service: string,
   operation: string,
+  state = 'Standby',
+  links: unknown[] = [],
 ): Callback =>
   ({
-    callback: { nexusHandler: { taskQueueName, service, operation } },
+    state,
+    callback: { nexusHandler: { taskQueueName, service, operation }, links },
   }) as unknown as Callback;
+
+const workflowLink = {
+  workflowEvent: { namespace: 'default', workflowId: 'wf', runId: 'run' },
+};
+const activityLink = {
+  activity: { namespace: 'default', activityId: 'act', runId: 'run' },
+};
+const batchJobLink = { batchJob: { jobId: 'job' } };
 
 const callbacks = [
   callback('orders-tq', 'order-service', 'start-workflow'),
-  callback('orders-tq', 'order-service', 'update-workflow'),
-  callback('billing-tq', 'billing-service', 'start-workflow'),
-  callback('billing-tq', 'order-service', 'start-workflow'),
+  callback('orders-tq', 'order-service', 'update-workflow', 'Failed'),
+  callback('billing-tq', 'billing-service', 'start-workflow', 'Succeeded', [
+    workflowLink,
+  ]),
+  callback('billing-tq', 'order-service', 'start-activity', 'Succeeded', [
+    activityLink,
+  ]),
 ];
+
+const filtersWith = (filters: Partial<CallbackFilters>): CallbackFilters => ({
+  ...EMPTY_CALLBACK_FILTERS,
+  ...filters,
+});
 
 const urlWith = (params: Record<string, string>) =>
   new URL(
@@ -36,176 +56,270 @@ const urlWith = (params: Record<string, string>) =>
 
 describe('parseCallbackFilters', () => {
   it('returns empty filters when the URL has none', () => {
-    expect(parseCallbackFilters(urlWith({}))).toEqual({
-      endpoint: [],
-      service: [],
-      operation: [],
-    });
+    expect(parseCallbackFilters(urlWith({}))).toEqual(EMPTY_CALLBACK_FILTERS);
   });
 
-  it('reads comma-joined, URL-encoded values for each field', () => {
-    const url = urlWith({
-      [CALLBACK_FILTER_PARAMETERS.endpoint]: `orders-tq,${encodeURIComponent('a,b')}`,
-      [CALLBACK_FILTER_PARAMETERS.service]: 'order-service',
-      [CALLBACK_FILTER_PARAMETERS.operation]: 'start-workflow',
-    });
+  it('reads keyword filters with their operator, defaulting to equal', () => {
+    expect(
+      parseCallbackFilters(
+        urlWith({
+          'callbacks-task-queue': 'orders-tq',
+          'callbacks-service': 'order',
+          'callbacks-service-operator': 'starts-with',
+          'callbacks-operation': 'a,b',
+          'callbacks-operation-operator': 'not-equal',
+        }),
+      ),
+    ).toEqual(
+      filtersWith({
+        taskQueue: { operator: '=', value: 'orders-tq' },
+        service: { operator: 'STARTS_WITH', value: 'order' },
+        operation: { operator: '!=', value: 'a,b' },
+      }),
+    );
+  });
 
-    expect(parseCallbackFilters(url)).toEqual({
-      endpoint: ['orders-tq', 'a,b'],
-      service: ['order-service'],
-      operation: ['start-workflow'],
-    });
+  it('falls back to equal for an unknown operator', () => {
+    expect(
+      parseCallbackFilters(
+        urlWith({
+          'callbacks-service': 'order-service',
+          'callbacks-service-operator': 'contains',
+        }),
+      ).service,
+    ).toEqual({ operator: '=', value: 'order-service' });
+  });
+
+  it('reads delivery states and target types, dropping unknown values', () => {
+    expect(
+      parseCallbackFilters(
+        urlWith({
+          'callbacks-state': 'Failed,Bogus,BackingOff',
+          'callbacks-target-type': 'workflow,nexusOperation',
+        }),
+      ),
+    ).toEqual(
+      filtersWith({
+        state: ['Failed', 'BackingOff'],
+        targetType: ['workflow'],
+      }),
+    );
+  });
+});
+
+describe('matchesCallbackKeyword', () => {
+  it('matches the whole value with =', () => {
+    expect(
+      matchesCallbackKeyword('orders-tq', {
+        operator: '=',
+        value: 'orders-tq',
+      }),
+    ).toBe(true);
+    expect(
+      matchesCallbackKeyword('orders-tq', { operator: '=', value: 'orders' }),
+    ).toBe(false);
+  });
+
+  it('excludes the value with !=', () => {
+    expect(
+      matchesCallbackKeyword('orders-tq', {
+        operator: '!=',
+        value: 'orders-tq',
+      }),
+    ).toBe(false);
+    expect(
+      matchesCallbackKeyword('billing-tq', {
+        operator: '!=',
+        value: 'orders-tq',
+      }),
+    ).toBe(true);
+  });
+
+  it('matches a prefix with STARTS_WITH', () => {
+    expect(
+      matchesCallbackKeyword('orders-tq', {
+        operator: 'STARTS_WITH',
+        value: 'orders',
+      }),
+    ).toBe(true);
+    expect(
+      matchesCallbackKeyword('orders-tq', {
+        operator: 'STARTS_WITH',
+        value: 'tq',
+      }),
+    ).toBe(false);
+  });
+
+  it('is case-sensitive, like the workflow list', () => {
+    expect(
+      matchesCallbackKeyword('orders-tq', {
+        operator: '=',
+        value: 'Orders-TQ',
+      }),
+    ).toBe(false);
+  });
+});
+
+describe('callbackTargetType', () => {
+  it('reads the type of a succeeded callback’s target link', () => {
+    expect(callbackTargetType(callbacks[2])).toBe('workflow');
+    expect(callbackTargetType(callbacks[3])).toBe('activity');
+    expect(
+      callbackTargetType(
+        callback('tq', 'service', 'operation', 'Succeeded', [batchJobLink]),
+      ),
+    ).toBe('batchJob');
+  });
+
+  it('has no type until the callback succeeds, matching the table', () => {
+    expect(
+      callbackTargetType(
+        callback('tq', 'service', 'operation', 'Failed', [workflowLink]),
+      ),
+    ).toBeUndefined();
+  });
+
+  it('has no type without a target link', () => {
+    expect(
+      callbackTargetType(callback('tq', 'service', 'operation', 'Succeeded')),
+    ).toBeUndefined();
   });
 });
 
 describe('filterCallbacks', () => {
+  const operations = (filtered: Callback[]) =>
+    filtered.map((filteredCallback) => [
+      filteredCallback.callback?.nexusHandler?.taskQueueName,
+      filteredCallback.callback?.nexusHandler?.operation,
+    ]);
+
   it('returns every callback when no filter is applied', () => {
-    expect(
-      filterCallbacks(callbacks, { endpoint: [], service: [], operation: [] }),
-    ).toEqual(callbacks);
+    expect(filterCallbacks(callbacks, EMPTY_CALLBACK_FILTERS)).toBe(callbacks);
   });
 
-  it('matches any selected value within a field', () => {
+  it('matches the task queue keyword on the handler task queue', () => {
     expect(
-      filterCallbacks(callbacks, {
-        endpoint: [],
-        service: [],
-        operation: ['start-workflow', 'update-workflow'],
-      }),
-    ).toHaveLength(4);
+      operations(
+        filterCallbacks(
+          callbacks,
+          filtersWith({ taskQueue: { operator: '=', value: 'billing-tq' } }),
+        ),
+      ),
+    ).toEqual([
+      ['billing-tq', 'start-workflow'],
+      ['billing-tq', 'start-activity'],
+    ]);
+  });
+
+  it('matches the operation keyword on the displayed operation name', () => {
+    expect(
+      operations(
+        filterCallbacks(
+          callbacks,
+          filtersWith({
+            operation: { operator: 'STARTS_WITH', value: 'start-' },
+          }),
+        ),
+      ),
+    ).toEqual([
+      ['orders-tq', 'start-workflow'],
+      ['billing-tq', 'start-workflow'],
+      ['billing-tq', 'start-activity'],
+    ]);
+  });
+
+  it('matches any selected delivery state', () => {
+    expect(
+      operations(
+        filterCallbacks(
+          callbacks,
+          filtersWith({ state: ['Failed', 'Succeeded'] }),
+        ),
+      ),
+    ).toEqual([
+      ['orders-tq', 'update-workflow'],
+      ['billing-tq', 'start-workflow'],
+      ['billing-tq', 'start-activity'],
+    ]);
+  });
+
+  it('matches any selected target type and skips callbacks without a target', () => {
+    expect(
+      operations(
+        filterCallbacks(callbacks, filtersWith({ targetType: ['activity'] })),
+      ),
+    ).toEqual([['billing-tq', 'start-activity']]);
   });
 
   it('requires a match in every filtered field', () => {
     expect(
-      filterCallbacks(callbacks, {
-        endpoint: ['billing-tq'],
-        service: ['order-service'],
-        operation: [],
-      }),
-    ).toEqual([callbacks[3]]);
-  });
-
-  it('matches the endpoint filter on the handler task queue', () => {
-    expect(
-      filterCallbacks(callbacks, {
-        endpoint: ['orders-tq'],
-        service: [],
-        operation: [],
-      }),
-    ).toEqual([callbacks[0], callbacks[1]]);
+      operations(
+        filterCallbacks(
+          callbacks,
+          filtersWith({
+            state: ['Succeeded'],
+            service: { operator: '!=', value: 'billing-service' },
+          }),
+        ),
+      ),
+    ).toEqual([['billing-tq', 'start-activity']]);
   });
 
   it('returns nothing when no callback matches', () => {
     expect(
-      filterCallbacks(callbacks, {
-        endpoint: ['missing-tq'],
-        service: [],
-        operation: [],
-      }),
+      filterCallbacks(
+        callbacks,
+        filtersWith({ taskQueue: { operator: '=', value: 'missing-tq' } }),
+      ),
     ).toEqual([]);
   });
 });
 
-describe('callbackFilterOptions', () => {
-  it('lists the distinct values of each field with counts, sorted by value', () => {
-    expect(callbackFilterOptions(callbacks)).toEqual({
-      endpoint: [
-        { value: 'billing-tq', count: 2 },
-        { value: 'orders-tq', count: 2 },
-      ],
-      service: [
-        { value: 'billing-service', count: 1 },
-        { value: 'order-service', count: 3 },
-      ],
-      operation: [
-        { value: 'start-workflow', count: 3 },
-        { value: 'update-workflow', count: 1 },
-      ],
-    });
-  });
-
-  it('skips callbacks without a value for a field', () => {
-    const options = callbackFilterOptions([
-      { callback: {} } as unknown as Callback,
-      callback('orders-tq', '', 'start-workflow'),
-    ]);
-
-    expect(options.endpoint).toEqual([{ value: 'orders-tq', count: 1 }]);
-    expect(options.service).toEqual([]);
-  });
-});
-
 describe('appliedCallbackFilterCount', () => {
-  it('counts every selected value across the fields', () => {
+  it('counts each field that has a filter', () => {
+    expect(appliedCallbackFilterCount(EMPTY_CALLBACK_FILTERS)).toBe(0);
     expect(
-      appliedCallbackFilterCount({
-        endpoint: ['orders-tq'],
-        service: ['order-service', 'billing-service'],
-        operation: [],
-      }),
-    ).toBe(3);
-  });
-});
-
-describe('matchesCallbackFilterSearch', () => {
-  it('matches case-insensitively anywhere in the value', () => {
-    expect(matchesCallbackFilterSearch('Order-Service', 'der-se')).toBe(true);
-    expect(matchesCallbackFilterSearch('order-service', 'BILLING')).toBe(false);
-  });
-
-  it('matches everything when the search is blank', () => {
-    expect(matchesCallbackFilterSearch('order-service', '  ')).toBe(true);
-  });
-});
-
-describe('limitCallbackFilterOptions', () => {
-  const options = Array.from({ length: 150 }, (_, index) => ({
-    value: `value-${String(index).padStart(3, '0')}`,
-    count: 1,
-  }));
-
-  it('keeps the first options up to the limit', () => {
-    expect(limitCallbackFilterOptions(options, [], 100)).toHaveLength(100);
-  });
-
-  it('always keeps selected options, even past the limit', () => {
-    const limited = limitCallbackFilterOptions(options, ['value-149'], 100);
-
-    expect(limited).toHaveLength(100);
-    expect(limited.map(({ value }) => value)).toContain('value-149');
+      appliedCallbackFilterCount(
+        filtersWith({
+          state: ['Failed', 'Blocked'],
+          service: { operator: '=', value: 'order-service' },
+        }),
+      ),
+    ).toBe(2);
   });
 });
 
 describe('callbackFilterUpdate', () => {
-  it('writes each field as an encoded, comma-joined URL parameter and resets the page', () => {
+  it('writes each field and keyword operator to the URL and resets the page', () => {
     expect(
-      callbackFilterUpdate({
-        endpoint: ['orders-tq', 'a,b'],
-        service: [],
-        operation: ['start-workflow'],
-      }),
+      callbackFilterUpdate(
+        filtersWith({
+          state: ['Failed', 'Blocked'],
+          service: { operator: 'STARTS_WITH', value: 'order' },
+          operation: { operator: '=', value: 'start-workflow' },
+        }),
+      ),
     ).toEqual({
       parameters: [
-        {
-          parameter: CALLBACK_FILTER_PARAMETERS.endpoint,
-          value: `orders-tq,${encodeURIComponent('a,b')}`,
-        },
-        { parameter: CALLBACK_FILTER_PARAMETERS.service, value: '' },
-        {
-          parameter: CALLBACK_FILTER_PARAMETERS.operation,
-          value: 'start-workflow',
-        },
+        { parameter: 'callbacks-state', value: 'Failed,Blocked' },
+        { parameter: 'callbacks-task-queue', value: '' },
+        { parameter: 'callbacks-task-queue-operator', value: '' },
+        { parameter: 'callbacks-service', value: 'order' },
+        { parameter: 'callbacks-service-operator', value: 'starts-with' },
+        { parameter: 'callbacks-operation', value: 'start-workflow' },
+        { parameter: 'callbacks-operation-operator', value: '' },
+        { parameter: 'callbacks-target-type', value: '' },
       ],
       clearParameters: ['callbacks-page'],
     });
   });
 
   it('round-trips through parseCallbackFilters', () => {
-    const filters = {
-      endpoint: ['orders-tq', 'a,b'],
-      service: ['order service'],
-      operation: [],
-    };
+    const filters = filtersWith({
+      state: ['BackingOff'],
+      taskQueue: { operator: '!=', value: 'orders tq,a' },
+      targetType: ['workflow', 'batchJob'],
+    });
     const params: Record<string, string> = {};
     for (const { parameter, value } of callbackFilterUpdate(filters)
       .parameters) {

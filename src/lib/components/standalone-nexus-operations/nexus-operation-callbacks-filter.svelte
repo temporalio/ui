@@ -8,37 +8,65 @@
   import Menu from '$lib/holocene/menu/menu.svelte';
   import { translate } from '$lib/i18n/translate';
   import IconFilter from '$lib/io/icon/icons/filter.svelte';
-  import type { Callback } from '$lib/types/nexus';
   import {
     appliedCallbackFilterCount,
     CALLBACK_FILTER_FIELDS,
+    CALLBACK_TARGET_TYPES,
+    type CallbackChoiceField,
+    type CallbackChoiceOption,
     type CallbackFilterField,
-    callbackFilterOptions,
     type CallbackFilters,
     callbackFilterUpdate,
+    type CallbackKeywordFilter,
+    type CallbackTargetType,
+    EMPTY_CALLBACK_FILTERS,
+    isCallbackFilterActive,
+    isCallbackKeywordField,
     parseCallbackFilters,
   } from '$lib/utilities/nexus-operation-callback-filters';
+  import {
+    CALLBACK_DELIVERY_STATES,
+    callbackDeliveryState,
+  } from '$lib/utilities/nexus-operation-callbacks';
   import { updateMultipleQueryParameters } from '$lib/utilities/update-query-parameters';
 
-  import NexusOperationCallbacksFilterChip from './nexus-operation-callbacks-filter-chip.svelte';
-
-  let { callbacks }: { callbacks: Callback[] } = $props();
+  import NexusOperationCallbacksChoiceFilterChip from './nexus-operation-callbacks-choice-filter-chip.svelte';
+  import NexusOperationCallbacksKeywordFilterChip from './nexus-operation-callbacks-keyword-filter-chip.svelte';
 
   let editingField = $state<CallbackFilterField | null>(null);
   let addedField = $state<CallbackFilterField | null>(null);
 
   const fieldLabels: Record<CallbackFilterField, string> = {
-    endpoint: translate('common.task-queue'),
+    state: translate('nexus.delivery-state'),
+    taskQueue: translate('common.task-queue'),
     service: translate('nexus.nexus-service'),
     operation: translate('nexus.nexus-operation'),
+    targetType: translate('nexus.target-execution-type'),
+  };
+
+  const targetTypeLabels: Record<CallbackTargetType, string> = {
+    workflow: translate('nexus.target-type-workflow-execution'),
+    activity: translate('nexus.target-type-standalone-activity'),
+    batchJob: translate('nexus.target-type-batch-job'),
+  };
+
+  const choiceOptions: Record<CallbackChoiceField, CallbackChoiceOption[]> = {
+    state: CALLBACK_DELIVERY_STATES.map((state) => ({
+      value: state,
+      ...callbackDeliveryState(state),
+    })),
+    targetType: CALLBACK_TARGET_TYPES.map((type) => ({
+      value: type,
+      label: targetTypeLabels[type],
+    })),
   };
 
   const filters = $derived(parseCallbackFilters(page.url));
   const appliedCount = $derived(appliedCallbackFilterCount(filters));
-  const options = $derived(callbackFilterOptions(callbacks));
   const chipFields = $derived(
     CALLBACK_FILTER_FIELDS.filter(
-      (field) => filters[field].length > 0 || field === editingField,
+      (field) =>
+        isCallbackFilterActive(filters, field) || field === editingField,
     ),
   );
 
@@ -54,9 +82,20 @@
     addedField = field;
   };
 
-  const applyFilter = (field: CallbackFilterField, values: string[]) => {
-    editingField = values.length > 0 ? field : null;
+  const settleChip = (field: CallbackFilterField, active: boolean) => {
+    editingField = active ? field : null;
     if (addedField === field) addedField = null;
+  };
+
+  const applyKeyword = (
+    field: CallbackFilterField,
+    filter: CallbackKeywordFilter | null,
+  ) => {
+    settleChip(field, filter !== null);
+    setFilters({ ...filters, [field]: filter });
+  };
+
+  const changeChoices = (field: CallbackChoiceField, values: string[]) => {
     setFilters({ ...filters, [field]: values });
   };
 
@@ -68,7 +107,7 @@
   const clearAll = () => {
     editingField = null;
     addedField = null;
-    setFilters({ endpoint: [], service: [], operation: [] });
+    setFilters(EMPTY_CALLBACK_FILTERS);
   };
 </script>
 
@@ -77,15 +116,26 @@
   data-testid="callbacks-filter-bar"
 >
   {#each chipFields as field (field)}
-    <NexusOperationCallbacksFilterChip
-      {field}
-      label={fieldLabels[field]}
-      options={options[field]}
-      selected={filters[field]}
-      openOnMount={field === addedField}
-      onApply={(values) => applyFilter(field, values)}
-      onDismiss={() => dismissChip(field)}
-    />
+    {#if isCallbackKeywordField(field)}
+      <NexusOperationCallbacksKeywordFilterChip
+        {field}
+        label={fieldLabels[field]}
+        filter={filters[field]}
+        openOnMount={field === addedField}
+        onApply={(filter) => applyKeyword(field, filter)}
+        onDismiss={() => dismissChip(field)}
+      />
+    {:else}
+      <NexusOperationCallbacksChoiceFilterChip
+        {field}
+        label={fieldLabels[field]}
+        options={choiceOptions[field]}
+        selected={filters[field]}
+        openOnMount={field === addedField}
+        onChange={(values) => changeChoices(field, values)}
+        onDismiss={() => dismissChip(field)}
+      />
+    {/if}
   {/each}
   <MenuContainer>
     <MenuButton
