@@ -20,6 +20,17 @@ body.sb-show-main,
   gap: 24px;
 }
 
+/* Storybook's page nav uses fixed light colors, so follow the Io theme.
+   The rail selectors match the specificity of Storybook's nested lists. */
+.sbdocs.sbdocs-toc--custom .toc-wrapper .toc-list,
+.sbdocs.sbdocs-toc--custom .toc-wrapper .toc-list .toc-list {
+  border-left-color: var(--color-border-primary);
+}
+
+.sbdocs-toc--custom .toc-list-item.is-active-li::before {
+  border-left-color: var(--color-content-secondary);
+}
+
 .io-docs-canvas,
 .io-docs-adjust-props {
   min-width: 0;
@@ -28,6 +39,22 @@ body.sb-show-main,
 .io-docs-canvas .sbdocs-preview {
   margin-top: 0;
   box-sizing: border-box;
+}
+
+:is(.io-docs-canvas, .io-docs-examples) .docs-story {
+  background-color: var(--color-surface-primary);
+}
+
+:is(.io-docs-canvas, .io-docs-examples) .docs-story > div:first-child {
+  display: flex;
+  min-height: 86px;
+  align-items: center;
+  justify-content: center;
+}
+
+:is(.io-docs-canvas, .io-docs-examples) .docs-story .sb-story > * {
+  display: flex;
+  justify-content: center;
 }
 
 .io-docs-examples .sbdocs-preview-actions {
