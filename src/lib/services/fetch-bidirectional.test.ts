@@ -255,26 +255,51 @@ describe('fetchBidirectional failure recovery', () => {
           ),
         );
       });
-      const onPause = vi.fn();
 
       await fetchBidirectional({
         namespace: 'ns',
         workflowId: 'wf',
         runId: 'run',
-        pauseAfterPages: 2,
-        onPause,
         onRawPage: (events) =>
           received.push(...events.map((event) => event.eventId)),
       });
 
       expect(healthyCalls).toBe(3);
       expect(received.toSorted()).toEqual(['1', '2', '3', '4', '5', '6']);
-      expect(onPause).not.toHaveBeenCalled();
       expect(
         requestFromAPI.mock.calls.filter(([url]) => url === failedDirection),
       ).toHaveLength(1);
     },
   );
+
+  it('stops the healthy cursor at the pause threshold after a failure', async () => {
+    const error = new Error('ascending failed');
+    let descendingCalls = 0;
+    requestFromAPI.mockImplementation((url: string) => {
+      if (url === 'asc') return Promise.reject(error);
+      descendingCalls++;
+      return Promise.resolve(
+        descPage(
+          descendingCalls === 1 ? [6, 5] : [4, 3],
+          `d${descendingCalls + 1}`,
+        ),
+      );
+    });
+    const onPause = vi.fn();
+
+    await expect(
+      fetchBidirectional({
+        namespace: 'ns',
+        workflowId: 'wf',
+        runId: 'run',
+        pauseAfterPages: 2,
+        onPause,
+        onRawPage: vi.fn(),
+      }),
+    ).rejects.toBe(error);
+    expect(descendingCalls).toBe(2);
+    expect(onPause).not.toHaveBeenCalled();
+  });
 
   it('rejects after both directions fail with a gap, retaining delivered pages', async () => {
     const error = new Error('ascending failed');
@@ -402,7 +427,7 @@ describe('fetchBidirectional failure recovery', () => {
     ).rejects.toBe(error);
   });
 
-  it('releases an existing pause on failure so the healthy cursor can finish', async () => {
+  it('stops a paused cursor and rejects when the other cursor fails', async () => {
     const failingPage = deferred<ReturnType<typeof ascPage>>();
     const paused = deferred<void>();
     const onPause = vi.fn(() => paused.resolve());
@@ -425,15 +450,16 @@ describe('fetchBidirectional failure recovery', () => {
       onPause,
     });
     await paused.promise;
-    failingPage.reject(new Error('ascending failed while descending paused'));
+    const error = new Error('ascending failed while descending paused');
+    failingPage.reject(error);
 
-    await expect(done).resolves.toBeUndefined();
+    await expect(done).rejects.toBe(error);
     expect(
       onRawPage.mock.calls.flatMap(([events]) =>
         events.map((event: ReturnType<typeof makeEvent>) => event.eventId),
       ),
-    ).toEqual(['4', '3', '2', '1']);
-    expect(descendingCalls).toBe(2);
+    ).toEqual(['4', '3']);
+    expect(descendingCalls).toBe(1);
     expect(onPause).toHaveBeenCalledTimes(1);
   });
 

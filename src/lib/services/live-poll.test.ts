@@ -8,11 +8,17 @@ import {
   vi,
 } from 'vitest';
 
+import { handleUnauthorizedOrForbiddenError } from '$lib/utilities/handle-error';
+
 import { runLivePoll } from './live-poll';
 
 // ---------------------------------------------------------------------------
 // Mocks
 // ---------------------------------------------------------------------------
+
+vi.mock('$lib/utilities/handle-error', () => ({
+  handleUnauthorizedOrForbiddenError: vi.fn(),
+}));
 
 vi.mock('$lib/utilities/request-from-api', () => ({
   requestFromAPI: vi.fn(),
@@ -538,6 +544,76 @@ describe('runLivePoll — back-off', () => {
       expect(delays).toContain(2000);
       expect(delays).toContain(5000);
     });
+  });
+});
+
+describe('runLivePoll — request errors', () => {
+  const networkError = (statusCode: number) => ({
+    statusCode,
+    statusText: 'Request failed',
+    response: new Response(null, { status: statusCode }),
+  });
+
+  it('delegates request errors to auth handling and rethrows them', async () => {
+    const ctrl = new AbortController();
+    requestFromAPI.mockImplementationOnce(() => {
+      ctrl.abort();
+      return Promise.resolve(pollResponse([]));
+    });
+
+    await runLivePoll({
+      route: '/api/events',
+      runId: 'run-1',
+      startToken: '',
+      signal: ctrl.signal,
+      onEvent: vi.fn(),
+      ...FAST,
+    });
+
+    const { handleError } = requestFromAPI.mock.calls[0][1] as {
+      handleError: (error: unknown) => void;
+    };
+    const error = networkError(403);
+    expect(() => handleError(error)).toThrow();
+    expect(handleUnauthorizedOrForbiddenError).toHaveBeenCalledWith(error);
+  });
+
+  it('rejects on a non-retryable error response', async () => {
+    const error = networkError(404);
+    requestFromAPI.mockRejectedValueOnce(error);
+
+    await expect(
+      runLivePoll({
+        route: '/api/events',
+        runId: 'run-1',
+        startToken: '',
+        signal: new AbortController().signal,
+        onEvent: vi.fn(),
+        ...FAST,
+      }),
+    ).rejects.toBe(error);
+    expect(requestFromAPI).toHaveBeenCalledTimes(1);
+  });
+
+  it.each([408, 429, 503])('retries a %s error response', async (status) => {
+    const ctrl = new AbortController();
+    requestFromAPI
+      .mockRejectedValueOnce(networkError(status))
+      .mockImplementationOnce(() => {
+        ctrl.abort();
+        return Promise.resolve(pollResponse([]));
+      });
+
+    await runLivePoll({
+      route: '/api/events',
+      runId: 'run-1',
+      startToken: '',
+      signal: ctrl.signal,
+      onEvent: vi.fn(),
+      ...FAST,
+    });
+
+    expect(requestFromAPI).toHaveBeenCalledTimes(2);
   });
 });
 

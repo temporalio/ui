@@ -220,6 +220,7 @@
       workflowError = error;
       return;
     }
+    workflowError = null;
     $workflowRun.workflow = workflow ?? null;
   };
 
@@ -282,7 +283,7 @@
 
   $effect(() => {
     const controller = historyController;
-    const paused = $pauseLiveUpdates;
+    const paused = $pauseLiveUpdates || !!workflowError;
     untrack(() => controller?.setLiveUpdatesPaused(paused));
   });
 

@@ -85,10 +85,14 @@ export const fetchBidirectional = async ({
     resumePause = undefined;
   };
 
-  const onAbort = () => {
-    rootCtrl.abort();
+  const stopCursors = () => {
     ascCtrl.abort();
     descCtrl.abort();
+  };
+
+  const onAbort = () => {
+    rootCtrl.abort();
+    stopCursors();
     releasePause();
   };
   signal?.addEventListener('abort', onAbort);
@@ -117,6 +121,10 @@ export const fetchBidirectional = async ({
       pages >= pauseAfterPages
     ) {
       pauseFired = true;
+      if (failure) {
+        stopCursors();
+        return;
+      }
       pauseLatch = new Promise<void>((resolve) => {
         resumePause = resolve;
       });
@@ -161,8 +169,9 @@ export const fetchBidirectional = async ({
         error instanceof Error || isNetworkError(error)
           ? error
           : new Error(getErrorMessage(error));
-      pauseFired = true;
-      releasePause();
+      if (pauseLatch) {
+        stopCursors();
+      }
     }
   };
 

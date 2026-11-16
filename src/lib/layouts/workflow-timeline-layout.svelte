@@ -192,7 +192,7 @@
   };
 
   const workflowTaskFailedError = $derived.by(() => {
-    if (historyController.loading) return undefined;
+    if (!historyController.fetchComplete) return undefined;
     return historyController.history.workflowTaskFailedEvent as
       | WorkflowTaskFailedEvent
       | WorkflowTaskTimedOutEvent

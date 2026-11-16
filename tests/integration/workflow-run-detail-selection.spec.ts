@@ -72,8 +72,8 @@ async function openActivity(page: Page) {
 }
 
 async function toggleFilter(page: Page, name: string) {
-  await page.locator('button[aria-controls="status-menu"]').click();
-  await page.locator('#event-type-menu').getByTestId(name).click();
+  await page.locator('button[aria-controls="event-type-filter"]').click();
+  await page.locator('#event-type-filter').getByTestId(name).click();
   await page.keyboard.press('Escape');
 }
 

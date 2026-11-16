@@ -2,8 +2,13 @@ import type {
   GetWorkflowExecutionHistoryResponse,
   HistoryEvent,
 } from '$lib/types/events';
+import { handleUnauthorizedOrForbiddenError } from '$lib/utilities/handle-error';
 import { isWorkflowCloseEvent } from '$lib/utilities/is-event-type';
-import { requestFromAPI } from '$lib/utilities/request-from-api';
+import { isNetworkError } from '$lib/utilities/is-network-error';
+import {
+  type ErrorCallback,
+  requestFromAPI,
+} from '$lib/utilities/request-from-api';
 
 export type LivePollOptions = {
   route: string;
@@ -21,8 +26,19 @@ export type LivePollOptions = {
   onToken?: (token: string) => void;
   /** ms to wait when a long-poll times out with no new events. Default 2000. */
   backoffMs?: number;
-  /** ms to wait after a network error before retrying. Default 5000. */
+  /** ms to wait after a retryable error before retrying. Default 5000. */
   errorBackoffMs?: number;
+};
+
+const handlePollError: ErrorCallback = (error) => {
+  handleUnauthorizedOrForbiddenError(error);
+  throw error;
+};
+
+const isRetryableError = (error: unknown): boolean => {
+  if (!isNetworkError(error)) return true;
+  const { statusCode } = error;
+  return statusCode === 408 || statusCode === 429 || statusCode >= 500;
 };
 
 /**
@@ -35,7 +51,8 @@ export type LivePollOptions = {
  *     continue immediately.
  *   - nextPageToken absent, no new events (timeout) → reset token; back off
  *     2 s before retrying so we don't spin on an idle workflow.
- *   - Network error → back off 5 s and retry.
+ *   - Network failure, 408, 429 or 5xx → back off 5 s and retry.
+ *   - Any other error response → reject so the caller can surface it.
  *
  * The loop exits cleanly when `signal` is aborted or once it receives the
  * workflow's close event.
@@ -78,12 +95,13 @@ export async function runLivePoll({
             waitNewEvent: 'true',
           },
           options: { signal },
+          handleError: handlePollError,
         },
       );
-    } catch {
-      if (!signal.aborted) {
-        await wait(errorBackoffMs);
-      }
+    } catch (error) {
+      if (signal.aborted) break;
+      if (!isRetryableError(error)) throw error;
+      await wait(errorBackoffMs);
       continue;
     }
     const events = response?.history?.events ?? [];
