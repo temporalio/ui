@@ -12,14 +12,9 @@ body.sb-show-main,
   border-bottom: 0;
 }
 
+/* The controls always sit directly under the canvas. */
 .io-docs-playground {
   --io-docs-controls-header-height: 36px;
-  display: grid;
-  /* The canvas is 80% of the width it would have next to a 320px controls
-     column; the controls take the rest. */
-  grid-template-columns: calc((100% - 344px) * 0.8) minmax(260px, 1fr);
-  align-items: start;
-  gap: 24px;
 }
 
 /* Storybook's page nav uses fixed light colors, so follow the Io theme.
@@ -46,6 +41,11 @@ body.sb-show-main,
   table:not(.sb-anchor, .sb-unstyled, .sb-unstyled table)
   tr:nth-of-type(2n) {
   background-color: rgb(69 76 84 / 10%);
+}
+
+/* Narrower than Storybook's default 1000px docs column. */
+.sbdocs.sbdocs-content {
+  max-width: 800px;
 }
 
 /* Keep docs prose near 66 characters per line, never over 75. */
@@ -125,6 +125,13 @@ body.sb-show-main,
   overflow-x: auto;
 }
 
+/* Storybook gives this table width: 100% plus a 1px side margin, which
+   overflows the scroll wrapper by 2px. Keep the margin, shrink the width; the
+   extra class outranks Storybook's doubled-class table style. */
+.sbdocs .io-docs-api-reference .docblock-argstable {
+  width: calc(100% - 2px);
+}
+
 .io-docs-page-actions {
   position: relative;
   float: right;
@@ -172,18 +179,77 @@ body.sb-show-main,
   height: var(--io-docs-controls-header-height);
 }
 
-.io-docs-playground .io-docs-canvas {
-  margin-top: var(--io-docs-controls-header-height);
+/* IO overview landing page cards. */
+.io-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+  margin: 12px 0 32px;
 }
 
-@media (max-width: 1100px) {
-  /* Attach the controls to the bottom of the canvas when stacked. */
-  .io-docs-playground {
-    grid-template-columns: minmax(0, 1fr);
-    row-gap: 0;
-  }
+.sbdocs .io-overview-card {
+  padding: 16px;
+  border: 1px solid var(--color-border-primary);
+  border-radius: 8px;
+  background-color: var(--color-surface-primary);
+}
 
-  .io-docs-playground .io-docs-canvas {
-    margin-top: 0;
-  }
+.sbdocs .io-overview-card > p {
+  margin: 0;
+}
+
+.sbdocs .io-overview-card > p + p {
+  margin-top: 6px;
+  color: var(--color-content-secondary);
+}
+
+/* IO overview hero, sized from the 800 × 450 Figma frame. Text and spacing
+   scale with the banner width (cqw); the banner grows if text needs room. */
+.sbdocs .io-overview-hero {
+  position: relative;
+  container-type: inline-size;
+  display: flex;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  margin: 0 0 40px;
+  background: #000 var(--io-overview-hero-image) center / cover no-repeat;
+  color: #fff;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}
+
+.io-overview-hero::after {
+  position: absolute;
+  inset: 0;
+  background: var(--io-overview-hero-noise) top left / 31.97cqw;
+  content: '';
+  mix-blend-mode: difference;
+  pointer-events: none;
+}
+
+.io-overview-hero-content {
+  position: relative;
+  z-index: 1;
+  /* 260px of text plus 40px padding on each side, in the 540px frame. */
+  width: max(62.96cqw, min(340px, 100%));
+  padding: 7.41cqw;
+}
+
+.sbdocs .io-overview-hero h1 {
+  margin: 0 0 1.48cqw;
+  padding: 0;
+  border: 0;
+  color: inherit;
+  font-family: inherit;
+  font-size: max(5.56cqw, 24px);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.sbdocs.sbdocs-content .io-overview-hero p {
+  max-width: none;
+  margin: 0;
+  color: inherit;
+  font-family: inherit;
+  font-size: max(2.22cqw, 13px);
+  line-height: 1.2;
 }

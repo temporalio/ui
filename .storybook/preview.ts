@@ -42,7 +42,7 @@ const preview: Preview = {
         method: 'alphabetical',
         order: [
           'IO',
-          ['Guides', ['Forms', 'Theme'], 'Components', 'Layouts'],
+          ['Overview', 'Guides', ['Forms', 'Theme'], 'Components', 'Layouts'],
           'Holocene',
           ['Components'],
           'Application',
