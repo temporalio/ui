@@ -32,6 +32,11 @@ const historyPage = (events: HistoryEvent[]) => ({
   archived: false,
 });
 
+const livePage = (events: HistoryEvent[]) => ({
+  ...historyPage(events),
+  nextPageToken: 'end-of-history',
+});
+
 function gate() {
   let release = () => {};
   const promise = new Promise<void>((resolve) => {
@@ -56,6 +61,7 @@ async function mockRunDetail(page: Page, liveEvents: HistoryEvent[]) {
   const state = { completed: false };
   const liveRequested = gate();
   const liveResponse = gate();
+  const reverseServed = gate();
 
   await mockWorkflowApis(page, runningWorkflow);
   await page.route(WORKFLOW_API, (route) => {
@@ -75,23 +81,23 @@ async function mockRunDetail(page: Page, liveEvents: HistoryEvent[]) {
     });
   });
   await page.route(EVENT_HISTORY_API, async (route) => {
-    if (
-      new URL(route.request().url()).searchParams.get('waitNewEvent') === 'true'
-    ) {
+    if (new URL(route.request().url()).searchParams.has('next_page_token')) {
       requests.live += 1;
       if (requests.live === 1) {
         liveRequested.release();
         await liveResponse.promise;
-        return route.fulfill({ json: historyPage(liveEvents) });
+        return route.fulfill({ json: livePage(liveEvents) });
       }
-      return route.fulfill({ json: historyPage([]) });
+      return route.fulfill({ json: livePage([]) });
     }
     requests.initial += 1;
-    return route.fulfill({ json: historyPage(initialEvents) });
+    await reverseServed.promise;
+    return route.fulfill({ json: livePage(initialEvents) });
   });
-  await page.route(EVENT_HISTORY_API_REVERSE, (route) => {
+  await page.route(EVENT_HISTORY_API_REVERSE, async (route) => {
     requests.reverse += 1;
-    return route.fulfill({ json: historyPage([...initialEvents].reverse()) });
+    await route.fulfill({ json: historyPage([...initialEvents].reverse()) });
+    reverseServed.release();
   });
 
   return { requests, state, liveRequested, liveResponse };

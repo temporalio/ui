@@ -37,6 +37,44 @@ export type FetchBidirectionalParams = {
   onPause?: (handle: PauseHandle) => void;
 };
 
+const handlePageError: ErrorCallback = (error) => {
+  handleUnauthorizedOrForbiddenError(error);
+  throw error;
+};
+
+export type FetchHistoryTailParams = {
+  namespace: string;
+  workflowId: string;
+  runId: string;
+  signal?: AbortSignal;
+  maximumPageSize?: number;
+};
+
+export const fetchHistoryTail = async ({
+  namespace,
+  workflowId,
+  runId,
+  signal,
+  maximumPageSize,
+}: FetchHistoryTailParams): Promise<HistoryEvent[]> => {
+  const response = await requestFromAPI<GetWorkflowExecutionHistoryResponse>(
+    routeForApi('events.descending', { namespace, workflowId }),
+    {
+      request: fetch,
+      params: {
+        'execution.runId': runId,
+        ...(maximumPageSize && {
+          maximumPageSize: String(maximumPageSize),
+        }),
+      },
+      options: { signal },
+      handleError: handlePageError,
+    },
+  );
+  if (!response) throw new Error('Missing workflow history response.');
+  return response.history?.events ?? [];
+};
+
 export const fetchBidirectional = async ({
   namespace,
   workflowId,
@@ -49,11 +87,6 @@ export const fetchBidirectional = async ({
   onPause,
 }: FetchBidirectionalParams): Promise<void> => {
   if (signal?.aborted) return;
-
-  const handlePageError: ErrorCallback = (error) => {
-    handleUnauthorizedOrForbiddenError(error);
-    throw error;
-  };
 
   const rootCtrl = new AbortController();
   const ascCtrl = new AbortController();

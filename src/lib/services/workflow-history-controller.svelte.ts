@@ -11,7 +11,11 @@ import { isWorkflowCloseEvent } from '$lib/utilities/is-event-type';
 import { isNetworkError } from '$lib/utilities/is-network-error';
 import { routeForApi } from '$lib/utilities/route-for-api';
 
-import { fetchBidirectional, type PauseHandle } from './fetch-bidirectional';
+import {
+  fetchBidirectional,
+  fetchHistoryTail,
+  type PauseHandle,
+} from './fetch-bidirectional';
 import {
   createGroupedEventBuffer,
   type GroupedEventBuffer,
@@ -29,7 +33,13 @@ type HistoryLoadSession = {
   livePollTask: Promise<void> | null;
   livePollFailed: boolean;
   lastPollToken: string;
+  lastPollEventId: number;
   workflowWasRunning: boolean;
+  catchingUp: boolean;
+  tailStartId: number;
+  pollPages: number;
+  pollPausedAtPageLimit: boolean;
+  finishCatchUp: () => void;
 };
 
 type WorkflowHistoryControllerOptions = {
@@ -106,6 +116,10 @@ export class WorkflowHistoryController {
     const lastPollToken = preserveHistory
       ? (this.session?.lastPollToken ?? '')
       : '';
+    const lastPollEventId =
+      preserveHistory && lastPollToken
+        ? (this.session?.lastPollEventId ?? 0)
+        : 0;
     this.stopSession();
 
     this.fetchComplete = false;
@@ -129,10 +143,20 @@ export class WorkflowHistoryController {
       livePollTask: null,
       livePollFailed: false,
       lastPollToken,
+      lastPollEventId,
       workflowWasRunning: workflow.isRunning,
+      catchingUp: workflow.isRunning,
+      tailStartId: 0,
+      pollPages: 0,
+      pollPausedAtPageLimit: false,
+      finishCatchUp: () => {},
     };
     this.session = session;
-    this.startLivePoll(session);
+
+    if (workflow.isRunning) {
+      await this.loadOpenHistory(session);
+      return;
+    }
 
     try {
       await fetchBidirectional({
@@ -189,6 +213,91 @@ export class WorkflowHistoryController {
     }
   }
 
+  private async loadOpenHistory(session: HistoryLoadSession): Promise<void> {
+    const caughtUp = new Promise<void>((resolve) => {
+      session.finishCatchUp = resolve;
+    });
+    this.startLivePoll(session);
+    void this.loadTail(session);
+    await caughtUp;
+    if (this.isCurrent(session)) this.started = false;
+  }
+
+  private async loadTail(session: HistoryLoadSession): Promise<void> {
+    try {
+      const events = await fetchHistoryTail({
+        ...this.workflowExecutionIdentity,
+        signal: session.controller.signal,
+        maximumPageSize: this.maximumPageSize,
+      });
+      if (!this.isCurrent(session)) return;
+      const eventIds = events.map((event) => parseInt(event.eventId) || 0);
+      for (const event of events) this.ingestEvent(event, session);
+      session.pollPages++;
+      session.tailStartId = eventIds.length ? Math.min(...eventIds) : 1;
+      this.totalExpectedEvents = Math.max(
+        this.totalExpectedEvents,
+        ...eventIds,
+      );
+      this.descMinId = this.descMinId
+        ? Math.min(this.descMinId, session.tailStartId)
+        : session.tailStartId;
+      this.checkCaughtUp(session);
+      this.syncLivePoll(session);
+    } catch (error) {
+      if (!this.isCurrent(session)) return;
+      this.error =
+        error instanceof Error || isNetworkError(error)
+          ? error
+          : new Error(getErrorMessage(error));
+      session.controller.abort();
+      this.endCatchUp(session);
+      this.syncLivePoll(session);
+    }
+  }
+
+  private checkCaughtUp(session: HistoryLoadSession): void {
+    if (!session.catchingUp || !session.tailStartId) return;
+    if (session.lastPollEventId < session.tailStartId - 1) return;
+    this.fetchComplete = true;
+    this.endCatchUp(session);
+  }
+
+  private endCatchUp(session: HistoryLoadSession): void {
+    session.catchingUp = false;
+    if (session.pollPausedAtPageLimit) {
+      session.pollPausedAtPageLimit = false;
+      this.pauseHandle = null;
+    }
+    session.finishCatchUp();
+  }
+
+  private syncLivePoll(session: HistoryLoadSession): void {
+    if (!this.canPoll(session)) {
+      session.livePollController?.abort();
+      return;
+    }
+    this.startLivePoll(session);
+  }
+
+  private pauseAtPageLimit(session: HistoryLoadSession): void {
+    if (
+      !session.catchingUp ||
+      this.historyRequested ||
+      this.pauseAfterPages === undefined ||
+      session.pollPages < this.pauseAfterPages
+    ) {
+      return;
+    }
+    session.pollPausedAtPageLimit = true;
+    this.pauseHandle = {
+      resume: () => {
+        session.pollPausedAtPageLimit = false;
+        this.startLivePoll(session);
+      },
+    };
+  }
+
   updateWorkflow(workflow: WorkflowExecution): void {
     if (this.disposed) return;
     this.verifyWorkflow(workflow);
@@ -208,7 +317,7 @@ export class WorkflowHistoryController {
     const session = this.session;
     if (!session) return;
     if (paused) {
-      session.livePollController?.abort();
+      if (!session.catchingUp) session.livePollController?.abort();
       return;
     }
     this.startLivePoll(session);
@@ -246,10 +355,12 @@ export class WorkflowHistoryController {
   private canPoll(session: HistoryLoadSession): boolean {
     return (
       this.isCurrent(session) &&
-      !this.liveUpdatesPaused &&
+      !session.pollPausedAtPageLimit &&
       !session.livePollFailed &&
-      session.workflowWasRunning &&
-      !this.historyClosed
+      (session.catchingUp ||
+        (!this.liveUpdatesPaused &&
+          session.workflowWasRunning &&
+          !this.historyClosed))
     );
   }
 
@@ -265,7 +376,7 @@ export class WorkflowHistoryController {
     );
     if (isWorkflowCloseEvent(event)) {
       this.historyClosed = true;
-      session.livePollController?.abort();
+      if (!session.catchingUp) session.livePollController?.abort();
     }
     return isNew;
   }
@@ -278,15 +389,24 @@ export class WorkflowHistoryController {
       route: routeForApi('events.ascending', this.workflowExecutionIdentity),
       runId: this.workflowExecutionIdentity.runId,
       startToken: session.lastPollToken,
+      maximumPageSize: this.maximumPageSize,
       signal: controller.signal,
       onEvent: (event) => {
         if (controller.signal.aborted) return false;
-        return this.ingestEvent(event, session);
+        const isNew = this.ingestEvent(event, session);
+        session.lastPollEventId = Math.max(
+          session.lastPollEventId,
+          parseInt(event.eventId) || 0,
+        );
+        this.checkCaughtUp(session);
+        return isNew;
       },
       onToken: (token) => {
-        if (this.isCurrent(session) && !controller.signal.aborted) {
-          session.lastPollToken = token;
-        }
+        if (!this.isCurrent(session) || controller.signal.aborted) return;
+        session.lastPollToken = token;
+        session.pollPages++;
+        this.pauseAtPageLimit(session);
+        this.syncLivePoll(session);
       },
     })
       .then(() => {
@@ -301,6 +421,7 @@ export class WorkflowHistoryController {
             : new Error(getErrorMessage(error));
         session.livePollFailed = true;
         controller.abort();
+        this.endCatchUp(session);
       })
       .finally(() => {
         session.livePollTask = null;
@@ -314,6 +435,7 @@ export class WorkflowHistoryController {
     this.session = null;
     session?.controller.abort();
     session?.livePollController?.abort();
+    session?.finishCatchUp();
     const handle = this.pauseHandle;
     this.pauseHandle = null;
     handle?.resume();

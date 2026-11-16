@@ -37,6 +37,11 @@ const historyPage = (events: HistoryEvent[]) => ({
   archived: false,
 });
 
+const livePage = (events: HistoryEvent[]) => ({
+  ...historyPage(events),
+  nextPageToken: 'end-of-history',
+});
+
 function gate() {
   let release = () => {};
   const promise = new Promise<void>((resolve) => {
@@ -62,38 +67,28 @@ async function mockEventDetail(
   });
   await mockWorkflowApis(page, workflow);
   await page.route(EVENT_HISTORY_API, async (route) => {
-    if (
-      new URL(route.request().url()).searchParams.get('waitNewEvent') === 'true'
-    ) {
+    if (new URL(route.request().url()).searchParams.has('next_page_token')) {
       requests.live += 1;
       if (requests.live === 1) {
         liveRequested.release();
         await liveResponse.promise;
-        return route.fulfill({ json: historyPage(liveEvents) });
+        return route.fulfill({ json: livePage(liveEvents) });
       }
-      return route.fulfill({ json: historyPage([]) });
+      return route.fulfill({ json: livePage([]) });
     }
     requests.initial += 1;
     await initialResponse.promise;
-    return route.fulfill({ json: historyPage(initialEvents) });
+    return route.fulfill({ json: livePage(initialEvents) });
   });
   await page.route(EVENT_HISTORY_API_REVERSE, async (route) => {
     requests.reverse += 1;
-    if (reverseEvents.length < initialEvents.length) {
-      if (requests.reverse === 1) {
-        return route.fulfill({
-          json: {
-            ...historyPage(reverseEvents),
-            nextPageToken: 'older-events',
-          },
-        });
-      }
-      await initialResponse.promise;
-      return route.fulfill({
-        json: historyPage([...initialEvents].reverse()),
-      });
-    }
-    return route.fulfill({ json: historyPage(reverseEvents) });
+    return route.fulfill({
+      json: {
+        ...historyPage(reverseEvents),
+        nextPageToken:
+          reverseEvents.length < initialEvents.length ? 'older-events' : null,
+      },
+    });
   });
 
   return { initialResponse, liveResponse, liveRequested, requests };
@@ -235,16 +230,15 @@ test.describe('Workflow event detail live history', () => {
       await expect(
         details.getByText('Activity Task Scheduled', { exact: true }),
       ).toHaveCount(0);
-      await liveRequested.promise;
-      await expect.poll(() => requests.initial).toBe(1);
-      await expect.poll(() => requests.reverse).toBe(2);
-      const before = { ...requests };
-
       initialResponse.release();
       await expect(details).toContainText('LiveDetailActivity');
       await expect(
         details.getByText('Activity Task Scheduled', { exact: true }),
       ).toBeVisible();
+      await liveRequested.promise;
+      await expect.poll(() => requests.initial).toBe(1);
+      await expect.poll(() => requests.reverse).toBe(1);
+      const before = { ...requests };
       await expect(
         details.getByText('Activity Task Completed', { exact: true }),
       ).toHaveCount(0);

@@ -24,6 +24,7 @@ export type LivePollOptions = {
   /** Optional hook, called once per poll iteration that added new events. */
   onNewEvents?: () => void;
   onToken?: (token: string) => void;
+  maximumPageSize?: number;
   /** ms to wait when a long-poll times out with no new events. Default 2000. */
   backoffMs?: number;
   /** ms to wait after a retryable error before retrying. Default 5000. */
@@ -65,6 +66,7 @@ export async function runLivePoll({
   onEvent,
   onNewEvents,
   onToken,
+  maximumPageSize,
   backoffMs = 2000,
   errorBackoffMs = 5000,
 }: LivePollOptions): Promise<void> {
@@ -93,6 +95,9 @@ export async function runLivePoll({
           params: {
             'execution.runId': runId,
             waitNewEvent: 'true',
+            ...(maximumPageSize && {
+              maximumPageSize: String(maximumPageSize),
+            }),
           },
           options: { signal },
           handleError: handlePollError,
