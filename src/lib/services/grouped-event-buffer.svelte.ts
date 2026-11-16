@@ -122,6 +122,11 @@ export class EventBufferView {
     return this.buffer.hasTimelineEventGroups();
   });
 
+  readonly hasUserDefinedEventGroups: boolean = $derived.by(() => {
+    void this._version;
+    return this.buffer.hasUserDefinedEventGroups();
+  });
+
   readonly timelineEventGroups: TimelineEventGroup<LazyGroup>[] = $derived.by(
     () => {
       void this._version;

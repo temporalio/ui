@@ -7,7 +7,7 @@
   export { template };
 
   const { Story } = defineMeta({
-    title: 'Duration Input',
+    title: 'Holocene/Components/Duration Input',
     component: DurationInput,
     render: template,
     argTypes: {

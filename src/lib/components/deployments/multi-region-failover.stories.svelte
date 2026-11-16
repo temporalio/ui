@@ -14,7 +14,7 @@
    */
 
   const { Story } = defineMeta({
-    title: 'Workers/Multi-Region/Failover Warning',
+    title: 'Application/Workers/Multi-Region/Failover Warning',
   });
 
   const namespace = 'orders.a1b2c';

@@ -5,7 +5,7 @@
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
 
   const { Story } = defineMeta({
-    title: 'Toggle Switch',
+    title: 'Holocene/Components/Toggle Switch',
     component: ToggleSwitch,
     args: {
       label: 'Toggle Switch',

@@ -18,7 +18,7 @@
   };
 
   const { Story } = defineMeta({
-    title: 'Toaster',
+    title: 'Holocene/Components/Toaster',
     component: Toaster,
     args: {
       closeButtonLabel: 'Close',

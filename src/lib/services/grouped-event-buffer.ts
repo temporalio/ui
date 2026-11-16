@@ -307,6 +307,7 @@ export function createGroupedEventBuffer() {
   >();
   const dirtyTimelineEventGroupKeys = new Set<EventGroupKey>();
   let timelineEventGroupCount = 0;
+  let userDefinedEventGroupFound = false;
   let cachedTimelineEventGroups: TimelineEventGroup<LazyGroup>[] | null = null;
   let cachedTimelineEventGroupsRevision = -1;
 
@@ -486,7 +487,10 @@ export function createGroupedEventBuffer() {
   ): void {
     const last = entry.lifecycle[entry.lifecycle.length - 1];
     if (last && last.headSlot > record.headSlot) entry.lifecycleSorted = false;
-    if (!last) timelineEventGroupCount++;
+    if (!last) {
+      timelineEventGroupCount++;
+      if (entry.group.kind === 'label') userDefinedEventGroupFound = true;
+    }
     entry.lifecycle.push(record);
   }
 
@@ -622,6 +626,7 @@ export function createGroupedEventBuffer() {
     timelineEventGroupsByKey = new Map();
     dirtyTimelineEventGroupKeys.clear();
     timelineEventGroupCount = 0;
+    userDefinedEventGroupFound = false;
     cachedTimelineEventGroups = null;
 
     revision++;
@@ -829,6 +834,10 @@ export function createGroupedEventBuffer() {
     return timelineEventGroupCount > 0;
   }
 
+  function hasUserDefinedEventGroups(): boolean {
+    return userDefinedEventGroupFound;
+  }
+
   function getTimelineEventGroups(): TimelineEventGroup<LazyGroup>[] {
     if (
       cachedTimelineEventGroups &&
@@ -987,6 +996,7 @@ export function createGroupedEventBuffer() {
     getEventGroupOptions,
     getTimelineEventGroups,
     hasTimelineEventGroups,
+    hasUserDefinedEventGroups,
     getEventGroupMatcher,
     getLatestEventTimeMs,
     getEventArray,

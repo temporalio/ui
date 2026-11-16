@@ -91,10 +91,12 @@
   const hasTimelineEventGroups = $derived(
     historyController.history.hasTimelineEventGroups,
   );
+  const eventGroupsVisible = $derived(
+    $showTimelineEventGroups ??
+      historyController.history.hasUserDefinedEventGroups,
+  );
   const timelineEventGroups = $derived(
-    $showTimelineEventGroups
-      ? historyController.history.timelineEventGroups
-      : [],
+    eventGroupsVisible ? historyController.history.timelineEventGroups : [],
   );
   const showEventGroups = $derived(timelineEventGroups.length > 0);
   let selectedEventGroupKey = $state<EventGroupKey>();
@@ -177,7 +179,7 @@
   const onEventGroupsToggle = () => {
     activeGroupId = undefined;
     selectedEventGroupKey = undefined;
-    $showTimelineEventGroups = !$showTimelineEventGroups;
+    void showTimelineEventGroups.save(!eventGroupsVisible);
   };
 
   const onSelectEventGroup = (group: TimelineEventGroup) => {
@@ -319,7 +321,7 @@
                 class="max-xl:rounded-l xl:border-l-0 [&:not(:last-child)]:border-r"
                 onclick={onEventGroupsToggle}
               >
-                {$showTimelineEventGroups
+                {eventGroupsVisible
                   ? translate('workflows.hide-event-groups')
                   : translate('workflows.show-event-groups')}
               </ToggleButton>

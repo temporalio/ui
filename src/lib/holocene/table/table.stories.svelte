@@ -11,7 +11,7 @@
   type TableTemplate = Snippet<[TableArgs, StoryContext<TableArgs>]>;
 
   const { Story } = defineMeta<TableTemplate, typeof Table>({
-    title: 'Table',
+    title: 'Holocene/Components/Table',
     component: Table,
     args: {
       columns: 3,

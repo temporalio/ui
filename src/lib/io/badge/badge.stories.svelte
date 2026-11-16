@@ -9,6 +9,8 @@
     IconHeartbeat,
   } from '$lib/io/icon';
 
+  import usage from './badge.usage.md?raw';
+
   const sizes: BadgeSize[] = ['sm', 'md'];
 
   const colorSchemes: BadgeColorScheme[] = [
@@ -23,6 +25,7 @@
 
   const { Story } = defineMeta({
     title: 'IO/Components/Badge',
+    tags: ['autodocs'],
     component: Badge,
     args: {
       text: 'badge',
@@ -40,6 +43,13 @@
       class: { table: { disable: true } },
     },
     parameters: {
+      docs: {
+        description: {
+          component:
+            'A compact, non-interactive label for metadata, with optional adjoining extensions.',
+        },
+        usage,
+      },
       layout: 'padded',
     },
     render: template,
@@ -52,7 +62,7 @@
   </div>
 {/snippet}
 
-<Story name="Playground" />
+<Story tags={['!dev']} name="Playground" />
 
 <Story name="With icon" args={{ Icon: IconHeartbeat }} />
 

@@ -234,3 +234,37 @@ test.describe('Timeline event groups only on workflow tasks', () => {
     await expect(toggle(page)).toHaveCount(0);
   });
 });
+
+test.describe('Timeline event groups without labels', () => {
+  test('hides event groups by default but keeps the toggle', async ({
+    page,
+  }) => {
+    await mockWorkflowApis(page);
+    await mockEventHistoryApi(page, {
+      history: {
+        events: [
+          makeWorkflowStarted(1),
+          {
+            ...makeActivityScheduled(2, 'InboundActivity'),
+            eventGroupMarkers: [{ inboundEvent: { inboundEventId: 1 } }],
+          },
+          makeActivityStarted(3, 2),
+          makeActivityCompleted(4, 2, 3),
+        ],
+      },
+      nextPageToken: null,
+    });
+    await page.goto(timelineUrl);
+    await page
+      .getByRole('img', { name: `Workflow ${workflowId}: Running` })
+      .scrollIntoViewIfNeeded();
+
+    await expect(eventRow(page, 'InboundActivity')).toBeVisible();
+    await expect(toggle(page)).toHaveText('Show Event Groups');
+
+    await toggle(page).click();
+
+    await expect(toggle(page)).toHaveText('Hide Event Groups');
+    await expect(eventRow(page, 'InboundActivity')).toHaveCount(0);
+  });
+});

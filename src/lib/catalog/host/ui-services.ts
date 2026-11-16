@@ -158,7 +158,7 @@ const withoutRouting = (
 ): Record<string, JsonValue> => {
   const {
     namespace: _namespace,
-    targetId: _targetId,
+    workspaceId: _workspaceId,
     taskQueue: _taskQueue,
     workflowId: _workflowId,
     workflowType: _workflowType,

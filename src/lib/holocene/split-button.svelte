@@ -9,6 +9,7 @@
     label: string;
     menuLabel: string;
     Icon?: IconComponent;
+    TrailingIcon?: IconComponent;
     id: string;
     disabled?: boolean;
     position?: 'left' | 'right';
@@ -24,6 +25,7 @@
     label,
     menuLabel,
     Icon,
+    TrailingIcon,
     id,
     disabled = false,
     position = 'left',
@@ -53,6 +55,9 @@
         <Icon />
       {/if}
       {label}
+      {#if TrailingIcon}
+        <TrailingIcon />
+      {/if}
     </Button>
     <MenuButton
       class="max-w-fit grow-0 rounded-l-none px-3"

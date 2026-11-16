@@ -11,7 +11,7 @@
   const iconOptions: Record<string, unknown> = { ...ioIcons };
 
   const { Story } = defineMeta({
-    title: 'Button',
+    title: 'Holocene/Components/Button',
     component: Button,
     args: {
       variant: 'primary',

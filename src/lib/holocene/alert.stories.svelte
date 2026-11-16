@@ -9,7 +9,7 @@
   const iconOptions: Record<string, unknown> = { ...ioIcons };
 
   const { Story } = defineMeta({
-    title: 'Alert',
+    title: 'Holocene/Components/Alert',
     component: Alert,
     args: {
       title: 'Alert Title',

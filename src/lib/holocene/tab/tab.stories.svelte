@@ -8,7 +8,7 @@
   import Tabs from './tabs.svelte';
 
   const { Story } = defineMeta({
-    title: 'Tabs',
+    title: 'Holocene/Components/Tabs',
     component: Tabs,
     subcomponents: { TabList, TabPanel, Tab },
     render: template,

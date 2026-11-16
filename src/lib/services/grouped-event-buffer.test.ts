@@ -2359,6 +2359,23 @@ describe('event group index', () => {
       expect(buffer.hasTimelineEventGroups()).toBe(false);
     });
 
+    it('reports user-defined event groups only for label markers', () => {
+      const [timerStarted] = makeTimerGroup(1);
+      const [otherTimerStarted] = makeTimerGroup(3);
+      buffer.ingestHistoryEvent({
+        ...timerStarted,
+        eventGroupMarkers: [{ inboundEvent: { inboundEventId: 1 } }],
+      } as unknown as HistoryEvent);
+      expect(buffer.hasTimelineEventGroups()).toBe(true);
+      expect(buffer.hasUserDefinedEventGroups()).toBe(false);
+
+      buffer.ingestHistoryEvent(withMarkers(otherTimerStarted, [marker('a')]));
+      expect(buffer.hasUserDefinedEventGroups()).toBe(true);
+
+      buffer.reset(0);
+      expect(buffer.hasUserDefinedEventGroups()).toBe(false);
+    });
+
     it('reports timeline event groups once a marked lifecycle head arrives', () => {
       const [timerStarted, timerFired] = makeTimerGroup(1);
       buffer.ingestHistoryEvent(withMarkers(timerFired, [marker('a')]));

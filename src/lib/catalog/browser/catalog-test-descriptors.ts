@@ -4,8 +4,8 @@ import type {
   BrowserCatalogSource,
 } from './types';
 
-const target = {
-  targetId: 'catalog',
+const workspace = {
+  workspaceId: 'catalog',
   namespace: 'default',
   taskQueue: 'catalog-tasks',
 };
@@ -31,10 +31,14 @@ export const testDescriptor = (
 
 export const workflowExecution = (
   workflowType = 'Workflow',
-): BrowserCatalogExecution => ({ ...target, kind: 'workflow', workflowType });
+): BrowserCatalogExecution => ({
+  ...workspace,
+  kind: 'workflow',
+  workflowType,
+});
 
 export const activityExecution: BrowserCatalogExecution = {
-  ...target,
+  ...workspace,
   kind: 'standalone-activity',
   activityType: 'activity',
   timeouts: {},
@@ -42,7 +46,7 @@ export const activityExecution: BrowserCatalogExecution = {
 };
 
 export const nexusOperationExecution: BrowserCatalogExecution = {
-  ...target,
+  ...workspace,
   kind: 'standalone-nexus-operation',
   endpoint: 'catalog-endpoint',
   service: 'service',
