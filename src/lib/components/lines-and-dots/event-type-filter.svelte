@@ -1,7 +1,6 @@
 <script lang="ts">
   import { writable } from 'svelte/store';
 
-  import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
   import Checkbox from '$lib/holocene/checkbox.svelte';
@@ -16,9 +15,11 @@
     allEventTypeOptions,
     compactEventTypeOptions,
   } from '$lib/models/event-history/get-event-categorization';
-  import { eventStatusFilter, eventTypeFilter } from '$lib/stores/filters';
   import { temporalVersion } from '$lib/stores/versions';
-  import { updateEventFilterParams } from '$lib/utilities/event-filter-params';
+  import type {
+    EventTypeCategory,
+    EventTypeFilterChange,
+  } from '$lib/types/events';
   import { nexusEnabled } from '$lib/utilities/nexus-enabled';
   import { isVersionNewer } from '$lib/utilities/version-check';
 
@@ -27,9 +28,18 @@
   interface Props {
     compact?: boolean;
     statusFilterAvailable?: boolean;
+    eventTypes: EventTypeCategory[];
+    statusFilter: boolean;
+    onChange: (change: EventTypeFilterChange) => void;
   }
 
-  let { compact = false, statusFilterAvailable = true }: Props = $props();
+  let {
+    compact = false,
+    statusFilterAvailable = true,
+    eventTypes,
+    statusFilter,
+    onChange,
+  }: Props = $props();
 
   const open = writable(false);
 
@@ -58,50 +68,39 @@
   });
 
   const onOptionClick = ({ value }: (typeof options)[number]) => {
-    const newCategories = $eventTypeFilter.some((type) => type === value)
-      ? $eventTypeFilter.filter((type) => type !== value)
-      : [...$eventTypeFilter, value];
-    $eventTypeFilter = newCategories;
-    updateEventFilterParams(
-      page.url,
-      {
-        categories:
-          newCategories.length === defaultOptions.length ? null : newCategories,
-      },
-      goto,
-    );
+    const newEventTypes = eventTypes.some((type) => type === value)
+      ? eventTypes.filter((type) => type !== value)
+      : [...eventTypes, value];
+    onChange({
+      eventTypes: newEventTypes,
+      statusFilter,
+      allEventTypes: newEventTypes.length === defaultOptions.length,
+    });
   };
 
   const onAllClick = () => {
-    $eventTypeFilter = defaultOptions;
-    $eventStatusFilter = false;
-    updateEventFilterParams(
-      page.url,
-      { categories: null, statusFilter: false },
-      goto,
-    );
+    onChange({
+      eventTypes: defaultOptions,
+      statusFilter: false,
+      allEventTypes: true,
+    });
   };
 
   const onPendingClick = () => {
-    const statusFilter = !$eventStatusFilter;
-    $eventTypeFilter = defaultOptions;
-    $eventStatusFilter = statusFilter;
-    updateEventFilterParams(page.url, { categories: null, statusFilter }, goto);
+    onChange({
+      eventTypes: defaultOptions,
+      statusFilter: !statusFilter,
+      allEventTypes: true,
+    });
   };
 
   const onNoneClick = () => {
-    $eventTypeFilter = [];
-    $eventStatusFilter = false;
-    updateEventFilterParams(
-      page.url,
-      { categories: [], statusFilter: false },
-      goto,
-    );
+    onChange({ eventTypes: [], statusFilter: false, allEventTypes: false });
   };
 
   const filterActive = $derived(
-    ($eventStatusFilter && statusFilterAvailable) ||
-      $eventTypeFilter.length < defaultOptions.length,
+    (statusFilter && statusFilterAvailable) ||
+      eventTypes.length < defaultOptions.length,
   );
 </script>
 
@@ -133,8 +132,7 @@
       {#snippet leading()}
         <Checkbox
           onChange={onAllClick}
-          checked={!$eventStatusFilter &&
-            $eventTypeFilter.length === defaultOptions.length}
+          checked={!statusFilter && eventTypes.length === defaultOptions.length}
           label={translate('common.all')}
           labelHidden
           class="mt-px"
@@ -152,7 +150,7 @@
         {#snippet leading()}
           <Checkbox
             onChange={onPendingClick}
-            checked={$eventStatusFilter}
+            checked={statusFilter}
             label={translate('common.pending-and-failed')}
             labelHidden
             class="mt-px"
@@ -165,7 +163,7 @@
       {#snippet leading()}
         <Checkbox
           onChange={onNoneClick}
-          checked={!$eventStatusFilter && !$eventTypeFilter.length}
+          checked={!statusFilter && !eventTypes.length}
           label={translate('common.none')}
           labelHidden
           class="mt-px"
@@ -186,7 +184,7 @@
         {#snippet leading()}
           <Checkbox
             onclick={() => onOptionClick(option)}
-            checked={$eventTypeFilter.some((type) => type === option.value)}
+            checked={eventTypes.some((type) => type === option.value)}
             label={option.label}
             labelHidden
             class="mt-px"

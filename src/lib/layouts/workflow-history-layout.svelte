@@ -42,6 +42,7 @@
   import { triggerRefresh, workflowRun } from '$lib/stores/workflow-run';
   import type {
     EventTypeCategory,
+    EventTypeFilterChange,
     WorkflowEvent,
     WorkflowTaskFailedEvent,
     WorkflowTaskTimedOutEvent,
@@ -189,6 +190,20 @@
     updateEventFilterParams(page.url, { sort: newSort }, goto);
   };
 
+  const onEventTypeFilterChange = ({
+    eventTypes,
+    statusFilter,
+    allEventTypes,
+  }: EventTypeFilterChange) => {
+    $eventTypeFilter = eventTypes;
+    $eventStatusFilter = statusFilter;
+    updateEventFilterParams(
+      page.url,
+      { categories: allEventTypes ? null : eventTypes, statusFilter },
+      goto,
+    );
+  };
+
   const onAutoRefreshToggle = () => {
     updateEventFilterParams(
       page.url,
@@ -281,6 +296,9 @@
         <EventTypeFilter
           {compact}
           statusFilterAvailable={$eventViewType !== 'json'}
+          eventTypes={$eventTypeFilter}
+          statusFilter={$eventStatusFilter}
+          onChange={onEventTypeFilterChange}
         />
       </ToggleButtons>
       <ToggleButtons

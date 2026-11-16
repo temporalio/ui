@@ -1,44 +1,30 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-
   import { beforeNavigate, goto } from '$app/navigation';
   import { page } from '$app/state';
 
   import ActivityCommands from '$lib/components/activity/activity-commands.svelte';
   import EventGroupControls from '$lib/components/lines-and-dots/event-group-filter/event-group-controls.svelte';
-  import EventHistoryLegend from '$lib/components/lines-and-dots/event-history-legend.svelte';
-  import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
-  import TimelineGraph from '$lib/components/lines-and-dots/timeline-graph/timeline-graph.svelte';
-  import type { Timeline } from '$lib/components/lines-and-dots/timeline-graph/timeline.svelte';
   import WorkflowError from '$lib/components/lines-and-dots/workflow-error.svelte';
+  import WorkflowTimeline from '$lib/components/lines-and-dots/workflow-timeline.svelte';
   import DownloadEventHistoryModal from '$lib/components/workflow/download-event-history-modal.svelte';
   import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
   import WorkflowCallbacks from '$lib/components/workflow/workflow-callbacks.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
-  import {
-    IconArrowAscending,
-    IconArrowDescending,
-    IconCollapse,
-    IconDownload,
-  } from '$lib/io/icon';
-  import type { EventGroupKey } from '$lib/models/event-history/event-group-markers';
-  import {
-    createTimelineEventGroupFilter,
-    type TimelineEventGroup,
-  } from '$lib/models/event-history/timeline-event-groups';
-  import type { LazyGroup } from '$lib/services/grouped-event-buffer';
+  import { IconDownload } from '$lib/io/icon';
   import { getWorkflowHistoryController } from '$lib/services/workflow-history-controller.svelte.js';
   import {
     collapseIdleTime,
     eventFilterSort,
+    type EventSortOrder,
     showTimelineEventGroups,
   } from '$lib/stores/event-view';
   import { pauseLiveUpdates } from '$lib/stores/events';
   import { eventStatusFilter, eventTypeFilter } from '$lib/stores/filters';
   import { triggerRefresh, workflowRun } from '$lib/stores/workflow-run';
   import type {
+    EventTypeFilterChange,
     WorkflowTaskFailedEvent,
     WorkflowTaskTimedOutEvent,
   } from '$lib/types/events';
@@ -46,8 +32,6 @@
     parseEventFilterParams,
     updateEventFilterParams,
   } from '$lib/utilities/event-filter-params';
-  import { isFailedOrPendingGroup } from '$lib/utilities/get-failed-or-pending';
-  import { getTimelineGroups } from '$lib/utilities/sort-timeline-groups';
 
   const historyController = getWorkflowHistoryController();
 
@@ -69,24 +53,27 @@
     );
   };
 
-  const reverseSort = $derived($eventFilterSort === 'descending');
+  const onSortChange = (sort: EventSortOrder) => {
+    updateEventFilterParams(page.url, { sort }, goto);
+  };
 
-  const bufferLazyGroups = $derived(
-    historyController.history.lazyGroupsWithoutWorkflowTasks,
-  );
+  const onCollapseIdleTimeChange = (collapsed: boolean) => {
+    $collapseIdleTime = collapsed ? 'on' : 'off';
+  };
 
-  const eventGroupMatcher = $derived(
-    historyController.history.eventGroupMatcher(urlParams.eventGroups),
-  );
-
-  const filteredBufferLazyGroups = $derived.by(() => {
-    const active = $eventTypeFilter;
-    return bufferLazyGroups.filter(
-      (g) =>
-        active.includes(g.category) &&
-        (!eventGroupMatcher || eventGroupMatcher.hasGroup(g.id)),
+  const onEventTypeFilterChange = ({
+    eventTypes,
+    statusFilter,
+    allEventTypes,
+  }: EventTypeFilterChange) => {
+    $eventTypeFilter = eventTypes;
+    $eventStatusFilter = statusFilter;
+    updateEventFilterParams(
+      page.url,
+      { categories: allEventTypes ? null : eventTypes, statusFilter },
+      goto,
     );
-  });
+  };
 
   const hasTimelineEventGroups = $derived(
     historyController.history.hasTimelineEventGroups,
@@ -95,100 +82,10 @@
     $showTimelineEventGroups ??
       historyController.history.hasUserDefinedEventGroups,
   );
-  const timelineEventGroups = $derived(
-    eventGroupsVisible ? historyController.history.timelineEventGroups : [],
-  );
-  const showEventGroups = $derived(timelineEventGroups.length > 0);
-  let selectedEventGroupKey = $state<EventGroupKey>();
-
-  const filterEventGroupsByType = createTimelineEventGroupFilter<LazyGroup>();
-
-  const selectedEventGroupKeysParam = $derived(
-    JSON.stringify(urlParams.eventGroups),
-  );
-  const selectedEventGroupKeys = $derived(
-    new Set<EventGroupKey>(JSON.parse(selectedEventGroupKeysParam)),
-  );
-
-  const filteredEventGroups = $derived.by(() => {
-    const active = $eventTypeFilter;
-    const statusFilter = $eventStatusFilter;
-    const selectedKeys =
-      selectedEventGroupKeys.size &&
-      historyController.history.eventGroupOptions.some(({ group }) =>
-        selectedEventGroupKeys.has(group.key),
-      )
-        ? selectedEventGroupKeys
-        : undefined;
-    return filterEventGroupsByType(
-      selectedKeys
-        ? timelineEventGroups.filter((group) => selectedKeys.has(group.key))
-        : timelineEventGroups,
-      (lifecycleGroup) =>
-        active.includes(lifecycleGroup.category) &&
-        (!statusFilter || isFailedOrPendingGroup(lifecycleGroup)),
-    );
-  });
-
-  const selectedEventGroup = $derived(
-    showEventGroups && selectedEventGroupKey
-      ? filteredEventGroups.find((group) => group.key === selectedEventGroupKey)
-      : undefined,
-  );
-
-  $effect(() => {
-    if (selectedEventGroupKey && !selectedEventGroup) {
-      selectedEventGroupKey = undefined;
-      activeGroupId = undefined;
-    }
-  });
-
-  const lazyGroups: LazyGroup[] = $derived.by(() => {
-    if (!showEventGroups) {
-      return getTimelineGroups(
-        filteredBufferLazyGroups,
-        reverseSort,
-        historyController.fetchComplete,
-        historyController.descMinId,
-      );
-    }
-
-    const eventGroupRows = getTimelineGroups(
-      filteredEventGroups,
-      reverseSort,
-      historyController.fetchComplete,
-      historyController.descMinId,
-    );
-    if (!selectedEventGroup) return eventGroupRows;
-
-    const lifecycleRows = getTimelineGroups(
-      selectedEventGroup.lifecycleGroups,
-      reverseSort,
-      historyController.fetchComplete,
-      historyController.descMinId,
-    );
-
-    return eventGroupRows.flatMap((group): LazyGroup[] => {
-      if (group !== selectedEventGroup) return [group];
-      return reverseSort
-        ? [...lifecycleRows, group]
-        : [group, ...lifecycleRows];
-    });
-  });
 
   const onEventGroupsToggle = () => {
     activeGroupId = undefined;
-    selectedEventGroupKey = undefined;
     void showTimelineEventGroups.save(!eventGroupsVisible);
-  };
-
-  const onSelectEventGroup = (group: TimelineEventGroup) => {
-    selectedEventGroupKey =
-      selectedEventGroupKey === group.key ? undefined : group.key;
-  };
-
-  const onCloseEventGroup = () => {
-    selectedEventGroupKey = undefined;
   };
 
   const workflowTaskFailedError = $derived.by(() => {
@@ -210,40 +107,6 @@
   });
 
   let showDownloadPrompt = $state(false);
-
-  const onSort = () => {
-    const newSort = reverseSort ? 'ascending' : 'descending';
-    updateEventFilterParams(page.url, { sort: newSort }, goto);
-  };
-
-  // The timeline renders in normal page flow: the page (#content-wrapper)
-  // scrolls it and the controls bar sticks to the top-nav. TimelineGraph
-  // virtualizes internally via IntersectionObserver, so there's no bounded
-  // scroll container, no scroll-offset bridge, and no height plumbing here.
-  const estimatedTotalGroups = $derived.by(() => {
-    if (historyController.fetchComplete) return lazyGroups.length;
-    const totalEvents = historyController.totalExpectedEvents;
-    return Math.max(lazyGroups.length, Math.ceil(totalEvents * 0.5));
-  });
-
-  onMount(() => historyController.resume());
-
-  let timeline = $state<Timeline>();
-
-  const handleTimelineInit = (t: Timeline) => {
-    timeline = t;
-  };
-
-  const onToggleIdleTime = () => {
-    if (!timeline) return;
-    if (timeline.allCollapsibleSegmentsCollapsed) {
-      timeline.expandAllSegments();
-      $collapseIdleTime = 'off';
-    } else {
-      timeline.collapseAllSegments();
-      $collapseIdleTime = 'on';
-    }
-  };
 </script>
 
 <InputAndResults events={historyController.history.events} />
@@ -262,48 +125,22 @@
   {/if}
 </div>
 
-<!--
-  Wrapper: single flex child so the parent's gap-4 only applies once (above
-  this block). The controls bar sticks below the top-nav while the page scrolls
-  the timeline past it; the timeline virtualizes itself via IntersectionObserver.
--->
-<div>
-  <div
-    class="sticky top-0 z-[11] flex flex-wrap items-center justify-between gap-2 bg-background-primary pb-2 text-primary md:top-[var(--top-nav-height)] md:pt-2 xl:gap-8"
+{#if workflow}
+  <WorkflowTimeline
+    {namespace}
+    {workflow}
+    sort={$eventFilterSort}
+    {onSortChange}
+    collapseIdleTime={$collapseIdleTime === 'on'}
+    {onCollapseIdleTimeChange}
+    eventTypes={$eventTypeFilter}
+    failedOrPendingOnly={$eventStatusFilter}
+    {onEventTypeFilterChange}
+    eventGroupKeys={urlParams.eventGroups}
+    {eventGroupsVisible}
+    bind:activeGroupId
   >
-    <div class="flex items-center gap-2">
-      <h2>{translate('workflows.timeline-tab')}</h2>
-      <EventHistoryLegend />
-    </div>
-    <div class="flex flex-wrap items-center gap-2 xl:gap-x-0">
-      <ToggleButtons
-        class="max-xl:[&>:last-child_.menu-button-anchor>button]:rounded-r"
-      >
-        <ToggleButton
-          LeadingIcon={reverseSort ? IconArrowDescending : IconArrowAscending}
-          data-testid="zoom-in"
-          onclick={onSort}
-          size="sm"
-          variant="tertiary"
-        >
-          {reverseSort ? 'Descending' : 'Ascending'}
-        </ToggleButton>
-        <ToggleButton
-          LeadingIcon={IconCollapse}
-          data-testid="toggle-idle-time"
-          loading={historyController.loading}
-          disabled={!historyController.fetchComplete ||
-            !timeline?.hasCollapsibleSegments}
-          onclick={onToggleIdleTime}
-          size="sm"
-          variant="tertiary"
-        >
-          {timeline?.allCollapsibleSegmentsCollapsed
-            ? translate('workflows.show-idle-time')
-            : translate('workflows.hide-idle-time')}
-        </ToggleButton>
-        <EventTypeFilter compact={false} />
-      </ToggleButtons>
+    {#snippet controls()}
       <ToggleButtons
         class={hasTimelineEventGroups
           ? 'empty:hidden max-xl:[&>:last-child_.menu-button-anchor>button]:rounded-r'
@@ -357,51 +194,18 @@
           {translate('common.download')}
         </ToggleButton>
       </ToggleButtons>
-    </div>
-  </div>
+    {/snippet}
+    {#snippet activityActions(activity)}
+      <ActivityCommands
+        {activity}
+        workflowExecutionIdentity={historyController.workflowExecutionIdentity}
+        {workflow}
+        onRefresh={triggerRefresh}
+        class="justify-end"
+      />
+    {/snippet}
+  </WorkflowTimeline>
 
-  <!--
-  Timeline in page flow: it's a tall element the page scrolls, and it
-  virtualizes itself via IntersectionObserver (no bounded scroll container,
-  no scroll-offset bridge).
--->
-  {#if workflow}
-    <TimelineGraph
-      {namespace}
-      {workflow}
-      history={historyController.history}
-      {lazyGroups}
-      latestEventTimeMs={historyController.history.latestEventTimeMs}
-      scaleGroups={filteredBufferLazyGroups}
-      {selectedEventGroup}
-      {onSelectEventGroup}
-      {onCloseEventGroup}
-      {reverseSort}
-      bind:activeGroupId
-      collapseIdleTime={$collapseIdleTime === 'on'}
-      failedOrPendingOnly={$eventStatusFilter}
-      loading={historyController.loading}
-      totalExpectedEvents={estimatedTotalGroups}
-      showLoadingRows={!showEventGroups}
-      descMinId={historyController.descMinId}
-      error={Boolean(workflowTaskFailedError)}
-      onTimelineInit={handleTimelineInit}
-    >
-      {#snippet activityActions(activity)}
-        <ActivityCommands
-          {activity}
-          workflowExecutionIdentity={historyController.workflowExecutionIdentity}
-          {workflow}
-          onRefresh={triggerRefresh}
-          class="justify-end"
-        />
-      {/snippet}
-    </TimelineGraph>
-  {/if}
-</div>
-<!-- end wrapper -->
-
-{#if workflow}
   <DownloadEventHistoryModal
     bind:open={showDownloadPrompt}
     {namespace}
