@@ -16,7 +16,7 @@
   ];
 
   const { Story } = defineMeta({
-    title: 'Orderable List',
+    title: 'Holocene/Components/Orderable List',
     component: OrderableList,
   });
 </script>

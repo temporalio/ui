@@ -13,6 +13,7 @@ export type ActivityStatus =
 
 export const activityStatuses: ActivityStatus[] = [
   'Running',
+  'Paused',
   'Completed',
   'Failed',
   'Canceled',

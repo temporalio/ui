@@ -114,17 +114,18 @@ const activitySummaryExamples = [
 ] as const;
 
 describe('shared workflow corpus', () => {
-  it('registers one shared-workflows target with committed default routing', () => {
+  it('registers one shared-workflows workspace with committed default routing', () => {
     const registry = createCatalogRegistry();
 
     catalogRegistrationSource.register(registry);
 
-    expect(registry.targets).toMatchObject([
+    expect(registry.workspaces).toMatchObject([
       {
         id: 'shared-workflows',
         namespace: 'default',
         taskQueue: 'ui-catalog',
-        workflowsPath: './workflows.js',
+        workflowsPath: expect.stringMatching(/\/workflows\.[jt]s$/),
+        controls: ['crash'],
       },
     ]);
   });
@@ -175,8 +176,8 @@ describe('shared workflow corpus', () => {
       )?.title,
     ).toBe('Timer-driven repeated activities');
 
-    const target = registry.targets[0];
-    expect(Object.keys(target?.workflowExports ?? {}).sort()).toEqual(
+    const workspace = registry.workspaces[0];
+    expect(Object.keys(workspace?.workflowExports ?? {}).sort()).toEqual(
       [
         ...migratedWorkflowTypes,
         'priorityFairnessWorkflow',
@@ -187,12 +188,13 @@ describe('shared workflow corpus', () => {
         'largeHistory',
         'featureTourWorkflow',
         'childFanOut',
+        'workerCrashWorkflow',
         ...activitySummaryExamples.map(({ workflowType }) => workflowType),
       ].sort(),
     );
     for (const example of registry.examples) {
-      if (example.execution.kind !== 'workflow' || !target) continue;
-      expect(target.workflowExports[example.execution.workflowType]).toBe(
+      if (example.execution.kind !== 'workflow' || !workspace) continue;
+      expect(workspace.workflowExports[example.execution.workflowType]).toBe(
         example.execution.workflow,
       );
     }
@@ -268,7 +270,7 @@ describe('shared workflow corpus', () => {
     const example = generated.browserDescriptors.find(
       ({ id }) => id === 'priority-fairness',
     );
-    const target = registry.targets[0];
+    const workspace = registry.workspaces[0];
     const binding = generated.workerBindings[0];
 
     expect(example).toMatchObject({
@@ -382,7 +384,7 @@ describe('shared workflow corpus', () => {
         memo: { fields: {} },
       }),
     ).resolves.toBe(true);
-    expect(target?.workflowExports.priorityFairnessWorkflow).toBe(
+    expect(workspace?.workflowExports.priorityFairnessWorkflow).toBe(
       priorityFairnessWorkflow,
     );
     expect(binding?.activities.greet).toBe(greet);
@@ -600,10 +602,10 @@ describe('shared workflow corpus', () => {
   it('declares every catalog-owned corpus source so generated artifact verification catches drift', () => {
     expect([...catalogRegistrationSource.sourceFiles].sort()).toEqual(
       [
-        'src/lib/catalog/worker/shared-registrations.ts',
-        'src/lib/catalog/worker/workflows.ts',
+        'src/lib/catalog/worker/examples/workspace.ts',
         'src/lib/catalog/worker/examples/inventory.ts',
-        'src/lib/catalog/worker/examples/index.ts',
+        'src/lib/catalog/worker/examples/worker-crash/example.ts',
+        'src/lib/catalog/worker/examples/worker-crash/workflow.ts',
         'src/lib/catalog/worker/examples/shared-activities.ts',
         'src/lib/catalog/worker/examples/hello/example.ts',
         'src/lib/catalog/worker/examples/hello/workflow.ts',

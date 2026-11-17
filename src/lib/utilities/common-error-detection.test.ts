@@ -40,15 +40,31 @@ const makeWorkflow = (
     ...overrides,
   }) as unknown as WorkflowExecution;
 
+const ACTIVITY_OPTION_KEYS = [
+  'retryPolicy',
+  'startToCloseTimeout',
+  'scheduleToCloseTimeout',
+  'scheduleToStartTimeout',
+  'heartbeatTimeout',
+];
+
 const makeActivity = (
-  overrides: Partial<PendingActivity> = {},
-): PendingActivity =>
-  ({
+  overrides: Record<string, unknown> = {},
+): PendingActivity => {
+  const activityOptions: Record<string, unknown> = {};
+  const rest: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(overrides)) {
+    if (ACTIVITY_OPTION_KEYS.includes(key)) activityOptions[key] = value;
+    else rest[key] = value;
+  }
+  return {
     id: '1',
     state: 'Started',
     activityType: 'test-activity',
-    ...overrides,
-  }) as unknown as PendingActivity;
+    activityOptions,
+    ...rest,
+  } as unknown as PendingActivity;
+};
 
 const makeFirstEvent = (attrs: Record<string, unknown> = {}) =>
   ({
@@ -305,6 +321,37 @@ describe('detectActivityErrors', () => {
     });
     expect(detectActivityErrors([activity]).some((e) => e.id === 13)).toBe(
       false,
+    );
+  });
+
+  it('does not fire #13 for top-level maximumAttempts without a retry policy', () => {
+    const activity = {
+      id: '1',
+      state: 'Started',
+      activityType: 'test-activity',
+      maximumAttempts: 3,
+    } as unknown as PendingActivity;
+    expect(detectActivityErrors([activity]).some((e) => e.id === 13)).toBe(
+      false,
+    );
+  });
+
+  it('ignores a top-level retryPolicy, which the server never sends', () => {
+    const activity = {
+      id: '1',
+      state: 'Started',
+      activityType: 'test-activity',
+      retryPolicy: { maximumAttempts: 3 },
+    } as unknown as PendingActivity;
+    expect(detectActivityErrors([activity]).some((e) => e.id === 13)).toBe(
+      true,
+    );
+  });
+
+  it('detects #14: top-level maximumAttempts == 1', () => {
+    const activity = makeActivity({ maximumAttempts: 1 });
+    expect(detectActivityErrors([activity]).some((e) => e.id === 14)).toBe(
+      true,
     );
   });
 

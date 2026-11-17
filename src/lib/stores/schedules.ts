@@ -96,6 +96,7 @@ export async function submitCreateSchedule(
   } catch (error) {
     const errorMessage = translate('schedules.create-schedule-error', {
       error: getErrorMessage(error),
+      escapeValue: false,
     });
     serverError.set(errorMessage);
     toaster.push({ variant: 'error', message: errorMessage });
@@ -120,6 +121,7 @@ export async function submitCreateSchedule(
   } catch (error) {
     const errorMessage = translate('schedules.create-schedule-error', {
       error: getErrorMessage(error),
+      escapeValue: false,
     });
     serverError.set(errorMessage);
     toaster.push({ variant: 'error', message: errorMessage });
@@ -139,6 +141,7 @@ export async function submitEditSchedule(
   } catch (error) {
     const errorMessage = translate('schedules.edit-schedule-error', {
       error: getErrorMessage(error),
+      escapeValue: false,
     });
     serverError.set(errorMessage);
     toaster.push({ variant: 'error', message: errorMessage });
@@ -163,6 +166,7 @@ export async function submitEditSchedule(
   } catch (error) {
     const errorMessage = translate('schedules.edit-schedule-error', {
       error: getErrorMessage(error),
+      escapeValue: false,
     });
     serverError.set(errorMessage);
     toaster.push({ variant: 'error', message: errorMessage });
@@ -189,6 +193,7 @@ export async function submitDeleteSchedule(context: ScheduleContext) {
     serverError.set(
       translate('schedules.delete-schedule-error', {
         error: getErrorMessage(error),
+        escapeValue: false,
       }),
     );
   }
@@ -229,6 +234,7 @@ export async function submitPauseSchedule(
           : 'schedules.pause-schedule-error',
         {
           error: getErrorMessage(error),
+          escapeValue: false,
         },
       ),
     );
@@ -269,6 +275,7 @@ export async function submitTriggerImmediatelySchedule(
     serverError.set(
       translate('schedules.trigger-schedule-error', {
         error: getErrorMessage(error),
+        escapeValue: false,
       }),
     );
   }
@@ -316,6 +323,7 @@ export async function submitBackfillSchedule(
     serverError.set(
       translate('schedules.backfill-schedule-error', {
         error: getErrorMessage(error),
+        escapeValue: false,
       }),
     );
   }

@@ -14,9 +14,9 @@ Committed defaults, built-in dev server, no `.env.catalog.local`.
 pnpm catalog dev
 ```
 
-The banner prints the catalog URL and each target. Both shared and local examples appear and run.
+The banner prints the catalog URL and each workspace. Both shared and local examples appear and run.
 
-**Verified.** Cold start with nothing running: the worker waits for the server, both targets reach running, and examples execute.
+**Verified.** Cold start with nothing running: the worker waits for the server, both workspaces reach running, and examples execute.
 
 ### Separate processes
 
@@ -29,13 +29,13 @@ pnpm catalog worker        # terminal 2
 
 **Verified.**
 
-### One target only
+### One workspace only
 
 ```bash
-CATALOG_TARGET_ID=shared-workflows pnpm catalog worker
+CATALOG_WORKSPACE_ID=shared-workflows pnpm catalog worker
 ```
 
-An unknown id fails in about a second, listing the available targets, without attempting a connection. Because the worker runs under Node's watch mode, a runtime preflight failure like this one reports and then waits for a file change instead of exiting the command; stop it with a signal. Stale artifacts still exit right away, because the command verifies them before starting the worker.
+An unknown id fails in about a second, listing the available workspaces, without attempting a connection. Because the worker runs under Node's watch mode, a runtime preflight failure like this one reports and then waits for a file change instead of exiting the command; stop it with a signal. Stale artifacts still exit right away, because the command verifies them before starting the worker.
 
 **Verified**, including the unknown-id path.
 
@@ -43,9 +43,9 @@ An unknown id fails in about a second, listing the available targets, without at
 
 ### Relocating the worker
 
-Set `TEMPORAL_NAMESPACE` in `.env.catalog.local`. Every target moves to that namespace and keeps its registered task queue. Browse the matching namespace in the UI.
+Set `TEMPORAL_NAMESPACE` in `.env.catalog.local`. Every workspace moves to that namespace and keeps its registered task queue. Browse the matching namespace in the UI.
 
-**Verified** that all targets relocate and queues are preserved.
+**Verified** that all workspaces relocate and queues are preserved.
 
 ### Namespace mismatch
 
@@ -83,7 +83,7 @@ Creates the example and its assemblies, regenerates, and prints where to see it.
 
 Both `dev` and `worker` run the worker entry under Node's watch mode, so it restarts whenever a catalog module it loaded changes. A worker started before an example existed picks that example up on its own.
 
-**Verified** against a live server: scaffolding while the worker ran restarted it, both targets came back, the new workflow ran to completion, and a later edit to its `workflow.ts` restarted the worker again with the new code.
+**Verified** against a live server: scaffolding while the worker ran restarted it, both workspaces came back, the new workflow ran to completion, and a later edit to its `workflow.ts` restarted the worker again with the new code.
 
 ### Promotion
 

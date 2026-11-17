@@ -117,9 +117,9 @@ const validateAuthoredTree = async (
     );
   }
 
-  if (/\b(?:sourceFiles|targetId)\s*:/.test(example)) {
+  if (/\b(?:sourceFiles|workspaceId)\s*:/.test(example)) {
     throw new Error(
-      `${relative(rootDirectory, examplePath)} must be environment-neutral and omit targetId and sourceFiles`,
+      `${relative(rootDirectory, examplePath)} must be environment-neutral and omit workspaceId and sourceFiles`,
     );
   }
 

@@ -4,7 +4,7 @@
   import SuperFormsExample from './superforms-example.svelte';
 
   const { Story } = defineMeta({
-    title: 'Forms/SuperForms',
+    title: 'IO/Guides/Forms',
     component: SuperFormsExample,
   });
 </script>

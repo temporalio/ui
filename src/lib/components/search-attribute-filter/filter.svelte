@@ -24,10 +24,9 @@
 
   import { afterNavigate } from '$app/navigation';
 
+  import type { StatusFilter } from '$lib/models/status-filter';
   import type { SearchAttributeOption } from '$lib/stores/search-attributes';
   import { createFilter } from '$lib/utilities/query/to-list-workflow-filters';
-
-  import type { StatusAttribute } from './types.ts';
 
   import DropdownFilterList from './filter-list.svelte';
   import SearchAttributeMenu from './search-attribute-menu.svelte';
@@ -36,10 +35,10 @@
     filters: Writable<SearchAttributeFilter[]>;
     options: SearchAttributeOption[];
     id: string;
-    statusAttribute?: StatusAttribute;
+    statusFilter?: StatusFilter;
   }
 
-  let { filters, options, id, statusAttribute }: Props = $props();
+  let { filters, options, id, statusFilter }: Props = $props();
 
   const filter = writable<SearchAttributeFilter>(createFilter());
   const activeQueryIndex = writable<number | null>(null);
@@ -79,6 +78,6 @@
 </script>
 
 <div class="flex min-w-0 flex-1 flex-wrap items-center justify-start gap-2">
-  <DropdownFilterList {filters} {statusAttribute} />
-  <SearchAttributeMenu {options} {filters} {statusAttribute} />
+  <DropdownFilterList {filters} {statusFilter} />
+  <SearchAttributeMenu {options} {filters} {statusFilter} />
 </div>

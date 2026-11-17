@@ -780,9 +780,9 @@
             <dd class="mt-0.5">{descriptor.execution.namespace}</dd>
           </div>
           <div class="py-2 last:pb-0">
-            <dt class="body-small text-secondary">Target</dt>
+            <dt class="body-small text-secondary">Workspace</dt>
             <dd class="mt-0.5 break-all font-mono text-xs">
-              {descriptor.execution.targetId}
+              {descriptor.execution.workspaceId}
             </dd>
           </div>
         </dl>

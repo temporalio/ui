@@ -8,10 +8,10 @@
   import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
+  import type { StatusFilter } from '$lib/models/status-filter';
+  import { replaceAttributeFilters } from '$lib/utilities/query/column-filter';
   import { createFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
-
-  import type { StatusAttribute } from './types.ts';
 
   import DropdownFilterChip from './dropdown-filter-chip.svelte';
   import {
@@ -22,12 +22,14 @@
 
   interface Props {
     filters: Writable<SearchAttributeFilter[]>;
-    statusAttribute?: StatusAttribute;
+    statusFilter?: StatusFilter;
   }
 
-  let { filters, statusAttribute }: Props = $props();
+  let { filters, statusFilter }: Props = $props();
 
-  const isStatusFilter = (f: SearchAttributeFilter) =>
+  const statusAttribute = $derived(statusFilter?.attribute);
+
+  const matchesStatusAttribute = (f: SearchAttributeFilter) =>
     statusAttribute ? f.attribute === statusAttribute : false;
 
   const { filter, activeQueryIndex, chipOpenIndex } =
@@ -36,16 +38,13 @@
   let totalFiltersInView = $state(10);
 
   const firstExecutionStatusIndex = $derived(
-    $filters.findIndex((filter) => isStatusFilter(filter)),
+    $filters.findIndex((filter) => matchesStatusAttribute(filter)),
   );
   const visibleFilters = $derived($filters.slice(0, totalFiltersInView));
   const statusFilters = $derived(
     statusAttribute
       ? $filters.filter((filter) => filter.attribute === statusAttribute)
       : [],
-  );
-  const nonStatusFilters = $derived(
-    $filters.filter((filter) => !isStatusFilter(filter)),
   );
   const hasMoreFilters = $derived(totalFiltersInView < $filters.length);
 
@@ -56,19 +55,14 @@
     updateQueryParamsFromFilter(page.url, $filters);
   }
 
-  function updateStatusFilters(
-    index: number,
-    updatedFilters: SearchAttributeFilter[],
-  ) {
-    if (updatedFilters.length === 0) {
-      $filters = nonStatusFilters;
-      updateQueryParamsFromFilter(page.url, $filters);
-    } else {
-      const next = [...$filters];
-      next.splice(index, statusFilters.length, ...updatedFilters);
-      $filters = next;
-      updateQueryParamsFromFilter(page.url, $filters);
-    }
+  function updateStatusFilters(updatedFilters: SearchAttributeFilter[]) {
+    if (!statusAttribute) return;
+    $filters = replaceAttributeFilters(
+      $filters,
+      statusAttribute,
+      updatedFilters,
+    );
+    updateQueryParamsFromFilter(page.url, $filters);
   }
 
   function removeFilter(index: number) {
@@ -102,16 +96,15 @@
 {#if visibleFilters.length > 0}
   <div class="flex min-w-0 flex-wrap items-center gap-2">
     {#each visibleFilters as filterItem, i (filterItem.id)}
-      {#if statusAttribute && isStatusFilter(filterItem) && i === firstExecutionStatusIndex}
+      {#if statusFilter && matchesStatusAttribute(filterItem) && i === firstExecutionStatusIndex}
         <StatusFilterChip
-          attribute={statusAttribute}
+          {statusFilter}
           filters={statusFilters}
           index={i}
           openIndex={$chipOpenIndex}
-          onUpdate={(updatedStatusFilters) =>
-            updateStatusFilters(i, updatedStatusFilters)}
+          onUpdate={updateStatusFilters}
         />
-      {:else if !isStatusFilter(filterItem) && filterItem.attribute}
+      {:else if !matchesStatusAttribute(filterItem) && filterItem.attribute}
         <DropdownFilterChip
           filter={filterItem}
           index={i}

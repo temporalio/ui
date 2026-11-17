@@ -22,7 +22,7 @@
   type StoryArgs = { namespace: Topology };
 
   const { Story } = defineMeta({
-    title: 'Workers/Multi-Region/Pages',
+    title: 'Application/Workers/Multi-Region/Pages',
     args: { namespace: 'multi' },
     argTypes: {
       namespace: {

@@ -76,7 +76,7 @@
   }
 
   const { Story } = defineMeta({
-    title: 'Forms/SearchAttributes',
+    title: 'Application/Forms/SearchAttributes',
     component: SearchAttributesForm,
     args: {
       onSave: fn(),

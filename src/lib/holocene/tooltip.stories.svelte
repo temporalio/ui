@@ -9,7 +9,7 @@
   const iconOptions: Record<string, unknown> = { ...ioIcons };
 
   const { Story } = defineMeta({
-    title: 'Tooltip',
+    title: 'Holocene/Components/Tooltip',
     component: Tooltip,
     args: {
       text: 'This is a tooltip',

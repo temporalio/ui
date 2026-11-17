@@ -51,8 +51,67 @@ export type UpdateWorkflowResponse =
   temporal.api.workflowservice.v1.IUpdateWorkflowExecutionResponse;
 export type PendingWorkflowTaskInfo =
   temporal.api.workflow.v1.IPendingWorkflowTaskInfo;
-export type WorkflowExtendedInfo =
-  temporal.api.workflow.v1.IWorkflowExecutionExtendedInfo;
+type WorkflowPauseInfo = Omit<
+  temporal.api.workflow.v1.IWorkflowExecutionPauseInfo,
+  'pausedTime'
+> & {
+  pausedTime?: string | null;
+};
+
+type TimeSkippingFastForwardInfo = Omit<
+  temporal.api.common.v1.ITimeSkippingFastForwardInfo,
+  'fastForwardDuration' | 'targetTime'
+> & {
+  fastForwardDuration?: string | null;
+  targetTime?: string | null;
+};
+
+type TimeSkippingConfig = Omit<
+  temporal.api.common.v1.ITimeSkippingConfig,
+  'fastForwardConfig'
+> & {
+  fastForwardConfig?:
+    | (Omit<temporal.api.common.v1.IFastForwardConfig, 'duration'> & {
+        duration?: string | null;
+      })
+    | null;
+};
+
+type TimeSkippingInfo = Omit<
+  temporal.api.common.v1.ITimeSkippingInfo,
+  'currentTime' | 'effectiveConfig' | 'fastForwardInfo'
+> & {
+  currentTime?: string | null;
+  effectiveConfig?: TimeSkippingConfig | null;
+  fastForwardInfo?: TimeSkippingFastForwardInfo | null;
+};
+
+type WorkflowRequestIdInfo = Omit<
+  temporal.api.workflow.v1.IRequestIdInfo,
+  'eventId' | 'eventType'
+> & {
+  eventId?: string | null;
+  eventType?: keyof typeof temporal.api.enums.v1.EventType | null;
+};
+
+export type WorkflowExtendedInfo = Omit<
+  temporal.api.workflow.v1.IWorkflowExecutionExtendedInfo,
+  | 'executionExpirationTime'
+  | 'runExpirationTime'
+  | 'lastResetTime'
+  | 'originalStartTime'
+  | 'requestIdInfos'
+  | 'pauseInfo'
+  | 'timeSkippingInfo'
+> & {
+  executionExpirationTime?: string | null;
+  runExpirationTime?: string | null;
+  lastResetTime?: string | null;
+  originalStartTime?: string | null;
+  requestIdInfos?: Record<string, WorkflowRequestIdInfo> | null;
+  pauseInfo?: WorkflowPauseInfo | null;
+  timeSkippingInfo?: TimeSkippingInfo | null;
+};
 export type PauseWorkflowRequest =
   temporal.api.workflowservice.v1.IPauseWorkflowExecutionRequest;
 export type UnpauseWorkflowRequest =

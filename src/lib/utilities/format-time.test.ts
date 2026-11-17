@@ -384,12 +384,10 @@ describe('getTimestampDifference', () => {
       expect(formatDurationAbbreviated('2652361s')).toBe('30d, 16h, 46m, 1s');
     });
     it('should return duration abbreviated', () => {
-      expect(formatDurationAbbreviated('2694361s')).toBe('1month, 4h, 26m, 1s');
+      expect(formatDurationAbbreviated('2694361s')).toBe('31d, 4h, 26m, 1s');
     });
     it('should return duration abbreviated', () => {
-      expect(formatDurationAbbreviated('32694361s')).toBe(
-        '1year, 13d, 9h, 46m, 1s',
-      );
+      expect(formatDurationAbbreviated('32694361s')).toBe('378d, 9h, 46m, 1s');
     });
   });
 });

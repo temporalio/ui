@@ -7,7 +7,7 @@
   import CommonErrorCard from './common-error-card.svelte';
 
   const { Story } = defineMeta({
-    title: 'Diagnostics Card',
+    title: 'Application/Diagnostics Card',
     component: CommonErrorCard,
     args: {
       errors: COMMON_ERRORS.slice(0, 4),

@@ -2,11 +2,12 @@ import { get } from 'svelte/store';
 
 import { describe, expect, test } from 'vitest';
 
+import { MIN_COLUMN_WIDTH } from '$lib/utilities/column-width';
+
 import {
   addColumn,
   DEFAULT_DEPLOYMENTS_COLUMNS,
   migrateColumnLabels,
-  MIN_COLUMN_WIDTH,
   moveColumn,
   persistedDeploymentsTableColumns,
   persistedWorkflowTableColumns,

@@ -1,5 +1,6 @@
 <script lang="ts">
   import FilterBar from '$lib/components/search-attribute-filter/filter-bar.svelte';
+  import { nexusOperationStatusFilter } from '$lib/models/status-filter';
   import { nexusOperationFilters } from '$lib/stores/filters';
   import {
     nexusOperationRefresh,
@@ -21,6 +22,6 @@
   options={$nexusOperationSearchAttributeOptions}
   searchAttributes={$nexusOperationSearchAttributes}
   id="nexus-operation"
-  statusAttribute="ExecutionStatus"
+  statusFilter={nexusOperationStatusFilter}
   {onManualSearch}
 />

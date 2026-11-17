@@ -7,7 +7,9 @@
   import SavedQueryViews from '$lib/components/saved-query-views/saved-views.svelte';
   import { scheduledActionPresentations } from '$lib/components/schedule/scheduled-action-types/presentation-registry';
   import { resolveScheduledActionListEntry } from '$lib/components/schedule/scheduled-action-types/resolve-scheduled-action-list-entry';
+  import { getScheduleColumnFilter } from '$lib/components/schedule/schedules-list/column-search-attributes';
   import SchedulesTableRow from '$lib/components/schedule/schedules-list/schedules-table-row.svelte';
+  import ColumnHeaderFilter from '$lib/components/search-attribute-filter/column-header-filter.svelte';
   import FilterBar from '$lib/components/search-attribute-filter/filter-bar.svelte';
   import ConfigurableTableHeadersDrawer from '$lib/components/table/configurable-table-headers-drawer.svelte';
   import ResetColumnWidthsButton from '$lib/components/table/reset-column-widths-button.svelte';
@@ -30,7 +32,6 @@
   import {
     availableScheduleColumns,
     configurableTableColumns,
-    MIN_COLUMN_WIDTH,
     resizeColumn,
     TABLE_TYPE,
   } from '$lib/stores/configurable-table-columns';
@@ -46,7 +47,10 @@
     scheduleSearchAttributeOptions,
     scheduleSearchAttributes,
   } from '$lib/stores/search-attributes';
-  import { columnWidthStyle } from '$lib/utilities/column-width';
+  import {
+    columnWidthStyle,
+    MIN_COLUMN_WIDTH,
+  } from '$lib/utilities/column-width';
   import { parseSearchAttributes } from '$lib/utilities/decode-payload';
   import { isTimestamp, timestampToDate } from '$lib/utilities/format-time';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
@@ -248,7 +252,25 @@
       {#snippet headers()}
         <tr class="text-left">
           {#each columns as { label, width }, i (`${label}:${i}`)}
-            <SortableTableHeader column={label} style={columnWidthStyle(width)}>
+            {@const columnFilter = getScheduleColumnFilter(
+              label,
+              $scheduleSearchAttributes,
+            )}
+            {#snippet filter()}
+              {#if columnFilter}
+                <ColumnHeaderFilter
+                  attribute={columnFilter.attribute}
+                  type={columnFilter.type}
+                  {label}
+                  filters={scheduleFilters}
+                />
+              {/if}
+            {/snippet}
+            <SortableTableHeader
+              column={label}
+              leading={columnFilter ? filter : undefined}
+              style={columnWidthStyle(width)}
+            >
               <ColumnResizeHandle
                 {label}
                 {width}

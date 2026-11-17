@@ -8,7 +8,7 @@
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
   const { Story } = defineMeta({
-    title: 'Code Block',
+    title: 'Holocene/Components/Code Block',
     args: {
       editable: false,
       inline: false,

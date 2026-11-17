@@ -5,7 +5,7 @@
   import ComputeProviderPicker from './compute-provider-picker.svelte';
 
   const { Story } = defineMeta({
-    title: 'Workers/Compute Provider Picker',
+    title: 'Application/Workers/Compute Provider Picker',
     component: ComputeProviderPicker,
   });
 </script>

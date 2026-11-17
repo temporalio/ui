@@ -7,9 +7,11 @@
   import { translate } from '$lib/i18n/translate';
   import { Badge } from '$lib/io/badge';
   import { IconRetry } from '$lib/io/icon';
+  import { workflowRun } from '$lib/stores/workflow-run';
   import type { PendingNexusOperation } from '$lib/types/events';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
+  import { getWorkflowCurrentTime } from '$lib/utilities/workflow-time-skipping';
 
   let { operation }: { operation: PendingNexusOperation } = $props();
 
@@ -47,6 +49,7 @@
       {#if operation.nextAttemptScheduleTime}
         {@const timeDifference = toTimeDifference({
           date: operation.nextAttemptScheduleTime,
+          now: getWorkflowCurrentTime($workflowRun?.workflow),
           negativeDefault: '',
         })}
         {#if timeDifference}

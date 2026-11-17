@@ -31,7 +31,9 @@
     "src/lib/models/**/*.test.ts",
     "utilities/**/*.ts",
     "temporal/**/*.ts",
-    "plugins/**/*.ts"
+    "plugins/**/*.ts",
+    ".storybook/**/*.ts",
+    ".storybook/**/*.svelte"
   ],
   "exclude": [
     "src/lib/services/**/*.test.ts",

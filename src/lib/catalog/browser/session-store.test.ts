@@ -19,7 +19,7 @@ const descriptor: BrowserCatalogDescriptor = {
   startOptions: { defaultValue: {}, schema: true },
   execution: {
     kind: 'workflow',
-    targetId: 'catalog',
+    workspaceId: 'catalog',
     namespace: 'default',
     taskQueue: 'catalog',
     workflowType: 'OrderLifecycle',
@@ -40,7 +40,7 @@ const accepted = (attemptId: string, executionId: string) => ({
     kind: 'workflow' as const,
     attempt: { attemptId, executionId },
     target: {
-      targetId: descriptor.execution.targetId,
+      workspaceId: descriptor.execution.workspaceId,
       namespace: descriptor.execution.namespace,
       taskQueue: descriptor.execution.taskQueue,
     },
