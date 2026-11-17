@@ -29,6 +29,7 @@ const networkError = (statusCode: number) => ({
 
 class FakeController {
   error: unknown = null;
+  closeEvent: HistoryEvent | null = null;
   updateWorkflow = vi.fn();
   dispose = vi.fn();
   private _finishLoad: ((error?: unknown) => void) | null = null;
@@ -59,6 +60,7 @@ class FakeController {
   }
 
   close(closeEvent: HistoryEvent): void {
+    this.closeEvent = closeEvent;
     this._callbacks.onClose(closeEvent);
   }
 
@@ -707,6 +709,14 @@ describe('WorkflowExecutionChain', () => {
       expect(server.controllers.get('run-1')!.load).toHaveBeenCalledTimes(1);
     });
 
+    it('cardLoadOf reads an unknown Run as queued', async () => {
+      server.addChain(runIds(2));
+      const chain = track(await loadChain(server));
+
+      expect(chain.cardLoadOf('run-2')).toEqual({ status: 'loaded' });
+      expect(chain.cardLoadOf('missing')).toEqual({ status: 'queued' });
+    });
+
     it('retryCard restarts the load at the head of the queue', async () => {
       server.holdLoads = true;
       server.addChain(runIds(4));
@@ -800,6 +810,21 @@ describe('WorkflowExecutionChain', () => {
       server.controllers.get('run-1')!.close(completed('run-2'));
       await settle();
       server.controllers.get('run-2')!.close(completed('run-3'));
+      await settle();
+
+      expect(chainRunIds(chain)).toEqual(['run-1', 'run-2', 'run-3']);
+      expect(chain.latestRunId).toBe('run-3');
+    });
+
+    it('keeps following from a requested successor that closed first', async () => {
+      server.addChain(['run-1']);
+      const chain = track(await loadChain(server));
+      server.addChain(['run-1', 'run-2', 'run-3']);
+      await chain.requestRun('run-2');
+      await settle();
+
+      server.controllers.get('run-2')!.close(completed('run-3'));
+      server.controllers.get('run-1')!.close(completed('run-2'));
       await settle();
 
       expect(chainRunIds(chain)).toEqual(['run-1', 'run-2', 'run-3']);
@@ -1096,6 +1121,298 @@ describe('WorkflowExecutionChain', () => {
 
       expect(chain.latestRunId).toBe('run-1');
       expect(server.createController).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('requestRun', () => {
+    it('hops the requested Run in parallel with load and starts its controller', async () => {
+      server.holdLoads = true;
+      server.addChain(runIds(12));
+      const chain = track(createChain(server));
+      chain.prioritizeRun('run-1');
+      chain.requestRun('run-1');
+      void chain.load();
+      await settle();
+
+      expect(chain.requestedRuns.get('run-1')).toEqual({
+        status: 'found',
+        run: {
+          runId: 'run-1',
+          workflow: server.runs.get('run-1')?.workflow,
+          startedEvent: server.runs.get('run-1')?.startedEvent,
+        },
+      });
+      expect(server.controllers.get('run-1')?.load).toHaveBeenCalledWith(
+        server.runs.get('run-1')?.workflow,
+      );
+      expect(chainRunIds(chain)).not.toContain('run-1');
+    });
+
+    it('does not load a requested Run twice when the walk reaches it', async () => {
+      server.addChain(runIds(3));
+      const chain = track(createChain(server));
+      chain.requestRun('run-1');
+      chain.prioritizeRun('run-1');
+      void chain.load();
+      await settle();
+
+      expect(chainRunIds(chain)).toEqual(runIds(3));
+      expect(server.controllers.get('run-1')?.load).toHaveBeenCalledTimes(1);
+      expect(chain.cardLoads.get('run-1')).toEqual({ status: 'loaded' });
+    });
+
+    it('uses the window Run when it is already loaded', async () => {
+      server.addChain(runIds(3));
+      const chain = track(await loadChain(server));
+      const describes = server.describe.mock.calls.length;
+
+      chain.requestRun('run-2');
+
+      expect(chain.requestedRuns.get('run-2')).toEqual({
+        status: 'found',
+        run: chain.runs[1],
+      });
+      expect(server.describe.mock.calls.length).toBe(describes);
+    });
+
+    it('classifies a missing Run as not found', async () => {
+      server.addChain(runIds(2));
+      const chain = track(await loadChain(server));
+
+      chain.requestRun('missing');
+      await settle();
+
+      expect(chain.requestedRuns.get('missing')).toEqual({
+        status: 'notFound',
+      });
+      expect(server.controllers.has('missing')).toBe(false);
+    });
+
+    it('classifies a Run from another chain as wrong chain', async () => {
+      server.addChain(runIds(2));
+      server.runs.set('other-1', {
+        workflow: makeWorkflow('other-1', { firstRunId: 'other-1' }),
+        startedEvent: makeStartedEvent({ firstExecutionRunId: 'other-1' }),
+      });
+      const chain = track(await loadChain(server));
+
+      chain.requestRun('other-1');
+      await settle();
+
+      expect(chain.requestedRuns.get('other-1')).toEqual({
+        status: 'wrongChain',
+        firstRunId: 'other-1',
+      });
+      expect(server.controllers.has('other-1')).toBe(false);
+    });
+
+    it('reads the first Run ID from the Started event on older servers', async () => {
+      server.addChain(runIds(2), { legacy: true });
+      server.runs.set('other-1', {
+        workflow: makeWorkflow('other-1'),
+        startedEvent: makeStartedEvent({ firstExecutionRunId: 'other-1' }),
+      });
+      const chain = track(await loadChain(server));
+
+      chain.requestRun('other-1');
+      await settle();
+
+      expect(chain.requestedRuns.get('other-1')?.status).toBe('wrongChain');
+    });
+
+    it('keeps a failed request after retries are exhausted', async () => {
+      server.addChain(runIds(2));
+      server.runs.set('run-x', server.runs.get('run-1')!);
+      server.errors.set('describe:run-x', networkError(503));
+      const chain = track(await loadChain(server));
+
+      chain.requestRun('run-x');
+      await vi.advanceTimersByTimeAsync(30_000);
+
+      expect(chain.requestedRuns.get('run-x')?.status).toBe('failed');
+    });
+
+    it('requests each Run once', async () => {
+      server.addChain(runIds(2));
+      const chain = track(await loadChain(server));
+
+      chain.requestRun('missing');
+      chain.requestRun('missing');
+      await settle();
+
+      expect(server.describeCalls('missing')).toBe(1);
+    });
+  });
+
+  describe('pending successor', () => {
+    it('names the successor until its hop resolves', async () => {
+      server.addChain(['run-1']);
+      const chain = track(await loadChain(server));
+      server.addChain(['run-1', 'run-2']);
+
+      server.controllers.get('run-1')!.close(completed('run-2'));
+      expect(chain.pendingSuccessorRunId).toBe('run-2');
+
+      await settle();
+
+      expect(chain.pendingSuccessorRunId).toBeNull();
+      expect(chain.latestRunId).toBe('run-2');
+    });
+
+    it('clears when the hop fails', async () => {
+      server.addChain(['run-1']);
+      const chain = track(await loadChain(server));
+      server.controllers.get('run-1')!.close(completed('run-2'));
+      await vi.advanceTimersByTimeAsync(30_000);
+
+      expect(chain.pendingSuccessorRunId).toBeNull();
+      expect(chain.status).toBe('discoveryError');
+    });
+  });
+
+  describe('requestRun result', () => {
+    it('resolves with the settled request and reuses it', async () => {
+      server.addChain(runIds(2));
+      const chain = track(await loadChain(server));
+
+      const first = chain.requestRun('missing');
+      const second = chain.requestRun('missing');
+      await settle();
+
+      expect(second).toBe(first);
+      await expect(first).resolves.toEqual({ status: 'notFound' });
+    });
+
+    it('resolves a Run already in the window at once', async () => {
+      server.addChain(runIds(2));
+      const chain = track(await loadChain(server));
+
+      await expect(chain.requestRun('run-1')).resolves.toEqual({
+        status: 'found',
+        run: chain.runs[0],
+      });
+    });
+  });
+
+  describe('prioritizeRun(null)', () => {
+    it('gates the queue on the Latest Run again', async () => {
+      server.holdLoads = true;
+      server.addChain(runIds(4));
+      const chain = track(await loadChain(server));
+      chain.prioritizeRun('run-1');
+      await settle();
+
+      chain.prioritizeRun(null);
+      server.controllers.get('run-4')!.firstEvent();
+      await settle();
+
+      expect(server.controllers.has('run-3')).toBe(true);
+    });
+  });
+
+  describe('whenLoaded', () => {
+    it('resolves once load settles, whatever the outcome', async () => {
+      server.addChain(['run-1']);
+      server.errors.set('current', networkError(404));
+      const chain = track(createChain(server));
+      let loaded = false;
+      void chain.whenLoaded().then(() => {
+        loaded = true;
+      });
+
+      await settle();
+      expect(loaded).toBe(false);
+
+      void chain.load();
+      await settle();
+      expect(loaded).toBe(true);
+      expect(chain.error).not.toBeNull();
+    });
+
+    it('resolves on dispose', async () => {
+      server.addChain(['run-1']);
+      const chain = createChain(server);
+      let loaded = false;
+      void chain.whenLoaded().then(() => {
+        loaded = true;
+      });
+
+      chain.dispose();
+      await settle();
+
+      expect(loaded).toBe(true);
+    });
+  });
+
+  describe('subscribe', () => {
+    it('emits a hand-off with the new Latest Run', async () => {
+      server.addChain(['run-1']);
+      const chain = track(await loadChain(server));
+      const listener = vi.fn();
+      chain.subscribe(listener);
+      server.addChain(['run-1', 'run-2']);
+
+      server.controllers.get('run-1')!.close(completed('run-2'));
+      await settle();
+
+      expect(listener).toHaveBeenCalledExactlyOnceWith({
+        type: 'handOff',
+        runId: 'run-2',
+      });
+    });
+
+    it('emits closed when the chain closes, but not for a chain closed at load', async () => {
+      server.addChain(['run-1'], { openLatest: false });
+      const closedAtLoad = track(createChain(server));
+      const closedListener = vi.fn();
+      closedAtLoad.subscribe(closedListener);
+      void closedAtLoad.load();
+      await settle();
+      expect(closedListener).not.toHaveBeenCalled();
+
+      server.addChain(['run-1']);
+      const chain = track(await loadChain(server));
+      const listener = vi.fn();
+      chain.subscribe(listener);
+      server.controllers.get('run-1')!.close(completed());
+      await settle();
+
+      expect(listener).toHaveBeenCalledExactlyOnceWith({ type: 'closed' });
+    });
+
+    it('emits discoveryError once while steps keep failing', async () => {
+      server.addChain(runIds(12));
+      server.errors.set('describe:run-1', networkError(503));
+      const chain = track(await loadChain(server));
+      const listener = vi.fn();
+      chain.subscribe(listener);
+
+      void chain.loadOlder();
+      await vi.advanceTimersByTimeAsync(30_000);
+      server.controllers.get('run-12')!.close(completed('run-13'));
+      await vi.advanceTimersByTimeAsync(30_000);
+
+      expect(chain.status).toBe('discoveryError');
+      expect(listener).toHaveBeenCalledExactlyOnceWith({
+        type: 'discoveryError',
+      });
+    });
+
+    it('stops after unsubscribe and after dispose', async () => {
+      server.addChain(['run-1']);
+      const chain = await loadChain(server);
+      const unsubscribed = vi.fn();
+      const disposed = vi.fn();
+      chain.subscribe(unsubscribed)();
+      chain.subscribe(disposed);
+      server.addChain(['run-1', 'run-2']);
+
+      chain.dispose();
+      server.controllers.get('run-1')!.close(completed('run-2'));
+      await settle();
+
+      expect(unsubscribed).not.toHaveBeenCalled();
+      expect(disposed).not.toHaveBeenCalled();
     });
   });
 });

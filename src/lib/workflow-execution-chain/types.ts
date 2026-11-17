@@ -40,6 +40,23 @@ export type ChainMismatch = {
   currentFirstRunId: string;
 };
 
+export type RequestedRun =
+  | { status: 'loading' }
+  | { status: 'found'; run: ChainRun }
+  | { status: 'notFound' }
+  | { status: 'wrongChain'; firstRunId: string }
+  | { status: 'failed'; error: ChainError };
+
+export type ChainEvent =
+  | { type: 'handOff'; runId: string }
+  | { type: 'closed' }
+  | { type: 'discoveryError' };
+
+export type RunNotice = {
+  kind: 'notFound' | 'wrongChain' | 'failed';
+  runId: string;
+};
+
 export type CardLoad =
   | { status: 'queued' }
   | { status: 'loading' }

@@ -21,6 +21,7 @@
     routeForWorkflows,
     routeForWorkflowsWithQuery,
   } from '$lib/utilities/route-for';
+  import { getWorkflowLatestTime } from '$lib/utilities/workflow-time-skipping';
 
   import type { WorkflowExecutionChain } from './workflow-execution-chain.svelte';
 
@@ -79,9 +80,18 @@
     return () => clearInterval(interval);
   });
 
+  const chainLatestTime = $derived.by(() => {
+    if (chainEnd) {
+      return chainEnd;
+    }
+    return latestRun?.workflow.isRunning
+      ? getWorkflowLatestTime(latestRun.workflow, now)
+      : now;
+  });
+
   const chainDuration = $derived(
     chainStart
-      ? formatDistance({ start: chainStart, end: chainEnd ?? now })
+      ? formatDistance({ start: chainStart, end: chainLatestTime })
       : '',
   );
 
@@ -102,8 +112,8 @@
     if (!chain.latestRunId) {
       return true;
     }
-    const status = chain.cardLoads.get(chain.latestRunId)?.status;
-    return status === undefined || status === 'queued' || status === 'loading';
+    const { status } = chain.cardLoadOf(chain.latestRunId);
+    return status === 'queued' || status === 'loading';
   });
 </script>
 

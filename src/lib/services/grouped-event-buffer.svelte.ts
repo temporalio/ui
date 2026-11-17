@@ -74,6 +74,12 @@ export class EventBufferView {
     return this.buffer.getLatestEventTimeMs();
   }
 
+  /** Events ingested so far, without flattening them into an array. */
+  get eventCount(): number {
+    void this._version;
+    return this.buffer.getEventCount();
+  }
+
   /**
    * Materialize a group, re-running whenever the buffer changes. A GroupRecord's
    * identity is stable for the life of the run, so a caller deriving off the

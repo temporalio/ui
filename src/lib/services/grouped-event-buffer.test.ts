@@ -531,6 +531,18 @@ describe('latest received event time', () => {
   });
 });
 
+describe('event count', () => {
+  it('counts each ingested event once and clears for the next run', () => {
+    buffer.ingestHistoryEvent(makeWorkflowStarted(5));
+    buffer.ingestHistoryEvent(makeWorkflowStarted(1));
+    buffer.ingestHistoryEvent(makeWorkflowStarted(5));
+    expect(buffer.getEventCount()).toBe(2);
+
+    buffer.reset(0);
+    expect(buffer.getEventCount()).toBe(0);
+  });
+});
+
 describe('navigation reset', () => {
   it('reset() zeroes pool entries and reuses them for the next workflow', async () => {
     const events1 = makeSyntheticEvents(30);

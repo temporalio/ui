@@ -304,6 +304,7 @@ export function createGroupedEventBuffer() {
   let headGroup = new Int32Array(0); // head slot -> record index + 1 (0 = none)
   let records: GroupRecord[] = [];
   let maxSlot = -1;
+  let eventCount = 0;
 
   let failedEvent: HistoryEvent | null = null;
   let initialEvent: WorkflowExecutionStartedEvent | undefined;
@@ -638,6 +639,7 @@ export function createGroupedEventBuffer() {
     pendingByActivityId = new Map();
     pendingByNexusScheduledId = new Map();
     maxSlot = -1;
+    eventCount = 0;
 
     failedEvent = null;
     initialEvent = undefined;
@@ -686,6 +688,7 @@ export function createGroupedEventBuffer() {
       initialEvent = event;
     }
     events[slot] = event;
+    eventCount++;
     if (slot > maxSlot) maxSlot = slot;
 
     const headSlot = headSlotFor(event, slot);
@@ -703,6 +706,10 @@ export function createGroupedEventBuffer() {
 
   function getLatestEventTimeMs(): number | undefined {
     return latestEventTimeMs;
+  }
+
+  function getEventCount(): number {
+    return eventCount;
   }
 
   /**
@@ -1022,6 +1029,7 @@ export function createGroupedEventBuffer() {
     hasUserDefinedEventGroups,
     getEventGroupMatcher,
     getLatestEventTimeMs,
+    getEventCount,
     getEventArray,
     getEvent,
     getEventGroup,

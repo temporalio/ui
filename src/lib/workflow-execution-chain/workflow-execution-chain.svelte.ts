@@ -15,10 +15,12 @@ import type {
   ChainBoundary,
   ChainClient,
   ChainError,
+  ChainEvent,
   ChainMismatch,
   ChainRun,
   ChainStatus,
   FirstRunState,
+  RequestedRun,
   WorkflowExecutionChainIdentity,
 } from './types';
 
@@ -56,6 +58,7 @@ export class WorkflowExecutionChain {
   readonly identity: Readonly<WorkflowExecutionChainIdentity>;
   readonly controllers = new SvelteMap<string, WorkflowHistoryController>();
   readonly cardLoads = new SvelteMap<string, CardLoad>();
+  readonly requestedRuns = new SvelteMap<string, RequestedRun>();
 
   runs = $state.raw<ChainRun[]>([]);
   boundary = $state<ChainBoundary>(null);
@@ -64,6 +67,7 @@ export class WorkflowExecutionChain {
   mismatch = $state.raw<ChainMismatch | null>(null);
   redirectFirstRunId = $state<string | null>(null);
   walking = $state(false);
+  pendingSuccessorRunId = $state<string | null>(null);
 
   private _latestRunId = $state<string | null>(null);
   private _phase = $state<Phase>('loading');
@@ -78,6 +82,12 @@ export class WorkflowExecutionChain {
   });
   private readonly _client: ChainClient;
   private readonly _abort = new AbortController();
+  private readonly _requests = new SvelteMap<string, Promise<RequestedRun>>();
+  private readonly _listeners = new SvelteSet<(event: ChainEvent) => void>();
+  private _resolveLoaded!: () => void;
+  private readonly _loaded = new Promise<void>((resolve) => {
+    this._resolveLoaded = resolve;
+  });
 
   constructor(
     identity: WorkflowExecutionChainIdentity,
@@ -109,6 +119,25 @@ export class WorkflowExecutionChain {
   }
 
   async load(): Promise<void> {
+    try {
+      await this._load();
+    } finally {
+      this._resolveLoaded();
+    }
+  }
+
+  whenLoaded(): Promise<void> {
+    return this._loaded;
+  }
+
+  subscribe(listener: (event: ChainEvent) => void): () => void {
+    this._listeners.add(listener);
+    return () => {
+      this._listeners.delete(listener);
+    };
+  }
+
+  private async _load(): Promise<void> {
     const { namespace, workflowId, firstRunId } = this.identity;
     const firstRunTask = this._describeFirstRun();
 
@@ -162,25 +191,39 @@ export class WorkflowExecutionChain {
     void this._walkBack(WALK_SIZE - 1);
   }
 
-  loadOlder(): void {
+  loadOlder(): Promise<void> {
     if (
       this.walking ||
       this.boundary !== null ||
       this._failedSteps.has('walkBack') ||
       this.runs.length === 0
     ) {
-      return;
+      return Promise.resolve();
     }
-    void this._walkBack(WALK_SIZE);
+    return this._walkBack(WALK_SIZE);
   }
 
-  prioritizeRun(runId: string): void {
+  requestRun(runId: string): Promise<RequestedRun> {
+    const existing = this._requests.get(runId);
+    if (existing) {
+      return existing;
+    }
+    const request = this._requestRun(runId);
+    this._requests.set(runId, request);
+    return request;
+  }
+
+  prioritizeRun(runId: string | null): void {
     this._prioritizedRunId = runId;
-    const cardLoad = this.cardLoads.get(runId);
-    if (cardLoad?.status === 'queued') {
+    const cardLoad = runId ? this.cardLoads.get(runId) : undefined;
+    if (runId && cardLoad?.status === 'queued') {
       this._startCard(runId);
     }
     this._syncQueueGate();
+  }
+
+  cardLoadOf(runId: string): CardLoad {
+    return this.cardLoads.get(runId) ?? { status: 'queued' };
   }
 
   retryCard(runId: string): void {
@@ -209,6 +252,8 @@ export class WorkflowExecutionChain {
       return;
     }
     this._abort.abort();
+    this._listeners.clear();
+    this._resolveLoaded();
     this._queue.dispose();
     this._stopRefresh();
     for (const controller of this.controllers.values()) {
@@ -241,6 +286,64 @@ export class WorkflowExecutionChain {
       this._fetchStartedEvent(runId),
     ]);
     return { runId, workflow, startedEvent };
+  }
+
+  private _findRun(runId: string): ChainRun | undefined {
+    const inWindow = this.runs.find((run) => run.runId === runId);
+    if (inWindow) {
+      return inWindow;
+    }
+    const requested = this.requestedRuns.get(runId);
+    return requested?.status === 'found' ? requested.run : undefined;
+  }
+
+  private async _requestRun(runId: string): Promise<RequestedRun> {
+    const loading: RequestedRun = { status: 'loading' };
+    if (this._disposed) {
+      return loading;
+    }
+    const inWindow = this._findRun(runId);
+    if (inWindow) {
+      return this._settleRequest(runId, { status: 'found', run: inWindow });
+    }
+    this.requestedRuns.set(runId, loading);
+    let run: ChainRun;
+    try {
+      run = await this._hop(runId);
+    } catch (error) {
+      if (this._disposed) {
+        return loading;
+      }
+      return this._settleRequest(
+        runId,
+        isNotFound(error)
+          ? { status: 'notFound' }
+          : { status: 'failed', error: toChainError(error) },
+      );
+    }
+    if (this._disposed) {
+      return loading;
+    }
+    const firstRunId =
+      run.workflow.firstRunId ??
+      readStartedEvent(run.startedEvent).firstExecutionRunId;
+    if (firstRunId && firstRunId !== this.identity.firstRunId) {
+      return this._settleRequest(runId, { status: 'wrongChain', firstRunId });
+    }
+    const found = this._settleRequest(runId, {
+      status: 'found',
+      run: this._findRun(runId) ?? run,
+    });
+    const status = this.cardLoads.get(runId)?.status;
+    if (status === undefined || status === 'queued') {
+      this._startCard(runId);
+    }
+    return found;
+  }
+
+  private _settleRequest(runId: string, result: RequestedRun): RequestedRun {
+    this.requestedRuns.set(runId, result);
+    return result;
   }
 
   private async _describeFirstRun(): Promise<FirstRunState> {
@@ -357,12 +460,14 @@ export class WorkflowExecutionChain {
     const successorRunId = readSuccessorRunId(closeEvent);
     if (!successorRunId) {
       this._phase = 'closed';
+      this._emit({ type: 'closed' });
       return;
     }
     void this._handOff(successorRunId);
   }
 
   private async _handOff(successorRunId: string): Promise<void> {
+    this.pendingSuccessorRunId = successorRunId;
     let run: ChainRun;
     try {
       run = await this._hop(successorRunId);
@@ -370,20 +475,29 @@ export class WorkflowExecutionChain {
       if (this._disposed) {
         return;
       }
+      this.pendingSuccessorRunId = null;
       this._fail('handOff', () => void this._handOff(successorRunId));
       return;
     }
     if (this._disposed) {
       return;
     }
+    this.pendingSuccessorRunId = null;
     this.runs = [...this.runs, run];
     this._latestRunId = run.runId;
     this._phase = 'ready';
+    this._emit({ type: 'handOff', runId: run.runId });
     if (run.workflow.isRunning) {
       this._scheduleRefresh();
     }
-    this._startCard(run.runId);
+    if (!this.cardLoads.has(run.runId)) {
+      this._startCard(run.runId);
+    }
     this._syncQueueGate();
+    const knownCloseEvent = this.controllers.get(run.runId)?.closeEvent;
+    if (knownCloseEvent) {
+      this._handleClose(run.runId, knownCloseEvent);
+    }
   }
 
   private async _finalDescribe(runId: string): Promise<void> {
@@ -475,6 +589,9 @@ export class WorkflowExecutionChain {
   }
 
   private _enqueueCard(runId: string): void {
+    if (this.cardLoads.has(runId)) {
+      return;
+    }
     this.cardLoads.set(runId, { status: 'queued' });
     if (runId === this._prioritizedRunId) {
       this._startCard(runId);
@@ -496,7 +613,7 @@ export class WorkflowExecutionChain {
     this.cardLoads.set(runId, { status: 'loading' });
     try {
       await this._retry(async () => {
-        const run = this.runs.find((chainRun) => chainRun.runId === runId);
+        const run = this._findRun(runId);
         if (!run) {
           throw new Error('Missing Run for this card.');
         }
@@ -550,6 +667,19 @@ export class WorkflowExecutionChain {
   }
 
   private _fail(step: DiscoveryStep, retry: () => void): void {
+    const firstFailure = this._failedSteps.size === 0;
     this._failedSteps.set(step, retry);
+    if (firstFailure) {
+      this._emit({ type: 'discoveryError' });
+    }
+  }
+
+  private _emit(event: ChainEvent): void {
+    if (this._disposed) {
+      return;
+    }
+    for (const listener of this._listeners) {
+      listener(event);
+    }
   }
 }
