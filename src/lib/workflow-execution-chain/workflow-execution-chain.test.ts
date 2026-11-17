@@ -1428,6 +1428,33 @@ describe('WorkflowExecutionChain', () => {
       expect(server.describeCalls('run-2')).toBe(1);
     });
 
+    it('does not hop a Run again when the walk reaches a replaced pin', async () => {
+      server.addChain(runIds(15));
+      const chain = await loadWithRequest('run-2');
+      chain.prioritizeRun('run-4');
+      await chain.requestRun('run-4');
+
+      await chain.loadOlder();
+
+      expect(chainRunIds(chain)).toEqual(runIds(15));
+      expect(server.describeCalls('run-2')).toBe(1);
+    });
+
+    it('describes a pinned successor again on hand-off', async () => {
+      server.addChain(['run-1']);
+      const chain = track(await loadChain(server));
+      server.addChain(['run-1', 'run-2']);
+      chain.prioritizeRun('run-2');
+      await chain.requestRun('run-2');
+      server.addChain(['run-1', 'run-2'], { openLatest: false });
+
+      server.controllers.get('run-1')!.close(completed('run-2'));
+      await settle();
+
+      expect(chain.latestRunId).toBe('run-2');
+      expect(chain.runs.at(-1)?.workflow.isRunning).toBe(false);
+    });
+
     it('resets the boundary and off-path state when the group changes', async () => {
       server.addChain(runIds(15));
       addBranch('run-10', undefined);
