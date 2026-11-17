@@ -402,12 +402,12 @@ describe('WorkflowExecutionChain', () => {
       server.addChain(['new-1', 'new-2']);
     });
 
-    it('(a) is an older chain when the route Run is its own first Run', async () => {
+    it('(a) is a mismatch when the route Run is its own first Run', async () => {
       const chain = track(await loadChain(server, 'old-1'));
 
-      expect(chain.status).toBe('olderChain');
-      expect(chain.olderChain).toEqual({
-        reason: 'reused',
+      expect(chain.status).toBe('mismatch');
+      expect(chain.mismatch).toEqual({
+        reason: 'workflowIdReused',
         currentFirstRunId: 'new-1',
       });
       expect(chain.runs).toEqual([]);
@@ -421,8 +421,8 @@ describe('WorkflowExecutionChain', () => {
       });
       const chain = track(await loadChain(server, 'old-1'));
 
-      expect(chain.status).toBe('olderChain');
-      expect(chain.olderChain?.reason).toBe('reused');
+      expect(chain.status).toBe('mismatch');
+      expect(chain.mismatch?.reason).toBe('workflowIdReused');
     });
 
     it('(b) redirects when a mid-chain Run ID was given', async () => {
@@ -430,7 +430,7 @@ describe('WorkflowExecutionChain', () => {
 
       expect(chain.redirectFirstRunId).toBe('old-1');
       expect(chain.status).toBe('loading');
-      expect(chain.olderChain).toBeNull();
+      expect(chain.mismatch).toBeNull();
     });
 
     it('(b) redirects to the current chain for one of its mid-chain Runs', async () => {
@@ -442,9 +442,9 @@ describe('WorkflowExecutionChain', () => {
     it('(c) shows neutral copy when the route Run is not found', async () => {
       const chain = track(await loadChain(server, 'gone'));
 
-      expect(chain.status).toBe('olderChain');
-      expect(chain.olderChain).toEqual({
-        reason: 'notVisible',
+      expect(chain.status).toBe('mismatch');
+      expect(chain.mismatch).toEqual({
+        reason: 'routeChainNotFound',
         currentFirstRunId: 'new-1',
       });
       expect(chain.firstRun).toEqual({ status: 'notFound' });
@@ -454,8 +454,8 @@ describe('WorkflowExecutionChain', () => {
       server.errors.set('describe:old-1', networkError(500));
       const chain = track(await loadChain(server, 'old-1'));
 
-      expect(chain.status).toBe('olderChain');
-      expect(chain.olderChain?.reason).toBe('notVisible');
+      expect(chain.status).toBe('mismatch');
+      expect(chain.mismatch?.reason).toBe('routeChainNotFound');
       expect(chain.firstRun.status).toBe('failed');
     });
   });

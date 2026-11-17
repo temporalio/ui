@@ -21,7 +21,7 @@ export type ChainRun = {
 export type ChainStatus =
   | 'loading'
   | 'ready'
-  | 'olderChain'
+  | 'mismatch'
   | 'closed'
   | 'discoveryError';
 
@@ -35,8 +35,8 @@ export type FirstRunState =
   | { status: 'notFound' }
   | { status: 'failed'; error: ChainError };
 
-export type OlderChain = {
-  reason: 'reused' | 'notVisible';
+export type ChainMismatch = {
+  reason: 'workflowIdReused' | 'routeChainNotFound';
   currentFirstRunId: string;
 };
 

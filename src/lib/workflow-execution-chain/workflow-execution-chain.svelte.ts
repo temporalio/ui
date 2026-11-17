@@ -13,10 +13,10 @@ import type {
   ChainBoundary,
   ChainClient,
   ChainError,
+  ChainMismatch,
   ChainRun,
   ChainStatus,
   FirstRunState,
-  OlderChain,
   WorkflowExecutionChainIdentity,
 } from './types';
 
@@ -57,7 +57,7 @@ export class WorkflowExecutionChain {
   boundary = $state<ChainBoundary>(null);
   firstRun = $state.raw<FirstRunState>({ status: 'loading' });
   error = $state.raw<ChainError | null>(null);
-  olderChain = $state.raw<OlderChain | null>(null);
+  mismatch = $state.raw<ChainMismatch | null>(null);
   redirectFirstRunId = $state<string | null>(null);
   walking = $state(false);
 
@@ -244,11 +244,11 @@ export class WorkflowExecutionChain {
       this.redirectFirstRunId = routeRunFirstRunId;
       return;
     }
-    this.olderChain = {
-      reason: routeRunFirstRunId ? 'reused' : 'notVisible',
+    this.mismatch = {
+      reason: routeRunFirstRunId ? 'workflowIdReused' : 'routeChainNotFound',
       currentFirstRunId,
     };
-    this._phase = 'olderChain';
+    this._phase = 'mismatch';
   }
 
   private async _readFirstRunId(
