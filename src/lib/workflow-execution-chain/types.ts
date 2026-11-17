@@ -71,6 +71,7 @@ export type CardLoad =
 export type ControllerCallbacks = {
   onClose: (closeEvent: HistoryEvent) => void;
   onFirstEvent: () => void;
+  onLivePollError: (error: ChainError) => void;
 };
 
 export type DescribeParameters = {

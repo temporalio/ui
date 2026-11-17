@@ -101,6 +101,7 @@ function createController(
     pauseAfterPages?: number;
     liveUpdatesPaused?: boolean;
     onClose?: (closeEvent: HistoryEvent) => void;
+    onLivePollError?: (error: Error) => void;
   } = {
     pauseAfterPages: 2,
   },
@@ -602,6 +603,23 @@ describe('WorkflowHistoryController', () => {
       controller.setLiveUpdatesPaused(true);
       controller.setLiveUpdatesPaused(false);
       expect(polls).toHaveLength(1);
+    });
+
+    it('reports a terminal live-poll error after catch-up', async () => {
+      const onLivePollError = vi.fn();
+      const { controller } = createController('run-1', { onLivePollError });
+      const load = controller.load(workflow('run-1', true));
+      tail(0).result.resolve(tailEvents([2, 3]));
+      pollEvents(0, [1]);
+      await load;
+      expect(onLivePollError).not.toHaveBeenCalled();
+
+      const failure = new Error('forbidden');
+      poll(0).result.reject(failure);
+      await settle();
+
+      expect(controller.error).toBe(failure);
+      expect(onLivePollError).toHaveBeenCalledExactlyOnceWith(failure);
     });
 
     it('retries from the last acknowledged token and preserves buffered events', async () => {

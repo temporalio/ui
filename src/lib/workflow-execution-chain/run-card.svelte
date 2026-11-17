@@ -139,7 +139,9 @@
 
   const workflow = $derived(run.workflow);
   const isOpen = $derived(workflow.isRunning);
-  const isLive = $derived(isLatest && live && isOpen);
+  const isLive = $derived(
+    isLatest && live && isOpen && cardLoad.status !== 'error',
+  );
   const duration = $derived(
     formatDistanceAbbreviated({
       start: workflow.startTime,

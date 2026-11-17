@@ -49,6 +49,7 @@ type WorkflowHistoryControllerOptions = {
   pauseAfterPages?: number;
   liveUpdatesPaused?: boolean;
   onClose?: (closeEvent: HistoryEvent) => void;
+  onLivePollError?: (error: Error | NetworkError) => void;
 };
 
 export class WorkflowHistoryController {
@@ -73,6 +74,9 @@ export class WorkflowHistoryController {
   private readonly maximumPageSize: number;
   private readonly pauseAfterPages: number | undefined;
   private readonly onClose: ((closeEvent: HistoryEvent) => void) | undefined;
+  private readonly onLivePollError:
+    | ((error: Error | NetworkError) => void)
+    | undefined;
 
   constructor({
     workflowExecutionIdentity,
@@ -81,6 +85,7 @@ export class WorkflowHistoryController {
     pauseAfterPages,
     liveUpdatesPaused = false,
     onClose,
+    onLivePollError,
   }: WorkflowHistoryControllerOptions) {
     const { namespace, workflowId, runId } = workflowExecutionIdentity;
     if (!namespace || !workflowId || !runId) {
@@ -97,6 +102,7 @@ export class WorkflowHistoryController {
     this.pauseAfterPages = pauseAfterPages;
     this.liveUpdatesPaused = liveUpdatesPaused;
     this.onClose = onClose;
+    this.onLivePollError = onLivePollError;
   }
 
   get loading(): boolean {
@@ -425,13 +431,15 @@ export class WorkflowHistoryController {
       })
       .catch((error) => {
         if (!this.isCurrent(session) || controller.signal.aborted) return;
-        this.error =
+        const pollError =
           error instanceof Error || isNetworkError(error)
             ? error
             : new Error(getErrorMessage(error));
+        this.error = pollError;
         session.livePollFailed = true;
         controller.abort();
         this.endCatchUp(session);
+        this.onLivePollError?.(pollError);
       })
       .finally(() => {
         session.livePollTask = null;

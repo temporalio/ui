@@ -69,6 +69,7 @@ class RunRecord {
   pendingRequest: Promise<RequestedRun> | null = null;
   firstEventSeen = false;
   closeHandled = false;
+  livePollFailed = false;
 
   constructor(readonly runId: string) {}
 }
@@ -805,6 +806,8 @@ export class WorkflowExecutionChain {
     }
     const record = this._recordFor(runId);
     const controller = this._controllerFor(record);
+    const resumeHistory = record.livePollFailed;
+    record.livePollFailed = false;
     record.cardLoad = { status: 'loading' };
     try {
       await this._retry(async () => {
@@ -812,7 +815,9 @@ export class WorkflowExecutionChain {
         if (!run) {
           throw new Error('Missing Run for this card.');
         }
-        await controller.load(run.workflow);
+        await (resumeHistory
+          ? controller.retry(run.workflow)
+          : controller.load(run.workflow));
         if (controller.error) {
           throw controller.error;
         }
@@ -847,6 +852,7 @@ export class WorkflowExecutionChain {
       {
         onClose: (closeEvent) => this._handleClose(runId, closeEvent),
         onFirstEvent: () => this._handleFirstEvent(runId),
+        onLivePollError: (error) => this._handleLivePollError(runId, error),
       },
     );
     record.controller = controller;
@@ -858,6 +864,20 @@ export class WorkflowExecutionChain {
       return;
     }
     this._recordFor(runId).firstEventSeen = true;
+    this._syncQueueGate();
+  }
+
+  private _handleLivePollError(runId: string, error: ChainError): void {
+    const record = this._records.get(runId);
+    if (this._disposed || record?.cardLoad?.status !== 'loaded') {
+      return;
+    }
+    record.livePollFailed = true;
+    record.cardLoad = {
+      status: 'error',
+      error,
+      retryable: !isNotFound(error),
+    };
     this._syncQueueGate();
   }
 

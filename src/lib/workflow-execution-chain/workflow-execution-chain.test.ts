@@ -9,6 +9,7 @@ import type {
 
 import type {
   ChainClient,
+  ChainError,
   ControllerCallbacks,
   DescribeParameters,
 } from './types';
@@ -49,6 +50,11 @@ class FakeController {
     });
   });
 
+  retry = vi.fn((): Promise<void> => {
+    this.error = null;
+    return Promise.resolve();
+  });
+
   constructor(
     readonly identity: WorkflowExecutionIdentity,
     private readonly _callbacks: ControllerCallbacks,
@@ -66,6 +72,11 @@ class FakeController {
 
   firstEvent(): void {
     this._callbacks.onFirstEvent();
+  }
+
+  failLivePoll(error: ChainError): void {
+    this.error = error;
+    this._callbacks.onLivePollError(error);
   }
 
   finishLoad(error?: unknown): void {
@@ -350,7 +361,11 @@ describe('WorkflowExecutionChain', () => {
       expect(server.createController).toHaveBeenNthCalledWith(
         1,
         { namespace: NAMESPACE, workflowId: WORKFLOW_ID, runId: 'run-3' },
-        { onClose: expect.any(Function), onFirstEvent: expect.any(Function) },
+        {
+          onClose: expect.any(Function),
+          onFirstEvent: expect.any(Function),
+          onLivePollError: expect.any(Function),
+        },
       );
     });
 
@@ -747,6 +762,50 @@ describe('WorkflowExecutionChain', () => {
       await finishLoad('run-3');
       expect(chain.cardLoads.get('run-3')).toEqual({ status: 'loaded' });
       expect(server.controllers.has('run-1')).toBe(true);
+    });
+
+    it('surfaces a terminal live-poll error on a loaded card and resumes history on retry', async () => {
+      server.addChain(runIds(2));
+      const chain = track(await loadChain(server));
+      const controller = server.controllers.get('run-2')!;
+      expect(chain.cardLoads.get('run-2')).toEqual({ status: 'loaded' });
+
+      controller.failLivePoll(networkError(403));
+
+      expect(chain.cardLoads.get('run-2')).toEqual({
+        status: 'error',
+        error: networkError(403),
+        retryable: true,
+      });
+
+      chain.retryCard('run-2');
+      await settle();
+
+      expect(controller.retry).toHaveBeenCalledOnce();
+      expect(controller.retry).toHaveBeenCalledWith(
+        server.runs.get('run-2')!.workflow,
+      );
+      expect(controller.load).toHaveBeenCalledOnce();
+      expect(chain.cardLoads.get('run-2')).toEqual({ status: 'loaded' });
+    });
+
+    it('leaves a live-poll error during the load to the load itself', async () => {
+      server.holdLoads = true;
+      server.addChain(runIds(2));
+      const chain = track(await loadChain(server));
+      const controller = server.controllers.get('run-2')!;
+
+      controller.failLivePoll(networkError(403));
+      expect(chain.cardLoads.get('run-2')).toEqual({ status: 'loading' });
+
+      await finishLoad('run-2', networkError(403));
+      expect(chain.cardLoads.get('run-2')).toMatchObject({ status: 'error' });
+
+      chain.retryCard('run-2');
+      await finishLoad('run-2');
+
+      expect(controller.retry).not.toHaveBeenCalled();
+      expect(chain.cardLoads.get('run-2')).toEqual({ status: 'loaded' });
     });
 
     it('starts no more cards after dispose', async () => {
