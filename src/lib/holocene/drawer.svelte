@@ -81,7 +81,7 @@
           class="text-primary"
           Icon={IconClose}
           aria-expanded={open}
-          aria-controls="navigation-drawer"
+          aria-controls={id}
           onclick={onClick}
         />
       </div>

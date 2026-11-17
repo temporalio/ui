@@ -123,8 +123,8 @@ with `class`, such as `w-[32rem] max-w-full sm:max-w-full`.
   "OK". The modal uses `cancelText` to label its close icon too.
 - Give drawers a `closeButtonLabel` that names what closes, such as "Close
   worker settings".
-- Both components move focus inside when they open and close with Escape.
-  Don't add your own focus handling on top.
+- Both components move focus inside when they open. Modals also close with
+  Escape; drawers close with their close button or a click outside.
 
 {/* MDX here has no GFM tables; the Markdown block renders them. */}
 

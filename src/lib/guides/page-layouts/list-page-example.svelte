@@ -1,6 +1,7 @@
 <script lang="ts">
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Input from '$lib/holocene/input/input.svelte';
+  import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
   import { BadgeStatus, type BadgeStatusValue } from '$lib/io/badge-status';
   import { Button } from '$lib/io/button';
@@ -43,7 +44,11 @@
   let pageState = $state<PageState>('results');
   let search = $state('');
 
-  const rows = $derived(pageState === 'results' ? workflows : []);
+  const rows = $derived(
+    pageState === 'results'
+      ? workflows.filter(({ id }) => id.includes(search.trim().toLowerCase()))
+      : [],
+  );
 </script>
 
 <div class="flex w-full flex-col gap-6">
@@ -106,10 +111,12 @@
           <caption class="sr-only">Workflows</caption>
         {/snippet}
         {#snippet headers()}
-          <th>Status</th>
-          <th>Workflow ID</th>
-          <th>Type</th>
-          <th>Start</th>
+          <TableHeaderRow>
+            <th>Status</th>
+            <th>Workflow ID</th>
+            <th>Type</th>
+            <th>Start</th>
+          </TableHeaderRow>
         {/snippet}
         {#each rows as workflow (workflow.id)}
           <tr>

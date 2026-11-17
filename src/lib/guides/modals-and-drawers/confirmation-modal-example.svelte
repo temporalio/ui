@@ -52,6 +52,7 @@
     colorScheme="danger"
     onclick={() => {
       result = '';
+      error = '';
       open = true;
     }}
   >

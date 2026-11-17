@@ -89,7 +89,7 @@ body.sb-show-main,
 
 :is(.io-docs-canvas, .io-docs-examples) .docs-story .sb-story > * {
   display: flex;
-  justify-content: center;
+  justify-content: safe center;
 }
 
 /* Show code buttons on the heading row for the Playground and each example.
