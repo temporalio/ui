@@ -1,10 +1,4 @@
 import type { HourFormat } from '$lib/utilities/format-date';
-import {
-  DAY_MS,
-  HOUR_MS,
-  MINUTE_MS,
-  SECOND_MS,
-} from '$lib/utilities/time-units';
 import { BASE_TIME_FORMAT_OPTIONS, getTimezone } from '$lib/utilities/timezone';
 
 export const MIN_CARD_WIDTH = 148;
@@ -19,6 +13,11 @@ const MAJOR_LABEL_TO_END = 44;
 const DATED_MAJOR_LABEL_FROM_START = 186;
 const DATED_MAJOR_LABEL_TO_END = 56;
 const MINOR_TICK_INSET = 6;
+
+const SECOND_MS = 1_000;
+export const MINUTE_MS = 60 * SECOND_MS;
+const HOUR_MS = 60 * MINUTE_MS;
+export const DAY_MS = 24 * HOUR_MS;
 
 const stepsOf = (unitMs: number, counts: number[]): number[] =>
   counts.map((count) => count * unitMs);

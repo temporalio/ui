@@ -4,11 +4,12 @@
   import { timestamp } from '$lib/components/timestamp.svelte';
   import { translate } from '$lib/i18n/translate';
   import { hourFormat, timeFormat } from '$lib/stores/time-format';
-  import { DAY_MS, MINUTE_MS } from '$lib/utilities/time-units';
 
   import {
     buildRulerTicks,
+    DAY_MS,
     formatClockTime,
+    MINUTE_MS,
     type RulerSegment,
   } from './run-strip-layout';
 
