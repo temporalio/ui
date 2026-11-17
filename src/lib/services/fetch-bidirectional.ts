@@ -85,6 +85,8 @@ export const fetchBidirectional = async ({
     resumePause = undefined;
   };
 
+  const isPaused = () => pauseLatch !== null;
+
   const stopCursors = () => {
     ascCtrl.abort();
     descCtrl.abort();
@@ -121,14 +123,13 @@ export const fetchBidirectional = async ({
       pages >= pauseAfterPages
     ) {
       pauseFired = true;
-      if (failure) {
-        stopCursors();
-        return;
-      }
       pauseLatch = new Promise<void>((resolve) => {
         resumePause = resolve;
       });
       onPause({ resume: releasePause });
+      if (failure && isPaused()) {
+        stopCursors();
+      }
     }
   };
 

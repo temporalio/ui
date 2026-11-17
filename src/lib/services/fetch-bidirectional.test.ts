@@ -298,7 +298,41 @@ describe('fetchBidirectional failure recovery', () => {
       }),
     ).rejects.toBe(error);
     expect(descendingCalls).toBe(2);
-    expect(onPause).not.toHaveBeenCalled();
+    expect(onPause).toHaveBeenCalledTimes(1);
+  });
+
+  it('lets the healthy cursor finish after a failure when the pause is released immediately', async () => {
+    let descendingCalls = 0;
+    const pages = [
+      [6, 5],
+      [4, 3],
+      [2, 1],
+    ];
+    requestFromAPI.mockImplementation((url: string) => {
+      if (url === 'asc') return Promise.reject(new Error('ascending failed'));
+      const ids = pages[descendingCalls];
+      descendingCalls++;
+      return Promise.resolve(
+        descPage(
+          ids,
+          descendingCalls < pages.length ? `d${descendingCalls + 1}` : '',
+        ),
+      );
+    });
+    const received: string[] = [];
+
+    await fetchBidirectional({
+      namespace: 'ns',
+      workflowId: 'wf',
+      runId: 'run',
+      pauseAfterPages: 2,
+      onPause: (handle) => handle.resume(),
+      onRawPage: (events) =>
+        received.push(...events.map((event) => event.eventId)),
+    });
+
+    expect(descendingCalls).toBe(3);
+    expect(received).toEqual(['6', '5', '4', '3', '2', '1']);
   });
 
   it('rejects after both directions fail with a gap, retaining delivered pages', async () => {

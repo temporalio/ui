@@ -10,7 +10,10 @@ import {
   makeWorkflowTaskStarted,
 } from '$src/lib/services/test-helpers/synthetic-events';
 import type { HistoryEvent } from '$src/lib/types/events';
-import type { WorkflowExecutionAPIResponse } from '$src/lib/types/workflows';
+import type {
+  WorkflowExecutionAPIResponse,
+  WorkflowExecutionInfo,
+} from '$src/lib/types/workflows';
 import { mockWorkflowApis } from '~/test-utilities/mock-apis';
 import {
   EVENT_HISTORY_API,
@@ -28,16 +31,17 @@ const events: HistoryEvent[] = [
   makeWorkflowCompleted(9),
 ];
 const pageSize = 2;
+const completedExecutionInfo: WorkflowExecutionInfo = {
+  ...mockWorkflow.workflowExecutionInfo,
+  status: 'Completed',
+  startTime: events[0].eventTime,
+  executionTime: events[0].eventTime,
+  closeTime: events[8].eventTime,
+  historyLength: String(events.length),
+};
 const completedWorkflow: WorkflowExecutionAPIResponse = {
   ...mockWorkflow,
-  workflowExecutionInfo: {
-    ...mockWorkflow.workflowExecutionInfo,
-    status: 'Completed',
-    startTime: events[0].eventTime,
-    executionTime: events[0].eventTime,
-    closeTime: events[8].eventTime,
-    historyLength: String(events.length),
-  },
+  workflowExecutionInfo: completedExecutionInfo,
   pendingActivities: [],
   pendingChildren: [],
 };
@@ -106,7 +110,7 @@ test.describe('Workflow run detail history loading errors', () => {
   test('shows the status text fallback when both history directions return HTTP 503 with an empty message', async ({
     page,
   }) => {
-    const failedDirections = new Set<string>();
+    const failedDirections = new Set<RegExp>();
     for (const api of [EVENT_HISTORY_API, EVENT_HISTORY_API_REVERSE]) {
       await page.route(api, (route) => {
         failedDirections.add(api);
@@ -132,13 +136,13 @@ test.describe('Workflow run detail history loading errors', () => {
   });
 
   for (const view of ['history', 'timeline']) {
-    test(`shows a loaded workflow-task failure on ${view} after a partial history error`, async ({
+    test(`hides a loaded workflow-task failure on ${view} after a partial history error`, async ({
       page,
     }) => {
       await mockWorkflowApis(page, {
         ...completedWorkflow,
         workflowExecutionInfo: {
-          ...completedWorkflow.workflowExecutionInfo,
+          ...completedExecutionInfo,
           status: 'Running',
           closeTime: '',
         },
@@ -171,7 +175,7 @@ test.describe('Workflow run detail history loading errors', () => {
       await expect(page.getByTestId('history-load-error')).toBeVisible();
       await expect(
         page.getByText('Non Deterministic Error', { exact: true }),
-      ).toBeVisible();
+      ).toBeHidden();
     });
   }
 

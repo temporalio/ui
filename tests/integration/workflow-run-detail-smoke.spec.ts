@@ -134,8 +134,8 @@ test.describe('Workflow run detail smoke', () => {
   }) => {
     await page.goto(`${runUrl}/history?sort=ascending`);
     await expect(page.getByTestId('event-summary-row')).toHaveCount(5);
-    await page.locator('button[aria-controls="status-menu"]').click();
-    await page.locator('#event-type-menu').getByTestId('Activity').click();
+    await page.locator('button[aria-controls="event-type-filter"]').click();
+    await page.locator('#event-type-filter').getByTestId('Activity').click();
     await page.keyboard.press('Escape');
     await expect(page.getByTestId('event-summary-row')).toHaveCount(2);
     await expect(page.getByTestId('event-summary-table')).not.toContainText(

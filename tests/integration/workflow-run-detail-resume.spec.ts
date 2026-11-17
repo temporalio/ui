@@ -146,6 +146,9 @@ test.describe('Workflow run detail resume ownership', () => {
     {
       view: 'timeline',
       verify: async (page: Page) => {
+        await page
+          .getByRole('img', { name: `Workflow ${workflowId}: Completed` })
+          .scrollIntoViewIfNeeded();
         const activity = page.getByRole('button', {
           name: 'Event ResumeSecondRunActivity3: Completed',
         });
