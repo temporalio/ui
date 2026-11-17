@@ -25,7 +25,7 @@
   }
 
   const { Story } = defineMeta({
-    title: 'IO/Theme',
+    title: 'IO/Guides/Theme',
     parameters: {
       layout: 'fullscreen',
     },

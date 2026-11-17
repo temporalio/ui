@@ -5,6 +5,8 @@
   import { Chip, type ChipColorScheme } from '$lib/io/chip';
   import { IconClose, IconRegions } from '$lib/io/icon';
 
+  import usage from './chip.usage.md?raw';
+
   const colorSchemes: ChipColorScheme[] = [
     'neutral',
     'info',
@@ -16,6 +18,7 @@
 
   const { Story } = defineMeta({
     title: 'IO/Components/Chip',
+    tags: ['autodocs'],
     component: Chip,
     args: {
       text: 'chip',
@@ -26,12 +29,26 @@
     argTypes: {
       text: { control: 'text' },
       colorScheme: { control: 'select', options: colorSchemes },
-      disabled: { control: 'boolean' },
+      disabled: {
+        control: 'boolean',
+        table: {
+          category: 'properties',
+          type: { summary: 'boolean' },
+          defaultValue: { summary: 'false' },
+        },
+      },
       Icon: { control: false },
       extension: { control: 'object' },
       class: { table: { disable: true } },
     },
     parameters: {
+      docs: {
+        description: {
+          component:
+            'An interactive label for filters or compact actions, with an optional extension.',
+        },
+        usage,
+      },
       layout: 'padded',
     },
     render: template,
@@ -44,7 +61,7 @@
   </div>
 {/snippet}
 
-<Story name="Playground" />
+<Story tags={['!dev']} name="Playground" />
 
 <Story name="Color schemes">
   {#snippet template()}

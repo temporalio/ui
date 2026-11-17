@@ -5,7 +5,7 @@
   import ButtonRadioGroup from '$lib/holocene/button-radio-group.svelte';
 
   const { Story } = defineMeta({
-    title: 'Button Radio Group',
+    title: 'Holocene/Components/Button Radio Group',
     component: ButtonRadioGroup,
     args: {
       label: 'Recurrence',
@@ -28,7 +28,10 @@
     ButtonRadioItem,
     ButtonRadioOption,
   } from '$lib/holocene/button-radio-group.svelte';
-  import Button, { type ButtonStyles } from '$lib/holocene/button.svelte';
+  import Button, {
+    type ButtonSize,
+    type ButtonStyles,
+  } from '$lib/holocene/button.svelte';
 
   type StoryArgs = ComponentProps<
     typeof ButtonRadioGroup<ButtonRadioOption<string>>
@@ -60,7 +63,7 @@
     onKeydown,
   }: ButtonRadioItem<ButtonRadioOption<string>>,
   variant: ButtonStyles['variant'] = 'secondary',
-  size: ButtonStyles['size'] = 'md',
+  size: ButtonSize = 'md',
 )}
   <Button
     {variant}

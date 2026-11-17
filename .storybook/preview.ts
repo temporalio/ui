@@ -4,6 +4,7 @@ import '../src/app.css';
 import './preview.css';
 import i18next from 'i18next';
 
+import { ComponentDocs } from './blocks/component-docs';
 import { i18nNamespaces } from '../src/lib/i18n';
 import resources from '../src/lib/i18n/locales';
 import { defaultThemeName, themes } from '../src/lib/theme/io/themes';
@@ -35,6 +36,25 @@ const preview: Preview = {
     }),
   ],
   parameters: {
+    options: {
+      storySort: {
+        method: 'alphabetical',
+        order: [
+          'IO',
+          ['Guides', ['Forms', 'Theme'], 'Components', 'Layouts'],
+          'Holocene',
+          ['Components'],
+          'Application',
+          '*',
+        ],
+      },
+    },
+    docs: {
+      page: ComponentDocs,
+      toc: {
+        headingSelector: 'h2, h3',
+      },
+    },
     backgrounds: {
       disable: true,
     },

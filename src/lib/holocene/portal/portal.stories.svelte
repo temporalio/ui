@@ -7,7 +7,7 @@
   import Portal from './portal.svelte';
 
   const { Story } = defineMeta({
-    title: 'Portal',
+    title: 'Holocene/Components/Portal',
     component: Portal,
     args: {
       position: 'bottom',

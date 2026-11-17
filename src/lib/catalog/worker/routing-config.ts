@@ -2,26 +2,26 @@ import type { CatalogRouting } from '../browser/routing';
 
 type CatalogRoutingEnvironment = Record<string, string | undefined>;
 
-export type CatalogRoutableTargetRegistration = {
-  targetId: string;
+export type CatalogRoutableWorkspaceRegistration = {
+  workspaceId: string;
   taskQueue: string;
 };
 
-const defaultTargets: readonly CatalogRoutableTargetRegistration[] = [
-  { targetId: 'shared-workflows', taskQueue: 'ui-catalog' },
+const defaultWorkspaces: readonly CatalogRoutableWorkspaceRegistration[] = [
+  { workspaceId: 'shared-workflows', taskQueue: 'ui-catalog' },
 ];
 
 export const catalogRoutingFromEnvironment = (
   environment: CatalogRoutingEnvironment,
-  targets: readonly CatalogRoutableTargetRegistration[] = defaultTargets,
+  workspaces: readonly CatalogRoutableWorkspaceRegistration[] = defaultWorkspaces,
 ): CatalogRouting => {
   const namespace = environment.TEMPORAL_NAMESPACE;
 
   if (!namespace) return {};
 
   return Object.fromEntries(
-    targets.map(({ targetId, taskQueue }) => [
-      targetId,
+    workspaces.map(({ workspaceId, taskQueue }) => [
+      workspaceId,
       { namespace, taskQueue },
     ]),
   );
@@ -29,11 +29,11 @@ export const catalogRoutingFromEnvironment = (
 
 export const requireCatalogRoutingFromEnvironment = (
   environment: CatalogRoutingEnvironment,
-  targets?: readonly CatalogRoutableTargetRegistration[],
+  workspaces?: readonly CatalogRoutableWorkspaceRegistration[],
 ): CatalogRouting => {
   if (!environment.TEMPORAL_NAMESPACE) {
     throw new Error('TEMPORAL_NAMESPACE is required');
   }
 
-  return catalogRoutingFromEnvironment(environment, targets);
+  return catalogRoutingFromEnvironment(environment, workspaces);
 };

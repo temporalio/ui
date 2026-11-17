@@ -78,6 +78,21 @@ export function validTimeToDate(validTime: ValidTime): Date {
   return parsedDate;
 }
 
+export function getValidTimeMs(
+  time: ValidTime | null | undefined,
+): number | undefined {
+  if (time == null) {
+    return undefined;
+  }
+
+  try {
+    const milliseconds = validTimeToDate(time).getTime();
+    return Number.isFinite(milliseconds) ? milliseconds : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 /**
  * Returns the latest `Date` from the given times.
  *

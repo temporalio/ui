@@ -30,6 +30,7 @@
           format,
           relativeLabel,
           hourFormat,
+          now: options?.now,
         });
       };
     },

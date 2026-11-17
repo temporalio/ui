@@ -19,7 +19,7 @@
   import VerticalNav from './vertical-nav.svelte';
 
   const { Story } = defineMeta({
-    title: 'Vertical Nav',
+    title: 'Holocene/Components/Vertical Nav',
     component: VerticalNav,
   });
 </script>

@@ -2,6 +2,7 @@ import type { WorkflowExecution } from '$lib/types/workflows';
 import { isFuture } from '$lib/utilities/format-date';
 
 import { getTimestampDifference } from './format-time';
+import { getWorkflowCurrentTime } from './workflow-time-skipping';
 
 export const isWorkflowDelayed = (workflow: WorkflowExecution): boolean => {
   if (!workflow.executionTime || !workflow.startTime) {
@@ -13,8 +14,7 @@ export const isWorkflowDelayed = (workflow: WorkflowExecution): boolean => {
     workflow.startTime,
   );
 
-  const workflowNow =
-    workflow.workflowExtendedInfo?.timeSkippingInfo?.currentTime || new Date();
+  const workflowNow = getWorkflowCurrentTime(workflow);
 
   if (!delay || workflow.endTime || isFuture(workflow.startTime, workflowNow)) {
     return false;

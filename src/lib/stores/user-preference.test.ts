@@ -19,7 +19,11 @@ test('user preference keys match the snapshot', () => {
   expect(
     [...USER_PREFERENCE_KEYS].sort(),
     'Changing or removing a user preference key orphans values users already saved. Verify the change is accounted for before updating this snapshot.',
-  ).toMatchInlineSnapshot('[]');
+  ).toMatchInlineSnapshot(`
+    [
+      "showTimelineEventGroups",
+    ]
+  `);
 });
 
 describe('createUserPreference', () => {

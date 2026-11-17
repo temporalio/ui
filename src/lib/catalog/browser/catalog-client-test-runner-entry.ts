@@ -43,7 +43,7 @@ const descriptor: BrowserCatalogDescriptor = {
   },
   execution: {
     kind: 'workflow',
-    targetId: 'catalog',
+    workspaceId: 'catalog',
     namespace: 'default',
     taskQueue: 'catalog-tasks',
     workflowType: 'OrderLifecycle',
@@ -58,7 +58,7 @@ const localDescriptor: BrowserCatalogDescriptor = {
   description: 'Send a local payment reminder.',
   execution: {
     kind: 'workflow',
-    targetId: 'catalog',
+    workspaceId: 'catalog',
     namespace: 'default',
     taskQueue: 'catalog-tasks',
     workflowType: 'PaymentReminder',

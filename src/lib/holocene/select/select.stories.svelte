@@ -11,7 +11,7 @@
   import Select from './select.svelte';
 
   const { Story } = defineMeta({
-    title: 'Select',
+    title: 'Holocene/Components/Select',
     component: Select,
     render: template,
     args: {

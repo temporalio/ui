@@ -9,7 +9,7 @@
   const iconOptions: Record<string, unknown> = { ...ioIcons };
 
   const { Story } = defineMeta({
-    title: 'Icon Button (Deprecated)',
+    title: 'Holocene/Components/Icon Button (Deprecated)',
     component: IconButton,
     args: {
       Icon: ioIcons.IconClose,

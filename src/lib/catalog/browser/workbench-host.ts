@@ -6,7 +6,7 @@ export type AttemptIdentity = {
 };
 
 export type LaunchTarget = {
-  targetId: string;
+  workspaceId: string;
   namespace: string;
   taskQueue: string;
 };

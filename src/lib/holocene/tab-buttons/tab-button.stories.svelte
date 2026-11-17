@@ -14,7 +14,7 @@
   const iconOptions: Record<string, unknown> = { ...ioIcons };
 
   const { Story } = defineMeta({
-    title: 'Tab Button',
+    title: 'Holocene/Components/Tab Button',
     component: TabButton,
     subcomponents: { TabButtons },
     argTypes: {

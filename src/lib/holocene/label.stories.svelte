@@ -4,7 +4,7 @@
   import Label from '$lib/holocene/label.svelte';
 
   const { Story } = defineMeta({
-    title: 'Label',
+    title: 'Holocene/Components/Label',
     component: Label,
     args: {
       label: 'Label',

@@ -1,4 +1,5 @@
 import { persistStore } from '$lib/stores/persist-store';
+import { createUserPreference } from '$lib/stores/user-preference';
 import type { EventView } from '$lib/types/events';
 import type { BooleanString } from '$lib/types/global';
 
@@ -16,6 +17,11 @@ export const autoRefreshWorkflow = persistStore<'on' | 'off'>(
 export const collapseIdleTime = persistStore<'on' | 'off'>(
   'collapseIdleTime',
   'on',
+);
+
+export const showTimelineEventGroups = createUserPreference<boolean | null>(
+  'showTimelineEventGroups',
+  null,
 );
 
 export const eventViewType = persistStore<EventView>('eventView', 'feed', true);
