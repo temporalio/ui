@@ -24,6 +24,9 @@ const previousButton = (page: Page) =>
 const jumpButton = (page: Page) =>
   page.getByRole('button', { name: /^(Jump to live|View latest run)$/ });
 
+const gapButton = (page: Page) =>
+  strip(page).getByRole('button', { name: 'Load older runs' });
+
 const announcements = (page: Page) =>
   page.getByTestId('run-strip-announcer-polite');
 
@@ -349,6 +352,108 @@ test.describe('Workflow execution chain Run strip', () => {
 
     await expect(page).toHaveURL(/[?&]run=run-01/);
     await expect(card(page, 'run-01')).toHaveAttribute('aria-current', 'true');
+  });
+
+  test('detaches a ?run= beyond the first 10 behind a gap that loads older runs', async ({
+    page,
+  }) => {
+    await mockChain(page, { runs: linearChain(15), current: () => 'run-15' });
+    await page.goto(chainUrl('run-01', '?run=run-02'));
+
+    await expect(strip(page)).toHaveAccessibleName('Runs, 11 loaded');
+    await expect(card(page, 'run-02')).toHaveAttribute('aria-current', 'true');
+    await expect(card(page, 'run-05')).toHaveCount(0);
+    await expect(page.getByTestId('run-ruler-break')).toHaveCount(1);
+    await expect(
+      page.getByRole('button', { name: /^Event Work2:/ }),
+    ).toBeVisible();
+
+    await gapButton(page).click();
+
+    await expect(strip(page)).toHaveAccessibleName('Runs, 15 loaded');
+    await expect(gapButton(page)).toHaveCount(0);
+    await expect(page.getByTestId('run-ruler-break')).toHaveCount(0);
+    await expect(card(page, 'run-02')).toHaveAttribute('aria-current', 'true');
+    await expect(page).toHaveURL(/[?&]run=run-02/);
+  });
+
+  test('keeps the detached group, so Back to its ?run= finds the card', async ({
+    page,
+  }) => {
+    await mockChain(page, { runs: linearChain(15), current: () => 'run-15' });
+    await page.goto(chainUrl('run-01', '?run=run-03'));
+
+    await expect(card(page, 'run-03')).toHaveAttribute('aria-current', 'true');
+
+    await previousButton(page).click();
+
+    await expect(page).toHaveURL(/[?&]run=run-02/);
+    await expect(card(page, 'run-02')).toHaveAttribute('aria-current', 'true');
+    await expect(strip(page)).toHaveAccessibleName('Runs, 12 loaded');
+
+    await card(page, 'run-15').click();
+    await expect(page).not.toHaveURL(/run=/);
+
+    await page.goBack();
+
+    await expect(page).toHaveURL(/[?&]run=run-02/);
+    await expect(card(page, 'run-02')).toHaveAttribute('aria-current', 'true');
+    await expect(gapButton(page)).toBeVisible();
+  });
+
+  test('marks a detached Run replaced by a reset once the walk passes it', async ({
+    page,
+  }) => {
+    await mockChain(page, {
+      runs: [
+        ...linearChain(15),
+        {
+          runId: 'branch',
+          firstRunId: 'run-01',
+          predecessorRunId: 'run-03',
+          activity: 'BranchWork',
+          startTime: '2024-01-01T02:30:00.000Z',
+          closeTime: '2024-01-01T02:45:00.000Z',
+        },
+      ],
+      current: () => 'run-15',
+    });
+    await page.goto(chainUrl('run-01', '?run=branch'));
+
+    await expect(card(page, 'branch')).toHaveAttribute('aria-current', 'true');
+
+    await gapButton(page).click();
+
+    await expect(gapButton(page)).toHaveCount(0);
+    await expect(page.getByTestId('run-strip-off-path')).toHaveText(
+      'Replaced by a reset',
+    );
+    await expect(card(page, 'run-03')).toBeVisible();
+    await expect(card(page, 'branch')).toHaveAttribute('aria-current', 'true');
+  });
+
+  test('puts the gap button in the arrow order', async ({ page }) => {
+    await mockChain(page, { runs: linearChain(15), current: () => 'run-15' });
+    await page.goto(chainUrl('run-01', '?run=run-02'));
+
+    await expect(card(page, 'run-02')).toHaveAttribute('aria-current', 'true');
+
+    await previousButton(page).focus();
+    await page.keyboard.press('Tab');
+    await expect(card(page, 'run-02')).toBeFocused();
+
+    await page.keyboard.press('ArrowRight');
+    await expect(gapButton(page)).toBeFocused();
+    await expect(gapButton(page)).toHaveAttribute('tabindex', '0');
+
+    await page.keyboard.press('ArrowRight');
+    await expect(card(page, 'run-06')).toBeFocused();
+
+    await page.keyboard.press('ArrowLeft');
+    await page.keyboard.press('Enter');
+
+    await expect(strip(page)).toHaveAccessibleName('Runs, 15 loaded');
+    await expect(card(page, 'run-02')).toBeFocused();
   });
 
   test('names and describes each card', async ({ page }) => {

@@ -29,7 +29,12 @@ export const REFRESH_INTERVAL_MS = 10_000;
 export const CARD_LOAD_CONCURRENCY = 1;
 
 type Phase = Exclude<ChainStatus, 'discoveryError'>;
-type DiscoveryStep = 'walkBack' | 'handOff' | 'refresh' | 'finalDescribe';
+type DiscoveryStep =
+  | 'walkBack'
+  | 'detachedWalkBack'
+  | 'handOff'
+  | 'refresh'
+  | 'finalDescribe';
 
 const toChainError = (error: unknown): ChainError =>
   error instanceof Error || isNetworkError(error)
@@ -68,6 +73,10 @@ export class WorkflowExecutionChain {
   redirectFirstRunId = $state<string | null>(null);
   walking = $state(false);
   pendingSuccessorRunId = $state<string | null>(null);
+  detachedRuns = $state.raw<ChainRun[]>([]);
+  detachedBoundary = $state<ChainBoundary>(null);
+  detachedWalking = $state(false);
+  detachedOffPath = $state(false);
 
   private _latestRunId = $state<string | null>(null);
   private _phase = $state<Phase>('loading');
@@ -75,6 +84,8 @@ export class WorkflowExecutionChain {
   private _handledCloses = new SvelteSet<string>();
   private _refreshTimer: ReturnType<typeof setTimeout> | null = null;
   private _prioritizedRunId: string | null = null;
+  private _detachedCandidate: ChainRun | null = null;
+  private readonly _fetchedRuns = new SvelteMap<string, ChainRun>();
   private readonly _firstEventRunIds = new SvelteSet<string>();
   private readonly _queue = new LoadQueue({
     concurrency: CARD_LOAD_CONCURRENCY,
@@ -206,13 +217,60 @@ export class WorkflowExecutionChain {
     return this._walkBack(WALK_SIZE);
   }
 
-  requestRun(runId: string): Promise<RequestedRun> {
-    const existingRequest = this._runRequests.get(runId);
-    if (existingRequest) {
-      return existingRequest;
+  async loadDetachedPredecessor(): Promise<string | null> {
+    const oldest = this.detachedRuns[0];
+    if (
+      !oldest ||
+      this.detachedWalking ||
+      this.detachedBoundary !== null ||
+      this._failedSteps.has('detachedWalkBack')
+    ) {
+      return null;
     }
-    const request = this._requestRun(runId);
+    const predecessor = readStartedEvent(
+      oldest.startedEvent,
+    ).continuedExecutionRunId;
+    if (!predecessor) {
+      this.detachedBoundary = 'chainStart';
+      return null;
+    }
+    if (this._isInWindow(predecessor)) {
+      this.detachedOffPath = true;
+      return predecessor;
+    }
+    this.detachedWalking = true;
+    let run: ChainRun;
+    try {
+      run = await this._hop(predecessor);
+    } catch (error) {
+      if (this._disposed || this.detachedRuns[0] !== oldest) {
+        return null;
+      }
+      this.detachedWalking = false;
+      if (isNotFound(error)) {
+        this.detachedBoundary = 'retention';
+        return null;
+      }
+      this._fail('detachedWalkBack', () => void this.loadDetachedPredecessor());
+      return null;
+    }
+    if (this._disposed || this.detachedRuns[0] !== oldest) {
+      return null;
+    }
+    this.detachedWalking = false;
+    if (this._isInWindow(predecessor)) {
+      this.detachedOffPath = true;
+      return predecessor;
+    }
+    this.detachedRuns = [run, ...this.detachedRuns];
+    this._enqueueCard(run.runId);
+    return run.runId;
+  }
+
+  requestRun(runId: string): Promise<RequestedRun> {
+    const request = this._runRequests.get(runId) ?? this._requestRun(runId);
     this._runRequests.set(runId, request);
+    void request.then((result) => this._showRequested(result));
     return request;
   }
 
@@ -288,16 +346,25 @@ export class WorkflowExecutionChain {
       this._describe(runId),
       this._fetchStartedEvent(runId),
     ]);
-    return { runId, workflow, startedEvent };
+    const run = { runId, workflow, startedEvent };
+    this._fetchedRuns.set(runId, run);
+    return run;
+  }
+
+  private _isInWindow(runId: string): boolean {
+    return this.runs.some((run) => run.runId === runId);
+  }
+
+  private _isDetached(runId: string): boolean {
+    return this.detachedRuns.some((run) => run.runId === runId);
   }
 
   private _findRun(runId: string): ChainRun | undefined {
-    const inWindow = this.runs.find((run) => run.runId === runId);
-    if (inWindow) {
-      return inWindow;
-    }
-    const requested = this.requestedRuns.get(runId);
-    return requested?.status === 'found' ? requested.run : undefined;
+    return (
+      this.runs.find((run) => run.runId === runId) ??
+      this.detachedRuns.find((run) => run.runId === runId) ??
+      this._fetchedRuns.get(runId)
+    );
   }
 
   private async _requestRun(runId: string): Promise<RequestedRun> {
@@ -333,15 +400,77 @@ export class WorkflowExecutionChain {
     if (firstRunId && firstRunId !== this.identity.firstRunId) {
       return this._settleRequest(runId, { status: 'wrongChain', firstRunId });
     }
-    const foundRequest = this._settleRequest(runId, {
+    return this._settleRequest(runId, {
       status: 'found',
       run: this._findRun(runId) ?? run,
     });
-    const { status: cardLoadStatus } = this.cardLoadOf(runId);
-    if (cardLoadStatus === 'queued') {
+  }
+
+  private _showRequested(result: RequestedRun): void {
+    if (this._disposed || result.status !== 'found') {
+      return;
+    }
+    const { runId } = result.run;
+    this._detachedCandidate = this._findRun(runId) ?? result.run;
+    this._attachDetached();
+    if (this.cardLoadOf(runId).status === 'queued') {
       this._startCard(runId);
     }
-    return foundRequest;
+  }
+
+  private _attachDetached(): void {
+    const candidate = this._detachedCandidate;
+    if (!candidate || this.runs.length === 0 || this.walking) {
+      return;
+    }
+    this._detachedCandidate = null;
+    if (
+      candidate.runId !== this._prioritizedRunId ||
+      this._isInWindow(candidate.runId) ||
+      this._isDetached(candidate.runId)
+    ) {
+      return;
+    }
+    this._replaceDetached([candidate]);
+    this._checkDetachedOffPath(this.runs[0]);
+  }
+
+  private _replaceDetached(runs: ChainRun[]): void {
+    this.detachedRuns = runs;
+    this.detachedBoundary = null;
+    this.detachedOffPath = false;
+    this.detachedWalking = false;
+    this._failedSteps.delete('detachedWalkBack');
+  }
+
+  private _removeDetached(runId: string): void {
+    const rest = this.detachedRuns.filter((run) => run.runId !== runId);
+    if (rest.length === 0) {
+      this._replaceDetached([]);
+      return;
+    }
+    this._replaceDetached(rest);
+    this.detachedOffPath = true;
+  }
+
+  private _checkDetachedOffPath(windowRun: ChainRun): void {
+    const detached = this.detachedRuns[this.detachedRuns.length - 1];
+    if (!detached || this.detachedOffPath) {
+      return;
+    }
+    if (
+      Date.parse(windowRun.workflow.startTime) <
+      Date.parse(detached.workflow.startTime)
+    ) {
+      this.detachedOffPath = true;
+    }
+  }
+
+  private _mergeDetached(): boolean {
+    this.runs = [...this.detachedRuns, ...this.runs];
+    this.boundary = this.detachedBoundary;
+    this._replaceDetached([]);
+    return this.boundary !== null;
   }
 
   private _settleRequest(runId: string, result: RequestedRun): RequestedRun {
@@ -415,6 +544,14 @@ export class WorkflowExecutionChain {
           this.boundary = 'chainStart';
           return;
         }
+        const detachedNewest = this.detachedRuns[this.detachedRuns.length - 1];
+        if (detachedNewest?.runId === predecessor) {
+          hop += this.detachedRuns.length - 1;
+          if (this._mergeDetached()) {
+            return;
+          }
+          continue;
+        }
         let run: ChainRun;
         try {
           run = await this._hop(predecessor);
@@ -435,10 +572,12 @@ export class WorkflowExecutionChain {
         }
         this.runs = [run, ...this.runs];
         this._enqueueCard(run.runId);
+        this._checkDetachedOffPath(run);
       }
     } finally {
       if (!this._disposed) {
         this.walking = false;
+        this._attachDetached();
       }
     }
   }
@@ -487,13 +626,16 @@ export class WorkflowExecutionChain {
     }
     this.pendingSuccessorRunId = null;
     this.runs = [...this.runs, run];
+    if (this._isDetached(run.runId)) {
+      this._removeDetached(run.runId);
+    }
     this._latestRunId = run.runId;
     this._phase = 'ready';
     this._emit({ type: 'handOff', runId: run.runId });
     if (run.workflow.isRunning) {
       this._scheduleRefresh();
     }
-    if (!this.cardLoads.has(run.runId)) {
+    if (this.cardLoadOf(run.runId).status === 'queued') {
       this._startCard(run.runId);
     }
     this._syncQueueGate();

@@ -98,6 +98,25 @@ describe('layoutSegments', () => {
       },
     ]);
   });
+
+  it('leaves room for a gap before the given segment', () => {
+    const segments = layoutSegments(
+      [100, 200, 300],
+      [
+        { id: 'run-x', startMs: 0, endMs: 10 },
+        { id: 'run-a', startMs: 20, endMs: 30 },
+        { id: 'run-b', startMs: 30, endMs: 40 },
+      ],
+      42,
+      { beforeIndex: 1, width: 120 },
+    );
+
+    expect(segments.map(({ x }) => x)).toEqual([
+      42,
+      42 + 100 + CARD_GAP + 120 + CARD_GAP,
+      42 + 100 + CARD_GAP + 120 + CARD_GAP + 200 + CARD_GAP,
+    ]);
+  });
 });
 
 describe('buildRulerTicks', () => {

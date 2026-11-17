@@ -257,6 +257,10 @@ export const Strings = {
   'run-wrong-chain-notice': "Run {{runId}} isn't part of this chain.",
   'run-load-failed-notice': "Run {{runId}} couldn't be loaded.",
   'view-run': 'View run',
+  'load-older-runs': 'Load older runs',
+  'replaced-by-reset': 'Replaced by a reset',
+  'replaced-by-reset-description':
+    "A reset replaced this run's branch. Newer runs in this chain continue from a different run.",
   'workflow-error-no-workers-title': 'No workers polling',
   'workflow-error-no-workers-description':
     'There are no workers polling the {{taskQueue}} task queue.',

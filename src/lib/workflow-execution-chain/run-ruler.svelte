@@ -9,6 +9,7 @@
     buildRulerTicks,
     DAY_MS,
     formatClockTime,
+    GAP_WIDTH,
     MINUTE_MS,
     type RulerSegment,
   } from './run-strip-layout';
@@ -18,9 +19,10 @@
     selectedIndex: number;
     live: boolean;
     nowX: number | undefined;
+    gapX?: number;
   }
 
-  let { segments, selectedIndex, live, nowX }: Props = $props();
+  let { segments, selectedIndex, live, nowX, gapX }: Props = $props();
 
   const FIRST_LABEL_WIDTH = 128;
   const RUN_LABEL_WIDTH = 80;
@@ -133,6 +135,17 @@
       style:width="{Math.max(2, selectedSegment.width)}px"
       data-testid="run-ruler-band"
     ></span>
+  {/if}
+  {#if gapX !== undefined}
+    <span
+      class="absolute left-0 top-0 flex h-3.5 items-start justify-center gap-1"
+      style:translate="{gapX}px"
+      style:width="{GAP_WIDTH}px"
+      data-testid="run-ruler-break"
+    >
+      <span class="h-3.5 w-0 rotate-12 border-l border-tertiary"></span>
+      <span class="h-3.5 w-0 rotate-12 border-l border-tertiary"></span>
+    </span>
   {/if}
   {#each ticks as tick (`${tick.segmentId}-${tick.kind}-${tick.time}`)}
     <span

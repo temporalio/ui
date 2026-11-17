@@ -83,13 +83,15 @@ const makeWorkflow = (
   {
     firstRunId,
     isRunning = false,
-  }: { firstRunId?: string; isRunning?: boolean } = {},
+    startTime,
+  }: { firstRunId?: string; isRunning?: boolean; startTime?: string } = {},
 ): WorkflowExecution =>
   ({
     id: WORKFLOW_ID,
     runId,
     firstRunId,
     isRunning,
+    startTime,
     status: isRunning ? 'Running' : 'Completed',
   }) as WorkflowExecution;
 
@@ -197,6 +199,7 @@ class FakeServer {
         workflow: makeWorkflow(runId, {
           firstRunId: legacy ? undefined : firstRunId,
           isRunning: isLatest && openLatest,
+          startTime: hoursIn(index),
         }),
         startedEvent: makeStartedEvent({
           predecessor: runIds[index - 1],
@@ -213,6 +216,9 @@ class FakeServer {
     ).length;
   }
 }
+
+const hoursIn = (hours: number) =>
+  new Date(Date.UTC(2024, 0, 1) + hours * 3_600_000).toISOString();
 
 const runIds = (count: number, prefix = 'run') =>
   Array.from({ length: count }, (_, index) => `${prefix}-${index + 1}`);
@@ -820,7 +826,9 @@ describe('WorkflowExecutionChain', () => {
       server.addChain(['run-1']);
       const chain = track(await loadChain(server));
       server.addChain(['run-1', 'run-2', 'run-3']);
+      chain.prioritizeRun('run-2');
       await chain.requestRun('run-2');
+      expect(chain.detachedRuns).toHaveLength(1);
       await settle();
 
       server.controllers.get('run-2')!.close(completed('run-3'));
@@ -828,6 +836,7 @@ describe('WorkflowExecutionChain', () => {
       await settle();
 
       expect(chainRunIds(chain)).toEqual(['run-1', 'run-2', 'run-3']);
+      expect(chain.detachedRuns).toEqual([]);
       expect(chain.latestRunId).toBe('run-3');
     });
 
@@ -1241,6 +1250,327 @@ describe('WorkflowExecutionChain', () => {
       await settle();
 
       expect(server.describeCalls('missing')).toBe(1);
+    });
+  });
+
+  describe('detached Runs', () => {
+    const addBranch = (
+      predecessor: string,
+      startTime: string | undefined,
+      runId = 'branch',
+    ) => {
+      server.runs.set(runId, {
+        workflow: makeWorkflow(runId, { firstRunId: 'run-1', startTime }),
+        startedEvent: makeStartedEvent({
+          predecessor,
+          firstExecutionRunId: 'run-1',
+        }),
+      });
+    };
+
+    const loadWithRequest = async (runId: string) => {
+      const chain = track(createChain(server));
+      chain.requestRun(runId);
+      chain.prioritizeRun(runId);
+      void chain.load();
+      await settle();
+      return chain;
+    };
+
+    const detachedRunIds = (chain: WorkflowExecutionChain) =>
+      chain.detachedRuns.map((run) => run.runId);
+
+    it('detaches a requested Run the first walk misses', async () => {
+      server.addChain(runIds(15));
+      const chain = await loadWithRequest('run-2');
+
+      expect(chainRunIds(chain)).toEqual(runIds(15).slice(5));
+      expect(detachedRunIds(chain)).toEqual(['run-2']);
+      expect(chain.detachedOffPath).toBe(false);
+      expect(chain.requestedRuns.get('run-2')?.status).toBe('found');
+    });
+
+    it('does not detach a requested Run the first walk reaches', async () => {
+      server.addChain(runIds(10));
+      const chain = await loadWithRequest('run-2');
+
+      expect(chainRunIds(chain)).toEqual(runIds(10));
+      expect(chain.detachedRuns).toEqual([]);
+    });
+
+    it('merges the group into the window when the walk reaches it', async () => {
+      server.addChain(runIds(15));
+      const chain = await loadWithRequest('run-2');
+      await chain.loadDetachedPredecessor();
+      await settle();
+
+      await chain.loadOlder();
+      await settle();
+
+      expect(chainRunIds(chain)).toEqual(runIds(15));
+      expect(chain.detachedRuns).toEqual([]);
+      expect(chain.boundary).toBe('chainStart');
+      expect(server.describeCalls('run-2')).toBe(1);
+      expect(server.describeCalls('run-1')).toBe(2);
+    });
+
+    it('stops the walk at the boundary the group reached', async () => {
+      server.addChain(runIds(15));
+      server.runs.delete('run-1');
+      const chain = await loadWithRequest('run-2');
+      await chain.loadDetachedPredecessor();
+      expect(chain.detachedBoundary).toBe('retention');
+
+      await chain.loadOlder();
+      await settle();
+
+      expect(chainRunIds(chain)).toEqual(runIds(15).slice(1));
+      expect(chain.boundary).toBe('retention');
+      expect(chain.detachedBoundary).toBeNull();
+    });
+
+    it('‹ grows the group backwards one hop at a time', async () => {
+      server.addChain(runIds(15));
+      const chain = await loadWithRequest('run-3');
+
+      expect(await chain.loadDetachedPredecessor()).toBe('run-2');
+      expect(detachedRunIds(chain)).toEqual(['run-2', 'run-3']);
+      expect(chain.cardLoads.has('run-2')).toBe(true);
+
+      expect(await chain.loadDetachedPredecessor()).toBe('run-1');
+      expect(detachedRunIds(chain)).toEqual(['run-1', 'run-2', 'run-3']);
+
+      expect(await chain.loadDetachedPredecessor()).toBeNull();
+      expect(chain.detachedBoundary).toBe('chainStart');
+      expect(chainRunIds(chain)).toEqual(runIds(15).slice(5));
+    });
+
+    it('‹ selects the window card instead of duplicating it, and marks the group off-path', async () => {
+      server.addChain(runIds(15));
+      addBranch('run-10', undefined);
+      const chain = await loadWithRequest('branch');
+      expect(chain.detachedOffPath).toBe(false);
+      const describes = server.describe.mock.calls.length;
+
+      expect(await chain.loadDetachedPredecessor()).toBe('run-10');
+
+      expect(detachedRunIds(chain)).toEqual(['branch']);
+      expect(chain.detachedOffPath).toBe(true);
+      expect(server.describe.mock.calls.length).toBe(describes);
+    });
+
+    it('is off-path once the window walk loads a Run that started before it', async () => {
+      server.addChain(runIds(15));
+      addBranch('run-3', hoursIn(2.5));
+      const chain = await loadWithRequest('branch');
+
+      expect(detachedRunIds(chain)).toEqual(['branch']);
+      expect(chain.detachedOffPath).toBe(false);
+
+      await chain.loadOlder();
+      await settle();
+
+      expect(chain.detachedOffPath).toBe(true);
+      expect(detachedRunIds(chain)).toEqual(['branch']);
+      expect(chainRunIds(chain)).toEqual(runIds(15));
+    });
+
+    it('is off-path at once when the first window already started before it', async () => {
+      server.addChain(runIds(15));
+      addBranch('run-10', hoursIn(9.5));
+      const chain = await loadWithRequest('branch');
+
+      expect(detachedRunIds(chain)).toEqual(['branch']);
+      expect(chain.detachedOffPath).toBe(true);
+    });
+
+    it('keeps the group across selection changes', async () => {
+      server.addChain(runIds(15));
+      const chain = await loadWithRequest('run-2');
+
+      chain.prioritizeRun(null);
+      chain.prioritizeRun('run-8');
+      await chain.requestRun('run-8');
+      chain.prioritizeRun('run-2');
+
+      expect(detachedRunIds(chain)).toEqual(['run-2']);
+      expect(await chain.requestRun('run-2')).toEqual({
+        status: 'found',
+        run: chain.detachedRuns[0],
+      });
+    });
+
+    it('replaces the group when another detached Run is requested, and restores it on Back', async () => {
+      server.addChain(runIds(15));
+      const chain = await loadWithRequest('run-2');
+
+      chain.prioritizeRun('run-4');
+      await chain.requestRun('run-4');
+      expect(detachedRunIds(chain)).toEqual(['run-4']);
+
+      chain.prioritizeRun('run-2');
+      await chain.requestRun('run-2');
+      expect(detachedRunIds(chain)).toEqual(['run-2']);
+      expect(server.describeCalls('run-2')).toBe(1);
+    });
+
+    it('restores a Run the group walked back to without hopping it again', async () => {
+      server.addChain(runIds(15));
+      const chain = await loadWithRequest('run-3');
+      await chain.loadDetachedPredecessor();
+
+      chain.prioritizeRun('run-5');
+      await chain.requestRun('run-5');
+      chain.prioritizeRun('run-2');
+      await chain.requestRun('run-2');
+
+      expect(detachedRunIds(chain)).toEqual(['run-2']);
+      expect(server.describeCalls('run-2')).toBe(1);
+    });
+
+    it('resets the boundary and off-path state when the group changes', async () => {
+      server.addChain(runIds(15));
+      addBranch('run-10', undefined);
+      const chain = await loadWithRequest('run-2');
+      await chain.loadDetachedPredecessor();
+      await chain.loadDetachedPredecessor();
+      expect(chain.detachedBoundary).toBe('chainStart');
+
+      chain.prioritizeRun('branch');
+      await chain.requestRun('branch');
+      expect(chain.detachedBoundary).toBeNull();
+      await chain.loadDetachedPredecessor();
+      expect(chain.detachedOffPath).toBe(true);
+
+      chain.prioritizeRun('run-3');
+      await chain.requestRun('run-3');
+      expect(detachedRunIds(chain)).toEqual(['run-3']);
+      expect(chain.detachedOffPath).toBe(false);
+    });
+
+    it('drops a failed walk of the replaced group from Retry', async () => {
+      server.addChain(runIds(15));
+      server.errors.set('describe:run-2', networkError(503));
+      const chain = await loadWithRequest('run-3');
+      const walking = chain.loadDetachedPredecessor();
+      await settle();
+      await walking;
+      expect(chain.status).toBe('discoveryError');
+
+      chain.prioritizeRun('run-5');
+      await chain.requestRun('run-5');
+
+      expect(chain.status).toBe('ready');
+      expect(detachedRunIds(chain)).toEqual(['run-5']);
+    });
+
+    it('ignores a walk that resolves after the group was replaced', async () => {
+      server.addChain(runIds(15));
+      const chain = await loadWithRequest('run-3');
+      const describe = server.describe.getMockImplementation()!;
+      let releaseHop!: () => void;
+      server.describe.mockImplementationOnce(async (parameters, signal) => {
+        await new Promise<void>((resolve) => {
+          releaseHop = resolve;
+        });
+        return describe(parameters, signal);
+      });
+
+      const walking = chain.loadDetachedPredecessor();
+      expect(chain.detachedWalking).toBe(true);
+      chain.prioritizeRun('run-5');
+      await chain.requestRun('run-5');
+      expect(chain.detachedWalking).toBe(false);
+
+      releaseHop();
+      expect(await walking).toBeNull();
+      expect(chain.detachedWalking).toBe(false);
+      expect(detachedRunIds(chain)).toEqual(['run-5']);
+    });
+
+    const holdNextDescribe = () => {
+      const describe = server.describe.getMockImplementation()!;
+      let release!: () => void;
+      server.describe.mockImplementationOnce(async (parameters, signal) => {
+        await new Promise<void>((resolve) => {
+          release = resolve;
+        });
+        return describe(parameters, signal);
+      });
+      return () => release();
+    };
+
+    it('ignores a request that resolves after another Run was pinned', async () => {
+      server.addChain(runIds(15));
+      const chain = track(await loadChain(server));
+      const releaseRequest = holdNextDescribe();
+      chain.prioritizeRun('run-2');
+      void chain.requestRun('run-2');
+
+      chain.prioritizeRun('run-4');
+      await chain.requestRun('run-4');
+      releaseRequest();
+      await settle();
+
+      expect(detachedRunIds(chain)).toEqual(['run-4']);
+    });
+
+    it('does not attach a pin deferred by a walk once it is no longer pinned', async () => {
+      server.addChain(runIds(25));
+      const chain = track(await loadChain(server));
+      const releaseWalk = holdNextDescribe();
+      const walking = chain.loadOlder();
+      chain.prioritizeRun('run-2');
+      await chain.requestRun('run-2');
+      expect(chain.detachedRuns).toEqual([]);
+
+      chain.prioritizeRun('run-20');
+      releaseWalk();
+      await settle();
+      await walking;
+
+      expect(chainRunIds(chain)).toEqual(runIds(25).slice(5));
+      expect(chain.detachedRuns).toEqual([]);
+    });
+
+    const handOffToWalkedBackRun = async () => {
+      server.addChain(['run-1', 'run-2']);
+      const chain = track(await loadChain(server));
+      server.addChain(runIds(4));
+      server.holdLoads = true;
+      chain.prioritizeRun('run-4');
+      await chain.requestRun('run-4');
+      await chain.loadDetachedPredecessor();
+      expect(detachedRunIds(chain)).toEqual(['run-3', 'run-4']);
+      expect(chain.cardLoadOf('run-3').status).toBe('queued');
+
+      server.controllers.get('run-2')!.close(completed('run-3'));
+      await settle();
+      return chain;
+    };
+
+    it('starts the card of a queued successor on hand-off', async () => {
+      const chain = await handOffToWalkedBackRun();
+      chain.prioritizeRun(null);
+      await settle();
+
+      expect(chain.latestRunId).toBe('run-3');
+      expect(chain.cardLoadOf('run-3').status).toBe('loading');
+
+      server.addChain(runIds(5));
+      server.controllers.get('run-3')!.close(completed('run-5'));
+      await settle();
+
+      expect(chain.latestRunId).toBe('run-5');
+    });
+
+    it('keeps the rest of the group detached when its oldest Run becomes the Latest Run', async () => {
+      const chain = await handOffToWalkedBackRun();
+
+      expect(chainRunIds(chain)).toEqual(['run-1', 'run-2', 'run-3']);
+      expect(detachedRunIds(chain)).toEqual(['run-4']);
+      expect(chain.detachedOffPath).toBe(true);
+      expect(chain.detachedBoundary).toBeNull();
     });
   });
 

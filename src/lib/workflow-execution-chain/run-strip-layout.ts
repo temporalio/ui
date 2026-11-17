@@ -5,6 +5,7 @@ export const MIN_CARD_WIDTH = 148;
 export const CAP_WIDTH = 36;
 export const CARD_GAP = 6;
 export const INITIAL_VISIBLE_RUNS = 4;
+export const GAP_WIDTH = 120;
 
 const MAJOR_TICK_SPACING = 92;
 const MINOR_TICK_SPACING = 12;
@@ -78,9 +79,13 @@ export const layoutSegments = (
   widths: readonly number[],
   spans: readonly { id: string; startMs: number; endMs: number }[],
   offset = 0,
+  gap?: { beforeIndex: number; width: number },
 ): RulerSegment[] => {
   let x = offset;
   return widths.map((width, index) => {
+    if (index === gap?.beforeIndex) {
+      x += gap.width + CARD_GAP;
+    }
     const { id, startMs, endMs } = spans[index];
     const segment = {
       id,

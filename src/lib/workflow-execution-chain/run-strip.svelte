@@ -10,6 +10,7 @@
   import { translate } from '$lib/i18n/translate';
   import { Button } from '$lib/io/button';
   import {
+    IconArrowLeft,
     IconArrowRightToLine,
     IconChevronLeft,
     IconFlag,
@@ -25,11 +26,12 @@
     allocateCardWidths,
     CAP_WIDTH,
     CARD_GAP,
+    GAP_WIDTH,
     layoutSegments,
     MIN_CARD_WIDTH,
   } from './run-strip-layout';
   import { transitionOf } from './transitions';
-  import type { ChainEvent } from './types';
+  import type { ChainEvent, ChainRun } from './types';
 
   import RunCard from './run-card.svelte';
   import RunRuler from './run-ruler.svelte';
@@ -48,12 +50,16 @@
 
   const TRAILING_PADDING = 4;
   const SKELETON_CARDS = [0, 1, 2, 3];
+  const GAP_ITEM = Symbol('gap');
+
+  type RunIdOrGap = string | typeof GAP_ITEM;
 
   const id = $props.id();
   const descriptionId = `${id}-description`;
   const announcer = createAnnouncer();
   const messages = announcer.messages;
   const cardElements: Record<string, HTMLButtonElement | null> = {};
+  let gapElement = $state<HTMLButtonElement | null>(null);
 
   let scroller = $state<HTMLDivElement>();
   let viewportWidth = $state(0);
@@ -64,21 +70,42 @@
   let now = $state(Date.now());
 
   const runs = $derived(chain.runs);
-  const runIds = $derived(runs.map((run) => run.runId));
+  const detachedRuns = $derived(chain.detachedRuns);
+  const stripRuns = $derived([...detachedRuns, ...runs]);
+  const stripRunIds = $derived(stripRuns.map((run) => run.runId));
+  const hasGap = $derived(detachedRuns.length > 0);
+  const gapLoadsOlder = $derived(hasGap && !chain.detachedOffPath);
+  const gapDisabled = $derived(chain.walking || chain.boundary !== null);
+  const rovingItems = $derived<RunIdOrGap[]>(
+    gapLoadsOlder
+      ? [
+          ...detachedRuns.map((run) => run.runId),
+          GAP_ITEM,
+          ...runs.map((run) => run.runId),
+        ]
+      : stripRunIds,
+  );
   const latestRun = $derived(
     runs.find((run) => run.runId === chain.latestRunId),
   );
   const latestRunOpen = $derived(Boolean(latestRun?.workflow.isRunning));
   const selectedIndex = $derived(
-    selectedRunId ? runIds.indexOf(selectedRunId) : -1,
+    selectedRunId ? stripRunIds.indexOf(selectedRunId) : -1,
+  );
+  const selectedInDetached = $derived(
+    selectedIndex >= 0 && selectedIndex < detachedRuns.length,
+  );
+  const selectedGroupStartIndex = $derived(
+    selectedInDetached ? 0 : detachedRuns.length,
   );
 
   const preferredScrollBehavior = (): ScrollBehavior =>
     prefersReducedMotion.current ? 'auto' : 'smooth';
 
-  const rovingFocus = createRovingFocusState<string>({
-    getItems: () => runIds,
-    getElement: (runId) => cardElements[runId],
+  const rovingFocus = createRovingFocusState<RunIdOrGap>({
+    getItems: () => rovingItems,
+    getElement: (runIdOrGap) =>
+      runIdOrGap === GAP_ITEM ? gapElement : cardElements[runIdOrGap],
     getResetItem: () => selectedRunId ?? undefined,
     loop: false,
     onNavigate: (_, element) => {
@@ -102,7 +129,7 @@
   });
 
   const runSpans = $derived(
-    runs.map(({ runId, workflow }) => {
+    stripRuns.map(({ runId, workflow }) => {
       const startMs = Date.parse(workflow.startTime);
       const endMs = getWorkflowLatestTime(workflow, now);
       return { id: runId, startMs, endMs: Math.max(startMs, endMs) };
@@ -121,14 +148,31 @@
     ),
   );
   const segments = $derived(
-    layoutSegments(cardWidths, runSpans, CAP_WIDTH + CARD_GAP),
+    layoutSegments(
+      cardWidths,
+      runSpans,
+      CAP_WIDTH + CARD_GAP,
+      hasGap
+        ? { beforeIndex: detachedRuns.length, width: GAP_WIDTH }
+        : undefined,
+    ),
   );
+  const gapX = $derived.by(() => {
+    const firstWindowSegment = segments[detachedRuns.length];
+    return hasGap && firstWindowSegment
+      ? firstWindowSegment.x - CARD_GAP - GAP_WIDTH
+      : undefined;
+  });
   const nowX = $derived.by(() => {
     const lastSegment = segments[segments.length - 1];
     return latestRunOpen && lastSegment
       ? lastSegment.x + lastSegment.width
       : undefined;
   });
+
+  const previousRunLoading = $derived(
+    selectedInDetached ? chain.detachedWalking : chain.walking,
+  );
 
   const previousRunButton = $derived.by(() => {
     if (selectedIndex < 0) {
@@ -137,20 +181,23 @@
         tooltip: translate('workflows.view-previous-run'),
       };
     }
-    if (selectedIndex > 0) {
+    if (selectedIndex > selectedGroupStartIndex) {
       return {
         disabled: false,
         tooltip: translate('workflows.view-previous-run'),
       };
     }
-    if (chain.boundary === 'chainStart') {
+    const boundary = selectedInDetached
+      ? chain.detachedBoundary
+      : chain.boundary;
+    if (boundary === 'chainStart') {
       return { disabled: true, tooltip: translate('workflows.start-of-chain') };
     }
-    if (chain.boundary === 'retention') {
+    if (boundary === 'retention') {
       return { disabled: true, tooltip: translate('workflows.past-retention') };
     }
     return {
-      disabled: chain.walking,
+      disabled: previousRunLoading,
       tooltip: translate('workflows.view-previous-run'),
     };
   });
@@ -169,16 +216,8 @@
       : translate('workflows.viewing-latest-run');
   });
 
-  const selectPreviousRun = async () => {
-    if (previousRunButton.disabled) {
-      return;
-    }
-    if (selectedIndex > 0) {
-      onSelect(runIds[selectedIndex - 1]);
-      return;
-    }
-    const runIdWhenClicked = selectedRunId;
-    const runCountBeforeLoad = runs.length;
+  const loadOlderRuns = async () => {
+    const runCountBeforeLoad = chain.runs.length;
     await chain.loadOlder();
     const loadedRunCount = chain.runs.length - runCountBeforeLoad;
     if (loadedRunCount > 0) {
@@ -186,6 +225,25 @@
         translate('workflows.announce-older-runs', { count: loadedRunCount }),
       );
     }
+  };
+
+  const selectPreviousRun = async () => {
+    if (previousRunButton.disabled) {
+      return;
+    }
+    if (selectedIndex > selectedGroupStartIndex) {
+      onSelect(stripRunIds[selectedIndex - 1]);
+      return;
+    }
+    const runIdWhenClicked = selectedRunId;
+    if (selectedInDetached) {
+      const predecessorRunId = await chain.loadDetachedPredecessor();
+      if (predecessorRunId && runIdWhenClicked === selectedRunId) {
+        onSelect(predecessorRunId);
+      }
+      return;
+    }
+    await loadOlderRuns();
     if (runIdWhenClicked !== selectedRunId) {
       return;
     }
@@ -194,6 +252,19 @@
     );
     if (windowIndex > 0) {
       onSelect(chain.runs[windowIndex - 1].runId);
+    }
+  };
+
+  const loadOlderFromGap = async () => {
+    if (gapDisabled) {
+      return;
+    }
+    const gapFocused = document.activeElement === gapElement;
+    const detachedNewestRunId = detachedRuns[detachedRuns.length - 1]?.runId;
+    await loadOlderRuns();
+    await tick();
+    if (gapFocused && !gapElement && detachedNewestRunId) {
+      cardElements[detachedNewestRunId]?.focus();
     }
   };
 
@@ -251,7 +322,7 @@
 
   $effect(function autoScroll() {
     void selectedRunId;
-    void runs.length;
+    void stripRuns.length;
     untrack(() => {
       void tick().then(() => {
         if (!scroller) {
@@ -375,7 +446,7 @@
         class="group/strip relative w-max min-w-full"
         style:padding-right="{TRAILING_PADDING}px"
       >
-        <RunRuler {segments} {selectedIndex} {live} {nowX} />
+        <RunRuler {segments} {selectedIndex} {live} {nowX} {gapX} />
 
         <div class="flex items-stretch gap-1.5">
           <div class="sticky left-0 z-30 flex w-9 shrink-0 bg-surface-primary">
@@ -389,7 +460,8 @@
                 type="button"
                 aria-label={translate('workflows.view-previous-run')}
                 aria-disabled={previousRunButton.disabled ? 'true' : undefined}
-                aria-busy={chain.walking && selectedIndex === 0
+                aria-busy={previousRunLoading &&
+                selectedIndex === selectedGroupStartIndex
                   ? 'true'
                   : undefined}
                 onclick={selectPreviousRun}
@@ -405,6 +477,29 @@
               )}
             ></span>
           </div>
+
+          {#snippet runCard(run: ChainRun, index: number, first: boolean)}
+            {@const transition = transitionOf(run.startedEvent)}
+            {#if !first && transition}
+              <RunTransition {transition} />
+            {/if}
+            <RunCard
+              {run}
+              namespace={chain.identity.namespace}
+              controller={chain.controllers.get(run.runId)}
+              cardLoad={chain.cardLoadOf(run.runId)}
+              {transition}
+              width={cardWidths[index] ?? MIN_CARD_WIDTH}
+              {now}
+              selected={run.runId === selectedRunId}
+              isLatest={run.runId === chain.latestRunId}
+              {live}
+              tabIndex={rovingFocus.tabIndex(run.runId)}
+              bind:buttonElement={cardElements[run.runId]}
+              onSelect={() => onSelect(run.runId)}
+              onRetry={() => chain.retryCard(run.runId)}
+            />
+          {/snippet}
 
           {#if runs.length === 0}
             {#each SKELETON_CARDS as card (card)}
@@ -422,7 +517,7 @@
             <div
               role="group"
               aria-label={translate('workflows.runs-group-label', {
-                count: runs.length,
+                count: stripRuns.length,
               })}
               aria-describedby={descriptionId}
               class="flex items-stretch gap-1.5"
@@ -430,27 +525,43 @@
               onfocusin={rovingFocus.onfocusin}
               onfocusout={rovingFocus.onfocusout}
             >
+              {#each detachedRuns as run, index (run.runId)}
+                {@render runCard(run, index, index === 0)}
+              {/each}
+              {#if gapLoadsOlder}
+                <button
+                  bind:this={gapElement}
+                  type="button"
+                  tabindex={rovingFocus.tabIndex(GAP_ITEM)}
+                  aria-disabled={gapDisabled ? 'true' : undefined}
+                  aria-busy={chain.walking ? 'true' : undefined}
+                  onclick={loadOlderFromGap}
+                  class="flex shrink-0 flex-col items-center justify-center gap-1 rounded-md border border-dashed border-secondary px-2 text-center text-xs text-secondary transition-colors hover:border-brand hover:text-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary-press aria-disabled:cursor-not-allowed aria-disabled:opacity-disabled aria-disabled:hover:border-secondary aria-disabled:hover:text-secondary"
+                  style:width="{GAP_WIDTH}px"
+                  data-testid="run-strip-gap"
+                >
+                  <IconArrowLeft />
+                  {translate('workflows.load-older-runs')}
+                </button>
+              {:else if hasGap}
+                <Tooltip
+                  text={translate('workflows.replaced-by-reset-description')}
+                  top
+                  usePortal
+                  class="flex shrink-0"
+                >
+                  <div
+                    class="flex h-full flex-col items-center justify-center gap-1 border-x border-dashed border-secondary px-2 text-center text-xs text-secondary"
+                    style:width="{GAP_WIDTH}px"
+                    data-testid="run-strip-off-path"
+                  >
+                    <IconWarning />
+                    {translate('workflows.replaced-by-reset')}
+                  </div>
+                </Tooltip>
+              {/if}
               {#each runs as run, index (run.runId)}
-                {@const transition = transitionOf(run.startedEvent)}
-                {#if index > 0 && transition}
-                  <RunTransition {transition} />
-                {/if}
-                <RunCard
-                  {run}
-                  namespace={chain.identity.namespace}
-                  controller={chain.controllers.get(run.runId)}
-                  cardLoad={chain.cardLoadOf(run.runId)}
-                  {transition}
-                  width={cardWidths[index] ?? MIN_CARD_WIDTH}
-                  {now}
-                  selected={run.runId === selectedRunId}
-                  isLatest={run.runId === chain.latestRunId}
-                  {live}
-                  tabIndex={rovingFocus.tabIndex(run.runId)}
-                  bind:buttonElement={cardElements[run.runId]}
-                  onSelect={() => onSelect(run.runId)}
-                  onRetry={() => chain.retryCard(run.runId)}
-                />
+                {@render runCard(run, detachedRuns.length + index, index === 0)}
               {/each}
             </div>
             {#if chain.pendingSuccessorRunId}
