@@ -111,7 +111,7 @@
   const cardsViewportWidth = $derived(
     Math.max(
       MIN_CARD_WIDTH,
-      viewportWidth - 2 * (CAP_WIDTH + CARD_GAP) - 2 * TRAILING_PADDING,
+      viewportWidth - 2 * (CAP_WIDTH + CARD_GAP) - TRAILING_PADDING,
     ),
   );
   const cardWidths = $derived(
