@@ -24,7 +24,12 @@
   import { translate } from '$lib/i18n/translate';
   import { Badge } from '$lib/io/badge';
   import { BadgeCount } from '$lib/io/badge-count';
-  import { IconCanceled, IconChevronLeft, IconInfo } from '$lib/io/icon';
+  import {
+    IconCanceled,
+    IconChevronLeft,
+    IconInfo,
+    IconLink,
+  } from '$lib/io/icon';
   import { getVisibleInboundNexusLinkEvents } from '$lib/runes/inbound-nexus-links.svelte';
   import type { EventBufferView } from '$lib/services/grouped-event-buffer.svelte';
   import { workflowViewPreference } from '$lib/stores/event-view';
@@ -50,6 +55,7 @@
     routeForTimeline,
     routeForUserMetadata,
     routeForWorkflow,
+    routeForWorkflowExecutionChain,
     routeForWorkflowMemo,
     routeForWorkflowQuery,
     routeForWorkflows,
@@ -142,6 +148,19 @@
       </Link>
     {/if}
   </div>
+  {#if workflowRelationships.isMultiRunChain && workflowRelationships.firstRunId}
+    <Link
+      href={routeForWorkflowExecutionChain({
+        namespace,
+        workflow: workflowId,
+        firstRunId: workflowRelationships.firstRunId,
+      })}
+      data-testid="view-execution-chain"
+      LeadingIcon={IconLink}
+    >
+      {translate('workflows.view-execution-chain')}
+    </Link>
+  {/if}
 </div>
 <header class="flex flex-col gap-4">
   <div class="flex flex-col items-start justify-between gap-4 xl:flex-row">

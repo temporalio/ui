@@ -184,6 +184,7 @@ export const Strings = {
   chain: 'Chain',
   'chain-start': 'Chain Start',
   'chain-duration': 'Chain Duration',
+  'view-execution-chain': 'View execution chain',
   'first-run': 'First run',
   'latest-run': 'Latest run',
   'chain-start-past-retention': 'Unknown (past retention)',

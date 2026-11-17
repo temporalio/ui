@@ -64,6 +64,7 @@ type WorkflowRelationships = {
   parent: WorkflowIdentifier | undefined;
   parentNamespaceName: string | undefined;
   nextRunId: string | undefined;
+  isMultiRunChain: boolean;
   scheduleId: string | undefined;
   relationshipCount: number;
 };
@@ -127,6 +128,7 @@ export const getWorkflowRelationships = (
     parent,
     parentNamespaceName,
     nextRunId,
+    isMultiRunChain: hasEarlierFirstRun || !!nextRunId,
     scheduleId,
     relationshipCount,
   };

@@ -246,6 +246,68 @@ describe('getWorkflowRelationships', () => {
       ).scheduleId,
     ).toBe('');
   });
+
+  describe('isMultiRunChain', () => {
+    const firstExecutionRunId = 'dd65e55d-d058-401c-9cb6-77dd4846a98e';
+    const withRunId = (runId: string) => {
+      const workflow = JSON.parse(JSON.stringify(continuedAsNewWorkflow));
+      workflow.workflowExecutionInfo.execution.runId = runId;
+      return toWorkflowExecution(workflow);
+    };
+    const withoutSuccessor = continuedAsNewEvents.filter(
+      (event) => event?.name !== 'WorkflowExecutionContinuedAsNew',
+    );
+
+    it('is true when the Run has a predecessor and a successor', () => {
+      expect(
+        getWorkflowRelationships(
+          toWorkflowExecution(continuedAsNewWorkflow),
+          continuedAsNewEvents,
+          namespaces.namespaces[0],
+        ).isMultiRunChain,
+      ).toBe(true);
+    });
+
+    it('is true when the Run only has a predecessor', () => {
+      expect(
+        getWorkflowRelationships(
+          toWorkflowExecution(continuedAsNewWorkflow),
+          withoutSuccessor,
+          namespaces.namespaces[0],
+        ).isMultiRunChain,
+      ).toBe(true);
+    });
+
+    it('is true when the first Run closes with a successor', () => {
+      expect(
+        getWorkflowRelationships(
+          withRunId(firstExecutionRunId),
+          continuedAsNewEvents,
+          namespaces.namespaces[0],
+        ).isMultiRunChain,
+      ).toBe(true);
+    });
+
+    it('is false for a first Run with no successor', () => {
+      expect(
+        getWorkflowRelationships(
+          withRunId(firstExecutionRunId),
+          withoutSuccessor,
+          namespaces.namespaces[0],
+        ).isMultiRunChain,
+      ).toBe(false);
+    });
+
+    it('is false for a single-Run chain whose close event has an empty newExecutionRunId', () => {
+      expect(
+        getWorkflowRelationships(
+          toWorkflowExecution(completedWorkflow),
+          completedEvents,
+          namespaces.namespaces[0],
+        ).isMultiRunChain,
+      ).toBe(false);
+    });
+  });
 });
 
 describe('getWorkflowNexusLinksFromHistory', () => {
