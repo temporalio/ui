@@ -47,6 +47,11 @@ export type RequestedRun =
   | { status: 'wrongChain'; firstRunId: string }
   | { status: 'failed'; error: ChainError };
 
+export type RunLookup<T> = {
+  get: (runId: string) => T | undefined;
+  has: (runId: string) => boolean;
+};
+
 export type ChainEvent =
   | { type: 'handOff'; runId: string }
   | { type: 'closed' }
