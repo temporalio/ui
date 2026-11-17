@@ -24,7 +24,7 @@ import {
   isWorkflowExecutionStartedEvent,
 } from './is-event-type';
 
-const getNewExecutionId = (events: WorkflowEvents): string | undefined => {
+const findNewExecutionRunId = (events: WorkflowEvents): string | undefined => {
   for (const event of events) {
     if (
       has(event.attributes, 'newExecutionRunId') &&
@@ -58,11 +58,12 @@ type WorkflowRelationships = {
   hasRelationships: boolean;
   hasChildren: boolean;
   children: ChildWorkflowClosedEvent[];
-  first: string | undefined;
-  previous: string | undefined;
+  firstRunId: string | undefined;
+  isFirstRun: boolean;
+  previousRunId: string | undefined;
   parent: WorkflowIdentifier | undefined;
   parentNamespaceName: string | undefined;
-  next: string | undefined;
+  nextRunId: string | undefined;
   scheduleId: string | undefined;
   relationshipCount: number;
 };
@@ -79,23 +80,16 @@ export const getWorkflowRelationships = (
   const parent = workflow?.parent;
   const parentNamespaceName = namespace.namespaceInfo?.name ?? undefined;
 
-  const workflowExecutionStartedEvent = fullEventHistory.find(
-    isWorkflowExecutionStartedEvent,
-  );
+  const startedEvent = fullEventHistory.find(isWorkflowExecutionStartedEvent);
 
-  const newExecutionRunId = getNewExecutionId(fullEventHistory);
+  const nextRunId = findNewExecutionRunId(fullEventHistory);
 
-  const firstExecutionRunId =
-    workflowExecutionStartedEvent?.attributes?.firstExecutionRunId;
+  const firstRunId = startedEvent?.attributes?.firstExecutionRunId ?? undefined;
+  const isFirstRun = !!firstRunId && firstRunId === workflow?.runId;
+  const hasEarlierFirstRun = !!firstRunId && !isFirstRun;
 
-  const first =
-    firstExecutionRunId === workflow?.runId
-      ? undefined
-      : (firstExecutionRunId ?? undefined);
-
-  const previous =
-    workflowExecutionStartedEvent?.attributes?.continuedExecutionRunId ??
-    undefined;
+  const previousRunId =
+    startedEvent?.attributes?.continuedExecutionRunId ?? undefined;
 
   let scheduleId = '';
   const temporalScheduledById =
@@ -108,9 +102,9 @@ export const getWorkflowRelationships = (
   const hasRelationships = !!(
     parent ||
     hasChildren ||
-    first ||
-    previous ||
-    newExecutionRunId ||
+    hasEarlierFirstRun ||
+    previousRunId ||
+    nextRunId ||
     scheduleId
   );
 
@@ -118,20 +112,21 @@ export const getWorkflowRelationships = (
     (parent ? 1 : 0) +
     (workflow?.pendingChildren?.length ?? 0) +
     children.length +
-    (first ? 1 : 0) +
-    (previous ? 1 : 0) +
-    (newExecutionRunId ? 1 : 0) +
+    (hasEarlierFirstRun ? 1 : 0) +
+    (previousRunId ? 1 : 0) +
+    (nextRunId ? 1 : 0) +
     (scheduleId ? 1 : 0);
 
   return {
     hasRelationships,
     hasChildren,
     children,
-    first,
-    previous,
+    firstRunId,
+    isFirstRun,
+    previousRunId,
     parent,
     parentNamespaceName,
-    next: newExecutionRunId,
+    nextRunId,
     scheduleId,
     relationshipCount,
   };

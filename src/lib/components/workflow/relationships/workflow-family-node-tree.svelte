@@ -56,9 +56,10 @@
   const workflowRelationships = $derived(
     getWorkflowRelationships(fullWorkflow, events, page.data.namespace),
   );
-  const first = $derived(workflowRelationships.first);
-  const next = $derived(workflowRelationships.next);
-  const previous = $derived(workflowRelationships.previous);
+  const firstRunId = $derived(workflowRelationships.firstRunId);
+  const isFirstRun = $derived(workflowRelationships.isFirstRun);
+  const nextRunId = $derived(workflowRelationships.nextRunId);
+  const previousRunId = $derived(workflowRelationships.previousRunId);
 
   const getPositions = (
     width: number,
@@ -365,7 +366,7 @@
         >
       </a>
     {/if}
-    {#if next}
+    {#if nextRunId}
       <line
         x1={x}
         y1={y}
@@ -380,18 +381,18 @@
         text-anchor="start"
         font-weight="500">Next Execution</text
       >
-      <a href={routeForRelationships({ namespace, workflow, run: next })}>
+      <a href={routeForRelationships({ namespace, workflow, run: nextRunId })}>
         <text
           x={x + 4.25 * radius}
           y={y + radius - 4}
           fill="currentColor"
           text-decoration="underline"
           text-anchor="start"
-          font-weight="500">{next}</text
+          font-weight="500">{nextRunId}</text
         >
       </a>
     {/if}
-    {#if previous}
+    {#if previousRunId}
       <line
         x1={x}
         y1={y}
@@ -405,23 +406,33 @@
         fill="currentColor"
         text-anchor="end"
         font-weight="500"
-        >{previous === first ? 'First' : 'Previous'} Execution</text
+        >{previousRunId === firstRunId ? 'First' : 'Previous'} Execution</text
       >
-      <a href={routeForRelationships({ namespace, workflow, run: previous })}>
+      <a
+        href={routeForRelationships({
+          namespace,
+          workflow,
+          run: previousRunId,
+        })}
+      >
         <text
-          href={routeForRelationships({ namespace, workflow, run: previous })}
+          href={routeForRelationships({
+            namespace,
+            workflow,
+            run: previousRunId,
+          })}
           x={x - 4.25 * radius}
           y={y + radius - 4}
           fill="currentColor"
           text-decoration="underline"
           text-anchor="end"
-          font-weight="500">{previous}</text
+          font-weight="500">{previousRunId}</text
         >
       </a>
     {/if}
-    {#if first && previous !== first}
+    {#if !isFirstRun && firstRunId && previousRunId !== firstRunId}
       <line
-        x1={previous ? x - 4 * radius : x}
+        x1={previousRunId ? x - 4 * radius : x}
         y1={y}
         x2={radius}
         y2={y}
@@ -435,14 +446,14 @@
         text-anchor="start"
         font-weight="500">First Execution</text
       >
-      <a href={routeForRelationships({ namespace, workflow, run: first })}>
+      <a href={routeForRelationships({ namespace, workflow, run: firstRunId })}>
         <text
           x={radius}
           y={y + radius - 4}
           fill="currentColor"
           text-decoration="underline"
           text-anchor="start"
-          font-weight="500">{first}</text
+          font-weight="500">{firstRunId}</text
         >
       </a>
     {/if}

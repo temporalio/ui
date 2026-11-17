@@ -28,14 +28,15 @@
   );
 
   const hasChildren = $derived(workflowRelationships.hasChildren);
-  const first = $derived(workflowRelationships.first);
+  const firstRunId = $derived(workflowRelationships.firstRunId);
+  const isFirstRun = $derived(workflowRelationships.isFirstRun);
   const parent = $derived(workflowRelationships.parent);
   const parentNamespaceName = $derived(
     workflowRelationships.parentNamespaceName,
   );
   const children = $derived(workflowRelationships.children);
-  const next = $derived(workflowRelationships.next);
-  const previous = $derived(workflowRelationships.previous);
+  const nextRunId = $derived(workflowRelationships.nextRunId);
+  const previousRunId = $derived(workflowRelationships.previousRunId);
   const scheduleId = $derived(workflowRelationships.scheduleId);
 </script>
 
@@ -47,11 +48,11 @@
     {#if parent}
       <ParentWorkflowTable {parent} {parentNamespaceName} {namespace} />
     {/if}
-    {#if first || previous || next}
+    {#if (!isFirstRun && firstRunId) || previousRunId || nextRunId}
       <FirstPreviousNextWorkflowTable
-        first={first ?? ''}
-        previous={previous ?? ''}
-        next={next ?? ''}
+        first={isFirstRun ? '' : (firstRunId ?? '')}
+        previous={previousRunId ?? ''}
+        next={nextRunId ?? ''}
         workflow={workflowId}
         {namespace}
       />

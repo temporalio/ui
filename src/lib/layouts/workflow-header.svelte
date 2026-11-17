@@ -167,8 +167,10 @@
             {cancelInProgress}
             workflow={workflow!}
             {namespace}
-            first={workflowRelationships.first}
-            next={workflowRelationships.next}
+            first={workflowRelationships.isFirstRun
+              ? undefined
+              : workflowRelationships.firstRunId}
+            next={workflowRelationships.nextRunId}
           />
         </div>
       </div>
@@ -194,8 +196,10 @@
         {cancelInProgress}
         workflow={workflow!}
         {namespace}
-        first={workflowRelationships.first}
-        next={workflowRelationships.next}
+        first={workflowRelationships.isFirstRun
+          ? undefined
+          : workflowRelationships.firstRunId}
+        next={workflowRelationships.nextRunId}
       />
     </div>
   </div>
@@ -203,7 +207,7 @@
   <WorkflowDetails
     {history}
     workflow={workflow!}
-    next={workflowRelationships.next}
+    next={workflowRelationships.nextRunId}
   />
   <ExtensionSlot
     name="workflow.header.after-details"

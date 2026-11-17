@@ -99,7 +99,7 @@ describe('getWorkflowRelationships', () => {
     ).toBe(false);
   });
 
-  it('should return the firstExecutionRunId for first on a workflowExecutionStartedEvent', () => {
+  it('should return the firstExecutionRunId for firstRunId on a workflowExecutionStartedEvent', () => {
     const workflowExecutionStartedEvent = continuedAsNewEvents.find(
       (event) => event?.name === 'WorkflowExecutionStarted',
     );
@@ -111,11 +111,11 @@ describe('getWorkflowRelationships', () => {
         toWorkflowExecution(continuedAsNewWorkflow),
         continuedAsNewEvents,
         namespaces.namespaces[0],
-      ).first,
+      ).firstRunId,
     ).toBe(firstExecutionRunId);
   });
 
-  it('should not return the firstExecutionRunId for first on a workflowExecutionStartedEvent if the id matches the runId', () => {
+  it('isFirstRun should be true only when the firstExecutionRunId matches the runId', () => {
     const workflowExecutionStartedEvent = continuedAsNewEvents.find(
       (event) => event?.name === 'WorkflowExecutionStarted',
     );
@@ -129,22 +129,22 @@ describe('getWorkflowRelationships', () => {
         toWorkflowExecution(continuedAsNewWorkflowCopy),
         continuedAsNewEvents,
         namespaces.namespaces[0],
-      ).first,
-    ).toBe(firstExecutionRunId);
+      ).isFirstRun,
+    ).toBe(false);
 
     continuedAsNewWorkflowCopy.workflowExecutionInfo.execution.runId =
       firstExecutionRunId;
 
-    expect(
-      getWorkflowRelationships(
-        toWorkflowExecution(continuedAsNewWorkflowCopy),
-        continuedAsNewEvents,
-        namespaces.namespaces[0],
-      ).first,
-    ).toBe(undefined);
+    const relationships = getWorkflowRelationships(
+      toWorkflowExecution(continuedAsNewWorkflowCopy),
+      continuedAsNewEvents,
+      namespaces.namespaces[0],
+    );
+    expect(relationships.isFirstRun).toBe(true);
+    expect(relationships.firstRunId).toBe(firstExecutionRunId);
   });
 
-  it('should return the continuedExecutionRunId for previous on a WorkflowExecutionStarted event', () => {
+  it('should return the continuedExecutionRunId for previousRunId on a WorkflowExecutionStarted event', () => {
     const workflowExecutionStartedEvent = continuedAsNewEvents.find(
       (event) => event?.name === 'WorkflowExecutionStarted',
     );
@@ -155,11 +155,11 @@ describe('getWorkflowRelationships', () => {
         toWorkflowExecution(continuedAsNewWorkflow),
         continuedAsNewEvents,
         namespaces.namespaces[0],
-      ).previous,
+      ).previousRunId,
     ).toBe(continuedExecutionRunId);
   });
 
-  it('should return the newExecutionRunId for next on a WorkflowExecutionContinuedAsNew event', () => {
+  it('should return the newExecutionRunId for nextRunId on a WorkflowExecutionContinuedAsNew event', () => {
     const workflowExecutionContinuedAsNewEvent = continuedAsNewEvents.find(
       (event) => event?.name === 'WorkflowExecutionContinuedAsNew',
     );
@@ -171,11 +171,11 @@ describe('getWorkflowRelationships', () => {
         toWorkflowExecution(continuedAsNewWorkflow),
         continuedAsNewEvents,
         namespaces.namespaces[0],
-      ).next,
+      ).nextRunId,
     ).toBe(newExecutionRunId);
   });
 
-  it('should return the newExecutionRunId for next on a WorkflowExecutionCompleted event', () => {
+  it('should return the newExecutionRunId for nextRunId on a WorkflowExecutionCompleted event', () => {
     const workflowExecutionCompletedEvent = completedEvents.find(
       (event) => event?.name === 'WorkflowExecutionCompleted',
     );
@@ -187,11 +187,11 @@ describe('getWorkflowRelationships', () => {
         toWorkflowExecution(completedWorkflow),
         completedEvents,
         namespaces.namespaces[0],
-      ).next,
+      ).nextRunId,
     ).toBe(newExecutionRunId);
   });
 
-  it('should return the newExecutionRunId for next on a WorkflowExecutionTimedOut event', () => {
+  it('should return the newExecutionRunId for nextRunId on a WorkflowExecutionTimedOut event', () => {
     const workflowExecutionCompletedEvent = timedOutEvents.find(
       (event) => event?.name === 'WorkflowExecutionTimedOut',
     );
@@ -203,11 +203,11 @@ describe('getWorkflowRelationships', () => {
         toWorkflowExecution(timedOutWorkflow),
         timedOutEvents,
         namespaces.namespaces[0],
-      ).next,
+      ).nextRunId,
     ).toBe(newExecutionRunId);
   });
 
-  it('should return the newExecutionRunId for next on a WorkflowExecutionFailed event', () => {
+  it('should return the newExecutionRunId for nextRunId on a WorkflowExecutionFailed event', () => {
     const workflowExecutionCompletedEvent = failedEvents.find(
       (event) => event?.name === 'WorkflowExecutionFailed',
     );
@@ -219,7 +219,7 @@ describe('getWorkflowRelationships', () => {
         toWorkflowExecution(failedWorkflow),
         failedEvents,
         namespaces.namespaces[0],
-      ).next,
+      ).nextRunId,
     ).toBe(newExecutionRunId);
   });
 
