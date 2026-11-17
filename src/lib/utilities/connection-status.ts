@@ -11,6 +11,7 @@ import { parseVersionStatus } from '$lib/utilities/deployments';
 import type { ValidTime } from '$lib/utilities/format-time';
 import { isTimestamp, timestampToDate } from '$lib/utilities/format-time';
 import type { APIErrorResponse } from '$lib/utilities/request-from-api';
+import { HOUR_MS } from '$lib/utilities/time-units';
 
 export const versionComputeProviderType = (
   summary: VersionSummary,
@@ -82,10 +83,10 @@ export const formatConnectionCheckTime = (time: ValidTime): string => {
       ? timestampToDate(time)
       : new Date(time as string | number | Date);
     const diff = Date.now() - parsedDate.getTime();
-    if (Number.isNaN(diff) || diff < 3_600_000) {
+    if (Number.isNaN(diff) || diff < HOUR_MS) {
       return translate('deployments.connection-checked-recently');
     }
-    const hours = Math.floor(diff / 3_600_000);
+    const hours = Math.floor(diff / HOUR_MS);
     return translate(
       hours === 1
         ? 'deployments.connection-checked-hour'

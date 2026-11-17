@@ -1,6 +1,8 @@
 import { enUS } from 'date-fns/locale';
 import * as dateTz from 'date-fns-tz';
 
+import { HOUR_MS } from '$lib/utilities/time-units';
+
 export const TIME_UNIT_OPTIONS = ['minutes', 'hours', 'days'];
 
 export const BASE_TIME_FORMAT_OPTIONS = {
@@ -39,7 +41,7 @@ const getGroupedTimezones = (): GroupedTimezones => {
           locale: enUS,
         });
         const offset = Math.floor(
-          (dateTz.getTimezoneOffset(timeZone) / (1000 * 60 * 60)) % 24,
+          (dateTz.getTimezoneOffset(timeZone) / HOUR_MS) % 24,
         );
         acc[zoneString] = {
           abbr: zoneAbbr,

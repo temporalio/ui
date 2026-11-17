@@ -1,10 +1,11 @@
+import { DAY_MS } from '$lib/utilities/time-units';
+
 export interface RecentUse {
   id: string;
   at: number;
 }
 
 const MAX_RECENT = 20;
-const DAY_MS = 24 * 60 * 60 * 1000;
 // Less than the gap between two text match tiers, so a strong text match
 // always beats a weak recent match.
 const MAX_BOOST = 0.9;

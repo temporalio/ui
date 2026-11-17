@@ -10,6 +10,7 @@ import {
 import type { Timestamp } from '$lib/types';
 
 import { has } from './has';
+import { HOUR_MS, MINUTE_MS, SECOND_MS } from './time-units';
 import { fromSeconds } from './to-duration';
 
 export type ValidTime = Parameters<typeof parseJSON>[0] | Timestamp;
@@ -348,10 +349,10 @@ export function toQueryDuration(milliseconds: number): string {
   if (total === 0) return '0s';
 
   const units: [number, string][] = [
-    [Math.floor(total / 3600000), 'h'],
-    [Math.floor((total % 3600000) / 60000), 'm'],
-    [Math.floor((total % 60000) / 1000), 's'],
-    [total % 1000, 'ms'],
+    [Math.floor(total / HOUR_MS), 'h'],
+    [Math.floor((total % HOUR_MS) / MINUTE_MS), 'm'],
+    [Math.floor((total % MINUTE_MS) / SECOND_MS), 's'],
+    [total % SECOND_MS, 'ms'],
   ];
 
   return units

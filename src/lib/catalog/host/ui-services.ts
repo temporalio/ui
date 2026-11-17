@@ -11,6 +11,7 @@ import {
   routeForWorkflow,
 } from '$lib/utilities/route-for';
 import { routeForApi } from '$lib/utilities/route-for-api';
+import { MINUTE_MS } from '$lib/utilities/time-units';
 
 import {
   ApiObservationError,
@@ -44,7 +45,7 @@ type ApiWorkbenchHostOptions = {
   createRequestId?: () => string;
 };
 
-const ACTIVE_POLLER_WINDOW_MS = 2 * 60 * 1000;
+const ACTIVE_POLLER_WINDOW_MS = 2 * MINUTE_MS;
 
 const isActivePoller = (poller: PollerInfo) =>
   !poller.lastAccessTime ||

@@ -1,7 +1,8 @@
 import i18next from 'i18next';
 
+import { DAY_MS } from '$lib/utilities/time-units';
+
 const SUNDAY_UTC = Date.UTC(1970, 0, 4);
-const DAY_MS = 24 * 60 * 60 * 1000;
 
 export const getWeekdayLabel = (
   weekday: number,

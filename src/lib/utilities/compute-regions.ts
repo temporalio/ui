@@ -7,6 +7,7 @@ import type {
   ComputeConfig,
   ComputeConfigScalingGroup,
 } from '$lib/types/deployments';
+import { HOUR_MS, MINUTE_MS, SECOND_MS } from '$lib/utilities/time-units';
 
 /**
  * Which scaling groups serve which Namespace region, for highly available
@@ -211,9 +212,9 @@ export const computeProviderShortLabel = (
 /** Human-readable duration for scaler settings: 900000 -> "15m", 5000 -> "5s". */
 export const formatDurationMs = (ms: number): string => {
   const units: [number, string][] = [
-    [3_600_000, 'h'],
-    [60_000, 'm'],
-    [1_000, 's'],
+    [HOUR_MS, 'h'],
+    [MINUTE_MS, 'm'],
+    [SECOND_MS, 's'],
   ];
   const unit = units.find(([size]) => ms >= size && ms % size === 0);
   return unit ? `${ms / unit[0]}${unit[1]}` : `${ms}ms`;

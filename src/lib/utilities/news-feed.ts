@@ -6,9 +6,10 @@ import type {
   NewsFeedResponse,
   NewsFeedSource,
 } from '$lib/types/news-feed';
+import { DAY_MS } from '$lib/utilities/time-units';
 
 export const NEWS_FEED_URL = 'https://newsfeed.temporal.io/feed_en.json';
-export const NEWS_FEED_AUTO_FETCH_INTERVAL_MS = 24 * 60 * 60 * 1000;
+export const NEWS_FEED_AUTO_FETCH_INTERVAL_MS = DAY_MS;
 
 export const NEWS_FEED_STORAGE_KEYS = {
   autoFetch: 'temporal-news-auto-fetch',
