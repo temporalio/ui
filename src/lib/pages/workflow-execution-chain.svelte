@@ -17,8 +17,8 @@
   import { routeForWorkflowExecutionChain } from '$lib/utilities/route-for';
   import { toURL } from '$lib/utilities/to-url';
   import ChainHeader from '$lib/workflow-execution-chain/chain-header.svelte';
+  import ChainMismatchWarning from '$lib/workflow-execution-chain/chain-mismatch-warning.svelte';
   import ChainSkeleton from '$lib/workflow-execution-chain/chain-skeleton.svelte';
-  import OlderChainWarning from '$lib/workflow-execution-chain/older-chain-warning.svelte';
   import WorkflowChainError from '$lib/workflow-execution-chain/workflow-chain-error.svelte';
   import { WorkflowExecutionChain } from '$lib/workflow-execution-chain/workflow-execution-chain.svelte';
 
@@ -90,12 +90,12 @@
 
 {#if chain.error}
   <WorkflowChainError {namespace} {workflowId} error={chain.error} />
-{:else if chain.olderChain}
-  <OlderChainWarning
+{:else if chain.mismatch}
+  <ChainMismatchWarning
     {namespace}
     {workflowId}
     {firstRunId}
-    olderChain={chain.olderChain}
+    mismatch={chain.mismatch}
   />
 {:else}
   <div class="flex flex-col gap-6">

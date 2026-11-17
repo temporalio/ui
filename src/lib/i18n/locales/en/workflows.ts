@@ -188,14 +188,14 @@ export const Strings = {
   'latest-run': 'Latest run',
   'chain-start-past-retention': 'Unknown (past retention)',
   'run-past-retention': '{{runId}} (past retention)',
-  'older-chain-title': 'This is an older workflow execution chain',
-  'older-chain-description':
+  'chain-mismatch-reused-title': 'This is an older workflow execution chain',
+  'chain-mismatch-reused-description':
     'This Workflow ID was reused, so this chain is an older one.',
-  'view-newer-chain': 'View the newer chain',
-  'chain-not-visible-title': 'Workflow execution chain not found',
-  'chain-not-visible-description':
+  'chain-mismatch-reused-link': 'View the newer chain',
+  'chain-mismatch-not-found-title': 'Workflow execution chain not found',
+  'chain-mismatch-not-found-description':
     'No workflow execution chain starting at {{firstRunId}} is visible for this Workflow ID; it may be past retention.',
-  'view-current-chain': 'View the current chain',
+  'chain-mismatch-not-found-link': 'View the current chain',
   'workflow-error-no-workers-title': 'No workers polling',
   'workflow-error-no-workers-description':
     'There are no workers polling the {{taskQueue}} task queue.',

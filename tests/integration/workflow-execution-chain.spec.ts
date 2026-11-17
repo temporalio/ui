@@ -458,7 +458,7 @@ test.describe('Workflow execution chain page', () => {
 
     await page.goto(chainUrl('old-a'));
 
-    const warning = page.getByTestId('older-chain-warning');
+    const warning = page.getByTestId('chain-mismatch-warning');
     await expect(warning).toContainText('Workflow ID was reused');
     await expect(
       warning.getByRole('link', { name: 'View the newer chain' }),
@@ -484,7 +484,7 @@ test.describe('Workflow execution chain page', () => {
 
     await page.goto(chainUrl('gone'));
 
-    const warning = page.getByTestId('older-chain-warning');
+    const warning = page.getByTestId('chain-mismatch-warning');
     await expect(warning).toContainText(
       'No workflow execution chain starting at gone is visible for this Workflow ID; it may be past retention',
     );
