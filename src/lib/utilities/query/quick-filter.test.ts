@@ -13,6 +13,7 @@ import {
   getDefaultConditional,
   getQuickFilterConditional,
   isQuickFilterActive,
+  isReadOnlyFilter,
   RANGE_PREFERRED_ATTRIBUTES,
   requiresOperatorChoice,
   STATUS_ATTRIBUTES,
@@ -259,6 +260,36 @@ describe('quick filter round trip', () => {
       });
     },
   );
+});
+
+describe('isReadOnlyFilter', () => {
+  it.each([
+    [
+      'a filter on a text attribute',
+      { attribute: 'WorkflowId', conditional: '=' },
+    ],
+    ['a status filter', { attribute: 'ExecutionStatus', conditional: '=' }],
+    [
+      'a NOT IN filter on a list attribute',
+      { attribute: 'CustomKeywordListField', conditional: 'not in' },
+    ],
+  ])('is false for %s', (_, overrides) => {
+    expect(isReadOnlyFilter(createFilter(overrides))).toBe(false);
+  });
+
+  it.each([
+    [
+      'a negated filter',
+      { attribute: 'WorkflowId', conditional: '=', negated: true },
+    ],
+    [
+      'a NOT IN status filter',
+      { attribute: 'ExecutionStatus', conditional: 'NOT IN' },
+    ],
+    ['a != status filter', { attribute: 'WorkerStatus', conditional: '!=' }],
+  ])('is true for %s', (_, overrides) => {
+    expect(isReadOnlyFilter(createFilter(overrides))).toBe(true);
+  });
 });
 
 describe('isQuickFilterActive', () => {

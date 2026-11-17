@@ -15,25 +15,38 @@ class NoopObserver {
 beforeEach(() => {
   vi.stubGlobal('ResizeObserver', NoopObserver);
   vi.stubGlobal('IntersectionObserver', NoopObserver);
+  Object.defineProperty(Element.prototype, 'animate', {
+    configurable: true,
+    value: () => ({ cancel() {} }) as Animation,
+  });
 });
 
 let component: ReturnType<typeof mount> | undefined;
 
-const mountChip = (filter: SearchAttributeFilter) => {
+const mountChip = (filter: SearchAttributeFilter, onRemove = vi.fn()) => {
   const target = document.createElement('div');
   document.body.appendChild(target);
   component = mount(DropdownFilterChip, {
     target,
-    props: { filter, onUpdate: vi.fn(), onRemove: vi.fn() },
+    props: { filter, onUpdate: vi.fn(), onRemove },
   });
   flushSync();
   return target;
 };
 
+const openChip = (target: HTMLElement) => {
+  target.querySelector('button')?.click();
+  flushSync();
+};
+
+const byTestId = (testId: string) =>
+  document.querySelector<HTMLElement>(`[data-testid="${testId}"]`);
+
 afterEach(() => {
   if (component) unmount(component);
   component = undefined;
   document.body.innerHTML = '';
+  delete (Element.prototype as { animate?: unknown }).animate;
   vi.unstubAllGlobals();
 });
 
@@ -93,5 +106,47 @@ describe('DropdownFilterChip', () => {
     expect(chipText(target)).toBe(
       'NOT ExecutionStatus IN ("Terminated", "Canceled")',
     );
+  });
+
+  it('opens the editor for a filter it can edit', () => {
+    const target = mountChip(
+      createFilter({
+        attribute: 'WorkflowId',
+        conditional: 'STARTS_WITH',
+        value: 'abc',
+      }),
+    );
+
+    openChip(target);
+
+    expect(byTestId('apply-filter-button')).not.toBeNull();
+    expect(byTestId('read-only-filter')).toBeNull();
+  });
+
+  it.each([
+    createFilter({
+      attribute: 'WorkflowId',
+      conditional: 'STARTS_WITH',
+      value: 'abc',
+      negated: true,
+    }),
+    createFilter({
+      attribute: 'ExecutionStatus',
+      conditional: 'NOT IN',
+      value: '("Terminated", "Canceled")',
+    }),
+  ])('only offers Remove for $attribute $conditional', (filter) => {
+    const onRemove = vi.fn();
+    const target = mountChip(filter, onRemove);
+
+    openChip(target);
+
+    expect(byTestId('apply-filter-button')).toBeNull();
+    expect(byTestId('read-only-filter')).not.toBeNull();
+
+    byTestId('remove-filter-button')?.click();
+    flushSync();
+
+    expect(onRemove).toHaveBeenCalledOnce();
   });
 });

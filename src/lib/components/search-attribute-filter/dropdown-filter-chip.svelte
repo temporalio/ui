@@ -2,11 +2,14 @@
   import { writable } from 'svelte/store';
 
   import { timestamp } from '$lib/components/timestamp.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import { Menu, MenuButton, MenuContainer } from '$lib/holocene/menu';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconTrash } from '$lib/io/icon';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { isNullConditional } from '$lib/utilities/is';
+  import { isReadOnlyFilter } from '$lib/utilities/query/quick-filter';
   import {
     isDateTimeFilter,
     isStatusFilter,
@@ -139,16 +142,36 @@
   >
     <!-- Keyed on open so the editor remounts seeded from the applied filter,
          discarding anything typed and then dismissed. -->
-    {#key $open}
-      <FilterEditor
-        {filter}
-        idPrefix={controlsId}
-        onApply={(updated) => {
-          onUpdate(updated);
-          $open = false;
-        }}
-        {onRemove}
-      />
-    {/key}
+    {#if isReadOnlyFilter(filter)}
+      <div class="space-y-4" data-testid="read-only-filter">
+        <h3 class="text-sm font-medium">Filter by {filter.attribute}</h3>
+        <p class="min-w-60 break-all text-sm">{displayText}</p>
+        <p class="text-sm text-secondary">
+          {translate('common.read-only-filter')}
+        </p>
+        <div class="flex justify-end">
+          <Button
+            TrailingIcon={IconTrash}
+            variant="secondary"
+            size="xs"
+            data-testid="remove-filter-button"
+            type="button"
+            onclick={onRemove}>{translate('common.remove')}</Button
+          >
+        </div>
+      </div>
+    {:else}
+      {#key $open}
+        <FilterEditor
+          {filter}
+          idPrefix={controlsId}
+          onApply={(updated) => {
+            onUpdate(updated);
+            $open = false;
+          }}
+          {onRemove}
+        />
+      {/key}
+    {/if}
   </Menu>
 </MenuContainer>
