@@ -31,7 +31,7 @@
   } from 'svelte';
   import { type ClassNameValue, twMerge as merge } from 'tailwind-merge';
 
-  import type { ButtonStyles } from '$lib/holocene/button.svelte';
+  import type { ButtonSize, ButtonStyles } from '$lib/holocene/button.svelte';
   import Label from '$lib/holocene/label.svelte';
   import { Menu, MenuButton, MenuContainer } from '$lib/holocene/menu';
   import { type IconComponent, IconLock, IconSpinner } from '$lib/io/icon';
@@ -56,7 +56,7 @@
       ButtonStyles['variant'],
       'primary' | 'secondary' | 'tertiary'
     >;
-    size?: ButtonStyles['size'];
+    size?: ButtonSize;
     required?: boolean;
     valid?: boolean;
     error?: string;

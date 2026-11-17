@@ -47,11 +47,16 @@
   import { getContext } from 'svelte';
   import { type ClassNameValue, twMerge as merge } from 'tailwind-merge';
 
+  import { buttonTextSizes } from '$lib/holocene/button.svelte';
   import Portal from '$lib/holocene/portal/portal.svelte';
   import type { PortalPosition } from '$lib/holocene/portal/types';
   import { getFocusableElements } from '$lib/utilities/focus-trap';
 
-  import { MENU_CONTEXT, type MenuContext } from './menu-container.svelte';
+  import {
+    FALLBACK_MENU_SIZE,
+    MENU_CONTEXT,
+    type MenuContext,
+  } from './menu-container.svelte';
 
   export interface Props extends Omit<
     HTMLAttributes<HTMLUListElement>,
@@ -87,7 +92,10 @@
     keepOpen: keepOpenCtx,
     menuElement: menuElementCtx,
     open,
+    size: sizeCtx,
   } = getContext<MenuContext>(MENU_CONTEXT);
+
+  const textSize = $derived(buttonTextSizes[$sizeCtx ?? FALLBACK_MENU_SIZE]);
 
   $effect(() => {
     $keepOpenCtx = keepOpen;
@@ -156,11 +164,13 @@
     offset={{ y: 4 }}
     {scrollContainer}
   >
-    {@render menu({ _class: merge(sharedMenuStyles, maxHeight, className) })}
+    {@render menu({
+      _class: merge(sharedMenuStyles, textSize, maxHeight, className),
+    })}
   </Portal>
 {:else}
   {@render menu({
-    _class: merge(styles, maxHeight, className),
+    _class: merge(styles, textSize, maxHeight, className),
     style:
       position === 'top-right' || position === 'top-left'
         ? `top: -${height + 16}px;`
