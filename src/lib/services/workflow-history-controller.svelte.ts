@@ -48,6 +48,7 @@ type WorkflowHistoryControllerOptions = {
   maximumPageSize?: number;
   pauseAfterPages?: number;
   liveUpdatesPaused?: boolean;
+  onClose?: (closeEvent: HistoryEvent) => void;
 };
 
 export class WorkflowHistoryController {
@@ -71,6 +72,7 @@ export class WorkflowHistoryController {
   private readonly buffer: GroupedEventBuffer;
   private readonly maximumPageSize: number;
   private readonly pauseAfterPages: number | undefined;
+  private readonly onClose: ((closeEvent: HistoryEvent) => void) | undefined;
 
   constructor({
     workflowExecutionIdentity,
@@ -78,6 +80,7 @@ export class WorkflowHistoryController {
     maximumPageSize = 1000,
     pauseAfterPages,
     liveUpdatesPaused = false,
+    onClose,
   }: WorkflowHistoryControllerOptions) {
     const { namespace, workflowId, runId } = workflowExecutionIdentity;
     if (!namespace || !workflowId || !runId) {
@@ -93,6 +96,7 @@ export class WorkflowHistoryController {
     this.maximumPageSize = maximumPageSize;
     this.pauseAfterPages = pauseAfterPages;
     this.liveUpdatesPaused = liveUpdatesPaused;
+    this.onClose = onClose;
   }
 
   get loading(): boolean {
@@ -381,6 +385,7 @@ export class WorkflowHistoryController {
       this.historyClosed = true;
       this.closeEvent = event;
       if (!session.catchingUp) session.livePollController?.abort();
+      this.onClose?.(event);
     }
     return isNew;
   }

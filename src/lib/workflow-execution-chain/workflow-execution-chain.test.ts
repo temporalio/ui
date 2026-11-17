@@ -1,0 +1,890 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+import type { WorkflowHistoryController } from '$lib/services/workflow-history-controller.svelte';
+import type { HistoryEvent } from '$lib/types/events';
+import type {
+  WorkflowExecution,
+  WorkflowExecutionIdentity,
+} from '$lib/types/workflows';
+
+import type { ChainClient, DescribeParameters } from './types';
+
+import {
+  REFRESH_INTERVAL_MS,
+  WorkflowExecutionChain,
+} from './workflow-execution-chain.svelte';
+
+const NAMESPACE = 'default';
+const WORKFLOW_ID = 'chain-workflow';
+
+const networkError = (statusCode: number) => ({
+  statusCode,
+  statusText: String(statusCode),
+  response: {} as Response,
+});
+
+class FakeController {
+  load = vi.fn(async () => {});
+  updateWorkflow = vi.fn();
+  dispose = vi.fn();
+
+  constructor(
+    readonly identity: WorkflowExecutionIdentity,
+    private readonly _onClose: (closeEvent: HistoryEvent) => void,
+  ) {}
+
+  close(closeEvent: HistoryEvent): void {
+    this._onClose(closeEvent);
+  }
+}
+
+type FakeRun = {
+  workflow: WorkflowExecution;
+  startedEvent: HistoryEvent;
+};
+
+const makeWorkflow = (
+  runId: string,
+  {
+    firstRunId,
+    isRunning = false,
+  }: { firstRunId?: string; isRunning?: boolean } = {},
+): WorkflowExecution =>
+  ({
+    id: WORKFLOW_ID,
+    runId,
+    firstRunId,
+    isRunning,
+    status: isRunning ? 'Running' : 'Completed',
+  }) as WorkflowExecution;
+
+const makeStartedEvent = ({
+  predecessor = '',
+  firstExecutionRunId,
+}: {
+  predecessor?: string;
+  firstExecutionRunId: string;
+}): HistoryEvent =>
+  ({
+    eventId: '1',
+    eventType: 'WorkflowExecutionStarted',
+    workflowExecutionStartedEventAttributes: {
+      continuedExecutionRunId: predecessor,
+      firstExecutionRunId,
+    },
+  }) as unknown as HistoryEvent;
+
+const makeCloseEvent = (
+  eventType: string,
+  attributesKey: string,
+  newExecutionRunId = '',
+): HistoryEvent =>
+  ({
+    eventId: '10',
+    eventType,
+    [attributesKey]: { newExecutionRunId },
+  }) as unknown as HistoryEvent;
+
+const completed = (successor?: string) =>
+  makeCloseEvent(
+    'WorkflowExecutionCompleted',
+    'workflowExecutionCompletedEventAttributes',
+    successor,
+  );
+
+class FakeServer {
+  runs = new Map<string, FakeRun>();
+  errors = new Map<string, unknown>();
+  currentRunId = '';
+  controllers = new Map<string, FakeController>();
+
+  describe = vi.fn(
+    async (
+      { runId }: DescribeParameters,
+      _signal?: AbortSignal,
+    ): Promise<WorkflowExecution> => {
+      const id = runId ?? this.currentRunId;
+      const error = this.errors.get(runId ? `describe:${id}` : 'current');
+      if (error) {
+        throw error;
+      }
+      const run = this.runs.get(id);
+      if (!run) {
+        throw networkError(404);
+      }
+      return run.workflow;
+    },
+  );
+
+  fetchStartedEvent = vi.fn(
+    async ({ runId }: WorkflowExecutionIdentity): Promise<HistoryEvent> => {
+      const error = this.errors.get(`started:${runId}`);
+      if (error) {
+        throw error;
+      }
+      const run = this.runs.get(runId);
+      if (!run) {
+        throw networkError(404);
+      }
+      return run.startedEvent;
+    },
+  );
+
+  createController = vi.fn(
+    (
+      identity: WorkflowExecutionIdentity,
+      { onClose }: { onClose: (closeEvent: HistoryEvent) => void },
+    ) => {
+      const controller = new FakeController(identity, onClose);
+      this.controllers.set(identity.runId, controller);
+      return controller as unknown as WorkflowHistoryController;
+    },
+  );
+
+  get client(): ChainClient {
+    return {
+      describe: this.describe,
+      fetchStartedEvent: this.fetchStartedEvent,
+      createController: this.createController,
+    };
+  }
+
+  addChain(
+    runIds: string[],
+    {
+      openLatest = true,
+      legacy = false,
+    }: { openLatest?: boolean; legacy?: boolean } = {},
+  ): void {
+    const [firstRunId] = runIds;
+    runIds.forEach((runId, index) => {
+      const isLatest = index === runIds.length - 1;
+      this.runs.set(runId, {
+        workflow: makeWorkflow(runId, {
+          firstRunId: legacy ? undefined : firstRunId,
+          isRunning: isLatest && openLatest,
+        }),
+        startedEvent: makeStartedEvent({
+          predecessor: runIds[index - 1],
+          firstExecutionRunId: firstRunId,
+        }),
+      });
+    });
+    this.currentRunId = runIds[runIds.length - 1];
+  }
+
+  describeCalls(runId: string): number {
+    return this.describe.mock.calls.filter(
+      ([parameters]) => parameters.runId === runId,
+    ).length;
+  }
+}
+
+const runIds = (count: number, prefix = 'run') =>
+  Array.from({ length: count }, (_, index) => `${prefix}-${index + 1}`);
+
+const settle = async () => {
+  for (let i = 0; i < 20; i++) {
+    await vi.advanceTimersByTimeAsync(1);
+  }
+};
+
+const createChain = (server: FakeServer, firstRunId = 'run-1') =>
+  new WorkflowExecutionChain(
+    { namespace: NAMESPACE, workflowId: WORKFLOW_ID, firstRunId },
+    server.client,
+  );
+
+const loadChain = async (server: FakeServer, firstRunId = 'run-1') => {
+  const chain = createChain(server, firstRunId);
+  const loading = chain.load();
+  await settle();
+  await loading;
+  await settle();
+  return chain;
+};
+
+const chainRunIds = (chain: WorkflowExecutionChain) =>
+  chain.runs.map((run) => run.runId);
+
+describe('WorkflowExecutionChain', () => {
+  let chains: WorkflowExecutionChain[] = [];
+  let server: FakeServer;
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+    server = new FakeServer();
+    chains = [];
+  });
+
+  afterEach(() => {
+    for (const chain of chains) {
+      chain.dispose();
+    }
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+  });
+
+  const track = (chain: WorkflowExecutionChain) => {
+    chains.push(chain);
+    return chain;
+  };
+
+  describe('identity', () => {
+    it.each([
+      { namespace: '', workflowId: WORKFLOW_ID, firstRunId: 'run-1' },
+      { namespace: NAMESPACE, workflowId: '', firstRunId: 'run-1' },
+      { namespace: NAMESPACE, workflowId: WORKFLOW_ID, firstRunId: '' },
+      {
+        namespace: NAMESPACE,
+        workflowId: WORKFLOW_ID,
+        firstRunId: undefined as unknown as string,
+      },
+    ])('throws when a field is missing: %o', (identity) => {
+      expect(() => new WorkflowExecutionChain(identity, server.client)).toThrow(
+        /requires a namespace, Workflow ID, and first Run ID/,
+      );
+    });
+
+    it('keeps its own copy of the identity', () => {
+      const identity = {
+        namespace: NAMESPACE,
+        workflowId: WORKFLOW_ID,
+        firstRunId: 'run-1',
+      };
+      const chain = track(new WorkflowExecutionChain(identity, server.client));
+      identity.firstRunId = 'changed';
+
+      expect(chain.identity.firstRunId).toBe('run-1');
+    });
+  });
+
+  describe('load', () => {
+    it('starts in the loading state', () => {
+      server.addChain(['run-1']);
+      const chain = track(createChain(server));
+
+      expect(chain.status).toBe('loading');
+      expect(chain.firstRun).toEqual({ status: 'loading' });
+      expect(chain.latestRunId).toBeNull();
+    });
+
+    it('loads a chain whose current Run is its first Run', async () => {
+      server.addChain(['run-1']);
+      const chain = track(await loadChain(server));
+
+      expect(chain.status).toBe('ready');
+      expect(chainRunIds(chain)).toEqual(['run-1']);
+      expect(chain.latestRunId).toBe('run-1');
+      expect(chain.boundary).toBe('chainStart');
+      expect(server.controllers.get('run-1')?.load).toHaveBeenCalledWith(
+        server.runs.get('run-1')?.workflow,
+      );
+    });
+
+    it('describes the current Run and the first Run in parallel', async () => {
+      server.addChain(['run-1', 'run-2']);
+      const chain = track(createChain(server));
+      void chain.load();
+
+      expect(server.describe).toHaveBeenCalledTimes(2);
+      expect(server.describe).toHaveBeenCalledWith(
+        { namespace: NAMESPACE, workflowId: WORKFLOW_ID },
+        expect.any(AbortSignal),
+      );
+      expect(server.describe).toHaveBeenCalledWith(
+        { namespace: NAMESPACE, workflowId: WORKFLOW_ID, runId: 'run-1' },
+        expect.any(AbortSignal),
+      );
+      await settle();
+    });
+
+    it('loads mid-chain and walks back to the chain start', async () => {
+      server.addChain(runIds(3));
+      const chain = track(await loadChain(server));
+
+      expect(chainRunIds(chain)).toEqual(['run-1', 'run-2', 'run-3']);
+      expect(chain.latestRunId).toBe('run-3');
+      expect(chain.boundary).toBe('chainStart');
+      expect(server.createController).toHaveBeenCalledTimes(1);
+      expect(server.createController).toHaveBeenCalledWith(
+        { namespace: NAMESPACE, workflowId: WORKFLOW_ID, runId: 'run-3' },
+        { onClose: expect.any(Function) },
+      );
+    });
+
+    it('falls back to the Started event on servers older than 1.25', async () => {
+      server.addChain(runIds(3), { legacy: true });
+      const chain = track(await loadChain(server));
+
+      expect(chain.status).toBe('ready');
+      expect(chainRunIds(chain)).toEqual(['run-1', 'run-2', 'run-3']);
+      expect(server.fetchStartedEvent).toHaveBeenCalledWith(
+        { namespace: NAMESPACE, workflowId: WORKFLOW_ID, runId: 'run-3' },
+        expect.any(AbortSignal),
+      );
+    });
+
+    it('is closed when the current Run is already closed', async () => {
+      server.addChain(runIds(2), { openLatest: false });
+      const chain = track(await loadChain(server));
+
+      expect(chain.status).toBe('closed');
+      expect(chainRunIds(chain)).toEqual(['run-1', 'run-2']);
+    });
+  });
+
+  describe('describe-current failing on load', () => {
+    it('sets the page error on a 404 without retrying', async () => {
+      server.addChain(['run-1']);
+      server.errors.set('current', networkError(404));
+      const chain = track(await loadChain(server));
+
+      expect(chain.error).toMatchObject({ statusCode: 404 });
+      expect(chain.status).toBe('loading');
+      expect(chain.runs).toEqual([]);
+      expect(
+        server.describe.mock.calls.filter(([{ runId }]) => !runId),
+      ).toHaveLength(1);
+    });
+
+    it('sets the page error after retrying a 5xx', async () => {
+      server.addChain(['run-1']);
+      server.errors.set('current', networkError(503));
+      const chain = track(await loadChain(server));
+
+      expect(chain.error).toMatchObject({ statusCode: 503 });
+      expect(chain.runs).toEqual([]);
+      expect(
+        server.describe.mock.calls.filter(([{ runId }]) => !runId),
+      ).toHaveLength(4);
+    });
+  });
+
+  describe('first-Run Describe', () => {
+    it('is found', async () => {
+      server.addChain(runIds(2));
+      const chain = track(await loadChain(server));
+
+      expect(chain.firstRun).toEqual({
+        status: 'found',
+        workflow: server.runs.get('run-1')?.workflow,
+      });
+    });
+
+    it('is notFound on a 404', async () => {
+      server.addChain(runIds(2));
+      server.errors.set('describe:run-1', networkError(404));
+      const chain = track(await loadChain(server));
+
+      expect(chain.firstRun).toEqual({ status: 'notFound' });
+      expect(chain.status).toBe('ready');
+    });
+
+    it('is failed on a non-404 and the page loads normally', async () => {
+      server.addChain(['run-1']);
+      server.errors.set('describe:run-1', networkError(500));
+      const chain = track(await loadChain(server));
+
+      expect(chain.firstRun).toMatchObject({
+        status: 'failed',
+        error: { statusCode: 500 },
+      });
+      expect(chain.status).toBe('ready');
+      expect(chainRunIds(chain)).toEqual(['run-1']);
+    });
+  });
+
+  describe('first Run ID mismatch', () => {
+    beforeEach(() => {
+      server.addChain(['old-1', 'old-2'], { openLatest: false });
+      server.addChain(['new-1', 'new-2']);
+    });
+
+    it('(a) is an older chain when the route Run is its own first Run', async () => {
+      const chain = track(await loadChain(server, 'old-1'));
+
+      expect(chain.status).toBe('olderChain');
+      expect(chain.olderChain).toEqual({
+        reason: 'reused',
+        currentFirstRunId: 'new-1',
+      });
+      expect(chain.runs).toEqual([]);
+      expect(server.createController).not.toHaveBeenCalled();
+    });
+
+    it('(a) reads the route Run first Run ID from its Started event on older servers', async () => {
+      server.runs.set('old-1', {
+        ...server.runs.get('old-1')!,
+        workflow: makeWorkflow('old-1'),
+      });
+      const chain = track(await loadChain(server, 'old-1'));
+
+      expect(chain.status).toBe('olderChain');
+      expect(chain.olderChain?.reason).toBe('reused');
+    });
+
+    it('(b) redirects when a mid-chain Run ID was given', async () => {
+      const chain = track(await loadChain(server, 'old-2'));
+
+      expect(chain.redirectFirstRunId).toBe('old-1');
+      expect(chain.status).toBe('loading');
+      expect(chain.olderChain).toBeNull();
+    });
+
+    it('(b) redirects to the current chain for one of its mid-chain Runs', async () => {
+      const chain = track(await loadChain(server, 'new-2'));
+
+      expect(chain.redirectFirstRunId).toBe('new-1');
+    });
+
+    it('(c) shows neutral copy when the route Run is not found', async () => {
+      const chain = track(await loadChain(server, 'gone'));
+
+      expect(chain.status).toBe('olderChain');
+      expect(chain.olderChain).toEqual({
+        reason: 'notVisible',
+        currentFirstRunId: 'new-1',
+      });
+      expect(chain.firstRun).toEqual({ status: 'notFound' });
+    });
+
+    it('(c) shows neutral copy when the route Run Describe fails', async () => {
+      server.errors.set('describe:old-1', networkError(500));
+      const chain = track(await loadChain(server, 'old-1'));
+
+      expect(chain.status).toBe('olderChain');
+      expect(chain.olderChain?.reason).toBe('notVisible');
+      expect(chain.firstRun.status).toBe('failed');
+    });
+  });
+
+  describe('walk back', () => {
+    it('stops after 10 Runs', async () => {
+      server.addChain(runIds(15));
+      const chain = track(await loadChain(server));
+
+      expect(chainRunIds(chain)).toEqual(runIds(15).slice(5));
+      expect(chain.boundary).toBeNull();
+      expect(chain.walking).toBe(false);
+    });
+
+    it('stops at retention on the first NotFound', async () => {
+      server.addChain(runIds(5));
+      server.errors.set('describe:run-2', networkError(404));
+      const chain = track(await loadChain(server));
+
+      expect(chainRunIds(chain)).toEqual(['run-3', 'run-4', 'run-5']);
+      expect(chain.boundary).toBe('retention');
+      expect(chain.status).toBe('ready');
+    });
+
+    it('stops at retention when the Started event is NotFound', async () => {
+      server.addChain(runIds(5));
+      server.errors.set('started:run-3', networkError(404));
+      const chain = track(await loadChain(server));
+
+      expect(chainRunIds(chain)).toEqual(['run-4', 'run-5']);
+      expect(chain.boundary).toBe('retention');
+    });
+
+    it('loadOlder walks the next 10', async () => {
+      server.addChain(runIds(25));
+      const chain = track(await loadChain(server));
+
+      chain.loadOlder();
+      await settle();
+
+      expect(chainRunIds(chain)).toEqual(runIds(25).slice(5));
+      expect(chain.boundary).toBeNull();
+
+      chain.loadOlder();
+      await settle();
+
+      expect(chainRunIds(chain)).toEqual(runIds(25));
+      expect(chain.boundary).toBe('chainStart');
+    });
+
+    it('loadOlder does nothing once a boundary is reached', async () => {
+      server.addChain(runIds(2));
+      const chain = track(await loadChain(server));
+      const calls = server.describe.mock.calls.length;
+
+      chain.loadOlder();
+      await settle();
+
+      expect(server.describe.mock.calls.length).toBe(calls);
+    });
+
+    it('loadOlder does nothing while a walk is in flight', async () => {
+      server.addChain(runIds(25));
+      const chain = track(createChain(server));
+      await chain.load();
+
+      expect(chain.walking).toBe(true);
+      chain.loadOlder();
+      await settle();
+
+      expect(chainRunIds(chain)).toHaveLength(10);
+    });
+
+    it('never starts controllers for walked-back Runs', async () => {
+      server.addChain(runIds(4));
+      track(await loadChain(server));
+
+      expect([...server.controllers.keys()]).toEqual(['run-4']);
+    });
+  });
+
+  describe('hand-off', () => {
+    it.each([
+      [
+        'continue-as-new',
+        makeCloseEvent(
+          'WorkflowExecutionContinuedAsNew',
+          'workflowExecutionContinuedAsNewEventAttributes',
+          'run-2',
+        ),
+      ],
+      [
+        'retry after failure',
+        makeCloseEvent(
+          'WorkflowExecutionFailed',
+          'workflowExecutionFailedEventAttributes',
+          'run-2',
+        ),
+      ],
+      [
+        'retry after timeout',
+        makeCloseEvent(
+          'WorkflowExecutionTimedOut',
+          'workflowExecutionTimedOutEventAttributes',
+          'run-2',
+        ),
+      ],
+      ['cron', completed('run-2')],
+    ])('follows the successor on %s', async (_, closeEvent) => {
+      server.addChain(['run-1']);
+      const chain = track(await loadChain(server));
+      server.addChain(['run-1', 'run-2']);
+
+      server.controllers.get('run-1')!.close(closeEvent);
+      await settle();
+
+      expect(chainRunIds(chain)).toEqual(['run-1', 'run-2']);
+      expect(chain.latestRunId).toBe('run-2');
+      expect(chain.status).toBe('ready');
+      expect(server.controllers.get('run-2')?.load).toHaveBeenCalledWith(
+        server.runs.get('run-2')?.workflow,
+      );
+      expect(server.controllers.get('run-1')?.dispose).not.toHaveBeenCalled();
+    });
+
+    it('keeps following when the successor closes too', async () => {
+      server.addChain(['run-1']);
+      const chain = track(await loadChain(server));
+      server.addChain(['run-1', 'run-2', 'run-3']);
+
+      server.controllers.get('run-1')!.close(completed('run-2'));
+      await settle();
+      server.controllers.get('run-2')!.close(completed('run-3'));
+      await settle();
+
+      expect(chainRunIds(chain)).toEqual(['run-1', 'run-2', 'run-3']);
+      expect(chain.latestRunId).toBe('run-3');
+    });
+
+    it('is closed when the close event names no successor', async () => {
+      server.addChain(['run-1']);
+      const chain = track(await loadChain(server));
+
+      server.controllers
+        .get('run-1')!
+        .close(
+          makeCloseEvent(
+            'WorkflowExecutionTerminated',
+            'workflowExecutionTerminatedEventAttributes',
+          ),
+        );
+      await settle();
+
+      expect(chain.status).toBe('closed');
+      expect(chain.latestRunId).toBe('run-1');
+      expect(server.createController).toHaveBeenCalledTimes(1);
+    });
+
+    it('hands off when a Run already closed at load names a successor', async () => {
+      server.addChain(['run-1'], { openLatest: false });
+      const chain = track(await loadChain(server));
+      expect(chain.status).toBe('closed');
+      server.addChain(['run-1', 'run-2']);
+
+      server.controllers.get('run-1')!.close(completed('run-2'));
+      await settle();
+
+      expect(chain.status).toBe('ready');
+      expect(chain.latestRunId).toBe('run-2');
+    });
+
+    it('ignores a second close from the same Run', async () => {
+      server.addChain(['run-1']);
+      const chain = track(await loadChain(server));
+      server.addChain(['run-1', 'run-2']);
+      const controller = server.controllers.get('run-1')!;
+
+      controller.close(completed('run-2'));
+      controller.close(completed('run-2'));
+      await settle();
+
+      expect(chainRunIds(chain)).toEqual(['run-1', 'run-2']);
+      expect(server.createController).toHaveBeenCalledTimes(2);
+    });
+
+    it('ignores a later close from an earlier Run', async () => {
+      server.addChain(['run-1']);
+      const chain = track(await loadChain(server));
+      server.addChain(['run-1', 'run-2', 'run-3']);
+      server.controllers.get('run-1')!.close(completed('run-2'));
+      await settle();
+      const describeCalls = server.describe.mock.calls.length;
+
+      server.controllers.get('run-1')!.close(completed('run-3'));
+      await settle();
+
+      expect(chainRunIds(chain)).toEqual(['run-1', 'run-2']);
+      expect(chain.latestRunId).toBe('run-2');
+      expect(chain.status).toBe('ready');
+      expect(server.describe.mock.calls.length).toBe(describeCalls);
+    });
+  });
+
+  describe('fresh Describe', () => {
+    it('re-describes the open Latest Run every 10s', async () => {
+      server.addChain(['run-1']);
+      const chain = track(await loadChain(server));
+      const initial = server.describeCalls('run-1');
+      const refreshed = makeWorkflow('run-1', {
+        firstRunId: 'run-1',
+        isRunning: true,
+      });
+      server.runs.set('run-1', {
+        ...server.runs.get('run-1')!,
+        workflow: refreshed,
+      });
+
+      await vi.advanceTimersByTimeAsync(REFRESH_INTERVAL_MS - 100);
+      expect(server.describeCalls('run-1')).toBe(initial);
+
+      await vi.advanceTimersByTimeAsync(100);
+      await settle();
+      expect(server.describeCalls('run-1')).toBe(initial + 1);
+      expect(
+        server.controllers.get('run-1')?.updateWorkflow,
+      ).toHaveBeenCalledWith(refreshed);
+      expect(chain.runs[0].workflow).toBe(refreshed);
+
+      await vi.advanceTimersByTimeAsync(REFRESH_INTERVAL_MS);
+      await settle();
+      expect(server.describeCalls('run-1')).toBe(initial + 2);
+    });
+
+    it('does not re-describe a closed Latest Run', async () => {
+      server.addChain(['run-1'], { openLatest: false });
+      track(await loadChain(server));
+      const initial = server.describeCalls('run-1');
+
+      await vi.advanceTimersByTimeAsync(REFRESH_INTERVAL_MS * 3);
+
+      expect(server.describeCalls('run-1')).toBe(initial);
+    });
+
+    it('describes once more on close, then stops', async () => {
+      server.addChain(['run-1']);
+      const chain = track(await loadChain(server));
+      const initial = server.describeCalls('run-1');
+      const closed = makeWorkflow('run-1', { firstRunId: 'run-1' });
+      server.runs.set('run-1', {
+        ...server.runs.get('run-1')!,
+        workflow: closed,
+      });
+
+      server.controllers.get('run-1')!.close(completed());
+      await settle();
+
+      expect(server.describeCalls('run-1')).toBe(initial + 1);
+      expect(chain.runs[0].workflow).toBe(closed);
+      expect(
+        server.controllers.get('run-1')?.updateWorkflow,
+      ).toHaveBeenCalledWith(closed);
+
+      await vi.advanceTimersByTimeAsync(REFRESH_INTERVAL_MS * 3);
+      expect(server.describeCalls('run-1')).toBe(initial + 1);
+    });
+
+    it('moves the re-describe to the successor after a hand-off', async () => {
+      server.addChain(['run-1']);
+      track(await loadChain(server));
+      server.addChain(['run-1', 'run-2']);
+      server.controllers.get('run-1')!.close(completed('run-2'));
+      await settle();
+      const run1 = server.describeCalls('run-1');
+      const run2 = server.describeCalls('run-2');
+
+      await vi.advanceTimersByTimeAsync(REFRESH_INTERVAL_MS);
+      await settle();
+
+      expect(server.describeCalls('run-1')).toBe(run1);
+      expect(server.describeCalls('run-2')).toBe(run2 + 1);
+    });
+  });
+
+  describe('discovery errors', () => {
+    it('sets discoveryError when a walk-back hop exhausts its retries', async () => {
+      server.addChain(runIds(4));
+      server.errors.set('describe:run-2', networkError(503));
+      const chain = track(await loadChain(server));
+
+      expect(chain.status).toBe('discoveryError');
+      expect(chainRunIds(chain)).toEqual(['run-3', 'run-4']);
+      expect(chain.latestRunId).toBe('run-4');
+
+      server.errors.clear();
+      chain.retryDiscovery();
+      await settle();
+
+      expect(chain.status).toBe('ready');
+      expect(chainRunIds(chain)).toEqual(runIds(4));
+      expect(chain.boundary).toBe('chainStart');
+    });
+
+    it('keeps the Latest Run when a hand-off hop fails, and retries it', async () => {
+      server.addChain(['run-1']);
+      const chain = track(await loadChain(server));
+      server.addChain(['run-1', 'run-2']);
+      server.errors.set('started:run-2', networkError(500));
+
+      server.controllers.get('run-1')!.close(completed('run-2'));
+      await settle();
+
+      expect(chain.status).toBe('discoveryError');
+      expect(chain.latestRunId).toBe('run-1');
+
+      server.errors.clear();
+      chain.retryDiscovery();
+      await settle();
+
+      expect(chain.status).toBe('ready');
+      expect(chain.latestRunId).toBe('run-2');
+    });
+
+    it('sets discoveryError when a re-describe fails, and resumes on retry', async () => {
+      server.addChain(['run-1']);
+      const chain = track(await loadChain(server));
+      server.errors.set('describe:run-1', networkError(502));
+
+      await vi.advanceTimersByTimeAsync(REFRESH_INTERVAL_MS);
+      await settle();
+
+      expect(chain.status).toBe('discoveryError');
+      const failed = server.describeCalls('run-1');
+      await vi.advanceTimersByTimeAsync(REFRESH_INTERVAL_MS * 2);
+      expect(server.describeCalls('run-1')).toBe(failed);
+
+      server.errors.clear();
+      chain.retryDiscovery();
+      await settle();
+
+      expect(chain.status).toBe('ready');
+      expect(server.describeCalls('run-1')).toBe(failed + 1);
+      await vi.advanceTimersByTimeAsync(REFRESH_INTERVAL_MS);
+      await settle();
+      expect(server.describeCalls('run-1')).toBe(failed + 2);
+    });
+
+    it('sets discoveryError when the final Describe fails', async () => {
+      server.addChain(['run-1']);
+      const chain = track(await loadChain(server));
+      server.errors.set('describe:run-1', networkError(500));
+
+      server.controllers.get('run-1')!.close(completed());
+      await settle();
+
+      expect(chain.status).toBe('discoveryError');
+
+      server.errors.clear();
+      chain.retryDiscovery();
+      await settle();
+
+      expect(chain.status).toBe('closed');
+    });
+  });
+
+  describe('dispose', () => {
+    it('disposes every controller and stops the re-describe', async () => {
+      server.addChain(['run-1']);
+      const chain = await loadChain(server);
+      server.addChain(['run-1', 'run-2']);
+      server.controllers.get('run-1')!.close(completed('run-2'));
+      await settle();
+      const calls = server.describe.mock.calls.length;
+
+      chain.dispose();
+      await vi.advanceTimersByTimeAsync(REFRESH_INTERVAL_MS * 3);
+
+      expect(server.controllers.get('run-1')?.dispose).toHaveBeenCalled();
+      expect(server.controllers.get('run-2')?.dispose).toHaveBeenCalled();
+      expect(server.describe.mock.calls.length).toBe(calls);
+    });
+
+    it('aborts in-flight requests and drops their results', async () => {
+      server.addChain(runIds(3));
+      let resolveCurrent: (workflow: WorkflowExecution) => void = () => {};
+      let signal: AbortSignal | undefined;
+      server.describe.mockImplementationOnce((_, requestSignal) => {
+        signal = requestSignal;
+        return new Promise((resolve) => {
+          resolveCurrent = resolve;
+        });
+      });
+      const chain = createChain(server);
+      const loading = chain.load();
+
+      chain.dispose();
+      resolveCurrent(server.runs.get('run-3')!.workflow);
+      await loading;
+      await settle();
+
+      expect(signal?.aborted).toBe(true);
+      expect(chain.runs).toEqual([]);
+      expect(chain.latestRunId).toBeNull();
+      expect(chain.error).toBeNull();
+      expect(chain.firstRun).toEqual({ status: 'loading' });
+      expect(server.createController).not.toHaveBeenCalled();
+    });
+
+    it('drops a walk-back hop that resolves after dispose', async () => {
+      server.addChain(runIds(3));
+      const chain = createChain(server);
+      await chain.load();
+
+      chain.dispose();
+      await settle();
+
+      expect(chainRunIds(chain)).toEqual(['run-3']);
+    });
+
+    it('ignores close events after dispose', async () => {
+      server.addChain(['run-1']);
+      const chain = await loadChain(server);
+      server.addChain(['run-1', 'run-2']);
+
+      chain.dispose();
+      server.controllers.get('run-1')!.close(completed('run-2'));
+      await settle();
+
+      expect(chain.latestRunId).toBe('run-1');
+      expect(server.createController).toHaveBeenCalledTimes(1);
+    });
+  });
+});

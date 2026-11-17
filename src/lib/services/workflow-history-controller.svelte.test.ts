@@ -97,7 +97,11 @@ function poll(index: number) {
 
 function createController(
   runId = 'run-1',
-  options: { pauseAfterPages?: number; liveUpdatesPaused?: boolean } = {
+  options: {
+    pauseAfterPages?: number;
+    liveUpdatesPaused?: boolean;
+    onClose?: (closeEvent: HistoryEvent) => void;
+  } = {
     pauseAfterPages: 2,
   },
 ) {
@@ -249,6 +253,37 @@ describe('WorkflowHistoryController', () => {
       expect(controller.closeEvent).toBeNull();
       request(1).result.resolve();
       await nextLoad;
+    });
+
+    it('calls onClose once with the close event', async () => {
+      const onClose = vi.fn();
+      const { controller } = createController('run-1', { onClose });
+      const load = controller.load(workflow());
+      request(0).options.onRawPage([makeWorkflowStarted(1)]);
+      expect(onClose).not.toHaveBeenCalled();
+
+      const closeEvent = makeWorkflowCompleted(10);
+      request(0).options.onRawPage([closeEvent]);
+      request(0).result.resolve();
+      await load;
+
+      expect(onClose).toHaveBeenCalledOnce();
+      expect(onClose).toHaveBeenCalledWith(closeEvent);
+    });
+
+    it('calls onClose when the poll delivers the close', async () => {
+      const onClose = vi.fn();
+      const { controller } = createController('run-1', { onClose });
+      const load = controller.load(workflow('run-1', true));
+      tail(0).result.resolve(tailEvents([2, 3]));
+      pollEvents(0, [1, 2, 3], 'token-1');
+      await load;
+      expect(onClose).not.toHaveBeenCalled();
+
+      const closeEvent = makeWorkflowCompleted(4);
+      poll(0).options.onEvent(closeEvent);
+
+      expect(onClose).toHaveBeenCalledWith(closeEvent);
     });
   });
 
