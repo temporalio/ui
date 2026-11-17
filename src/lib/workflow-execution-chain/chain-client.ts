@@ -1,3 +1,4 @@
+import { createGroupedEventBuffer } from '$lib/services/grouped-event-buffer';
 import { WorkflowHistoryController } from '$lib/services/workflow-history-controller.svelte';
 import { fetchWorkflow } from '$lib/services/workflow-service';
 import type { GetWorkflowExecutionHistoryResponse } from '$lib/types/events';
@@ -56,8 +57,22 @@ const fetchStartedEvent: ChainClient['fetchStartedEvent'] = async (
 
 const createController: ChainClient['createController'] = (
   workflowExecutionIdentity,
-  { onClose },
-) => new WorkflowHistoryController({ workflowExecutionIdentity, onClose });
+  { onClose, onFirstEvent },
+) => {
+  const buffer = createGroupedEventBuffer();
+  const unsubscribe = buffer.onChange(() => {
+    if (buffer.getLazyGroups().length === 0) {
+      return;
+    }
+    unsubscribe();
+    onFirstEvent();
+  });
+  return new WorkflowHistoryController({
+    workflowExecutionIdentity,
+    buffer,
+    onClose,
+  });
+};
 
 export const client: ChainClient = {
   describe,

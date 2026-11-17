@@ -8,8 +8,10 @@ import { isNotFound } from '$lib/utilities/handle-error';
 import { isNetworkError } from '$lib/utilities/is-network-error';
 
 import { client as defaultClient } from './chain-client';
+import { LoadQueue } from './load-queue';
 import { retryWithBackoff } from './retry-with-backoff';
 import type {
+  CardLoad,
   ChainBoundary,
   ChainClient,
   ChainError,
@@ -22,6 +24,7 @@ import type {
 
 export const WALK_SIZE = 10;
 export const REFRESH_INTERVAL_MS = 10_000;
+export const CARD_LOAD_CONCURRENCY = 1;
 
 type Phase = Exclude<ChainStatus, 'discoveryError'>;
 type DiscoveryStep = 'walkBack' | 'handOff' | 'refresh' | 'finalDescribe';
@@ -52,6 +55,7 @@ const readSuccessorRunId = (closeEvent: HistoryEvent): string | undefined =>
 export class WorkflowExecutionChain {
   readonly identity: Readonly<WorkflowExecutionChainIdentity>;
   readonly controllers = new SvelteMap<string, WorkflowHistoryController>();
+  readonly cardLoads = new SvelteMap<string, CardLoad>();
 
   runs = $state.raw<ChainRun[]>([]);
   boundary = $state<ChainBoundary>(null);
@@ -66,6 +70,12 @@ export class WorkflowExecutionChain {
   private _failedSteps = new SvelteMap<DiscoveryStep, () => void>();
   private _handledCloses = new SvelteSet<string>();
   private _refreshTimer: ReturnType<typeof setTimeout> | null = null;
+  private _prioritizedRunId: string | null = null;
+  private readonly _firstEventRunIds = new SvelteSet<string>();
+  private readonly _queue = new LoadQueue({
+    concurrency: CARD_LOAD_CONCURRENCY,
+    start: (runId) => this._loadCard(runId),
+  });
   private readonly _client: ChainClient;
   private readonly _abort = new AbortController();
 
@@ -148,7 +158,7 @@ export class WorkflowExecutionChain {
     if (current.isRunning) {
       this._scheduleRefresh();
     }
-    this._startController(latest);
+    this._startCard(latest.runId);
     void this._walkBack(WALK_SIZE - 1);
   }
 
@@ -164,6 +174,28 @@ export class WorkflowExecutionChain {
     void this._walkBack(WALK_SIZE);
   }
 
+  prioritizeRun(runId: string): void {
+    this._prioritizedRunId = runId;
+    const cardLoad = this.cardLoads.get(runId);
+    if (cardLoad?.status === 'queued') {
+      this._startCard(runId);
+    }
+    this._syncQueueGate();
+  }
+
+  retryCard(runId: string): void {
+    const cardLoad = this.cardLoads.get(runId);
+    if (cardLoad?.status !== 'error' || !cardLoad.retryable) {
+      return;
+    }
+    this.cardLoads.set(runId, { status: 'queued' });
+    if (runId === this._latestRunId || runId === this._queueGateRunId) {
+      this._startCard(runId);
+      return;
+    }
+    this._queue.prioritize(runId);
+  }
+
   retryDiscovery(): void {
     const steps = [...this._failedSteps.values()];
     this._failedSteps.clear();
@@ -177,6 +209,7 @@ export class WorkflowExecutionChain {
       return;
     }
     this._abort.abort();
+    this._queue.dispose();
     this._stopRefresh();
     for (const controller of this.controllers.values()) {
       controller.dispose();
@@ -295,6 +328,7 @@ export class WorkflowExecutionChain {
           return;
         }
         this.runs = [run, ...this.runs];
+        this._enqueueCard(run.runId);
       }
     } finally {
       if (!this._disposed) {
@@ -348,7 +382,8 @@ export class WorkflowExecutionChain {
     if (run.workflow.isRunning) {
       this._scheduleRefresh();
     }
-    this._startController(run);
+    this._startCard(run.runId);
+    this._syncQueueGate();
   }
 
   private async _finalDescribe(runId: string): Promise<void> {
@@ -420,14 +455,98 @@ export class WorkflowExecutionChain {
     this.controllers.get(runId)?.updateWorkflow(workflow);
   }
 
-  private _startController(run: ChainRun): void {
+  private get _queueGateRunId(): string | null {
+    return this._prioritizedRunId ?? this._latestRunId;
+  }
+
+  private _syncQueueGate(): void {
+    const runId = this._queueGateRunId;
+    const status = runId ? this.cardLoads.get(runId)?.status : undefined;
+    if (
+      runId &&
+      (this._firstEventRunIds.has(runId) ||
+        status === 'loaded' ||
+        status === 'error')
+    ) {
+      this._queue.release();
+      return;
+    }
+    this._queue.hold();
+  }
+
+  private _enqueueCard(runId: string): void {
+    this.cardLoads.set(runId, { status: 'queued' });
+    if (runId === this._prioritizedRunId) {
+      this._startCard(runId);
+      return;
+    }
+    this._queue.push(runId);
+  }
+
+  private _startCard(runId: string): void {
+    this._queue.remove(runId);
+    void this._loadCard(runId);
+  }
+
+  private async _loadCard(runId: string): Promise<void> {
+    if (this._disposed) {
+      return;
+    }
+    const controller = this._controllerFor(runId);
+    this.cardLoads.set(runId, { status: 'loading' });
+    try {
+      await this._retry(async () => {
+        const run = this.runs.find((chainRun) => chainRun.runId === runId);
+        if (!run) {
+          throw new Error('Missing Run for this card.');
+        }
+        await controller.load(run.workflow);
+        if (controller.error) {
+          throw controller.error;
+        }
+      });
+    } catch (error) {
+      if (this._disposed) {
+        return;
+      }
+      this.cardLoads.set(runId, {
+        status: 'error',
+        error: toChainError(error),
+        retryable: !isNotFound(error),
+      });
+      this._syncQueueGate();
+      return;
+    }
+    if (this._disposed) {
+      return;
+    }
+    this.cardLoads.set(runId, { status: 'loaded' });
+    this._syncQueueGate();
+  }
+
+  private _controllerFor(runId: string): WorkflowHistoryController {
+    const existing = this.controllers.get(runId);
+    if (existing) {
+      return existing;
+    }
     const { namespace, workflowId } = this.identity;
     const controller = this._client.createController(
-      { namespace, workflowId, runId: run.runId },
-      { onClose: (closeEvent) => this._handleClose(run.runId, closeEvent) },
+      { namespace, workflowId, runId },
+      {
+        onClose: (closeEvent) => this._handleClose(runId, closeEvent),
+        onFirstEvent: () => this._handleFirstEvent(runId),
+      },
     );
-    this.controllers.set(run.runId, controller);
-    void controller.load(run.workflow);
+    this.controllers.set(runId, controller);
+    return controller;
+  }
+
+  private _handleFirstEvent(runId: string): void {
+    if (this._disposed) {
+      return;
+    }
+    this._firstEventRunIds.add(runId);
+    this._syncQueueGate();
   }
 
   private _fail(step: DiscoveryStep, retry: () => void): void {

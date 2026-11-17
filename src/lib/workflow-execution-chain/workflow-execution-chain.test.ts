@@ -7,7 +7,11 @@ import type {
   WorkflowExecutionIdentity,
 } from '$lib/types/workflows';
 
-import type { ChainClient, DescribeParameters } from './types';
+import type {
+  ChainClient,
+  ControllerCallbacks,
+  DescribeParameters,
+} from './types';
 
 import {
   REFRESH_INTERVAL_MS,
@@ -24,17 +28,46 @@ const networkError = (statusCode: number) => ({
 });
 
 class FakeController {
-  load = vi.fn(async () => {});
+  error: unknown = null;
   updateWorkflow = vi.fn();
   dispose = vi.fn();
+  private _finishLoad: ((error?: unknown) => void) | null = null;
+
+  load = vi.fn((): Promise<void> => {
+    this.error = null;
+    if (!this._server.holdLoads) {
+      this.error = this._server.loadErrors.get(this.identity.runId) ?? null;
+      return Promise.resolve();
+    }
+    return new Promise<void>((resolve) => {
+      this._finishLoad = (error) => {
+        this._finishLoad = null;
+        this.error = error ?? null;
+        resolve();
+      };
+    });
+  });
 
   constructor(
     readonly identity: WorkflowExecutionIdentity,
-    private readonly _onClose: (closeEvent: HistoryEvent) => void,
+    private readonly _callbacks: ControllerCallbacks,
+    private readonly _server: FakeServer,
   ) {}
 
+  get loading(): boolean {
+    return this._finishLoad !== null;
+  }
+
   close(closeEvent: HistoryEvent): void {
-    this._onClose(closeEvent);
+    this._callbacks.onClose(closeEvent);
+  }
+
+  firstEvent(): void {
+    this._callbacks.onFirstEvent();
+  }
+
+  finishLoad(error?: unknown): void {
+    this._finishLoad?.(error);
   }
 }
 
@@ -97,6 +130,8 @@ class FakeServer {
   errors = new Map<string, unknown>();
   currentRunId = '';
   controllers = new Map<string, FakeController>();
+  holdLoads = false;
+  loadErrors = new Map<string, unknown>();
 
   describe = vi.fn(
     async (
@@ -131,11 +166,8 @@ class FakeServer {
   );
 
   createController = vi.fn(
-    (
-      identity: WorkflowExecutionIdentity,
-      { onClose }: { onClose: (closeEvent: HistoryEvent) => void },
-    ) => {
-      const controller = new FakeController(identity, onClose);
+    (identity: WorkflowExecutionIdentity, callbacks: ControllerCallbacks) => {
+      const controller = new FakeController(identity, callbacks, this);
       this.controllers.set(identity.runId, controller);
       return controller as unknown as WorkflowHistoryController;
     },
@@ -307,10 +339,10 @@ describe('WorkflowExecutionChain', () => {
       expect(chainRunIds(chain)).toEqual(['run-1', 'run-2', 'run-3']);
       expect(chain.latestRunId).toBe('run-3');
       expect(chain.boundary).toBe('chainStart');
-      expect(server.createController).toHaveBeenCalledTimes(1);
-      expect(server.createController).toHaveBeenCalledWith(
+      expect(server.createController).toHaveBeenNthCalledWith(
+        1,
         { namespace: NAMESPACE, workflowId: WORKFLOW_ID, runId: 'run-3' },
-        { onClose: expect.any(Function) },
+        { onClose: expect.any(Function), onFirstEvent: expect.any(Function) },
       );
     });
 
@@ -528,12 +560,191 @@ describe('WorkflowExecutionChain', () => {
 
       expect(chainRunIds(chain)).toHaveLength(10);
     });
+  });
 
-    it('never starts controllers for walked-back Runs', async () => {
+  describe('card loading', () => {
+    const controllerIds = () => [...server.controllers.keys()];
+
+    const finishLoad = async (runId: string, error?: unknown) => {
+      server.controllers.get(runId)!.finishLoad(error);
+      await settle();
+    };
+
+    it('starts the Latest Run at once and holds other cards until its first event', async () => {
+      server.holdLoads = true;
       server.addChain(runIds(4));
+      const chain = track(await loadChain(server));
+
+      expect(controllerIds()).toEqual(['run-4']);
+      expect(chain.cardLoads.get('run-4')).toEqual({ status: 'loading' });
+      expect(chain.cardLoads.get('run-3')).toEqual({ status: 'queued' });
+
+      server.controllers.get('run-4')!.firstEvent();
+      await settle();
+
+      expect(controllerIds()).toEqual(['run-4', 'run-3']);
+      expect(chain.cardLoads.get('run-3')).toEqual({ status: 'loading' });
+    });
+
+    it('loads the other cards newest first, one at a time', async () => {
+      server.holdLoads = true;
+      server.addChain(runIds(4));
+      const chain = track(await loadChain(server));
+      server.controllers.get('run-4')!.firstEvent();
+      await settle();
+
+      await finishLoad('run-3');
+      expect(controllerIds()).toEqual(['run-4', 'run-3', 'run-2']);
+      expect(chain.cardLoads.get('run-3')).toEqual({ status: 'loaded' });
+
+      await finishLoad('run-2');
+      expect(controllerIds()).toEqual(['run-4', 'run-3', 'run-2', 'run-1']);
+    });
+
+    it('releases the queue when the gating Run settles without events', async () => {
+      server.holdLoads = true;
+      server.addChain(runIds(3));
       track(await loadChain(server));
 
-      expect([...server.controllers.keys()]).toEqual(['run-4']);
+      await finishLoad('run-3');
+
+      expect(controllerIds()).toEqual(['run-3', 'run-2']);
+    });
+
+    it('prioritizeRun starts a queued Run at once and gates the queue on it', async () => {
+      server.holdLoads = true;
+      server.addChain(runIds(4));
+      const chain = track(await loadChain(server));
+      server.controllers.get('run-4')!.firstEvent();
+      await settle();
+
+      chain.prioritizeRun('run-1');
+      await settle();
+      expect(controllerIds()).toEqual(['run-4', 'run-3', 'run-1']);
+
+      await finishLoad('run-3');
+      expect(server.controllers.has('run-2')).toBe(false);
+
+      server.controllers.get('run-1')!.firstEvent();
+      await settle();
+      expect(server.controllers.has('run-2')).toBe(true);
+    });
+
+    it('starts a prioritized Run as soon as the walk reaches it', async () => {
+      server.holdLoads = true;
+      server.addChain(runIds(3));
+      const chain = createChain(server);
+      track(chain);
+      chain.prioritizeRun('run-1');
+      void chain.load();
+      await settle();
+
+      expect(controllerIds()).toEqual(['run-3', 'run-1']);
+      expect(chain.cardLoads.get('run-2')).toEqual({ status: 'queued' });
+    });
+
+    it('never makes hops wait on the queue', async () => {
+      server.holdLoads = true;
+      server.addChain(runIds(4));
+      const chain = track(await loadChain(server));
+
+      expect(chainRunIds(chain)).toEqual(runIds(4));
+
+      server.addChain(runIds(5));
+      server.controllers.get('run-4')!.close(completed('run-5'));
+      await settle();
+
+      expect(chain.latestRunId).toBe('run-5');
+      expect(controllerIds()).toEqual(['run-4', 'run-5']);
+    });
+
+    it('gates the queue on the successor after a hand-off', async () => {
+      server.holdLoads = true;
+      server.addChain(runIds(3));
+      track(await loadChain(server));
+      server.addChain(runIds(4));
+      server.controllers.get('run-3')!.close(completed('run-4'));
+      await settle();
+
+      server.controllers.get('run-3')!.firstEvent();
+      await settle();
+      expect(server.controllers.has('run-2')).toBe(false);
+
+      server.controllers.get('run-4')!.firstEvent();
+      await settle();
+      expect(server.controllers.has('run-2')).toBe(true);
+    });
+
+    it('shows a retryable error once retries are exhausted, leaving other cards running', async () => {
+      server.loadErrors.set('run-2', networkError(500));
+      server.addChain(runIds(3));
+      const chain = track(await loadChain(server));
+
+      expect(server.controllers.get('run-2')!.load).toHaveBeenCalledTimes(4);
+      expect(chain.cardLoads.get('run-2')).toEqual({
+        status: 'error',
+        error: networkError(500),
+        retryable: true,
+      });
+      expect(chain.cardLoads.get('run-1')).toEqual({ status: 'loaded' });
+      expect(chain.cardLoads.get('run-3')).toEqual({ status: 'loaded' });
+      expect(chain.status).toBe('ready');
+    });
+
+    it('shows NotFound without Retry, and retryCard ignores it', async () => {
+      server.loadErrors.set('run-1', networkError(404));
+      server.addChain(runIds(2));
+      const chain = track(await loadChain(server));
+
+      expect(chain.cardLoads.get('run-1')).toMatchObject({
+        status: 'error',
+        retryable: false,
+      });
+      expect(server.controllers.get('run-1')!.load).toHaveBeenCalledTimes(1);
+
+      chain.retryCard('run-1');
+      await settle();
+      expect(server.controllers.get('run-1')!.load).toHaveBeenCalledTimes(1);
+    });
+
+    it('retryCard restarts the load at the head of the queue', async () => {
+      server.holdLoads = true;
+      server.addChain(runIds(4));
+      const chain = track(await loadChain(server));
+      server.controllers.get('run-4')!.firstEvent();
+      await settle();
+
+      for (let attempt = 0; attempt < 4; attempt++) {
+        await finishLoad('run-3', networkError(500));
+      }
+      expect(chain.cardLoads.get('run-3')).toMatchObject({ status: 'error' });
+      expect(controllerIds()).toEqual(['run-4', 'run-3', 'run-2']);
+
+      chain.retryCard('run-3');
+      expect(chain.cardLoads.get('run-3')).toEqual({ status: 'queued' });
+      await finishLoad('run-2');
+
+      expect(server.controllers.get('run-3')!.loading).toBe(true);
+      expect(server.controllers.get('run-3')!.load).toHaveBeenCalledTimes(5);
+      expect(server.controllers.has('run-1')).toBe(false);
+
+      await finishLoad('run-3');
+      expect(chain.cardLoads.get('run-3')).toEqual({ status: 'loaded' });
+      expect(server.controllers.has('run-1')).toBe(true);
+    });
+
+    it('starts no more cards after dispose', async () => {
+      server.holdLoads = true;
+      server.addChain(runIds(3));
+      const chain = await loadChain(server);
+      server.controllers.get('run-3')!.firstEvent();
+      await settle();
+
+      chain.dispose();
+      await finishLoad('run-2');
+
+      expect(server.controllers.has('run-1')).toBe(false);
+      expect(chain.cardLoads.get('run-2')).toEqual({ status: 'loading' });
     });
   });
 

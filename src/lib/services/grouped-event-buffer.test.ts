@@ -11,7 +11,11 @@ import {
 } from '$lib/models/event-groups/create-event-group';
 import type { EventGroup } from '$lib/models/event-groups/event-groups';
 import { toEvent, toEventHistory } from '$lib/models/event-history';
-import { createTimelineEventGroup } from '$lib/models/event-history/timeline-event-groups';
+import {
+  createTimelineEventGroup,
+  lifecycleRetries,
+  summarizeLifecycleGroups,
+} from '$lib/models/event-history/timeline-event-groups';
 import type {
   HistoryEvent,
   PendingActivity,
@@ -44,6 +48,7 @@ import {
   type GroupedEventBuffer,
   isWorkflowTaskGroup,
   type LazyGroup,
+  lifecycleStatusOf,
   materializeGroup,
 } from './grouped-event-buffer';
 import { SHARED_WITH_EVENT_GROUP } from './test-helpers/lazy-group-fields';
@@ -1847,6 +1852,54 @@ describe('lazy and materialized group agreement', () => {
     }
   });
 
+  it.each(cases)(
+    'keeps a lifecycle status that matches the summary of a %s group',
+    (_, build) => {
+      const events = build(1);
+
+      for (let count = 1; count <= events.length; count++) {
+        buffer.reset(20);
+        for (const event of events.slice(0, count)) {
+          buffer.ingestHistoryEvent(event);
+        }
+
+        const [lazy] = buffer.getLazyGroups();
+        const summary = summarizeLifecycleGroups([materializeGroup(lazy)]);
+        const { failed, timedOut, highestAttempt } = lifecycleStatusOf(lazy);
+
+        expect({
+          failed: Number(failed),
+          timedOut: Number(timedOut),
+          retries: lifecycleRetries(highestAttempt, lazy),
+        }).toEqual({
+          failed: summary.failed,
+          timedOut: summary.timedOut,
+          retries: summary.retries,
+        });
+      }
+    },
+  );
+
+  it('keeps the highest activity attempt in its lifecycle status', () => {
+    buffer.reset(10);
+    const [scheduled, started, completed] = makeActivityGroup(1);
+    buffer.ingestHistoryEvent(scheduled);
+    buffer.ingestHistoryEvent({
+      ...started,
+      activityTaskStartedEventAttributes: {
+        ...started.activityTaskStartedEventAttributes,
+        attempt: 4,
+      },
+    } as HistoryEvent);
+    buffer.ingestHistoryEvent(completed);
+
+    expect(lifecycleStatusOf(buffer.getLazyGroups()[0])).toEqual({
+      failed: false,
+      timedOut: false,
+      highestAttempt: 4,
+    });
+  });
+
   it('agrees on isPending once pending metadata is attached', () => {
     buffer.reset(10);
     buffer.ingestHistoryEvent(makeActivityScheduled(1, 'Act'));
@@ -1880,6 +1933,20 @@ describe('lazy and materialized group agreement', () => {
 
     expect(lazyGroups.map((lazy) => lazy.id)).toEqual(groups.map((g) => g.id));
     expect(lazyGroups.map(materializeGroup)).toEqual(groups);
+  });
+
+  it('reads the lifecycle status of a group built outside the buffer from its events', () => {
+    buffer.reset(10);
+    for (const event of makeActivityTimeoutGroup(1)) {
+      buffer.ingestHistoryEvent(event);
+    }
+    const group = materializeGroup(buffer.getLazyGroups()[0]);
+
+    expect(lifecycleStatusOf(group)).toEqual({
+      failed: false,
+      timedOut: true,
+      highestAttempt: 0,
+    });
   });
 
   it('passes an already-materialized group straight through', () => {

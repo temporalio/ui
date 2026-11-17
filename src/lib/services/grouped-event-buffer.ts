@@ -15,6 +15,9 @@ import {
   type EventGroupLabel,
 } from '$lib/models/event-history/event-group-markers';
 import {
+  addLifecycleEvent,
+  createLifecycleEventStatus,
+  type LifecycleEventStatus,
   type TimelineEventGroup,
   toTimelineEventGroup,
 } from '$lib/models/event-history/timeline-event-groups';
@@ -134,6 +137,7 @@ class GroupRecord implements LazyGroup {
   headsGroup = false;
   hasTerminalActivity = false;
   hasTerminalNexus = false;
+  readonly lifecycleStatus = createLifecycleEventStatus();
   eventGroupKeys: EventGroupKey[] | undefined;
   syncedVersion = 0;
   syncedEventCount = 0;
@@ -158,6 +162,7 @@ class GroupRecord implements LazyGroup {
     }
     if (isTerminalActivityEvent(event)) this.hasTerminalActivity = true;
     if (isTerminalNexusEvent(event)) this.hasTerminalNexus = true;
+    addLifecycleEvent(this.lifecycleStatus, event);
     if (slot === this.headSlot) {
       this.initialEvent = event;
       this.category = groupCategory(event);
@@ -270,6 +275,24 @@ export function materializeGroup(lazy: LazyGroup): EventGroup {
     return lazy.materialize() as EventGroup;
   }
   return lazy as EventGroup;
+}
+
+/**
+ * What `summarizeLifecycleGroups` reads from a group's events. Buffer groups
+ * keep it as events arrive, so summing it over every group materializes none;
+ * groups built elsewhere are already materialized and read their eventList.
+ */
+export function lifecycleStatusOf(
+  group: LazyGroup,
+): Readonly<LifecycleEventStatus> {
+  if (group instanceof GroupRecord) {
+    return group.lifecycleStatus;
+  }
+  const status = createLifecycleEventStatus();
+  for (const event of materializeGroup(group).eventList) {
+    addLifecycleEvent(status, event);
+  }
+  return status;
 }
 
 export function createGroupedEventBuffer() {

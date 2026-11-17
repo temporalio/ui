@@ -40,6 +40,17 @@ export type ChainMismatch = {
   currentFirstRunId: string;
 };
 
+export type CardLoad =
+  | { status: 'queued' }
+  | { status: 'loading' }
+  | { status: 'loaded' }
+  | { status: 'error'; error: ChainError; retryable: boolean };
+
+export type ControllerCallbacks = {
+  onClose: (closeEvent: HistoryEvent) => void;
+  onFirstEvent: () => void;
+};
+
 export type DescribeParameters = {
   namespace: string;
   workflowId: string;
@@ -57,6 +68,6 @@ export type ChainClient = {
   ) => Promise<HistoryEvent>;
   createController: (
     identity: WorkflowExecutionIdentity,
-    options: { onClose: (closeEvent: HistoryEvent) => void },
+    callbacks: ControllerCallbacks,
   ) => WorkflowHistoryController;
 };
