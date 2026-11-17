@@ -826,10 +826,10 @@
         class="w-full max-w-2xl rounded-xl border border-primary shadow-2xl"
       >
         <div
-          class="relative flex max-h-[min(560px,76dvh)] flex-col rounded-xl bg-surface-primary"
+          class="relative flex max-h-[min(560px,76dvh)] min-h-[min(377px,76dvh)] flex-col rounded-xl bg-surface-primary"
         >
           <div
-            class="flex items-center gap-2 border-b border-secondary px-4 py-3"
+            class="flex shrink-0 items-center gap-2 border-b border-secondary px-4 py-3"
           >
             {#each breadcrumbs as crumb, index (index)}
               <span
@@ -936,7 +936,7 @@
           <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
           <div
             bind:this={list}
-            class="min-h-72 flex-1 overflow-y-auto p-2"
+            class="min-h-0 flex-1 overflow-y-auto p-2"
             tabindex="0"
           >
             {#if loading}
@@ -1093,7 +1093,7 @@
           {/if}
 
           <div
-            class="flex min-h-10 items-center justify-between gap-3 border-t border-secondary px-4 py-2 text-xs text-secondary"
+            class="flex min-h-10 shrink-0 items-center justify-between gap-3 border-t border-secondary px-4 py-2 text-xs text-secondary"
           >
             {#if pendingConfirm}
               <span class="truncate text-danger">{pendingConfirm.message}</span>
