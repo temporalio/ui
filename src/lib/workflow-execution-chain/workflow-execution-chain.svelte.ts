@@ -515,10 +515,15 @@ export class WorkflowExecutionChain {
     }
   }
 
-  private _mergeDetached(): boolean {
-    this._windowIds = [...this._detachedIds, ...this._windowIds];
+  private _mergeDetached(sharedCount: number): boolean {
+    const sharedIds = this._detachedIds.slice(0, sharedCount);
+    const offPathIds = this._detachedIds.slice(sharedCount);
+    this._windowIds = [...sharedIds, ...this._windowIds];
     this.boundary = this.detachedBoundary;
-    this._replaceDetached([]);
+    this._replaceDetached(offPathIds);
+    if (offPathIds.length > 0) {
+      this.detachedOffPath = true;
+    }
     return this.boundary !== null;
   }
 
@@ -588,13 +593,6 @@ export class WorkflowExecutionChain {
           this.boundary = 'chainStart';
           return;
         }
-        if (this._detachedIds.at(-1) === predecessor) {
-          hop += this._detachedIds.length - 1;
-          if (this._mergeDetached()) {
-            return;
-          }
-          continue;
-        }
         let run: ChainRun;
         try {
           run = await this._fetchRun(predecessor);
@@ -612,6 +610,14 @@ export class WorkflowExecutionChain {
         }
         if (this._disposed) {
           return;
+        }
+        const sharedCount = this._detachedIds.indexOf(run.runId) + 1;
+        if (sharedCount > 0) {
+          hop += sharedCount - 1;
+          if (this._mergeDetached(sharedCount)) {
+            return;
+          }
+          continue;
         }
         this._windowIds = [run.runId, ...this._windowIds];
         this._enqueueCard(run.runId);
