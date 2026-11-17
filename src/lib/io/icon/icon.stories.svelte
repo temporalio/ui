@@ -38,6 +38,9 @@
             'The shared IO icon library, including optical variants for adjusted visual sizing.',
         },
         usage,
+        // The icon picker is a Playground control, not a component prop.
+        // Storybook matches exclude against the argType's display name.
+        argTypes: { exclude: ['Icon'] },
       },
     },
     argTypes: {

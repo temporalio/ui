@@ -4,6 +4,10 @@ import * as Stories from './modals-and-drawers.stories.svelte';
 
 <Meta of={Stories} />
 
+{/* Marks IO pages for the docs layout rules in .storybook/preview.css. */}
+
+<div className="io-docs-page" hidden />
+
 # Modals and Drawers
 
 Modals and drawers show content on top of the page. They are built from the
@@ -91,8 +95,9 @@ The flow:
 ```
 
 The modal clears `error` whenever it closes, and Escape, the backdrop, the close
-icon, and Cancel all close it the same way. Use `onCancelModal` to reset any
-fields you own.
+icon, and Cancel all close it the same way. While `loading` is true, none of
+them can close it, so a request can't finish after users think they cancelled.
+Use `onCancelModal` to reset any fields you own.
 
 ## Form in a drawer
 

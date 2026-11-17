@@ -30,8 +30,7 @@ newly exported icons appear automatically.
 
 ## API Reference
 
-| Name             | Description                           | Type     | Default       | Required |
-| ---------------- | ------------------------------------- | -------- | ------------- | -------- |
-| Accessible label |                                       | `string` | —             | No       |
-| viewBox          |                                       | `string` | `"0 0 16 16"` | No       |
-| Icon             | Playground only: the icon to preview. |          | —             | No       |
+| Name             | Description | Type     | Default       | Required |
+| ---------------- | ----------- | -------- | ------------- | -------- |
+| Accessible label |             | `string` | —             | No       |
+| viewBox          |             | `string` | `"0 0 16 16"` | No       |

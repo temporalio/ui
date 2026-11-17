@@ -28,34 +28,38 @@ body.sb-show-main,
   border-left-color: var(--color-content-secondary);
 }
 
+/* IO docs pages render a hidden .io-docs-page marker; the rules below only
+   apply there, so Holocene and Application docs keep Storybook's defaults. */
+
 /* Soften Storybook's docs table striping to 10% of its default fill. */
 [data-theme='light']
-  .sbdocs.sbdocs-content
+  .sbdocs.sbdocs-content:has(.io-docs-page)
   table:not(.sb-anchor, .sb-unstyled, .sb-unstyled table)
   tr:nth-of-type(2n) {
   background-color: rgb(246 249 252 / 10%);
 }
 
 [data-theme='dark']
-  .sbdocs.sbdocs-content
+  .sbdocs.sbdocs-content:has(.io-docs-page)
   table:not(.sb-anchor, .sb-unstyled, .sb-unstyled table)
   tr:nth-of-type(2n) {
   background-color: rgb(69 76 84 / 10%);
 }
 
 /* Narrower than Storybook's default 1000px docs column. */
-.sbdocs.sbdocs-content {
+.sbdocs.sbdocs-content:has(.io-docs-page) {
   max-width: 800px;
 }
 
 /* Keep docs prose near 66 characters per line, never over 75. */
-.sbdocs.sbdocs-content :is(p, li, blockquote):not(table *, .docs-story *) {
+.sbdocs.sbdocs-content:has(.io-docs-page)
+  :is(p, li, blockquote):not(table *, .docs-story *) {
   max-width: 52ch;
 }
 
 /* Two-column docs tables, such as Do / Don't, split evenly and keep each
    cell to the same 52ch text width (plus 13px padding and a border). */
-.sbdocs.sbdocs-content
+.sbdocs.sbdocs-content:has(.io-docs-page)
   table:not(.sb-anchor, .sb-unstyled, .sb-unstyled table):has(
     tr > :nth-child(2):last-child
   ) {

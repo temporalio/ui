@@ -122,6 +122,8 @@ export function ComponentDocs(): ReactElement {
   return h(
     Fragment,
     null,
+    // Marks IO pages for the docs layout rules in preview.css.
+    h('span', { className: 'io-docs-page', hidden: true }),
     h(PageActions),
     h(Title),
     h(Description),
