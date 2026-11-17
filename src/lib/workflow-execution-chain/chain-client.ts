@@ -57,7 +57,7 @@ const fetchStartedEvent: ChainClient['fetchStartedEvent'] = async (
 
 const createController: ChainClient['createController'] = (
   workflowExecutionIdentity,
-  { onClose, onFirstEvent },
+  { onClose, onFirstEvent, onLivePollError },
 ) => {
   const buffer = createGroupedEventBuffer();
   const unsubscribe = buffer.onChange(() => {
@@ -71,6 +71,7 @@ const createController: ChainClient['createController'] = (
     workflowExecutionIdentity,
     buffer,
     onClose,
+    onLivePollError,
   });
 };
 
