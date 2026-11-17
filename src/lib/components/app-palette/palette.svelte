@@ -369,7 +369,7 @@
   function push(view: PaletteView, variant: PaletteVariant) {
     savedFrames.push({ query, selected: selectedIndex });
     frames = [...frames, { view, variant }];
-    query = '';
+    query = view.initialQuery ?? '';
     selected = 0;
     resetTransientState();
     view.onOpen?.();
