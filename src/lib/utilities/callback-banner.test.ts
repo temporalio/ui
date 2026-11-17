@@ -1,11 +1,14 @@
 import { describe, expect, it } from 'vitest';
 
+import type { EventLink } from '$lib/types';
 import type { Callback } from '$lib/types/nexus';
 
 import {
   callbackBannerKind,
   callbackBannerTitle,
   callbackStateCounts,
+  findSourceCallback,
+  workerCallbackSource,
 } from './callback-banner';
 
 const callback = (state: string) => ({ state }) as unknown as Callback;
@@ -88,5 +91,79 @@ describe('callbackStateCounts', () => {
     const counts = callbackStateCounts([callback('Unspecified')]);
 
     expect(counts.every(({ count }) => count === 0)).toBe(true);
+  });
+});
+
+describe('workerCallbackSource', () => {
+  const link = (
+    type: string,
+    overrides: Record<string, unknown> = {},
+  ): EventLink =>
+    ({
+      callback: {
+        namespace: 'source-ns',
+        requestId: 'request-1',
+        execution: { type, businessId: 'source-op', runId: 'source-run' },
+        ...overrides,
+      },
+    }) as unknown as EventLink;
+
+  it('reads the source operation and request ID from a worker callback link', () => {
+    expect(
+      workerCallbackSource(link('EXECUTION_TYPE_NEXUS_OPERATION')),
+    ).toEqual({
+      namespace: 'source-ns',
+      operationId: 'source-op',
+      runId: 'source-run',
+      requestId: 'request-1',
+    });
+  });
+
+  it('ignores callback links whose source is not a Nexus operation', () => {
+    expect(
+      workerCallbackSource(link('EXECUTION_TYPE_WORKFLOW')),
+    ).toBeUndefined();
+  });
+
+  it('ignores links missing the request ID or namespace', () => {
+    expect(
+      workerCallbackSource(
+        link('EXECUTION_TYPE_NEXUS_OPERATION', { requestId: '' }),
+      ),
+    ).toBeUndefined();
+    expect(
+      workerCallbackSource(
+        link('EXECUTION_TYPE_NEXUS_OPERATION', { namespace: undefined }),
+      ),
+    ).toBeUndefined();
+  });
+
+  it('ignores links that are not callback links', () => {
+    expect(workerCallbackSource(undefined)).toBeUndefined();
+    expect(
+      workerCallbackSource({ workflowEvent: {} } as unknown as EventLink),
+    ).toBeUndefined();
+  });
+});
+
+describe('findSourceCallback', () => {
+  const sourceCallback = (requestId: string) =>
+    ({ requestId, state: 'Succeeded' }) as unknown as Callback;
+
+  it('finds the source callback with the link request ID', () => {
+    const match = sourceCallback('request-2');
+
+    expect(
+      findSourceCallback(
+        [sourceCallback('request-1'), match, sourceCallback('request-3')],
+        'request-2',
+      ),
+    ).toBe(match);
+  });
+
+  it('returns nothing when no callback has the request ID', () => {
+    expect(
+      findSourceCallback([sourceCallback('request-1')], 'request-2'),
+    ).toBeUndefined();
   });
 });

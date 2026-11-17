@@ -1,4 +1,5 @@
 import { translate } from '$lib/i18n/translate';
+import type { EventLink } from '$lib/types';
 import type { Callback } from '$lib/types/nexus';
 
 export type CallbackBannerKind = 'none' | 'single' | 'summary';
@@ -68,3 +69,42 @@ export const callbackStateCounts = (
     count: callbacks.filter((callback) => String(callback.state) === state)
       .length,
   }));
+
+export type WorkerCallbackSource = {
+  namespace: string;
+  operationId: string;
+  runId: string;
+  requestId: string;
+};
+
+const isPresent = (value: string | null | undefined): value is string =>
+  typeof value === 'string' && value.length > 0;
+
+export const workerCallbackSource = (
+  link: EventLink | undefined,
+): WorkerCallbackSource | undefined => {
+  const callback = link?.callback;
+  const namespace = callback?.namespace;
+  const operationId = callback?.execution?.businessId;
+  const runId = callback?.execution?.runId;
+  const requestId = callback?.requestId;
+  if (String(callback?.execution?.type) !== 'EXECUTION_TYPE_NEXUS_OPERATION') {
+    return undefined;
+  }
+  if (
+    !isPresent(namespace) ||
+    !isPresent(operationId) ||
+    !isPresent(runId) ||
+    !isPresent(requestId)
+  ) {
+    return undefined;
+  }
+
+  return { namespace, operationId, runId, requestId };
+};
+
+export const findSourceCallback = (
+  callbacks: Callback[],
+  requestId: string,
+): Callback | undefined =>
+  callbacks.find((callback) => callback.requestId === requestId);

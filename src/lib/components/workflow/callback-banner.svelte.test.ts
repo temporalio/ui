@@ -1,12 +1,33 @@
-import { mount, unmount } from 'svelte';
-import { afterEach, describe, expect, it } from 'vitest';
+import { flushSync, mount, unmount } from 'svelte';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { page } from '$app/state';
 
+import { getNexusOperationExecution } from '$lib/services/standalone-nexus-operations';
 import type { EventLink } from '$lib/types';
 import type { Callback } from '$lib/types/nexus';
+import type { NexusOperationExecution } from '$lib/types/nexus-operation-execution';
 
 import CallbackBanner from './callback-banner.svelte';
+
+vi.mock('$lib/services/standalone-nexus-operations', () => ({
+  getNexusOperationExecution: vi.fn(),
+}));
+
+const describeSource = vi.mocked(getNexusOperationExecution);
+
+const sourceExecution = (completionCallbacks: Callback[]) =>
+  ({ completionCallbacks }) as unknown as NexusOperationExecution;
+
+const settle = async () => {
+  await new Promise((resolve) => setTimeout(resolve));
+  flushSync();
+};
+
+beforeEach(() => {
+  describeSource.mockReset();
+  describeSource.mockResolvedValue(sourceExecution([]));
+});
 
 const workflowLink = {
   workflow: {
@@ -108,6 +129,72 @@ describe('CallbackBanner', () => {
     expect(target.textContent).toContain('Callback');
     expect(link?.getAttribute('href')).toContain('requestId=request-1');
     expect(target.textContent).toContain('source-ns');
+  });
+
+  it('shows the matched source callback state for a single worker callback', async () => {
+    describeSource.mockResolvedValue(
+      sourceExecution([
+        { requestId: 'request-0', state: 'Failed' } as unknown as Callback,
+        {
+          requestId: 'request-1',
+          state: 'Succeeded',
+          attempt: 3,
+          lastAttemptCompleteTime: '2026-11-16T12:00:00Z',
+        } as unknown as Callback,
+      ]),
+    );
+    const target = mountBanner({ workerCallbackLinks: [workerCallbackLink] });
+    await settle();
+
+    const text = target.textContent ?? '';
+    expect(describeSource).toHaveBeenCalledOnce();
+    expect(describeSource).toHaveBeenCalledWith(
+      'source-ns',
+      'source-op',
+      'source-run',
+      false,
+    );
+    expect(text).toContain('Callback has succeeded.');
+    expect(text).toContain('Success');
+    expect(text).toContain('Attempt');
+    expect(text).toContain('3');
+    expect(text).toContain('Last Attempt Completed Time');
+    expect(text).toContain('Callback Link');
+    expect(text).toContain('source-ns');
+  });
+
+  it('keeps the link and caller namespace only when no source callback matches', async () => {
+    describeSource.mockResolvedValue(
+      sourceExecution([
+        { requestId: 'other-request', state: 'Failed' } as unknown as Callback,
+      ]),
+    );
+    const target = mountBanner({ workerCallbackLinks: [workerCallbackLink] });
+    await settle();
+
+    const text = target.textContent ?? '';
+    expect(text).toContain('Callback Link');
+    expect(text).toContain('source-ns');
+    expect(text).not.toContain('Callback has failed.');
+    expect(text).not.toContain('Attempt');
+  });
+
+  it('keeps the link and caller namespace only when the source describe fails', async () => {
+    describeSource.mockRejectedValue(new Error('not found'));
+    const target = mountBanner({ workerCallbackLinks: [workerCallbackLink] });
+    await settle();
+
+    const text = target.textContent ?? '';
+    expect(text).toContain('Callback Link');
+    expect(text).toContain('source-ns');
+    expect(text).not.toContain('Attempt');
+  });
+
+  it('does not describe a source operation for an own callback', async () => {
+    mountBanner({ callbacks: [makeCallback('Succeeded', [workflowLink])] });
+    await settle();
+
+    expect(describeSource).not.toHaveBeenCalled();
   });
 
   it('shows every state count in the summary, including zeros', () => {
