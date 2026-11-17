@@ -55,6 +55,40 @@ export const getLargestDurationUnit = (
 
 const isDatetimeStatement = is(SEARCH_ATTRIBUTE_TYPE.DATETIME);
 const isBoolStatement = is(SEARCH_ATTRIBUTE_TYPE.BOOL);
+const isNot = is('not');
+
+const extractNegations = (
+  tokens: Tokens,
+  attributes: SearchAttributes,
+): { tokens: Tokens; negatedIndexes: Set<number> } => {
+  const remainingTokens: Tokens = [];
+  const negatedIndexes = new Set<number>();
+  let negateNextToken = false;
+
+  tokens.forEach((token, index) => {
+    const previousToken = tokens[index - 1];
+    const nextToken = getOneAhead(tokens, index);
+
+    if (isNot(token) && attributes[nextToken]) {
+      negateNextToken = true;
+      return;
+    }
+
+    if (isNot(token) && attributes[previousToken] && isConditional(nextToken)) {
+      negatedIndexes.add(remainingTokens.length - 1);
+      return;
+    }
+
+    if (negateNextToken) {
+      negatedIndexes.add(remainingTokens.length);
+      negateNextToken = false;
+    }
+
+    remainingTokens.push(token);
+  });
+
+  return { tokens: remainingTokens, negatedIndexes };
+};
 
 const defaultFilter: SearchAttributeFilter = {
   id: '',
@@ -87,7 +121,10 @@ export const toListWorkflowFilters = (
   query: string,
   attributes: SearchAttributes = DefaultAttributes,
 ): SearchAttributeFilter[] => {
-  const tokens = tokenize(query);
+  const { tokens, negatedIndexes } = extractNegations(
+    tokenize(query),
+    attributes,
+  );
   const filters: SearchAttributeFilter[] = [];
   let filter = createFilter();
 
@@ -103,6 +140,10 @@ export const toListWorkflowFilters = (
       if (attributes[token]) {
         filter.attribute = token;
         filter.type = attributes[token];
+
+        if (negatedIndexes.has(index)) {
+          filter.negated = true;
+        }
 
         if (isNullConditional(nextToken)) {
           const combinedTokens = `${nextToken} ${tokenTwoAhead}`;

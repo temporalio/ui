@@ -56,10 +56,7 @@ const formatValue = ({
   if (type === SEARCH_ATTRIBUTE_TYPE.BOOL) {
     return value.toLowerCase() === 'true' ? true : false;
   }
-  if (
-    type === SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST &&
-    isInConditional(conditional)
-  ) {
+  if (isInConditional(conditional)) {
     return value;
   }
   if (
@@ -86,6 +83,7 @@ const toFilterQueryStatement = (
   conditional = '=',
   archived: boolean,
   customDate: boolean,
+  negated: boolean,
 ): string => {
   const queryKey = getQueryKey(attribute);
 
@@ -116,11 +114,13 @@ const toFilterQueryStatement = (
   }
 
   if (isStartsWith(conditional)) {
-    return `\`${queryKey}\` ${conditional} ${formatValue({
-      value,
-      type,
-      conditional,
-    })}`;
+    return `\`${queryKey}\` ${negated ? 'NOT ' : ''}${conditional} ${formatValue(
+      {
+        value,
+        type,
+        conditional,
+      },
+    )}`;
   }
 
   return `\`${queryKey}\`${conditional}${formatValue({
@@ -144,6 +144,7 @@ const toQueryStatementsFromFilters = (
         operator,
         parenthesis,
         customDate,
+        negated,
       }) => {
         if (isValidFilterValue(value, conditional)) {
           let statement = toFilterQueryStatement(
@@ -153,7 +154,11 @@ const toQueryStatementsFromFilters = (
             conditional,
             archived,
             customDate ?? false,
+            negated ?? false,
           );
+          if (negated && statement && !isStartsWith(conditional)) {
+            statement = `NOT ${statement}`;
+          }
           if (parenthesis === '(') {
             statement = `(${statement}`;
           } else if (parenthesis === ')') {

@@ -42,6 +42,11 @@
   );
 
   function getDisplayKeyWithConditional(filter: SearchAttributeFilter): string {
+    const displayKey = getDisplayKey(filter);
+    return filter.negated ? `NOT ${displayKey}` : displayKey;
+  }
+
+  function getDisplayKey(filter: SearchAttributeFilter): string {
     const { attribute, conditional } = filter;
 
     if (isDateTimeFilter(filter)) {

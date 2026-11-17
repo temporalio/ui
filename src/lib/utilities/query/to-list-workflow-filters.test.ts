@@ -36,6 +36,11 @@ const isNotEmptyQuery = '`StartTime` IS NOT NULL';
 const keywordListQuery = '`CustomKeywordListField`in("Hello", "World")';
 const keywordListNotInQuery =
   '`CustomKeywordListField`not in("Hello", "World")';
+const notStartsWithQuery = '`WorkflowId` NOT STARTS_WITH "abc"';
+const multipleNotStartsWithQuery =
+  '`WorkflowType`="Deploy" AND `WorkflowId` NOT STARTS_WITH "first_" AND `WorkflowId` NOT STARTS_WITH "second_"';
+const prefixNotInQuery =
+  '`WorkflowId`="temporal.canary.cron" AND NOT `ExecutionStatus` IN ("Terminated", "Canceled")';
 
 const attributes = {
   CloseTime: 'Datetime',
@@ -635,6 +640,111 @@ describe('toListWorkflowFilters', () => {
       attributes,
     );
     expect(spy).toHaveBeenCalled();
+  });
+
+  it('should parse a query with NOT STARTS_WITH as a negated filter', () => {
+    const result = toListWorkflowFilters(notStartsWithQuery, attributes);
+    const expectedFilters = [
+      {
+        attribute: 'WorkflowId',
+        type: 'Keyword',
+        conditional: 'STARTS_WITH',
+        operator: '',
+        parenthesis: '',
+        value: 'abc',
+        negated: true,
+      },
+    ];
+    expect(result).toMatchObject(expectedFilters);
+  });
+
+  it('should parse multiple NOT STARTS_WITH filters joined by AND', () => {
+    const result = toListWorkflowFilters(
+      multipleNotStartsWithQuery,
+      attributes,
+    );
+    const expectedFilters = [
+      {
+        attribute: 'WorkflowType',
+        conditional: '=',
+        operator: 'AND',
+        value: 'Deploy',
+      },
+      {
+        attribute: 'WorkflowId',
+        conditional: 'STARTS_WITH',
+        operator: 'AND',
+        value: 'first_',
+        negated: true,
+      },
+      {
+        attribute: 'WorkflowId',
+        conditional: 'STARTS_WITH',
+        operator: '',
+        value: 'second_',
+        negated: true,
+      },
+    ];
+    expect(result).toMatchObject(expectedFilters);
+    expect(result[0].negated).toBeUndefined();
+  });
+
+  it('should parse a NOT before a backticked attribute as a negated filter', () => {
+    const result = toListWorkflowFilters(prefixNotInQuery, attributes);
+    const expectedFilters = [
+      {
+        attribute: 'WorkflowId',
+        conditional: '=',
+        operator: 'AND',
+        value: 'temporal.canary.cron',
+      },
+      {
+        attribute: 'ExecutionStatus',
+        type: 'Keyword',
+        conditional: 'IN',
+        operator: '',
+        value: '("Terminated", "Canceled")',
+        negated: true,
+      },
+    ];
+    expect(result).toMatchObject(expectedFilters);
+    expect(result[0].negated).toBeUndefined();
+  });
+
+  it('should parse a NOT before an attribute without backticks', () => {
+    const result = toListWorkflowFilters(
+      'not WorkflowType = "World"',
+      attributes,
+    );
+    const expectedFilters = [
+      {
+        attribute: 'WorkflowType',
+        conditional: '=',
+        value: 'World',
+        negated: true,
+      },
+    ];
+    expect(result).toMatchObject(expectedFilters);
+  });
+
+  it('should not negate IS NOT NULL or NOT IN filters', () => {
+    const result = toListWorkflowFilters(
+      `${isNotEmptyQuery} AND ${keywordListNotInQuery}`,
+      attributes,
+    );
+    const expectedFilters = [
+      { attribute: 'StartTime', conditional: 'IS NOT', value: null },
+      {
+        attribute: 'CustomKeywordListField',
+        conditional: 'not in',
+        value: '("Hello", "World")',
+      },
+    ];
+    expect(result).toMatchObject(expectedFilters);
+    expect(result.map((filter) => filter.negated)).toEqual([
+      undefined,
+      undefined,
+    ]);
   });
 });
 

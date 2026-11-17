@@ -199,4 +199,40 @@ describe('tokenize', () => {
 
     expect(tokenize(query)).toEqual(['WorkflowType', 'STARTS_WITH', 'Joiner']);
   });
+
+  it('should tokenize a NOT STARTS_WITH query', () => {
+    const query = '`WorkflowId` NOT STARTS_WITH "abc"';
+
+    expect(tokenize(query)).toEqual([
+      'WorkflowId',
+      'NOT',
+      'STARTS_WITH',
+      'abc',
+    ]);
+  });
+
+  it('should tokenize a backticked attribute after a NOT', () => {
+    const query =
+      '`WorkflowId`="abc" AND NOT `ExecutionStatus` IN ("Terminated", "Canceled")';
+
+    expect(tokenize(query)).toEqual([
+      'WorkflowId',
+      '=',
+      'abc',
+      'AND',
+      'NOT',
+      'ExecutionStatus',
+      'IN',
+      '("Terminated", "Canceled")',
+    ]);
+  });
+
+  it('should not tokenize "not in" at the start of an attribute name', () => {
+    expect(tokenize('NOT InvoiceId = 1')).toEqual([
+      'NOT',
+      'InvoiceId',
+      '=',
+      '1',
+    ]);
+  });
 });

@@ -15,6 +15,9 @@ const OPERATOR_CONDITIONALS = new Set(['>=', '<=', '!=', '==']);
 const isOperatorConditional = (value: string): boolean =>
   OPERATOR_CONDITIONALS.has(value);
 
+const isNot = (value: unknown): boolean =>
+  typeof value === 'string' && value.toLowerCase() === 'not';
+
 export const tokenize = (string: string): Tokens => {
   const tokens: Tokens = [];
   const addBufferToTokens = (): void => {
@@ -52,7 +55,8 @@ export const tokenize = (string: string): Tokens => {
       const isPotentialStartofAttribute =
         cursor === 0 ||
         (isSpace(string[cursor - 1]) &&
-          isOperator(tokens[tokens.length - 1])) ||
+          (isOperator(tokens[tokens.length - 1]) ||
+            isNot(tokens[tokens.length - 1]))) ||
         isParenthesis(string[cursor - 1]);
       const hasClosingBacktick = string.slice(cursor + 1).includes(character);
 
@@ -81,7 +85,13 @@ export const tokenize = (string: string): Tokens => {
     const midConditional = string.slice(cursor, cursor + 3);
     const maxConditional = string.slice(cursor, cursor + 6);
 
-    if (isConditional(maxConditional)) {
+    if (
+      isConditional(maxConditional) &&
+      (cursor + 6 >= string.length ||
+        isSpace(string[cursor + 6]) ||
+        isQuote(string[cursor + 6]) ||
+        isParenthesis(string[cursor + 6]))
+    ) {
       buffer += maxConditional;
       addBufferToTokens();
       cursor += 6;

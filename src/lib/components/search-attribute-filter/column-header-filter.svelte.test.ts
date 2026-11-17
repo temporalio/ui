@@ -136,6 +136,34 @@ describe('ColumnHeaderFilter', () => {
     expect(byTestId('remove-filter-button')).toBeNull();
   });
 
+  it('leaves a negated filter on the column untouched', () => {
+    const negated = createFilter({ ...workflowType(), negated: true });
+    const { button, open } = mountFilter({ filters: [negated] });
+
+    expect(button.dataset.filtered).toBe('false');
+
+    open();
+
+    expect(byTestId('remove-filter-button')).toBeNull();
+  });
+
+  it('leaves a NOT IN status filter out of the status editor', () => {
+    const notIn = createFilter({
+      id: 'not-in',
+      attribute: 'ExecutionStatus',
+      type: 'Keyword',
+      value: '("Terminated", "Canceled")',
+      conditional: 'NOT IN',
+    });
+    const { button } = mountFilter({
+      attribute: 'ExecutionStatus',
+      filters: [notIn],
+      statusFilter: workflowStatusFilter,
+    });
+
+    expect(button.dataset.filtered).toBe('false');
+  });
+
   it('removes the column filter and closes the menu', () => {
     const other = createFilter({
       id: 'wid',
