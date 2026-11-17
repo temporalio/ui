@@ -7,6 +7,17 @@ import type { JsonObject, JsonSchema, JsonValue } from './types';
  */
 export const catalogSharedStartOptionsSchema = {
   details: { type: 'string' },
+  retryPolicy: {
+    type: 'object',
+    properties: {
+      initialInterval: { type: 'string' },
+      backoffCoefficient: { type: 'number', minimum: 1 },
+      maximumInterval: { type: 'string' },
+      maximumAttempts: { type: 'integer', minimum: 0 },
+      nonRetryableErrorTypes: { type: 'array', items: { type: 'string' } },
+    },
+    additionalProperties: false,
+  },
   searchAttributes: { type: 'object' },
   summary: { type: 'string' },
   workflowStartDelay: { type: 'string' },

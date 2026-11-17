@@ -4,6 +4,7 @@ export * from './examples/activity-retry/workflow.js';
 export * from './examples/activity-timeout/workflow.js';
 export * from './examples/child-fan-out/workflow.js';
 export * from './examples/child-workflows/workflow.js';
+export * from './examples/execution-chain/workflow.js';
 export * from './examples/hello/workflow.js';
 export * from './examples/high-event-count/workflow.js';
 export * from './examples/large-history/workflow.js';

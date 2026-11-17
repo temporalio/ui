@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { createCatalogSessionStore } from './session-store';
 import { startFromEditors, startWithDefaults } from './start-example';
+import { withSharedCatalogStartOptions } from './start-options';
 import type { BrowserCatalogDescriptor, JsonSchema, JsonValue } from './types';
 import type { ReadinessCheck, WorkbenchHost } from './workbench-host';
 
@@ -294,5 +295,65 @@ describe('catalog example start', () => {
       ),
     ).resolves.toEqual({ error: 'invalid-schema' });
     expect(catalogHost.start).not.toHaveBeenCalled();
+  });
+
+  describe('workflow retry policy', () => {
+    const workflowDescriptor = structuredClone(descriptor);
+    workflowDescriptor.startOptions.schema = withSharedCatalogStartOptions(
+      descriptor.startOptions.schema,
+    );
+
+    it('sends a retry policy', async () => {
+      const catalogHost = host();
+
+      await expect(
+        run(catalogHost, workflowDescriptor, descriptor.input.defaultValue, {
+          retryPolicy: { maximumAttempts: 2, initialInterval: '1s' },
+        }),
+      ).resolves.toEqual({ started: true });
+      expect(catalogHost.start).toHaveBeenCalledWith(
+        expect.objectContaining({
+          startOptions: {
+            retryPolicy: { maximumAttempts: 2, initialInterval: '1s' },
+          },
+        }),
+        expect.any(AbortSignal),
+      );
+    });
+
+    it('drops an empty retry policy', async () => {
+      const catalogHost = host();
+
+      await run(
+        catalogHost,
+        workflowDescriptor,
+        descriptor.input.defaultValue,
+        {
+          retryPolicy: {},
+        },
+      );
+
+      expect(catalogHost.start).toHaveBeenCalledWith(
+        expect.objectContaining({ startOptions: {} }),
+        expect.any(AbortSignal),
+      );
+    });
+
+    it.each([
+      ['an unknown field', { retryPolicy: { attempts: 2 } }],
+      ['negative maximum attempts', { retryPolicy: { maximumAttempts: -1 } }],
+    ])('rejects %s', async (_name, startOptions) => {
+      const catalogHost = host();
+
+      await expect(
+        run(
+          catalogHost,
+          workflowDescriptor,
+          descriptor.input.defaultValue,
+          startOptions,
+        ),
+      ).resolves.toEqual({ error: 'unsupported-start-options' });
+      expect(catalogHost.start).not.toHaveBeenCalled();
+    });
   });
 });
