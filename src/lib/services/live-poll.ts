@@ -29,6 +29,8 @@ export type LivePollOptions = {
   backoffMs?: number;
   /** ms to wait after a retryable error before retrying. Default 5000. */
   errorBackoffMs?: number;
+  /** Return false to reject on a retryable error instead of retrying it. */
+  shouldRetryError?: () => boolean;
 };
 
 const handlePollError: ErrorCallback = (error) => {
@@ -52,7 +54,8 @@ const isRetryableError = (error: unknown): boolean => {
  *     continue immediately.
  *   - nextPageToken absent, no new events (timeout) → reset token; back off
  *     2 s before retrying so we don't spin on an idle workflow.
- *   - Network failure, 408, 429 or 5xx → back off 5 s and retry.
+ *   - Network failure, 408, 429 or 5xx → back off 5 s and retry, unless
+ *     `shouldRetryError` returns false.
  *   - Any other error response → reject so the caller can surface it.
  *
  * The loop exits cleanly when `signal` is aborted or once it receives the
@@ -69,6 +72,7 @@ export async function runLivePoll({
   maximumPageSize,
   backoffMs = 2000,
   errorBackoffMs = 5000,
+  shouldRetryError = () => true,
 }: LivePollOptions): Promise<void> {
   const wait = (delay: number): Promise<void> => {
     if (signal.aborted) return Promise.resolve();
@@ -105,7 +109,7 @@ export async function runLivePoll({
       );
     } catch (error) {
       if (signal.aborted) break;
-      if (!isRetryableError(error)) throw error;
+      if (!isRetryableError(error) || !shouldRetryError()) throw error;
       await wait(errorBackoffMs);
       continue;
     }

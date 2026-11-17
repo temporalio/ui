@@ -447,12 +447,12 @@ describe('WorkflowHistoryController', () => {
       expect(first.controller.error).toBeNull();
       expect(second.controller.error?.message).toBe('history failed');
       expect(poll(0).options.signal.aborted).toBe(false);
-      expect(poll(1).options.signal.aborted).toBe(false);
+      expect(poll(1).options.signal.aborted).toBe(true);
       expect(poll(1).options.runId).toBe('run-2');
     });
 
-    it('keeps polling, token updates, and close detection alive after the tail fails', async () => {
-      const { controller, buffer } = createController();
+    it('stops polling and keeps the error after the tail fails', async () => {
+      const { controller } = createController();
       const load = controller.load(workflow('run-1', true));
       const failure = new Error('history failed');
       tail(0).result.reject(failure);
@@ -460,21 +460,25 @@ describe('WorkflowHistoryController', () => {
 
       expect(controller.loading).toBe(false);
       expect(controller.fetchComplete).toBe(false);
-      expect(tail(0).options.signal?.aborted).toBe(true);
-      expect(poll(0).options.signal.aborted).toBe(false);
-      pollEvents(0, [1], 'healthy-token');
-      expect(controller.latestEventId).toBe(1);
       expect(controller.error).toBe(failure);
-      expect(poll(0).options.onEvent(makeWorkflowCompleted(10))).toBe(true);
+      expect(tail(0).options.signal?.aborted).toBe(true);
       expect(poll(0).options.signal.aborted).toBe(true);
       poll(0).result.resolve();
       await settle();
+      controller.updateWorkflow(workflow('run-1', true));
       expect(polls).toHaveLength(1);
-      expect(buffer.getEventArray().map((event) => event.id)).toEqual([
-        '1',
-        '10',
-      ]);
-      expect(controller.fetchComplete).toBe(false);
+    });
+
+    it('rejects retryable poll errors only while catching up', async () => {
+      const { controller } = createController();
+      const load = controller.load(workflow('run-1', true));
+      expect(poll(0).options.shouldRetryError?.()).toBe(false);
+      tail(0).result.resolve(tailEvents([2, 3]));
+      pollEvents(0, [1]);
+      await load;
+
+      expect(controller.fetchComplete).toBe(true);
+      expect(poll(0).options.shouldRetryError?.()).toBe(true);
     });
 
     it('surfaces poll errors during catch-up without restarting polling', async () => {

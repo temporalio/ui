@@ -615,6 +615,24 @@ describe('runLivePoll — request errors', () => {
 
     expect(requestFromAPI).toHaveBeenCalledTimes(2);
   });
+
+  it('rejects a retryable error when shouldRetryError returns false', async () => {
+    const error = networkError(503);
+    requestFromAPI.mockRejectedValueOnce(error);
+
+    await expect(
+      runLivePoll({
+        route: '/api/events',
+        runId: 'run-1',
+        startToken: '',
+        signal: new AbortController().signal,
+        onEvent: vi.fn(),
+        shouldRetryError: () => false,
+        ...FAST,
+      }),
+    ).rejects.toBe(error);
+    expect(requestFromAPI).toHaveBeenCalledTimes(1);
+  });
 });
 
 // ---------------------------------------------------------------------------

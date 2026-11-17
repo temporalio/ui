@@ -251,8 +251,9 @@ export class WorkflowHistoryController {
           ? error
           : new Error(getErrorMessage(error));
       session.controller.abort();
+      session.livePollFailed = true;
+      session.livePollController?.abort();
       this.endCatchUp(session);
-      this.syncLivePoll(session);
     }
   }
 
@@ -391,6 +392,7 @@ export class WorkflowHistoryController {
       startToken: session.lastPollToken,
       maximumPageSize: this.maximumPageSize,
       signal: controller.signal,
+      shouldRetryError: () => !session.catchingUp,
       onEvent: (event) => {
         if (controller.signal.aborted) return false;
         const isNew = this.ingestEvent(event, session);
