@@ -1339,6 +1339,18 @@ describe('WorkflowExecutionChain', () => {
     const detachedRunIds = (chain: WorkflowExecutionChain) =>
       chain.detachedRuns.map((run) => run.runId);
 
+    const holdNextDescribe = () => {
+      const describe = server.describe.getMockImplementation()!;
+      let release!: () => void;
+      server.describe.mockImplementationOnce(async (parameters, signal) => {
+        await new Promise<void>((resolve) => {
+          release = resolve;
+        });
+        return describe(parameters, signal);
+      });
+      return () => release();
+    };
+
     it('detaches a requested Run the first walk misses', async () => {
       server.addChain(runIds(15));
       const chain = await loadWithRequest('run-2');
@@ -1417,6 +1429,68 @@ describe('WorkflowExecutionChain', () => {
       expect(chain.detachedOffPath).toBe(true);
       expect(server.describe.mock.calls.length).toBe(describes);
     });
+
+    it('moves shared ancestry into the window and keeps the off-path Run detached', async () => {
+      server.addChain(runIds(15));
+      addBranch('run-3', undefined);
+      const chain = await loadWithRequest('branch');
+      await chain.loadDetachedPredecessor();
+      await chain.loadDetachedPredecessor();
+      expect(detachedRunIds(chain)).toEqual(['run-2', 'run-3', 'branch']);
+
+      await chain.loadOlder();
+      await settle();
+
+      expect(chainRunIds(chain)).toEqual(runIds(15));
+      expect(detachedRunIds(chain)).toEqual(['branch']);
+      expect(chain.detachedOffPath).toBe(true);
+      expect(chain.boundary).toBe('chainStart');
+      expect(server.describeCalls('run-3')).toBe(1);
+    });
+
+    it('keeps the window boundary the shared ancestry reached', async () => {
+      server.addChain(runIds(15));
+      server.runs.delete('run-2');
+      addBranch('run-3', undefined);
+      const chain = await loadWithRequest('branch');
+      await chain.loadDetachedPredecessor();
+      await chain.loadDetachedPredecessor();
+      expect(chain.detachedBoundary).toBe('retention');
+
+      await chain.loadOlder();
+      await settle();
+
+      expect(chainRunIds(chain)).toEqual(runIds(15).slice(2));
+      expect(chain.boundary).toBe('retention');
+      expect(detachedRunIds(chain)).toEqual(['branch']);
+      expect(chain.detachedBoundary).toBeNull();
+    });
+
+    it.each([
+      ['‹', 'the window walk'],
+      ['the window walk', '‹'],
+    ])(
+      'keeps a shared ancestor unique when %s fetches it before %s',
+      async (first) => {
+        server.addChain(runIds(15));
+        addBranch('run-5', undefined);
+        const chain = await loadWithRequest('branch');
+        const releaseHop = holdNextDescribe();
+
+        const walks =
+          first === '‹'
+            ? [chain.loadDetachedPredecessor(), chain.loadOlder()]
+            : [chain.loadOlder(), chain.loadDetachedPredecessor()];
+        releaseHop();
+        await settle();
+        await Promise.all(walks);
+
+        expect(chainRunIds(chain)).toEqual(runIds(15));
+        expect(detachedRunIds(chain)).toEqual(['branch']);
+        expect(chain.detachedOffPath).toBe(true);
+        expect(server.describeCalls('run-5')).toBe(1);
+      },
+    );
 
     it('is off-path once the window walk loads a Run that started before it', async () => {
       server.addChain(runIds(15));
@@ -1573,18 +1647,6 @@ describe('WorkflowExecutionChain', () => {
       expect(chain.detachedWalking).toBe(false);
       expect(detachedRunIds(chain)).toEqual(['run-5']);
     });
-
-    const holdNextDescribe = () => {
-      const describe = server.describe.getMockImplementation()!;
-      let release!: () => void;
-      server.describe.mockImplementationOnce(async (parameters, signal) => {
-        await new Promise<void>((resolve) => {
-          release = resolve;
-        });
-        return describe(parameters, signal);
-      });
-      return () => release();
-    };
 
     it('ignores a request that resolves after another Run was pinned', async () => {
       server.addChain(runIds(15));
