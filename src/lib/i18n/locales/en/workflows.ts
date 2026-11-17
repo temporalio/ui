@@ -175,6 +175,27 @@ export const Strings = {
   'workflow-404-title': 'This is not the Workflow you are looking for',
   'workflow-error-title':
     'We are having technical difficulties retrieving this Workflow',
+  'workflow-chain-404-title':
+    'This is not the workflow execution chain you are looking for',
+  'workflow-chain-error-title':
+    'We are having technical difficulties retrieving this workflow execution chain',
+  'all-workflows': 'All Workflows',
+  'chain-of-executions': 'Chain of Executions',
+  chain: 'Chain',
+  'chain-start': 'Chain Start',
+  'chain-duration': 'Chain Duration',
+  'first-run': 'First run',
+  'latest-run': 'Latest run',
+  'chain-start-past-retention': 'Unknown (past retention)',
+  'run-past-retention': '{{runId}} (past retention)',
+  'older-chain-title': 'This is an older workflow execution chain',
+  'older-chain-description':
+    'This Workflow ID was reused, so this chain is an older one.',
+  'view-newer-chain': 'View the newer chain',
+  'chain-not-visible-title': 'Workflow execution chain not found',
+  'chain-not-visible-description':
+    'No workflow execution chain starting at {{firstRunId}} is visible for this Workflow ID; it may be past retention.',
+  'view-current-chain': 'View the current chain',
   'workflow-error-no-workers-title': 'No workers polling',
   'workflow-error-no-workers-description':
     'There are no workers polling the {{taskQueue}} task queue.',
