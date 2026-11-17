@@ -16,7 +16,7 @@ type LogFields = {
   exampleId: string;
   attemptId: string;
   executionId: string;
-  targetId: string;
+  workspaceId: string;
   namespace: string;
   taskQueue: string;
   runId?: string;
@@ -58,7 +58,7 @@ const launchFields = (reference: LaunchLogReference) => ({
   exampleId: reference.exampleId,
   attemptId: reference.attempt.attemptId,
   executionId: reference.attempt.executionId,
-  targetId: reference.target.targetId,
+  workspaceId: reference.target.workspaceId,
   namespace: reference.target.namespace,
   taskQueue: reference.target.taskQueue,
   ...(reference.runId === undefined ? {} : { runId: reference.runId }),

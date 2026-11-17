@@ -1,3 +1,8 @@
+import type {
+  CatalogScenario,
+  CatalogWorkspaceMetadata,
+} from './metadata-schema';
+
 export type JsonValue =
   | boolean
   | null
@@ -24,21 +29,22 @@ export type BrowserCatalogMetadata = {
   input: RuntimeJsonDocument;
   startOptions: RuntimeJsonDocument;
   setupMarkdown?: string;
+  scenarios?: CatalogScenario[];
 };
 
-export type BrowserExecutionTarget = {
-  targetId: string;
+export type BrowserExecutionWorkspace = {
+  workspaceId: string;
   namespace: string;
   taskQueue: string;
 };
 
-export type BrowserWorkflowExecution = BrowserExecutionTarget & {
+export type BrowserWorkflowExecution = BrowserExecutionWorkspace & {
   kind: 'workflow';
   workflowType: string;
   nexusEndpoints?: string[];
 };
 
-export type BrowserStandaloneActivityExecution = BrowserExecutionTarget & {
+export type BrowserStandaloneActivityExecution = BrowserExecutionWorkspace & {
   kind: 'standalone-activity';
   activityType: string;
   timeouts: JsonObject;
@@ -46,7 +52,7 @@ export type BrowserStandaloneActivityExecution = BrowserExecutionTarget & {
 };
 
 export type BrowserStandaloneNexusOperationExecution =
-  BrowserExecutionTarget & {
+  BrowserExecutionWorkspace & {
     kind: 'standalone-nexus-operation';
     endpoint: string;
     service: string;
@@ -69,7 +75,12 @@ export type BrowserCatalogDescriptor = BrowserCatalogMetadata & {
   execution: BrowserCatalogExecution;
 };
 
+export type BrowserCatalogWorkspace = CatalogWorkspaceMetadata & {
+  id: string;
+};
+
 export type BrowserCatalogArtifact = {
   sourceHash: string;
+  workspaces: BrowserCatalogWorkspace[];
   descriptors: BrowserCatalogDescriptor[];
 };

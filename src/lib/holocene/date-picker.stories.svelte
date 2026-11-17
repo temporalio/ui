@@ -7,7 +7,7 @@
   import DatePicker from '$lib/holocene/date-picker.svelte';
 
   const { Story } = defineMeta({
-    title: 'Date Picker',
+    title: 'Holocene/Components/Date Picker',
     component: DatePicker,
     args: {
       label: 'Pick a Date',

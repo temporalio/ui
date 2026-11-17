@@ -5,7 +5,7 @@
   import { onMount } from 'svelte';
 
   import Timestamp from '$lib/components/timestamp.svelte';
-  import type { ButtonStyles } from '$lib/holocene/button.svelte';
+  import type { ButtonSize } from '$lib/holocene/button.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import {
     Menu,
@@ -40,7 +40,7 @@
 
   interface Props {
     position?: 'left' | 'right';
-    size?: ButtonStyles['size'];
+    size?: ButtonSize;
   }
 
   let { position = 'right', size = 'md' }: Props = $props();

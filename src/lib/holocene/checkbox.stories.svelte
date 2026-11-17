@@ -7,7 +7,7 @@
   import Checkbox from '$lib/holocene/checkbox.svelte';
 
   const { Story } = defineMeta({
-    title: 'Checkbox',
+    title: 'Holocene/Components/Checkbox',
     component: Checkbox,
     args: {
       label: 'Check Me',

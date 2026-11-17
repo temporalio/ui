@@ -1,10 +1,15 @@
 <script lang="ts" module>
+  import type { ButtonSize } from '$lib/holocene/button.svelte';
+
   export const MENU_CONTEXT = 'menu-context';
+
+  export const FALLBACK_MENU_SIZE: ButtonSize = 'sm';
 
   export type MenuContext = {
     open: Writable<boolean>;
     keepOpen: Writable<boolean>;
     menuElement: Writable<HTMLUListElement | null>;
+    size?: Writable<ButtonSize>;
   };
 </script>
 
@@ -37,6 +42,7 @@
 
   const keepOpen = writable(false);
   const menuElement: Writable<HTMLUListElement | null> = writable(null);
+  const size: Writable<ButtonSize> = writable(FALLBACK_MENU_SIZE);
 
   const closeMenu = (event?: MouseEvent) => {
     if (event?.target instanceof Node && $menuElement?.contains(event.target))
@@ -52,6 +58,7 @@
     open: open,
     keepOpen: keepOpen,
     menuElement: menuElement,
+    size,
   });
 </script>
 

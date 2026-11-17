@@ -6,7 +6,7 @@
   import Chip from '$lib/holocene/chip.svelte';
 
   const { Story } = defineMeta({
-    title: 'Chip',
+    title: 'Holocene/Components/Chip',
     component: Chip,
     args: {
       intent: 'default',

@@ -8,8 +8,10 @@
   import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { isCloud } from '$lib/stores/advanced-visibility';
+  import { workflowRun } from '$lib/stores/workflow-run';
   import type { PendingActivity } from '$lib/types/events';
   import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
+  import { getWorkflowCurrentTime } from '$lib/utilities/workflow-time-skipping';
 
   import { eventTypeStyle } from './event-styles';
   import { CategoryIcon } from '../lines-and-dots/constants';
@@ -109,6 +111,7 @@
     <div class="flex items-center gap-1">
       <PendingAttemptBadge
         attempt={event.attempt ?? 0}
+        now={getWorkflowCurrentTime($workflowRun?.workflow)}
         maximumAttempts={event.maximumAttempts ?? null}
         paused={Boolean(event.paused)}
         nextRetryTime={event.scheduledTime}

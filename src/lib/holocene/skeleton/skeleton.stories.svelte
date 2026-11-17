@@ -5,7 +5,7 @@
   import Skeleton from './index.svelte';
 
   const { Story } = defineMeta({
-    title: 'Skeleton Loader',
+    title: 'Holocene/Components/Skeleton Loader',
     component: Skeleton,
     args: { class: 'h-4' },
     argTypes: {

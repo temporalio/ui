@@ -3,44 +3,44 @@ import { describe, expect, it } from 'vitest';
 import { resolveCatalogRouting } from './routing';
 
 describe('resolveCatalogRouting', () => {
-  it('returns routed target copies without changing registered routing', () => {
-    const registeredTargets = [
+  it('returns routed workspace copies without changing registered routing', () => {
+    const registeredWorkspaces = [
       {
-        targetId: 'shared-workflows',
+        workspaceId: 'shared-workflows',
         namespace: 'registered-namespace',
         taskQueue: 'registered-task-queue',
       },
     ];
 
-    const resolvedTargets = resolveCatalogRouting(registeredTargets, {
+    const resolvedWorkspaces = resolveCatalogRouting(registeredWorkspaces, {
       'shared-workflows': {
         namespace: 'runtime-namespace',
         taskQueue: 'runtime-task-queue',
       },
     });
 
-    expect(resolvedTargets).toEqual([
+    expect(resolvedWorkspaces).toEqual([
       {
-        targetId: 'shared-workflows',
+        workspaceId: 'shared-workflows',
         namespace: 'runtime-namespace',
         taskQueue: 'runtime-task-queue',
       },
     ]);
-    expect(registeredTargets).toEqual([
+    expect(registeredWorkspaces).toEqual([
       {
-        targetId: 'shared-workflows',
+        workspaceId: 'shared-workflows',
         namespace: 'registered-namespace',
         taskQueue: 'registered-task-queue',
       },
     ]);
   });
 
-  it('rejects routing for a target that is not registered', () => {
+  it('rejects routing for a workspace that is not registered', () => {
     expect(() =>
       resolveCatalogRouting(
         [
           {
-            targetId: 'shared-workflows',
+            workspaceId: 'shared-workflows',
             namespace: 'registered-namespace',
             taskQueue: 'registered-task-queue',
           },
@@ -52,14 +52,14 @@ describe('resolveCatalogRouting', () => {
           },
         },
       ),
-    ).toThrowError('Unknown catalog routing target "missing"');
+    ).toThrowError('Unknown catalog routing workspace "missing"');
   });
 
-  it('copies only non-secret routing fields into resolved targets', () => {
+  it('copies only non-secret routing fields into resolved workspaces', () => {
     const resolved = resolveCatalogRouting(
       [
         {
-          targetId: 'shared-workflows',
+          workspaceId: 'shared-workflows',
           namespace: 'registered-namespace',
           taskQueue: 'registered-task-queue',
         },
@@ -76,7 +76,7 @@ describe('resolveCatalogRouting', () => {
 
     expect(resolved).toEqual([
       {
-        targetId: 'shared-workflows',
+        workspaceId: 'shared-workflows',
         namespace: 'runtime-namespace',
         taskQueue: 'runtime-task-queue',
       },
