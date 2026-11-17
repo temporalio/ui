@@ -147,7 +147,7 @@
     }) || '0s',
   );
 
-  const groups = $derived(
+  const eventGroups = $derived(
     controller?.history.lazyGroupsWithoutWorkflowTasks ?? [],
   );
   const loadState = $derived.by(() => {
@@ -157,27 +157,27 @@
     if (controller?.fetchComplete) {
       return 'complete';
     }
-    if (groups.length > 0) {
+    if (eventGroups.length > 0) {
       return 'partial';
     }
     return 'loading';
   });
-  const suffix = $derived(loadState === 'partial' ? '+' : '');
-  const counts = $derived(countRunGroups(groups));
-  const visibleCounts = $derived(
-    COUNT_DISPLAY.filter(({ key }) => counts[key] > 0),
+  const partialSuffix = $derived(loadState === 'partial' ? '+' : '');
+  const runCounts = $derived(countRunGroups(eventGroups));
+  const visibleCountDisplays = $derived(
+    COUNT_DISPLAY.filter(({ key }) => runCounts[key] > 0),
   );
-  const segments = $derived(buildRunBar(groups, width));
+  const barSegments = $derived(buildRunBar(eventGroups, width));
   const loadedFraction = $derived.by(() => {
     if (loadState !== 'partial' || !controller) {
       return 1;
     }
-    const expected =
+    const expectedEventCount =
       controller.totalExpectedEvents || Number(workflow.historyEvents) || 0;
-    if (expected <= 0) {
+    if (expectedEventCount <= 0) {
       return 1;
     }
-    return Math.min(1, controller.history.eventCount / expected);
+    return Math.min(1, controller.history.eventCount / expectedEventCount);
   });
 
   const statusLabel = $derived(
@@ -206,44 +206,46 @@
         }),
   );
 
-  const description = $derived.by(() => {
-    const parts = [run.runId];
-    for (const { key, label } of visibleCounts) {
-      parts.push(translate(label, { count: counts[key] }) + suffix);
+  const accessibleDescription = $derived.by(() => {
+    const descriptionParts = [run.runId];
+    for (const { key, label } of visibleCountDisplays) {
+      descriptionParts.push(
+        translate(label, { count: runCounts[key] }) + partialSuffix,
+      );
     }
-    if (counts.failed) {
-      parts.push(
+    if (runCounts.failed) {
+      descriptionParts.push(
         translate('workflows.run-count-failed', {
-          count: counts.failed,
-          suffix,
+          count: runCounts.failed,
+          suffix: partialSuffix,
         }),
       );
     }
-    if (counts.retried) {
-      parts.push(
+    if (runCounts.retried) {
+      descriptionParts.push(
         translate('workflows.run-count-retried', {
-          count: counts.retried,
-          suffix,
+          count: runCounts.retried,
+          suffix: partialSuffix,
         }),
       );
     }
     if (loadState === 'partial') {
-      parts.push(translate('workflows.run-card-still-loading'));
+      descriptionParts.push(translate('workflows.run-card-still-loading'));
     }
     if (loadState === 'loading') {
-      parts.push(translate('workflows.run-card-loading-events'));
+      descriptionParts.push(translate('workflows.run-card-loading-events'));
     }
     if (loadState === 'error') {
-      parts.push(translate('workflows.run-card-load-failed'));
+      descriptionParts.push(translate('workflows.run-card-load-failed'));
     }
-    parts.push(
+    descriptionParts.push(
       translate(
         transition
           ? TRANSITION_DESCRIPTIONS[transition]
           : 'workflows.start-of-chain',
       ),
     );
-    return parts.join(', ');
+    return descriptionParts.join(', ');
   });
 
   const runHref = $derived(
@@ -331,11 +333,11 @@
     {:else}
       <span class="flex h-1.5 w-full overflow-hidden rounded-full">
         <span class="flex h-full gap-px" style:width="{loadedFraction * 100}%">
-          {#each segments as segment, index (index)}
+          {#each barSegments as barSegment, index (index)}
             <span
               class="h-full min-w-px flex-1"
-              style:background-color={segment.color}
-              style:opacity={segment.opacity}
+              style:background-color={barSegment.color}
+              style:opacity={barSegment.opacity}
             ></span>
           {/each}
         </span>
@@ -348,31 +350,31 @@
       <span
         class="flex min-w-0 items-center gap-2 text-xs tabular-nums text-secondary"
       >
-        {#each visibleCounts as { key, Icon, category } (key)}
+        {#each visibleCountDisplays as { key, Icon, category } (key)}
           <span class="flex items-center gap-0.5">
             <span
               class="flex text-sm"
               style:color={getCategoryStrokeColor(category)}><Icon /></span
-            >{counts[key]}{suffix}
+            >{runCounts[key]}{partialSuffix}
           </span>
         {/each}
-        {#if counts.failed || counts.retried}
+        {#if runCounts.failed || runCounts.retried}
           <span
             class="ml-auto flex shrink-0 items-center gap-2 pl-2 font-medium"
           >
-            {#if counts.failed}
+            {#if runCounts.failed}
               <span class="text-static-danger">
                 {translate('workflows.run-count-failed', {
-                  count: counts.failed,
-                  suffix,
+                  count: runCounts.failed,
+                  suffix: partialSuffix,
                 })}
               </span>
             {/if}
-            {#if counts.retried}
+            {#if runCounts.retried}
               <span class="text-static-warning">
                 {translate('workflows.run-count-retried', {
-                  count: counts.retried,
-                  suffix,
+                  count: runCounts.retried,
+                  suffix: partialSuffix,
                 })}
               </span>
             {/if}
@@ -381,7 +383,7 @@
       </span>
     {/if}
   </button>
-  <span id={descriptionId} class="sr-only">{description}</span>
+  <span id={descriptionId} class="sr-only">{accessibleDescription}</span>
 
   <div
     class="pointer-events-none absolute right-1.5 top-1.5 flex items-center gap-0.5 rounded-md border border-secondary bg-surface-primary p-0.5 opacity-0 shadow-sm transition-opacity group-focus-within/run:pointer-events-auto group-focus-within/run:opacity-100 group-hover/run:pointer-events-auto group-hover/run:opacity-100"

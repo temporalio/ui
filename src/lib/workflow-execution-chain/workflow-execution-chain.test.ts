@@ -1164,7 +1164,7 @@ describe('WorkflowExecutionChain', () => {
     it('uses the window Run when it is already loaded', async () => {
       server.addChain(runIds(3));
       const chain = track(await loadChain(server));
-      const describes = server.describe.mock.calls.length;
+      const describeCallCount = server.describe.mock.calls.length;
 
       chain.requestRun('run-2');
 
@@ -1172,7 +1172,7 @@ describe('WorkflowExecutionChain', () => {
         status: 'found',
         run: chain.runs[1],
       });
-      expect(server.describe.mock.calls.length).toBe(describes);
+      expect(server.describe.mock.calls.length).toBe(describeCallCount);
     });
 
     it('classifies a missing Run as not found', async () => {
@@ -1275,12 +1275,12 @@ describe('WorkflowExecutionChain', () => {
       server.addChain(runIds(2));
       const chain = track(await loadChain(server));
 
-      const first = chain.requestRun('missing');
-      const second = chain.requestRun('missing');
+      const firstRequest = chain.requestRun('missing');
+      const secondRequest = chain.requestRun('missing');
       await settle();
 
-      expect(second).toBe(first);
-      await expect(first).resolves.toEqual({ status: 'notFound' });
+      expect(secondRequest).toBe(firstRequest);
+      await expect(firstRequest).resolves.toEqual({ status: 'notFound' });
     });
 
     it('resolves a Run already in the window at once', async () => {

@@ -18,6 +18,6 @@ export const transitionOf = (startedEvent: HistoryEvent): Transition | null => {
   if (typeof initiator !== 'string') {
     return 'continuedAsNew';
   }
-  const name = fromScreamingEnum(initiator, 'ContinueAsNewInitiator');
-  return INITIATOR_TRANSITIONS[name] ?? 'continuedAsNew';
+  const initiatorName = fromScreamingEnum(initiator, 'ContinueAsNewInitiator');
+  return INITIATOR_TRANSITIONS[initiatorName] ?? 'continuedAsNew';
 };

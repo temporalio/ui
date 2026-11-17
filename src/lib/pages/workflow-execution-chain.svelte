@@ -48,16 +48,16 @@
   );
 
   $effect(function loadChain() {
-    const current = chain;
-    void current.load().then(() => redirectToFirstRun(current));
+    const loadingChain = chain;
+    void loadingChain.load().then(() => redirectToFirstRun(loadingChain));
     return function disposeChain() {
-      current.dispose();
+      loadingChain.dispose();
     };
   });
 
-  const redirectToFirstRun = (loaded: WorkflowExecutionChain) => {
-    const redirectFirstRunId = loaded.redirectFirstRunId;
-    if (loaded !== chain || !redirectFirstRunId) {
+  const redirectToFirstRun = (loadedChain: WorkflowExecutionChain) => {
+    const redirectFirstRunId = loadedChain.redirectFirstRunId;
+    if (loadedChain !== chain || !redirectFirstRunId) {
       return;
     }
     const route = routeForWorkflowExecutionChain({
@@ -99,7 +99,7 @@
     pinnedRunId ? chain.requestedRuns.get(pinnedRunId) : undefined,
   );
 
-  let notice = $state<RunNotice | null>(null);
+  let runNotice = $state<RunNotice | null>(null);
 
   const NOTICE_TITLES = {
     notFound: 'workflows.run-not-found-notice',
@@ -107,7 +107,10 @@
     failed: 'workflows.run-load-failed-notice',
   } as const;
 
-  const setRunParameter = (runId: string | null, replaceState = false) => {
+  const setRunParameter = (
+    runId: string | null,
+    { replaceState = false }: { replaceState?: boolean } = {},
+  ) => {
     void updateQueryParameters({
       parameter: 'run',
       value: runId ?? '',
@@ -118,28 +121,28 @@
   };
 
   const applyRunParameter = async () => {
-    const current = chain;
+    const requestingChain = chain;
     const runId = page.url.searchParams.get('run') || null;
-    current.prioritizeRun(runId);
+    requestingChain.prioritizeRun(runId);
     if (!runId) {
       return;
     }
-    notice = null;
-    const [requested] = await Promise.all([
-      current.requestRun(runId),
-      current.whenLoaded(),
+    runNotice = null;
+    const [requestResult] = await Promise.all([
+      requestingChain.requestRun(runId),
+      requestingChain.whenLoaded(),
     ]);
-    const status = requested.status;
+    const status = requestResult.status;
     if (
-      current !== chain ||
-      !current.latestRunId ||
+      requestingChain !== chain ||
+      !requestingChain.latestRunId ||
       page.url.searchParams.get('run') !== runId ||
       (status !== 'notFound' && status !== 'wrongChain' && status !== 'failed')
     ) {
       return;
     }
-    notice = { kind: status, runId };
-    setRunParameter(null, true);
+    runNotice = { kind: status, runId };
+    setRunParameter(null, { replaceState: true });
   };
 
   afterNavigate(() => void applyRunParameter());
@@ -183,18 +186,20 @@
 {:else}
   <div class="flex flex-col gap-6">
     <ChainHeader {chain} />
-    {#if notice}
+    {#if runNotice}
       <Alert
         intent="warning"
-        title={translate(NOTICE_TITLES[notice.kind], { runId: notice.runId })}
+        title={translate(NOTICE_TITLES[runNotice.kind], {
+          runId: runNotice.runId,
+        })}
         data-testid="run-notice"
       >
-        {#if notice.kind === 'wrongChain'}
+        {#if runNotice.kind === 'wrongChain'}
           <Link
             href={routeForWorkflow({
               namespace,
               workflow: workflowId,
-              run: notice.runId,
+              run: runNotice.runId,
             })}>{translate('workflows.view-run')}</Link
           >
         {/if}

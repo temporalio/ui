@@ -37,13 +37,16 @@
 
   const formatTickLabel = (
     time: number,
-    { seconds, date = false }: { seconds: boolean; date?: boolean },
+    {
+      withSeconds,
+      withDate = false,
+    }: { withSeconds: boolean; withDate?: boolean },
   ) =>
     formatClockTime(time, {
       timeFormat: $timeFormat,
       hourFormat: $hourFormat,
-      seconds,
-      date,
+      withSeconds,
+      withDate,
     });
 
   const overlapsReservedLabel = (
@@ -77,18 +80,19 @@
       if (!tick.labelled) {
         return [];
       }
-      const isFirst = tick.kind === 'run' && tick.x === firstSegment?.x;
-      const seconds = tick.step < MINUTE_MS;
-      const daily = tick.step >= DAY_MS;
-      const majorLabelHalfWidth = daily
+      const isFirstRunTick = tick.kind === 'run' && tick.x === firstSegment?.x;
+      const withSeconds = tick.step < MINUTE_MS;
+      const dated = tick.step >= DAY_MS;
+      const majorLabelHalfWidth = dated
         ? DATED_MAJOR_LABEL_HALF_WIDTH
         : MAJOR_LABEL_HALF_WIDTH;
       if (tick.kind === 'run') {
-        const width = isFirst || daily ? FIRST_LABEL_WIDTH : RUN_LABEL_WIDTH;
+        const labelWidth =
+          isFirstRunTick || dated ? FIRST_LABEL_WIDTH : RUN_LABEL_WIDTH;
         if (
           overlapsReservedLabel(
-            { from: tick.x, to: tick.x + width },
-            { ignoreFirstRunLabel: isFirst },
+            { from: tick.x, to: tick.x + labelWidth },
+            { ignoreFirstRunLabel: isFirstRunTick },
           )
         ) {
           return [];
@@ -97,8 +101,8 @@
           {
             tick,
             text: formatTickLabel(tick.time, {
-              seconds,
-              date: isFirst || daily,
+              withSeconds,
+              withDate: isFirstRunTick || dated,
             }),
           },
         ];
@@ -112,7 +116,10 @@
         return [];
       }
       return [
-        { tick, text: formatTickLabel(tick.time, { seconds, date: daily }) },
+        {
+          tick,
+          text: formatTickLabel(tick.time, { withSeconds, withDate: dated }),
+        },
       ];
     }),
   );
@@ -122,7 +129,7 @@
   {#if selectedSegment}
     <span
       class="absolute left-0 top-0 h-1 rounded-b-full bg-surface-overlay-brand transition-[translate,width] duration-500 motion-reduce:transition-none"
-      style:translate="{selectedSegment.x}px 0"
+      style:translate="{selectedSegment.x}px"
       style:width="{Math.max(2, selectedSegment.width)}px"
       data-testid="run-ruler-band"
     ></span>
@@ -135,7 +142,7 @@
         tick.kind === 'major' && 'h-2.5',
         tick.kind === 'minor' && 'h-1.5',
       )}
-      style:translate="{tick.x}px 0"
+      style:translate="{tick.x}px"
     ></span>
   {/each}
   {#each labels as { tick, text } (`${tick.segmentId}-${tick.kind}-${tick.time}`)}
@@ -147,30 +154,30 @@
         tick.kind === 'major' &&
           '-translate-x-1/2 group-hover/strip:text-secondary',
       )}
-      style:translate="{tick.x}px 0">{text}</span
+      style:translate="{tick.x}px">{text}</span
     >
   {/each}
   {#if nowX !== undefined}
     {#if live}
       <span
         class="absolute left-0 top-3 -translate-x-full whitespace-nowrap rounded-full bg-interactive-primary px-2 py-0.5 text-[10px] font-medium uppercase leading-none tracking-wide text-white transition-[translate] motion-reduce:transition-none"
-        style:translate="{nowX}px 0"
+        style:translate="{nowX}px"
         data-testid="run-ruler-now">{translate('workflows.now')}</span
       >
     {:else}
       <span
         class="absolute left-0 top-4 -translate-x-full pr-1 text-[10px] font-semibold uppercase leading-none tracking-wide text-tertiary group-hover/strip:text-primary"
-        style:translate="{nowX}px 0">{translate('workflows.now')}</span
+        style:translate="{nowX}px">{translate('workflows.now')}</span
       >
     {/if}
   {/if}
   {#if pinnedX !== undefined && selectedSegment}
     <span
       class="absolute left-0 top-3 whitespace-nowrap rounded-full bg-interactive-primary px-2 py-0.5 font-mono text-[10px] font-medium tabular-nums leading-none text-white"
-      style:translate="{pinnedX}px 0"
+      style:translate="{pinnedX}px"
       title={$timestamp(new Date(selectedSegment.startMs))}
       data-testid="run-ruler-pinned"
-      >{formatTickLabel(selectedSegment.startMs, { seconds: true })}</span
+      >{formatTickLabel(selectedSegment.startMs, { withSeconds: true })}</span
     >
   {/if}
 </div>

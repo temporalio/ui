@@ -82,7 +82,10 @@ export class WorkflowExecutionChain {
   });
   private readonly _client: ChainClient;
   private readonly _abort = new AbortController();
-  private readonly _requests = new SvelteMap<string, Promise<RequestedRun>>();
+  private readonly _runRequests = new SvelteMap<
+    string,
+    Promise<RequestedRun>
+  >();
   private readonly _listeners = new SvelteSet<(event: ChainEvent) => void>();
   private _resolveLoaded!: () => void;
   private readonly _loaded = new Promise<void>((resolve) => {
@@ -204,12 +207,12 @@ export class WorkflowExecutionChain {
   }
 
   requestRun(runId: string): Promise<RequestedRun> {
-    const existing = this._requests.get(runId);
-    if (existing) {
-      return existing;
+    const existingRequest = this._runRequests.get(runId);
+    if (existingRequest) {
+      return existingRequest;
     }
     const request = this._requestRun(runId);
-    this._requests.set(runId, request);
+    this._runRequests.set(runId, request);
     return request;
   }
 
@@ -298,21 +301,21 @@ export class WorkflowExecutionChain {
   }
 
   private async _requestRun(runId: string): Promise<RequestedRun> {
-    const loading: RequestedRun = { status: 'loading' };
+    const loadingRequest: RequestedRun = { status: 'loading' };
     if (this._disposed) {
-      return loading;
+      return loadingRequest;
     }
-    const inWindow = this._findRun(runId);
-    if (inWindow) {
-      return this._settleRequest(runId, { status: 'found', run: inWindow });
+    const knownRun = this._findRun(runId);
+    if (knownRun) {
+      return this._settleRequest(runId, { status: 'found', run: knownRun });
     }
-    this.requestedRuns.set(runId, loading);
+    this.requestedRuns.set(runId, loadingRequest);
     let run: ChainRun;
     try {
       run = await this._hop(runId);
     } catch (error) {
       if (this._disposed) {
-        return loading;
+        return loadingRequest;
       }
       return this._settleRequest(
         runId,
@@ -322,7 +325,7 @@ export class WorkflowExecutionChain {
       );
     }
     if (this._disposed) {
-      return loading;
+      return loadingRequest;
     }
     const firstRunId =
       run.workflow.firstRunId ??
@@ -330,15 +333,15 @@ export class WorkflowExecutionChain {
     if (firstRunId && firstRunId !== this.identity.firstRunId) {
       return this._settleRequest(runId, { status: 'wrongChain', firstRunId });
     }
-    const found = this._settleRequest(runId, {
+    const foundRequest = this._settleRequest(runId, {
       status: 'found',
       run: this._findRun(runId) ?? run,
     });
-    const status = this.cardLoads.get(runId)?.status;
-    if (status === undefined || status === 'queued') {
+    const { status: cardLoadStatus } = this.cardLoadOf(runId);
+    if (cardLoadStatus === 'queued') {
       this._startCard(runId);
     }
-    return found;
+    return foundRequest;
   }
 
   private _settleRequest(runId: string, result: RequestedRun): RequestedRun {
@@ -667,9 +670,9 @@ export class WorkflowExecutionChain {
   }
 
   private _fail(step: DiscoveryStep, retry: () => void): void {
-    const firstFailure = this._failedSteps.size === 0;
+    const isFirstFailure = this._failedSteps.size === 0;
     this._failedSteps.set(step, retry);
-    if (firstFailure) {
+    if (isFirstFailure) {
       this._emit({ type: 'discoveryError' });
     }
   }

@@ -56,18 +56,21 @@ export const allocateCardWidths = (
   if (durations.length === 0) {
     return [];
   }
-  const newest = durations.slice(-INITIAL_VISIBLE_RUNS);
-  const fitted = viewportWidth - CARD_GAP * (newest.length - 1);
-  const spare = Math.max(0, fitted - newest.length * MIN_CARD_WIDTH);
-  const total = sumOf(newest);
-  const maxWidth = Math.max(MIN_CARD_WIDTH, fitted);
+  const newestDurations = durations.slice(-INITIAL_VISIBLE_RUNS);
+  const fittedWidth = viewportWidth - CARD_GAP * (newestDurations.length - 1);
+  const spareWidth = Math.max(
+    0,
+    fittedWidth - newestDurations.length * MIN_CARD_WIDTH,
+  );
+  const newestTotalDuration = sumOf(newestDurations);
+  const maxWidth = Math.max(MIN_CARD_WIDTH, fittedWidth);
 
   return durations.map((duration) => {
-    const share =
-      total > 0
-        ? (spare * Math.max(0, duration)) / total
-        : spare / newest.length;
-    return Math.min(maxWidth, MIN_CARD_WIDTH + share);
+    const extraWidth =
+      newestTotalDuration > 0
+        ? (spareWidth * Math.max(0, duration)) / newestTotalDuration
+        : spareWidth / newestDurations.length;
+    return Math.min(maxWidth, MIN_CARD_WIDTH + extraWidth);
   });
 };
 
@@ -100,11 +103,11 @@ export const buildRulerTicks = (
 ): RulerTick[] => {
   const ticks: RulerTick[] = [];
   for (const segment of segments) {
-    const span = segment.endMs - segment.startMs;
-    if (segment.width <= 0 || span <= 0) {
+    const spanMs = segment.endMs - segment.startMs;
+    if (segment.width <= 0 || spanMs <= 0) {
       continue;
     }
-    const msPerPx = span / segment.width;
+    const msPerPx = spanMs / segment.width;
     const step = pickClockStep(msPerPx);
     ticks.push({
       segmentId: segment.id,
@@ -123,24 +126,25 @@ export const buildRulerTicks = (
       ? DATED_MAJOR_LABEL_FROM_START
       : MAJOR_LABEL_FROM_START;
     const labelToEnd = dated ? DATED_MAJOR_LABEL_TO_END : MAJOR_LABEL_TO_END;
-    const minor = step / 2;
-    const tickMs = minor / msPerPx >= MINOR_TICK_SPACING ? minor : step;
-    const first = Math.floor(segment.startMs / tickMs + 1) * tickMs;
-    for (let time = first; time < segment.endMs; time += tickMs) {
+    const minorStep = step / 2;
+    const tickStep =
+      minorStep / msPerPx >= MINOR_TICK_SPACING ? minorStep : step;
+    const firstTickTime = Math.floor(segment.startMs / tickStep + 1) * tickStep;
+    for (let time = firstTickTime; time < segment.endMs; time += tickStep) {
       const x = segment.x + (time - segment.startMs) / msPerPx;
       const fromStart = x - segment.x;
       const toEnd = segment.x + segment.width - x;
       if (fromStart < MINOR_TICK_INSET || toEnd < MINOR_TICK_INSET) {
         continue;
       }
-      const major = time % step === 0;
+      const isMajor = time % step === 0;
       ticks.push({
         segmentId: segment.id,
         time,
         x,
-        kind: major ? 'major' : 'minor',
+        kind: isMajor ? 'major' : 'minor',
         step,
-        labelled: major && fromStart >= labelFromStart && toEnd >= labelToEnd,
+        labelled: isMajor && fromStart >= labelFromStart && toEnd >= labelToEnd,
       });
     }
   }
@@ -150,32 +154,37 @@ export const buildRulerTicks = (
 type ClockTimeOptions = {
   timeFormat: string;
   hourFormat: HourFormat;
-  seconds?: boolean;
-  date?: boolean;
+  withSeconds?: boolean;
+  withDate?: boolean;
 };
 
 const clockFormatters = new Map<string, Intl.DateTimeFormat>();
 
 export const formatClockTime = (
   time: number,
-  { timeFormat, hourFormat, seconds = true, date = false }: ClockTimeOptions,
+  {
+    timeFormat,
+    hourFormat,
+    withSeconds = true,
+    withDate = false,
+  }: ClockTimeOptions,
 ): string => {
   const timeZone =
     timeFormat === BASE_TIME_FORMAT_OPTIONS.LOCAL
       ? undefined
       : getTimezone(timeFormat);
-  const key = `${timeZone ?? 'local'}|${hourFormat}|${seconds}|${date}`;
-  let formatter = clockFormatters.get(key);
+  const formatterKey = `${timeZone ?? 'local'}|${hourFormat}|${withSeconds}|${withDate}`;
+  let formatter = clockFormatters.get(formatterKey);
   if (!formatter) {
     formatter = new Intl.DateTimeFormat(undefined, {
       hour: 'numeric',
       minute: '2-digit',
-      ...(seconds && { second: '2-digit' }),
-      ...(date && { month: 'short', day: 'numeric' }),
+      ...(withSeconds && { second: '2-digit' }),
+      ...(withDate && { month: 'short', day: 'numeric' }),
       ...(hourFormat !== 'system' && { hour12: hourFormat === '12' }),
       ...(timeZone && { timeZone }),
     });
-    clockFormatters.set(key, formatter);
+    clockFormatters.set(formatterKey, formatter);
   }
   return formatter.format(time);
 };

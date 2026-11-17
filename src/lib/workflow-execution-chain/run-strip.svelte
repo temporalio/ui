@@ -46,7 +46,7 @@
 
   let { chain, selectedRunId, live, onSelect, onJumpToLive }: Props = $props();
 
-  const PADDING = 4;
+  const TRAILING_PADDING = 4;
   const SKELETON_CARDS = [0, 1, 2, 3];
 
   const id = $props.id();
@@ -68,7 +68,7 @@
   const latestRun = $derived(
     runs.find((run) => run.runId === chain.latestRunId),
   );
-  const latestOpen = $derived(Boolean(latestRun?.workflow.isRunning));
+  const latestRunOpen = $derived(Boolean(latestRun?.workflow.isRunning));
   const selectedIndex = $derived(
     selectedRunId ? runIds.indexOf(selectedRunId) : -1,
   );
@@ -76,7 +76,7 @@
   const preferredScrollBehavior = (): ScrollBehavior =>
     prefersReducedMotion.current ? 'auto' : 'smooth';
 
-  const roving = createRovingFocusState<string>({
+  const rovingFocus = createRovingFocusState<string>({
     getItems: () => runIds,
     getElement: (runId) => cardElements[runId],
     getResetItem: () => selectedRunId ?? undefined,
@@ -91,7 +91,7 @@
   });
 
   $effect(() => {
-    if (!latestOpen) {
+    if (!latestRunOpen) {
       return;
     }
     now = Date.now();
@@ -101,34 +101,36 @@
     return () => clearInterval(interval);
   });
 
-  const spans = $derived(
+  const runSpans = $derived(
     runs.map(({ runId, workflow }) => {
       const startMs = Date.parse(workflow.startTime);
       const endMs = getWorkflowLatestTime(workflow, now);
       return { id: runId, startMs, endMs: Math.max(startMs, endMs) };
     }),
   );
-  const cardsViewport = $derived(
+  const cardsViewportWidth = $derived(
     Math.max(
       MIN_CARD_WIDTH,
-      viewportWidth - 2 * (CAP_WIDTH + CARD_GAP) - 2 * PADDING,
+      viewportWidth - 2 * (CAP_WIDTH + CARD_GAP) - 2 * TRAILING_PADDING,
     ),
   );
-  const widths = $derived(
+  const cardWidths = $derived(
     allocateCardWidths(
-      spans.map(({ startMs, endMs }) => endMs - startMs),
-      cardsViewport,
+      runSpans.map(({ startMs, endMs }) => endMs - startMs),
+      cardsViewportWidth,
     ),
   );
   const segments = $derived(
-    layoutSegments(widths, spans, CAP_WIDTH + CARD_GAP),
+    layoutSegments(cardWidths, runSpans, CAP_WIDTH + CARD_GAP),
   );
   const nowX = $derived.by(() => {
-    const last = segments[segments.length - 1];
-    return latestOpen && last ? last.x + last.width : undefined;
+    const lastSegment = segments[segments.length - 1];
+    return latestRunOpen && lastSegment
+      ? lastSegment.x + lastSegment.width
+      : undefined;
   });
 
-  const previous = $derived.by(() => {
+  const previousRunButton = $derived.by(() => {
     if (selectedIndex < 0) {
       return {
         disabled: true,
@@ -153,43 +155,45 @@
     };
   });
 
-  const jumpLabel = $derived(
-    latestOpen || chain.status !== 'closed'
+  const jumpToLiveLabel = $derived(
+    latestRunOpen || chain.status !== 'closed'
       ? translate('workflows.jump-to-live')
       : translate('workflows.view-latest-run'),
   );
-  const jumpTooltip = $derived.by(() => {
+  const jumpToLiveTooltip = $derived.by(() => {
     if (!live) {
-      return jumpLabel;
+      return jumpToLiveLabel;
     }
-    return latestOpen
+    return latestRunOpen
       ? translate('workflows.viewing-live')
       : translate('workflows.viewing-latest-run');
   });
 
-  const selectPrevious = async () => {
-    if (previous.disabled) {
+  const selectPreviousRun = async () => {
+    if (previousRunButton.disabled) {
       return;
     }
     if (selectedIndex > 0) {
       onSelect(runIds[selectedIndex - 1]);
       return;
     }
-    const from = selectedRunId;
-    const before = runs.length;
+    const runIdWhenClicked = selectedRunId;
+    const runCountBeforeLoad = runs.length;
     await chain.loadOlder();
-    const added = chain.runs.length - before;
-    if (added > 0) {
+    const loadedRunCount = chain.runs.length - runCountBeforeLoad;
+    if (loadedRunCount > 0) {
       announcer.announce(
-        translate('workflows.announce-older-runs', { count: added }),
+        translate('workflows.announce-older-runs', { count: loadedRunCount }),
       );
     }
-    if (from !== selectedRunId) {
+    if (runIdWhenClicked !== selectedRunId) {
       return;
     }
-    const index = chain.runs.findIndex((run) => run.runId === from);
-    if (index > 0) {
-      onSelect(chain.runs[index - 1].runId);
+    const windowIndex = chain.runs.findIndex(
+      (run) => run.runId === runIdWhenClicked,
+    );
+    if (windowIndex > 0) {
+      onSelect(chain.runs[windowIndex - 1].runId);
     }
   };
 
@@ -207,22 +211,24 @@
     const { scrollLeft, clientWidth, scrollWidth } = scroller;
     scrolledFromStart = scrollLeft > 1;
     scrolledFromEnd = scrollLeft + clientWidth < scrollWidth - 1;
-    const segment = segments[selectedIndex];
+    const selectedSegment = segments[selectedIndex];
     selectedOutOfView = Boolean(
-      segment &&
-      (segment.x + segment.width < scrollLeft + CAP_WIDTH + CARD_GAP ||
-        segment.x > scrollLeft + clientWidth - CAP_WIDTH - CARD_GAP),
+      selectedSegment &&
+      (selectedSegment.x + selectedSegment.width <
+        scrollLeft + CAP_WIDTH + CARD_GAP ||
+        selectedSegment.x > scrollLeft + clientWidth - CAP_WIDTH - CARD_GAP),
     );
   };
 
   const scrollSelectedIntoView = () => {
-    const segment = segments[selectedIndex];
-    if (!scroller || !segment) {
+    const selectedSegment = segments[selectedIndex];
+    if (!scroller || !selectedSegment) {
       return;
     }
     const inset = CAP_WIDTH + CARD_GAP;
-    const left = segment.x - inset;
-    const right = segment.x + segment.width + inset + PADDING;
+    const left = selectedSegment.x - inset;
+    const right =
+      selectedSegment.x + selectedSegment.width + inset + TRAILING_PADDING;
     if (left < scroller.scrollLeft) {
       scroller.scrollTo({ left, behavior: preferredScrollBehavior() });
       return;
@@ -270,7 +276,7 @@
     untrack(() => void tick().then(updateScrollIndicators));
   });
 
-  const newerArrived = $derived(
+  const showNewerRunIndicator = $derived(
     !live &&
       newerArrivedForRunId !== null &&
       newerArrivedForRunId === selectedRunId,
@@ -367,21 +373,26 @@
     >
       <div
         class="group/strip relative w-max min-w-full"
-        style:padding-right="{PADDING}px"
+        style:padding-right="{TRAILING_PADDING}px"
       >
         <RunRuler {segments} {selectedIndex} {live} {nowX} />
 
         <div class="flex items-stretch gap-1.5">
           <div class="sticky left-0 z-30 flex w-9 shrink-0 bg-surface-primary">
-            <Tooltip text={previous.tooltip} top usePortal class="flex w-full">
+            <Tooltip
+              text={previousRunButton.tooltip}
+              top
+              usePortal
+              class="flex w-full"
+            >
               <button
                 type="button"
                 aria-label={translate('workflows.view-previous-run')}
-                aria-disabled={previous.disabled ? 'true' : undefined}
+                aria-disabled={previousRunButton.disabled ? 'true' : undefined}
                 aria-busy={chain.walking && selectedIndex === 0
                   ? 'true'
                   : undefined}
-                onclick={selectPrevious}
+                onclick={selectPreviousRun}
                 class="flex w-full items-center justify-center rounded border border-brand bg-surface-primary text-brand shadow-sm transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary-press aria-disabled:cursor-not-allowed aria-disabled:opacity-disabled aria-disabled:shadow-sm"
               >
                 <IconChevronLeft />
@@ -415,9 +426,9 @@
               })}
               aria-describedby={descriptionId}
               class="flex items-stretch gap-1.5"
-              onkeydown={roving.onkeydown}
-              onfocusin={roving.onfocusin}
-              onfocusout={roving.onfocusout}
+              onkeydown={rovingFocus.onkeydown}
+              onfocusin={rovingFocus.onfocusin}
+              onfocusout={rovingFocus.onfocusout}
             >
               {#each runs as run, index (run.runId)}
                 {@const transition = transitionOf(run.startedEvent)}
@@ -430,12 +441,12 @@
                   controller={chain.controllers.get(run.runId)}
                   cardLoad={chain.cardLoadOf(run.runId)}
                   {transition}
-                  width={widths[index] ?? MIN_CARD_WIDTH}
+                  width={cardWidths[index] ?? MIN_CARD_WIDTH}
                   {now}
                   selected={run.runId === selectedRunId}
                   isLatest={run.runId === chain.latestRunId}
                   {live}
-                  tabIndex={roving.tabIndex(run.runId)}
+                  tabIndex={rovingFocus.tabIndex(run.runId)}
                   bind:buttonElement={cardElements[run.runId]}
                   onSelect={() => onSelect(run.runId)}
                   onRetry={() => chain.retryCard(run.runId)}
@@ -463,16 +474,21 @@
                 scrolledFromEnd && 'opacity-100',
               )}
             ></span>
-            <Tooltip text={jumpTooltip} topLeft usePortal class="flex w-full">
+            <Tooltip
+              text={jumpToLiveTooltip}
+              topLeft
+              usePortal
+              class="flex w-full"
+            >
               <button
                 type="button"
-                aria-label={jumpLabel}
+                aria-label={jumpToLiveLabel}
                 aria-disabled={live ? 'true' : undefined}
                 onclick={jumpToLive}
                 class="relative flex w-full items-center justify-center rounded border border-brand bg-surface-primary text-brand shadow-sm transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary-press aria-disabled:cursor-not-allowed aria-disabled:opacity-disabled aria-disabled:shadow-sm"
               >
                 <IconArrowRightToLine />
-                {#if newerArrived && !live}
+                {#if showNewerRunIndicator && !live}
                   <span
                     class="absolute right-1 top-1 size-2 rounded-full bg-interactive-primary motion-safe:animate-pulse"
                     data-testid="newer-run-indicator"

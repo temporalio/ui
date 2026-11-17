@@ -10,7 +10,7 @@ import {
   pickClockStep,
 } from './run-strip-layout';
 
-const total = (widths: number[]) =>
+const totalWidth = (widths: number[]) =>
   widths.reduce((sum, width) => sum + width, 0);
 
 describe('allocateCardWidths', () => {
@@ -21,7 +21,7 @@ describe('allocateCardWidths', () => {
   it('fits the newest 4 Runs into the viewport in proportion to duration', () => {
     const widths = allocateCardWidths([10, 10, 20, 40], 1000);
 
-    expect(total(widths) + CARD_GAP * 3).toBeCloseTo(1000);
+    expect(totalWidth(widths) + CARD_GAP * 3).toBeCloseTo(1000);
     expect(widths[3] - MIN_CARD_WIDTH).toBeCloseTo(
       2 * (widths[2] - MIN_CARD_WIDTH),
     );
@@ -30,9 +30,9 @@ describe('allocateCardWidths', () => {
 
   it('gives older Runs the same scale so they scroll', () => {
     const widths = allocateCardWidths([10, 10, 10, 10, 10, 10], 1000);
-    const newest = widths.slice(-4);
+    const newestWidths = widths.slice(-4);
 
-    expect(total(newest) + CARD_GAP * 3).toBeCloseTo(1000);
+    expect(totalWidth(newestWidths) + CARD_GAP * 3).toBeCloseTo(1000);
     expect(widths[0]).toBeCloseTo(widths[5]);
   });
 
@@ -54,7 +54,7 @@ describe('allocateCardWidths', () => {
     const widths = allocateCardWidths([0, 0], 500);
 
     expect(widths[0]).toBeCloseTo(widths[1]);
-    expect(total(widths) + CARD_GAP).toBeCloseTo(500);
+    expect(totalWidth(widths) + CARD_GAP).toBeCloseTo(500);
   });
 });
 
@@ -183,8 +183,8 @@ describe('formatClockTime', () => {
       formatClockTime(time, {
         timeFormat: 'UTC',
         hourFormat: '24',
-        seconds: false,
-        date: true,
+        withSeconds: false,
+        withDate: true,
       }),
     ).toMatch(/Jan 2.*15:04/);
   });
@@ -201,9 +201,9 @@ describe('formatClockTime', () => {
 
 describe('buildRulerTicks over long spans', () => {
   it('steps by days or more for a Run lasting years', () => {
-    const span = 3 * 365 * 86_400_000;
+    const spanMs = 3 * 365 * 86_400_000;
     const ticks = buildRulerTicks([
-      { id: 'run-a', x: 0, width: 600, startMs: 0, endMs: span },
+      { id: 'run-a', x: 0, width: 600, startMs: 0, endMs: spanMs },
     ]);
 
     expect(ticks.length).toBeLessThan(60);
@@ -227,9 +227,9 @@ describe('buildRulerTicks over long spans', () => {
 
 describe('dated major labels', () => {
   it('leave room after the dated run label and before the segment end', () => {
-    const span = 60 * 86_400_000;
+    const spanMs = 60 * 86_400_000;
     const ticks = buildRulerTicks([
-      { id: 'run-a', x: 0, width: 800, startMs: 0, endMs: span },
+      { id: 'run-a', x: 0, width: 800, startMs: 0, endMs: spanMs },
     ]);
     const labelled = ticks.filter(
       (tick) => tick.kind === 'major' && tick.labelled,
