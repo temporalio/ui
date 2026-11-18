@@ -456,6 +456,22 @@ test.describe('Workflow execution chain Run strip', () => {
     await expect(card(page, 'run-02')).toBeFocused();
   });
 
+  test('keeps focus on a detached card when the walk-back merges it', async ({
+    page,
+  }) => {
+    await mockChain(page, { runs: linearChain(15), current: () => 'run-15' });
+    await page.goto(chainUrl('run-01', '?run=run-02'));
+
+    await expect(card(page, 'run-02')).toHaveAttribute('aria-current', 'true');
+    await card(page, 'run-02').focus();
+
+    await gapButton(page).dispatchEvent('click');
+
+    await expect(strip(page)).toHaveAccessibleName('Runs, 15 loaded');
+    await expect(gapButton(page)).toHaveCount(0);
+    await expect(card(page, 'run-02')).toBeFocused();
+  });
+
   test('names and describes each card', async ({ page }) => {
     const runs = linearChain(3);
     runs[1].continueAsNewInitiator = 'CONTINUE_AS_NEW_INITIATOR_RETRY';

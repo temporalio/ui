@@ -56,6 +56,9 @@
   const GAP_ITEM = Symbol('gap');
 
   type RunIdOrGap = string | typeof GAP_ITEM;
+  type StripItem =
+    | { kind: 'run'; id: string; run: ChainRun; index: number; first: boolean }
+    | { kind: 'gap'; id: typeof GAP_ITEM };
 
   const id = $props.id();
   const descriptionId = `${id}-description`;
@@ -79,14 +82,30 @@
   const hasGap = $derived(detachedRuns.length > 0);
   const gapLoadsOlder = $derived(hasGap && !chain.detachedOffPath);
   const gapDisabled = $derived(chain.walking || chain.boundary !== null);
+  const stripItems = $derived.by((): StripItem[] => {
+    const runItem = (
+      run: ChainRun,
+      index: number,
+      first: boolean,
+    ): StripItem => ({
+      kind: 'run',
+      id: run.runId,
+      run,
+      index,
+      first,
+    });
+    return [
+      ...detachedRuns.map((run, index) => runItem(run, index, index === 0)),
+      ...(hasGap ? [{ kind: 'gap', id: GAP_ITEM } as const] : []),
+      ...runs.map((run, index) =>
+        runItem(run, detachedRuns.length + index, index === 0),
+      ),
+    ];
+  });
   const rovingItems = $derived<RunIdOrGap[]>(
-    gapLoadsOlder
-      ? [
-          ...detachedRuns.map((run) => run.runId),
-          GAP_ITEM,
-          ...runs.map((run) => run.runId),
-        ]
-      : stripRunIds,
+    stripItems
+      .filter((item) => item.kind === 'run' || gapLoadsOlder)
+      .map((item) => item.id),
   );
   const latestRun = $derived(
     runs.find((run) => run.runId === chain.latestRunId),
@@ -520,43 +539,41 @@
               onfocusin={rovingFocus.onfocusin}
               onfocusout={rovingFocus.onfocusout}
             >
-              {#each detachedRuns as run, index (run.runId)}
-                {@render runCard(run, index, index === 0)}
-              {/each}
-              {#if gapLoadsOlder}
-                <button
-                  bind:this={gapElement}
-                  type="button"
-                  tabindex={rovingFocus.tabIndex(GAP_ITEM)}
-                  aria-disabled={gapDisabled ? 'true' : undefined}
-                  aria-busy={chain.walking ? 'true' : undefined}
-                  onclick={loadOlderFromGap}
-                  class="flex shrink-0 flex-col items-center justify-center gap-1 rounded-md border border-dashed border-secondary px-2 text-center text-xs text-secondary transition-colors hover:border-brand hover:text-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary-press aria-disabled:cursor-not-allowed aria-disabled:opacity-disabled aria-disabled:hover:border-secondary aria-disabled:hover:text-secondary"
-                  style:width="{GAP_WIDTH}px"
-                  data-testid="run-strip-gap"
-                >
-                  <IconArrowLeft />
-                  {translate('workflows.load-older-runs')}
-                </button>
-              {:else if hasGap}
-                <Tooltip
-                  text={translate('workflows.replaced-by-reset-description')}
-                  top
-                  usePortal
-                  class="flex shrink-0"
-                >
-                  <div
-                    class="flex h-full flex-col items-center justify-center gap-1 border-x border-dashed border-secondary px-2 text-center text-xs text-secondary"
+              {#each stripItems as item (item.id)}
+                {#if item.kind === 'run'}
+                  {@render runCard(item.run, item.index, item.first)}
+                {:else if gapLoadsOlder}
+                  <button
+                    bind:this={gapElement}
+                    type="button"
+                    tabindex={rovingFocus.tabIndex(GAP_ITEM)}
+                    aria-disabled={gapDisabled ? 'true' : undefined}
+                    aria-busy={chain.walking ? 'true' : undefined}
+                    onclick={loadOlderFromGap}
+                    class="flex shrink-0 flex-col items-center justify-center gap-1 rounded-md border border-dashed border-secondary px-2 text-center text-xs text-secondary transition-colors hover:border-brand hover:text-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary-press aria-disabled:cursor-not-allowed aria-disabled:opacity-disabled aria-disabled:hover:border-secondary aria-disabled:hover:text-secondary"
                     style:width="{GAP_WIDTH}px"
-                    data-testid="run-strip-off-path"
+                    data-testid="run-strip-gap"
                   >
-                    <IconWarning />
-                    {translate('workflows.replaced-by-reset')}
-                  </div>
-                </Tooltip>
-              {/if}
-              {#each runs as run, index (run.runId)}
-                {@render runCard(run, detachedRuns.length + index, index === 0)}
+                    <IconArrowLeft />
+                    {translate('workflows.load-older-runs')}
+                  </button>
+                {:else}
+                  <Tooltip
+                    text={translate('workflows.replaced-by-reset-description')}
+                    top
+                    usePortal
+                    class="flex shrink-0"
+                  >
+                    <div
+                      class="flex h-full flex-col items-center justify-center gap-1 border-x border-dashed border-secondary px-2 text-center text-xs text-secondary"
+                      style:width="{GAP_WIDTH}px"
+                      data-testid="run-strip-off-path"
+                    >
+                      <IconWarning />
+                      {translate('workflows.replaced-by-reset')}
+                    </div>
+                  </Tooltip>
+                {/if}
               {/each}
             </div>
             {#if chain.pendingSuccessorRunId}
