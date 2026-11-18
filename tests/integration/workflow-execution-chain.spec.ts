@@ -154,6 +154,101 @@ test.describe('Workflow execution chain page', () => {
     expect(url.searchParams.has('run')).toBe(false);
   });
 
+  test('keeps an explicit None event filter in the URL', async ({ page }) => {
+    await mockChain(page, { runs: closedChain(), current: () => 'run-b' });
+    await page.goto(chainUrl('run-a'));
+
+    const workA = page.getByRole('button', { name: /^Event WorkA:/ });
+    const workB = page.getByRole('button', { name: /^Event WorkB:/ });
+    const filterButton = page.locator(
+      'button[aria-controls="event-type-filter"]',
+    );
+    const filterMenu = page.locator('#event-type-filter');
+    await expect(workB).toBeVisible();
+
+    await filterButton.click();
+    await filterMenu.getByTestId('None').click();
+
+    await expect(page).toHaveURL(/[?&]category=(&|$)/);
+    await expect(workB).toHaveCount(0);
+    await expect(
+      filterMenu.getByTestId('None').getByRole('checkbox'),
+    ).toBeChecked();
+    await page.keyboard.press('Escape');
+
+    await page.reload();
+    await expect(
+      detailValue(page, 'Latest run').getByRole('link', { name: 'run-b' }),
+    ).toBeVisible();
+    await expect(workB).toHaveCount(0);
+
+    await page
+      .getByRole('group', { name: /^Runs, \d+ loaded$/ })
+      .getByRole('button', { name: /^Run run-a, / })
+      .click();
+    await expect(page).toHaveURL(/[?&]run=run-a/);
+    await expect(page).toHaveURL(/[?&]category=(&|$)/);
+    await expect(workA).toHaveCount(0);
+
+    await page.goBack();
+    await expect(page).not.toHaveURL(/run=/);
+    await expect(workB).toHaveCount(0);
+
+    await page.goForward();
+    await expect(page).toHaveURL(/[?&]run=run-a/);
+    await expect(workA).toHaveCount(0);
+
+    await filterButton.click();
+    await filterMenu.getByTestId('All').click();
+
+    await expect(page).not.toHaveURL(/category=/);
+    await expect(workA).toBeVisible();
+  });
+
+  test('keeps an explicit None event filter across a live hand-off', async ({
+    page,
+  }) => {
+    const handOff = deferred();
+    const runs: MockRun[] = [
+      {
+        runId: 'run-a',
+        firstRunId: 'run-a',
+        successorRunId: 'run-b',
+        activity: 'WorkA',
+        startTime: '2024-01-01T00:00:00.000Z',
+        open: true,
+        release: handOff.promise,
+      },
+      {
+        runId: 'run-b',
+        firstRunId: 'run-a',
+        predecessorRunId: 'run-a',
+        activity: 'WorkB',
+        startTime: '2024-01-01T00:30:00.000Z',
+        open: true,
+      },
+    ];
+    let currentRunId = 'run-a';
+    await mockChain(page, { runs, current: () => currentRunId });
+
+    await page.goto(chainUrl('run-a', '?category='));
+
+    await expect(header(page).getByRole('link', { name: 'run-a' })).toHaveCount(
+      2,
+    );
+
+    currentRunId = 'run-b';
+    handOff.resolve();
+
+    await expect(
+      detailValue(page, 'Latest run').getByRole('link', { name: 'run-b' }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: /^Event WorkB:/ }),
+    ).toHaveCount(0);
+    expect(new URL(page.url()).searchParams.get('category')).toBe('');
+  });
+
   test('stops at a closed chain', async ({ page }) => {
     await page.clock.install();
     await mockChain(page, { runs: closedChain(), current: () => 'run-b' });

@@ -7,7 +7,10 @@ import {
 import type { EventSortOrder } from '$lib/stores/event-view';
 import type { EventTypeCategory } from '$lib/types/events';
 
-import { updateMultipleQueryParameters } from './update-query-parameters';
+import {
+  type QueryParameter,
+  updateMultipleQueryParameters,
+} from './update-query-parameters';
 
 export const SHARED_FILTER_PARAMS = [
   'sort',
@@ -42,6 +45,18 @@ const decodeEventGroupKey = (key: string): string => {
   }
 };
 
+const categorySeparator = ',';
+
+const parseCategories = (value: string | null): EventTypeCategory[] | null => {
+  if (value === null) {
+    return null;
+  }
+  if (!value) {
+    return [];
+  }
+  return value.split(categorySeparator) as EventTypeCategory[];
+};
+
 const parseEventGroups = (value: string | null): EventGroupKey[] =>
   value
     ? value
@@ -54,13 +69,10 @@ const serializeEventGroups = (keys: EventGroupKey[]): string =>
   keys.map((key) => encodeURIComponent(key)).join(eventGroupSeparator);
 
 export function parseEventFilterParams(url: URL) {
-  const categoryParam = url.searchParams.get('category');
   return {
     eventGroups: parseEventGroups(url.searchParams.get('groups')),
     sort: (url.searchParams.get('sort') as EventSortOrder) || 'descending',
-    categories: categoryParam
-      ? (categoryParam.split(',') as EventTypeCategory[])
-      : null,
+    categories: parseCategories(url.searchParams.get('category')),
     statusFilter: url.searchParams.get('status') === 'pending',
     refresh_off: url.searchParams.get('refresh_off') === 'true',
   };
@@ -79,8 +91,7 @@ export function updateEventFilterParams(
   filters: FilterUpdate,
   goto: typeof navigateTo = navigateTo,
 ) {
-  const parameters: { parameter: string; value?: string | number | boolean }[] =
-    [];
+  const parameters: QueryParameter[] = [];
 
   if (filters.sort !== undefined) {
     parameters.push({
@@ -92,9 +103,8 @@ export function updateEventFilterParams(
   if (filters.categories !== undefined) {
     parameters.push({
       parameter: 'category',
-      value: filters.categories?.length
-        ? filters.categories.join(',')
-        : undefined,
+      value: filters.categories?.join(categorySeparator),
+      allowEmpty: filters.categories !== null,
     });
   }
 
