@@ -1762,6 +1762,43 @@ describe('WorkflowExecutionChain', () => {
       await settle();
 
       expect(detachedRunIds(chain)).toEqual(['run-4']);
+      expect(chain.cardLoadOf('run-2').status).toBe('queued');
+    });
+
+    it('does not start the card of a request that resolves after jumping to live', async () => {
+      server.addChain(runIds(15));
+      const chain = track(await loadChain(server));
+      const releaseRequest = holdNextDescribe();
+      chain.prioritizeRun('run-2');
+      void chain.requestRun('run-2');
+
+      chain.prioritizeRun(null);
+      releaseRequest();
+      await settle();
+
+      expect(chain.detachedRuns).toEqual([]);
+      expect(chain.cardLoadOf('run-2').status).toBe('queued');
+    });
+
+    it('attaches the current pin when an older pin resolves later during a walk', async () => {
+      server.addChain(runIds(25));
+      const chain = track(await loadChain(server));
+      const releaseWalk = holdNextDescribe();
+      const walking = chain.loadOlder();
+      const releaseRequest = holdNextDescribe();
+      chain.prioritizeRun('run-2');
+      void chain.requestRun('run-2');
+
+      chain.prioritizeRun('run-3');
+      await chain.requestRun('run-3');
+      releaseRequest();
+      await settle();
+      releaseWalk();
+      await settle();
+      await walking;
+
+      expect(detachedRunIds(chain)).toEqual(['run-3']);
+      expect(chain.cardLoadOf('run-2').status).toBe('queued');
     });
 
     it('does not attach a pin deferred by a walk once it is no longer pinned', async () => {

@@ -462,6 +462,9 @@ export class WorkflowExecutionChain {
       return;
     }
     const { runId } = result.run;
+    if (runId !== this._prioritizedRunId) {
+      return;
+    }
     this._detachedCandidateId = runId;
     this._attachDetached();
     if (this.cardLoadOf(runId).status === 'queued') {
