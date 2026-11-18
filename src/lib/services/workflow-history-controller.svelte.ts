@@ -391,9 +391,11 @@ export class WorkflowHistoryController {
     );
     if (isWorkflowCloseEvent(event)) {
       this.historyClosed = true;
-      this.closeEvent = event;
       if (!session.catchingUp) session.livePollController?.abort();
-      this.onClose?.(event);
+      if (!this.closeEvent) {
+        this.closeEvent = event;
+        this.onClose?.(event);
+      }
     }
     return isNew;
   }
