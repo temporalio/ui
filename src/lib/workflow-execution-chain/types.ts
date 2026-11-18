@@ -18,12 +18,7 @@ export type ChainRun = {
   startedEvent: HistoryEvent;
 };
 
-export type ChainStatus =
-  | 'loading'
-  | 'ready'
-  | 'mismatch'
-  | 'closed'
-  | 'discoveryError';
+export type ChainStatus = 'loading' | 'ready' | 'mismatch' | 'closed';
 
 export type ChainBoundary = 'chainStart' | 'retention' | null;
 

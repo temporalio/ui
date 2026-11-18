@@ -13,7 +13,7 @@
   import { Badge } from '$lib/io/badge';
   import { Breadcrumbs } from '$lib/io/breadcrumbs';
   import { IconLink } from '$lib/io/icon';
-  import { isWorkflowOpen } from '$lib/models/workflow-status';
+  import { createWallClock } from '$lib/runes/wall-clock.svelte';
   import { workflowsSearchParams } from '$lib/stores/workflows';
   import { formatDistance } from '$lib/utilities/format-time';
   import {
@@ -22,7 +22,7 @@
     routeForWorkflows,
     routeForWorkflowsWithQuery,
   } from '$lib/utilities/route-for';
-  import { getWorkflowLatestTime } from '$lib/utilities/workflow-time-skipping';
+  import { getWorkflowVirtualTime } from '$lib/utilities/workflow-time-skipping';
 
   import type { WorkflowExecutionChain } from './workflow-execution-chain.svelte';
 
@@ -64,36 +64,16 @@
   const chainStart = $derived(
     firstRun.status === 'found' ? firstRun.workflow.startTime : undefined,
   );
-  const chainEnd = $derived(
-    chain.status === 'closed' ? latestRun?.workflow.endTime : undefined,
+  const chainEnd = $derived(chain.closeTime);
+
+  const readWallClock = createWallClock();
+
+  const durationEnd = $derived(
+    chainEnd ?? getWorkflowVirtualTime(latestRun?.workflow) ?? readWallClock(),
   );
 
-  let now = $state(Date.now());
-
-  $effect(() => {
-    if (!chainStart || chainEnd) {
-      return;
-    }
-    now = Date.now();
-    const interval = setInterval(() => {
-      now = Date.now();
-    }, 1000);
-    return () => clearInterval(interval);
-  });
-
-  const chainLatestTime = $derived.by(() => {
-    if (chainEnd) {
-      return chainEnd;
-    }
-    return latestRun && isWorkflowOpen(latestRun.workflow)
-      ? getWorkflowLatestTime(latestRun.workflow, now)
-      : now;
-  });
-
   const chainDuration = $derived(
-    chainStart
-      ? formatDistance({ start: chainStart, end: chainLatestTime })
-      : '',
+    chainStart ? formatDistance({ start: chainStart, end: durationEnd }) : '',
   );
 
   const sdkInfo = $derived.by(() => {

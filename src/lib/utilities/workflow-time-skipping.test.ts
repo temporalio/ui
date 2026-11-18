@@ -6,6 +6,7 @@ import type { WorkflowExecution } from '$lib/types/workflows';
 import {
   getWorkflowCurrentTime,
   getWorkflowLatestTime,
+  getWorkflowVirtualTime,
 } from './workflow-time-skipping';
 
 const wallTime = Date.parse('2026-11-09T12:00:00Z');
@@ -32,6 +33,7 @@ describe('workflow clocks', () => {
   });
 
   it('uses the latest virtual or received event time without extrapolating browser time', () => {
+    expect(getWorkflowVirtualTime(workflow)).toBe(virtualTime);
     expect(getWorkflowCurrentTime(workflow, wallTime)).toBe(virtualTime);
     expect(getWorkflowCurrentTime(workflow, wallTime + 10_000)).toBe(
       virtualTime,
@@ -53,6 +55,8 @@ describe('workflow clocks', () => {
       wallTime,
     );
     expect(getWorkflowCurrentTime(undefined, wallTime)).toBe(wallTime);
+    expect(getWorkflowVirtualTime(ordinary)).toBeUndefined();
+    expect(getWorkflowVirtualTime(undefined)).toBeUndefined();
     expect(getWorkflowLatestTime(undefined, wallTime)).toBe(wallTime);
   });
 });

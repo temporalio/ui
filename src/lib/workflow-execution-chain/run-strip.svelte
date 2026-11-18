@@ -19,7 +19,9 @@
     IconWarning,
   } from '$lib/io/icon';
   import { isWorkflowOpen } from '$lib/models/workflow-status';
+  import { createWallClock } from '$lib/runes/wall-clock.svelte';
   import { createAnnouncer } from '$lib/stores/announcer';
+  import { getValidTimeMs } from '$lib/utilities/format-time';
   import { createRovingFocusState } from '$lib/utilities/roving-focus';
   import { getWorkflowLatestTime } from '$lib/utilities/workflow-time-skipping';
 
@@ -68,7 +70,7 @@
   let scrolledFromEnd = $state(false);
   let selectedOutOfView = $state(false);
   let newerArrivedForRunId = $state<string | null>(null);
-  let now = $state(Date.now());
+  const readWallClock = createWallClock();
 
   const runs = $derived(chain.runs);
   const detachedRuns = $derived(chain.detachedRuns);
@@ -92,6 +94,7 @@
   const latestRunOpen = $derived(
     Boolean(latestRun && isWorkflowOpen(latestRun.workflow)),
   );
+  const now = $derived(latestRunOpen ? readWallClock() : Date.now());
   const selectedIndex = $derived(
     selectedRunId ? stripRunIds.indexOf(selectedRunId) : -1,
   );
@@ -120,21 +123,10 @@
     },
   });
 
-  $effect(() => {
-    if (!latestRunOpen) {
-      return;
-    }
-    now = Date.now();
-    const interval = setInterval(() => {
-      now = Date.now();
-    }, 1000);
-    return () => clearInterval(interval);
-  });
-
   const runSpans = $derived(
     stripRuns.map(({ runId, workflow }) => {
-      const startMs = Date.parse(workflow.startTime);
       const endMs = getWorkflowLatestTime(workflow, now);
+      const startMs = getValidTimeMs(workflow.startTime) ?? endMs;
       return { id: runId, startMs, endMs: Math.max(startMs, endMs) };
     }),
   );
@@ -409,7 +401,7 @@
       class="flex items-center gap-2 text-xs text-secondary"
       data-testid="run-strip-status"
     >
-      {#if chain.status === 'discoveryError'}
+      {#if chain.hasDiscoveryError}
         <span class="flex items-center gap-1 text-danger"
           ><IconWarning />{translate('workflows.discovery-error')}</span
         >
