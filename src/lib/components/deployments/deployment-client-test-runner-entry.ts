@@ -6,6 +6,10 @@ import { page } from '$app/state';
 
 import ComputeProviderPerRegion from '$lib/components/workers/serverless-worker-form/compute-provider-per-region.svelte';
 import type { ComputeRegion } from '$lib/components/workers/serverless-worker-form/multi-region';
+import type {
+  ComputeInitialValues,
+  RegionComputeValues,
+} from '$lib/components/workers/serverless-worker-form/shared';
 import { i18nNamespaces } from '$lib/i18n';
 import resources from '$lib/i18n/locales';
 import Deployment from '$lib/pages/deployment.svelte';
@@ -137,14 +141,25 @@ export function renderRows({
   return target;
 }
 
+let computeRegionValues: RegionComputeValues[] = [];
+
+/** What the per-region form last bound to `regionValues`, as a save sends. */
+export function savedRegionValues() {
+  flushSync();
+  return computeRegionValues;
+}
+
 export function renderComputePerRegion({
   regions,
   enabledRegionIds,
+  initialPrimary,
 }: {
   regions: ComputeRegion[];
   enabledRegionIds?: string[];
+  initialPrimary?: ComputeInitialValues;
 }) {
   setPageState();
+  computeRegionValues = [];
   const target = document.body.appendChild(document.createElement('div'));
   mounted.push(
     mount(ComputeProviderPerRegion, {
@@ -153,6 +168,13 @@ export function renderComputePerRegion({
         namespace: 'default',
         regions,
         ...(enabledRegionIds === undefined ? {} : { enabledRegionIds }),
+        ...(initialPrimary === undefined ? {} : { initialPrimary }),
+        get regionValues() {
+          return computeRegionValues;
+        },
+        set regionValues(value: RegionComputeValues[]) {
+          computeRegionValues = value;
+        },
       },
     }),
   );

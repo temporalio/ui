@@ -181,45 +181,87 @@ describe('multi-region wiring', () => {
   });
 
   describe('the per-region compute form', () => {
-    const FORM_REGIONS = [
+    const PRIMARY_ARN = 'arn:aws:lambda:us-east-1:123456789012:function:worker';
+    const regionsFor = (provider: 'lambda' | 'cloud-run') => [
       {
         id: EAST,
         role: 'primary' as const,
         providerRegion: 'us-east-1',
-        provider: 'lambda' as const,
+        provider,
       },
       {
         id: WEST,
         role: 'replica' as const,
-        providerRegion: 'us-west-2',
-        provider: 'lambda' as const,
+        providerRegion: 'us-west-2' as string | undefined,
+        provider,
       },
     ];
+    const lambdaPrimary = {
+      provider: 'lambda' as const,
+      lambdaArn: PRIMARY_ARN,
+      iamRoleArn: '',
+      roleExternalId: '',
+    };
     const replicaToggle = (form: HTMLElement) =>
       form.querySelector<HTMLInputElement>('#replica-compute');
+    const savedRegionIds = () =>
+      client.savedRegionValues().map(({ regionId }) => regionId);
 
-    test('starts with Serverless on in the replica for a new Version', () => {
-      const form = client.renderComputePerRegion({ regions: FORM_REGIONS });
+    test('a new Lambda Version saves a replica with a suggested ARN', () => {
+      const form = client.renderComputePerRegion({
+        regions: regionsFor('lambda'),
+        initialPrimary: lambdaPrimary,
+      });
 
       expect(replicaToggle(form)?.checked).toBe(true);
+      expect(savedRegionIds()).toEqual([EAST, WEST]);
+      expect(client.savedRegionValues()[1]?.values.lambdaArn).toBe(
+        'arn:aws:lambda:us-west-2:123456789012:function:worker',
+      );
     });
 
-    test('starts the replica off when the saved Version has no group there', () => {
+    test('a new Cloud Run Version saves only the primary', () => {
       const form = client.renderComputePerRegion({
-        regions: FORM_REGIONS,
-        enabledRegionIds: [],
+        regions: regionsFor('cloud-run'),
       });
 
       expect(replicaToggle(form)?.checked).toBe(false);
+      expect(savedRegionIds()).toEqual([EAST]);
     });
 
-    test('starts the replica on when the saved Version has a group there', () => {
+    test('a new Version saves only the primary when the replica has no provider region', () => {
       const form = client.renderComputePerRegion({
-        regions: FORM_REGIONS,
+        regions: regionsFor('lambda').map((region) =>
+          region.role === 'replica'
+            ? { ...region, providerRegion: undefined }
+            : region,
+        ),
+        initialPrimary: lambdaPrimary,
+      });
+
+      expect(replicaToggle(form)?.checked).toBe(false);
+      expect(savedRegionIds()).toEqual([EAST]);
+    });
+
+    test('a saved Version with no replica group keeps the replica off', () => {
+      const form = client.renderComputePerRegion({
+        regions: regionsFor('lambda'),
+        enabledRegionIds: [],
+        initialPrimary: lambdaPrimary,
+      });
+
+      expect(replicaToggle(form)?.checked).toBe(false);
+      expect(savedRegionIds()).toEqual([EAST]);
+    });
+
+    test('a saved Cloud Run Version with a replica group keeps the replica on', () => {
+      const form = client.renderComputePerRegion({
+        regions: regionsFor('cloud-run'),
         enabledRegionIds: [WEST],
       });
 
       expect(replicaToggle(form)?.checked).toBe(true);
+      expect(savedRegionIds()).toEqual([EAST, WEST]);
     });
   });
 });

@@ -6,6 +6,7 @@ import {
 } from 'node:util';
 
 import { startIsolatedViteServer } from '$lib/test-utilities/isolated-vite-server';
+import '$lib/test-utilities/jsdom-browser-apis';
 
 type ClientRunner = typeof import('./deployment-client-test-runner-entry');
 
@@ -124,15 +125,6 @@ export async function getDeploymentClientTestRunner(): Promise<ClientRunner> {
         if (!isRunnableDevEnvironment(clientEnvironment)) {
           throw new Error('The Vite client test environment is not runnable');
         }
-        // The compute form's motion reads the reduced-motion query on import,
-        // and JSDOM has no matchMedia.
-        window.matchMedia ??= (query: string) =>
-          ({
-            matches: false,
-            media: query,
-            addEventListener() {},
-            removeEventListener() {},
-          }) as unknown as MediaQueryList;
         const clientRunner = (await clientEnvironment.runner.import(
           '/src/lib/components/deployments/deployment-client-test-runner-entry.ts',
         )) as ClientRunner;
