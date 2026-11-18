@@ -286,6 +286,26 @@ describe('WorkflowHistoryController', () => {
 
       expect(onClose).toHaveBeenCalledWith(closeEvent);
     });
+
+    it('live-polls a paused Run and calls onClose when the poll delivers the close', async () => {
+      const onClose = vi.fn();
+      const { controller } = createController('run-1', { onClose });
+      const load = controller.load({
+        ...workflow('run-1'),
+        status: 'Paused',
+        isPaused: true,
+      });
+      expect(requests).toHaveLength(0);
+      tail(0).result.resolve(tailEvents([2, 3]));
+      pollEvents(0, [1, 2, 3], 'token-1');
+      await load;
+      expect(poll(0).options.signal.aborted).toBe(false);
+
+      const closeEvent = makeWorkflowCompleted(4);
+      poll(0).options.onEvent(closeEvent);
+
+      expect(onClose).toHaveBeenCalledWith(closeEvent);
+    });
   });
 
   describe('closed Run', () => {

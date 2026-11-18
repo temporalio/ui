@@ -18,6 +18,7 @@
     IconTarget,
     IconWarning,
   } from '$lib/io/icon';
+  import { isWorkflowOpen } from '$lib/models/workflow-status';
   import { createAnnouncer } from '$lib/stores/announcer';
   import { createRovingFocusState } from '$lib/utilities/roving-focus';
   import { getWorkflowLatestTime } from '$lib/utilities/workflow-time-skipping';
@@ -88,7 +89,9 @@
   const latestRun = $derived(
     runs.find((run) => run.runId === chain.latestRunId),
   );
-  const latestRunOpen = $derived(Boolean(latestRun?.workflow.isRunning));
+  const latestRunOpen = $derived(
+    Boolean(latestRun && isWorkflowOpen(latestRun.workflow)),
+  );
   const selectedIndex = $derived(
     selectedRunId ? stripRunIds.indexOf(selectedRunId) : -1,
   );

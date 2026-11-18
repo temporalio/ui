@@ -1,5 +1,6 @@
 import { createContext } from 'svelte';
 
+import { isWorkflowOpen } from '$lib/models/workflow-status';
 import type { HistoryEvent } from '$lib/types/events';
 import type { NetworkError } from '$lib/types/global';
 import type {
@@ -34,7 +35,7 @@ type HistoryLoadSession = {
   livePollFailed: boolean;
   lastPollToken: string;
   lastPollEventId: number;
-  workflowWasRunning: boolean;
+  workflowWasOpen: boolean;
   catchingUp: boolean;
   tailStartId: number;
   pollPages: number;
@@ -148,6 +149,7 @@ export class WorkflowHistoryController {
       workflow.pendingActivities ?? [],
       workflow.pendingNexusOperations ?? [],
     );
+    const isOpen = isWorkflowOpen(workflow);
 
     const session: HistoryLoadSession = {
       controller: new AbortController(),
@@ -156,8 +158,8 @@ export class WorkflowHistoryController {
       livePollFailed: false,
       lastPollToken,
       lastPollEventId,
-      workflowWasRunning: workflow.isRunning,
-      catchingUp: workflow.isRunning,
+      workflowWasOpen: isOpen,
+      catchingUp: isOpen,
       tailStartId: 0,
       pollPages: 0,
       pollPausedAtPageLimit: false,
@@ -165,7 +167,7 @@ export class WorkflowHistoryController {
     };
     this.session = session;
 
-    if (workflow.isRunning) {
+    if (isOpen) {
       await this.loadOpenHistory(session);
       return;
     }
@@ -320,7 +322,7 @@ export class WorkflowHistoryController {
     );
     const session = this.session;
     if (!session) return;
-    session.workflowWasRunning ||= workflow.isRunning;
+    session.workflowWasOpen ||= isWorkflowOpen(workflow);
     this.startLivePoll(session);
   }
 
@@ -372,7 +374,7 @@ export class WorkflowHistoryController {
       !session.livePollFailed &&
       (session.catchingUp ||
         (!this.liveUpdatesPaused &&
-          session.workflowWasRunning &&
+          session.workflowWasOpen &&
           !this.historyClosed))
     );
   }
