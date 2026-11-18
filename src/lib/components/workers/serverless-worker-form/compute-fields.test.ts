@@ -447,24 +447,25 @@ describe("a consumer replacing a provider's credential fields", () => {
     expect(body).toContain('IAM Role ARN');
   });
 
-  it('types the Modal workspace when no consumer supplies credentials', () => {
+  it('never asks for the Modal workspace', () => {
+    // Nobody types it. Open source resolves the workspace from the Modal
+    // credentials the server is configured with, and one API key owns one
+    // workspace. Temporal Cloud sets it from its connection picker.
     const body = renderComputeFields({ provider: 'modal' });
 
-    expect(body).toContain('Workspace ID');
+    expect(body).not.toContain('Workspace ID');
+    // The rest of the resource section is untouched.
+    expect(body).toContain('App Name');
+    expect(body).toContain('Function Name');
   });
 
-  it('drops the typed Modal workspace when a consumer supplies credentials', () => {
-    // The consumer's credentials own the workspace -- Temporal Cloud's grant
-    // is per workspace, so its picker sets it. Rendering the input as well
-    // would offer two answers to one question.
+  it('still asks for nothing extra when a consumer supplies credentials', () => {
     const body = renderComputeFields({
       provider: 'modal',
       credentials: { modal: cloudRunAccessFields },
     });
 
     expect(body).not.toContain('Workspace ID');
-    // The rest of the resource section is untouched.
     expect(body).toContain('App Name');
-    expect(body).toContain('Function Name');
   });
 });

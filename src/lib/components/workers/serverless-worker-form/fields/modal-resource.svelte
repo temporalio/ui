@@ -7,19 +7,12 @@
 
   import type { ComputeSectionProps } from './types';
 
-  let {
-    values = $bindable(),
-    errors,
-    fieldId,
-    credentialsSupplied = false,
-  }: ComputeSectionProps = $props();
+  let { values = $bindable(), errors, fieldId }: ComputeSectionProps = $props();
 
-  // Open source types the workspace, because one API key owns one workspace
-  // and the form cannot know which. A consumer that supplies credentials
-  // knows: Temporal Cloud's grant is per workspace, so its connection picker
-  // sets this and showing a text input beside it would offer two answers to
-  // one question.
-  const typesWorkspace = $derived(!credentialsSupplied);
+  // No workspace field. Open source resolves the workspace from the Modal
+  // credentials the server is configured with, and one API key owns one
+  // workspace, so there is nothing for a person to choose. Temporal Cloud
+  // sets modalWorkspaceId from its connection picker instead.
 </script>
 
 <div class="flex flex-col gap-4">
@@ -71,19 +64,6 @@
     placeholder={translate('workers.modal-environment-placeholder')}
     required
   />
-  {#if typesWorkspace}
-    <Input
-      bind:value={values.modalWorkspaceId}
-      id={fieldId('modalWorkspaceId')}
-      name={fieldId('modalWorkspaceId')}
-      spellcheck={false}
-      label={translate('workers.modal-workspace-id-label')}
-      hintText={errors.modalWorkspaceId?.[0] ||
-        translate('workers.modal-workspace-id-hint')}
-      error={!!errors.modalWorkspaceId?.[0]}
-      placeholder={translate('workers.modal-workspace-id-placeholder')}
-    />
-  {/if}
   <Input
     bind:value={values.modalAppVersion}
     id={fieldId('modalAppVersion')}
