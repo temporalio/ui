@@ -35,6 +35,7 @@ export type MockRun = {
   activity: string;
   startTime: string;
   closeTime?: string;
+  currentTime?: string;
   open?: boolean;
   release?: Promise<void>;
   continueAsNewInitiator?: ContinueAsNewInitiator;
@@ -145,6 +146,11 @@ const describeResponse = (run: MockRun): WorkflowExecutionAPIResponse => {
     },
     pendingActivities: [],
     pendingChildren: [],
+    ...(run.currentTime && {
+      workflowExtendedInfo: {
+        timeSkippingInfo: { currentTime: run.currentTime },
+      },
+    }),
   } as unknown as WorkflowExecutionAPIResponse;
 };
 

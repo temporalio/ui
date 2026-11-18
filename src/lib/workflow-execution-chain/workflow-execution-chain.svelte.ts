@@ -5,6 +5,7 @@ import type { WorkflowHistoryController } from '$lib/services/workflow-history-c
 import type { HistoryEvent } from '$lib/types/events';
 import type { WorkflowExecution } from '$lib/types/workflows';
 import { getErrorMessage } from '$lib/utilities/error-message';
+import { getValidTimeMs, type ValidTime } from '$lib/utilities/format-time';
 import { isNotFound } from '$lib/utilities/handle-error';
 import { isNetworkError } from '$lib/utilities/is-network-error';
 
@@ -30,7 +31,6 @@ export const WALK_SIZE = 10;
 export const REFRESH_INTERVAL_MS = 10_000;
 export const CARD_LOAD_CONCURRENCY = 1;
 
-type Phase = Exclude<ChainStatus, 'discoveryError'>;
 type DiscoveryStep =
   | 'walkBack'
   | 'detachedWalkBack'
@@ -98,7 +98,7 @@ export class WorkflowExecutionChain {
   detachedOffPath = $state(false);
 
   private _latestRunId = $state<string | null>(null);
-  private _phase = $state<Phase>('loading');
+  private _status = $state<ChainStatus>('loading');
   private _failedSteps = new SvelteMap<DiscoveryStep, () => void>();
   private _refreshTimer: ReturnType<typeof setTimeout> | null = null;
   private _prioritizedRunId: string | null = null;
@@ -130,10 +130,23 @@ export class WorkflowExecutionChain {
   }
 
   get status(): ChainStatus {
-    if (this._failedSteps.size > 0) {
-      return 'discoveryError';
+    return this._status;
+  }
+
+  get hasDiscoveryError(): boolean {
+    return this._failedSteps.size > 0;
+  }
+
+  get closeTime(): ValidTime | undefined {
+    if (this._status !== 'closed' || !this._latestRunId) {
+      return undefined;
     }
-    return this._phase;
+    const record = this._records.get(this._latestRunId);
+    return (
+      record?.run?.workflow.endTime ||
+      record?.controller?.closeEvent?.eventTime ||
+      undefined
+    );
   }
 
   get latestRunId(): string | null {
@@ -206,7 +219,7 @@ export class WorkflowExecutionChain {
     this._windowIds = [latest.runId];
     this._latestRunId = latest.runId;
     const isOpen = isWorkflowOpen(current);
-    this._phase = isOpen ? 'ready' : 'closed';
+    this._status = isOpen ? 'ready' : 'closed';
     if (isOpen) {
       this._scheduleRefresh();
     }
@@ -512,10 +525,12 @@ export class WorkflowExecutionChain {
     if (!detached || this.detachedOffPath) {
       return;
     }
-    if (
-      Date.parse(windowRun.workflow.startTime) <
-      Date.parse(detached.workflow.startTime)
-    ) {
+    const windowStartMs = getValidTimeMs(windowRun.workflow.startTime);
+    const detachedStartMs = getValidTimeMs(detached.workflow.startTime);
+    if (windowStartMs === undefined || detachedStartMs === undefined) {
+      return;
+    }
+    if (windowStartMs < detachedStartMs) {
       this.detachedOffPath = true;
     }
   }
@@ -570,7 +585,7 @@ export class WorkflowExecutionChain {
       reason: routeRunFirstRunId ? 'workflowIdReused' : 'routeChainNotFound',
       currentFirstRunId,
     };
-    this._phase = 'mismatch';
+    this._status = 'mismatch';
   }
 
   private async _readFirstRunId(
@@ -656,7 +671,7 @@ export class WorkflowExecutionChain {
 
     const successorRunId = readSuccessorRunId(closeEvent);
     if (!successorRunId) {
-      this._phase = 'closed';
+      this._status = 'closed';
       this._emit({ type: 'closed' });
       return;
     }
@@ -685,7 +700,7 @@ export class WorkflowExecutionChain {
       this._removeDetached(run.runId);
     }
     this._latestRunId = run.runId;
-    this._phase = 'ready';
+    this._status = 'ready';
     this._emit({ type: 'handOff', runId: run.runId });
     if (isWorkflowOpen(run.workflow)) {
       this._scheduleRefresh();

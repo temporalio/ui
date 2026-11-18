@@ -102,6 +102,63 @@ test.describe('Workflow execution chain page', () => {
     await expect(duration).not.toHaveText(initial ?? '');
   });
 
+  test("measures the chain duration to the latest run's skipped time", async ({
+    page,
+  }) => {
+    await page.clock.install();
+    const [first] = closedChain();
+    const open: MockRun = {
+      runId: 'run-b',
+      firstRunId: 'run-a',
+      predecessorRunId: 'run-a',
+      activity: 'WorkB',
+      startTime: '2024-01-01T00:30:00.000Z',
+      currentTime: '2024-01-01T03:00:00.000Z',
+      open: true,
+    };
+    await mockChain(page, { runs: [first, open], current: () => 'run-b' });
+
+    await page.goto(chainUrl('run-a'));
+
+    const duration = detailValue(page, 'Chain Duration');
+    await expect(duration).toHaveText('3 hours');
+    await page.clock.runFor(5000);
+    await expect(duration).toHaveText('3 hours');
+  });
+
+  test('keeps the skipped time while the hand-off to the next run is pending', async ({
+    page,
+  }) => {
+    await page.clock.install();
+    const handOff = deferred();
+    const latest: MockRun = {
+      runId: 'run-a',
+      firstRunId: 'run-a',
+      successorRunId: 'run-b',
+      activity: 'WorkA',
+      startTime: '2024-01-01T00:00:00.000Z',
+      currentTime: '2024-01-01T02:00:00.000Z',
+      open: true,
+      release: handOff.promise,
+    };
+    await mockChain(page, { runs: [latest], current: () => 'run-a' });
+
+    await page.goto(chainUrl('run-a'));
+
+    const duration = detailValue(page, 'Chain Duration');
+    await expect(duration).toHaveText('2 hours');
+
+    handOff.resolve();
+
+    await expect(
+      page
+        .getByTestId('run-strip-status')
+        .getByRole('button', { name: 'Retry' }),
+    ).toBeVisible();
+    await page.clock.runFor(5000);
+    await expect(duration).toHaveText('2 hours');
+  });
+
   test('follows a continue-as-new hand-off and keeps filters in the URL', async ({
     page,
   }) => {
