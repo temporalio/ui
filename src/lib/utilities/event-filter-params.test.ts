@@ -139,3 +139,62 @@ describe('event group filter params', () => {
     ).toEqual(['label:%E0']);
   });
 });
+
+describe('category filter params', () => {
+  it('reads a missing category param as all categories', () => {
+    expect(
+      parseEventFilterParams(new URL('http://localhost/')).categories,
+    ).toBeNull();
+  });
+
+  it('reads an empty category param as no categories', () => {
+    expect(
+      parseEventFilterParams(new URL('http://localhost/?category=')).categories,
+    ).toEqual([]);
+  });
+
+  it('round-trips an explicit empty category list', async () => {
+    const mockGoto = vi.fn(() => Promise.resolve());
+
+    await updateEventFilterParams(
+      new URL('http://localhost/?category=activity&run=abc'),
+      { categories: [] },
+      mockGoto,
+    );
+
+    const [href] = mockGoto.mock.calls[0] as unknown as [string];
+    const url = new URL(href, 'http://localhost');
+    expect(url.searchParams.get('run')).toBe('abc');
+    expect(parseEventFilterParams(url).categories).toEqual([]);
+  });
+
+  it('round-trips a category selection', async () => {
+    const mockGoto = vi.fn(() => Promise.resolve());
+
+    await updateEventFilterParams(
+      new URL('http://localhost/'),
+      { categories: ['activity', 'timer'] },
+      mockGoto,
+    );
+
+    const [href] = mockGoto.mock.calls[0] as unknown as [string];
+    expect(
+      parseEventFilterParams(new URL(href, 'http://localhost')).categories,
+    ).toEqual(['activity', 'timer']);
+  });
+
+  it('removes the category param when all categories are selected', async () => {
+    const mockGoto = vi.fn(() => Promise.resolve());
+
+    await updateEventFilterParams(
+      new URL('http://localhost/?category='),
+      { categories: null },
+      mockGoto,
+    );
+
+    const [href] = mockGoto.mock.calls[0] as unknown as [string];
+    expect(new URL(href, 'http://localhost').searchParams.has('category')).toBe(
+      false,
+    );
+  });
+});
