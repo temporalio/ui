@@ -10,9 +10,10 @@
   import { translate } from '$lib/i18n/translate';
 
   import {
-    type ComputeProviderTemplates,
+    type ComputeProviderTemplateMap,
     type ComputeProviderValue,
   } from './compute-providers';
+  import type { ComputeSection } from './fields/types';
   import { revealFirstProblem } from './motion';
   import {
     type ComputeRegion,
@@ -54,9 +55,11 @@
     ) => Promise<SubmitFieldErrors | void>;
     onSuccess: () => void;
     cancelHref: string;
-    templates?: Record<ComputeProviderValue, ComputeProviderTemplates>;
+    templates?: ComputeProviderTemplateMap;
     computeProviders?: readonly ComputeProviderOption[];
     gcpRegions?: string[];
+    /** Credential components supplied by the consumer, keyed by provider. */
+    credentials?: Partial<Record<ComputeProviderValue, ComputeSection>>;
     /**
      * Regions this namespace runs in. When more than one is provided (a highly
      * available namespace), the form collects a compute provider per region.
@@ -73,6 +76,7 @@
     templates,
     computeProviders,
     gcpRegions,
+    credentials,
     regions,
     namespace = '',
   }: Props = $props();
@@ -113,6 +117,11 @@
       gcpRegion: '',
       gcpWorkerPool: '',
       gcpServiceAccount: '',
+      modalAppName: '',
+      modalFunctionName: '',
+      modalEnvironment: '',
+      modalWorkspaceId: '',
+      modalAppVersion: '',
       minReplicas: 0,
       maxReplicas: 30,
       initialReplicas: 0,
@@ -223,6 +232,7 @@
           {namespace}
           {regions}
           {computeProviders}
+          {credentials}
           deploymentName={$form.name}
           buildId={$form.buildId}
           bind:regionValues
@@ -256,6 +266,7 @@
               regions?.[0]?.providerRegion,
             )}
             {gcpRegions}
+            {credentials}
             {templates}
             errors={$errors}
           />

@@ -12,6 +12,7 @@
   } from '$lib/io/icon';
   import { colorScales } from '$lib/theme/io/themes';
 
+  import { COMPUTE_PROVIDERS } from './compute-providers';
   import { motion } from './motion';
   import {
     type PreviewRegion,
@@ -67,8 +68,14 @@
       lambda: translate('workers.preview-resource-lambda'),
       agentcore: translate('workers.preview-resource-agentcore'),
       'cloud-run': translate('workers.preview-resource-cloud-run'),
+      modal: translate('workers.preview-resource-modal'),
     }[provider],
   );
+  // The provider says whether it collects credentials at all. Modal does not:
+  // the worker controller resolves its own, so an access row would render
+  // "Not set" and claim a Role was missing when none is wanted.
+  const hasAccess = $derived(!!COMPUTE_PROVIDERS[provider].fields.access);
+
   const accessLabel = $derived(
     provider === 'cloud-run'
       ? translate('workers.preview-access-cloud-run')
@@ -457,8 +464,10 @@
                 })}
               {:else}
                 {@render field(resourceLabel, region.resource)}
-                <div class="my-1 border-t border-primary"></div>
-                {@render field(accessLabel, region.access)}
+                {#if hasAccess}
+                  <div class="my-1 border-t border-primary"></div>
+                  {@render field(accessLabel, region.access)}
+                {/if}
               {/if}
             </div>
           </div>

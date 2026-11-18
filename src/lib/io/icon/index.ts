@@ -113,6 +113,7 @@ export { default as IconLock } from './icons/lock.svelte';
 export { default as IconLockOpen } from './icons/lock-open.svelte';
 export { default as IconLogout } from './icons/logout.svelte';
 export { default as IconMegaphone } from './icons/megaphone.svelte';
+export { default as IconModalColor } from './icons/modal-color.svelte';
 export { default as IconMicrochip } from './icons/microchip.svelte';
 export { default as IconMerge } from './icons/merge.svelte';
 export { default as IconMessages } from './icons/messages.svelte';

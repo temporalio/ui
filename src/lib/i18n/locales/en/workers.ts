@@ -216,6 +216,26 @@ export const Strings = {
   'provider-cloud-run': 'Google Cloud Run',
   'provider-cloud-run-description':
     'Run Workers as Cloud Run services in your GCP project.',
+  'modal-app-name-label': 'App Name',
+  'modal-app-name-hint': 'The deployed Modal App holding the Function.',
+  'modal-app-name-placeholder': 'my-worker-app',
+  'modal-function-name-label': 'Function Name',
+  'modal-function-name-hint': 'The Function in that App which runs the Worker.',
+  'modal-function-name-placeholder': 'temporal_worker',
+  'modal-environment-label': 'Environment',
+  'modal-environment-hint': 'The Modal environment the App is deployed in.',
+  'modal-environment-placeholder': 'main',
+  'modal-workspace-id-label': 'Workspace ID',
+  'modal-workspace-id-hint':
+    'Optional. Leave blank to use the workspace your Modal credentials belong to.',
+  'modal-workspace-id-placeholder': 'ac-',
+  'modal-version-label': 'App Version',
+  'modal-version-hint':
+    "Optional. Pins a deployed App version; blank uses the App's current deployment.",
+  'open-modal-dashboard': 'Open Modal Dashboard',
+  'provider-modal': 'Modal',
+  'provider-modal-description':
+    'Run Workers as Modal Functions in your Modal workspace.',
   'provider-vercel': 'Vercel Functions',
   'provider-vercel-description':
     'Run Workers as serverless functions on the Vercel platform.',
@@ -290,6 +310,7 @@ export const Strings = {
   'preview-resource-lambda': 'Function',
   'preview-resource-agentcore': 'Endpoint',
   'preview-resource-cloud-run': 'Worker Pool',
+  'preview-resource-modal': 'Function',
   'preview-access-aws': 'Role',
   'preview-access-cloud-run': 'Service Account',
   'preview-same-as': 'Same as',

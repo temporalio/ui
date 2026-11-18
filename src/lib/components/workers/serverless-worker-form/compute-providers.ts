@@ -1,10 +1,23 @@
 import type { I18nKey, I18nResources } from '$lib/i18n';
-import { IconAwsColor, type IconComponent, IconGcpColor } from '$lib/io/icon';
+import {
+  IconAwsColor,
+  type IconComponent,
+  IconGcpColor,
+  IconModalColor,
+} from '$lib/io/icon';
+import {
+  decodeAgentCoreProviderDetails,
+  decodeGcpCloudRunProviderDetails,
+  decodeLambdaProviderDetails,
+  decodeModalProviderDetails,
+} from '$lib/services/deployments-service';
+import type { ComputeConfig } from '$lib/types/deployments';
 
-import type { ComputeSection } from './fields/types';
+import type { ComputeProviderSection, ComputeSection } from './fields/types';
 import defaultAgentCoreTerraform from './serverless-worker-agentcore.tf?raw';
 import defaultCloudRunTerraform from './serverless-worker-cloud-run.tf?raw';
 import defaultLambdaTerraform from './serverless-worker-lambda.tf?raw';
+import type { ComputeInitialValues } from './shared';
 import defaultAgentCoreCloudFormation from './temporal-agentcore-role.yaml?raw';
 import defaultLambdaCloudFormation from './temporal-worker-role.yaml?raw';
 import { TERRAFORM_MODULES } from './terraform-modules';
@@ -14,6 +27,8 @@ import AwsRoleAccessFields from './fields/aws-role-access.svelte';
 import CloudRunAccessFields from './fields/cloud-run-access.svelte';
 import CloudRunResourceFields from './fields/cloud-run-resource.svelte';
 import LambdaResourceFields from './fields/lambda-resource.svelte';
+import ModalResourceFields from './fields/modal-resource.svelte';
+import ModalSection from './fields/modal-section.svelte';
 
 /**
  * Everything the UI knows about a compute provider, in one place.
@@ -38,6 +53,7 @@ export const COMPUTE_PROVIDER_VALUES = [
   'lambda',
   'agentcore',
   'cloud-run',
+  'modal',
 ] as const;
 
 export type ComputeProviderValue = (typeof COMPUTE_PROVIDER_VALUES)[number];
@@ -46,7 +62,21 @@ export type ComputeProviderValue = (typeof COMPUTE_PROVIDER_VALUES)[number];
 export type ComputeProviderType =
   | 'aws-lambda'
   | 'aws-agentcore'
-  | 'gcp-cloud-run';
+  | 'gcp-cloud-run'
+  | 'modal-function';
+
+/**
+ * A consumer's templates, by provider.
+ *
+ * Exhaustive, so a provider added here stops a consumer compiling until it
+ * says what that provider offers. The value is optional because the answer
+ * may be nothing: a Modal App is deployed from the customer's own project,
+ * so there is no infrastructure to hand them.
+ */
+export type ComputeProviderTemplateMap = Record<
+  ComputeProviderValue,
+  ComputeProviderTemplates | undefined
+>;
 
 export type ComputeProviderReleaseStage =
   | 'public-preview'
@@ -90,7 +120,12 @@ export type ComputeProviderDefinition = {
   /** The compact label for compute-badge, where the full vendor name will not fit. */
   badgeLabel: string;
   releaseStage: ComputeProviderReleaseStage;
-  templates: ComputeProviderTemplates;
+  /**
+   * Absent for a provider that offers no infrastructure to copy. Modal is
+   * deployed with `modal deploy` from the customer's own project, so there is
+   * no Terraform or CloudFormation to hand them.
+   */
+  templates?: ComputeProviderTemplates;
   /** The published Terraform module, when one exists for the provider. */
   terraformModuleHref?: string;
   /**
@@ -104,11 +139,65 @@ export type ComputeProviderDefinition = {
    */
   fields: {
     resource: ComputeSection;
-    access: ComputeSection;
+    /** Absent for a provider that asks for no credentials of its own. */
+    access?: ComputeSection;
   };
+  /**
+   * This provider's whole section, when the region-shaped default does not
+   * describe it.
+   *
+   * Absent for every provider whose compute is regional, which is the form's
+   * default layout. Modal declares one because a Function has no region to
+   * fail over to, so the replica toggle and the failover strip offered it a
+   * choice it cannot make.
+   */
+  section?: ComputeProviderSection;
+  /**
+   * What a saved Version shows for this provider, as labelled rows.
+   *
+   * Rows rather than a shape keyed by field name, so a consumer renders them
+   * without knowing which provider it holds. Every reader that wanted a
+   * provider's saved settings used to name all of them and decode each in
+   * turn, which is why three of them silently rendered nothing for Modal: the
+   * list was theirs to maintain, and nothing failed when it fell behind.
+   */
+  details: (computeConfig: ComputeConfig) => readonly ComputeDetailRow[];
+  /**
+   * This provider's saved settings, as the form holds them.
+   *
+   * Separate from `details` because the shapes differ: details are labelled
+   * rows for reading, these are form fields for editing. Both answer the same
+   * question, and both used to be answered by a reader that named every
+   * provider itself.
+   */
+  formValues: (computeConfig: ComputeConfig) => Partial<ComputeInitialValues>;
+};
+
+/** One labelled setting from a saved Version. */
+export type ComputeDetailRow = {
+  labelKey: I18nKey<I18nResources>;
+  value: string | undefined;
+  /** An identifier long enough to truncate, keeping the full value on hover. */
+  truncate?: boolean;
 };
 
 export { TERRAFORM_MODULES } from './terraform-modules';
+
+/**
+ * The provider a saved group belongs to, by the type the API stores.
+ *
+ * A saved group names its provider, so nothing needs to infer one from which
+ * fields happen to be filled. Readers that inferred it got Modal wrong,
+ * because its fields were not in the list they checked.
+ */
+export const computeProviderForType = (
+  providerType: string | undefined,
+): ComputeProviderDefinition | undefined =>
+  providerType === undefined
+    ? undefined
+    : COMPUTE_PROVIDER_VALUES.map((value) => COMPUTE_PROVIDERS[value]).find(
+        (definition) => definition.providerType === providerType,
+      );
 
 export const COMPUTE_PROVIDERS: Record<
   ComputeProviderValue,
@@ -131,6 +220,36 @@ export const COMPUTE_PROVIDERS: Record<
     },
     terraformModuleHref: `${TERRAFORM_MODULES}/aws/lambda`,
     fields: { resource: LambdaResourceFields, access: AwsRoleAccessFields },
+    details: (computeConfig) => {
+      const { lambdaArn, iamRoleArn, roleExternalId } =
+        decodeLambdaProviderDetails(computeConfig);
+      return [
+        {
+          labelKey: 'workers.preview-resource-lambda',
+          value: lambdaArn,
+          truncate: true,
+        },
+        {
+          labelKey: 'workers.preview-access-aws',
+          value: iamRoleArn,
+          truncate: true,
+        },
+        {
+          labelKey: 'deployments.role-external-id',
+          value: roleExternalId,
+          truncate: true,
+        },
+      ];
+    },
+    formValues: (computeConfig) => {
+      const { lambdaArn, iamRoleArn, roleExternalId } =
+        decodeLambdaProviderDetails(computeConfig);
+      return {
+        lambdaArn: lambdaArn ?? '',
+        iamRoleArn: iamRoleArn ?? '',
+        roleExternalId: roleExternalId ?? '',
+      };
+    },
   },
   agentcore: {
     value: 'agentcore',
@@ -149,6 +268,36 @@ export const COMPUTE_PROVIDERS: Record<
     },
     terraformModuleHref: `${TERRAFORM_MODULES}/aws/agentcore`,
     fields: { resource: AgentCoreResourceFields, access: AwsRoleAccessFields },
+    details: (computeConfig) => {
+      const { agentCoreEndpointArn, iamRoleArn, roleExternalId } =
+        decodeAgentCoreProviderDetails(computeConfig);
+      return [
+        {
+          labelKey: 'workers.preview-resource-agentcore',
+          value: agentCoreEndpointArn,
+          truncate: true,
+        },
+        {
+          labelKey: 'workers.preview-access-aws',
+          value: iamRoleArn,
+          truncate: true,
+        },
+        {
+          labelKey: 'deployments.role-external-id',
+          value: roleExternalId,
+          truncate: true,
+        },
+      ];
+    },
+    formValues: (computeConfig) => {
+      const { agentCoreEndpointArn, iamRoleArn, roleExternalId } =
+        decodeAgentCoreProviderDetails(computeConfig);
+      return {
+        agentCoreEndpointArn: agentCoreEndpointArn ?? '',
+        iamRoleArn: iamRoleArn ?? '',
+        roleExternalId: roleExternalId ?? '',
+      };
+    },
   },
   'cloud-run': {
     value: 'cloud-run',
@@ -163,6 +312,86 @@ export const COMPUTE_PROVIDERS: Record<
       terraform: defaultCloudRunTerraform,
     },
     fields: { resource: CloudRunResourceFields, access: CloudRunAccessFields },
+    details: (computeConfig) => {
+      const { gcpWorkerPool, gcpProject, gcpRegion, gcpServiceAccount } =
+        decodeGcpCloudRunProviderDetails(computeConfig);
+      return [
+        {
+          labelKey: 'workers.gcp-worker-pool-label',
+          value: gcpWorkerPool,
+          truncate: true,
+        },
+        { labelKey: 'workers.gcp-project-label', value: gcpProject },
+        { labelKey: 'workers.gcp-region-label', value: gcpRegion },
+        {
+          labelKey: 'workers.gcp-service-account-label',
+          value: gcpServiceAccount,
+          truncate: true,
+        },
+      ];
+    },
+    formValues: (computeConfig) => {
+      const { gcpProject, gcpRegion, gcpWorkerPool, gcpServiceAccount } =
+        decodeGcpCloudRunProviderDetails(computeConfig);
+      return { gcpProject, gcpRegion, gcpWorkerPool, gcpServiceAccount };
+    },
+  },
+  modal: {
+    value: 'modal',
+    // The API spells it `modal-function`. The CLI sent `modal` and every
+    // create failed with "invalid compute provider type", so the long name is
+    // the one that works.
+    providerType: 'modal-function',
+    icon: IconModalColor,
+    labelKey: 'workers.provider-modal',
+    descriptionKey: 'workers.provider-modal-description',
+    badgeLabel: 'Modal',
+    releaseStage: 'pre-release',
+    // No access section: the worker controller resolves Modal credentials
+    // itself, so there is nothing for the form to collect.
+    fields: { resource: ModalResourceFields },
+    section: ModalSection,
+    details: (computeConfig) => {
+      const {
+        modalAppName,
+        modalFunctionName,
+        modalEnvironment,
+        modalWorkspaceId,
+        modalAppVersion,
+      } = decodeModalProviderDetails(computeConfig);
+      return [
+        { labelKey: 'workers.modal-app-name-label', value: modalAppName },
+        {
+          labelKey: 'workers.modal-function-name-label',
+          value: modalFunctionName,
+        },
+        {
+          labelKey: 'workers.modal-environment-label',
+          value: modalEnvironment,
+        },
+        {
+          labelKey: 'workers.modal-workspace-id-label',
+          value: modalWorkspaceId,
+        },
+        { labelKey: 'workers.modal-version-label', value: modalAppVersion },
+      ];
+    },
+    formValues: (computeConfig) => {
+      const {
+        modalAppName,
+        modalFunctionName,
+        modalEnvironment,
+        modalWorkspaceId,
+        modalAppVersion,
+      } = decodeModalProviderDetails(computeConfig);
+      return {
+        modalAppName: modalAppName ?? '',
+        modalFunctionName: modalFunctionName ?? '',
+        modalEnvironment: modalEnvironment ?? '',
+        modalWorkspaceId: modalWorkspaceId ?? '',
+        modalAppVersion: modalAppVersion ?? '',
+      };
+    },
   },
 };
 
@@ -176,11 +405,14 @@ export const COMPUTE_PROVIDERS: Record<
  */
 export const defaultComputeProviderTemplates: Record<
   ComputeProviderValue,
-  ComputeProviderTemplates
+  ComputeProviderTemplates | undefined
 > = {
   lambda: COMPUTE_PROVIDERS.lambda.templates,
   agentcore: COMPUTE_PROVIDERS.agentcore.templates,
   'cloud-run': COMPUTE_PROVIDERS['cloud-run'].templates,
+  // Modal has none. The key is still required, so a provider added later
+  // cannot be forgotten here.
+  modal: undefined,
 };
 
 // Both spellings appear in the wild: the API sends `aws-lambda`, while some
