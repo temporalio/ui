@@ -1,5 +1,6 @@
 import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 
+import { isWorkflowOpen } from '$lib/models/workflow-status';
 import type { WorkflowHistoryController } from '$lib/services/workflow-history-controller.svelte';
 import type { HistoryEvent } from '$lib/types/events';
 import type { WorkflowExecution } from '$lib/types/workflows';
@@ -204,8 +205,9 @@ export class WorkflowExecutionChain {
     const latest = this._storeRun(current.runId, current, startedEvent);
     this._windowIds = [latest.runId];
     this._latestRunId = latest.runId;
-    this._phase = current.isRunning ? 'ready' : 'closed';
-    if (current.isRunning) {
+    const isOpen = isWorkflowOpen(current);
+    this._phase = isOpen ? 'ready' : 'closed';
+    if (isOpen) {
       this._scheduleRefresh();
     }
     this._startCard(latest.runId);
@@ -645,7 +647,7 @@ export class WorkflowExecutionChain {
     this._stopRefresh();
     this._failedSteps.delete('refresh');
 
-    if (record.run?.workflow.isRunning) {
+    if (record.run && isWorkflowOpen(record.run.workflow)) {
       void this._finalDescribe(runId);
     }
 
@@ -682,7 +684,7 @@ export class WorkflowExecutionChain {
     this._latestRunId = run.runId;
     this._phase = 'ready';
     this._emit({ type: 'handOff', runId: run.runId });
-    if (run.workflow.isRunning) {
+    if (isWorkflowOpen(run.workflow)) {
       this._scheduleRefresh();
     }
     if (this.cardLoadOf(run.runId).status === 'queued') {
@@ -748,7 +750,7 @@ export class WorkflowExecutionChain {
       return;
     }
     this._applyWorkflow(runId, workflow);
-    if (workflow.isRunning) {
+    if (isWorkflowOpen(workflow)) {
       this._scheduleRefresh();
     }
   }

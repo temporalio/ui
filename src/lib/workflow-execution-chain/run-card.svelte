@@ -21,6 +21,7 @@
     IconWarning,
     IconXmarkCircleSolid,
   } from '$lib/io/icon';
+  import { isWorkflowOpen } from '$lib/models/workflow-status';
   import type { WorkflowHistoryController } from '$lib/services/workflow-history-controller.svelte';
   import type { EventTypeCategory } from '$lib/types/events';
   import type { WorkflowStatus } from '$lib/types/workflows';
@@ -138,7 +139,7 @@
   const { copy, copied } = copyToClipboard();
 
   const workflow = $derived(run.workflow);
-  const isOpen = $derived(workflow.isRunning);
+  const isOpen = $derived(isWorkflowOpen(workflow));
   const isLive = $derived(
     isLatest && live && isOpen && cardLoad.status !== 'error',
   );

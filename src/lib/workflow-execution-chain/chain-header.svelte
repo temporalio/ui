@@ -13,6 +13,7 @@
   import { Badge } from '$lib/io/badge';
   import { Breadcrumbs } from '$lib/io/breadcrumbs';
   import { IconLink } from '$lib/io/icon';
+  import { isWorkflowOpen } from '$lib/models/workflow-status';
   import { workflowsSearchParams } from '$lib/stores/workflows';
   import { formatDistance } from '$lib/utilities/format-time';
   import {
@@ -84,7 +85,7 @@
     if (chainEnd) {
       return chainEnd;
     }
-    return latestRun?.workflow.isRunning
+    return latestRun && isWorkflowOpen(latestRun.workflow)
       ? getWorkflowLatestTime(latestRun.workflow, now)
       : now;
   });

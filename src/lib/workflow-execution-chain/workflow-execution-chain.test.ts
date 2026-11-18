@@ -94,16 +94,23 @@ const makeWorkflow = (
   {
     firstRunId,
     isRunning = false,
+    isPaused = false,
     startTime,
-  }: { firstRunId?: string; isRunning?: boolean; startTime?: string } = {},
+  }: {
+    firstRunId?: string;
+    isRunning?: boolean;
+    isPaused?: boolean;
+    startTime?: string;
+  } = {},
 ): WorkflowExecution =>
   ({
     id: WORKFLOW_ID,
     runId,
     firstRunId,
     isRunning,
+    isPaused,
     startTime,
-    status: isRunning ? 'Running' : 'Completed',
+    status: isPaused ? 'Paused' : isRunning ? 'Running' : 'Completed',
   }) as WorkflowExecution;
 
 const makeStartedEvent = ({
@@ -1040,6 +1047,100 @@ describe('WorkflowExecutionChain', () => {
 
       expect(server.describeCalls('run-1')).toBe(run1);
       expect(server.describeCalls('run-2')).toBe(run2 + 1);
+    });
+  });
+
+  describe('paused Latest Run', () => {
+    const setLatestWorkflow = (
+      runId: string,
+      state: { isRunning?: boolean; isPaused?: boolean },
+    ) => {
+      const run = server.runs.get(runId)!;
+      const workflow = makeWorkflow(runId, {
+        firstRunId: 'run-1',
+        startTime: run.workflow.startTime,
+        ...state,
+      });
+      server.runs.set(runId, { ...run, workflow });
+      return workflow;
+    };
+
+    it('keeps a chain loaded while paused open and re-describes it', async () => {
+      server.addChain(['run-1']);
+      setLatestWorkflow('run-1', { isPaused: true });
+      const chain = track(await loadChain(server));
+      const initial = server.describeCalls('run-1');
+
+      expect(chain.status).toBe('ready');
+      expect(chain.runs[0].workflow.status).toBe('Paused');
+
+      await vi.advanceTimersByTimeAsync(REFRESH_INTERVAL_MS);
+      await settle();
+
+      expect(server.describeCalls('run-1')).toBe(initial + 1);
+    });
+
+    it('keeps refreshing through running → paused → running while pinned elsewhere', async () => {
+      server.addChain(['run-1', 'run-2']);
+      const chain = track(await loadChain(server));
+      chain.prioritizeRun('run-1');
+      const controller = server.controllers.get('run-2')!;
+
+      const paused = setLatestWorkflow('run-2', { isPaused: true });
+      await vi.advanceTimersByTimeAsync(REFRESH_INTERVAL_MS);
+      await settle();
+
+      expect(chain.status).toBe('ready');
+      expect(chain.runs.at(-1)?.workflow).toBe(paused);
+      expect(controller.updateWorkflow).toHaveBeenLastCalledWith(paused);
+
+      const resumed = setLatestWorkflow('run-2', { isRunning: true });
+      await vi.advanceTimersByTimeAsync(REFRESH_INTERVAL_MS);
+      await settle();
+
+      expect(chain.status).toBe('ready');
+      expect(chain.runs.at(-1)?.workflow).toBe(resumed);
+      expect(controller.updateWorkflow).toHaveBeenLastCalledWith(resumed);
+
+      const describes = server.describeCalls('run-2');
+      await vi.advanceTimersByTimeAsync(REFRESH_INTERVAL_MS);
+      await settle();
+      expect(server.describeCalls('run-2')).toBe(describes + 1);
+    });
+
+    it('closes when a paused Run closes without a successor', async () => {
+      server.addChain(['run-1']);
+      setLatestWorkflow('run-1', { isPaused: true });
+      const chain = track(await loadChain(server));
+      const initial = server.describeCalls('run-1');
+
+      server.controllers
+        .get('run-1')!
+        .close(
+          makeCloseEvent(
+            'WorkflowExecutionTerminated',
+            'workflowExecutionTerminatedEventAttributes',
+          ),
+        );
+      await settle();
+
+      expect(chain.status).toBe('closed');
+      expect(server.describeCalls('run-1')).toBe(initial + 1);
+      await vi.advanceTimersByTimeAsync(REFRESH_INTERVAL_MS * 3);
+      expect(server.describeCalls('run-1')).toBe(initial + 1);
+    });
+
+    it('hands off when a paused Run closes with a successor', async () => {
+      server.addChain(['run-1']);
+      setLatestWorkflow('run-1', { isPaused: true });
+      const chain = track(await loadChain(server));
+      server.addChain(['run-1', 'run-2']);
+
+      server.controllers.get('run-1')!.close(completed('run-2'));
+      await settle();
+
+      expect(chain.latestRunId).toBe('run-2');
+      expect(chain.status).toBe('ready');
     });
   });
 
