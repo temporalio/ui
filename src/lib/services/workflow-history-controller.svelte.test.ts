@@ -287,6 +287,40 @@ describe('WorkflowHistoryController', () => {
       expect(onClose).toHaveBeenCalledWith(closeEvent);
     });
 
+    it('calls onClose once when the reverse page repeats a close the poll already delivered', async () => {
+      const onClose = vi.fn();
+      const { controller } = createController('run-1', { onClose });
+      const load = controller.load(workflow('run-1', true));
+      const closeEvent = makeWorkflowCompleted(4);
+      pollEvents(0, [1, 2, 3]);
+      poll(0).options.onEvent(closeEvent);
+      expect(onClose).toHaveBeenCalledOnce();
+
+      tail(0).result.resolve([makeWorkflowCompleted(4), ...tailEvents([2, 3])]);
+      await load;
+
+      expect(onClose).toHaveBeenCalledOnce();
+      expect(onClose).toHaveBeenCalledWith(closeEvent);
+      expect(controller.closeEvent).toBe(closeEvent);
+    });
+
+    it('does not call onClose again when a retry preserves the history', async () => {
+      const onClose = vi.fn();
+      const { controller } = createController('run-1', { onClose });
+      const load = controller.load(workflow());
+      request(0).options.onRawPage([makeWorkflowCompleted(10)]);
+      request(0).result.reject(new Error('Network down'));
+      await load;
+      expect(onClose).toHaveBeenCalledOnce();
+
+      const retry = controller.retry(workflow());
+      request(1).options.onRawPage([makeWorkflowCompleted(10)]);
+      request(1).result.resolve();
+      await retry;
+
+      expect(onClose).toHaveBeenCalledOnce();
+    });
+
     it('live-polls a paused Run and calls onClose when the poll delivers the close', async () => {
       const onClose = vi.fn();
       const { controller } = createController('run-1', { onClose });
