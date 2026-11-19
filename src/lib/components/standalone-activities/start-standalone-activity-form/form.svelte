@@ -237,16 +237,31 @@
 
   onDestroy(() => {
     unsubscribe?.();
+    taskQueueCheck?.abort();
   });
 
+  let taskQueueCheck: AbortController | undefined;
+
+  // Each check aborts the previous one and clears its result, so a slower
+  // earlier check or an emptied field never shows a stale result. A failed
+  // check has already shown an error toast and leaves no result.
   const checkTaskQueue = async (queue: string) => {
-    if (!queue) return;
+    taskQueueCheck?.abort();
+    const controller = new AbortController();
+    taskQueueCheck = controller;
     taskQueueActive = null;
-    const response = await getActivityPollers({ namespace, queue });
-    if (response.pollers && response.pollers.length > 0) {
-      taskQueueActive = true;
-    } else {
-      taskQueueActive = false;
+    if (!queue) return;
+    try {
+      const response = await getActivityPollers(
+        { namespace, queue },
+        fetch,
+        controller.signal,
+      );
+      if (!controller.signal.aborted) {
+        taskQueueActive = Boolean(response.pollers?.length);
+      }
+    } catch {
+      return;
     }
   };
 </script>
