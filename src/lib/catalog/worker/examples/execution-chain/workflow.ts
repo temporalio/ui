@@ -15,6 +15,7 @@ import type * as activities from './activity.js';
 
 const MAX_RUNS = 25;
 const BUSY_ACTIVITY_COUNT = 300;
+const TIMER_MULTIPLIERS = [1, 12, 3, 30, 1, 6, 20];
 
 const { flakyStep, brokenStep, busyStep } = proxyActivities<typeof activities>({
   startToCloseTimeout: '10 seconds',
@@ -37,7 +38,7 @@ export async function executionChainChild(run: number): Promise<string> {
 
 export async function executionChain(
   runCount = 14,
-  delaySeconds = 2,
+  delaySeconds = 1,
   failOnRuns: number[] = [],
   busyRuns: number[] = [],
   completedRuns = 0,
@@ -95,7 +96,9 @@ export async function executionChain(
     );
   }
 
-  await sleep(`${delaySeconds} seconds`);
+  const timerSeconds =
+    delaySeconds * TIMER_MULTIPLIERS[(run - 1) % TIMER_MULTIPLIERS.length];
+  await sleep(`${timerSeconds} seconds`);
   await executeChild(executionChainChild, { args: [run] });
   await condition(() => proceeded, '2 seconds');
 

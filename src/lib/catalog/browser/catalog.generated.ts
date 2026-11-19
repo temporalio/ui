@@ -2,7 +2,7 @@ import type { BrowserCatalogArtifact } from './types';
 
 export const catalogArtifact: BrowserCatalogArtifact = {
   sourceHash:
-    '8e24daa91ce5a587b9e207012dd3d46ed7b9b857511fe51f944ee16bc74b64af',
+    '2f9b246b5d9be07734fb98667363aa1e9440368ae834e37817e84031e399b020',
   workspaces: [{ id: 'shared-workflows', controls: ['crash'] }],
   descriptors: [
     {
@@ -318,13 +318,14 @@ export const catalogArtifact: BrowserCatalogArtifact = {
       expectedEvidence: [
         'Fifteen Runs with the same Workflow ID using the defaults: 14 linked by continue-as-new, plus one retry of Run 4.',
         'Each Run has a retried activity, a failed activity, a timer and a child workflow.',
+        'Run lengths vary widely: each Run’s timer is the base timer times 1, 12, 3, 30, 1, 6, 20, repeating, so with the defaults Run 4 waits 30 seconds and Run 5 waits 1.',
         'Run 7 schedules about 300 extra activities.',
         'Sending the `proceed` signal ends the current Run’s signal wait early and adds a signal to it.',
       ],
       setupMarkdown:
         'Run numbers count from 1 and are kept across retries, so a retried Run does not count twice toward the total. A Run listed in **Runs that fail once** fails on its first attempt only; the default Retry Policy (`maximumAttempts: 2`) starts its retry.\n\nThese paths are manual only:\n\n- **Off-path Run**: reset a Run from its run page.\n- **Older chain**: start this example again with the same Workflow ID after the chain closes.\n- **Past retention**: walking back past the namespace retention period can’t be reproduced locally.',
       input: {
-        defaultValue: [14, 2, [4], [7]],
+        defaultValue: [14, 1, [4], [7]],
         schema: {
           type: 'array',
           prefixItems: [
@@ -335,7 +336,7 @@ export const catalogArtifact: BrowserCatalogArtifact = {
               maximum: 25,
             },
             {
-              title: 'Timer per run in seconds',
+              title: 'Base timer per run in seconds',
               type: 'integer',
               minimum: 1,
               maximum: 30,
