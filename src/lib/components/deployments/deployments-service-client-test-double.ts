@@ -28,18 +28,11 @@ export async function removeRampingUnversionedWorkers(): Promise<void> {}
 
 export async function setRampingUnversionedWorkers(): Promise<void> {}
 
-export function decodeLambdaProviderDetails() {
-  return {};
-}
-
-export function decodeAgentCoreProviderDetails() {
-  return {};
-}
-
-export function decodeGcpCloudRunProviderDetails() {
-  return {};
-}
-
-export function decodeScalerDetails() {
-  return {};
-}
+// The decoders are pure, so pages read saved groups as they do in the app.
+// The relative path skips the alias that points here.
+export {
+  decodeAgentCoreProviderDetails,
+  decodeGcpCloudRunProviderDetails,
+  decodeLambdaProviderDetails,
+  decodeScalerDetails,
+} from '../../services/deployments-service';

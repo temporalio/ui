@@ -13,11 +13,15 @@ import type {
 import { i18nNamespaces } from '$lib/i18n';
 import resources from '$lib/i18n/locales';
 import Deployment from '$lib/pages/deployment.svelte';
+import ServerlessWorkerCreate from '$lib/pages/serverless-worker-create.svelte';
+import WorkerDeploymentVersionCreate from '$lib/pages/worker-deployment-version-create.svelte';
+import WorkerDeploymentVersionEdit from '$lib/pages/worker-deployment-version-edit.svelte';
 import type {
   ComputeConfig,
   ComputeStatus,
   ListWorkerDeployment,
 } from '$lib/types/deployments';
+import type { ComputeProviderConfig } from '$lib/utilities/compute-provider-config';
 import type { NamespaceRegion } from '$lib/utilities/compute-regions';
 
 import { resetDeploymentsServiceMock } from './deployments-service-client-test-double';
@@ -138,6 +142,48 @@ export function renderRows({
     );
   }
   flushSync();
+  return target;
+}
+
+const COMPUTE_PAGES = {
+  'create-deployment': ServerlessWorkerCreate,
+  'create-version': WorkerDeploymentVersionCreate,
+  'edit-version': WorkerDeploymentVersionEdit,
+};
+
+export type ComputePage = keyof typeof COMPUTE_PAGES;
+
+/** Mounts a page with a compute form, after its fetches settle. */
+export async function renderComputePage({
+  page: pageName,
+  providerConfig,
+  fetchDeployment,
+  fetchDeploymentVersion,
+}: {
+  page: ComputePage;
+  providerConfig: ComputeProviderConfig;
+  fetchDeployment?: unknown;
+  fetchDeploymentVersion?: unknown;
+}) {
+  setPageState();
+  resetDeploymentsServiceMock({ fetchDeployment, fetchDeploymentVersion });
+  const target = document.body.appendChild(document.createElement('div'));
+  mounted.push(
+    mount(COMPUTE_PAGES[pageName], {
+      target,
+      props: {
+        namespace: 'default',
+        deployment: 'deployment',
+        buildId: 'current',
+        onSuccess: () => {},
+        providerConfig,
+      },
+    }),
+  );
+  for (let turn = 0; turn < 5; turn++) {
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    flushSync();
+  }
   return target;
 }
 

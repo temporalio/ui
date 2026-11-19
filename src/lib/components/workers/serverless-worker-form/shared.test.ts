@@ -561,12 +561,18 @@ describe('formValuesFromGroup', () => {
     });
   });
 
-  it('reads no group as empty Lambda values', () => {
-    expect(formValuesFromGroup(undefined)).toMatchObject({
-      provider: 'lambda',
-      lambdaArn: '',
-      iamRoleArn: '',
-    });
+  it('reads no group as empty values with no provider', () => {
+    const values = formValuesFromGroup(undefined);
+    expect(values.provider).toBeUndefined();
+    expect(values).toMatchObject({ lambdaArn: '', iamRoleArn: '' });
+  });
+
+  it.each([
+    ['aws-lambda', 'lambda'],
+    ['aws-agentcore', 'agentcore'],
+    ['gcp-cloud-run', 'cloud-run'],
+  ])('reads a %s group as %s, even with no details', (type, provider) => {
+    expect(formValuesFromGroup({ provider: { type } }).provider).toBe(provider);
   });
 
   it('keeps a saved group name, so an edit updates it in place', () => {

@@ -51,3 +51,15 @@ Object.defineProperties(HTMLDialogElement.prototype, {
     },
   },
 });
+
+class NoopObserver {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+  takeRecords() {
+    return [];
+  }
+}
+
+vi.stubGlobal('ResizeObserver', NoopObserver);
+vi.stubGlobal('IntersectionObserver', NoopObserver);

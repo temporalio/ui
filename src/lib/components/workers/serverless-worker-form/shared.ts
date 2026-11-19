@@ -23,6 +23,7 @@ import type {
 
 import {
   COMPUTE_PROVIDERS,
+  computeProviderFromType,
   type ComputeProviderReleaseStage,
   type ComputeProviderValue,
 } from './compute-providers';
@@ -510,12 +511,12 @@ export const formValuesFromGroup = (
   const gcp = decodeGcpCloudRunProviderDetails(config);
   const scaler = decodeScalerDetails(config);
   return {
-    // A saved provider decides which fields it filled.
-    provider: agentCore.agentCoreEndpointArn
-      ? 'agentcore'
-      : gcp.gcpWorkerPool
-        ? 'cloud-run'
-        : 'lambda',
+    // The group names its provider. With no group there is none, so a caller
+    // can fall back to another region's group.
+    provider: group
+      ? (computeProviderFromType(group.providerType ?? group.provider?.type) ??
+        'lambda')
+      : undefined,
     lambdaArn: lambda.lambdaArn ?? '',
     agentCoreEndpointArn: agentCore.agentCoreEndpointArn ?? '',
     iamRoleArn: lambda.iamRoleArn ?? agentCore.iamRoleArn ?? '',

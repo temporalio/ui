@@ -45,3 +45,5 @@ export function replaceState(url: string | URL, state: App.PageState): void {
   void url;
   void state;
 }
+
+export async function invalidateAll(): Promise<void> {}

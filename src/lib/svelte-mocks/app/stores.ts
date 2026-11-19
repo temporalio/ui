@@ -70,3 +70,5 @@ export const page = readable<Page>({
     'http://localhost:3000/namespaces/default/workflows?search=basic&query=WorkflowType%3D%22testing%22',
   ),
 });
+
+export const navigating = readable(null);
