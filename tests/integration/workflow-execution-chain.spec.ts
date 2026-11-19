@@ -152,7 +152,7 @@ test.describe('Workflow execution chain page', () => {
 
     await expect(
       page
-        .getByTestId('run-strip-status')
+        .getByTestId('run-card-failed')
         .getByRole('button', { name: 'Retry' }),
     ).toBeVisible();
     await page.clock.runFor(5000);

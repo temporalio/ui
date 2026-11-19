@@ -10,7 +10,7 @@
     chain: WorkflowExecutionChain;
     selectedRunId: string | null;
     contentScrolledUnder: boolean;
-    loadOlderRuns: () => Promise<void>;
+    loadOlderRuns: (onRunAdded: (runId: string) => void) => Promise<void>;
     onSelect: (runId: string) => void;
   }
 
@@ -49,6 +49,12 @@
     if (chain.boundary === 'retention') {
       return { disabled: true, tooltip: translate('workflows.past-retention') };
     }
+    if (chain.failedOlderRunId) {
+      return {
+        disabled: true,
+        tooltip: translate('workflows.older-run-load-failed'),
+      };
+    }
     return {
       disabled: chain.walking,
       tooltip: translate('workflows.view-previous-run'),
@@ -64,10 +70,14 @@
       return;
     }
     const runIdWhenClicked = selectedRunId;
-    await loadOlderRuns();
-    if (runIdWhenClicked === selectedRunId && previousLoadedRunId) {
-      onSelect(previousLoadedRunId);
-    }
+    let previousRunSelected = false;
+    await loadOlderRuns((runId) => {
+      if (previousRunSelected || selectedRunId !== runIdWhenClicked) {
+        return;
+      }
+      previousRunSelected = true;
+      onSelect(runId);
+    });
   };
 </script>
 

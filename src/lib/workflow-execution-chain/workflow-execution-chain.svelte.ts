@@ -117,8 +117,24 @@ export class WorkflowExecutionChain {
     return this._cards.cardLoads;
   }
 
-  get hasDiscoveryError(): boolean {
-    return this._context.failures.hasFailures;
+  get failedOlderRunId(): string | null {
+    return this._context.failures.runIdOf('walkBack');
+  }
+
+  get failedSuccessorRunId(): string | null {
+    return this._context.failures.runIdOf('handOff');
+  }
+
+  get nextRunCheckFailed(): boolean {
+    return this._context.failures.has('closeEvent');
+  }
+
+  isStatusStale(runId: string): boolean {
+    const { failures } = this._context;
+    return (
+      failures.runIdOf('refresh') === runId ||
+      failures.runIdOf('finalDescribe') === runId
+    );
   }
 
   get closeTime(): ValidTime | undefined {
@@ -141,8 +157,8 @@ export class WorkflowExecutionChain {
     return this._loader.load();
   }
 
-  loadOlder(): Promise<void> {
-    return this._window.loadOlder();
+  loadOlder(onRunAdded?: (runId: string) => void): Promise<void> {
+    return this._window.loadOlder(onRunAdded);
   }
 
   prioritizeRun(runId: string | null): void {
@@ -157,8 +173,26 @@ export class WorkflowExecutionChain {
     this._cards.retryCard(runId);
   }
 
-  retryDiscovery(): void {
-    this._context.failures.retryAll();
+  retryOlderRun(): void {
+    this._context.failures.retry('walkBack');
+  }
+
+  retrySuccessorRun(): void {
+    this._context.failures.retry('handOff');
+  }
+
+  retryNextRunCheck(): void {
+    this._context.failures.retry('closeEvent');
+  }
+
+  retryStatus(runId: string): void {
+    const { failures } = this._context;
+    if (failures.runIdOf('refresh') === runId) {
+      failures.retry('refresh');
+    }
+    if (failures.runIdOf('finalDescribe') === runId) {
+      failures.retry('finalDescribe');
+    }
   }
 
   dispose(): void {

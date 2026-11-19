@@ -51,6 +51,17 @@ describe('runCardName', () => {
       }),
     ).toBe('Run run-03, Running, live, 5m');
   });
+
+  it('marks a Run whose status could not be refreshed as stale', () => {
+    expect(
+      runCardName({
+        runId: 'run-03',
+        status: 'Running',
+        mode: 'stale',
+        duration: '5m',
+      }),
+    ).toBe('Run run-03, Running, stale, 5m');
+  });
 });
 
 describe('runCardDescription', () => {

@@ -38,10 +38,12 @@
     selected: boolean;
     isLatest: boolean;
     live: boolean;
+    stale: boolean;
     tabIndex: 0 | -1;
     buttonElement?: HTMLButtonElement | null;
     onSelect: () => void;
     onRetry: () => void;
+    onRetryStatus: () => void;
   }
 
   let {
@@ -55,10 +57,12 @@
     selected,
     isLatest,
     live,
+    stale,
     tabIndex,
     buttonElement = $bindable(),
     onSelect,
     onRetry,
+    onRetryStatus,
   }: Props = $props();
 
   const descriptionId = $props.id();
@@ -66,11 +70,17 @@
   const workflow = $derived(run.workflow);
   const open = $derived(isWorkflowOpen(workflow));
   const showsLive = $derived(
-    isLatest && live && open && cardLoad.status !== 'error',
+    isLatest && live && open && !stale && cardLoad.status !== 'error',
   );
-  const mode = $derived<RunCardMode | null>(
-    isLatest ? (showsLive ? 'live' : 'latest') : null,
-  );
+  const mode = $derived.by((): RunCardMode | null => {
+    if (stale) {
+      return 'stale';
+    }
+    if (!isLatest) {
+      return null;
+    }
+    return showsLive ? 'live' : 'latest';
+  });
   const duration = $derived(
     formatDistanceAbbreviated({
       start: workflow.startTime,
@@ -151,6 +161,7 @@
       status={workflow.status}
       {open}
       live={showsLive}
+      {stale}
     />
 
     {#if loadState === 'loading'}
@@ -179,5 +190,7 @@
     {tabIndex}
     canRetry={cardLoad.status === 'error' && cardLoad.retryable}
     {onRetry}
+    canRetryStatus={stale}
+    {onRetryStatus}
   />
 </div>

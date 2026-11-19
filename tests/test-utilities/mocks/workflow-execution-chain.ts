@@ -38,6 +38,7 @@ export type MockRun = {
   currentTime?: string;
   open?: boolean;
   release?: Promise<void>;
+  describeRelease?: Promise<void>;
   continueAsNewInitiator?: ContinueAsNewInitiator;
   historyErrorStatus?: number;
 };
@@ -185,6 +186,9 @@ export const mockChain = async (page: Page, chain: ChainMock) => {
     const run = findRun(runId ?? chain.current());
     if (!run) {
       return route.fulfill(notFound);
+    }
+    if (runId) {
+      await run.describeRelease;
     }
     return route.fulfill({ json: describeResponse(run) });
   });

@@ -2,6 +2,7 @@ import { WorkflowHistoryController } from '$lib/services/workflow-history-contro
 import { fetchWorkflow } from '$lib/services/workflow-service';
 import type { GetWorkflowExecutionHistoryResponse } from '$lib/types/events';
 import { handleUnauthorizedOrForbiddenError } from '$lib/utilities/handle-error';
+import { isWorkflowCloseEvent } from '$lib/utilities/is-event-type';
 import {
   type APIErrorResponse,
   type ErrorCallback,
@@ -54,6 +55,26 @@ const fetchStartedEvent: ChainClient['fetchStartedEvent'] = async (
   return startedEvent;
 };
 
+const fetchCloseEvent: ChainClient['fetchCloseEvent'] = async (
+  { namespace, workflowId, runId },
+  signal,
+) => {
+  const response = await requestFromAPI<GetWorkflowExecutionHistoryResponse>(
+    routeForApi('events.descending', { namespace, workflowId }),
+    {
+      request: fetch,
+      params: { 'execution.runId': runId, maximumPageSize: '1' },
+      options: { signal },
+      handleError: handleRequestError,
+    },
+  );
+  const closeEvent = response?.history?.events?.[0];
+  if (!closeEvent || !isWorkflowCloseEvent(closeEvent)) {
+    throw new Error('Missing workflow execution close event.');
+  }
+  return closeEvent;
+};
+
 const createController: ChainClient['createController'] = (
   workflowExecutionIdentity,
   { onClose, onFirstEvent, onLivePollError },
@@ -68,5 +89,6 @@ const createController: ChainClient['createController'] = (
 export const client: ChainClient = {
   describe,
   fetchStartedEvent,
+  fetchCloseEvent,
   createController,
 };

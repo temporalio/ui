@@ -2,7 +2,12 @@
   import { twJoin, twMerge } from 'tailwind-merge';
 
   import { translate } from '$lib/i18n/translate';
-  import { IconArrowUpRight, IconCheckmark, IconCopy } from '$lib/io/icon';
+  import {
+    IconArrowUpRight,
+    IconCheckmark,
+    IconCopy,
+    IconRetry,
+  } from '$lib/io/icon';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
 
   interface Props {
@@ -11,9 +16,19 @@
     tabIndex: 0 | -1;
     canRetry: boolean;
     onRetry: () => void;
+    canRetryStatus: boolean;
+    onRetryStatus: () => void;
   }
 
-  let { runId, runHref, tabIndex, canRetry, onRetry }: Props = $props();
+  let {
+    runId,
+    runHref,
+    tabIndex,
+    canRetry,
+    onRetry,
+    canRetryStatus,
+    onRetryStatus,
+  }: Props = $props();
 
   const { copy, copied } = copyToClipboard();
 
@@ -43,6 +58,18 @@
       <IconCopy />
     {/if}
   </button>
+  {#if canRetryStatus}
+    <button
+      type="button"
+      tabindex={tabIndex}
+      class={twMerge(actionClasses, 'text-warning')}
+      aria-label={translate('workflows.retry-run-status')}
+      title={translate('workflows.run-status-stale')}
+      onclick={onRetryStatus}
+    >
+      <IconRetry />
+    </button>
+  {/if}
   <a
     href={runHref}
     tabindex={tabIndex}

@@ -1,45 +1,48 @@
 import { SvelteMap } from 'svelte/reactivity';
 
-export type DiscoveryStep =
-  | 'walkBack'
-  | 'handOff'
-  | 'refresh'
-  | 'finalDescribe';
+import type { DiscoveryStep } from './types';
+
+type DiscoveryFailure = {
+  runId: string;
+  retry: () => void;
+};
 
 /**
- * Discovery steps that exhausted their retries after load, each with a retry
- * to run on `retryAll()`. Reports only the first failure of a streak.
+ * Discovery steps that exhausted their retries after load, each with the Run
+ * it was fetching and a retry. Reports a step's failure once until it is
+ * retried or cleared.
  */
 export class DiscoveryFailures {
-  private readonly _retries = new SvelteMap<DiscoveryStep, () => void>();
+  private readonly _failures = new SvelteMap<DiscoveryStep, DiscoveryFailure>();
 
-  constructor(private readonly _onFirstFailure: () => void) {}
-
-  get hasFailures(): boolean {
-    return this._retries.size > 0;
-  }
+  constructor(private readonly _onFailure: (step: DiscoveryStep) => void) {}
 
   has(step: DiscoveryStep): boolean {
-    return this._retries.has(step);
+    return this._failures.has(step);
   }
 
-  fail(step: DiscoveryStep, retry: () => void): void {
-    const isFirstFailure = this._retries.size === 0;
-    this._retries.set(step, retry);
-    if (isFirstFailure) {
-      this._onFirstFailure();
+  runIdOf(step: DiscoveryStep): string | null {
+    return this._failures.get(step)?.runId ?? null;
+  }
+
+  fail(step: DiscoveryStep, runId: string, retry: () => void): void {
+    const isNewFailure = !this._failures.has(step);
+    this._failures.set(step, { runId, retry });
+    if (isNewFailure) {
+      this._onFailure(step);
     }
   }
 
   clear(step: DiscoveryStep): void {
-    this._retries.delete(step);
+    this._failures.delete(step);
   }
 
-  retryAll(): void {
-    const retries = [...this._retries.values()];
-    this._retries.clear();
-    for (const retry of retries) {
-      retry();
+  retry(step: DiscoveryStep): void {
+    const failure = this._failures.get(step);
+    if (!failure) {
+      return;
     }
+    this._failures.delete(step);
+    failure.retry();
   }
 }

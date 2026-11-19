@@ -1,5 +1,8 @@
 <script lang="ts">
+  import { tick } from 'svelte';
+
   import LiveRegion from '$lib/holocene/live-region.svelte';
+  import type { I18nKey } from '$lib/i18n';
   import { translate } from '$lib/i18n/translate';
   import { isWorkflowOpen } from '$lib/models/workflow-status';
   import { createWallClock } from '$lib/runes/wall-clock.svelte';
@@ -7,7 +10,7 @@
   import { getValidTimeMs } from '$lib/utilities/format-time';
   import { getWorkflowLatestTime } from '$lib/utilities/workflow-time-skipping';
 
-  import type { ChainEvent, ChainRun } from '../types';
+  import type { ChainEvent, ChainRun, DiscoveryStep } from '../types';
   import type { WorkflowExecutionChain } from '../workflow-execution-chain.svelte';
   import {
     allocateCardWidths,
@@ -28,6 +31,7 @@
   import {
     createRunStripFollowAttachment,
     getScrollIndicators,
+    preferredScrollBehavior,
     type ScrollMetrics,
     scrollSegmentIntoView,
   } from './run-strip-scroll.svelte';
@@ -41,6 +45,14 @@
   }
 
   let { chain, selectedRunId, live, onSelect, onJumpToLive }: Props = $props();
+
+  const DISCOVERY_ERROR_MESSAGES: Readonly<Record<DiscoveryStep, I18nKey>> = {
+    walkBack: 'workflows.older-run-load-failed',
+    handOff: 'workflows.next-run-load-failed',
+    refresh: 'workflows.run-status-stale',
+    finalDescribe: 'workflows.run-status-stale',
+    closeEvent: 'workflows.next-run-check-failed',
+  };
 
   const announcer = createAnnouncer();
   const messages = announcer.messages;
@@ -98,8 +110,15 @@
   const pendingCardWidth = $derived(
     liveCardWidth(runs.length + 1, cardsViewportWidth),
   );
+  const olderPlaceholderWidth = $derived(
+    chain.failedOlderRunId || chain.walking ? MIN_CARD_WIDTH + CARD_GAP : 0,
+  );
   const segments = $derived(
-    layoutSegments(cardWidths, runSpans, CAP_WIDTH + CARD_GAP),
+    layoutSegments(
+      cardWidths,
+      runSpans,
+      CAP_WIDTH + CARD_GAP + olderPlaceholderWidth,
+    ),
   );
   const selectedSegment = $derived(
     segments.find((segment) => segment.id === selectedRunId),
@@ -119,6 +138,7 @@
         ({ id, x, width }) => `${id}:${Math.round(x)}:${Math.round(width)}`,
       ),
       chain.pendingSuccessorRunId ?? '',
+      chain.failedSuccessorRunId ?? '',
     ].join('|'),
   );
 
@@ -128,9 +148,16 @@
       newerArrivedForRunId === selectedRunId,
   );
 
-  const loadOlderRuns = async () => {
+  const scrollToOldestEnd = () => {
+    scroller?.scrollTo({ left: 0, behavior: preferredScrollBehavior() });
+  };
+
+  const loadOlderRuns = async (onRunAdded: (runId: string) => void) => {
     const runCountBeforeLoad = chain.runs.length;
-    await chain.loadOlder();
+    const loading = chain.loadOlder(onRunAdded);
+    await tick();
+    scrollToOldestEnd();
+    await loading;
     const loadedRunCount = chain.runs.length - runCountBeforeLoad;
     if (loadedRunCount > 0) {
       announcer.announce(
@@ -155,7 +182,7 @@
       return;
     }
     if (event.type === 'discoveryError') {
-      announcer.announce(translate('workflows.discovery-error'));
+      announcer.announce(translate(DISCOVERY_ERROR_MESSAGES[event.step]));
       return;
     }
     if (live) {
@@ -180,9 +207,9 @@
 <section class="flex flex-col gap-3" data-testid="run-strip">
   <RunStripHeader
     runCount={runs.length}
-    hasDiscoveryError={chain.hasDiscoveryError}
+    nextRunCheckFailed={chain.nextRunCheckFailed}
+    onRetryNextRunCheck={() => chain.retryNextRunCheck()}
     selectedOutOfView={scrollIndicators.selectedOutOfView}
-    onRetryDiscovery={() => chain.retryDiscovery()}
     onScrollToSelected={scrollToSelected}
   />
 

@@ -54,6 +54,7 @@ export class LatestRunFollower {
     record.follow.closeHandled = true;
     this._stopRefresh();
     this._context.failures.clear('refresh');
+    this._context.failures.clear('closeEvent');
 
     if (record.run && isWorkflowOpen(record.run.workflow)) {
       void this._finalDescribe(runId);
@@ -84,6 +85,7 @@ export class LatestRunFollower {
       this.pendingSuccessorRunId = null;
       this._context.failures.fail(
         'handOff',
+        successorRunId,
         () => void this._handOff(successorRunId),
       );
       return;
@@ -115,6 +117,7 @@ export class LatestRunFollower {
       }
       this._context.failures.fail(
         'finalDescribe',
+        runId,
         () => void this._finalDescribe(runId),
       );
       return;
@@ -154,7 +157,11 @@ export class LatestRunFollower {
       if (this._context.disposed || !this._isOpenLatest(runId)) {
         return;
       }
-      this._context.failures.fail('refresh', () => void this._refresh(runId));
+      this._context.failures.fail(
+        'refresh',
+        runId,
+        () => void this._refresh(runId),
+      );
       return;
     }
     if (this._context.disposed || !this._isOpenLatest(runId)) {
@@ -163,7 +170,30 @@ export class LatestRunFollower {
     this._applyWorkflow(runId, workflow);
     if (isWorkflowOpen(workflow)) {
       this._scheduleRefresh();
+      return;
     }
+    void this._fetchCloseEvent(runId);
+  }
+
+  private async _fetchCloseEvent(runId: string): Promise<void> {
+    let closeEvent: HistoryEvent;
+    try {
+      closeEvent = await this._context.fetchCloseEvent(runId);
+    } catch {
+      if (this._context.disposed || !this._isOpenLatest(runId)) {
+        return;
+      }
+      this._context.failures.fail(
+        'closeEvent',
+        runId,
+        () => void this._fetchCloseEvent(runId),
+      );
+      return;
+    }
+    if (this._context.disposed) {
+      return;
+    }
+    this.handleClose(runId, closeEvent);
   }
 
   private _isOpenLatest(runId: string): boolean {

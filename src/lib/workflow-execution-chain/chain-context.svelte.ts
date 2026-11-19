@@ -35,6 +35,7 @@ export type ChainContext = {
   describeCurrent: () => Promise<WorkflowExecution>;
   describe: (runId: string) => Promise<WorkflowExecution>;
   fetchStartedEvent: (runId: string) => Promise<HistoryEvent>;
+  fetchCloseEvent: (runId: string) => Promise<HistoryEvent>;
   getOrFetchRun: (runId: string) => Promise<ChainRun>;
   refreshRun: (runId: string) => Promise<ChainRun>;
   storeRun: (
@@ -106,6 +107,11 @@ export const createChainContext = (
       client.fetchStartedEvent({ namespace, workflowId, runId }, signal),
     );
 
+  const fetchCloseEvent = (runId: string): Promise<HistoryEvent> =>
+    retry((signal) =>
+      client.fetchCloseEvent({ namespace, workflowId, runId }, signal),
+    );
+
   const storeRun = (
     runId: string,
     workflow: WorkflowExecution,
@@ -144,7 +150,9 @@ export const createChainContext = (
     identity,
     client,
     records,
-    failures: new DiscoveryFailures(() => emit({ type: 'discoveryError' })),
+    failures: new DiscoveryFailures((step) =>
+      emit({ type: 'discoveryError', step }),
+    ),
     get disposed() {
       return abort.signal.aborted;
     },
@@ -152,6 +160,7 @@ export const createChainContext = (
     describeCurrent: () => describe(),
     describe,
     fetchStartedEvent,
+    fetchCloseEvent,
     getOrFetchRun,
     refreshRun,
     storeRun,

@@ -141,6 +141,30 @@ test.describe('Workflow execution chain Run strip', () => {
     ).toBeVisible();
   });
 
+  test('‹ selects the previous Run before the rest of the walk loads', async ({
+    page,
+  }) => {
+    const walk = deferred();
+    const runs = linearChain(12);
+    runs[0] = { ...runs[0], describeRelease: walk.promise };
+    await mockChain(page, { runs, current: () => 'run-12' });
+    await page.goto(chainUrl('run-01'));
+
+    await expect(strip(page)).toHaveAccessibleName('Runs, 10 loaded');
+    await card(page, 'run-03').click();
+    await previousButton(page).click();
+
+    await expect(card(page, 'run-02')).toHaveAttribute('aria-current', 'true');
+    await expect(page.getByTestId('run-card-loading-older')).toBeVisible();
+
+    walk.resolve();
+
+    await expect(strip(page)).toHaveAccessibleName('Runs, 12 loaded');
+    await expect(page.getByTestId('run-card-loading-older')).toHaveCount(0);
+    await expect(card(page, 'run-02')).toHaveAttribute('aria-current', 'true');
+    await expect(card(page, 'run-02')).toBeInViewport();
+  });
+
   test('‹ is disabled past retention', async ({ page }) => {
     const [, latest] = closedChain();
     await mockChain(page, { runs: [latest], current: () => 'run-b' });

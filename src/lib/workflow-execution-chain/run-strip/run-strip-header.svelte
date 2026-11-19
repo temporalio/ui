@@ -6,17 +6,17 @@
 
   interface Props {
     runCount: number;
-    hasDiscoveryError: boolean;
+    nextRunCheckFailed: boolean;
+    onRetryNextRunCheck: () => void;
     selectedOutOfView: boolean;
-    onRetryDiscovery: () => void;
     onScrollToSelected: () => void;
   }
 
   let {
     runCount,
-    hasDiscoveryError,
+    nextRunCheckFailed,
+    onRetryNextRunCheck,
     selectedOutOfView,
-    onRetryDiscovery,
     onScrollToSelected,
   }: Props = $props();
 </script>
@@ -39,11 +39,11 @@
     class="flex items-center gap-2 text-xs text-secondary"
     data-testid="run-strip-status"
   >
-    {#if hasDiscoveryError}
+    {#if nextRunCheckFailed}
       <span class="flex items-center gap-1 text-danger"
-        ><IconWarning />{translate('workflows.discovery-error')}</span
+        ><IconWarning />{translate('workflows.next-run-check-failed')}</span
       >
-      <Button size="xs" colorScheme="secondary" onclick={onRetryDiscovery}
+      <Button size="xs" colorScheme="secondary" onclick={onRetryNextRunCheck}
         >{translate('common.retry')}</Button
       >
     {/if}

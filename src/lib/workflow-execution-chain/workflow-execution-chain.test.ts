@@ -87,6 +87,7 @@ class FakeController {
 type FakeRun = {
   workflow: WorkflowExecution;
   startedEvent: HistoryEvent;
+  closeEvent?: HistoryEvent;
 };
 
 const makeWorkflow = (
@@ -187,6 +188,20 @@ class FakeServer {
     },
   );
 
+  fetchCloseEvent = vi.fn(
+    async ({ runId }: WorkflowExecutionIdentity): Promise<HistoryEvent> => {
+      const error = this.errors.get(`close:${runId}`);
+      if (error) {
+        throw error;
+      }
+      const closeEvent = this.runs.get(runId)?.closeEvent;
+      if (!closeEvent) {
+        throw networkError(404);
+      }
+      return closeEvent;
+    },
+  );
+
   createController = vi.fn(
     (identity: WorkflowExecutionIdentity, callbacks: ControllerCallbacks) => {
       const controller = new FakeController(identity, callbacks, this);
@@ -199,6 +214,7 @@ class FakeServer {
     return {
       describe: this.describe,
       fetchStartedEvent: this.fetchStartedEvent,
+      fetchCloseEvent: this.fetchCloseEvent,
       createController: this.createController,
     };
   }
@@ -587,6 +603,16 @@ describe('WorkflowExecutionChain', () => {
 
       expect(chainRunIds(chain)).toEqual(runIds(25));
       expect(chain.boundary).toBe('chainStart');
+    });
+
+    it('loadOlder reports each older Run as it is added', async () => {
+      server.addChain(runIds(13));
+      const chain = track(await loadChain(server));
+      const added = vi.fn();
+
+      await chain.loadOlder(added);
+
+      expect(added.mock.calls).toEqual([['run-3'], ['run-2'], ['run-1']]);
     });
 
     it('loadOlder does nothing once a boundary is reached', async () => {
@@ -1111,6 +1137,69 @@ describe('WorkflowExecutionChain', () => {
       expect(server.describeCalls('run-2')).toBe(describes + 1);
     });
 
+    it('closes when a re-describe sees the Latest Run closed before its history does', async () => {
+      server.addChain(['run-1']);
+      const chain = track(await loadChain(server));
+
+      setLatestWorkflow('run-1', {});
+      server.runs.get('run-1')!.closeEvent = completed();
+      await vi.advanceTimersByTimeAsync(REFRESH_INTERVAL_MS);
+      await settle();
+
+      expect(chain.runs[0].workflow.status).toBe('Completed');
+      expect(chain.status).toBe('closed');
+    });
+
+    it('hands off when a re-describe sees the Latest Run continued before its history does', async () => {
+      server.addChain(['run-1']);
+      const chain = track(await loadChain(server));
+      server.addChain(['run-1', 'run-2']);
+      server.runs.get('run-1')!.closeEvent = completed('run-2');
+
+      await vi.advanceTimersByTimeAsync(REFRESH_INTERVAL_MS);
+      await settle();
+
+      expect(chain.status).toBe('ready');
+      expect(chain.latestRunId).toBe('run-2');
+      expect(chainRunIds(chain)).toEqual(['run-1', 'run-2']);
+    });
+
+    it('reports a failed next-run check and retries it', async () => {
+      server.addChain(['run-1']);
+      const chain = track(await loadChain(server));
+      setLatestWorkflow('run-1', {});
+      server.errors.set('close:run-1', networkError(503));
+
+      await vi.advanceTimersByTimeAsync(REFRESH_INTERVAL_MS);
+      await settle();
+
+      expect(chain.nextRunCheckFailed).toBe(true);
+      expect(chain.status).toBe('ready');
+
+      server.errors.clear();
+      server.runs.get('run-1')!.closeEvent = completed();
+      chain.retryNextRunCheck();
+      await settle();
+
+      expect(chain.nextRunCheckFailed).toBe(false);
+      expect(chain.status).toBe('closed');
+    });
+
+    it('clears a failed next-run check when the history delivers the close', async () => {
+      server.addChain(['run-1']);
+      const chain = track(await loadChain(server));
+      setLatestWorkflow('run-1', {});
+      server.errors.set('close:run-1', networkError(503));
+      await vi.advanceTimersByTimeAsync(REFRESH_INTERVAL_MS);
+      await settle();
+
+      server.controllers.get('run-1')!.close(completed());
+      await settle();
+
+      expect(chain.nextRunCheckFailed).toBe(false);
+      expect(chain.status).toBe('closed');
+    });
+
     it('closes when a paused Run closes without a successor', async () => {
       server.addChain(['run-1']);
       setLatestWorkflow('run-1', { isPaused: true });
@@ -1148,21 +1237,21 @@ describe('WorkflowExecutionChain', () => {
   });
 
   describe('discovery errors', () => {
-    it('sets discoveryError when a walk-back hop exhausts its retries', async () => {
+    it('records the older Run when a walk-back hop exhausts its retries', async () => {
       server.addChain(runIds(4));
       server.errors.set('describe:run-2', networkError(503));
       const chain = track(await loadChain(server));
 
-      expect(chain.hasDiscoveryError).toBe(true);
+      expect(chain.failedOlderRunId).toBe('run-2');
       expect(chain.status).toBe('ready');
       expect(chainRunIds(chain)).toEqual(['run-3', 'run-4']);
       expect(chain.latestRunId).toBe('run-4');
 
       server.errors.clear();
-      chain.retryDiscovery();
+      chain.retryOlderRun();
       await settle();
 
-      expect(chain.hasDiscoveryError).toBe(false);
+      expect(chain.failedOlderRunId).toBeNull();
       expect(chain.status).toBe('ready');
       expect(chainRunIds(chain)).toEqual(runIds(4));
       expect(chain.boundary).toBe('chainStart');
@@ -1177,18 +1266,19 @@ describe('WorkflowExecutionChain', () => {
       server.controllers.get('run-1')!.close(completed('run-2'));
       await settle();
 
-      expect(chain.hasDiscoveryError).toBe(true);
+      expect(chain.failedSuccessorRunId).toBe('run-2');
       expect(chain.latestRunId).toBe('run-1');
 
       server.errors.clear();
-      chain.retryDiscovery();
+      chain.retrySuccessorRun();
       await settle();
 
+      expect(chain.failedSuccessorRunId).toBeNull();
       expect(chain.status).toBe('ready');
       expect(chain.latestRunId).toBe('run-2');
     });
 
-    it('sets discoveryError when a re-describe fails, and resumes on retry', async () => {
+    it('marks the Latest Run stale when a re-describe fails, and resumes on retry', async () => {
       server.addChain(['run-1']);
       const chain = track(await loadChain(server));
       server.errors.set('describe:run-1', networkError(502));
@@ -1196,15 +1286,16 @@ describe('WorkflowExecutionChain', () => {
       await vi.advanceTimersByTimeAsync(REFRESH_INTERVAL_MS);
       await settle();
 
-      expect(chain.hasDiscoveryError).toBe(true);
+      expect(chain.isStatusStale('run-1')).toBe(true);
       const failed = server.describeCalls('run-1');
       await vi.advanceTimersByTimeAsync(REFRESH_INTERVAL_MS * 2);
       expect(server.describeCalls('run-1')).toBe(failed);
 
       server.errors.clear();
-      chain.retryDiscovery();
+      chain.retryStatus('run-1');
       await settle();
 
+      expect(chain.isStatusStale('run-1')).toBe(false);
       expect(chain.status).toBe('ready');
       expect(server.describeCalls('run-1')).toBe(failed + 1);
       await vi.advanceTimersByTimeAsync(REFRESH_INTERVAL_MS);
@@ -1212,7 +1303,7 @@ describe('WorkflowExecutionChain', () => {
       expect(server.describeCalls('run-1')).toBe(failed + 2);
     });
 
-    it('sets discoveryError when the final Describe fails', async () => {
+    it('marks the Run stale when the final Describe fails', async () => {
       server.addChain(['run-1']);
       const chain = track(await loadChain(server));
       server.errors.set('describe:run-1', networkError(500));
@@ -1220,14 +1311,14 @@ describe('WorkflowExecutionChain', () => {
       server.controllers.get('run-1')!.close(completed());
       await settle();
 
-      expect(chain.hasDiscoveryError).toBe(true);
+      expect(chain.isStatusStale('run-1')).toBe(true);
       expect(chain.status).toBe('closed');
 
       server.errors.clear();
-      chain.retryDiscovery();
+      chain.retryStatus('run-1');
       await settle();
 
-      expect(chain.hasDiscoveryError).toBe(false);
+      expect(chain.isStatusStale('run-1')).toBe(false);
       expect(chain.status).toBe('closed');
     });
 
@@ -1245,13 +1336,13 @@ describe('WorkflowExecutionChain', () => {
       } as HistoryEvent);
       await settle();
 
-      expect(chain.hasDiscoveryError).toBe(true);
+      expect(chain.isStatusStale('run-1')).toBe(true);
       expect(chain.closeTime).toBe(closeTime);
 
       const endTime = hoursIn(3);
       server.runs.get('run-1')!.workflow.endTime = endTime;
       server.errors.clear();
-      chain.retryDiscovery();
+      chain.retryStatus('run-1');
       await settle();
 
       expect(chain.closeTime).toBe(endTime);
@@ -1265,22 +1356,22 @@ describe('WorkflowExecutionChain', () => {
       const chain = track(await loadChain(server));
 
       expect(chain.status).toBe('closed');
-      expect(chain.hasDiscoveryError).toBe(true);
+      expect(chain.failedOlderRunId).toBe('run-2');
       expect(chain.closeTime).toBe(endTime);
 
-      chain.retryDiscovery();
+      chain.retryOlderRun();
       expect(chain.status).toBe('closed');
       await settle();
 
       expect(chain.status).toBe('closed');
-      expect(chain.hasDiscoveryError).toBe(true);
+      expect(chain.failedOlderRunId).toBe('run-2');
 
       server.errors.clear();
-      chain.retryDiscovery();
+      chain.retryOlderRun();
       await settle();
 
       expect(chain.status).toBe('closed');
-      expect(chain.hasDiscoveryError).toBe(false);
+      expect(chain.failedOlderRunId).toBeNull();
       expect(chainRunIds(chain)).toEqual(runIds(4));
       expect(chain.closeTime).toBe(endTime);
     });
@@ -1376,7 +1467,7 @@ describe('WorkflowExecutionChain', () => {
       await vi.advanceTimersByTimeAsync(30_000);
 
       expect(chain.pendingSuccessorRunId).toBeNull();
-      expect(chain.hasDiscoveryError).toBe(true);
+      expect(chain.failedSuccessorRunId).toBe('run-2');
     });
   });
 
@@ -1432,7 +1523,7 @@ describe('WorkflowExecutionChain', () => {
       expect(listener).toHaveBeenCalledExactlyOnceWith({ type: 'closed' });
     });
 
-    it('emits discoveryError once while steps keep failing', async () => {
+    it('emits discoveryError once per failing step', async () => {
       server.addChain(runIds(12));
       server.errors.set('describe:run-1', networkError(503));
       const chain = track(await loadChain(server));
@@ -1444,10 +1535,12 @@ describe('WorkflowExecutionChain', () => {
       server.controllers.get('run-12')!.close(completed('run-13'));
       await vi.advanceTimersByTimeAsync(30_000);
 
-      expect(chain.hasDiscoveryError).toBe(true);
-      expect(listener).toHaveBeenCalledExactlyOnceWith({
-        type: 'discoveryError',
-      });
+      expect(chain.failedOlderRunId).toBe('run-1');
+      expect(chain.failedSuccessorRunId).toBe('run-13');
+      expect(listener.mock.calls).toEqual([
+        [{ type: 'discoveryError', step: 'walkBack' }],
+        [{ type: 'discoveryError', step: 'handOff' }],
+      ]);
     });
 
     it('stops after unsubscribe and after dispose', async () => {

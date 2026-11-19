@@ -34,7 +34,7 @@ export class ChainWindow {
     this._runIds = [...this._runIds, runId];
   }
 
-  loadOlder(): Promise<void> {
+  loadOlder(onRunAdded?: (runId: string) => void): Promise<void> {
     if (
       this.walking ||
       this.boundary !== null ||
@@ -43,7 +43,7 @@ export class ChainWindow {
     ) {
       return Promise.resolve();
     }
-    return this._walkBack(WALK_SIZE);
+    return this._walkBack(WALK_SIZE, onRunAdded);
   }
 
   private _resolveRuns(runIds: string[]): ChainRun[] {
@@ -53,7 +53,10 @@ export class ChainWindow {
     });
   }
 
-  private async _walkBack(hops: number): Promise<void> {
+  private async _walkBack(
+    hops: number,
+    onRunAdded?: (runId: string) => void,
+  ): Promise<void> {
     this.walking = true;
     try {
       for (let hop = 0; hop < hops; hop++) {
@@ -78,6 +81,7 @@ export class ChainWindow {
           const remaining = hops - hop;
           this._context.failures.fail(
             'walkBack',
+            predecessor,
             () => void this._walkBack(remaining),
           );
           return;
@@ -87,6 +91,7 @@ export class ChainWindow {
         }
         this._runIds = [run.runId, ...this._runIds];
         this._onOlderRunAdded(run.runId);
+        onRunAdded?.(run.runId);
       }
     } finally {
       if (!this._context.disposed) {

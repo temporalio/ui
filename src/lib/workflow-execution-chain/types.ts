@@ -52,10 +52,17 @@ export type RunLookup<T> = {
   has: (runId: string) => boolean;
 };
 
+export type DiscoveryStep =
+  | 'walkBack'
+  | 'handOff'
+  | 'refresh'
+  | 'finalDescribe'
+  | 'closeEvent';
+
 export type ChainEvent =
   | { type: 'handOff'; runId: string }
   | { type: 'closed' }
-  | { type: 'discoveryError' };
+  | { type: 'discoveryError'; step: DiscoveryStep };
 
 export type CardLoad =
   | { status: 'queued' }
@@ -81,6 +88,10 @@ export type ChainClient = {
     signal: AbortSignal,
   ) => Promise<WorkflowExecution>;
   fetchStartedEvent: (
+    identity: WorkflowExecutionIdentity,
+    signal: AbortSignal,
+  ) => Promise<HistoryEvent>;
+  fetchCloseEvent: (
     identity: WorkflowExecutionIdentity,
     signal: AbortSignal,
   ) => Promise<HistoryEvent>;

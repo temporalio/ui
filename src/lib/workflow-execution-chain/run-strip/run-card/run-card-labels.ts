@@ -8,7 +8,7 @@ import type { Transition } from '../transitions';
 
 export type RunCardLoadState = 'loading' | 'partial' | 'complete' | 'error';
 
-export type RunCardMode = 'live' | 'latest';
+export type RunCardMode = 'live' | 'latest' | 'stale';
 
 const STATUS_LABELS: Record<NonNullable<WorkflowStatus>, I18nKey> = {
   Running: 'workflows.running',
@@ -30,6 +30,7 @@ const TRANSITION_DESCRIPTIONS: Record<Transition, I18nKey> = {
 const MODE_LABELS: Record<RunCardMode, I18nKey> = {
   live: 'workflows.live',
   latest: 'workflows.latest',
+  stale: 'workflows.stale',
 };
 
 const LOAD_STATE_DESCRIPTIONS: Partial<Record<RunCardLoadState, I18nKey>> = {

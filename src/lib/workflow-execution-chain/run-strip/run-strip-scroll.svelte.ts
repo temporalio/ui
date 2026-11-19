@@ -88,6 +88,31 @@ export const createRunStripFollowAttachment =
   (scroller) => {
     let stuckToEnd = true;
     let wasLive = untrack(options.isLive);
+    let selectionAnchor: { id: string; x: number } | null = null;
+    let programmaticScrollLeft: number | null = null;
+
+    const jumpTo = (left: number) => {
+      scroller.scrollLeft = left;
+      programmaticScrollLeft = scroller.scrollLeft;
+    };
+
+    const findSelectedSegment = () => {
+      const selectedRunId = options.getSelectedRunId();
+      return options.getSegments().find(({ id }) => id === selectedRunId);
+    };
+
+    const rememberSelectionAnchor = () => {
+      const segment = findSelectedSegment();
+      selectionAnchor = segment ? { id: segment.id, x: segment.x } : null;
+    };
+
+    const keepSelectionInPlace = () => {
+      const segment = findSelectedSegment();
+      if (!segment || segment.id !== selectionAnchor?.id) {
+        return;
+      }
+      jumpTo(scroller.scrollLeft + segment.x - selectionAnchor.x);
+    };
 
     const reportMetrics = () => {
       options.onMetricsChange(readScrollMetrics(scroller));
@@ -95,7 +120,7 @@ export const createRunStripFollowAttachment =
 
     const keepEndInView = () => {
       if (stuckToEnd) {
-        scroller.scrollLeft = scroller.scrollWidth;
+        jumpTo(scroller.scrollWidth);
       }
     };
 
@@ -118,20 +143,32 @@ export const createRunStripFollowAttachment =
       }
       wasLive = live;
       scrollToSelection(live, selectedRunId);
+      rememberSelectionAnchor();
       reportMetrics();
     };
 
-    const followLayout = () => {
+    const holdScrollPosition = () => {
       if (options.isLive()) {
         keepEndInView();
+        return;
       }
+      keepSelectionInPlace();
+    };
+
+    const followLayout = () => {
+      holdScrollPosition();
+      rememberSelectionAnchor();
       reportMetrics();
     };
 
     const onScroll = () => {
-      stuckToEnd =
-        scroller.scrollLeft + scroller.clientWidth >=
-        scroller.scrollWidth - END_TOLERANCE;
+      const scrolledByUs = scroller.scrollLeft === programmaticScrollLeft;
+      programmaticScrollLeft = null;
+      if (!scrolledByUs) {
+        stuckToEnd =
+          scroller.scrollLeft + scroller.clientWidth >=
+          scroller.scrollWidth - END_TOLERANCE;
+      }
       reportMetrics();
     };
 
