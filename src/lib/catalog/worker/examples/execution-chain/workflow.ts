@@ -15,6 +15,8 @@ import type * as activities from './activity.js';
 
 const MAX_RUNS = 25;
 const BUSY_ACTIVITY_COUNT = 300;
+const HEAVY_ACTIVITY_COUNT = 8000;
+const HEAVY_ACTIVITY_BATCH_SIZE = 1000;
 const TIMER_MULTIPLIERS = [1, 12, 3, 30, 1, 6, 20];
 
 const { flakyStep, brokenStep, busyStep } = proxyActivities<typeof activities>({
@@ -24,71 +26,86 @@ const { flakyStep, brokenStep, busyStep } = proxyActivities<typeof activities>({
 
 const proceedSignal = defineSignal('proceed');
 
-const isRunList = (runs: unknown): runs is number[] =>
-  Array.isArray(runs) &&
-  runs.every((run) => Number.isInteger(run) && run >= 1 && run <= MAX_RUNS);
+const isRunIndexList = (runIndexes: unknown): runIndexes is number[] =>
+  Array.isArray(runIndexes) &&
+  runIndexes.every(
+    (runIndex) =>
+      Number.isInteger(runIndex) && runIndex >= 0 && runIndex < MAX_RUNS,
+  );
 
 const errorMessage = (error: unknown) =>
   error instanceof Error ? error.message : String(error);
 
-export async function executionChainChild(run: number): Promise<string> {
+export async function executionChainChild(runIndex: number): Promise<string> {
   await sleep('1 second');
-  return `Run ${run} child completed`;
+  return `Run index ${runIndex} child completed`;
+}
+
+export interface ExecutionChainOptions {
+  totalRuns?: number;
+  baseTimerSeconds?: number;
+  runIndexesThatFailOnce?: number[];
+  runIndexesWith300Activities?: number[];
+  runIndexesWith8000Activities?: number[];
 }
 
 export async function executionChain(
-  runCount = 14,
-  delaySeconds = 1,
-  failOnRuns: number[] = [],
-  busyRuns: number[] = [],
-  completedRuns = 0,
+  options: ExecutionChainOptions = {},
+  runIndex = 0,
 ): Promise<string> {
-  if (!Number.isInteger(runCount) || runCount < 1 || runCount > MAX_RUNS) {
+  const {
+    totalRuns = 14,
+    baseTimerSeconds = 1,
+    runIndexesThatFailOnce = [],
+    runIndexesWith300Activities = [],
+    runIndexesWith8000Activities = [],
+  } = options;
+
+  if (!Number.isInteger(totalRuns) || totalRuns < 1 || totalRuns > MAX_RUNS) {
     throw ApplicationFailure.nonRetryable(
-      `Run count must be an integer between 1 and ${MAX_RUNS}.`,
+      `totalRuns must be an integer between 1 and ${MAX_RUNS}.`,
     );
   }
   if (
-    !Number.isInteger(delaySeconds) ||
-    delaySeconds < 1 ||
-    delaySeconds > 30
+    !Number.isInteger(baseTimerSeconds) ||
+    baseTimerSeconds < 1 ||
+    baseTimerSeconds > 30
   ) {
     throw ApplicationFailure.nonRetryable(
-      'Delay must be an integer between 1 and 30 seconds.',
-    );
-  }
-  if (!isRunList(failOnRuns) || !isRunList(busyRuns)) {
-    throw ApplicationFailure.nonRetryable(
-      `Run numbers must be integers between 1 and ${MAX_RUNS}.`,
+      'baseTimerSeconds must be an integer between 1 and 30.',
     );
   }
   if (
-    !Number.isInteger(completedRuns) ||
-    completedRuns < 0 ||
-    completedRuns >= runCount
+    !isRunIndexList(runIndexesThatFailOnce) ||
+    !isRunIndexList(runIndexesWith300Activities) ||
+    !isRunIndexList(runIndexesWith8000Activities)
   ) {
     throw ApplicationFailure.nonRetryable(
-      'Completed run count must be a non-negative integer below the run count.',
+      `Run indexes must be integers between 0 and ${MAX_RUNS - 1}.`,
+    );
+  }
+  if (!Number.isInteger(runIndex) || runIndex < 0 || runIndex >= totalRuns) {
+    throw ApplicationFailure.nonRetryable(
+      'Run index must be a non-negative integer below totalRuns.',
     );
   }
 
-  const run = completedRuns + 1;
   let proceeded = false;
   setHandler(proceedSignal, () => {
     proceeded = true;
   });
 
-  log.info('Execution chain run', { run, runCount });
+  log.info('Execution chain run', { runIndex, totalRuns });
 
-  await flakyStep(run);
+  await flakyStep(runIndex);
 
   try {
-    await brokenStep(run);
+    await brokenStep(runIndex);
   } catch (error) {
     log.info('Broken step failed as expected', { error: errorMessage(error) });
   }
 
-  if (busyRuns.includes(run)) {
+  if (runIndexesWith300Activities.includes(runIndex)) {
     await Promise.all(
       Array.from({ length: BUSY_ACTIVITY_COUNT }, (_, index) =>
         busyStep(index + 1),
@@ -96,27 +113,38 @@ export async function executionChain(
     );
   }
 
+  if (runIndexesWith8000Activities.includes(runIndex)) {
+    for (
+      let batchStart = 0;
+      batchStart < HEAVY_ACTIVITY_COUNT;
+      batchStart += HEAVY_ACTIVITY_BATCH_SIZE
+    ) {
+      await Promise.all(
+        Array.from({ length: HEAVY_ACTIVITY_BATCH_SIZE }, (_, index) =>
+          busyStep(batchStart + index + 1),
+        ),
+      );
+    }
+  }
+
   const timerSeconds =
-    delaySeconds * TIMER_MULTIPLIERS[(run - 1) % TIMER_MULTIPLIERS.length];
+    baseTimerSeconds * TIMER_MULTIPLIERS[runIndex % TIMER_MULTIPLIERS.length];
   await sleep(`${timerSeconds} seconds`);
-  await executeChild(executionChainChild, { args: [run] });
+  await executeChild(executionChainChild, { args: [runIndex] });
   await condition(() => proceeded, '2 seconds');
 
-  if (failOnRuns.includes(run) && workflowInfo().attempt === 1) {
+  if (
+    runIndexesThatFailOnce.includes(runIndex) &&
+    workflowInfo().attempt === 1
+  ) {
     throw ApplicationFailure.retryable(
-      `Run ${run} failed on purpose so the workflow Retry Policy starts a new Run.`,
+      `Run index ${runIndex} failed on purpose so the workflow Retry Policy starts a new Run.`,
     );
   }
 
-  if (run < runCount) {
-    return await continueAsNew<typeof executionChain>(
-      runCount,
-      delaySeconds,
-      failOnRuns,
-      busyRuns,
-      run,
-    );
+  if (runIndex + 1 < totalRuns) {
+    return await continueAsNew<typeof executionChain>(options, runIndex + 1);
   }
 
-  return `Completed ${runCount} runs in the execution chain.`;
+  return `Completed ${totalRuns} runs in the execution chain.`;
 }
