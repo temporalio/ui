@@ -1,11 +1,12 @@
 import type { WorkflowHistoryController } from '$lib/services/workflow-history-controller.svelte';
 
-import type { CardLoad, ChainRun } from './types';
+import type { CardLoad, ChainRun, RunCardSummary } from './types';
 
 /** A Run card's history controller and load progress. Owned by `CardLoader`. */
 export class RunCard {
   controller = $state.raw<WorkflowHistoryController | undefined>();
   loadState = $state.raw<CardLoad | undefined>();
+  summary = $state.raw<RunCardSummary | undefined>();
   firstEventSeen = false;
 }
 

@@ -1,3 +1,5 @@
+import type { RunCounts } from '$lib/models/event-history/run-counts';
+import type { LazyGroup } from '$lib/services/grouped-event-buffer';
 import type { WorkflowHistoryController } from '$lib/services/workflow-history-controller.svelte';
 import type { HistoryEvent } from '$lib/types/events';
 import type { NetworkError } from '$lib/types/global';
@@ -45,6 +47,19 @@ export type ChainResolution =
 
 export type ChainLoadResult = {
   redirectFirstRunId: string | null;
+};
+
+export type RunBarGroup = Pick<LazyGroup, 'category' | 'isPending'>;
+
+/**
+ * What a closed Run's card keeps once its history is released: enough to
+ * draw the card and to answer close-time and SDK lookups.
+ */
+export type RunCardSummary = {
+  counts: RunCounts;
+  barGroups: RunBarGroup[];
+  closeEvent: HistoryEvent | null;
+  sdkInfo: { sdk: string; version: string };
 };
 
 export type RunLookup<T> = {

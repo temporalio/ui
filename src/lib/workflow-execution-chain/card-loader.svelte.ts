@@ -1,3 +1,4 @@
+import { countRunGroups } from '$lib/models/event-history/run-counts';
 import type { WorkflowHistoryController } from '$lib/services/workflow-history-controller.svelte';
 import type { HistoryEvent } from '$lib/types/events';
 import type { WorkflowExecution } from '$lib/types/workflows';
@@ -5,25 +6,48 @@ import { isNotFound } from '$lib/utilities/handle-error';
 import { toError } from '$lib/utilities/to-error';
 
 import { LoadQueue } from './load-queue';
-import type { CardLoad, ChainError, RunLookup } from './types';
+import type { CardLoad, ChainError, RunCardSummary, RunLookup } from './types';
 
 import type { ChainContext } from './chain-context.svelte';
 import type { RunCard, RunRecord } from './run-record.svelte';
 
 const BACKGROUND_CARD_LOAD_CONCURRENCY = 1;
+const CLOSED_RUN_HISTORY_LIMIT = 10;
+
+const summarizeHistory = (
+  controller: WorkflowHistoryController,
+): RunCardSummary => {
+  const groups = controller.history.lazyGroupsWithoutWorkflowTasks;
+  return {
+    counts: countRunGroups(groups),
+    barGroups: groups.map(({ category, isPending }) => ({
+      category,
+      isPending,
+    })),
+    closeEvent: controller.closeEvent,
+    sdkInfo: controller.history.sdkInfo,
+  };
+};
 
 /**
  * Loads each Run card's history through its own controller. The foreground
  * Run (the pinned Run, or else the Latest Run) loads at once, outside the
  * queue; every other card waits in a background queue that stays held until
  * the foreground card has something to show.
+ *
+ * Only the `CLOSED_RUN_HISTORY_LIMIT` most recently pinned closed Runs, or
+ * else those nearest the Latest Run, keep their history, besides the pinned
+ * and Latest Runs. The rest keep a summary and load their history again if
+ * pinned.
  */
 export class CardLoader {
   readonly controllers = this._createRunLookup((card) => card.controller);
   readonly cardLoads = this._createRunLookup((card) => card.loadState);
+  readonly summaries = this._createRunLookup((card) => card.summary);
 
   private _latestRunId: string | null = null;
   private _pinnedRunId: string | null = null;
+  private _recentlyUsedRunIds: string[] = [];
   private readonly _backgroundQueue = new LoadQueue({
     concurrency: BACKGROUND_CARD_LOAD_CONCURRENCY,
     start: (runId) => this._loadCard(runId),
@@ -45,12 +69,27 @@ export class CardLoader {
     return this.cardLoads.get(runId) ?? { status: 'queued' };
   }
 
+  closeEventOf(runId: string): HistoryEvent | null | undefined {
+    const card = this._context.records.get(runId)?.card;
+    return card?.controller?.closeEvent ?? card?.summary?.closeEvent;
+  }
+
+  sdkInfoOf(runId: string): RunCardSummary['sdkInfo'] | undefined {
+    const card = this._context.records.get(runId)?.card;
+    return card?.controller?.history.sdkInfo ?? card?.summary?.sdkInfo;
+  }
+
   latestRunChanged(runId: string): void {
+    const previousLatestRunId = this._latestRunId;
     this._latestRunId = runId;
     if (this.cardLoadOf(runId).status === 'queued') {
       this._startCardNow(runId);
     }
     this._holdBackgroundLoadsUntilForegroundShows();
+    if (previousLatestRunId) {
+      this._markUsed(previousLatestRunId);
+    }
+    this._releaseLeastRecentlyUsedHistories();
   }
 
   enqueue(runId: string): void {
@@ -67,12 +106,18 @@ export class CardLoader {
   }
 
   prioritizeRun(runId: string | null): void {
+    const previousPinnedRunId = this._pinnedRunId;
     this._pinnedRunId = runId;
-    const cardLoad = runId ? this.cardLoads.get(runId) : undefined;
-    if (runId && cardLoad?.status === 'queued') {
+    const card = runId ? this._context.records.get(runId)?.card : undefined;
+    const isReleased = card?.summary !== undefined && !card.controller;
+    if (runId && (card?.loadState?.status === 'queued' || isReleased)) {
       this._startCardNow(runId);
     }
     this._holdBackgroundLoadsUntilForegroundShows();
+    if (previousPinnedRunId) {
+      this._markUsed(previousPinnedRunId);
+    }
+    this._releaseLeastRecentlyUsedHistories();
   }
 
   retryCard(runId: string): void {
@@ -172,6 +217,58 @@ export class CardLoader {
     }
     record.card.loadState = { status: 'loaded' };
     this._holdBackgroundLoadsUntilForegroundShows();
+    this._markLoaded(runId);
+    this._releaseLeastRecentlyUsedHistories();
+  }
+
+  /**
+   * Cards load from the Latest Run backwards, so a load counts as the least
+   * recent use: otherwise the Runs nearest the Latest would be released
+   * first. Being pinned or Latest is what makes a Run recently used.
+   */
+  private _markLoaded(runId: string): void {
+    if (this._recentlyUsedRunIds.includes(runId)) {
+      return;
+    }
+    this._recentlyUsedRunIds = [runId, ...this._recentlyUsedRunIds];
+  }
+
+  private _markUsed(runId: string): void {
+    this._recentlyUsedRunIds = [
+      ...this._recentlyUsedRunIds.filter((usedRunId) => usedRunId !== runId),
+      runId,
+    ];
+  }
+
+  private _releaseLeastRecentlyUsedHistories(): void {
+    const releasable = this._recentlyUsedRunIds.filter((runId) =>
+      this._canReleaseHistory(runId),
+    );
+    for (const runId of releasable.slice(0, -CLOSED_RUN_HISTORY_LIMIT)) {
+      this._releaseHistory(runId);
+    }
+  }
+
+  private _canReleaseHistory(runId: string): boolean {
+    if (runId === this._pinnedRunId || runId === this._latestRunId) {
+      return false;
+    }
+    const controller = this._context.records.get(runId)?.card.controller;
+    return controller?.phase.kind === 'complete';
+  }
+
+  private _releaseHistory(runId: string): void {
+    const card = this._context.records.recordFor(runId).card;
+    const controller = card.controller;
+    if (!controller) {
+      return;
+    }
+    card.summary = summarizeHistory(controller);
+    card.controller = undefined;
+    controller.dispose();
+    this._recentlyUsedRunIds = this._recentlyUsedRunIds.filter(
+      (usedRunId) => usedRunId !== runId,
+    );
   }
 
   private _controllerFor(record: RunRecord): WorkflowHistoryController {

@@ -12,7 +12,7 @@
   import { routeForWorkflow } from '$lib/utilities/route-for';
   import { getWorkflowLatestTime } from '$lib/utilities/workflow-time-skipping';
 
-  import type { CardLoad, ChainRun } from '../../types';
+  import type { CardLoad, ChainRun, RunCardSummary } from '../../types';
   import type { Transition } from '../transitions';
   import { buildRunBar } from './run-bar';
   import {
@@ -31,6 +31,7 @@
     run: ChainRun;
     namespace: string;
     controller: WorkflowHistoryController | undefined;
+    summary: RunCardSummary | undefined;
     cardLoad: CardLoad;
     transition: Transition | null;
     width: number;
@@ -50,6 +51,7 @@
     run,
     namespace,
     controller,
+    summary,
     cardLoad,
     transition,
     width,
@@ -91,11 +93,14 @@
   const eventGroups = $derived(
     controller?.history.lazyGroupsWithoutWorkflowTasks ?? [],
   );
+  const shownSummary = $derived(
+    controller?.fetchComplete ? undefined : summary,
+  );
   const loadState = $derived.by((): RunCardLoadState => {
     if (cardLoad.status === 'error') {
       return 'error';
     }
-    if (controller?.fetchComplete) {
+    if (controller?.fetchComplete || shownSummary) {
       return 'complete';
     }
     if (eventGroups.length > 0) {
@@ -103,8 +108,10 @@
     }
     return 'loading';
   });
-  const counts = $derived(countRunGroups(eventGroups));
-  const barSegments = $derived(buildRunBar(eventGroups, width));
+  const counts = $derived(shownSummary?.counts ?? countRunGroups(eventGroups));
+  const barSegments = $derived(
+    buildRunBar(shownSummary?.barGroups ?? eventGroups, width),
+  );
   const loadedFraction = $derived.by(() => {
     if (loadState !== 'partial' || !controller) {
       return 1;

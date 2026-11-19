@@ -1,20 +1,15 @@
 import { describe, expect, it } from 'vitest';
 
 import { getCategoryStrokeColor } from '$lib/components/lines-and-dots/colors';
-import type { LazyGroup } from '$lib/services/grouped-event-buffer';
 import type { EventTypeCategory } from '$lib/types/events';
 
 import { buildRunBar, PENDING_OPACITY, runBarSlots } from './run-bar';
+import type { RunBarGroup } from '../../types';
 
 const group = (
   category: EventTypeCategory,
-  { isPending = false, eventType = 'ActivityTaskScheduled' } = {},
-): LazyGroup =>
-  ({
-    category,
-    isPending,
-    initialEvent: { eventType },
-  }) as unknown as LazyGroup;
+  { isPending = false } = {},
+): RunBarGroup => ({ category, isPending });
 
 const categories = (segments: ReturnType<typeof buildRunBar>) =>
   segments.map((segment) => segment.category);
@@ -56,18 +51,6 @@ describe('buildRunBar', () => {
     const [segment] = buildRunBar([group('activity', { isPending: true })], 20);
 
     expect(segment.opacity).toBe(PENDING_OPACITY);
-  });
-
-  it('excludes workflow tasks', () => {
-    const segments = buildRunBar(
-      [
-        group('workflow', { eventType: 'WorkflowTaskScheduled' }),
-        group('timer'),
-      ],
-      20,
-    );
-
-    expect(categories(segments)).toEqual(['timer']);
   });
 
   it('merges consecutive groups into equal buckets over capacity', () => {

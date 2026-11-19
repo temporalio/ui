@@ -1,4 +1,5 @@
 import type { WorkflowHistoryController } from '$lib/services/workflow-history-controller.svelte';
+import type { HistoryEvent } from '$lib/types/events';
 import type { ValidTime } from '$lib/utilities/format-time';
 
 import { client as defaultClient } from './chain-client';
@@ -12,6 +13,7 @@ import type {
   ChainRun,
   ChainStatus,
   FirstRunState,
+  RunCardSummary,
   RunLookup,
   WorkflowExecutionChainIdentity,
 } from './types';
@@ -63,7 +65,7 @@ export class WorkflowExecutionChain {
       },
       workflowUpdated: (runId, workflow) =>
         this._cards.updateWorkflow(runId, workflow),
-      closeEventOf: (runId) => this._cards.controllers.get(runId)?.closeEvent,
+      closeEventOf: (runId) => this._cards.closeEventOf(runId),
     });
     this._loader = new ChainLoader(this._context, (latestRun) =>
       this._startChain(latestRun),
@@ -117,6 +119,18 @@ export class WorkflowExecutionChain {
     return this._cards.cardLoads;
   }
 
+  get summaries(): RunLookup<RunCardSummary> {
+    return this._cards.summaries;
+  }
+
+  closeEventOf(runId: string): HistoryEvent | null | undefined {
+    return this._cards.closeEventOf(runId);
+  }
+
+  sdkInfoOf(runId: string): RunCardSummary['sdkInfo'] | undefined {
+    return this._cards.sdkInfoOf(runId);
+  }
+
   get failedOlderRunId(): string | null {
     return this._context.failures.runIdOf('walkBack');
   }
@@ -144,7 +158,7 @@ export class WorkflowExecutionChain {
     }
     return (
       this._context.records.get(latestRunId)?.run?.workflow.endTime ||
-      this._cards.controllers.get(latestRunId)?.closeEvent?.eventTime ||
+      this._cards.closeEventOf(latestRunId)?.eventTime ||
       undefined
     );
   }

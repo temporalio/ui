@@ -78,7 +78,7 @@
   );
 
   const runEndMs = ({ runId, workflow }: ChainRun): number =>
-    getValidTimeMs(chain.controllers.get(runId)?.closeEvent?.eventTime) ??
+    getValidTimeMs(chain.closeEventOf(runId)?.eventTime) ??
     getWorkflowLatestTime(workflow, now);
 
   const runSpans = $derived(

@@ -1,9 +1,7 @@
 import { getCategoryStrokeColor } from '$lib/components/lines-and-dots/colors';
-import {
-  isWorkflowTaskGroup,
-  type LazyGroup,
-} from '$lib/services/grouped-event-buffer';
 import type { EventTypeCategory } from '$lib/types/events';
+
+import type { RunBarGroup } from '../../types';
 
 const SLOT_WIDTH = 2;
 export const PENDING_OPACITY = 0.4;
@@ -17,7 +15,9 @@ export type RunBarSegment = {
 export const runBarSlots = (cardWidth: number): number =>
   Math.max(1, Math.floor(cardWidth / SLOT_WIDTH));
 
-const dominantCategory = (groups: readonly LazyGroup[]): EventTypeCategory => {
+const dominantCategory = (
+  groups: readonly RunBarGroup[],
+): EventTypeCategory => {
   const counts = new Map<EventTypeCategory, number>();
   let dominant = groups[0].category;
   for (const group of groups) {
@@ -30,7 +30,7 @@ const dominantCategory = (groups: readonly LazyGroup[]): EventTypeCategory => {
   return dominant;
 };
 
-const toSegment = (groups: readonly LazyGroup[]): RunBarSegment => {
+const toSegment = (groups: readonly RunBarGroup[]): RunBarSegment => {
   const category = dominantCategory(groups);
   return {
     category,
@@ -39,11 +39,11 @@ const toSegment = (groups: readonly LazyGroup[]): RunBarSegment => {
   };
 };
 
+/** `lifecycleGroups` must already exclude workflow tasks. */
 export const buildRunBar = (
-  groups: readonly LazyGroup[],
+  lifecycleGroups: readonly RunBarGroup[],
   cardWidth: number,
 ): RunBarSegment[] => {
-  const lifecycleGroups = groups.filter((group) => !isWorkflowTaskGroup(group));
   const slots = runBarSlots(cardWidth);
 
   if (lifecycleGroups.length <= slots) {

@@ -12,6 +12,7 @@ import type {
   ChainError,
   ControllerCallbacks,
   DescribeParameters,
+  RunBarGroup,
 } from './types';
 
 import {
@@ -31,6 +32,11 @@ const networkError = (statusCode: number) => ({
 class FakeController {
   error: unknown = null;
   closeEvent: HistoryEvent | null = null;
+  phase: { kind: 'idle' | 'live' | 'complete' | 'failed' } = { kind: 'idle' };
+  history = {
+    lazyGroupsWithoutWorkflowTasks: [] as RunBarGroup[],
+    sdkInfo: { sdk: '', version: '' },
+  };
   updateWorkflow = vi.fn();
   dispose = vi.fn();
   private _finishLoad: ((error?: unknown) => void) | null = null;
@@ -50,6 +56,7 @@ class FakeController {
 
   close(closeEvent: HistoryEvent): void {
     this.closeEvent = closeEvent;
+    this.phase = { kind: 'complete' };
     this._callbacks.onClose(closeEvent);
   }
 
@@ -69,16 +76,29 @@ class FakeController {
   private _loadHistory(): Promise<void> {
     this.error = null;
     if (!this._server.holdLoads) {
-      this.error = this._server.loadErrors.get(this.identity.runId) ?? null;
+      this._settle(this._server.loadErrors.get(this.identity.runId));
       return Promise.resolve();
     }
     return new Promise<void>((resolve) => {
       this._finishLoad = (error) => {
         this._finishLoad = null;
-        this.error = error ?? null;
+        this._settle(error);
         resolve();
       };
     });
+  }
+
+  private _settle(error: unknown): void {
+    this.error = error ?? null;
+    if (this.error) {
+      this.phase = { kind: 'failed' };
+      return;
+    }
+    this.closeEvent ??=
+      this._server.closeEvents.get(this.identity.runId) ?? null;
+    const isRunning = this._server.runs.get(this.identity.runId)?.workflow
+      .isRunning;
+    this.phase = { kind: isRunning && !this.closeEvent ? 'live' : 'complete' };
   }
 }
 
@@ -153,6 +173,7 @@ class FakeServer {
   controllers = new Map<string, FakeController>();
   holdLoads = false;
   loadErrors = new Map<string, unknown>();
+  closeEvents = new Map<string, HistoryEvent>();
 
   describe = vi.fn(
     async (
@@ -906,6 +927,86 @@ describe('WorkflowExecutionChain', () => {
       expect(controller.load).toHaveBeenCalledOnce();
       expect(controller.retry).toHaveBeenCalledOnce();
       expect(chain.cardLoads.get('run-2')).toEqual({ status: 'loaded' });
+    });
+
+    describe('closed Run history', () => {
+      const closedRunIds = runIds(21);
+      const releasedRunIds = () =>
+        closedRunIds.filter(
+          (runId) => server.controllers.get(runId)?.dispose.mock.calls.length,
+        );
+      const keptRunIds = (chain: WorkflowExecutionChain) =>
+        closedRunIds.filter((runId) => chain.controllers.has(runId));
+
+      const loadTwentyCards = async ({ openLatest = false } = {}) => {
+        server.addChain(runIds(22), { openLatest });
+        const chain = track(await loadChain(server));
+        await chain.loadOlder();
+        await settle();
+        return chain;
+      };
+
+      it('keeps history for ten closed Runs, nearest the Latest first', async () => {
+        const chain = await loadTwentyCards();
+
+        expect(chainRunIds(chain)).toEqual(runIds(22).slice(2));
+        expect(releasedRunIds()).toEqual(runIds(11).slice(2));
+        expect(keptRunIds(chain)).toEqual(runIds(21).slice(11));
+        expect(chain.controllers.has('run-22')).toBe(true);
+        for (const runId of releasedRunIds()) {
+          expect(chain.summaries.get(runId)).toBeDefined();
+          expect(chain.cardLoadOf(runId)).toEqual({ status: 'loaded' });
+        }
+      });
+
+      it("keeps a released Run's close event", async () => {
+        const closeEvents = new Map(
+          closedRunIds.map((runId) => [runId, completed()]),
+        );
+        server.closeEvents = closeEvents;
+        const chain = await loadTwentyCards();
+
+        const [releasedRunId] = releasedRunIds();
+        expect(chain.closeEventOf(releasedRunId)).toBe(
+          closeEvents.get(releasedRunId),
+        );
+      });
+
+      it('loads a released Run again when it is pinned', async () => {
+        const chain = await loadTwentyCards();
+        const released = server.controllers.get('run-3')!;
+
+        chain.prioritizeRun('run-3');
+        await settle();
+
+        const reloaded = server.controllers.get('run-3')!;
+        expect(reloaded).not.toBe(released);
+        expect(reloaded.load).toHaveBeenCalledOnce();
+        expect(chain.controllers.has('run-3')).toBe(true);
+      });
+
+      it('keeps a Run that was pinned over the least recently used', async () => {
+        const chain = await loadTwentyCards();
+
+        chain.prioritizeRun('run-3');
+        await settle();
+        chain.prioritizeRun(null);
+        await settle();
+
+        expect(keptRunIds(chain)).toEqual(['run-3', ...runIds(21).slice(12)]);
+      });
+
+      it('never releases the pinned or Latest Run, or an open Run', async () => {
+        const chain = await loadTwentyCards({ openLatest: true });
+        chain.prioritizeRun('run-3');
+        await settle();
+
+        expect(chain.controllers.has('run-3')).toBe(true);
+        expect(chain.controllers.has('run-22')).toBe(true);
+        expect(
+          server.controllers.get('run-22')!.dispose,
+        ).not.toHaveBeenCalled();
+      });
     });
 
     it('starts no more cards after dispose', async () => {

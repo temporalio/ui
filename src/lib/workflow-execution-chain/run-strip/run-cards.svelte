@@ -78,6 +78,7 @@
         {run}
         namespace={chain.identity.namespace}
         controller={chain.controllers.get(run.runId)}
+        summary={chain.summaries.get(run.runId)}
         cardLoad={chain.cardLoadOf(run.runId)}
         {transition}
         width={cardWidths[index] ?? MIN_CARD_WIDTH}

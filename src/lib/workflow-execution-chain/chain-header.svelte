@@ -79,7 +79,7 @@
 
   const sdkInfo = $derived.by(() => {
     for (const run of [...chain.runs].reverse()) {
-      const sdkAndVersion = chain.controllers.get(run.runId)?.history.sdkInfo;
+      const sdkAndVersion = chain.sdkInfoOf(run.runId);
       if (sdkAndVersion?.sdk && sdkAndVersion.version) {
         return sdkAndVersion;
       }
