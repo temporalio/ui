@@ -88,6 +88,9 @@ export interface PaletteView {
   id: string;
   title: string;
   placeholder?: string;
+  // Text the search field starts with, such as the query that opened the
+  // view. Defaults to an empty field.
+  initialQuery?: string;
   // Read inside a reactive scope, so items can come from runes or stores.
   items: () => PaletteItem[];
   // Items built from the query, such as a typed value. They show above the

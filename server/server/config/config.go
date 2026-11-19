@@ -154,9 +154,10 @@ type (
 		// OIDC .well-known/openid-configuration URL, ex. https://accounts.google.com/
 		ProviderURL string `yaml:"providerUrl"`
 		// IssuerUrl - optional. Needed only when differs from the auth provider URL
-		IssuerUrl    string `yaml:"issuerUrl"`
-		ClientID     string `yaml:"clientId"`
-		ClientSecret string `yaml:"clientSecret"`
+		IssuerUrl           string `yaml:"issuerUrl"`
+		ClientID            string `yaml:"clientId"`
+		ClientSecret        string `yaml:"clientSecret"`
+		ClientAssertionFile string `yaml:"clientAssertionFile"`
 		// Scopes for auth. Typically [openid, profile, email]
 		Scopes []string `yaml:"scopes"`
 		// CallbackURL - URL for the callback URL, ex. https://localhost:8080/sso/callback

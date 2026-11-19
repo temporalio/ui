@@ -138,6 +138,62 @@ describe('Palette', () => {
     expect(input.value).toBe('detail');
   });
 
+  it('starts a pushed view with its initial query, and restores the root query on Back', async () => {
+    const search = vi.fn((query: string) => [
+      {
+        id: `result-${query}`,
+        title: `Result for ${query}`,
+        actions: [{ title: 'Open', run: vi.fn() }],
+      },
+    ]);
+    setup([
+      {
+        id: 'help',
+        label: 'Help',
+        key: 'h',
+        tools: [
+          {
+            id: 'search',
+            section: 'Help',
+            items: () => [],
+            fallback: true,
+            search: (query) => [
+              {
+                id: 'search-for',
+                title: `Search for ${query}`,
+                actions: [
+                  {
+                    title: 'Search',
+                    run: (ctx) =>
+                      ctx.push({
+                        id: 'results',
+                        title: 'Results',
+                        initialQuery: query,
+                        items: () => [],
+                        search,
+                      }),
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ]);
+    const input = await openPalette();
+
+    await fireEvent.input(input, { target: { value: 'retry policy' } });
+    await fireEvent.keyDown(input, { key: 'Enter' });
+
+    expect(input.value).toBe('retry policy');
+    expect(search).toHaveBeenCalledWith('retry policy');
+    expect(screen.getByText('Result for retry policy')).toBeTruthy();
+
+    await fireEvent.keyDown(input, { key: 'Escape' });
+    expect(input.value).toBe('retry policy');
+    expect(screen.getByText('Search for retry policy')).toBeTruthy();
+  });
+
   it('asks for a second Enter before a confirm action runs', async () => {
     const { destroy } = setup();
     const input = await openPalette();

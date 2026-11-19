@@ -369,7 +369,7 @@
   function push(view: PaletteView, variant: PaletteVariant) {
     savedFrames.push({ query, selected: selectedIndex });
     frames = [...frames, { view, variant }];
-    query = '';
+    query = view.initialQuery ?? '';
     selected = 0;
     resetTransientState();
     view.onOpen?.();
@@ -826,7 +826,7 @@
         class="w-full max-w-2xl rounded-xl border border-primary shadow-2xl"
       >
         <div
-          class="relative flex max-h-[min(560px,76dvh)] flex-col rounded-xl bg-surface-primary"
+          class="relative flex max-h-[min(560px,76dvh)] min-h-[min(theme(spacing.96),76dvh)] flex-col rounded-xl bg-surface-primary"
         >
           <div
             class="flex items-center gap-2 border-b border-secondary px-4 py-3"
@@ -936,7 +936,7 @@
           <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
           <div
             bind:this={list}
-            class="min-h-72 flex-1 overflow-y-auto p-2"
+            class="min-h-0 flex-1 overflow-y-auto p-2"
             tabindex="0"
           >
             {#if loading}

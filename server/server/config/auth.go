@@ -26,6 +26,8 @@ package config
 
 import (
 	"errors"
+	"fmt"
+	"os"
 )
 
 // Validate validates the persistence config
@@ -62,6 +64,18 @@ func (c *AuthProvider) validate() error {
 
 	if c.CallbackURL == "" {
 		return errors.New("auth callback url is not set")
+	}
+
+	if c.ClientSecret != "" && c.ClientAssertionFile != "" {
+		return errors.New("auth client secret and client assertion file are mutually exclusive")
+	}
+
+	if c.ClientAssertionFile != "" {
+		f, err := os.Open(c.ClientAssertionFile)
+		if err != nil {
+			return fmt.Errorf("auth client assertion file can't be read: %w", err)
+		}
+		f.Close()
 	}
 
 	return nil
