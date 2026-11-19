@@ -256,6 +256,44 @@ describe('compute provider pages', () => {
     },
   );
 
+  test('create Deployment says so when no provider is offered', async () => {
+    const target = await client.renderComputePage({
+      page: 'create-deployment',
+      providerConfig: {
+        providers: PROVIDERS.map((value) => ({ value, hidden: true })),
+      },
+    });
+
+    expect(target.textContent).toContain(
+      'No compute provider is available for this Namespace.',
+    );
+    for (const provider of PROVIDERS) {
+      expect(resourceInputs(target, provider)).toEqual([]);
+    }
+  });
+
+  test('edit Version says so when the saved provider is unknown', async () => {
+    const target = await client.renderComputePage({
+      page: 'edit-version',
+      providerConfig: providerConfig('lambda', 'none'),
+      fetchDeploymentVersion: {
+        workerDeploymentVersionInfo: {
+          computeConfig: {
+            scalingGroups: { default: { provider: { type: 'other-cloud' } } },
+          },
+        },
+      },
+    });
+
+    expect(target.textContent).toContain(
+      'This Version uses a compute provider that this page cannot show.',
+    );
+    for (const provider of PROVIDERS) {
+      expect(target.textContent).not.toContain(LABEL[provider]);
+      expect(resourceInputs(target, provider)).toEqual([]);
+    }
+  });
+
   test.each(editCases)(
     'the Deployments row badge names only $provider ($topology, $layout)',
     ({ provider, topology, layout }) => {

@@ -26,7 +26,7 @@
   import { type ComputeProviderOption, defaultReleaseStage } from './shared';
 
   interface Props {
-    provider?: string;
+    provider: ComputeProviderValue;
     providers?: readonly ComputeProviderOption[];
     name?: string;
     /**
@@ -38,7 +38,7 @@
   }
 
   let {
-    provider = $bindable('lambda'),
+    provider = $bindable(),
     providers,
     name = 'provider',
     layout = 'cards',

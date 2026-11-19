@@ -64,7 +64,7 @@ describe('getInitialComputeProvider', () => {
     ).toBe('cloud-run');
   });
 
-  it('falls back to Lambda when no configured provider is selectable', () => {
+  it('has no provider when no configured provider is selectable', () => {
     expect(
       getInitialComputeProvider({
         providers: [
@@ -72,7 +72,7 @@ describe('getInitialComputeProvider', () => {
           { value: 'cloud-run', hidden: true },
         ],
       }),
-    ).toBe('lambda');
+    ).toBeUndefined();
   });
 
   it('preserves an existing visible provider when it is disabled', () => {

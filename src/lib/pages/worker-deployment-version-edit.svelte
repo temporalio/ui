@@ -94,7 +94,7 @@
        in use rather than offering alternatives that cannot be applied. A
        Version with compute only in the replica takes the replica's. -->
   {@const configuredProvider =
-    primaryValues.provider ?? replicaValues?.provider ?? 'lambda'}
+    primaryValues.provider ?? replicaValues?.provider}
   <div class="flex max-w-[45rem] flex-col gap-4">
     <Link href={backHref} LeadingIcon={IconChevronLeft}>
       {translate('workers.back-to-deployment', { deployment })}
@@ -102,84 +102,90 @@
     <h1 class="text-2xl font-semibold">
       {translate('workers.edit-version-title-with-id', { buildId })}
     </h1>
-    <EditVersionForm
-      {error}
-      computeProviders={lockProvidersTo(configuredProvider, computeProviders)}
-      {gcpRegions}
-      {templates}
-      initialData={{ ...primaryValues, provider: configuredProvider }}
-      initialReplicaData={replicaValues}
-      primaryGroup={slots?.primary}
-      replicaGroup={slots?.replica}
-      initialRunsInPrimary={!!groups.primary || !groups.replica}
-      enabledRegionIds={groups.replica && replicaRegionId
-        ? [replicaRegionId]
-        : []}
-      regions={computeRegionsFor(namespaceRegions, configuredProvider)}
-      {namespace}
-      deploymentName={deployment}
-      {buildId}
-      cancelHref={backHref}
-      onSubmit={async (data, regionValues) => {
-        error = undefined;
-        const computeConfig = regionValues
-          ? buildComputeConfigForRegions(regionValues)
-          : buildComputeConfigFromForm(data);
-        const removeScalingGroups = scalingGroupsToRemove(
-          info.computeConfig,
-          computeConfig,
-        );
-        await updateWorkerDeploymentVersionComputeConfig(
-          {
-            namespace,
-            deploymentName: deployment,
-            buildId,
+    {#if !configuredProvider}
+      <Alert intent="error" title={translate('common.error-occurred')}>
+        {translate('workers.provider-unknown')}
+      </Alert>
+    {:else}
+      <EditVersionForm
+        {error}
+        computeProviders={lockProvidersTo(configuredProvider, computeProviders)}
+        {gcpRegions}
+        {templates}
+        initialData={{ ...primaryValues, provider: configuredProvider }}
+        initialReplicaData={replicaValues}
+        primaryGroup={slots?.primary}
+        replicaGroup={slots?.replica}
+        initialRunsInPrimary={!!groups.primary || !groups.replica}
+        enabledRegionIds={groups.replica && replicaRegionId
+          ? [replicaRegionId]
+          : []}
+        regions={computeRegionsFor(namespaceRegions, configuredProvider)}
+        {namespace}
+        deploymentName={deployment}
+        {buildId}
+        cancelHref={backHref}
+        onSubmit={async (data, regionValues) => {
+          error = undefined;
+          const computeConfig = regionValues
+            ? buildComputeConfigForRegions(regionValues)
+            : buildComputeConfigFromForm(data);
+          const removeScalingGroups = scalingGroupsToRemove(
+            info.computeConfig,
             computeConfig,
-            removeScalingGroups,
-          },
-          (err) => {
+          );
+          await updateWorkerDeploymentVersionComputeConfig(
+            {
+              namespace,
+              deploymentName: deployment,
+              buildId,
+              computeConfig,
+              removeScalingGroups,
+            },
+            (err) => {
+              error =
+                err.body?.message ||
+                err.statusText ||
+                translate('workers.update-compute-config-error');
+            },
+          );
+          if (error) return;
+
+          let validateError: string | undefined;
+          const validation = await validateWorkerDeploymentVersionComputeConfig(
+            {
+              namespace,
+              deploymentName: deployment,
+              buildId,
+              computeConfig,
+            },
+            (err) => {
+              if (err.status === 501) return;
+              validateError =
+                err.body?.message ||
+                err.statusText ||
+                translate('workers.update-compute-config-error');
+            },
+          );
+
+          if (validateError) {
+            error = validateError;
+            return;
+          }
+          if (validation?.valid === false) {
             error =
-              err.body?.message ||
-              err.statusText ||
+              validation.message ??
               translate('workers.update-compute-config-error');
-          },
-        );
-        if (error) return;
+            return;
+          }
 
-        let validateError: string | undefined;
-        const validation = await validateWorkerDeploymentVersionComputeConfig(
-          {
-            namespace,
-            deploymentName: deployment,
-            buildId,
-            computeConfig,
-          },
-          (err) => {
-            if (err.status === 501) return;
-            validateError =
-              err.body?.message ||
-              err.statusText ||
-              translate('workers.update-compute-config-error');
-          },
-        );
-
-        if (validateError) {
-          error = validateError;
-          return;
-        }
-        if (validation?.valid === false) {
-          error =
-            validation.message ??
-            translate('workers.update-compute-config-error');
-          return;
-        }
-
-        await goto(backHref);
-      }}
-      onDelete={() => {
-        showDeleteModal = true;
-      }}
-    />
+          await goto(backHref);
+        }}
+        onDelete={() => {
+          showDeleteModal = true;
+        }}
+      />
+    {/if}
   </div>
 {:catch err}
   <Alert intent="warning" title={translate('common.error-occurred')}>

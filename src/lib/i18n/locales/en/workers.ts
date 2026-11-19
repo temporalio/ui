@@ -214,6 +214,10 @@ export const Strings = {
   'provider-agentcore-description':
     'Run Workers as Bedrock AgentCore Runtime sessions in your AWS account.',
   'provider-cloud-run': 'Google Cloud Run',
+  'provider-none-available':
+    'No compute provider is available for this Namespace.',
+  'provider-unknown':
+    'This Version uses a compute provider that this page cannot show.',
   'provider-cloud-run-description':
     'Run Workers as Cloud Run services in your GCP project.',
   'provider-vercel': 'Vercel Functions',

@@ -25,7 +25,6 @@
     defaultScaleDownStabilization,
     type EditVersionFormData,
     editVersionSchema,
-    getInitialComputeProvider,
     multiRegionEditVersionSchema,
     type RegionComputeValues,
     validateRegionValues,
@@ -39,7 +38,7 @@
   import RegionsHeading from './regions-heading.svelte';
 
   interface Props {
-    initialData: ComputeInitialValues;
+    initialData: ComputeInitialValues & { provider: ComputeProviderValue };
     /** The replica's saved values, when the Version has a replica group. */
     initialReplicaData?: ComputeInitialValues;
     /** Replica regions that already have a group, so high availability starts on. */
@@ -121,10 +120,7 @@
 
   const superform = superForm(
     {
-      provider: getInitialComputeProvider({
-        provider: initialData.provider ?? 'lambda',
-        providers: untrack(() => computeProviders),
-      }),
+      provider: initialData.provider,
       lambdaArn: initialData.lambdaArn,
       agentCoreEndpointArn: initialData.agentCoreEndpointArn ?? '',
       iamRoleArn: initialData.iamRoleArn,

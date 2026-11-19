@@ -96,7 +96,7 @@
   }: Props = $props();
 
   let provider = $state<ComputeProviderValue>(
-    untrack(() => initialPrimary?.provider ?? regions[0]?.provider ?? 'lambda'),
+    untrack(() => initialPrimary?.provider ?? regions[0].provider),
   );
 
   const emptyEntry = () => ({
@@ -192,11 +192,25 @@
     untrack(() => (enabledRegionIds ? enabledRegionIds.length > 0 : undefined)),
   );
   /**
-   * A replica is filled in only from a suggested ARN, which needs the
-   * provider's name for the replica region. Cloud Run has no suggestion.
+   * Where the user's own replica resource goes, per provider, when the form
+   * suggests one. A regional ARN can be suggested for another region; a Cloud
+   * Run worker pool cannot, so it has none.
+   */
+  const REPLICA_RESOURCE_OVERRIDE: Record<
+    ComputeProviderValue,
+    'lambdaArnOverride' | 'agentCoreEndpointArnOverride' | undefined
+  > = {
+    lambda: 'lambdaArnOverride',
+    agentcore: 'agentCoreEndpointArnOverride',
+    'cloud-run': undefined,
+  };
+  const replicaOverride = $derived(REPLICA_RESOURCE_OVERRIDE[provider]);
+  /**
+   * A replica is filled in only from a suggested resource, which needs the
+   * provider's name for the replica region.
    */
   const canFillReplica = $derived(
-    provider !== 'cloud-run' && !!replicaRegion?.providerRegion,
+    !!replicaOverride && !!replicaRegion?.providerRegion,
   );
   const highAvailability = $derived(replicaChoice ?? canFillReplica);
   const setHighAvailability = (value: boolean) => {
@@ -275,11 +289,16 @@
     return () => clearTimeout(timer);
   });
 
+  const suggestedReplicaResource: Record<ComputeProviderValue, string> =
+    $derived({
+      lambda: replicaLambdaArn,
+      agentcore: replicaAgentCoreArn,
+      'cloud-run': '',
+    });
   const isSuggested = $derived(
-    provider === 'agentcore'
-      ? replica.agentCoreEndpointArnOverride === undefined &&
-          !!replicaAgentCoreArn
-      : replica.lambdaArnOverride === undefined && !!replicaLambdaArn,
+    !!replicaOverride &&
+      replica[replicaOverride] === undefined &&
+      !!suggestedReplicaResource[provider],
   );
 
   const copyField = <K extends (typeof INHERITED_FIELDS)[number]>(
@@ -338,11 +357,9 @@
 
   /** Suggested until the user edits it; previewSlot handles an empty value. */
   const replicaResourceState = $derived.by((): 'set' | 'suggested' => {
-    const edited =
-      provider === 'agentcore'
-        ? replica.agentCoreEndpointArnOverride !== undefined
-        : replica.lambdaArnOverride !== undefined;
-    return edited || provider === 'cloud-run' ? 'set' : 'suggested';
+    return replicaOverride && replica[replicaOverride] === undefined
+      ? 'suggested'
+      : 'set';
   });
 
   const replicaFields = $derived({

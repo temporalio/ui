@@ -62,18 +62,18 @@
   const primaryRegion = $derived(regions[0]?.label ?? '');
   const shortNamespace = $derived(namespace.replace(/\.[a-z0-9]{5}$/i, ''));
 
-  const resourceLabel = $derived(
-    {
-      lambda: translate('workers.preview-resource-lambda'),
-      agentcore: translate('workers.preview-resource-agentcore'),
-      'cloud-run': translate('workers.preview-resource-cloud-run'),
-    }[provider],
-  );
-  const accessLabel = $derived(
-    provider === 'cloud-run'
-      ? translate('workers.preview-access-cloud-run')
-      : translate('workers.preview-access-aws'),
-  );
+  const resourceLabels: Record<ComputeProviderValue, string> = $derived({
+    lambda: translate('workers.preview-resource-lambda'),
+    agentcore: translate('workers.preview-resource-agentcore'),
+    'cloud-run': translate('workers.preview-resource-cloud-run'),
+  });
+  const accessLabels: Record<ComputeProviderValue, string> = $derived({
+    lambda: translate('workers.preview-access-aws'),
+    agentcore: translate('workers.preview-access-aws'),
+    'cloud-run': translate('workers.preview-access-cloud-run'),
+  });
+  const resourceLabel = $derived(resourceLabels[provider]);
+  const accessLabel = $derived(accessLabels[provider]);
 
   const isReady = (region: PreviewRegion): boolean =>
     region.serverless && region.resource.state !== 'missing';

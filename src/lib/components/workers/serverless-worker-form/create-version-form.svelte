@@ -27,7 +27,6 @@
     type CreateVersionFormData,
     createVersionSchema,
     defaultScaleDownStabilization,
-    getInitialComputeProvider,
     multiRegionCreateVersionSchema,
     type RegionComputeValues,
     savesRegionGroups,
@@ -52,7 +51,7 @@
     error?: string;
     versions?: VersionSummary[];
     computeProviders?: readonly ComputeProviderOption[];
-    initialProvider?: ComputeProviderOption['value'];
+    initialProvider: ComputeProviderValue;
     gcpRegions?: string[];
     /**
      * The templates offered per provider. Defaults to the ones bundled here,
@@ -109,10 +108,7 @@
   const superform = superForm(
     {
       buildId: '',
-      provider: getInitialComputeProvider({
-        provider: untrack(() => initialProvider),
-        providers: untrack(() => computeProviders),
-      }),
+      provider: untrack(() => initialProvider),
       lambdaArn: '',
       agentCoreEndpointArn: '',
       iamRoleArn: '',

@@ -54,14 +54,11 @@
   let loading = $state(true);
   let loadError = $state(false);
 
-  const regions = $derived(
-    computeRegionsFor(
-      namespaceRegions,
-      getInitialComputeProvider({
-        provider: lockedProvider?.provider,
-        providers: lockedProvider?.providers ?? computeProviders,
-      }),
-    ),
+  const initialProvider = $derived(
+    getInitialComputeProvider({
+      provider: lockedProvider?.provider,
+      providers: lockedProvider?.providers ?? computeProviders,
+    }),
   );
 
   const backHref = $derived(
@@ -115,15 +112,19 @@
     <Alert intent="error" title={translate('common.error-occurred')}>
       {translate('common.unknown-error')}
     </Alert>
-  {:else if !loading}
+  {:else if !loading && !initialProvider}
+    <Alert intent="error" title={translate('common.error-occurred')}>
+      {translate('workers.provider-none-available')}
+    </Alert>
+  {:else if !loading && initialProvider}
     <CreateVersionForm
       {error}
       {versions}
       computeProviders={lockedProvider?.providers ?? computeProviders}
-      initialProvider={lockedProvider?.provider}
+      {initialProvider}
       {gcpRegions}
       {templates}
-      {regions}
+      regions={computeRegionsFor(namespaceRegions, initialProvider)}
       {namespace}
       deploymentName={deployment}
       cancelHref={backHref}

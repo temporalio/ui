@@ -130,19 +130,27 @@ interface PreviewFields {
 export const resourceValue = (
   provider: ComputeProviderValue,
   fields: PreviewFields,
-): string =>
-  ({
+): string => {
+  const byProvider: Record<ComputeProviderValue, string> = {
     lambda: fields.lambdaArn,
     agentcore: fields.agentCoreEndpointArn,
     'cloud-run': fields.gcpWorkerPool,
-  })[provider];
+  };
+  return byProvider[provider];
+};
 
 /** The identity Temporal uses to invoke it, per provider. */
 export const accessValue = (
   provider: ComputeProviderValue,
   fields: PreviewFields,
-): string =>
-  provider === 'cloud-run' ? fields.gcpServiceAccount : fields.iamRoleArn;
+): string => {
+  const byProvider: Record<ComputeProviderValue, string> = {
+    lambda: fields.iamRoleArn,
+    agentcore: fields.iamRoleArn,
+    'cloud-run': fields.gcpServiceAccount,
+  };
+  return byProvider[provider];
+};
 
 export const regionPreview = (
   region: ComputeRegion,
@@ -203,10 +211,12 @@ export const resourceRegion = (
     gcpRegion: string;
   },
 ): string | undefined => {
-  if (provider === 'cloud-run') return fields.gcpRegion || undefined;
-  const arn =
-    provider === 'agentcore' ? fields.agentCoreEndpointArn : fields.lambdaArn;
-  return arn.match(ARN_REGION)?.[1];
+  const byProvider: Record<ComputeProviderValue, string | undefined> = {
+    lambda: fields.lambdaArn.match(ARN_REGION)?.[1],
+    agentcore: fields.agentCoreEndpointArn.match(ARN_REGION)?.[1],
+    'cloud-run': fields.gcpRegion || undefined,
+  };
+  return byProvider[provider];
 };
 
 /**

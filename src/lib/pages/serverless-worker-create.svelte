@@ -12,6 +12,7 @@
     getInitialComputeProvider,
     type RegionComputeValues,
   } from '$lib/components/workers/serverless-worker-form/shared';
+  import Alert from '$lib/holocene/alert.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
     createWorkerDeployment,
@@ -51,11 +52,8 @@
   const gcpRegions = $derived(deployRegionsFor(providerConfig, 'cloud-run'));
   const namespaceRegions = $derived(configuredRegions(providerConfig));
 
-  const regions = $derived(
-    computeRegionsFor(
-      namespaceRegions,
-      getInitialComputeProvider({ providers: computeProviders }),
-    ),
+  const initialProvider = $derived(
+    getInitialComputeProvider({ providers: computeProviders }),
   );
 
   async function rollbackDeployment(
@@ -203,13 +201,20 @@
   }
 </script>
 
-<ServerlessWorkerCreateForm
-  cancelHref={routeForWorkers({ namespace })}
-  {onSuccess}
-  onSubmit={handleCreate}
-  {templates}
-  {computeProviders}
-  {gcpRegions}
-  {regions}
-  {namespace}
-/>
+{#if initialProvider}
+  <ServerlessWorkerCreateForm
+    cancelHref={routeForWorkers({ namespace })}
+    {onSuccess}
+    onSubmit={handleCreate}
+    {templates}
+    {computeProviders}
+    {initialProvider}
+    {gcpRegions}
+    regions={computeRegionsFor(namespaceRegions, initialProvider)}
+    {namespace}
+  />
+{:else}
+  <Alert intent="error" title={translate('common.error-occurred')}>
+    {translate('workers.provider-none-available')}
+  </Alert>
+{/if}

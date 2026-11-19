@@ -64,6 +64,7 @@
     return {
       computeProviders: config.providers,
       gcpRegions: deployRegionsFor(config, 'cloud-run'),
+      initialProvider: 'lambda' as const,
       regions: computeRegionsFor(configuredRegions(config), 'lambda'),
     };
   };

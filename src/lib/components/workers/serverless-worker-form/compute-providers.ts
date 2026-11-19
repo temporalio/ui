@@ -173,3 +173,11 @@ export const computeProviderFromType = (
   type: string | undefined,
 ): ComputeProviderValue | undefined =>
   type === undefined ? undefined : BY_PROVIDER_TYPE.get(type);
+
+/**
+ * Ends a switch over every provider. A provider with no case is a type error
+ * here, so a new provider cannot fall through to another provider's fields.
+ */
+export const unhandledProvider = (provider: never): never => {
+  throw new Error(`No case for compute provider: ${String(provider)}`);
+};

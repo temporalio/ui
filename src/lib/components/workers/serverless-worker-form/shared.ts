@@ -22,10 +22,12 @@ import type {
 } from '$lib/types/deployments';
 
 import {
+  COMPUTE_PROVIDER_VALUES,
   COMPUTE_PROVIDERS,
   computeProviderFromType,
   type ComputeProviderReleaseStage,
   type ComputeProviderValue,
+  unhandledProvider,
 } from './compute-providers';
 
 const scalingFields = {
@@ -77,7 +79,7 @@ const AGENT_CORE_ENDPOINT_ARN =
   /^arn:aws:bedrock-agentcore:[a-z0-9-]+:\d{12}:runtime\/[^/]+\/runtime-endpoint\/[^/]+$/;
 
 const providerFields = {
-  provider: z.enum(['lambda', 'agentcore', 'cloud-run']).default('lambda'),
+  provider: z.enum(COMPUTE_PROVIDER_VALUES),
   lambdaArn: z.string().default(''),
   agentCoreEndpointArn: z.string().default(''),
   iamRoleArn: z.string().default(''),
@@ -125,79 +127,108 @@ const validateProviderFields = (
   data: z.infer<z.ZodObject<typeof providerFields>>,
   ctx: z.RefinementCtx,
 ) => {
-  if (data.provider === 'agentcore') {
-    if (!data.agentCoreEndpointArn) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['agentCoreEndpointArn'],
-        message: 'Agent Runtime Endpoint ARN is required',
-      });
-    } else if (!AGENT_CORE_ENDPOINT_ARN.test(data.agentCoreEndpointArn)) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['agentCoreEndpointArn'],
-        message: 'Invalid Agent Runtime Endpoint ARN format',
-      });
-    }
-    validateAwsAccessFields(data, ctx);
-  } else if (data.provider === 'lambda') {
-    if (!data.lambdaArn) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['lambdaArn'],
-        message: 'Lambda ARN is required',
-      });
-    } else if (
-      !/^arn:aws:lambda:[a-z0-9-]+:\d{12}:function:.+$/.test(data.lambdaArn)
-    ) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['lambdaArn'],
-        message: 'Invalid Lambda ARN format',
-      });
-    }
-    validateAwsAccessFields(data, ctx);
-  } else if (data.provider === 'cloud-run') {
-    if (!data.gcpProject)
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['gcpProject'],
-        message: 'GCP Project ID is required',
-      });
-    if (!data.gcpRegion)
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['gcpRegion'],
-        message: 'GCP Region is required',
-      });
-    if (!data.gcpWorkerPool)
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['gcpWorkerPool'],
-        message: 'Worker Pool is required',
-      });
-    if (!data.gcpServiceAccount)
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['gcpServiceAccount'],
-        message: 'Service Account is required',
-      });
-    if (data.minReplicas > data.maxReplicas)
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['minReplicas'],
-        message: 'Min Replicas must be less than or equal to Max Replicas',
-      });
-    if (
-      data.initialReplicas < data.minReplicas ||
-      data.initialReplicas > data.maxReplicas
-    )
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['initialReplicas'],
-        message: 'Initial Replicas must be between Min and Max Replicas',
-      });
+  switch (data.provider) {
+    case 'agentcore':
+      validateAgentCoreFields(data, ctx);
+      return;
+    case 'lambda':
+      validateLambdaFields(data, ctx);
+      return;
+    case 'cloud-run':
+      validateCloudRunFields(data, ctx);
+      return;
+    default:
+      unhandledProvider(data.provider);
   }
+};
+
+type ProviderFieldValues = z.infer<z.ZodObject<typeof providerFields>>;
+
+const validateAgentCoreFields = (
+  data: ProviderFieldValues,
+  ctx: z.RefinementCtx,
+) => {
+  if (!data.agentCoreEndpointArn) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['agentCoreEndpointArn'],
+      message: 'Agent Runtime Endpoint ARN is required',
+    });
+  } else if (!AGENT_CORE_ENDPOINT_ARN.test(data.agentCoreEndpointArn)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['agentCoreEndpointArn'],
+      message: 'Invalid Agent Runtime Endpoint ARN format',
+    });
+  }
+  validateAwsAccessFields(data, ctx);
+};
+
+const validateLambdaFields = (
+  data: ProviderFieldValues,
+  ctx: z.RefinementCtx,
+) => {
+  if (!data.lambdaArn) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['lambdaArn'],
+      message: 'Lambda ARN is required',
+    });
+  } else if (
+    !/^arn:aws:lambda:[a-z0-9-]+:\d{12}:function:.+$/.test(data.lambdaArn)
+  ) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['lambdaArn'],
+      message: 'Invalid Lambda ARN format',
+    });
+  }
+  validateAwsAccessFields(data, ctx);
+};
+
+const validateCloudRunFields = (
+  data: ProviderFieldValues,
+  ctx: z.RefinementCtx,
+) => {
+  if (!data.gcpProject)
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['gcpProject'],
+      message: 'GCP Project ID is required',
+    });
+  if (!data.gcpRegion)
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['gcpRegion'],
+      message: 'GCP Region is required',
+    });
+  if (!data.gcpWorkerPool)
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['gcpWorkerPool'],
+      message: 'Worker Pool is required',
+    });
+  if (!data.gcpServiceAccount)
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['gcpServiceAccount'],
+      message: 'Service Account is required',
+    });
+  if (data.minReplicas > data.maxReplicas)
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['minReplicas'],
+      message: 'Min Replicas must be less than or equal to Max Replicas',
+    });
+  if (
+    data.initialReplicas < data.minReplicas ||
+    data.initialReplicas > data.maxReplicas
+  )
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['initialReplicas'],
+      message: 'Initial Replicas must be between Min and Max Replicas',
+    });
 };
 
 const deploymentNameField = z
@@ -306,24 +337,6 @@ export const validateRegionValues = (
 export const buildComputeConfigFromForm = (
   data: ComputeFormValues,
 ): ComputeConfig => {
-  if (data.provider === 'cloud-run') {
-    return buildGcpCloudRunComputeConfig(
-      data.gcpProject,
-      data.gcpRegion,
-      data.gcpWorkerPool,
-      data.gcpServiceAccount,
-      {
-        minReplicas: data.minReplicas,
-        maxReplicas: data.maxReplicas,
-        initialReplicas: data.initialReplicas,
-        utilizationTarget: data.utilizationTarget,
-        scaleDownStabilizationMs: scaleDownStabilizationToMs(
-          data.scaleDownStabilization,
-        ),
-      },
-    );
-  }
-
   const invokeScaling = {
     roleExternalId: data.roleExternalId,
     scaleUpCooloffMs: data.scaleUpCooloffMs,
@@ -332,19 +345,38 @@ export const buildComputeConfigFromForm = (
     metricsPollIntervalMs: data.metricsPollIntervalMs,
   };
 
-  if (data.provider === 'agentcore') {
-    return buildAgentCoreComputeConfig(
-      data.agentCoreEndpointArn,
-      data.iamRoleArn,
-      invokeScaling,
-    );
+  switch (data.provider) {
+    case 'lambda':
+      return buildLambdaComputeConfig(
+        data.lambdaArn,
+        data.iamRoleArn,
+        invokeScaling,
+      );
+    case 'agentcore':
+      return buildAgentCoreComputeConfig(
+        data.agentCoreEndpointArn,
+        data.iamRoleArn,
+        invokeScaling,
+      );
+    case 'cloud-run':
+      return buildGcpCloudRunComputeConfig(
+        data.gcpProject,
+        data.gcpRegion,
+        data.gcpWorkerPool,
+        data.gcpServiceAccount,
+        {
+          minReplicas: data.minReplicas,
+          maxReplicas: data.maxReplicas,
+          initialReplicas: data.initialReplicas,
+          utilizationTarget: data.utilizationTarget,
+          scaleDownStabilizationMs: scaleDownStabilizationToMs(
+            data.scaleDownStabilization,
+          ),
+        },
+      );
+    default:
+      return unhandledProvider(data.provider);
   }
-
-  return buildLambdaComputeConfig(
-    data.lambdaArn,
-    data.iamRoleArn,
-    invokeScaling,
-  );
 };
 
 /**
@@ -412,25 +444,21 @@ interface InitialComputeProviderOptions {
   providers?: readonly ComputeProviderOption[];
 }
 
+const EVERY_PROVIDER: readonly ComputeProviderOption[] =
+  COMPUTE_PROVIDER_VALUES.map((value) => ({ value }));
+
+/**
+ * The provider a form starts on: the one asked for when it is offered, else
+ * the first one offered. Undefined when nothing is offered, so the page says
+ * so rather than showing a provider the Namespace cannot use.
+ */
 export const getInitialComputeProvider = ({
   provider,
-  providers,
-}: InitialComputeProviderOptions = {}): ComputeProviderValue => {
-  const configuredProvider = providers?.find(
-    (option) => option.value === provider,
-  );
-
-  if (
-    provider &&
-    (!providers || (configuredProvider && !configuredProvider.hidden))
-  ) {
-    return provider;
-  }
-
-  return (
-    providers?.find(({ disabled, hidden }) => !disabled && !hidden)?.value ??
-    'lambda'
-  );
+  providers = EVERY_PROVIDER,
+}: InitialComputeProviderOptions = {}): ComputeProviderValue | undefined => {
+  const requested = providers.find((option) => option.value === provider);
+  if (requested && !requested.hidden) return requested.value;
+  return providers.find(({ disabled, hidden }) => !disabled && !hidden)?.value;
 };
 
 interface TerraformTemplateValues {
@@ -511,12 +539,11 @@ export const formValuesFromGroup = (
   const gcp = decodeGcpCloudRunProviderDetails(config);
   const scaler = decodeScalerDetails(config);
   return {
-    // The group names its provider. With no group there is none, so a caller
-    // can fall back to another region's group.
-    provider: group
-      ? (computeProviderFromType(group.providerType ?? group.provider?.type) ??
-        'lambda')
-      : undefined,
+    // The group names its provider. With no group, or a provider this UI does
+    // not know, there is none: a page must not show another provider's fields.
+    provider: computeProviderFromType(
+      group?.providerType ?? group?.provider?.type,
+    ),
     lambdaArn: lambda.lambdaArn ?? '',
     agentCoreEndpointArn: agentCore.agentCoreEndpointArn ?? '',
     iamRoleArn: lambda.iamRoleArn ?? agentCore.iamRoleArn ?? '',

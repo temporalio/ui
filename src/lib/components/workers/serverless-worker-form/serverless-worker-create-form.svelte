@@ -26,7 +26,6 @@
     type CreateDeploymentFormData,
     createDeploymentSchema,
     defaultScaleDownStabilization,
-    getInitialComputeProvider,
     multiRegionCreateDeploymentSchema,
     type RegionComputeValues,
     savesRegionGroups,
@@ -56,6 +55,8 @@
     cancelHref: string;
     templates?: Record<ComputeProviderValue, ComputeProviderTemplates>;
     computeProviders?: readonly ComputeProviderOption[];
+    /** The provider the form starts on. The page decides it, once. */
+    initialProvider: ComputeProviderValue;
     gcpRegions?: string[];
     /**
      * Regions this namespace runs in. When more than one is provided (a highly
@@ -72,6 +73,7 @@
     cancelHref,
     templates,
     computeProviders,
+    initialProvider,
     gcpRegions,
     regions,
     namespace = '',
@@ -102,9 +104,7 @@
     {
       name: '',
       buildId: crypto.randomUUID() as string,
-      provider: getInitialComputeProvider({
-        providers: untrack(() => computeProviders),
-      }),
+      provider: untrack(() => initialProvider),
       lambdaArn: '',
       agentCoreEndpointArn: '',
       iamRoleArn: '',
