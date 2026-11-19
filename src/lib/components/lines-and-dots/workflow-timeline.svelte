@@ -1,7 +1,6 @@
 <script lang="ts">
   import { onMount, type Snippet } from 'svelte';
 
-  import EventHistoryLegend from '$lib/components/lines-and-dots/event-history-legend.svelte';
   import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
   import TimelineGraph from '$lib/components/lines-and-dots/timeline-graph/timeline-graph.svelte';
   import type { Timeline } from '$lib/components/lines-and-dots/timeline-graph/timeline.svelte';
@@ -229,7 +228,6 @@
           onChange={onEventTypeFilterChange}
         />
       </ToggleButtons>
-      <EventHistoryLegend />
     </div>
     <div class="flex flex-wrap items-center gap-2">
       <ToggleButtons>

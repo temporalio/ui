@@ -25,7 +25,12 @@
   import RunCards from './run-cards.svelte';
   import RunRuler from './run-ruler.svelte';
   import RunStripHeader from './run-strip-header.svelte';
-  import { RunStripScroll } from './run-strip-scroll.svelte';
+  import {
+    createRunStripFollowAttachment,
+    getScrollIndicators,
+    type ScrollMetrics,
+    scrollSegmentIntoView,
+  } from './run-strip-scroll.svelte';
 
   interface Props {
     chain: WorkflowExecutionChain;
@@ -42,6 +47,8 @@
   const readWallClock = createWallClock();
 
   let runCards = $state<ReturnType<typeof RunCards>>();
+  let scroller = $state<HTMLDivElement>();
+  let scrollMetrics = $state<ScrollMetrics>();
   let newerArrivedForRunId = $state<string | null>(null);
 
   const runs = $derived(chain.runs);
@@ -56,13 +63,6 @@
   const latestIsLive = $derived(
     followingChain && runs.at(-1)?.runId === chain.latestRunId,
   );
-
-  const scroll = new RunStripScroll({
-    getSegments: () => segments,
-    getLayoutKey: () => layoutKey,
-    getSelectedRunId: () => selectedRunId,
-    isLive: () => live,
-  });
 
   const runEndMs = ({ runId, workflow }: ChainRun): number =>
     getValidTimeMs(chain.controllers.get(runId)?.closeEvent?.eventTime) ??
@@ -83,7 +83,9 @@
   const cardsViewportWidth = $derived(
     Math.max(
       MIN_CARD_WIDTH,
-      scroll.viewportWidth - 2 * (CAP_WIDTH + CARD_GAP) - TRAILING_PADDING,
+      (scrollMetrics?.clientWidth ?? 0) -
+        2 * (CAP_WIDTH + CARD_GAP) -
+        TRAILING_PADDING,
     ),
   );
   const cardWidths = $derived(
@@ -98,6 +100,12 @@
   );
   const segments = $derived(
     layoutSegments(cardWidths, runSpans, CAP_WIDTH + CARD_GAP),
+  );
+  const selectedSegment = $derived(
+    segments.find((segment) => segment.id === selectedRunId),
+  );
+  const scrollIndicators = $derived(
+    getScrollIndicators(scrollMetrics, selectedSegment),
   );
   const nowX = $derived.by(() => {
     const lastSegment = segments[segments.length - 1];
@@ -131,17 +139,14 @@
     }
   };
 
-  const jumpToLive = () => {
-    scroll.stickToEnd();
-    onJumpToLive();
-  };
-
   const scrollToSelected = () => {
     if (!selectedRunId) {
       return;
     }
     runCards?.focusRun(selectedRunId);
-    scroll.scrollSelectedIntoView();
+    if (scroller && selectedSegment) {
+      scrollSegmentIntoView(scroller, selectedSegment);
+    }
   };
 
   const announceChainEvent = (event: ChainEvent) => {
@@ -176,8 +181,7 @@
   <RunStripHeader
     runCount={runs.length}
     hasDiscoveryError={chain.hasDiscoveryError}
-    chainClosed={chain.status === 'closed'}
-    selectedOutOfView={scroll.selectedOutOfView}
+    selectedOutOfView={scrollIndicators.selectedOutOfView}
     onRetryDiscovery={() => chain.retryDiscovery()}
     onScrollToSelected={scrollToSelected}
   />
@@ -186,9 +190,14 @@
     class="relative rounded-lg border border-primary bg-surface-primary px-3 pb-1.5"
   >
     <div
-      bind:this={scroll.scroller}
-      bind:clientWidth={scroll.viewportWidth}
-      onscroll={scroll.onScroll}
+      bind:this={scroller}
+      {@attach createRunStripFollowAttachment({
+        getSegments: () => segments,
+        getLayoutKey: () => layoutKey,
+        getSelectedRunId: () => selectedRunId,
+        isLive: () => live,
+        onMetricsChange: (metrics) => (scrollMetrics = metrics),
+      })}
       data-testid="run-strip-scroller"
       class="relative overflow-x-auto pb-2.5 [scrollbar-width:thin]"
     >
@@ -202,7 +211,7 @@
           <PreviousRunButton
             {chain}
             {selectedRunId}
-            contentScrolledUnder={scroll.scrolledFromStart}
+            contentScrolledUnder={scrollIndicators.scrolledFromStart}
             {loadOlderRuns}
             {onSelect}
           />
@@ -221,8 +230,8 @@
             {latestRunOpen}
             chainClosed={chain.status === 'closed'}
             {newerRunArrived}
-            contentScrolledUnder={scroll.scrolledFromEnd}
-            onJumpToLive={jumpToLive}
+            contentScrolledUnder={scrollIndicators.scrolledFromEnd}
+            {onJumpToLive}
           />
         </div>
       </div>

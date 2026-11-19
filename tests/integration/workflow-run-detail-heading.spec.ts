@@ -64,6 +64,30 @@ test.describe('Run page timeline heading', () => {
     );
   });
 
+  test('opens the legend from beside the Run heading', async ({ page }) => {
+    await mockChain(page, { runs: linearChain(3), current: () => 'run-03' });
+
+    await page.goto(runPath('run-02'));
+
+    await expect(
+      heading(page).getByRole('heading', {
+        level: 2,
+        name: 'Run run-02',
+        exact: true,
+      }),
+    ).toBeVisible();
+    await heading(page)
+      .getByRole('button', { name: 'Event history legend' })
+      .focus();
+    await expect(
+      page.getByRole('tooltip').filter({ hasText: 'Event Types' }),
+    ).toBeVisible();
+    await expect(page.getByTestId('zoom-in')).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: 'Event history legend' }),
+    ).toHaveCount(1);
+  });
+
   test('shows Next and Latest from the first Run', async ({ page }) => {
     await mockChain(page, { runs: linearChain(3), current: () => 'run-03' });
 

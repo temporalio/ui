@@ -100,6 +100,7 @@ export const Strings = {
   readable: 'Human Readable',
   'readable-description': 'Codec Server decoded and base64 decoded',
   'event-types': 'Event Types',
+  'history-legend': 'Event history legend',
   'decode-failed': 'Decoding failed',
   'event-groups': 'Event Groups',
   'event-group-filter-more-results':
