@@ -62,6 +62,9 @@ export class LatestRunFollower {
 
     const successorRunId = readSuccessorRunId(closeEvent);
     if (!successorRunId) {
+      if (this.lifecycle === 'closed') {
+        return;
+      }
       this.lifecycle = 'closed';
       this._context.emit({ type: 'closed' });
       return;

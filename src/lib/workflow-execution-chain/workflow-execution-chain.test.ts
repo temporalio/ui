@@ -1528,6 +1528,8 @@ describe('WorkflowExecutionChain', () => {
       closedAtLoad.subscribe(closedListener);
       void closedAtLoad.load();
       await settle();
+      server.controllers.get('run-1')!.close(completed());
+      await settle();
       expect(closedListener).not.toHaveBeenCalled();
 
       server.addChain(['run-1']);
