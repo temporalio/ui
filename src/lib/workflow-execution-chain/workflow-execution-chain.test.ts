@@ -1349,6 +1349,28 @@ describe('WorkflowExecutionChain', () => {
       expect(server.describeCalls('run-1')).toBe(failed + 2);
     });
 
+    it('keeps each Run stale when final Describes fail for two Runs', async () => {
+      server.addChain(['run-1']);
+      const chain = track(await loadChain(server));
+      server.addChain(['run-1', 'run-2']);
+      server.errors.set('describe:run-1', networkError(500));
+      server.controllers.get('run-1')!.close(completed('run-2'));
+      await settle();
+      server.errors.set('describe:run-2', networkError(500));
+      server.controllers.get('run-2')!.close(completed());
+      await settle();
+
+      expect(chain.isStatusStale('run-1')).toBe(true);
+      expect(chain.isStatusStale('run-2')).toBe(true);
+
+      server.errors.clear();
+      chain.retryStatus('run-1');
+      await settle();
+
+      expect(chain.isStatusStale('run-1')).toBe(false);
+      expect(chain.isStatusStale('run-2')).toBe(true);
+    });
+
     it('marks the Run stale when the final Describe fails', async () => {
       server.addChain(['run-1']);
       const chain = track(await loadChain(server));

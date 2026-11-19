@@ -132,8 +132,8 @@ export class WorkflowExecutionChain {
   isStatusStale(runId: string): boolean {
     const { failures } = this._context;
     return (
-      failures.runIdOf('refresh') === runId ||
-      failures.runIdOf('finalDescribe') === runId
+      failures.hasRun('refresh', runId) ||
+      failures.hasRun('finalDescribe', runId)
     );
   }
 
@@ -187,12 +187,8 @@ export class WorkflowExecutionChain {
 
   retryStatus(runId: string): void {
     const { failures } = this._context;
-    if (failures.runIdOf('refresh') === runId) {
-      failures.retry('refresh');
-    }
-    if (failures.runIdOf('finalDescribe') === runId) {
-      failures.retry('finalDescribe');
-    }
+    failures.retryRun('refresh', runId);
+    failures.retryRun('finalDescribe', runId);
   }
 
   dispose(): void {
