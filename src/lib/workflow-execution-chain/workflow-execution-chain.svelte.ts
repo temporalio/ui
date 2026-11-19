@@ -1,25 +1,14 @@
-import { SvelteMap, SvelteSet } from 'svelte/reactivity';
-
-import { isWorkflowOpen } from '$lib/models/workflow-status';
 import type { WorkflowHistoryController } from '$lib/services/workflow-history-controller.svelte';
-import type { HistoryEvent } from '$lib/types/events';
-import type { WorkflowExecution } from '$lib/types/workflows';
-import { getErrorMessage } from '$lib/utilities/error-message';
 import type { ValidTime } from '$lib/utilities/format-time';
-import { isNotFound } from '$lib/utilities/handle-error';
-import { isNetworkError } from '$lib/utilities/is-network-error';
 
 import { client as defaultClient } from './chain-client';
-import { LoadQueue } from './load-queue';
-import { retryWithBackoff } from './retry-with-backoff';
 import type {
   CardLoad,
   ChainBoundary,
   ChainClient,
-  ChainError,
   ChainEvent,
   ChainLoadResult,
-  ChainMismatch,
+  ChainResolution,
   ChainRun,
   ChainStatus,
   FirstRunState,
@@ -27,76 +16,27 @@ import type {
   WorkflowExecutionChainIdentity,
 } from './types';
 
-export const WALK_SIZE = 10;
-export const REFRESH_INTERVAL_MS = 10_000;
-export const CARD_LOAD_CONCURRENCY = 1;
+import { CardLoader } from './card-loader.svelte';
+import { type ChainContext, createChainContext } from './chain-context.svelte';
+import { ChainLoader } from './chain-loader.svelte';
+import { ChainWindow } from './chain-window.svelte';
+import { LatestRunFollower } from './latest-run-follower.svelte';
 
-const NO_REDIRECT: ChainLoadResult = { redirectFirstRunId: null };
+export { REFRESH_INTERVAL_MS } from './latest-run-follower.svelte';
 
-type DiscoveryStep = 'walkBack' | 'handOff' | 'refresh' | 'finalDescribe';
-
-const toChainError = (error: unknown): ChainError =>
-  error instanceof Error || isNetworkError(error)
-    ? error
-    : new Error(getErrorMessage(error));
-
-const readStartedEvent = (
-  event: HistoryEvent,
-): { continuedExecutionRunId?: string; firstExecutionRunId?: string } => {
-  const attributes = event.workflowExecutionStartedEventAttributes;
-  return {
-    continuedExecutionRunId: attributes?.continuedExecutionRunId || undefined,
-    firstExecutionRunId: attributes?.firstExecutionRunId || undefined,
-  };
-};
-
-const readSuccessorRunId = (closeEvent: HistoryEvent): string | undefined =>
-  closeEvent.workflowExecutionCompletedEventAttributes?.newExecutionRunId ||
-  closeEvent.workflowExecutionFailedEventAttributes?.newExecutionRunId ||
-  closeEvent.workflowExecutionTimedOutEventAttributes?.newExecutionRunId ||
-  closeEvent.workflowExecutionContinuedAsNewEventAttributes
-    ?.newExecutionRunId ||
-  undefined;
-
-class RunRecord {
-  run = $state.raw<ChainRun | null>(null);
-  controller = $state.raw<WorkflowHistoryController | undefined>();
-  cardLoad = $state.raw<CardLoad | undefined>();
-  pendingFetch: Promise<ChainRun> | null = null;
-  firstEventSeen = false;
-  closeHandled = false;
-  livePollFailed = false;
-
-  constructor(readonly runId: string) {}
-}
-
+/**
+ * A Workflow Execution chain: the Runs linked by continue-as-new, retry and
+ * cron, loaded from the Latest Run backwards and followed live. The only
+ * export of the chain model; it builds the parts below and wires them
+ * together, and its public API is what the page, header and strip use.
+ */
 export class WorkflowExecutionChain {
   readonly identity: Readonly<WorkflowExecutionChainIdentity>;
-  private readonly _records = new SvelteMap<string, RunRecord>();
-  readonly controllers = this._createRunLookup((record) => record.controller);
-  readonly cardLoads = this._createRunLookup((record) => record.cardLoad);
-
-  private _windowIds = $state.raw<string[]>([]);
-  readonly runs = $derived(this._resolveRuns(this._windowIds));
-  boundary = $state<ChainBoundary>(null);
-  firstRun = $state.raw<FirstRunState>({ status: 'loading' });
-  error = $state.raw<ChainError | null>(null);
-  mismatch = $state.raw<ChainMismatch | null>(null);
-  walking = $state(false);
-  pendingSuccessorRunId = $state<string | null>(null);
-
-  private _latestRunId = $state<string | null>(null);
-  private _status = $state<ChainStatus>('loading');
-  private _failedSteps = new SvelteMap<DiscoveryStep, () => void>();
-  private _refreshTimer: ReturnType<typeof setTimeout> | null = null;
-  private _prioritizedRunId: string | null = null;
-  private readonly _queue = new LoadQueue({
-    concurrency: CARD_LOAD_CONCURRENCY,
-    start: (runId) => this._loadCard(runId),
-  });
-  private readonly _client: ChainClient;
-  private readonly _abort = new AbortController();
-  private readonly _listeners = new SvelteSet<(event: ChainEvent) => void>();
+  private readonly _context: ChainContext;
+  private readonly _loader: ChainLoader;
+  private readonly _window: ChainWindow;
+  private readonly _follower: LatestRunFollower;
+  private readonly _cards: CardLoader;
 
   constructor(
     identity: WorkflowExecutionChainIdentity,
@@ -109,600 +49,131 @@ export class WorkflowExecutionChain {
       );
     }
     this.identity = { namespace, workflowId, firstRunId };
-    this._client = client;
+    this._context = createChainContext(this.identity, client);
+    this._cards = new CardLoader(this._context, (runId, closeEvent) =>
+      this._follower.handleClose(runId, closeEvent),
+    );
+    this._window = new ChainWindow(this._context, (runId) =>
+      this._cards.enqueue(runId),
+    );
+    this._follower = new LatestRunFollower(this._context, {
+      handedOff: (runId) => {
+        this._window.append(runId);
+        this._cards.latestRunChanged(runId);
+      },
+      workflowUpdated: (runId, workflow) =>
+        this._cards.updateWorkflow(runId, workflow),
+      closeEventOf: (runId) => this._cards.controllers.get(runId)?.closeEvent,
+    });
+    this._loader = new ChainLoader(this._context, (latestRun) =>
+      this._startChain(latestRun),
+    );
+  }
+
+  get resolution(): ChainResolution {
+    return this._loader.resolution;
   }
 
   get status(): ChainStatus {
-    return this._status;
+    const { kind } = this._loader.resolution;
+    if (kind === 'mismatch') {
+      return 'mismatch';
+    }
+    if (kind !== 'resolved') {
+      return 'loading';
+    }
+    return this._follower.lifecycle === 'closed' ? 'closed' : 'ready';
+  }
+
+  get firstRun(): FirstRunState {
+    return this._loader.firstRun;
+  }
+
+  get runs(): ChainRun[] {
+    return this._window.runs;
+  }
+
+  get boundary(): ChainBoundary {
+    return this._window.boundary;
+  }
+
+  get walking(): boolean {
+    return this._window.walking;
+  }
+
+  get latestRunId(): string | null {
+    return this._follower.latestRunId;
+  }
+
+  get pendingSuccessorRunId(): string | null {
+    return this._follower.pendingSuccessorRunId;
+  }
+
+  get controllers(): RunLookup<WorkflowHistoryController> {
+    return this._cards.controllers;
+  }
+
+  get cardLoads(): RunLookup<CardLoad> {
+    return this._cards.cardLoads;
   }
 
   get hasDiscoveryError(): boolean {
-    return this._failedSteps.size > 0;
+    return this._context.failures.hasFailures;
   }
 
   get closeTime(): ValidTime | undefined {
-    if (this._status !== 'closed' || !this._latestRunId) {
+    const latestRunId = this._follower.latestRunId;
+    if (this.status !== 'closed' || !latestRunId) {
       return undefined;
     }
-    const record = this._records.get(this._latestRunId);
     return (
-      record?.run?.workflow.endTime ||
-      record?.controller?.closeEvent?.eventTime ||
+      this._context.records.get(latestRunId)?.run?.workflow.endTime ||
+      this._cards.controllers.get(latestRunId)?.closeEvent?.eventTime ||
       undefined
     );
   }
 
-  get latestRunId(): string | null {
-    return this._latestRunId;
-  }
-
-  private get _disposed(): boolean {
-    return this._abort.signal.aborted;
-  }
-
   subscribe(listener: (event: ChainEvent) => void): () => void {
-    this._listeners.add(listener);
-    return () => {
-      this._listeners.delete(listener);
-    };
+    return this._context.subscribe(listener);
   }
 
-  async load(): Promise<ChainLoadResult> {
-    const { namespace, workflowId, firstRunId } = this.identity;
-    const firstRunTask = this._describeFirstRun();
-
-    let current: WorkflowExecution;
-    let currentFirstRunId: string | undefined;
-    let startedEvent: HistoryEvent | undefined;
-    try {
-      current = await this._retry((signal) =>
-        this._client.describe({ namespace, workflowId }, signal),
-      );
-      if (this._disposed) {
-        return NO_REDIRECT;
-      }
-      currentFirstRunId = current.firstRunId;
-      if (!currentFirstRunId || currentFirstRunId === firstRunId) {
-        startedEvent = await this._fetchStartedEvent(current.runId);
-        currentFirstRunId ??=
-          readStartedEvent(startedEvent).firstExecutionRunId;
-      }
-      if (!currentFirstRunId) {
-        throw new Error('Missing first Run ID for the current Run.');
-      }
-    } catch (error) {
-      if (this._disposed) {
-        return NO_REDIRECT;
-      }
-      this.error = toChainError(error);
-      return NO_REDIRECT;
-    }
-    if (this._disposed) {
-      return NO_REDIRECT;
-    }
-
-    if (currentFirstRunId !== firstRunId || !startedEvent) {
-      const redirectFirstRunId = await this._classifyMismatch(
-        currentFirstRunId,
-        await firstRunTask,
-      );
-      return { redirectFirstRunId };
-    }
-
-    const latest = this._storeRun(current.runId, current, startedEvent);
-    this._windowIds = [latest.runId];
-    this._latestRunId = latest.runId;
-    const isOpen = isWorkflowOpen(current);
-    this._status = isOpen ? 'ready' : 'closed';
-    if (isOpen) {
-      this._scheduleRefresh();
-    }
-    this._startCard(latest.runId);
-    void this._walkBack(WALK_SIZE - 1);
-    return NO_REDIRECT;
+  load(): Promise<ChainLoadResult> {
+    return this._loader.load();
   }
 
   loadOlder(): Promise<void> {
-    if (
-      this.walking ||
-      this.boundary !== null ||
-      this._failedSteps.has('walkBack') ||
-      this._windowIds.length === 0
-    ) {
-      return Promise.resolve();
-    }
-    return this._walkBack(WALK_SIZE);
+    return this._window.loadOlder();
   }
 
   prioritizeRun(runId: string | null): void {
-    this._prioritizedRunId = runId;
-    const cardLoad = runId ? this.cardLoads.get(runId) : undefined;
-    if (runId && cardLoad?.status === 'queued') {
-      this._startCard(runId);
-    }
-    this._syncQueueGate();
+    this._cards.prioritizeRun(runId);
   }
 
   cardLoadOf(runId: string): CardLoad {
-    return this.cardLoads.get(runId) ?? { status: 'queued' };
+    return this._cards.cardLoadOf(runId);
   }
 
   retryCard(runId: string): void {
-    const record = this._records.get(runId);
-    const cardLoad = record?.cardLoad;
-    if (!record || cardLoad?.status !== 'error' || !cardLoad.retryable) {
-      return;
-    }
-    record.cardLoad = { status: 'queued' };
-    if (runId === this._latestRunId || runId === this._queueGateRunId) {
-      this._startCard(runId);
-      return;
-    }
-    this._queue.prioritize(runId);
+    this._cards.retryCard(runId);
   }
 
   retryDiscovery(): void {
-    const steps = [...this._failedSteps.values()];
-    this._failedSteps.clear();
-    for (const step of steps) {
-      step();
-    }
+    this._context.failures.retryAll();
   }
 
   dispose(): void {
-    if (this._disposed) {
+    if (this._context.disposed) {
       return;
     }
-    this._abort.abort();
-    this._listeners.clear();
-    this._queue.dispose();
-    this._stopRefresh();
-    for (const record of this._records.values()) {
-      record.controller?.dispose();
-    }
+    this._context.dispose();
+    this._cards.dispose();
+    this._follower.dispose();
   }
 
-  private _createRunLookup<T>(
-    read: (record: RunRecord) => T | undefined,
-  ): RunLookup<T> {
-    const get = (runId: string): T | undefined => {
-      const record = this._records.get(runId);
-      return record ? read(record) : undefined;
-    };
-    return { get, has: (runId) => get(runId) !== undefined };
-  }
-
-  private _recordFor(runId: string): RunRecord {
-    const existing = this._records.get(runId);
-    if (existing) {
-      return existing;
-    }
-    const record = new RunRecord(runId);
-    this._records.set(runId, record);
-    return record;
-  }
-
-  private _resolveRuns(runIds: string[]): ChainRun[] {
-    return runIds.flatMap((runId) => {
-      const run = this._records.get(runId)?.run;
-      return run ? [run] : [];
-    });
-  }
-
-  private _storeRun(
-    runId: string,
-    workflow: WorkflowExecution,
-    startedEvent: HistoryEvent,
-  ): ChainRun {
-    const run = { runId, workflow, startedEvent };
-    this._recordFor(runId).run = run;
-    return run;
-  }
-
-  private _retry<T>(request: (signal: AbortSignal) => Promise<T>): Promise<T> {
-    const signal = this._abort.signal;
-    return retryWithBackoff(() => request(signal), signal);
-  }
-
-  private _describe(runId: string): Promise<WorkflowExecution> {
-    const { namespace, workflowId } = this.identity;
-    return this._retry((signal) =>
-      this._client.describe({ namespace, workflowId, runId }, signal),
-    );
-  }
-
-  private _fetchStartedEvent(runId: string): Promise<HistoryEvent> {
-    const { namespace, workflowId } = this.identity;
-    return this._retry((signal) =>
-      this._client.fetchStartedEvent({ namespace, workflowId, runId }, signal),
-    );
-  }
-
-  private _fetchRun(runId: string): Promise<ChainRun> {
-    const run = this._records.get(runId)?.run;
-    if (run) {
-      return Promise.resolve(run);
-    }
-    return this._refetchRun(runId);
-  }
-
-  private _refetchRun(runId: string): Promise<ChainRun> {
-    const record = this._recordFor(runId);
-    record.pendingFetch ??= this._hop(runId).finally(() => {
-      record.pendingFetch = null;
-    });
-    return record.pendingFetch;
-  }
-
-  private async _hop(runId: string): Promise<ChainRun> {
-    const [workflow, startedEvent] = await Promise.all([
-      this._describe(runId),
-      this._fetchStartedEvent(runId),
-    ]);
-    return this._storeRun(runId, workflow, startedEvent);
-  }
-
-  private async _describeFirstRun(): Promise<FirstRunState> {
-    let state: FirstRunState;
-    try {
-      const workflow = await this._describe(this.identity.firstRunId);
-      state = { status: 'found', workflow };
-    } catch (error) {
-      state = isNotFound(error)
-        ? { status: 'notFound' }
-        : { status: 'failed', error: toChainError(error) };
-    }
-    if (!this._disposed) {
-      this.firstRun = state;
-    }
-    return state;
-  }
-
-  private async _classifyMismatch(
-    currentFirstRunId: string,
-    firstRun: FirstRunState,
-  ): Promise<string | null> {
-    if (this._disposed) {
-      return null;
-    }
-    const routeRunFirstRunId =
-      firstRun.status === 'found'
-        ? await this._readFirstRunId(firstRun.workflow)
-        : undefined;
-    if (this._disposed) {
-      return null;
-    }
-    if (routeRunFirstRunId && routeRunFirstRunId !== this.identity.firstRunId) {
-      return routeRunFirstRunId;
-    }
-    this.mismatch = {
-      reason: routeRunFirstRunId ? 'workflowIdReused' : 'routeChainNotFound',
-      currentFirstRunId,
-    };
-    this._status = 'mismatch';
-    return null;
-  }
-
-  private async _readFirstRunId(
-    workflow: WorkflowExecution,
-  ): Promise<string | undefined> {
-    if (workflow.firstRunId) {
-      return workflow.firstRunId;
-    }
-    try {
-      const startedEvent = await this._fetchStartedEvent(workflow.runId);
-      return readStartedEvent(startedEvent).firstExecutionRunId;
-    } catch {
-      return undefined;
-    }
-  }
-
-  private async _walkBack(hops: number): Promise<void> {
-    this.walking = true;
-    try {
-      for (let hop = 0; hop < hops; hop++) {
-        const predecessor = readStartedEvent(
-          this.runs[0].startedEvent,
-        ).continuedExecutionRunId;
-        if (!predecessor) {
-          this.boundary = 'chainStart';
-          return;
-        }
-        let run: ChainRun;
-        try {
-          run = await this._fetchRun(predecessor);
-        } catch (error) {
-          if (this._disposed) {
-            return;
-          }
-          if (isNotFound(error)) {
-            this.boundary = 'retention';
-            return;
-          }
-          const remaining = hops - hop;
-          this._fail('walkBack', () => void this._walkBack(remaining));
-          return;
-        }
-        if (this._disposed) {
-          return;
-        }
-        this._windowIds = [run.runId, ...this._windowIds];
-        this._enqueueCard(run.runId);
-      }
-    } finally {
-      if (!this._disposed) {
-        this.walking = false;
-      }
-    }
-  }
-
-  private _handleClose(runId: string, closeEvent: HistoryEvent): void {
-    const record = this._records.get(runId);
-    if (
-      this._disposed ||
-      !record ||
-      runId !== this._latestRunId ||
-      record.closeHandled
-    ) {
-      return;
-    }
-    record.closeHandled = true;
-    this._stopRefresh();
-    this._failedSteps.delete('refresh');
-
-    if (record.run && isWorkflowOpen(record.run.workflow)) {
-      void this._finalDescribe(runId);
-    }
-
-    const successorRunId = readSuccessorRunId(closeEvent);
-    if (!successorRunId) {
-      this._status = 'closed';
-      this._emit({ type: 'closed' });
-      return;
-    }
-    void this._handOff(successorRunId);
-  }
-
-  private async _handOff(successorRunId: string): Promise<void> {
-    this.pendingSuccessorRunId = successorRunId;
-    let run: ChainRun;
-    try {
-      run = await this._refetchRun(successorRunId);
-    } catch {
-      if (this._disposed) {
-        return;
-      }
-      this.pendingSuccessorRunId = null;
-      this._fail('handOff', () => void this._handOff(successorRunId));
-      return;
-    }
-    if (this._disposed) {
-      return;
-    }
-    this.pendingSuccessorRunId = null;
-    this._windowIds = [...this._windowIds, run.runId];
-    this._latestRunId = run.runId;
-    this._status = 'ready';
-    this._emit({ type: 'handOff', runId: run.runId });
-    if (isWorkflowOpen(run.workflow)) {
-      this._scheduleRefresh();
-    }
-    if (this.cardLoadOf(run.runId).status === 'queued') {
-      this._startCard(run.runId);
-    }
-    this._syncQueueGate();
-    const knownCloseEvent = this.controllers.get(run.runId)?.closeEvent;
-    if (knownCloseEvent) {
-      this._handleClose(run.runId, knownCloseEvent);
-    }
-  }
-
-  private async _finalDescribe(runId: string): Promise<void> {
-    let workflow: WorkflowExecution;
-    try {
-      workflow = await this._describe(runId);
-    } catch {
-      if (this._disposed) {
-        return;
-      }
-      this._fail('finalDescribe', () => void this._finalDescribe(runId));
-      return;
-    }
-    if (this._disposed) {
-      return;
-    }
-    this._applyWorkflow(runId, workflow);
-  }
-
-  private _scheduleRefresh(): void {
-    this._stopRefresh();
-    const runId = this._latestRunId;
-    if (!runId) {
-      return;
-    }
-    this._refreshTimer = setTimeout(
-      () => void this._refresh(runId),
-      REFRESH_INTERVAL_MS,
-    );
-  }
-
-  private _stopRefresh(): void {
-    if (this._refreshTimer === null) {
-      return;
-    }
-    clearTimeout(this._refreshTimer);
-    this._refreshTimer = null;
-  }
-
-  private async _refresh(runId: string): Promise<void> {
-    this._refreshTimer = null;
-    let workflow: WorkflowExecution;
-    try {
-      workflow = await this._describe(runId);
-    } catch {
-      if (this._disposed || !this._isOpenLatest(runId)) {
-        return;
-      }
-      this._fail('refresh', () => void this._refresh(runId));
-      return;
-    }
-    if (this._disposed || !this._isOpenLatest(runId)) {
-      return;
-    }
-    this._applyWorkflow(runId, workflow);
-    if (isWorkflowOpen(workflow)) {
-      this._scheduleRefresh();
-    }
-  }
-
-  private _isOpenLatest(runId: string): boolean {
-    return (
-      runId === this._latestRunId && !this._records.get(runId)?.closeHandled
-    );
-  }
-
-  private _applyWorkflow(runId: string, workflow: WorkflowExecution): void {
-    const record = this._records.get(runId);
-    if (!record) {
-      return;
-    }
-    if (record.run) {
-      record.run = { ...record.run, workflow };
-    }
-    record.controller?.updateWorkflow(workflow);
-  }
-
-  private get _queueGateRunId(): string | null {
-    return this._prioritizedRunId ?? this._latestRunId;
-  }
-
-  private _syncQueueGate(): void {
-    const runId = this._queueGateRunId;
-    const record = runId ? this._records.get(runId) : undefined;
-    const status = record?.cardLoad?.status;
-    if (
-      record &&
-      (record.firstEventSeen || status === 'loaded' || status === 'error')
-    ) {
-      this._queue.release();
-      return;
-    }
-    this._queue.hold();
-  }
-
-  private _enqueueCard(runId: string): void {
-    const record = this._recordFor(runId);
-    if (record.cardLoad) {
-      return;
-    }
-    record.cardLoad = { status: 'queued' };
-    if (runId === this._prioritizedRunId) {
-      this._startCard(runId);
-      return;
-    }
-    this._queue.push(runId);
-  }
-
-  private _startCard(runId: string): void {
-    this._queue.remove(runId);
-    void this._loadCard(runId);
-  }
-
-  private async _loadCard(runId: string): Promise<void> {
-    if (this._disposed) {
-      return;
-    }
-    const record = this._recordFor(runId);
-    const controller = this._controllerFor(record);
-    const resumeHistory = record.livePollFailed;
-    record.livePollFailed = false;
-    record.cardLoad = { status: 'loading' };
-    try {
-      await this._retry(async () => {
-        const run = record.run;
-        if (!run) {
-          throw new Error('Missing Run for this card.');
-        }
-        await (resumeHistory
-          ? controller.retry(run.workflow)
-          : controller.load(run.workflow));
-        if (controller.error) {
-          throw controller.error;
-        }
-      });
-    } catch (error) {
-      if (this._disposed) {
-        return;
-      }
-      record.cardLoad = {
-        status: 'error',
-        error: toChainError(error),
-        retryable: !isNotFound(error),
-      };
-      this._syncQueueGate();
-      return;
-    }
-    if (this._disposed) {
-      return;
-    }
-    record.cardLoad = { status: 'loaded' };
-    this._syncQueueGate();
-  }
-
-  private _controllerFor(record: RunRecord): WorkflowHistoryController {
-    if (record.controller) {
-      return record.controller;
-    }
-    const { runId } = record;
-    const { namespace, workflowId } = this.identity;
-    const controller = this._client.createController(
-      { namespace, workflowId, runId },
-      {
-        onClose: (closeEvent) => this._handleClose(runId, closeEvent),
-        onFirstEvent: () => this._handleFirstEvent(runId),
-        onLivePollError: (error) => this._handleLivePollError(runId, error),
-      },
-    );
-    record.controller = controller;
-    return controller;
-  }
-
-  private _handleFirstEvent(runId: string): void {
-    if (this._disposed) {
-      return;
-    }
-    this._recordFor(runId).firstEventSeen = true;
-    this._syncQueueGate();
-  }
-
-  private _handleLivePollError(runId: string, error: ChainError): void {
-    const record = this._records.get(runId);
-    if (this._disposed || record?.cardLoad?.status !== 'loaded') {
-      return;
-    }
-    record.livePollFailed = true;
-    record.cardLoad = {
-      status: 'error',
-      error,
-      retryable: !isNotFound(error),
-    };
-    this._syncQueueGate();
-  }
-
-  private _fail(step: DiscoveryStep, retry: () => void): void {
-    const isFirstFailure = this._failedSteps.size === 0;
-    this._failedSteps.set(step, retry);
-    if (isFirstFailure) {
-      this._emit({ type: 'discoveryError' });
-    }
-  }
-
-  private _emit(event: ChainEvent): void {
-    if (this._disposed) {
-      return;
-    }
-    for (const listener of this._listeners) {
-      listener(event);
-    }
+  private _startChain(latestRun: ChainRun): void {
+    this._window.seed(latestRun.runId);
+    this._follower.start(latestRun);
+    this._cards.latestRunChanged(latestRun.runId);
+    void this._window.loadInitialRuns();
   }
 }
