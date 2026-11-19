@@ -57,22 +57,31 @@ export const fetchHistoryTail = async ({
   signal,
   maximumPageSize,
 }: FetchHistoryTailParams): Promise<HistoryEvent[]> => {
-  const response = await requestFromAPI<GetWorkflowExecutionHistoryResponse>(
-    routeForApi('events.descending', { namespace, workflowId }),
-    {
-      request: fetch,
-      params: {
-        'execution.runId': runId,
-        ...(maximumPageSize && {
-          maximumPageSize: String(maximumPageSize),
-        }),
+  const route = routeForApi('events.descending', { namespace, workflowId });
+  let token: string | undefined;
+  while (true) {
+    const response = await requestFromAPI<GetWorkflowExecutionHistoryResponse>(
+      route,
+      {
+        token,
+        request: fetch,
+        params: {
+          'execution.runId': runId,
+          ...(maximumPageSize && {
+            maximumPageSize: String(maximumPageSize),
+          }),
+        },
+        options: { signal },
+        handleError: handlePageError,
       },
-      options: { signal },
-      handleError: handlePageError,
-    },
-  );
-  if (!response) throw new Error('Missing workflow history response.');
-  return response.history?.events ?? [];
+    );
+    if (!response) throw new Error('Missing workflow history response.');
+    const events = response.history?.events ?? [];
+    if (events.length || !response.nextPageToken) {
+      return events;
+    }
+    token = String(response.nextPageToken);
+  }
 };
 
 export const fetchBidirectional = async ({

@@ -6,7 +6,11 @@ import {
 } from '$lib/utilities/handle-error';
 import type { ErrorCallback } from '$lib/utilities/request-from-api';
 
-import { fetchBidirectional, type PauseHandle } from './fetch-bidirectional';
+import {
+  fetchBidirectional,
+  fetchHistoryTail,
+  type PauseHandle,
+} from './fetch-bidirectional';
 import { createGroupedEventBuffer } from './grouped-event-buffer';
 
 // ---------------------------------------------------------------------------
@@ -759,5 +763,36 @@ describe('fetchBidirectional abort', () => {
     expect(onRawPage).not.toHaveBeenCalled();
     expect(onProgress).not.toHaveBeenCalled();
     expect(onPause).not.toHaveBeenCalled();
+  });
+});
+
+describe('fetchHistoryTail', () => {
+  it('follows the token past empty pages to the newest events', async () => {
+    requestFromAPI
+      .mockResolvedValueOnce({ history: { events: [] }, nextPageToken: 't1' })
+      .mockResolvedValueOnce(descPage([5, 4], 't2'));
+
+    const events = await fetchHistoryTail({
+      namespace: 'ns',
+      workflowId: 'wf',
+      runId: 'r',
+    });
+
+    expect(events.map((event) => event.eventId)).toEqual(['5', '4']);
+    expect(requestFromAPI).toHaveBeenCalledTimes(2);
+    expect(requestFromAPI.mock.calls[1][1].token).toBe('t1');
+  });
+
+  it('returns no events when the history is empty', async () => {
+    requestFromAPI.mockResolvedValueOnce(emptyPage);
+
+    const events = await fetchHistoryTail({
+      namespace: 'ns',
+      workflowId: 'wf',
+      runId: 'r',
+    });
+
+    expect(events).toEqual([]);
+    expect(requestFromAPI).toHaveBeenCalledOnce();
   });
 });
