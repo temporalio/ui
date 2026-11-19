@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
+import type { RunCounts } from '$lib/models/event-history/run-counts';
+
 import {
-  nonZeroCountDisplays,
   partialSuffix,
   runCardDescription,
   runCardName,
 } from './run-card-labels';
-import type { RunCounts } from './run-counts';
 
 const counts = (overrides: Partial<RunCounts> = {}): RunCounts => ({
   activities: 0,
@@ -15,6 +15,7 @@ const counts = (overrides: Partial<RunCounts> = {}): RunCounts => ({
   signals: 0,
   nexusOperations: 0,
   updates: 0,
+  succeeded: 0,
   failed: 0,
   retried: 0,
   ...overrides,
@@ -90,16 +91,6 @@ describe('runCardDescription', () => {
     expect(describe('error')).toBe(
       "run-01, couldn't load events, Start of chain",
     );
-  });
-});
-
-describe('nonZeroCountDisplays', () => {
-  it('keeps only categories with a count, in display order', () => {
-    expect(
-      nonZeroCountDisplays(counts({ updates: 1, activities: 2 })).map(
-        ({ key }) => key,
-      ),
-    ).toEqual(['activities', 'updates']);
   });
 });
 

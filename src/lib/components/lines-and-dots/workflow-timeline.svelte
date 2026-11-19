@@ -221,13 +221,18 @@
     class="sticky top-0 z-[11] flex flex-wrap items-center justify-between gap-2 bg-background-primary pb-2 text-primary md:top-[var(--top-nav-height)] md:pt-2 xl:gap-8"
   >
     <div class="flex items-center gap-2">
-      <h2>{translate('workflows.timeline-tab')}</h2>
+      <ToggleButtons class="[&_.menu-button-anchor>button]:rounded">
+        <EventTypeFilter
+          compact={false}
+          {eventTypes}
+          statusFilter={failedOrPendingOnly}
+          onChange={onEventTypeFilterChange}
+        />
+      </ToggleButtons>
       <EventHistoryLegend />
     </div>
-    <div class="flex flex-wrap items-center gap-2 xl:gap-x-0">
-      <ToggleButtons
-        class="max-xl:[&>:last-child_.menu-button-anchor>button]:rounded-r"
-      >
+    <div class="flex flex-wrap items-center gap-2">
+      <ToggleButtons>
         <ToggleButton
           LeadingIcon={reverseSort ? IconArrowDescending : IconArrowAscending}
           data-testid="zoom-in"
@@ -251,12 +256,6 @@
             ? translate('workflows.show-idle-time')
             : translate('workflows.hide-idle-time')}
         </ToggleButton>
-        <EventTypeFilter
-          compact={false}
-          {eventTypes}
-          statusFilter={failedOrPendingOnly}
-          onChange={onEventTypeFilterChange}
-        />
       </ToggleButtons>
       {@render controls?.()}
     </div>

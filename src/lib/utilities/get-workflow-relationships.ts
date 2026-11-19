@@ -62,6 +62,43 @@ export const belongsToCurrentChain = ({
   return currentRun.firstRunId === firstRunId;
 };
 
+export type LatestRunOfThisChain =
+  | { kind: 'thisRun' }
+  | { kind: 'unknown' }
+  | { kind: 'newerChain' }
+  | { kind: 'run'; runId: string };
+
+// A Run that is open, or closed without a successor, is its chain's Latest
+// Run. Otherwise the Latest Run is the Workflow ID's current Run, unless the
+// Workflow ID has since started a newer chain.
+export const latestRunOfThisChain = ({
+  runId,
+  firstRunId,
+  nextRunId,
+  isOpen,
+  currentRun,
+}: {
+  runId: string;
+  firstRunId: string | undefined;
+  nextRunId: string | undefined;
+  isOpen: boolean;
+  currentRun: CurrentRun | null;
+}): LatestRunOfThisChain => {
+  if (isOpen || !nextRunId) {
+    return { kind: 'thisRun' };
+  }
+  if (!currentRun) {
+    return { kind: 'unknown' };
+  }
+  if (!belongsToCurrentChain({ firstRunId, currentRun })) {
+    return { kind: 'newerChain' };
+  }
+  if (currentRun.runId === runId) {
+    return { kind: 'thisRun' };
+  }
+  return { kind: 'run', runId: currentRun.runId };
+};
+
 export type ChildWorkflowClosedEvent =
   | ChildWorkflowExecutionCompletedEvent
   | ChildWorkflowExecutionFailedEvent

@@ -8,6 +8,7 @@
   import WorkflowTimeline from '$lib/components/lines-and-dots/workflow-timeline.svelte';
   import DownloadEventHistoryModal from '$lib/components/workflow/download-event-history-modal.svelte';
   import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
+  import RunTimelineHeading from '$lib/components/workflow/run-timeline-heading.svelte';
   import WorkflowCallbacks from '$lib/components/workflow/workflow-callbacks.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
@@ -126,6 +127,7 @@
 </div>
 
 {#if workflow}
+  <RunTimelineHeading {namespace} {workflow} />
   <WorkflowTimeline
     {namespace}
     {workflow}
@@ -143,8 +145,8 @@
     {#snippet controls()}
       <ToggleButtons
         class={hasTimelineEventGroups
-          ? 'empty:hidden max-xl:[&>:last-child_.menu-button-anchor>button]:rounded-r'
-          : 'empty:hidden max-xl:[&_.menu-button-anchor>button]:rounded max-xl:[&_.menu-button-anchor>button]:border-l'}
+          ? 'empty:hidden [&>:last-child_.menu-button-anchor>button]:rounded-r'
+          : 'empty:hidden [&_.menu-button-anchor>button]:rounded [&_.menu-button-anchor>button]:border-l'}
       >
         <EventGroupControls
           options={historyController.history.eventGroupOptions}
@@ -155,7 +157,7 @@
                 data-testid="toggle-event-groups"
                 size="sm"
                 variant="tertiary"
-                class="max-xl:rounded-l xl:border-l-0 [&:not(:last-child)]:border-r"
+                class="rounded-l [&:not(:last-child)]:border-r"
                 onclick={onEventGroupsToggle}
               >
                 {eventGroupsVisible
@@ -170,7 +172,6 @@
         <ToggleButton
           disabled={isNotPending}
           data-testid="pause"
-          class="xl:!rounded-l-none xl:border-l-0"
           size="sm"
           variant="tertiary"
           onclick={onAutoRefreshToggle}

@@ -207,6 +207,7 @@
   <WorkflowDetails
     {history}
     workflow={workflow!}
+    firstRunId={workflowRelationships.firstRunId}
     next={workflowRelationships.nextRunId}
   />
   <ExtensionSlot

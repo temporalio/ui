@@ -6,7 +6,10 @@ import type {
   WorkflowEvent,
 } from '$lib/types/events';
 
-import { isLocalActivityMarkerEvent } from './is-event-type';
+import {
+  isFailedWorkflowExecutionUpdateCompletedEvent,
+  isLocalActivityMarkerEvent,
+} from './is-event-type';
 import {
   isPendingActivity,
   isPendingNexusOperation,
@@ -24,15 +27,35 @@ const isFailedLocalActivity = (event: WorkflowEvent) => {
  * isEventGroup, whose `eventList` check a LazyGroup can't satisfy.
  */
 type FilterableGroup = {
-  classification: EventGroup['classification'];
+  category: EventGroup['category'];
+  finalClassification: EventGroup['finalClassification'];
   isPending: boolean;
   initialEvent: WorkflowEvent;
+  lastEvent: WorkflowEvent;
 };
 
-const isFailedGroup = (group: FilterableGroup) =>
-  group.classification === 'Failed' ||
-  group.classification === 'TimedOut' ||
+export const isFailedGroup = (group: FilterableGroup): boolean =>
+  group.finalClassification === 'Failed' ||
+  group.finalClassification === 'TimedOut' ||
   !!isFailedLocalActivity(group.initialEvent);
+
+const SUCCEEDABLE_CATEGORIES: ReadonlySet<EventGroup['category']> = new Set([
+  'activity',
+  'child-workflow',
+  'nexus',
+  'update',
+]);
+
+export const isSucceededGroup = (group: FilterableGroup): boolean => {
+  if (isLocalActivityMarkerEvent(group.initialEvent)) {
+    return !isFailedLocalActivity(group.initialEvent);
+  }
+  return (
+    SUCCEEDABLE_CATEGORIES.has(group.category) &&
+    group.finalClassification === 'Completed' &&
+    !isFailedWorkflowExecutionUpdateCompletedEvent(group.lastEvent)
+  );
+};
 
 const isFailedEvent = (iterable: IterableEventWithPending) => {
   return (

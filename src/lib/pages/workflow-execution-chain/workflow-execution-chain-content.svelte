@@ -5,7 +5,12 @@
   import { page } from '$app/state';
 
   import WorkflowTimeline from '$lib/components/lines-and-dots/workflow-timeline.svelte';
+  import DownloadEventHistoryModal from '$lib/components/workflow/download-event-history-modal.svelte';
   import Skeleton from '$lib/holocene/skeleton/index.svelte';
+  import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
+  import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
+  import { translate } from '$lib/i18n/translate';
+  import { IconDownload } from '$lib/io/icon';
   import WorkflowHistoryProvider from '$lib/layouts/workflow-history-provider.svelte';
   import { allEventTypeOptions } from '$lib/models/event-history/get-event-categorization';
   import {
@@ -115,6 +120,8 @@
   const selectedController = $derived(
     selectedRunId ? chain.controllers.get(selectedRunId) : undefined,
   );
+
+  let showDownloadPrompt = $state(false);
 </script>
 
 {#if chain.resolution.kind === 'failed'}
@@ -146,8 +153,28 @@
           {eventTypes}
           failedOrPendingOnly={filterParams.statusFilter}
           {onEventTypeFilterChange}
-        />
+        >
+          {#snippet controls()}
+            <ToggleButtons>
+              <ToggleButton
+                data-testid="download"
+                LeadingIcon={IconDownload}
+                size="sm"
+                variant="tertiary"
+                onclick={() => (showDownloadPrompt = true)}
+              >
+                {translate('common.download')}
+              </ToggleButton>
+            </ToggleButtons>
+          {/snippet}
+        </WorkflowTimeline>
       </WorkflowHistoryProvider>
+      <DownloadEventHistoryModal
+        bind:open={showDownloadPrompt}
+        {namespace}
+        {workflowId}
+        runId={selectedRun.runId}
+      />
     {:else if chain.runs.length > 0}
       <Skeleton class="h-96 rounded-lg" />
     {/if}
