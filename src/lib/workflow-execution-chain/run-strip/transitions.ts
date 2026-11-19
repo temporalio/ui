@@ -1,7 +1,9 @@
-import type { HistoryEvent } from '$lib/types/events';
 import { fromScreamingEnum } from '$lib/utilities/screaming-enums';
 
-export type Transition = 'continuedAsNew' | 'retry' | 'cron';
+import { readResetBaseRunId } from '../chain-context.svelte';
+import type { ChainRun } from '../types';
+
+export type Transition = 'continuedAsNew' | 'retry' | 'cron' | 'reset';
 
 const INITIATOR_TRANSITIONS: Readonly<Record<string, Transition>> = {
   Workflow: 'continuedAsNew',
@@ -9,8 +11,13 @@ const INITIATOR_TRANSITIONS: Readonly<Record<string, Transition>> = {
   CronSchedule: 'cron',
 };
 
-export const transitionOf = (startedEvent: HistoryEvent): Transition | null => {
-  const attributes = startedEvent.workflowExecutionStartedEventAttributes;
+export const transitionOf = (
+  run: Pick<ChainRun, 'runId' | 'startedEvent'>,
+): Transition | null => {
+  if (readResetBaseRunId(run)) {
+    return 'reset';
+  }
+  const attributes = run.startedEvent.workflowExecutionStartedEventAttributes;
   if (!attributes?.continuedExecutionRunId) {
     return null;
   }

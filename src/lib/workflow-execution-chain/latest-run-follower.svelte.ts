@@ -56,20 +56,18 @@ export class LatestRunFollower {
     this._context.failures.clear('refresh');
     this._context.failures.clear('closeEvent');
 
-    if (record.run && isWorkflowOpen(record.run.workflow)) {
-      void this._finalDescribe(runId);
-    }
-
     const successorRunId = readSuccessorRunId(closeEvent);
-    if (!successorRunId) {
-      if (this.lifecycle === 'closed') {
-        return;
+    if (successorRunId) {
+      if (record.run && isWorkflowOpen(record.run.workflow)) {
+        void this._finalDescribe(runId);
       }
-      this.lifecycle = 'closed';
-      this._context.emit({ type: 'closed' });
+      void this._handOff(successorRunId);
       return;
     }
-    void this._handOff(successorRunId);
+    if (this.lifecycle === 'closed') {
+      return;
+    }
+    void this._followResetOrClose(runId);
   }
 
   dispose(): void {
@@ -108,6 +106,48 @@ export class LatestRunFollower {
     if (knownCloseEvent) {
       this.handleClose(run.runId, knownCloseEvent);
     }
+  }
+
+  /**
+   * A close without a successor ends the chain unless the Run was reset. The
+   * server then terminates it and names the new Run only in its Describe.
+   */
+  private async _followResetOrClose(runId: string): Promise<void> {
+    let workflow = this._context.records.get(runId)?.run?.workflow;
+    if (!workflow || isWorkflowOpen(workflow)) {
+      try {
+        workflow = await this._context.describe(runId);
+      } catch {
+        if (this._context.disposed) {
+          return;
+        }
+        this._context.failures.fail(
+          'finalDescribe',
+          runId,
+          () => void this._followResetOrClose(runId),
+        );
+        this._markClosed();
+        return;
+      }
+      if (this._context.disposed) {
+        return;
+      }
+      this._applyWorkflow(runId, workflow);
+    }
+    const resetRunId = workflow.workflowExtendedInfo?.resetRunId;
+    if (resetRunId) {
+      void this._handOff(resetRunId);
+      return;
+    }
+    this._markClosed();
+  }
+
+  private _markClosed(): void {
+    if (this.lifecycle === 'closed') {
+      return;
+    }
+    this.lifecycle = 'closed';
+    this._context.emit({ type: 'closed' });
   }
 
   private async _finalDescribe(runId: string): Promise<void> {

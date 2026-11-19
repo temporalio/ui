@@ -262,10 +262,12 @@ export const Strings = {
   'transition-continued-as-new': 'Continue-as-new',
   'transition-retry': 'Retry',
   'transition-cron': 'Cron',
+  'transition-reset': 'Reset',
   'transition-continued-as-new-description':
     'Continued from previous run by continue-as-new',
   'transition-retry-description': 'Continued from previous run by retry',
   'transition-cron-description': 'Continued from previous run by cron',
+  'transition-reset-description': 'Started by resetting previous run',
   'announce-latest-run': 'Now showing latest run {{shortId}}',
   'announce-older-runs_one': 'Loaded {{count, number}} older run',
   'announce-older-runs_other': 'Loaded {{count, number}} older runs',

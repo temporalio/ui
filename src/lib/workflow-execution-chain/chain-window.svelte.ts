@@ -2,7 +2,10 @@ import { isNotFound } from '$lib/utilities/handle-error';
 
 import type { ChainBoundary, ChainRun } from './types';
 
-import { type ChainContext, readStartedEvent } from './chain-context.svelte';
+import {
+  type ChainContext,
+  readPredecessorRunId,
+} from './chain-context.svelte';
 
 const WALK_SIZE = 10;
 
@@ -60,9 +63,7 @@ export class ChainWindow {
     this.walking = true;
     try {
       for (let hop = 0; hop < hops; hop++) {
-        const predecessor = readStartedEvent(
-          this.runs[0].startedEvent,
-        ).continuedExecutionRunId;
+        const predecessor = readPredecessorRunId(this.runs[0]);
         if (!predecessor) {
           this.boundary = 'chainStart';
           return;

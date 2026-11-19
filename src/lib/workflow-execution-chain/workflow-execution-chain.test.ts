@@ -135,9 +135,11 @@ const makeWorkflow = (
 const makeStartedEvent = ({
   predecessor = '',
   firstExecutionRunId,
+  originalExecutionRunId,
 }: {
   predecessor?: string;
   firstExecutionRunId: string;
+  originalExecutionRunId?: string;
 }): HistoryEvent =>
   ({
     eventId: '1',
@@ -145,6 +147,7 @@ const makeStartedEvent = ({
     workflowExecutionStartedEventAttributes: {
       continuedExecutionRunId: predecessor,
       firstExecutionRunId,
+      originalExecutionRunId,
     },
   }) as unknown as HistoryEvent;
 
@@ -261,6 +264,38 @@ class FakeServer {
       });
     });
     this.currentRunId = runIds[runIds.length - 1];
+  }
+
+  /**
+   * Resets `baseRunId` the way the server does: the base is terminated and
+   * points at the new Run, and the new Run's Started event is a copy of the
+   * base's, so it continues from the base's predecessor.
+   */
+  reset(baseRunId: string, newRunId: string): void {
+    const base = this.runs.get(baseRunId)!;
+    const { continuedExecutionRunId, firstExecutionRunId } =
+      base.startedEvent.workflowExecutionStartedEventAttributes!;
+    this.runs.set(baseRunId, {
+      ...base,
+      workflow: {
+        ...base.workflow,
+        isRunning: false,
+        status: 'Terminated',
+        workflowExtendedInfo: { resetRunId: newRunId },
+      } as WorkflowExecution,
+    });
+    this.runs.set(newRunId, {
+      workflow: makeWorkflow(newRunId, {
+        firstRunId: base.workflow.firstRunId,
+        isRunning: true,
+      }),
+      startedEvent: makeStartedEvent({
+        predecessor: continuedExecutionRunId ?? '',
+        firstExecutionRunId: firstExecutionRunId!,
+        originalExecutionRunId: baseRunId,
+      }),
+    });
+    this.currentRunId = newRunId;
   }
 
   describeCalls(runId: string): number {
@@ -1021,6 +1056,62 @@ describe('WorkflowExecutionChain', () => {
 
       expect(server.controllers.has('run-1')).toBe(false);
       expect(chain.cardLoads.get('run-2')).toEqual({ status: 'loading' });
+    });
+  });
+
+  describe('reset', () => {
+    const terminated = () =>
+      makeCloseEvent(
+        'WorkflowExecutionTerminated',
+        'workflowExecutionTerminatedEventAttributes',
+      );
+
+    it('follows the new Run when the Latest Run is reset', async () => {
+      server.addChain(['run-1', 'run-2']);
+      const chain = track(await loadChain(server));
+      const listener = vi.fn();
+      chain.subscribe(listener);
+
+      server.reset('run-2', 'run-3');
+      server.controllers.get('run-2')!.close(terminated());
+      await settle();
+
+      expect(chainRunIds(chain)).toEqual(['run-1', 'run-2', 'run-3']);
+      expect(chain.latestRunId).toBe('run-3');
+      expect(chain.status).toBe('ready');
+      expect(listener).toHaveBeenCalledExactlyOnceWith({
+        type: 'handOff',
+        runId: 'run-3',
+      });
+    });
+
+    it('closes the chain when a terminated Run was not reset', async () => {
+      server.addChain(['run-1']);
+      const chain = track(await loadChain(server));
+
+      server.controllers.get('run-1')!.close(terminated());
+      await settle();
+
+      expect(chain.status).toBe('closed');
+      expect(chain.latestRunId).toBe('run-1');
+    });
+
+    it('keeps the reset Run on load, between its predecessor and the new Run', async () => {
+      server.addChain(runIds(3));
+      server.reset('run-3', 'run-4');
+      const chain = track(await loadChain(server));
+
+      expect(chainRunIds(chain)).toEqual(runIds(4));
+      expect(chain.boundary).toBe('chainStart');
+    });
+
+    it('keeps the first Run when it was reset', async () => {
+      server.addChain(['run-1']);
+      server.reset('run-1', 'run-2');
+      const chain = track(await loadChain(server));
+
+      expect(chainRunIds(chain)).toEqual(['run-1', 'run-2']);
+      expect(chain.boundary).toBe('chainStart');
     });
   });
 

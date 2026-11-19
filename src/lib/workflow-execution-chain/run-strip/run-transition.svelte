@@ -8,12 +8,14 @@
     continuedAsNew: IconLink,
     retry: IconLink,
     cron: IconLink,
+    reset: IconLink,
   };
 
   const TRANSITION_LABELS: Readonly<Record<Transition, I18nKey>> = {
     continuedAsNew: 'workflows.transition-continued-as-new',
     retry: 'workflows.transition-retry',
     cron: 'workflows.transition-cron',
+    reset: 'workflows.transition-reset',
   };
 </script>
 

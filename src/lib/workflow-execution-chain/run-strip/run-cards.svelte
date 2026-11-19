@@ -70,7 +70,7 @@
     onfocusout={rovingFocus.onfocusout}
   >
     {#each runs as run, index (run.runId)}
-      {@const transition = transitionOf(run.startedEvent)}
+      {@const transition = transitionOf(run)}
       {#if index > 0 && transition}
         <RunTransition {transition} />
       {/if}

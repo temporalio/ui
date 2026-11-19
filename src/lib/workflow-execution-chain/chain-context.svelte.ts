@@ -50,13 +50,40 @@ export type ChainContext = {
 
 export const readStartedEvent = (
   event: HistoryEvent,
-): { continuedExecutionRunId?: string; firstExecutionRunId?: string } => {
+): {
+  continuedExecutionRunId?: string;
+  firstExecutionRunId?: string;
+  originalExecutionRunId?: string;
+} => {
   const attributes = event.workflowExecutionStartedEventAttributes;
   return {
     continuedExecutionRunId: attributes?.continuedExecutionRunId || undefined,
     firstExecutionRunId: attributes?.firstExecutionRunId || undefined,
+    originalExecutionRunId: attributes?.originalExecutionRunId || undefined,
   };
 };
+
+/**
+ * The Run a reset started from, if this Run was started by a reset. A reset
+ * copies the base Run's Started event, so `originalExecutionRunId` keeps
+ * naming the base while `continuedExecutionRunId` names the base's own
+ * predecessor.
+ */
+export const readResetBaseRunId = ({
+  runId,
+  startedEvent,
+}: Pick<ChainRun, 'runId' | 'startedEvent'>): string | undefined => {
+  const { originalExecutionRunId } = readStartedEvent(startedEvent);
+  return originalExecutionRunId && originalExecutionRunId !== runId
+    ? originalExecutionRunId
+    : undefined;
+};
+
+export const readPredecessorRunId = (
+  run: Pick<ChainRun, 'runId' | 'startedEvent'>,
+): string | undefined =>
+  readResetBaseRunId(run) ??
+  readStartedEvent(run.startedEvent).continuedExecutionRunId;
 
 export const createChainContext = (
   identity: Readonly<WorkflowExecutionChainIdentity>,

@@ -25,6 +25,7 @@ const TRANSITION_DESCRIPTIONS: Record<Transition, I18nKey> = {
   continuedAsNew: 'workflows.transition-continued-as-new-description',
   retry: 'workflows.transition-retry-description',
   cron: 'workflows.transition-cron-description',
+  reset: 'workflows.transition-reset-description',
 };
 
 const MODE_LABELS: Record<RunCardMode, I18nKey> = {
