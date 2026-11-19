@@ -1,4 +1,5 @@
 import { getGroupId } from '$lib/models/event-groups/get-group-id';
+import type { CurrentRun } from '$lib/stores/workflow-run';
 import { isSystemNexusScheduledEvent } from '$lib/system-nexus-endpoints';
 import type { DescribeNamespaceResponse, EventLink } from '$lib/types';
 import type {
@@ -7,6 +8,7 @@ import type {
   ChildWorkflowExecutionFailedEvent,
   ChildWorkflowExecutionTerminatedEvent,
   ChildWorkflowExecutionTimedOutEvent,
+  HistoryEvent,
   IterableEvent,
   WorkflowEvents,
 } from '$lib/types/events';
@@ -33,6 +35,31 @@ const findNewExecutionRunId = (events: WorkflowEvents): string | undefined => {
       return event.attributes.newExecutionRunId;
     }
   }
+};
+
+export const readSuccessorRunId = (
+  closeEvent: HistoryEvent,
+): string | undefined =>
+  closeEvent.workflowExecutionCompletedEventAttributes?.newExecutionRunId ||
+  closeEvent.workflowExecutionFailedEventAttributes?.newExecutionRunId ||
+  closeEvent.workflowExecutionTimedOutEventAttributes?.newExecutionRunId ||
+  closeEvent.workflowExecutionContinuedAsNewEventAttributes
+    ?.newExecutionRunId ||
+  undefined;
+
+// Unknown counts as the current chain: servers before 1.25 omit firstRunId,
+// and a failed describe-current leaves currentRun null.
+export const belongsToCurrentChain = ({
+  firstRunId,
+  currentRun,
+}: {
+  firstRunId: string | undefined;
+  currentRun: CurrentRun | null;
+}): boolean => {
+  if (!firstRunId || !currentRun?.firstRunId) {
+    return true;
+  }
+  return currentRun.firstRunId === firstRunId;
 };
 
 export type ChildWorkflowClosedEvent =

@@ -1,6 +1,7 @@
 import { isWorkflowOpen } from '$lib/models/workflow-status';
 import type { HistoryEvent } from '$lib/types/events';
 import type { WorkflowExecution } from '$lib/types/workflows';
+import { readSuccessorRunId } from '$lib/utilities/get-workflow-relationships';
 
 import type { ChainLifecycle, ChainRun } from './types';
 
@@ -13,14 +14,6 @@ export type LatestRunFollowerCallbacks = {
   workflowUpdated: (runId: string, workflow: WorkflowExecution) => void;
   closeEventOf: (runId: string) => HistoryEvent | null | undefined;
 };
-
-const readSuccessorRunId = (closeEvent: HistoryEvent): string | undefined =>
-  closeEvent.workflowExecutionCompletedEventAttributes?.newExecutionRunId ||
-  closeEvent.workflowExecutionFailedEventAttributes?.newExecutionRunId ||
-  closeEvent.workflowExecutionTimedOutEventAttributes?.newExecutionRunId ||
-  closeEvent.workflowExecutionContinuedAsNewEventAttributes
-    ?.newExecutionRunId ||
-  undefined;
 
 /**
  * Follows the chain forward from its Latest Run: re-describes it while it's

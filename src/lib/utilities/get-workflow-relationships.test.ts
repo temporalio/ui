@@ -6,6 +6,7 @@ import type { WorkflowEvent, WorkflowEvents } from '$lib/types/events';
 
 import { parseRawPayloadToJSON } from './decode-payload';
 import {
+  belongsToCurrentChain,
   getWorkflowNexusLinksFromHistory,
   getWorkflowRelationships,
 } from './get-workflow-relationships';
@@ -373,5 +374,46 @@ describe('getWorkflowNexusLinksFromHistory', () => {
       link('scheduled-7'),
       link('completed-8'),
     ]);
+  });
+});
+
+describe('belongsToCurrentChain', () => {
+  const currentRun = {
+    runId: 'run-c',
+    firstRunId: 'run-a',
+    status: 'Running' as const,
+  };
+
+  it('is true when the current Run shares the first Run ID', () => {
+    expect(belongsToCurrentChain({ firstRunId: 'run-a', currentRun })).toBe(
+      true,
+    );
+  });
+
+  it('is false when the Workflow ID was reused', () => {
+    expect(belongsToCurrentChain({ firstRunId: 'run-x', currentRun })).toBe(
+      false,
+    );
+  });
+
+  it('is true while the current Run is unknown', () => {
+    expect(
+      belongsToCurrentChain({ firstRunId: 'run-x', currentRun: null }),
+    ).toBe(true);
+  });
+
+  it('is true when the server omits the first Run ID', () => {
+    expect(
+      belongsToCurrentChain({
+        firstRunId: 'run-x',
+        currentRun: { ...currentRun, firstRunId: undefined },
+      }),
+    ).toBe(true);
+  });
+
+  it('is true when this Run has no first Run ID yet', () => {
+    expect(belongsToCurrentChain({ firstRunId: undefined, currentRun })).toBe(
+      true,
+    );
   });
 });

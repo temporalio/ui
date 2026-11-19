@@ -33,6 +33,7 @@
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
   import { decodePayloadAndParseDataToJSON } from '$lib/utilities/decode-payload';
+  import { readSuccessorRunId } from '$lib/utilities/get-workflow-relationships';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
   import { shouldRefetchWorkflowRun } from '$lib/utilities/should-refetch-workflow-run';
 
@@ -59,6 +60,7 @@
   let historyController = $state<WorkflowHistoryController | null>(null);
 
   let _refetchSeq = 0;
+  let _currentRunFetchedFor: WorkflowHistoryController | null = null;
 
   const fullJson = $derived({
     ...$workflowRun,
@@ -224,6 +226,31 @@
     $workflowRun.workflow = workflow ?? null;
   };
 
+  const fetchCurrentRun = async (
+    history: WorkflowHistoryController,
+    controller: AbortController,
+  ) => {
+    const ns = namespace;
+    const wfId = workflowId;
+    const rId = runId;
+    const { workflow } = await fetchWorkflow(
+      { namespace: ns, workflowId: wfId },
+      (input, init) => fetch(input, { ...init, signal: controller.signal }),
+    );
+    if (
+      !workflow ||
+      !isCurrentRoute(controller, ns, wfId, rId) ||
+      historyController !== history
+    ) {
+      return;
+    }
+    $workflowRun.currentRun = {
+      runId: workflow.runId,
+      firstRunId: workflow.firstRunId,
+      status: workflow.status,
+    };
+  };
+
   const abortAll = () => {
     workflowRunController?.abort();
     workflowRunController = null;
@@ -251,9 +278,35 @@
 
     workflowError = null;
     _refetchSeq++;
+    _currentRunFetchedFor = null;
     abortAll();
     resetLastDataEncoderSuccess();
   };
+
+  // A Workflow ID has at most one open Run, so only a closed Run can be in an
+  // older chain, and a single-Run chain has no chain link to check.
+  $effect(() => {
+    const history = historyController;
+    const closeEvent = history?.closeEvent;
+    if (!history || !closeEvent) {
+      return;
+    }
+    const firstRunId =
+      history.history.initialEvent?.attributes?.firstExecutionRunId;
+    const hasPredecessor =
+      !!firstRunId && firstRunId !== history.workflowExecutionIdentity.runId;
+    if (!hasPredecessor && !readSuccessorRunId(closeEvent)) {
+      return;
+    }
+    untrack(() => {
+      const controller = workflowRunController;
+      if (!controller || _currentRunFetchedFor === history) {
+        return;
+      }
+      _currentRunFetchedFor = history;
+      void fetchCurrentRun(history, controller);
+    });
+  });
 
   // Clearing and refetching were separate effects on the same trigger, so
   // clear-before-fetch held only because Svelte runs effects in creation order
