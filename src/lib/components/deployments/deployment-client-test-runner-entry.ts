@@ -199,10 +199,12 @@ export function renderComputePerRegion({
   regions,
   enabledRegionIds,
   initialPrimary,
+  initialReplica,
 }: {
   regions: ComputeRegion[];
   enabledRegionIds?: string[];
   initialPrimary?: ComputeInitialValues;
+  initialReplica?: ComputeInitialValues;
 }) {
   setPageState();
   computeRegionValues = [];
@@ -215,6 +217,7 @@ export function renderComputePerRegion({
         regions,
         ...(enabledRegionIds === undefined ? {} : { enabledRegionIds }),
         ...(initialPrimary === undefined ? {} : { initialPrimary }),
+        ...(initialReplica === undefined ? {} : { initialReplica }),
         get regionValues() {
           return computeRegionValues;
         },

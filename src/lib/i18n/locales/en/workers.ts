@@ -319,8 +319,13 @@ export const Strings = {
     'After failover to {{region}}, Tasks for this version wait for your own Workers.',
   'replica-same-region':
     'The primary and the replica both run in {{region}}, so an outage there stops both.',
-  'region-arn-suggested-from-primary':
-    "Based on the primary's ARN. Check the version number for",
+  'region-suggested-function-title': 'Check this function in {{region}}',
+  'region-suggested-function-body':
+    'This ARN was generated from the primary ARN and the replica region. Ensure the function exists in {{region}} before you save.',
+  'region-suggested-endpoint-title':
+    'Check this runtime endpoint in {{region}}',
+  'region-suggested-endpoint-body':
+    'This ARN was generated from the primary ARN and the replica region. Ensure the runtime endpoint exists in {{region}} before you save.',
   'region-inherits-primary':
     'Uses the same Access and Scaling and Lifecycle settings as',
   'region-customize': 'Customize',

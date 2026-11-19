@@ -220,6 +220,32 @@ describe('multi-region wiring', () => {
       );
     });
 
+    test('a suggested replica ARN asks the user to check it', () => {
+      const form = client.renderComputePerRegion({
+        regions: regionsFor('lambda'),
+        initialPrimary: lambdaPrimary,
+      });
+
+      expect(form.textContent).toContain('Check this function in us-west-2');
+      expect(form.textContent).toContain(
+        'Ensure the function exists in us-west-2 before you save.',
+      );
+    });
+
+    test('a saved replica ARN is not called a suggestion', () => {
+      const form = client.renderComputePerRegion({
+        regions: regionsFor('lambda'),
+        enabledRegionIds: [WEST],
+        initialPrimary: lambdaPrimary,
+        initialReplica: {
+          ...lambdaPrimary,
+          lambdaArn: 'arn:aws:lambda:us-west-2:123456789012:function:other',
+        },
+      });
+
+      expect(form.textContent).not.toContain('Check this function');
+    });
+
     test('a new Cloud Run Version saves only the primary', () => {
       const form = client.renderComputePerRegion({
         regions: regionsFor('cloud-run'),

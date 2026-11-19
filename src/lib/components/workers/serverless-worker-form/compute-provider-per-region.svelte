@@ -300,6 +300,30 @@
       replica[replicaOverride] === undefined &&
       !!suggestedReplicaResource[provider],
   );
+  /**
+   * A suggested resource is a guess: nothing checks that it exists until the
+   * save. Cloud Run has no suggestion, so it has no notice.
+   */
+  const suggestedNotices: Record<
+    ComputeProviderValue,
+    { title: string; body: string } | undefined
+  > = $derived.by(() => {
+    const region = replicaRegion?.providerRegion ?? '';
+    return {
+      lambda: {
+        title: translate('workers.region-suggested-function-title', { region }),
+        body: translate('workers.region-suggested-function-body', { region }),
+      },
+      agentcore: {
+        title: translate('workers.region-suggested-endpoint-title', { region }),
+        body: translate('workers.region-suggested-endpoint-body', { region }),
+      },
+      'cloud-run': undefined,
+    };
+  });
+  const suggestedNotice = $derived(
+    isSuggested ? suggestedNotices[provider] : undefined,
+  );
 
   const copyField = <K extends (typeof INHERITED_FIELDS)[number]>(
     from: Entry,
@@ -658,15 +682,12 @@
                     </div>
                   {/if}
                 </div>
-                {#if isSuggested}
-                  <p
-                    class="mt-2 text-xs text-secondary"
-                    in:fade={motion('swap')}
-                  >
-                    {translate('workers.region-arn-suggested-from-primary')}
-                    <span class="font-medium text-primary">{replicaLabel}</span
-                    >.
-                  </p>
+                {#if suggestedNotice}
+                  <div class="pt-3" in:fade={motion('swap')}>
+                    <Alert intent="info" title={suggestedNotice.title}>
+                      {suggestedNotice.body}
+                    </Alert>
+                  </div>
                 {/if}
                 {#if inheritsPrimary}
                   <hr class="my-5 border-primary" />
