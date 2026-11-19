@@ -12,6 +12,7 @@ import {
   mockCompletedWorkflow,
   mockWorkflow,
   mockWorkflowResetApi,
+  WORKFLOW_API,
   WORKFLOW_RESET_API,
   WORKFLOW_TERMINATE_API,
 } from '~/test-utilities/mocks/workflow';
@@ -281,6 +282,21 @@ test.describe('Workflow Actions for a Completed Workflow', () => {
       await mockWorkflowApis(page, mockCompletedWorkflow);
       await mockEventHistoryApi(page, mockContinuedAsNewEventHistory);
       await mockClusterApi(page, { serverVersion: '1.24.0' });
+      await page.route(WORKFLOW_API, (route) => {
+        const url = new URL(route.request().url());
+        if (url.searchParams.has('execution.runId')) {
+          return route.fallback();
+        }
+        return route.fulfill({
+          json: {
+            ...mockCompletedWorkflow,
+            workflowExecutionInfo: {
+              ...mockCompletedWorkflow.workflowExecutionInfo,
+              execution: { workflowId, runId: 'latest-run' },
+            },
+          },
+        });
+      });
       await page.goto(workflowUrl);
     });
 

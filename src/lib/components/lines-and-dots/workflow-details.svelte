@@ -4,6 +4,7 @@
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { IconFilter, IconInfo } from '$lib/io/icon';
+  import { isWorkflowOpen } from '$lib/models/workflow-status';
   import type { EventBufferView } from '$lib/services/grouped-event-buffer.svelte';
   import { isCloud } from '$lib/stores/advanced-visibility';
   import { workflowRun } from '$lib/stores/workflow-run';
@@ -15,6 +16,7 @@
   } from '$lib/utilities/format-time';
   import { getBuildIdFromVersion } from '$lib/utilities/get-deployment-build-id';
   import { getWorkerDeploymentName } from '$lib/utilities/get-worker-deployment-name';
+  import { latestRunOfThisChain } from '$lib/utilities/get-workflow-relationships';
   import {
     routeForSchedule,
     routeForWorkerDeployment,
@@ -38,10 +40,11 @@
   interface Props {
     workflow: WorkflowExecution;
     history: EventBufferView;
+    firstRunId?: string;
     next?: string;
   }
 
-  let { workflow, history, next }: Props = $props();
+  let { workflow, history, firstRunId, next }: Props = $props();
 
   const parent = $derived(workflow?.parent);
   const scheduleId = $derived(
@@ -88,8 +91,17 @@
 
   const { sdk, version: sdkVersion } = $derived(history.sdkInfo);
 
+  const latestRun = $derived(
+    latestRunOfThisChain({
+      runId: workflow.runId,
+      firstRunId,
+      nextRunId: next,
+      isOpen: isWorkflowOpen(workflow),
+      currentRun: $workflowRun.currentRun,
+    }),
+  );
   const latestRunId = $derived(
-    next ? $workflowRun.currentRun?.runId : undefined,
+    latestRun.kind === 'run' ? latestRun.runId : undefined,
   );
 </script>
 

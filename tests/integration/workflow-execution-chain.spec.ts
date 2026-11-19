@@ -311,6 +311,29 @@ test.describe('Workflow execution chain page', () => {
     ).toBeVisible();
   });
 
+  test('offers Download for the selected Run but no Auto refresh', async ({
+    page,
+  }) => {
+    await mockChain(page, { runs: closedChain(), current: () => 'run-b' });
+
+    await page.goto(chainUrl('run-a'));
+
+    await expect(page.getByTestId('download')).toBeVisible();
+    await expect(page.getByTestId('pause')).toHaveCount(0);
+    await expect(
+      page.locator('button[aria-controls="event-type-filter"]'),
+    ).toBeVisible();
+
+    await page.getByTestId('download').click();
+    const download = page.waitForEvent('download');
+    await page
+      .locator('#download-history')
+      .getByRole('button', { name: 'Download' })
+      .click();
+
+    expect((await download).suggestedFilename()).toContain('run-b');
+  });
+
   test('shows the chain error with a filtered back link on a 404', async ({
     page,
   }) => {

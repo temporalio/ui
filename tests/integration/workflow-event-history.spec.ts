@@ -1,8 +1,10 @@
 import { expect, test } from '@playwright/test';
 
 import {
+  makeActivityGroup,
   makeActivityScheduled,
   makeActivityStarted,
+  makeActivityTimedOut,
   makeWorkflowStarted,
 } from '$src/lib/services/test-helpers/synthetic-events';
 import {
@@ -241,5 +243,51 @@ test.describe('Workflow History view with pending activities and filters', () =>
         .getByTestId('Pending and Failed')
         .getByRole('checkbox'),
     ).toBeChecked();
+  });
+});
+
+test.describe('Pending and failed filter with a timed-out activity', () => {
+  const runUrl = workflowUrl.replace(/\/history$/, '');
+
+  test.beforeEach(async ({ page }) => {
+    await mockWorkflowApis(page);
+    await mockEventHistoryApi(page, {
+      history: {
+        events: [
+          makeWorkflowStarted(1),
+          ...makeActivityGroup(2, 'DoneActivity'),
+          makeActivityScheduled(5, 'SlowActivity'),
+          makeActivityTimedOut(6, 5),
+        ],
+      },
+      nextPageToken: null,
+    });
+  });
+
+  test('keeps the timed-out activity on the timeline', async ({ page }) => {
+    await page.goto(`${runUrl}/timeline?status=pending`);
+    await page
+      .getByRole('img', { name: /^Workflow .*: Running$/ })
+      .scrollIntoViewIfNeeded();
+    const timeline = page.locator('#event-history-timeline-graph');
+
+    await expect(
+      timeline.getByRole('button', { name: /SlowActivity/ }),
+    ).toBeVisible();
+    await expect(
+      timeline.getByRole('button', { name: /DoneActivity/ }),
+    ).toHaveCount(0);
+  });
+
+  test('keeps the timed-out activity in the history view', async ({ page }) => {
+    await page.goto(`${runUrl}/history?status=pending`);
+    const table = page.getByTestId('event-summary-table');
+
+    await expect(
+      table.getByRole('row', { name: /Activity Task Timed Out/ }),
+    ).toBeVisible();
+    await expect(
+      table.getByRole('row', { name: /Activity Task Completed/ }),
+    ).toHaveCount(0);
   });
 });

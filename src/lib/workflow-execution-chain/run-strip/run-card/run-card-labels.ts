@@ -1,71 +1,14 @@
+import { nonZeroCountDisplays } from '$lib/components/run-counts/run-count-displays';
 import type { I18nKey } from '$lib/i18n';
 import { translate } from '$lib/i18n/translate';
-import {
-  type IconComponent,
-  IconTemporalActivity,
-  IconTemporalChildWorkflow,
-  IconTemporalNexus,
-  IconTemporalSignal,
-  IconTemporalTimer,
-  IconTemporalUpdate,
-} from '$lib/io/icon';
-import type { EventTypeCategory } from '$lib/types/events';
+import type { RunCounts } from '$lib/models/event-history/run-counts';
 import type { WorkflowStatus } from '$lib/types/workflows';
 
 import type { Transition } from '../transitions';
-import type { RunCounts } from './run-counts';
 
 export type RunCardLoadState = 'loading' | 'partial' | 'complete' | 'error';
 
 export type RunCardMode = 'live' | 'latest';
-
-type CategoryCountKey = Exclude<keyof RunCounts, 'failed' | 'retried'>;
-
-export type CountDisplay = {
-  key: CategoryCountKey;
-  Icon: IconComponent;
-  label: I18nKey;
-  category: EventTypeCategory;
-};
-
-const COUNT_DISPLAYS: readonly CountDisplay[] = [
-  {
-    key: 'activities',
-    Icon: IconTemporalActivity,
-    label: 'workflows.run-count-activities',
-    category: 'activity',
-  },
-  {
-    key: 'childWorkflows',
-    Icon: IconTemporalChildWorkflow,
-    label: 'workflows.run-count-child-workflows',
-    category: 'child-workflow',
-  },
-  {
-    key: 'timers',
-    Icon: IconTemporalTimer,
-    label: 'workflows.run-count-timers',
-    category: 'timer',
-  },
-  {
-    key: 'signals',
-    Icon: IconTemporalSignal,
-    label: 'workflows.run-count-signals',
-    category: 'signal',
-  },
-  {
-    key: 'nexusOperations',
-    Icon: IconTemporalNexus,
-    label: 'workflows.run-count-nexus-operations',
-    category: 'nexus',
-  },
-  {
-    key: 'updates',
-    Icon: IconTemporalUpdate,
-    label: 'workflows.run-count-updates',
-    category: 'update',
-  },
-];
 
 const STATUS_LABELS: Record<NonNullable<WorkflowStatus>, I18nKey> = {
   Running: 'workflows.running',
@@ -94,9 +37,6 @@ const LOAD_STATE_DESCRIPTIONS: Partial<Record<RunCardLoadState, I18nKey>> = {
   loading: 'workflows.run-card-loading-events',
   error: 'workflows.run-card-load-failed',
 };
-
-export const nonZeroCountDisplays = (counts: RunCounts): CountDisplay[] =>
-  COUNT_DISPLAYS.filter(({ key }) => counts[key] > 0);
 
 export const partialSuffix = (loadState: RunCardLoadState): string =>
   loadState === 'partial' ? '+' : '';

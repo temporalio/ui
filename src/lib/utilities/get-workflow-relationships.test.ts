@@ -9,6 +9,7 @@ import {
   belongsToCurrentChain,
   getWorkflowNexusLinksFromHistory,
   getWorkflowRelationships,
+  latestRunOfThisChain,
 } from './get-workflow-relationships';
 
 import childEvents from '$fixtures/events.children.json';
@@ -415,5 +416,63 @@ describe('belongsToCurrentChain', () => {
     expect(belongsToCurrentChain({ firstRunId: undefined, currentRun })).toBe(
       true,
     );
+  });
+});
+
+describe('latestRunOfThisChain', () => {
+  const currentRun = {
+    runId: 'run-c',
+    firstRunId: 'run-a',
+    status: 'Running' as const,
+  };
+  const midChain = {
+    runId: 'run-b',
+    firstRunId: 'run-a',
+    nextRunId: 'run-c',
+    isOpen: false,
+    currentRun,
+  };
+
+  it('links to the current Run from earlier in the chain', () => {
+    expect(latestRunOfThisChain(midChain)).toEqual({
+      kind: 'run',
+      runId: 'run-c',
+    });
+  });
+
+  it('is this Run while it is open', () => {
+    expect(
+      latestRunOfThisChain({
+        ...midChain,
+        nextRunId: undefined,
+        isOpen: true,
+        currentRun: null,
+      }),
+    ).toEqual({ kind: 'thisRun' });
+  });
+
+  it('is this Run when it closed without a successor', () => {
+    expect(
+      latestRunOfThisChain({
+        ...midChain,
+        nextRunId: undefined,
+        currentRun: { ...currentRun, firstRunId: 'run-x' },
+      }),
+    ).toEqual({ kind: 'thisRun' });
+  });
+
+  it('is unknown until the current Run is described', () => {
+    expect(latestRunOfThisChain({ ...midChain, currentRun: null })).toEqual({
+      kind: 'unknown',
+    });
+  });
+
+  it('reports a newer chain when the Workflow ID was reused', () => {
+    expect(
+      latestRunOfThisChain({
+        ...midChain,
+        currentRun: { ...currentRun, firstRunId: 'run-x' },
+      }),
+    ).toEqual({ kind: 'newerChain' });
   });
 });

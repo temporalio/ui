@@ -1,9 +1,11 @@
 <script lang="ts">
   import { twMerge } from 'tailwind-merge';
 
+  import RunCounts from '$lib/components/run-counts/run-counts.svelte';
   import Skeleton from '$lib/holocene/skeleton/index.svelte';
   import { translate } from '$lib/i18n/translate';
   import { IconWarning } from '$lib/io/icon';
+  import { countRunGroups } from '$lib/models/event-history/run-counts';
   import { isWorkflowOpen } from '$lib/models/workflow-status';
   import type { WorkflowHistoryController } from '$lib/services/workflow-history-controller.svelte';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
@@ -20,11 +22,9 @@
     type RunCardMode,
     runCardName,
   } from './run-card-labels';
-  import { countRunGroups } from './run-counts';
 
   import RunCardActions from './run-card-actions.svelte';
   import RunCardBar from './run-card-bar.svelte';
-  import RunCardCounts from './run-card-counts.svelte';
   import RunCardHead from './run-card-head.svelte';
 
   interface Props {
@@ -168,7 +168,7 @@
       </span>
     {:else}
       <RunCardBar segments={barSegments} {loadedFraction} />
-      <RunCardCounts {counts} suffix={partialSuffix(loadState)} />
+      <RunCounts {counts} suffix={partialSuffix(loadState)} />
     {/if}
   </button>
   <span id={descriptionId} class="sr-only">{accessibleDescription}</span>

@@ -94,6 +94,7 @@ describe('countRunGroups', () => {
       signals: 1,
       nexusOperations: 1,
       updates: 1,
+      succeeded: 5,
       failed: 2,
       retried: 2,
     });
@@ -123,6 +124,7 @@ describe('countRunGroups', () => {
       signals: 0,
       nexusOperations: 0,
       updates: 0,
+      succeeded: 0,
       failed: 0,
       retried: 0,
     });
