@@ -1,11 +1,7 @@
 import type { HourFormat } from '$lib/utilities/format-date';
 import { BASE_TIME_FORMAT_OPTIONS, getTimezone } from '$lib/utilities/timezone';
 
-export const MIN_CARD_WIDTH = 148;
-export const CAP_WIDTH = 36;
-export const CARD_GAP = 6;
-export const INITIAL_VISIBLE_RUNS = 4;
-export const GAP_WIDTH = 120;
+import type { RunSegment } from './card-layout';
 
 const MAJOR_TICK_SPACING = 92;
 const MINOR_TICK_SPACING = 12;
@@ -30,14 +26,6 @@ export const CLOCK_STEPS = [
   ...stepsOf(DAY_MS, [1, 2, 7, 30, 90, 365]),
 ];
 
-export type RulerSegment = {
-  id: string;
-  x: number;
-  width: number;
-  startMs: number;
-  endMs: number;
-};
-
 export type RulerTick = {
   segmentId: string;
   time: number;
@@ -47,69 +35,28 @@ export type RulerTick = {
   labelled: boolean;
 };
 
-const sumOf = (values: readonly number[]): number =>
-  values.reduce((total, value) => total + value, 0);
-
-export const allocateCardWidths = (
-  durations: readonly number[],
-  viewportWidth: number,
-): number[] => {
-  if (durations.length === 0) {
-    return [];
-  }
-  const newestDurations = durations.slice(-INITIAL_VISIBLE_RUNS);
-  const fittedWidth = viewportWidth - CARD_GAP * (newestDurations.length - 1);
-  const spareWidth = Math.max(
-    0,
-    fittedWidth - newestDurations.length * MIN_CARD_WIDTH,
-  );
-  const newestTotalDuration = sumOf(newestDurations);
-  const maxWidth = Math.max(MIN_CARD_WIDTH, fittedWidth);
-
-  return durations.map((duration) => {
-    const extraWidth =
-      newestTotalDuration > 0
-        ? (spareWidth * Math.max(0, duration)) / newestTotalDuration
-        : spareWidth / newestDurations.length;
-    return Math.min(maxWidth, MIN_CARD_WIDTH + extraWidth);
-  });
-};
-
-export const layoutSegments = (
-  widths: readonly number[],
-  spans: readonly { id: string; startMs: number; endMs: number }[],
-  offset = 0,
-  gap?: { beforeIndex: number; width: number },
-): RulerSegment[] => {
-  let x = offset;
-  return widths.map((width, index) => {
-    if (index === gap?.beforeIndex) {
-      x += gap.width + CARD_GAP;
-    }
-    const { id, startMs, endMs } = spans[index];
-    const segment = {
-      id,
-      x,
-      width,
-      startMs,
-      endMs: Math.max(endMs, startMs + 1),
-    };
-    x += width + CARD_GAP;
-    return segment;
-  });
-};
-
 export const pickClockStep = (msPerPx: number): number =>
   CLOCK_STEPS.find((step) => step / msPerPx >= MAJOR_TICK_SPACING) ??
   CLOCK_STEPS[CLOCK_STEPS.length - 1];
 
 export const buildRulerTicks = (
-  segments: readonly RulerSegment[],
+  segments: readonly RunSegment[],
 ): RulerTick[] => {
   const ticks: RulerTick[] = [];
   for (const segment of segments) {
     const spanMs = segment.endMs - segment.startMs;
     if (segment.width <= 0 || spanMs <= 0) {
+      continue;
+    }
+    if (segment.live) {
+      ticks.push({
+        segmentId: segment.id,
+        time: segment.startMs,
+        x: segment.x,
+        kind: 'run',
+        step: CLOCK_STEPS[0],
+        labelled: true,
+      });
       continue;
     }
     const msPerPx = spanMs / segment.width;
