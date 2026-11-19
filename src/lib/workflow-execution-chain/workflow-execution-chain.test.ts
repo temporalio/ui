@@ -410,7 +410,10 @@ describe('WorkflowExecutionChain', () => {
       server.errors.set('current', networkError(404));
       const chain = track(await loadChain(server));
 
-      expect(chain.error).toMatchObject({ statusCode: 404 });
+      expect(chain.resolution).toMatchObject({
+        kind: 'failed',
+        error: { statusCode: 404 },
+      });
       expect(chain.status).toBe('loading');
       expect(chain.runs).toEqual([]);
       expect(
@@ -423,7 +426,10 @@ describe('WorkflowExecutionChain', () => {
       server.errors.set('current', networkError(503));
       const chain = track(await loadChain(server));
 
-      expect(chain.error).toMatchObject({ statusCode: 503 });
+      expect(chain.resolution).toMatchObject({
+        kind: 'failed',
+        error: { statusCode: 503 },
+      });
       expect(chain.runs).toEqual([]);
       expect(
         server.describe.mock.calls.filter(([{ runId }]) => !runId),
@@ -475,9 +481,9 @@ describe('WorkflowExecutionChain', () => {
       const chain = track(await loadChain(server, 'old-1'));
 
       expect(chain.status).toBe('mismatch');
-      expect(chain.mismatch).toEqual({
-        reason: 'workflowIdReused',
-        currentFirstRunId: 'new-1',
+      expect(chain.resolution).toEqual({
+        kind: 'mismatch',
+        mismatch: { reason: 'workflowIdReused', currentFirstRunId: 'new-1' },
       });
       expect(chain.runs).toEqual([]);
       expect(server.createController).not.toHaveBeenCalled();
@@ -491,7 +497,9 @@ describe('WorkflowExecutionChain', () => {
       const chain = track(await loadChain(server, 'old-1'));
 
       expect(chain.status).toBe('mismatch');
-      expect(chain.mismatch?.reason).toBe('workflowIdReused');
+      expect(chain.resolution).toMatchObject({
+        mismatch: { reason: 'workflowIdReused' },
+      });
     });
 
     it('(b) redirects when a mid-chain Run ID was given', async () => {
@@ -501,7 +509,7 @@ describe('WorkflowExecutionChain', () => {
         redirectFirstRunId: 'old-1',
       });
       expect(chain.status).toBe('loading');
-      expect(chain.mismatch).toBeNull();
+      expect(chain.resolution).toEqual({ kind: 'resolving' });
     });
 
     it('(b) redirects to the current chain for one of its mid-chain Runs', async () => {
@@ -516,9 +524,9 @@ describe('WorkflowExecutionChain', () => {
       const chain = track(await loadChain(server, 'gone'));
 
       expect(chain.status).toBe('mismatch');
-      expect(chain.mismatch).toEqual({
-        reason: 'routeChainNotFound',
-        currentFirstRunId: 'new-1',
+      expect(chain.resolution).toEqual({
+        kind: 'mismatch',
+        mismatch: { reason: 'routeChainNotFound', currentFirstRunId: 'new-1' },
       });
       expect(chain.firstRun).toEqual({ status: 'notFound' });
     });
@@ -528,7 +536,9 @@ describe('WorkflowExecutionChain', () => {
       const chain = track(await loadChain(server, 'old-1'));
 
       expect(chain.status).toBe('mismatch');
-      expect(chain.mismatch?.reason).toBe('routeChainNotFound');
+      expect(chain.resolution).toMatchObject({
+        mismatch: { reason: 'routeChainNotFound' },
+      });
       expect(chain.firstRun.status).toBe('failed');
     });
   });
@@ -1314,7 +1324,7 @@ describe('WorkflowExecutionChain', () => {
       expect(signal?.aborted).toBe(true);
       expect(chain.runs).toEqual([]);
       expect(chain.latestRunId).toBeNull();
-      expect(chain.error).toBeNull();
+      expect(chain.resolution).toEqual({ kind: 'resolving' });
       expect(chain.firstRun).toEqual({ status: 'loading' });
       expect(server.createController).not.toHaveBeenCalled();
     });

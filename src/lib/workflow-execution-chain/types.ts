@@ -20,6 +20,8 @@ export type ChainRun = {
 
 export type ChainStatus = 'loading' | 'ready' | 'mismatch' | 'closed';
 
+export type ChainLifecycle = 'following' | 'closed';
+
 export type ChainBoundary = 'chainStart' | 'retention' | null;
 
 export type ChainError = NetworkError | Error;
@@ -34,6 +36,12 @@ export type ChainMismatch = {
   reason: 'workflowIdReused' | 'routeChainNotFound';
   currentFirstRunId: string;
 };
+
+export type ChainResolution =
+  | { kind: 'resolving' }
+  | { kind: 'failed'; error: ChainError }
+  | { kind: 'mismatch'; mismatch: ChainMismatch }
+  | { kind: 'resolved' };
 
 export type ChainLoadResult = {
   redirectFirstRunId: string | null;

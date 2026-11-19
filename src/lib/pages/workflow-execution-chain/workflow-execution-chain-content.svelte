@@ -117,14 +117,14 @@
   );
 </script>
 
-{#if chain.error}
-  <WorkflowChainError {namespace} {workflowId} error={chain.error} />
-{:else if chain.mismatch}
+{#if chain.resolution.kind === 'failed'}
+  <WorkflowChainError {namespace} {workflowId} error={chain.resolution.error} />
+{:else if chain.resolution.kind === 'mismatch'}
   <ChainMismatchWarning
     {namespace}
     {workflowId}
     {firstRunId}
-    mismatch={chain.mismatch}
+    mismatch={chain.resolution.mismatch}
   />
 {:else}
   <div class="flex flex-col gap-6">
