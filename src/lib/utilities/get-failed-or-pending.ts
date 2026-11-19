@@ -34,7 +34,7 @@ type FilterableGroup = {
   lastEvent: WorkflowEvent;
 };
 
-export const isFailedGroup = (group: FilterableGroup): boolean =>
+const isFailedGroup = (group: FilterableGroup): boolean =>
   group.finalClassification === 'Failed' ||
   group.finalClassification === 'TimedOut' ||
   !!isFailedLocalActivity(group.initialEvent);

@@ -9,7 +9,7 @@ import type { ChainContext } from './chain-context.svelte';
 
 export const REFRESH_INTERVAL_MS = 10_000;
 
-export type LatestRunFollowerCallbacks = {
+type LatestRunFollowerCallbacks = {
   handedOff: (runId: string) => void;
   workflowUpdated: (runId: string, workflow: WorkflowExecution) => void;
   closeEventOf: (runId: string) => HistoryEvent | null | undefined;

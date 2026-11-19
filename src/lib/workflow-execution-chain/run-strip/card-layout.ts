@@ -1,7 +1,7 @@
 export const MIN_CARD_WIDTH = 148;
 export const CAP_WIDTH = 36;
 export const CARD_GAP = 6;
-export const INITIAL_VISIBLE_RUNS = 4;
+const INITIAL_VISIBLE_RUNS = 4;
 export const TRAILING_PADDING = 4;
 
 export type RunSegment = {

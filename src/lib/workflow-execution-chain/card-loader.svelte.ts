@@ -10,7 +10,7 @@ import type { CardLoad, ChainError, RunLookup } from './types';
 import type { ChainContext } from './chain-context.svelte';
 import type { RunCard, RunRecord } from './run-record.svelte';
 
-export const BACKGROUND_CARD_LOAD_CONCURRENCY = 1;
+const BACKGROUND_CARD_LOAD_CONCURRENCY = 1;
 
 /**
  * Loads each Run card's history through its own controller. The foreground

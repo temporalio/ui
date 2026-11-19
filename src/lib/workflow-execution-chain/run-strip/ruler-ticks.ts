@@ -19,14 +19,14 @@ export const DAY_MS = 24 * HOUR_MS;
 const stepsOf = (unitMs: number, counts: number[]): number[] =>
   counts.map((count) => count * unitMs);
 
-export const CLOCK_STEPS = [
+const CLOCK_STEPS = [
   ...stepsOf(SECOND_MS, [1, 2, 5, 10, 15, 30]),
   ...stepsOf(MINUTE_MS, [1, 2, 5, 10, 15, 30]),
   ...stepsOf(HOUR_MS, [1, 2, 3, 6, 12]),
   ...stepsOf(DAY_MS, [1, 2, 7, 30, 90, 365]),
 ];
 
-export type RulerTick = {
+type RulerTick = {
   segmentId: string;
   time: number;
   x: number;

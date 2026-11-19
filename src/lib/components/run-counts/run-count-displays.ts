@@ -14,7 +14,7 @@ import type {
 } from '$lib/models/event-history/run-counts';
 import type { EventTypeCategory } from '$lib/types/events';
 
-export type CountDisplay = {
+type CountDisplay = {
   key: CategoryCountKey;
   Icon: IconComponent;
   label: I18nKey;

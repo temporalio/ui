@@ -14,7 +14,7 @@ import type {
 import { DiscoveryFailures } from './discovery-failures.svelte';
 import { RunRecord } from './run-record.svelte';
 
-export type RunRecords = {
+type RunRecords = {
   get: (runId: string) => RunRecord | undefined;
   recordFor: (runId: string) => RunRecord;
   values: () => IterableIterator<RunRecord>;

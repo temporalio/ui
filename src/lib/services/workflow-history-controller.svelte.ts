@@ -49,7 +49,7 @@ export const [getWorkflowHistoryController, setWorkflowHistoryController] =
  * - `failed`: a fetch or poll failed. `retry()` resumes from the saved poll
  *   cursor and keeps the events loaded so far.
  */
-export type HistoryPhase =
+type HistoryPhase =
   | { kind: 'idle' }
   | { kind: 'loadingClosedRun'; pauseHandle: PauseHandle | null }
   | { kind: 'loadingOpenRun'; tailStartId: number }

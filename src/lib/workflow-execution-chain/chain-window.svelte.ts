@@ -4,7 +4,7 @@ import type { ChainBoundary, ChainRun } from './types';
 
 import { type ChainContext, readStartedEvent } from './chain-context.svelte';
 
-export const WALK_SIZE = 10;
+const WALK_SIZE = 10;
 
 /**
  * The window: the chain's Runs that are loaded and shown in the strip, oldest

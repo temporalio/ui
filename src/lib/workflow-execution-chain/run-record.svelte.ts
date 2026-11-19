@@ -11,7 +11,7 @@ export class RunCard {
 }
 
 /** What `LatestRunFollower` remembers about a Run it followed. */
-export type RunFollow = { closeHandled: boolean };
+type RunFollow = { closeHandled: boolean };
 
 /**
  * Everything the chain knows about one Run. `run` and `pendingFetch` are

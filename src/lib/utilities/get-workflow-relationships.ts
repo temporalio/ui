@@ -62,7 +62,7 @@ export const belongsToCurrentChain = ({
   return currentRun.firstRunId === firstRunId;
 };
 
-export type LatestRunOfThisChain =
+type LatestRunOfThisChain =
   | { kind: 'thisRun' }
   | { kind: 'unknown' }
   | { kind: 'newerChain' }

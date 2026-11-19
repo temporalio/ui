@@ -16,7 +16,7 @@ export type ScrollMetrics = {
   scrollWidth: number;
 };
 
-export type ScrollIndicators = {
+type ScrollIndicators = {
   scrolledFromStart: boolean;
   scrolledFromEnd: boolean;
   selectedOutOfView: boolean;

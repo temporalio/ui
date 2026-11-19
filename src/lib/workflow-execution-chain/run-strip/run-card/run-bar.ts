@@ -5,7 +5,7 @@ import {
 } from '$lib/services/grouped-event-buffer';
 import type { EventTypeCategory } from '$lib/types/events';
 
-export const SLOT_WIDTH = 2;
+const SLOT_WIDTH = 2;
 export const PENDING_OPACITY = 0.4;
 
 export type RunBarSegment = {
