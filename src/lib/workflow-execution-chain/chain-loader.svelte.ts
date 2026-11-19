@@ -100,10 +100,22 @@ export class ChainLoader {
     if (this._context.disposed) {
       return null;
     }
-    const routeRunFirstRunId =
-      firstRun.status === 'found'
-        ? await this._readFirstRunId(firstRun.workflow)
-        : undefined;
+    if (firstRun.status === 'failed') {
+      this.resolution = { kind: 'failed', error: firstRun.error };
+      return null;
+    }
+    let routeRunFirstRunId: string | undefined;
+    try {
+      routeRunFirstRunId =
+        firstRun.status === 'found'
+          ? await this._readFirstRunId(firstRun.workflow)
+          : undefined;
+    } catch (error) {
+      if (!this._context.disposed) {
+        this.resolution = { kind: 'failed', error: toError(error) };
+      }
+      return null;
+    }
     if (this._context.disposed) {
       return null;
     }
@@ -134,8 +146,11 @@ export class ChainLoader {
         workflow.runId,
       );
       return readStartedEvent(startedEvent).firstExecutionRunId;
-    } catch {
-      return undefined;
+    } catch (error) {
+      if (isNotFound(error)) {
+        return undefined;
+      }
+      throw error;
     }
   }
 }

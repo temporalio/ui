@@ -545,15 +545,42 @@ describe('WorkflowExecutionChain', () => {
       expect(chain.firstRun).toEqual({ status: 'notFound' });
     });
 
-    it('(c) shows neutral copy when the route Run Describe fails', async () => {
+    it('sets the page error when the route Run Describe fails with a non-404', async () => {
       server.errors.set('describe:old-1', networkError(500));
       const chain = track(await loadChain(server, 'old-1'));
 
-      expect(chain.status).toBe('mismatch');
+      expect(chain.resolution).toMatchObject({
+        kind: 'failed',
+        error: { statusCode: 500 },
+      });
+      expect(chain.firstRun.status).toBe('failed');
+    });
+
+    it('sets the page error when the route Run Started event fails with a non-404 on older servers', async () => {
+      server.runs.set('old-1', {
+        ...server.runs.get('old-1')!,
+        workflow: makeWorkflow('old-1'),
+      });
+      server.errors.set('started:old-1', networkError(500));
+      const chain = track(await loadChain(server, 'old-1'));
+
+      expect(chain.resolution).toMatchObject({
+        kind: 'failed',
+        error: { statusCode: 500 },
+      });
+    });
+
+    it('(c) shows neutral copy when the route Run Started event is not found on older servers', async () => {
+      server.runs.set('old-1', {
+        ...server.runs.get('old-1')!,
+        workflow: makeWorkflow('old-1'),
+      });
+      server.errors.set('started:old-1', networkError(404));
+      const chain = track(await loadChain(server, 'old-1'));
+
       expect(chain.resolution).toMatchObject({
         mismatch: { reason: 'routeChainNotFound' },
       });
-      expect(chain.firstRun.status).toBe('failed');
     });
   });
 
