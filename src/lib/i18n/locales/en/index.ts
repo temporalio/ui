@@ -9,6 +9,8 @@ import * as Events from './events';
 import * as Namespaces from './namespaces';
 import * as Nexus from './nexus';
 import * as Palette from './palette';
+import * as PalettePreferences from './palette-preferences';
+import * as PaletteWorkflow from './palette-workflow';
 import * as Schedules from './schedules';
 import * as SearchAttributes from './search-attributes';
 import * as StandaloneActivities from './standalone-activities';
@@ -34,6 +36,8 @@ export const English = {
   [Namespaces.Namespace]: Namespaces.Strings,
   [Nexus.Namespace]: Nexus.Strings,
   [Palette.Namespace]: Palette.Strings,
+  [PalettePreferences.Namespace]: PalettePreferences.Strings,
+  [PaletteWorkflow.Namespace]: PaletteWorkflow.Strings,
   [SearchAttributes.Namespace]: SearchAttributes.Strings,
   [StandaloneActivities.Namespace]: StandaloneActivities.Strings,
   [StandaloneNexusOperations.Namespace]: StandaloneNexusOperations.Strings,
