@@ -11,7 +11,7 @@ const runList = (title: string) => ({
 });
 
 const input: RuntimeJsonDocument = {
-  defaultValue: [14, 2, [4], [7]],
+  defaultValue: [14, 1, [4], [7]],
   schema: {
     type: 'array',
     prefixItems: [
@@ -22,7 +22,7 @@ const input: RuntimeJsonDocument = {
         maximum: 25,
       },
       {
-        title: 'Timer per run in seconds',
+        title: 'Base timer per run in seconds',
         type: 'integer',
         minimum: 1,
         maximum: 30,
@@ -52,6 +52,7 @@ export const catalogExample: CatalogExampleDefinition = {
   expectedEvidence: [
     'Fifteen Runs with the same Workflow ID using the defaults: 14 linked by continue-as-new, plus one retry of Run 4.',
     'Each Run has a retried activity, a failed activity, a timer and a child workflow.',
+    'Run lengths vary widely: each Run’s timer is the base timer times 1, 12, 3, 30, 1, 6, 20, repeating, so with the defaults Run 4 waits 30 seconds and Run 5 waits 1.',
     'Run 7 schedules about 300 extra activities.',
     'Sending the `proceed` signal ends the current Run’s signal wait early and adds a signal to it.',
   ],
