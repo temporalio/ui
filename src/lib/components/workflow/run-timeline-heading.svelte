@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from '$app/state';
 
+  import EventHistoryLegend from '$lib/components/lines-and-dots/event-history-legend.svelte';
   import RunCounts from '$lib/components/run-counts/run-counts.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -135,9 +136,12 @@
 
 <div class="flex flex-col gap-1" data-testid="run-timeline-heading">
   <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-    <h2 class="break-all text-2xl">
-      {translate('workflows.run-heading', { runId: workflow.runId })}
-    </h2>
+    <div class="flex items-center gap-2">
+      <h2 class="break-all text-2xl">
+        {translate('workflows.run-heading', { runId: workflow.runId })}
+      </h2>
+      <EventHistoryLegend />
+    </div>
     <div class="flex flex-wrap items-center gap-2">
       <RunNavigation links={navigationLinks} />
       {#if isMultiRunChain && firstRunId}

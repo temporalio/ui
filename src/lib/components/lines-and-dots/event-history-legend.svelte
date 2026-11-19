@@ -134,5 +134,11 @@
       </dl>
     </div>
   {/snippet}
-  <IconInfo class="text-secondary" />
+  <button
+    type="button"
+    class="flex text-secondary"
+    aria-label={translate('events.history-legend')}
+  >
+    <IconInfo />
+  </button>
 </Tooltip>

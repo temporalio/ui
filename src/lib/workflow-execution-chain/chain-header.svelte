@@ -136,9 +136,20 @@
 
   <DetailList
     aria-label={translate('workflows.chain-of-executions')}
-    rowCount={4}
+    rowCount={5}
     class="grid-flow-row"
   >
+    <DetailListLabel>{translate('workflows.chain-status')}</DetailListLabel>
+    {#if chain.status === 'loading'}
+      {@render skeleton()}
+    {:else}
+      <DetailListTextValue
+        text={chain.status === 'closed'
+          ? translate('workflows.chain-closed-status')
+          : translate('workflows.chain-open')}
+      />
+    {/if}
+
     <DetailListLabel>{translate('workflows.chain-start')}</DetailListLabel>
     {#if firstRun.status === 'loading'}
       {@render skeleton()}

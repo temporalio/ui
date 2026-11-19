@@ -311,6 +311,29 @@ test.describe('Workflow execution chain page', () => {
     ).toBeVisible();
   });
 
+  test('shows the chain status, switching to Closed when the chain closes', async ({
+    page,
+  }) => {
+    const close = deferred();
+    const run: MockRun = {
+      runId: 'run-a',
+      firstRunId: 'run-a',
+      activity: 'WorkA',
+      startTime: '2024-01-01T00:00:00.000Z',
+      open: true,
+      release: close.promise,
+    };
+    await mockChain(page, { runs: [run], current: () => 'run-a' });
+
+    await page.goto(chainUrl('run-a'));
+
+    await expect(detailValue(page, 'Chain Status')).toHaveText('Open');
+
+    close.resolve();
+
+    await expect(detailValue(page, 'Chain Status')).toHaveText('Closed');
+  });
+
   test('offers Download for the selected Run but no Auto refresh', async ({
     page,
   }) => {

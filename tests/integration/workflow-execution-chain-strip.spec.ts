@@ -4,6 +4,7 @@ import {
   chainUrl,
   closedChain,
   deferred,
+  detailValue,
   linearChain,
   mockChain,
   type MockRun,
@@ -39,6 +40,28 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.describe('Workflow execution chain Run strip', () => {
+  test('opens the legend from beside the Run Details heading', async ({
+    page,
+  }) => {
+    await mockChain(page, { runs: closedChain(), current: () => 'run-b' });
+    await page.goto(chainUrl('run-a'));
+
+    const section = page.getByTestId('run-strip');
+    await expect(
+      section.getByRole('heading', {
+        level: 2,
+        name: /^Run Details\s*\(\d+ latest runs? loaded\)$/,
+      }),
+    ).toBeVisible();
+    await section.getByRole('button', { name: 'Event history legend' }).focus();
+    await expect(
+      page.getByRole('tooltip').filter({ hasText: 'Event Types' }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: 'Event history legend' }),
+    ).toHaveCount(1);
+  });
+
   test('pins a card without touching the URL or history', async ({ page }) => {
     await mockChain(page, { runs: closedChain(), current: () => 'run-b' });
     await page.goto(chainUrl('run-a', '?sort=ascending'));
@@ -164,7 +187,8 @@ test.describe('Workflow execution chain Run strip', () => {
     await mockChain(page, { runs: closedChain(), current: () => 'run-b' });
     await page.goto(chainUrl('run-a'));
 
-    await expect(page.getByTestId('run-strip-status')).toContainText(
+    await expect(detailValue(page, 'Chain Status')).toHaveText('Closed');
+    await expect(page.getByTestId('run-strip-status')).not.toContainText(
       'Chain closed',
     );
     const jump = page.getByRole('button', { name: 'View latest run' });

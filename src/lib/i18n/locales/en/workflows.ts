@@ -199,9 +199,10 @@ export const Strings = {
   'run-details': 'Run Details',
   'runs-loaded_one': '({{count, number}} latest run loaded)',
   'runs-loaded_other': '({{count, number}} latest runs loaded)',
-  'run-details-info':
-    "Newest runs load first. Event counts fill in as each run's history loads; a + means more events are still loading.",
   'chain-closed': 'Chain closed',
+  'chain-status': 'Chain Status',
+  'chain-open': 'Open',
+  'chain-closed-status': 'Closed',
   'discovery-error': "Couldn't check for newer runs",
   'scroll-to-selected': 'Scroll to selected',
   'view-previous-run': 'View previous run',
