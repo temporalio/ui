@@ -9,6 +9,15 @@
 
   import type { IconComponent } from '$lib/io/icon';
 
+  export const buttonTextSizes = {
+    xs: 'text-xs',
+    sm: 'text-sm',
+    md: 'text-base',
+    lg: 'text-lg',
+  } as const;
+
+  export type ButtonSize = keyof typeof buttonTextSizes;
+
   const buttonStyles = cva(
     [
       'relative',
@@ -51,11 +60,11 @@
             'border-transparent bg-transparent text-primary focus-visible:border-transparent',
         },
         size: {
-          xs: 'h-8 text-xs px-2 py-1',
-          sm: 'h-9 text-sm px-4 py-1.5',
-          md: 'h-10 text-base px-4 py-2',
-          lg: 'h-11 text-lg px-5 py-2.5',
-        },
+          xs: ['h-8 px-2 py-1', buttonTextSizes.xs],
+          sm: ['h-9 px-4 py-1.5', buttonTextSizes.sm],
+          md: ['h-10 px-4 py-2', buttonTextSizes.md],
+          lg: ['h-11 px-5 py-2.5', buttonTextSizes.lg],
+        } satisfies Record<ButtonSize, string[]>,
       },
       defaultVariants: {
         variant: 'primary',
@@ -68,7 +77,7 @@
 
   interface BaseProps {
     variant?: ButtonStyles['variant'];
-    size?: ButtonStyles['size'];
+    size?: ButtonSize;
     disabled?: boolean;
     loading?: boolean;
     active?: boolean;

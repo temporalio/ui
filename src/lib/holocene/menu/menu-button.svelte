@@ -2,7 +2,7 @@
   import { getContext, type Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
-  import type { ButtonStyles } from '$lib/holocene/button.svelte';
+  import type { ButtonSize } from '$lib/holocene/button.svelte';
   import Button, {
     type ButtonWithoutHrefProps,
   } from '$lib/holocene/button.svelte';
@@ -21,7 +21,7 @@
     label?: string;
     class?: string;
     active?: boolean;
-    size?: ButtonStyles['size'];
+    size?: ButtonSize;
     onclick?: (open: boolean) => void;
     leading?: Snippet;
     trailing?: Snippet;
@@ -44,7 +44,15 @@
     ...rest
   }: Props = $props();
 
-  const { open, menuElement } = getContext<MenuContext>(MENU_CONTEXT);
+  const {
+    open,
+    menuElement,
+    size: menuSize,
+  } = getContext<MenuContext>(MENU_CONTEXT);
+
+  $effect.pre(() => {
+    menuSize?.set(size);
+  });
 
   const handleClick = () => {
     open.update((previousState) => {
