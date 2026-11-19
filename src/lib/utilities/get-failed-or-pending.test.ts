@@ -61,6 +61,20 @@ const failedLocalEvent = {
   },
 };
 
+const failedUpdate = (id: number): HistoryEvent[] => {
+  const [accepted, completed] = makeWorkflowUpdateGroup(id);
+  return [
+    accepted,
+    {
+      ...completed,
+      workflowExecutionUpdateCompletedEventAttributes: {
+        ...completed.workflowExecutionUpdateCompletedEventAttributes,
+        outcome: { failure: { message: 'rejected' } },
+      },
+    } as HistoryEvent,
+  ];
+};
+
 describe('getFailedOrPendingEvents', () => {
   it('should return all items if not filtering for failed event', () => {
     const filteredEvents = getFailedOrPendingEvents(
@@ -89,6 +103,14 @@ describe('getFailedOrPendingEvents', () => {
       true,
     );
     expect(filteredEvents.length).toEqual(1);
+  });
+  it('should return filtered items for an update that completed with a failure', () => {
+    const [, failedUpdateCompleted] = failedUpdate(2);
+    const filteredEvents = getFailedOrPendingEvents(
+      [completedEvent, failedUpdateCompleted],
+      true,
+    );
+    expect(filteredEvents).toEqual([failedUpdateCompleted]);
   });
   it('should return filtered items for pending events', () => {
     const filteredEvents = getFailedOrPendingEvents(
@@ -220,6 +242,14 @@ describe.each(groupTypes)('isFailedOrPendingGroup (%s)', (_, asGroup) => {
     expect(matches(failedNexusOperation(2))).toBe(true);
   });
 
+  it('matches an update that completed with a failure', () => {
+    expect(matches(failedUpdate(2))).toBe(true);
+  });
+
+  it('does not match an update that completed', () => {
+    expect(matches(makeWorkflowUpdateGroup(2))).toBe(false);
+  });
+
   it('matches a failed local activity', () => {
     expect(matches(failedLocalActivity(2))).toBe(true);
   });
@@ -272,19 +302,7 @@ describe.each(groupTypes)('isSucceededGroup (%s)', (_, asGroup) => {
   });
 
   it('does not count an update that completed with a failure', () => {
-    const [accepted, completed] = makeWorkflowUpdateGroup(2);
-    expect(
-      succeeded([
-        accepted,
-        {
-          ...completed,
-          workflowExecutionUpdateCompletedEventAttributes: {
-            ...completed.workflowExecutionUpdateCompletedEventAttributes,
-            outcome: { failure: { message: 'rejected' } },
-          },
-        } as HistoryEvent,
-      ]),
-    ).toBe(false);
+    expect(succeeded(failedUpdate(2))).toBe(false);
   });
 
   it('does not count an open activity', () => {

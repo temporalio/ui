@@ -37,7 +37,8 @@ type FilterableGroup = {
 const isFailedGroup = (group: FilterableGroup): boolean =>
   group.finalClassification === 'Failed' ||
   group.finalClassification === 'TimedOut' ||
-  !!isFailedLocalActivity(group.initialEvent);
+  !!isFailedLocalActivity(group.initialEvent) ||
+  isFailedWorkflowExecutionUpdateCompletedEvent(group.lastEvent);
 
 const SUCCEEDABLE_CATEGORIES: ReadonlySet<EventGroup['category']> = new Set([
   'activity',
@@ -62,7 +63,8 @@ const isFailedEvent = (iterable: IterableEventWithPending) => {
     isEvent(iterable) &&
     (iterable.classification === 'Failed' ||
       iterable.classification === 'TimedOut' ||
-      isFailedLocalActivity(iterable))
+      isFailedLocalActivity(iterable) ||
+      isFailedWorkflowExecutionUpdateCompletedEvent(iterable))
   );
 };
 
