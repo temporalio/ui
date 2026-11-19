@@ -24,7 +24,9 @@ export function getSharedFilterParams(url: URL): Record<string, string> {
   const params: Record<string, string> = {};
   for (const key of SHARED_FILTER_PARAMS) {
     const value = url.searchParams.get(key);
-    if (value) params[key] = value;
+    if (value !== null) {
+      params[key] = value;
+    }
   }
   return params;
 }

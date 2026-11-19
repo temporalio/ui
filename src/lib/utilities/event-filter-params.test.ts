@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import type { EventGroupKey } from '$lib/models/event-history/event-group-markers';
 
 import {
+  getSharedFilterParams,
   parseEventFilterParams,
   updateEventFilterParams,
 } from './event-filter-params';
@@ -196,5 +197,22 @@ describe('category filter params', () => {
     expect(new URL(href, 'http://localhost').searchParams.has('category')).toBe(
       false,
     );
+  });
+});
+
+describe('getSharedFilterParams', () => {
+  it('keeps the shared filter params and drops the rest', () => {
+    const url = new URL(
+      'http://localhost/?sort=ascending&status=pending&page=2',
+    );
+    expect(getSharedFilterParams(url)).toEqual({
+      sort: 'ascending',
+      status: 'pending',
+    });
+  });
+
+  it('keeps an empty category, which selects no event types', () => {
+    const url = new URL('http://localhost/?category=');
+    expect(getSharedFilterParams(url)).toEqual({ category: '' });
   });
 });
