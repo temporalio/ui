@@ -82,7 +82,7 @@ export class ChainWindow {
           this._context.failures.fail(
             'walkBack',
             predecessor,
-            () => void this._walkBack(remaining),
+            () => void this._walkBack(remaining, onRunAdded),
           );
           return;
         }

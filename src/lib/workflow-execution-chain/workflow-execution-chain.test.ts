@@ -615,6 +615,23 @@ describe('WorkflowExecutionChain', () => {
       expect(added.mock.calls).toEqual([['run-3'], ['run-2'], ['run-1']]);
     });
 
+    it('loadOlder keeps reporting older Runs after a failed hop is retried', async () => {
+      server.addChain(runIds(13));
+      const chain = track(await loadChain(server));
+      server.errors.set('describe:run-2', networkError(503));
+      const added = vi.fn();
+
+      void chain.loadOlder(added);
+      await vi.advanceTimersByTimeAsync(30_000);
+      expect(chain.failedOlderRunId).toBe('run-2');
+
+      server.errors.clear();
+      chain.retryOlderRun();
+      await settle();
+
+      expect(added.mock.calls).toEqual([['run-3'], ['run-2'], ['run-1']]);
+    });
+
     it('loadOlder does nothing once a boundary is reached', async () => {
       server.addChain(runIds(2));
       const chain = track(await loadChain(server));
