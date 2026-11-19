@@ -1,71 +1,26 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  allocateCardWidths,
-  buildRulerTicks,
-  CARD_GAP,
-  formatClockTime,
-  layoutSegments,
-  MIN_CARD_WIDTH,
-  pickClockStep,
-} from './run-strip-layout';
+import { layoutSegments } from './card-layout';
+import { buildRulerTicks, formatClockTime, pickClockStep } from './ruler-ticks';
 
-const totalWidth = (widths: number[]) =>
-  widths.reduce((sum, width) => sum + width, 0);
+describe('buildRulerTicks', () => {
+  it('gives a live segment only its run tick, whatever its span', () => {
+    const tickTimes = (endMs: number) =>
+      buildRulerTicks([
+        { id: 'run-a', x: 0, width: 600, startMs: 0, endMs, live: true },
+      ]).map(({ kind, x, step }) => ({ kind, x, step }));
 
-describe('allocateCardWidths', () => {
-  it('returns nothing for no Runs', () => {
-    expect(allocateCardWidths([], 1000)).toEqual([]);
+    expect(tickTimes(60_000)).toEqual([{ kind: 'run', x: 0, step: 1_000 }]);
+    expect(tickTimes(3_600_000)).toEqual(tickTimes(60_000));
   });
 
-  it('fits the newest 4 Runs into the viewport in proportion to duration', () => {
-    const widths = allocateCardWidths([10, 10, 20, 40], 1000);
-
-    expect(totalWidth(widths) + CARD_GAP * 3).toBeCloseTo(1000);
-    expect(widths[3] - MIN_CARD_WIDTH).toBeCloseTo(
-      2 * (widths[2] - MIN_CARD_WIDTH),
-    );
-    expect(widths[0]).toBeCloseTo(widths[1]);
-  });
-
-  it('gives older Runs the same scale so they scroll', () => {
-    const widths = allocateCardWidths([10, 10, 10, 10, 10, 10], 1000);
-    const newestWidths = widths.slice(-4);
-
-    expect(totalWidth(newestWidths) + CARD_GAP * 3).toBeCloseTo(1000);
-    expect(widths[0]).toBeCloseTo(widths[5]);
-  });
-
-  it('never goes below the minimum width', () => {
-    const widths = allocateCardWidths([0, 1, 1_000_000, 1], 300);
-
-    for (const width of widths) {
-      expect(width).toBeGreaterThanOrEqual(MIN_CARD_WIDTH);
-    }
-  });
-
-  it('caps an older Run at one viewport', () => {
-    const widths = allocateCardWidths([1_000_000, 1, 1, 1, 1], 800);
-
-    expect(widths[0]).toBeLessThanOrEqual(800);
-  });
-
-  it('splits the space evenly when every duration is zero', () => {
-    const widths = allocateCardWidths([0, 0], 500);
-
-    expect(widths[0]).toBeCloseTo(widths[1]);
-    expect(totalWidth(widths) + CARD_GAP).toBeCloseTo(500);
-  });
-});
-
-describe('layoutSegments', () => {
   it('keys ticks by their segment so equal times stay distinct', () => {
     const ticks = buildRulerTicks(
       layoutSegments(
         [200, 200],
         [
-          { id: 'run-a', startMs: 0, endMs: 0 },
-          { id: 'run-b', startMs: 0, endMs: 0 },
+          { id: 'run-a', startMs: 0, endMs: 0, live: false },
+          { id: 'run-b', startMs: 0, endMs: 0, live: false },
         ],
       ),
     );
@@ -77,49 +32,6 @@ describe('layoutSegments', () => {
     expect(ticks.filter((tick) => tick.kind === 'run')).toHaveLength(2);
   });
 
-  it('places segments one gap apart from the offset', () => {
-    const segments = layoutSegments(
-      [100, 200],
-      [
-        { id: 'run-a', startMs: 0, endMs: 10 },
-        { id: 'run-b', startMs: 10, endMs: 10 },
-      ],
-      42,
-    );
-
-    expect(segments).toEqual([
-      { id: 'run-a', x: 42, width: 100, startMs: 0, endMs: 10 },
-      {
-        id: 'run-b',
-        x: 42 + 100 + CARD_GAP,
-        width: 200,
-        startMs: 10,
-        endMs: 11,
-      },
-    ]);
-  });
-
-  it('leaves room for a gap before the given segment', () => {
-    const segments = layoutSegments(
-      [100, 200, 300],
-      [
-        { id: 'run-x', startMs: 0, endMs: 10 },
-        { id: 'run-a', startMs: 20, endMs: 30 },
-        { id: 'run-b', startMs: 30, endMs: 40 },
-      ],
-      42,
-      { beforeIndex: 1, width: 120 },
-    );
-
-    expect(segments.map(({ x }) => x)).toEqual([
-      42,
-      42 + 100 + CARD_GAP + 120 + CARD_GAP,
-      42 + 100 + CARD_GAP + 120 + CARD_GAP + 200 + CARD_GAP,
-    ]);
-  });
-});
-
-describe('buildRulerTicks', () => {
   it('picks the smallest clock step that leaves room for a label', () => {
     expect(pickClockStep(1000 / 100)).toBe(1_000);
     expect(pickClockStep(60_000 / 100)).toBe(60_000);
@@ -127,8 +39,15 @@ describe('buildRulerTicks', () => {
 
   it('starts each Run with a labelled run tick', () => {
     const ticks = buildRulerTicks([
-      { id: 'run-a', x: 0, width: 300, startMs: 0, endMs: 60_000 },
-      { id: 'run-b', x: 306, width: 300, startMs: 60_000, endMs: 120_000 },
+      { id: 'run-a', x: 0, width: 300, startMs: 0, endMs: 60_000, live: false },
+      {
+        id: 'run-b',
+        x: 306,
+        width: 300,
+        startMs: 60_000,
+        endMs: 120_000,
+        live: false,
+      },
     ]);
     const runTicks = ticks.filter((tick) => tick.kind === 'run');
 
@@ -142,7 +61,7 @@ describe('buildRulerTicks', () => {
 
   it('adds major and minor ticks on clock steps inside the Run', () => {
     const ticks = buildRulerTicks([
-      { id: 'run-a', x: 0, width: 600, startMs: 0, endMs: 60_000 },
+      { id: 'run-a', x: 0, width: 600, startMs: 0, endMs: 60_000, live: false },
     ]);
     const majors = ticks.filter((tick) => tick.kind === 'major');
     const minors = ticks.filter((tick) => tick.kind === 'minor');
@@ -161,7 +80,7 @@ describe('buildRulerTicks', () => {
 
   it('only labels major ticks with room from the Run edges', () => {
     const ticks = buildRulerTicks([
-      { id: 'run-a', x: 0, width: 600, startMs: 0, endMs: 60_000 },
+      { id: 'run-a', x: 0, width: 600, startMs: 0, endMs: 60_000, live: false },
     ]);
 
     for (const tick of ticks.filter((tick) => tick.labelled)) {
@@ -179,7 +98,7 @@ describe('buildRulerTicks', () => {
   it('skips segments with no width or span', () => {
     expect(
       buildRulerTicks([
-        { id: 'run-a', x: 0, width: 0, startMs: 0, endMs: 1000 },
+        { id: 'run-a', x: 0, width: 0, startMs: 0, endMs: 1000, live: false },
       ]),
     ).toEqual([]);
   });
@@ -222,7 +141,7 @@ describe('buildRulerTicks over long spans', () => {
   it('steps by days or more for a Run lasting years', () => {
     const spanMs = 3 * 365 * 86_400_000;
     const ticks = buildRulerTicks([
-      { id: 'run-a', x: 0, width: 600, startMs: 0, endMs: spanMs },
+      { id: 'run-a', x: 0, width: 600, startMs: 0, endMs: spanMs, live: false },
     ]);
 
     expect(ticks.length).toBeLessThan(60);
@@ -237,6 +156,7 @@ describe('buildRulerTicks over long spans', () => {
         width: 10,
         startMs: 0,
         endMs: 100 * 365 * 86_400_000,
+        live: false,
       },
     ]);
 
@@ -248,7 +168,7 @@ describe('dated major labels', () => {
   it('leave room after the dated run label and before the segment end', () => {
     const spanMs = 60 * 86_400_000;
     const ticks = buildRulerTicks([
-      { id: 'run-a', x: 0, width: 800, startMs: 0, endMs: spanMs },
+      { id: 'run-a', x: 0, width: 800, startMs: 0, endMs: spanMs, live: false },
     ]);
     const labelled = ticks.filter(
       (tick) => tick.kind === 'major' && tick.labelled,

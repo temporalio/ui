@@ -243,16 +243,7 @@ test.describe('Workflow execution chain page', () => {
       .getByRole('group', { name: /^Runs, \d+ loaded$/ })
       .getByRole('button', { name: /^Run run-a, / })
       .click();
-    await expect(page).toHaveURL(/[?&]run=run-a/);
     await expect(page).toHaveURL(/[?&]category=(&|$)/);
-    await expect(workA).toHaveCount(0);
-
-    await page.goBack();
-    await expect(page).not.toHaveURL(/run=/);
-    await expect(workB).toHaveCount(0);
-
-    await page.goForward();
-    await expect(page).toHaveURL(/[?&]run=run-a/);
     await expect(workA).toHaveCount(0);
 
     await filterButton.click();
@@ -386,14 +377,14 @@ test.describe('Workflow execution chain page', () => {
     await expect(page.getByTestId('chain-header')).toHaveCount(0);
   });
 
-  test('redirects a mid-chain Run ID to its chain and keeps ?run=', async ({
+  test('redirects a mid-chain Run ID to its chain and keeps the filters', async ({
     page,
   }) => {
     await mockChain(page, { runs: closedChain(), current: () => 'run-b' });
 
-    await page.goto(chainUrl('run-b', '?run=run-a&sort=ascending'));
+    await page.goto(chainUrl('run-b', '?sort=ascending'));
 
-    await expect(page).toHaveURL(/\/chains\/run-a\?run=run-a&sort=ascending$/);
+    await expect(page).toHaveURL(/\/chains\/run-a\?sort=ascending$/);
     await expect(page.getByTestId('workflow-id-heading')).toBeVisible();
   });
 

@@ -5,24 +5,22 @@
   import { translate } from '$lib/i18n/translate';
   import { hourFormat, timeFormat } from '$lib/stores/time-format';
 
+  import type { RunSegment } from './card-layout';
   import {
     buildRulerTicks,
     DAY_MS,
     formatClockTime,
-    GAP_WIDTH,
     MINUTE_MS,
-    type RulerSegment,
-  } from './run-strip-layout';
+  } from './ruler-ticks';
 
   interface Props {
-    segments: RulerSegment[];
-    selectedIndex: number;
+    segments: RunSegment[];
+    selectedRunId: string | null;
     live: boolean;
     nowX: number | undefined;
-    gapX?: number;
   }
 
-  let { segments, selectedIndex, live, nowX, gapX }: Props = $props();
+  let { segments, selectedRunId, live, nowX }: Props = $props();
 
   const FIRST_LABEL_WIDTH = 128;
   const RUN_LABEL_WIDTH = 80;
@@ -33,7 +31,9 @@
   const MARKER_GAP = 4;
 
   const ticks = $derived(buildRulerTicks(segments));
-  const selectedSegment = $derived(segments[selectedIndex]);
+  const selectedSegment = $derived(
+    segments.find((segment) => segment.id === selectedRunId),
+  );
   const pinnedX = $derived(live ? undefined : selectedSegment?.x);
   const firstSegment = $derived(segments[0]);
 
@@ -135,17 +135,6 @@
       style:width="{Math.max(2, selectedSegment.width)}px"
       data-testid="run-ruler-band"
     ></span>
-  {/if}
-  {#if gapX !== undefined}
-    <span
-      class="absolute left-0 top-0 flex h-3.5 items-start justify-center gap-1"
-      style:translate="{gapX}px"
-      style:width="{GAP_WIDTH}px"
-      data-testid="run-ruler-break"
-    >
-      <span class="h-3.5 w-0 rotate-12 border-l border-tertiary"></span>
-      <span class="h-3.5 w-0 rotate-12 border-l border-tertiary"></span>
-    </span>
   {/if}
   {#each ticks as tick (`${tick.segmentId}-${tick.kind}-${tick.time}`)}
     <span

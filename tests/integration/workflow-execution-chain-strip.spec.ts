@@ -24,13 +24,10 @@ const previousButton = (page: Page) =>
 const jumpButton = (page: Page) =>
   page.getByRole('button', { name: /^(Jump to live|View latest run)$/ });
 
-const gapButton = (page: Page) =>
-  strip(page).getByRole('button', { name: 'Load older runs' });
-
 const announcements = (page: Page) =>
   page.getByTestId('run-strip-announcer-polite');
 
-const runParam = (page: Page) => new URL(page.url()).searchParams.get('run');
+const historyLength = (page: Page) => page.evaluate(() => history.length);
 
 const focusedName = (page: Page) =>
   page.evaluate(() => document.activeElement?.getAttribute('aria-label'));
@@ -42,56 +39,52 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.describe('Workflow execution chain Run strip', () => {
-  test('pins a card with a pushed entry, and Back returns to live', async ({
-    page,
-  }) => {
+  test('pins a card without touching the URL or history', async ({ page }) => {
     await mockChain(page, { runs: closedChain(), current: () => 'run-b' });
-    await page.goto(chainUrl('run-a'));
+    await page.goto(chainUrl('run-a', '?sort=ascending'));
 
     await expect(card(page, 'run-b')).toHaveAttribute('aria-current', 'true');
+    const url = page.url();
+    const entries = await historyLength(page);
 
     await card(page, 'run-a').click();
 
-    await expect(page).toHaveURL(/[?&]run=run-a/);
     await expect(card(page, 'run-a')).toHaveAttribute('aria-current', 'true');
     await expect(card(page, 'run-b')).not.toHaveAttribute('aria-current');
     await expect(
       page.getByRole('button', { name: /^Event WorkA:/ }),
     ).toBeVisible();
-
-    await page.goBack();
-
-    await expect(page).not.toHaveURL(/run=/);
-    await expect(card(page, 'run-b')).toHaveAttribute('aria-current', 'true');
-    await expect(
-      page.getByRole('button', { name: /^Event WorkB:/ }),
-    ).toBeVisible();
+    expect(page.url()).toBe(url);
+    expect(await historyLength(page)).toBe(entries);
   });
 
-  test('selecting the latest card returns to live mode', async ({ page }) => {
+  test('the latest card and →| return to live mode', async ({ page }) => {
     await mockChain(page, { runs: closedChain(), current: () => 'run-b' });
-    await page.goto(chainUrl('run-a', '?run=run-a'));
+    await page.goto(chainUrl('run-a'));
 
-    await expect(card(page, 'run-a')).toHaveAttribute('aria-current', 'true');
-
-    await card(page, 'run-b').click();
-
-    await expect(page).not.toHaveURL(/run=/);
-    await expect(card(page, 'run-b')).toHaveAttribute('aria-current', 'true');
-    await expect(jumpButton(page)).toHaveAttribute('aria-disabled', 'true');
-  });
-
-  test('?run= naming the Latest Run opens it pinned', async ({ page }) => {
-    await mockChain(page, { runs: closedChain(), current: () => 'run-b' });
-    await page.goto(chainUrl('run-a', '?run=run-b'));
-
-    await expect(card(page, 'run-b')).toHaveAttribute('aria-current', 'true');
+    await card(page, 'run-a').click();
     await expect(page.getByTestId('run-ruler-pinned')).toBeVisible();
     await expect(jumpButton(page)).not.toHaveAttribute('aria-disabled');
 
     await jumpButton(page).click();
 
-    await expect(page).not.toHaveURL(/run=/);
+    await expect(card(page, 'run-b')).toHaveAttribute('aria-current', 'true');
+    await expect(page.getByTestId('run-ruler-pinned')).toHaveCount(0);
+    await expect(jumpButton(page)).toHaveAttribute('aria-disabled', 'true');
+
+    await card(page, 'run-a').click();
+    await card(page, 'run-b').click();
+
+    await expect(card(page, 'run-b')).toHaveAttribute('aria-current', 'true');
+    await expect(jumpButton(page)).toHaveAttribute('aria-disabled', 'true');
+  });
+
+  test('ignores a ?run= and opens in live mode', async ({ page }) => {
+    await mockChain(page, { runs: closedChain(), current: () => 'run-b' });
+    await page.goto(chainUrl('run-a', '?run=run-a'));
+
+    await expect(card(page, 'run-b')).toHaveAttribute('aria-current', 'true');
+    await expect(card(page, 'run-a')).not.toHaveAttribute('aria-current');
     await expect(page.getByTestId('run-ruler-pinned')).toHaveCount(0);
     await expect(jumpButton(page)).toHaveAttribute('aria-disabled', 'true');
   });
@@ -100,29 +93,29 @@ test.describe('Workflow execution chain Run strip', () => {
     page,
   }) => {
     await mockChain(page, { runs: linearChain(12), current: () => 'run-12' });
-    await page.goto(chainUrl('run-01', '?run=run-03'));
+    await page.goto(chainUrl('run-01'));
 
     await expect(strip(page)).toHaveAccessibleName('Runs, 10 loaded');
+    await card(page, 'run-04').click();
+
+    await previousButton(page).click();
+
     await expect(card(page, 'run-03')).toHaveAttribute('aria-current', 'true');
 
     await previousButton(page).click();
 
     await expect(strip(page)).toHaveAccessibleName('Runs, 12 loaded');
-    await expect(page).toHaveURL(/[?&]run=run-02/);
     await expect(card(page, 'run-02')).toHaveAttribute('aria-current', 'true');
     await expect(announcements(page)).toContainText('Loaded 2 older runs');
 
     await previousButton(page).click();
 
-    await expect(page).toHaveURL(/[?&]run=run-01/);
+    await expect(card(page, 'run-01')).toHaveAttribute('aria-current', 'true');
     await expect(previousButton(page)).toHaveAttribute('aria-disabled', 'true');
     await previousButton(page).hover();
     await expect(
       page.getByRole('tooltip').filter({ hasText: 'Start of chain' }),
     ).toBeVisible();
-
-    await page.goBack();
-    await expect(page).toHaveURL(/[?&]run=run-02/);
   });
 
   test('‹ is disabled past retention', async ({ page }) => {
@@ -138,7 +131,7 @@ test.describe('Workflow execution chain Run strip', () => {
     ).toBeVisible();
 
     await previousButton(page).dispatchEvent('click');
-    await expect(page).not.toHaveURL(/run=/);
+    await expect(card(page, 'run-b')).toHaveAttribute('aria-current', 'true');
   });
 
   test('→| is disabled in live mode with a tooltip saying why', async ({
@@ -196,33 +189,42 @@ test.describe('Workflow execution chain Run strip', () => {
         successorRunId: 'run-b',
         activity: 'WorkA',
         startTime: '2024-01-01T00:00:00.000Z',
-        open: true,
-        release: handOff.promise,
+        closeTime: '2024-01-01T00:30:00.000Z',
       },
       {
         runId: 'run-b',
         firstRunId: 'run-a',
         predecessorRunId: 'run-a',
+        successorRunId: 'run-c',
         activity: 'WorkB',
         startTime: '2024-01-01T00:30:00.000Z',
         open: true,
+        release: handOff.promise,
+      },
+      {
+        runId: 'run-c',
+        firstRunId: 'run-a',
+        predecessorRunId: 'run-b',
+        activity: 'WorkC',
+        startTime: '2024-01-01T01:00:00.000Z',
+        open: true,
       },
     ];
-    let currentRunId = 'run-a';
+    let currentRunId = 'run-b';
     await mockChain(page, { runs, current: () => currentRunId });
-    await page.goto(chainUrl('run-a', '?run=run-a'));
+    await page.goto(chainUrl('run-a'));
 
+    await card(page, 'run-a').click();
     await expect(card(page, 'run-a')).toHaveAttribute('aria-current', 'true');
     await expect(
       page.getByRole('button', { name: /^Event WorkA:/ }),
     ).toBeVisible();
 
-    currentRunId = 'run-b';
+    currentRunId = 'run-c';
     handOff.resolve();
 
-    await expect(card(page, 'run-b')).toBeVisible();
+    await expect(card(page, 'run-c')).toBeVisible();
     await expect(card(page, 'run-a')).toHaveAttribute('aria-current', 'true');
-    expect(runParam(page)).toBe('run-a');
     await expect(announcements(page)).toContainText('Newer run available');
     await expect(page.getByTestId('newer-run-indicator')).toBeVisible();
     await expect(
@@ -254,52 +256,6 @@ test.describe('Workflow execution chain Run strip', () => {
     );
   });
 
-  test('drops a ?run= that is not found and says so', async ({ page }) => {
-    await mockChain(page, { runs: closedChain(), current: () => 'run-b' });
-    await page.goto(chainUrl('run-a', '?run=missing&sort=ascending'));
-
-    const notice = page.getByTestId('run-notice');
-    await expect(notice).toContainText(
-      "Run missing couldn't be found. It may be past retention.",
-    );
-    await expect(page).not.toHaveURL(/run=/);
-    await expect(page).toHaveURL(/sort=ascending/);
-    await expect(card(page, 'run-b')).toHaveAttribute('aria-current', 'true');
-
-    await expect(notice.getByRole('button')).toHaveCount(0);
-
-    await card(page, 'run-a').click();
-    await expect(page).toHaveURL(/[?&]run=run-a/);
-    await expect(notice).toHaveCount(0);
-
-    await page.goBack();
-    await expect(page).not.toHaveURL(/run=/);
-    await expect(notice).toHaveCount(0);
-  });
-
-  test('drops a ?run= from another chain and links to it', async ({ page }) => {
-    await mockChain(page, {
-      runs: [
-        ...closedChain(),
-        {
-          runId: 'other',
-          firstRunId: 'other',
-          activity: 'OtherWork',
-          startTime: '2023-01-01T00:00:00.000Z',
-        },
-      ],
-      current: () => 'run-b',
-    });
-    await page.goto(chainUrl('run-a', '?run=other'));
-
-    const notice = page.getByTestId('run-notice');
-    await expect(notice).toContainText("Run other isn't part of this chain.");
-    await expect(
-      notice.getByRole('link', { name: 'View run' }),
-    ).toHaveAttribute('href', /\/workflows\/chain-workflow\/other/);
-    await expect(page).not.toHaveURL(/run=/);
-  });
-
   test('is one tab stop; arrows move focus only and Enter selects', async ({
     page,
   }) => {
@@ -320,7 +276,6 @@ test.describe('Workflow execution chain Run strip', () => {
 
     await page.keyboard.press('ArrowLeft');
     expect(await focusedName(page)).toMatch(/^Run run-02, /);
-    expect(runParam(page)).toBeNull();
     await expect(card(page, 'run-03')).toHaveAttribute('aria-current', 'true');
 
     await page.keyboard.press('Tab');
@@ -350,133 +305,14 @@ test.describe('Workflow execution chain Run strip', () => {
     await page.keyboard.press('Home');
     await page.keyboard.press('Enter');
 
-    await expect(page).toHaveURL(/[?&]run=run-01/);
     await expect(card(page, 'run-01')).toHaveAttribute('aria-current', 'true');
-  });
-
-  test('detaches a ?run= beyond the first 10 behind a gap that loads older runs', async ({
-    page,
-  }) => {
-    await mockChain(page, { runs: linearChain(15), current: () => 'run-15' });
-    await page.goto(chainUrl('run-01', '?run=run-02'));
-
-    await expect(strip(page)).toHaveAccessibleName('Runs, 11 loaded');
-    await expect(card(page, 'run-02')).toHaveAttribute('aria-current', 'true');
-    await expect(card(page, 'run-05')).toHaveCount(0);
-    await expect(page.getByTestId('run-ruler-break')).toHaveCount(1);
-    await expect(
-      page.getByRole('button', { name: /^Event Work2:/ }),
-    ).toBeVisible();
-
-    await gapButton(page).click();
-
-    await expect(strip(page)).toHaveAccessibleName('Runs, 15 loaded');
-    await expect(gapButton(page)).toHaveCount(0);
-    await expect(page.getByTestId('run-ruler-break')).toHaveCount(0);
-    await expect(card(page, 'run-02')).toHaveAttribute('aria-current', 'true');
-    await expect(page).toHaveURL(/[?&]run=run-02/);
-  });
-
-  test('keeps the detached group, so Back to its ?run= finds the card', async ({
-    page,
-  }) => {
-    await mockChain(page, { runs: linearChain(15), current: () => 'run-15' });
-    await page.goto(chainUrl('run-01', '?run=run-03'));
-
-    await expect(card(page, 'run-03')).toHaveAttribute('aria-current', 'true');
-
-    await previousButton(page).click();
-
-    await expect(page).toHaveURL(/[?&]run=run-02/);
-    await expect(card(page, 'run-02')).toHaveAttribute('aria-current', 'true');
-    await expect(strip(page)).toHaveAccessibleName('Runs, 12 loaded');
-
-    await card(page, 'run-15').click();
-    await expect(page).not.toHaveURL(/run=/);
-
-    await page.goBack();
-
-    await expect(page).toHaveURL(/[?&]run=run-02/);
-    await expect(card(page, 'run-02')).toHaveAttribute('aria-current', 'true');
-    await expect(gapButton(page)).toBeVisible();
-  });
-
-  test('marks a detached Run replaced by a reset once the walk passes it', async ({
-    page,
-  }) => {
-    await mockChain(page, {
-      runs: [
-        ...linearChain(15),
-        {
-          runId: 'branch',
-          firstRunId: 'run-01',
-          predecessorRunId: 'run-03',
-          activity: 'BranchWork',
-          startTime: '2024-01-01T02:30:00.000Z',
-          closeTime: '2024-01-01T02:45:00.000Z',
-        },
-      ],
-      current: () => 'run-15',
-    });
-    await page.goto(chainUrl('run-01', '?run=branch'));
-
-    await expect(card(page, 'branch')).toHaveAttribute('aria-current', 'true');
-
-    await gapButton(page).click();
-
-    await expect(gapButton(page)).toHaveCount(0);
-    await expect(page.getByTestId('run-strip-off-path')).toHaveText(
-      'Replaced by a reset',
-    );
-    await expect(card(page, 'run-03')).toBeVisible();
-    await expect(card(page, 'branch')).toHaveAttribute('aria-current', 'true');
-  });
-
-  test('puts the gap button in the arrow order', async ({ page }) => {
-    await mockChain(page, { runs: linearChain(15), current: () => 'run-15' });
-    await page.goto(chainUrl('run-01', '?run=run-02'));
-
-    await expect(card(page, 'run-02')).toHaveAttribute('aria-current', 'true');
-
-    await previousButton(page).focus();
-    await page.keyboard.press('Tab');
-    await expect(card(page, 'run-02')).toBeFocused();
-
-    await page.keyboard.press('ArrowRight');
-    await expect(gapButton(page)).toBeFocused();
-    await expect(gapButton(page)).toHaveAttribute('tabindex', '0');
-
-    await page.keyboard.press('ArrowRight');
-    await expect(card(page, 'run-06')).toBeFocused();
-
-    await page.keyboard.press('ArrowLeft');
-    await page.keyboard.press('Enter');
-
-    await expect(strip(page)).toHaveAccessibleName('Runs, 15 loaded');
-    await expect(card(page, 'run-02')).toBeFocused();
-  });
-
-  test('keeps focus on a detached card when the walk-back merges it', async ({
-    page,
-  }) => {
-    await mockChain(page, { runs: linearChain(15), current: () => 'run-15' });
-    await page.goto(chainUrl('run-01', '?run=run-02'));
-
-    await expect(card(page, 'run-02')).toHaveAttribute('aria-current', 'true');
-    await card(page, 'run-02').focus();
-
-    await gapButton(page).dispatchEvent('click');
-
-    await expect(strip(page)).toHaveAccessibleName('Runs, 15 loaded');
-    await expect(gapButton(page)).toHaveCount(0);
-    await expect(card(page, 'run-02')).toBeFocused();
   });
 
   test('names and describes each card', async ({ page }) => {
     const runs = linearChain(3);
     runs[1].continueAsNewInitiator = 'CONTINUE_AS_NEW_INITIATOR_RETRY';
     await mockChain(page, { runs, current: () => 'run-03' });
-    await page.goto(chainUrl('run-01', '?run=run-02'));
+    await page.goto(chainUrl('run-01'));
 
     await expect(card(page, 'run-03')).toHaveAccessibleName(
       'Run run-03, Completed, latest, 1h',
@@ -508,5 +344,117 @@ test.describe('Workflow execution chain Run strip', () => {
       /Continued from previous run by retry$/,
     );
     await expect(page.getByTestId('run-transition')).toHaveCount(9);
+  });
+
+  test('keeps cards and markers still while the live Run ticks', async ({
+    page,
+  }) => {
+    await page.clock.install({ time: new Date('2024-01-01T03:00:05.000Z') });
+    await mockChain(page, {
+      runs: linearChain(4, { open: true }),
+      current: () => 'run-04',
+    });
+    await page.goto(chainUrl('run-01'));
+    await expect(card(page, 'run-04')).toBeVisible();
+    await expect(page.getByTestId('run-ruler-now')).toBeVisible();
+
+    const layout = async () => ({
+      'run-01': await card(page, 'run-01').boundingBox(),
+      'run-02': await card(page, 'run-02').boundingBox(),
+      'run-03': await card(page, 'run-03').boundingBox(),
+      'run-04': await card(page, 'run-04').boundingBox(),
+      now: await page.getByTestId('run-ruler-now').boundingBox(),
+      scrollLeft: await page
+        .getByTestId('run-strip-scroller')
+        .evaluate((scroller) => scroller.scrollLeft),
+    });
+    let before = await layout();
+    await expect
+      .poll(async () => {
+        const settled = await layout();
+        const unchanged = JSON.stringify(settled) === JSON.stringify(before);
+        before = settled;
+        return unchanged;
+      })
+      .toBe(true);
+
+    const nameBefore = await card(page, 'run-04').getAttribute('aria-label');
+
+    await page.clock.runFor(5000);
+
+    await expect(card(page, 'run-04')).not.toHaveAccessibleName(
+      nameBefore ?? '',
+    );
+    expect(await layout()).toEqual(before);
+  });
+
+  const handOffChain = () => {
+    const handOff = deferred();
+    const runs = linearChain(8);
+    runs[7] = {
+      ...runs[7],
+      successorRunId: 'run-09',
+      closeTime: undefined,
+      open: true,
+      release: handOff.promise,
+    };
+    runs.push({
+      runId: 'run-09',
+      firstRunId: 'run-01',
+      predecessorRunId: 'run-08',
+      activity: 'Work9',
+      startTime: '2024-01-01T08:00:00.000Z',
+      open: true,
+    });
+    return { runs, handOff };
+  };
+
+  const scrollerPosition = (page: Page) =>
+    page.getByTestId('run-strip-scroller').evaluate((scroller) => ({
+      scrollLeft: scroller.scrollLeft,
+      atEnd:
+        scroller.scrollLeft + scroller.clientWidth >= scroller.scrollWidth - 2,
+    }));
+
+  test('stays at the live end through a hand-off', async ({ page }) => {
+    const { runs, handOff } = handOffChain();
+    await mockChain(page, { runs, current: () => 'run-08' });
+    await page.goto(chainUrl('run-01'));
+    await expect(card(page, 'run-08')).toBeVisible();
+    await expect
+      .poll(async () => (await scrollerPosition(page)).atEnd)
+      .toBe(true);
+
+    handOff.resolve();
+
+    await expect(card(page, 'run-09')).toHaveAttribute('aria-current', 'true');
+    await expect
+      .poll(async () => (await scrollerPosition(page)).atEnd)
+      .toBe(true);
+    await expect(card(page, 'run-09')).toBeInViewport({ ratio: 1 });
+  });
+
+  test('leaves the strip where the user scrolled it during a hand-off', async ({
+    page,
+  }) => {
+    const { runs, handOff } = handOffChain();
+    await mockChain(page, { runs, current: () => 'run-08' });
+    await page.goto(chainUrl('run-01'));
+    await expect(card(page, 'run-08')).toBeVisible();
+    await expect
+      .poll(async () => (await scrollerPosition(page)).atEnd)
+      .toBe(true);
+
+    await page
+      .getByTestId('run-strip-scroller')
+      .evaluate((scroller) => scroller.scrollTo({ left: 0 }));
+    await expect
+      .poll(async () => (await scrollerPosition(page)).scrollLeft)
+      .toBe(0);
+
+    handOff.resolve();
+
+    await expect(card(page, 'run-09')).toHaveCount(1);
+    expect((await scrollerPosition(page)).scrollLeft).toBe(0);
   });
 });

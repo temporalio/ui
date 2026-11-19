@@ -621,28 +621,6 @@ describe('routeForWorkflowExecutionChain', () => {
       `${base}/namespaces/default/workflows/order%2F42%20%231/chains/first-run`,
     );
   });
-
-  it('should add the run param for a Pinned Run', () => {
-    const path = routeForWorkflowExecutionChain({
-      namespace: 'default',
-      workflow: 'abc',
-      firstRunId: 'first-run',
-      run: 'pinned-run',
-    });
-    expect(path).toBe(
-      `${base}/namespaces/default/workflows/abc/chains/first-run?run=pinned-run`,
-    );
-  });
-
-  it('should omit the run param when run is empty', () => {
-    const path = routeForWorkflowExecutionChain({
-      namespace: 'default',
-      workflow: 'abc',
-      firstRunId: 'first-run',
-      run: '',
-    });
-    expect(path).not.toContain('?');
-  });
 });
 
 describe('routeFor worker deployment version and serverless routes', () => {

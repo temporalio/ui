@@ -5,7 +5,7 @@ import type { WorkflowHistoryController } from '$lib/services/workflow-history-c
 import type { HistoryEvent } from '$lib/types/events';
 import type { WorkflowExecution } from '$lib/types/workflows';
 import { getErrorMessage } from '$lib/utilities/error-message';
-import { getValidTimeMs, type ValidTime } from '$lib/utilities/format-time';
+import type { ValidTime } from '$lib/utilities/format-time';
 import { isNotFound } from '$lib/utilities/handle-error';
 import { isNetworkError } from '$lib/utilities/is-network-error';
 
@@ -18,11 +18,11 @@ import type {
   ChainClient,
   ChainError,
   ChainEvent,
+  ChainLoadResult,
   ChainMismatch,
   ChainRun,
   ChainStatus,
   FirstRunState,
-  RequestedRun,
   RunLookup,
   WorkflowExecutionChainIdentity,
 } from './types';
@@ -31,12 +31,9 @@ export const WALK_SIZE = 10;
 export const REFRESH_INTERVAL_MS = 10_000;
 export const CARD_LOAD_CONCURRENCY = 1;
 
-type DiscoveryStep =
-  | 'walkBack'
-  | 'detachedWalkBack'
-  | 'handOff'
-  | 'refresh'
-  | 'finalDescribe';
+const NO_REDIRECT: ChainLoadResult = { redirectFirstRunId: null };
+
+type DiscoveryStep = 'walkBack' | 'handOff' | 'refresh' | 'finalDescribe';
 
 const toChainError = (error: unknown): ChainError =>
   error instanceof Error || isNetworkError(error)
@@ -65,9 +62,7 @@ class RunRecord {
   run = $state.raw<ChainRun | null>(null);
   controller = $state.raw<WorkflowHistoryController | undefined>();
   cardLoad = $state.raw<CardLoad | undefined>();
-  request = $state.raw<RequestedRun | undefined>();
   pendingFetch: Promise<ChainRun> | null = null;
-  pendingRequest: Promise<RequestedRun> | null = null;
   firstEventSeen = false;
   closeHandled = false;
   livePollFailed = false;
@@ -80,29 +75,21 @@ export class WorkflowExecutionChain {
   private readonly _records = new SvelteMap<string, RunRecord>();
   readonly controllers = this._createRunLookup((record) => record.controller);
   readonly cardLoads = this._createRunLookup((record) => record.cardLoad);
-  readonly requestedRuns = this._createRunLookup((record) => record.request);
 
   private _windowIds = $state.raw<string[]>([]);
-  private _detachedIds = $state.raw<string[]>([]);
   readonly runs = $derived(this._resolveRuns(this._windowIds));
-  readonly detachedRuns = $derived(this._resolveRuns(this._detachedIds));
   boundary = $state<ChainBoundary>(null);
   firstRun = $state.raw<FirstRunState>({ status: 'loading' });
   error = $state.raw<ChainError | null>(null);
   mismatch = $state.raw<ChainMismatch | null>(null);
-  redirectFirstRunId = $state<string | null>(null);
   walking = $state(false);
   pendingSuccessorRunId = $state<string | null>(null);
-  detachedBoundary = $state<ChainBoundary>(null);
-  detachedWalking = $state(false);
-  detachedOffPath = $state(false);
 
   private _latestRunId = $state<string | null>(null);
   private _status = $state<ChainStatus>('loading');
   private _failedSteps = new SvelteMap<DiscoveryStep, () => void>();
   private _refreshTimer: ReturnType<typeof setTimeout> | null = null;
   private _prioritizedRunId: string | null = null;
-  private _detachedCandidateId: string | null = null;
   private readonly _queue = new LoadQueue({
     concurrency: CARD_LOAD_CONCURRENCY,
     start: (runId) => this._loadCard(runId),
@@ -110,10 +97,6 @@ export class WorkflowExecutionChain {
   private readonly _client: ChainClient;
   private readonly _abort = new AbortController();
   private readonly _listeners = new SvelteSet<(event: ChainEvent) => void>();
-  private _resolveLoaded!: () => void;
-  private readonly _loaded = new Promise<void>((resolve) => {
-    this._resolveLoaded = resolve;
-  });
 
   constructor(
     identity: WorkflowExecutionChainIdentity,
@@ -157,18 +140,6 @@ export class WorkflowExecutionChain {
     return this._abort.signal.aborted;
   }
 
-  async load(): Promise<void> {
-    try {
-      await this._load();
-    } finally {
-      this._resolveLoaded();
-    }
-  }
-
-  whenLoaded(): Promise<void> {
-    return this._loaded;
-  }
-
   subscribe(listener: (event: ChainEvent) => void): () => void {
     this._listeners.add(listener);
     return () => {
@@ -176,7 +147,7 @@ export class WorkflowExecutionChain {
     };
   }
 
-  private async _load(): Promise<void> {
+  async load(): Promise<ChainLoadResult> {
     const { namespace, workflowId, firstRunId } = this.identity;
     const firstRunTask = this._describeFirstRun();
 
@@ -188,7 +159,7 @@ export class WorkflowExecutionChain {
         this._client.describe({ namespace, workflowId }, signal),
       );
       if (this._disposed) {
-        return;
+        return NO_REDIRECT;
       }
       currentFirstRunId = current.firstRunId;
       if (!currentFirstRunId || currentFirstRunId === firstRunId) {
@@ -201,18 +172,21 @@ export class WorkflowExecutionChain {
       }
     } catch (error) {
       if (this._disposed) {
-        return;
+        return NO_REDIRECT;
       }
       this.error = toChainError(error);
-      return;
+      return NO_REDIRECT;
     }
     if (this._disposed) {
-      return;
+      return NO_REDIRECT;
     }
 
     if (currentFirstRunId !== firstRunId || !startedEvent) {
-      await this._classifyMismatch(currentFirstRunId, await firstRunTask);
-      return;
+      const redirectFirstRunId = await this._classifyMismatch(
+        currentFirstRunId,
+        await firstRunTask,
+      );
+      return { redirectFirstRunId };
     }
 
     const latest = this._storeRun(current.runId, current, startedEvent);
@@ -225,6 +199,7 @@ export class WorkflowExecutionChain {
     }
     this._startCard(latest.runId);
     void this._walkBack(WALK_SIZE - 1);
+    return NO_REDIRECT;
   }
 
   loadOlder(): Promise<void> {
@@ -237,64 +212,6 @@ export class WorkflowExecutionChain {
       return Promise.resolve();
     }
     return this._walkBack(WALK_SIZE);
-  }
-
-  async loadDetachedPredecessor(): Promise<string | null> {
-    const oldest = this.detachedRuns[0];
-    if (
-      !oldest ||
-      this.detachedWalking ||
-      this.detachedBoundary !== null ||
-      this._failedSteps.has('detachedWalkBack')
-    ) {
-      return null;
-    }
-    const predecessor = readStartedEvent(
-      oldest.startedEvent,
-    ).continuedExecutionRunId;
-    if (!predecessor) {
-      this.detachedBoundary = 'chainStart';
-      return null;
-    }
-    if (this._isInWindow(predecessor)) {
-      this.detachedOffPath = true;
-      return predecessor;
-    }
-    this.detachedWalking = true;
-    let run: ChainRun;
-    try {
-      run = await this._fetchRun(predecessor);
-    } catch (error) {
-      if (this._disposed || this._detachedIds[0] !== oldest.runId) {
-        return null;
-      }
-      this.detachedWalking = false;
-      if (isNotFound(error)) {
-        this.detachedBoundary = 'retention';
-        return null;
-      }
-      this._fail('detachedWalkBack', () => void this.loadDetachedPredecessor());
-      return null;
-    }
-    if (this._disposed || this._detachedIds[0] !== oldest.runId) {
-      return null;
-    }
-    this.detachedWalking = false;
-    if (this._isInWindow(predecessor)) {
-      this.detachedOffPath = true;
-      return predecessor;
-    }
-    this._detachedIds = [run.runId, ...this._detachedIds];
-    this._enqueueCard(run.runId);
-    return run.runId;
-  }
-
-  requestRun(runId: string): Promise<RequestedRun> {
-    const record = this._recordFor(runId);
-    record.pendingRequest ??= this._requestRun(record);
-    const request = record.pendingRequest;
-    void request.then((result) => this._showRequested(result));
-    return request;
   }
 
   prioritizeRun(runId: string | null): void {
@@ -338,7 +255,6 @@ export class WorkflowExecutionChain {
     }
     this._abort.abort();
     this._listeners.clear();
-    this._resolveLoaded();
     this._queue.dispose();
     this._stopRefresh();
     for (const record of this._records.values()) {
@@ -426,127 +342,6 @@ export class WorkflowExecutionChain {
     return this._storeRun(runId, workflow, startedEvent);
   }
 
-  private _isInWindow(runId: string): boolean {
-    return this._windowIds.includes(runId);
-  }
-
-  private _isDetached(runId: string): boolean {
-    return this._detachedIds.includes(runId);
-  }
-
-  private async _requestRun(record: RunRecord): Promise<RequestedRun> {
-    const loadingRequest: RequestedRun = { status: 'loading' };
-    if (this._disposed) {
-      return loadingRequest;
-    }
-    if (record.run) {
-      record.request = { status: 'found', run: record.run };
-      return record.request;
-    }
-    record.request = loadingRequest;
-    let run: ChainRun;
-    try {
-      run = await this._fetchRun(record.runId);
-    } catch (error) {
-      if (this._disposed) {
-        return loadingRequest;
-      }
-      record.request = isNotFound(error)
-        ? { status: 'notFound' }
-        : { status: 'failed', error: toChainError(error) };
-      return record.request;
-    }
-    if (this._disposed) {
-      return loadingRequest;
-    }
-    const firstRunId =
-      run.workflow.firstRunId ??
-      readStartedEvent(run.startedEvent).firstExecutionRunId;
-    if (firstRunId && firstRunId !== this.identity.firstRunId) {
-      record.request = { status: 'wrongChain', firstRunId };
-      return record.request;
-    }
-    record.request = { status: 'found', run };
-    return record.request;
-  }
-
-  private _showRequested(result: RequestedRun): void {
-    if (this._disposed || result.status !== 'found') {
-      return;
-    }
-    const { runId } = result.run;
-    if (runId !== this._prioritizedRunId) {
-      return;
-    }
-    this._detachedCandidateId = runId;
-    this._attachDetached();
-    if (this.cardLoadOf(runId).status === 'queued') {
-      this._startCard(runId);
-    }
-  }
-
-  private _attachDetached(): void {
-    const candidateId = this._detachedCandidateId;
-    if (!candidateId || this._windowIds.length === 0 || this.walking) {
-      return;
-    }
-    this._detachedCandidateId = null;
-    if (
-      candidateId !== this._prioritizedRunId ||
-      this._isInWindow(candidateId) ||
-      this._isDetached(candidateId)
-    ) {
-      return;
-    }
-    this._replaceDetached([candidateId]);
-    this._checkDetachedOffPath(this.runs[0]);
-  }
-
-  private _replaceDetached(runIds: string[]): void {
-    this._detachedIds = runIds;
-    this.detachedBoundary = null;
-    this.detachedOffPath = false;
-    this.detachedWalking = false;
-    this._failedSteps.delete('detachedWalkBack');
-  }
-
-  private _removeDetached(runId: string): void {
-    const rest = this._detachedIds.filter((detachedId) => detachedId !== runId);
-    if (rest.length === 0) {
-      this._replaceDetached([]);
-      return;
-    }
-    this._replaceDetached(rest);
-    this.detachedOffPath = true;
-  }
-
-  private _checkDetachedOffPath(windowRun: ChainRun): void {
-    const detached = this.detachedRuns[this.detachedRuns.length - 1];
-    if (!detached || this.detachedOffPath) {
-      return;
-    }
-    const windowStartMs = getValidTimeMs(windowRun.workflow.startTime);
-    const detachedStartMs = getValidTimeMs(detached.workflow.startTime);
-    if (windowStartMs === undefined || detachedStartMs === undefined) {
-      return;
-    }
-    if (windowStartMs < detachedStartMs) {
-      this.detachedOffPath = true;
-    }
-  }
-
-  private _mergeDetached(sharedCount: number): boolean {
-    const sharedIds = this._detachedIds.slice(0, sharedCount);
-    const offPathIds = this._detachedIds.slice(sharedCount);
-    this._windowIds = [...sharedIds, ...this._windowIds];
-    this.boundary = this.detachedBoundary;
-    this._replaceDetached(offPathIds);
-    if (offPathIds.length > 0) {
-      this.detachedOffPath = true;
-    }
-    return this.boundary !== null;
-  }
-
   private async _describeFirstRun(): Promise<FirstRunState> {
     let state: FirstRunState;
     try {
@@ -566,26 +361,26 @@ export class WorkflowExecutionChain {
   private async _classifyMismatch(
     currentFirstRunId: string,
     firstRun: FirstRunState,
-  ): Promise<void> {
+  ): Promise<string | null> {
     if (this._disposed) {
-      return;
+      return null;
     }
     const routeRunFirstRunId =
       firstRun.status === 'found'
         ? await this._readFirstRunId(firstRun.workflow)
         : undefined;
     if (this._disposed) {
-      return;
+      return null;
     }
     if (routeRunFirstRunId && routeRunFirstRunId !== this.identity.firstRunId) {
-      this.redirectFirstRunId = routeRunFirstRunId;
-      return;
+      return routeRunFirstRunId;
     }
     this.mismatch = {
       reason: routeRunFirstRunId ? 'workflowIdReused' : 'routeChainNotFound',
       currentFirstRunId,
     };
     this._status = 'mismatch';
+    return null;
   }
 
   private async _readFirstRunId(
@@ -631,22 +426,12 @@ export class WorkflowExecutionChain {
         if (this._disposed) {
           return;
         }
-        const sharedCount = this._detachedIds.indexOf(run.runId) + 1;
-        if (sharedCount > 0) {
-          hop += sharedCount - 1;
-          if (this._mergeDetached(sharedCount)) {
-            return;
-          }
-          continue;
-        }
         this._windowIds = [run.runId, ...this._windowIds];
         this._enqueueCard(run.runId);
-        this._checkDetachedOffPath(run);
       }
     } finally {
       if (!this._disposed) {
         this.walking = false;
-        this._attachDetached();
       }
     }
   }
@@ -696,9 +481,6 @@ export class WorkflowExecutionChain {
     }
     this.pendingSuccessorRunId = null;
     this._windowIds = [...this._windowIds, run.runId];
-    if (this._isDetached(run.runId)) {
-      this._removeDetached(run.runId);
-    }
     this._latestRunId = run.runId;
     this._status = 'ready';
     this._emit({ type: 'handOff', runId: run.runId });
