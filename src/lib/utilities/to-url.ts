@@ -24,8 +24,12 @@ export const toURL = (
   let query = existingQuery;
   if (searchParams && existingQuery !== undefined) {
     const merged = new URLSearchParams(existingQuery);
-    for (const [key, value] of searchParams) {
-      merged.set(key, value);
+    for (const key of new Set(searchParams.keys())) {
+      const [firstValue, ...otherValues] = searchParams.getAll(key);
+      merged.set(key, firstValue);
+      for (const value of otherValues) {
+        merged.append(key, value);
+      }
     }
     query = merged.toString();
   } else if (searchParams) {

@@ -44,6 +44,16 @@ describe('toURL', () => {
     );
   });
 
+  it('should keep every value of a repeated key in params', () => {
+    const params = new URLSearchParams([
+      ['a', 'goodbye'],
+      ['a', 'again'],
+    ]);
+    expect(toURL('/workflows?a=hello&b=world', params)).toBe(
+      '/workflows?a=goodbye&b=world&a=again',
+    );
+  });
+
   it('should keep an existing query when no params are given', () => {
     expect(toURL('/workflows?a=hello')).toBe('/workflows?a=hello');
   });
