@@ -57,9 +57,10 @@
     /** A server error that names one region, keyed by region id. */
     regionServerErrors?: Record<string, string>;
     /**
-     * A replica region that starts with high availability on, for example
-     * because the Version being edited already has a group there. Without
-     * one, high availability starts off.
+     * The saved state of the replica toggle, when editing: a non-empty list
+     * starts it on, an empty list starts it off. Left out, as on a new
+     * Version, the replica starts on when the form can fill it in from the
+     * primary, because a failover to a region without compute is an outage.
      */
     enabledRegionIds?: readonly string[];
     /** The primary's saved values, when editing. */
@@ -86,7 +87,7 @@
     regionValues = $bindable([]),
     regionErrors = {},
     regionServerErrors = {},
-    enabledRegionIds = [],
+    enabledRegionIds,
     initialPrimary,
     initialReplica,
     primaryGroup,
@@ -172,7 +173,6 @@
     }),
   );
 
-  let highAvailability = $state(untrack(() => enabledRegionIds.length > 0));
   let runsInPrimary = $state(untrack(() => initialRunsInPrimary));
 
   /**
@@ -187,6 +187,21 @@
     replicaRegion ? (replicaRegion.label ?? replicaRegion.id) : '',
   );
   const replicaKey = $derived(replicaRegion?.id ?? 'replica');
+  /** The user's or the saved choice. Undefined until one is made. */
+  let replicaChoice = $state<boolean | undefined>(
+    untrack(() => (enabledRegionIds ? enabledRegionIds.length > 0 : undefined)),
+  );
+  /**
+   * A replica is filled in only from a suggested ARN, which needs the
+   * provider's name for the replica region. Cloud Run has no suggestion.
+   */
+  const canFillReplica = $derived(
+    provider !== 'cloud-run' && !!replicaRegion?.providerRegion,
+  );
+  const highAvailability = $derived(replicaChoice ?? canFillReplica);
+  const setHighAvailability = (value: boolean) => {
+    replicaChoice = value;
+  };
   const replicated = $derived(highAvailability && !!replicaRegion);
   const primaryLabel = $derived(primaryRegion.label ?? primaryRegion.id);
   /**
@@ -284,10 +299,14 @@
 
   /**
    * With no primary there is nothing to inherit, so the replica keeps the
-   * primary's values as its own first.
+   * primary's values as its own first. The replica then stays on, so a
+   * provider change cannot leave neither region running.
    */
   const setRunsInPrimary = (value: boolean) => {
-    if (!value) customize();
+    if (!value) {
+      customize();
+      replicaChoice = true;
+    }
     runsInPrimary = value;
   };
 
@@ -561,7 +580,7 @@
               label={translate('workers.region-compute')}
               labelPosition="left"
               disabled={replicaIsLast}
-              bind:checked={highAvailability}
+              bind:checked={() => highAvailability, setHighAvailability}
             />
           </Tooltip>
         {/snippet}
