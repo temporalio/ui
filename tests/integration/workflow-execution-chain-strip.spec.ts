@@ -440,6 +440,7 @@ test.describe('Workflow execution chain Run strip', () => {
     page,
     isMobile,
   }) => {
+    // eslint-disable-next-line playwright/no-skipped-test
     test.skip(isMobile, 'Every card is at the minimum width on a phone');
     await page.clock.install({ time: new Date('2024-01-01T03:00:17.000Z') });
     await mockChain(page, {
@@ -470,6 +471,7 @@ test.describe('Workflow execution chain Run strip', () => {
     page,
     isMobile,
   }) => {
+    // eslint-disable-next-line playwright/no-skipped-test
     test.skip(isMobile, 'Every card is at the minimum width on a phone');
     await page.clock.install({ time: new Date('2024-01-01T07:00:17.000Z') });
     await mockChain(page, {
