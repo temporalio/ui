@@ -7,10 +7,9 @@ import type {
   WorkflowExecution,
   WorkflowExecutionIdentity,
 } from '$lib/types/workflows';
-import { getErrorMessage } from '$lib/utilities/error-message';
 import { isWorkflowCloseEvent } from '$lib/utilities/is-event-type';
-import { isNetworkError } from '$lib/utilities/is-network-error';
 import { routeForApi } from '$lib/utilities/route-for-api';
+import { toError } from '$lib/utilities/to-error';
 
 import {
   fetchBidirectional,
@@ -28,18 +27,45 @@ import { EventBufferView } from './grouped-event-buffer.svelte';
 export const [getWorkflowHistoryController, setWorkflowHistoryController] =
   createContext<WorkflowHistoryController>();
 
+/**
+ * What the controller is doing with a Run's history.
+ *
+ * - `idle`: nothing loaded yet, or the controller was disposed.
+ * - `loadingClosedRun`: the Run is closed, so its history is final. Pages are
+ *   fetched from both ends until they meet; nothing is polled. `pauseHandle`
+ *   is set while the fetch waits at `pauseAfterPages` for `resume()`.
+ * - `loadingOpenRun`: the Run is open. The newest page (starting at
+ *   `tailStartId`, 0 until it arrives) is fetched once while a long-poll reads
+ *   forward from the first event. Loading ends when the poll reaches that page.
+ * - `loadingPaused`: `loadingOpenRun` with the poll stopped at
+ *   `pauseAfterPages`, until `resume()` asks for the full history. The newest
+ *   page can still arrive and finish loading.
+ * - `live`: all history so far is loaded; the long-poll adds new events as
+ *   they happen.
+ * - `liveUpdatesPaused`: all history so far is loaded, but polling is stopped
+ *   by `setLiveUpdatesPaused(true)` (the run page's refresh toggle).
+ * - `complete`: all history is loaded and the Run has closed; nothing more
+ *   will arrive.
+ * - `failed`: a fetch or poll failed. `retry()` resumes from the saved poll
+ *   cursor and keeps the events loaded so far.
+ */
+export type HistoryPhase =
+  | { kind: 'idle' }
+  | { kind: 'loadingClosedRun'; pauseHandle: PauseHandle | null }
+  | { kind: 'loadingOpenRun'; tailStartId: number }
+  | { kind: 'loadingPaused'; tailStartId: number }
+  | { kind: 'live' }
+  | { kind: 'liveUpdatesPaused' }
+  | { kind: 'complete' }
+  | { kind: 'failed'; error: Error | NetworkError };
+
 type HistoryLoadSession = {
-  controller: AbortController;
-  livePollController: AbortController | null;
+  fetchAbortController: AbortController;
+  livePollAbortController: AbortController | null;
   livePollTask: Promise<void> | null;
-  livePollFailed: boolean;
   lastPollToken: string;
   lastPollEventId: number;
-  workflowWasOpen: boolean;
-  catchingUp: boolean;
-  tailStartId: number;
   pollPages: number;
-  pollPausedAtPageLimit: boolean;
   finishCatchUp: () => void;
 };
 
@@ -50,6 +76,7 @@ type WorkflowHistoryControllerOptions = {
   pauseAfterPages?: number;
   liveUpdatesPaused?: boolean;
   onClose?: (closeEvent: HistoryEvent) => void;
+  onFirstEvent?: () => void;
   onLivePollError?: (error: Error | NetworkError) => void;
 };
 
@@ -57,25 +84,24 @@ export class WorkflowHistoryController {
   readonly workflowExecutionIdentity: Readonly<WorkflowExecutionIdentity>;
   readonly history: EventBufferView;
 
+  phase = $state.raw<HistoryPhase>({ kind: 'idle' });
   fetchComplete = $state(false);
   latestEventId = $state(0);
   totalExpectedEvents = $state(0);
   descMinId = $state(0);
-  error = $state.raw<Error | NetworkError | null>(null);
   closeEvent = $state.raw<HistoryEvent | null>(null);
 
-  private started = $state(false);
-  private disposed = false;
-  private historyRequested = false;
-  private historyClosed = false;
-  private liveUpdatesPaused: boolean;
-  private pauseHandle: PauseHandle | null = null;
-  private session: HistoryLoadSession | null = null;
-  private readonly buffer: GroupedEventBuffer;
-  private readonly maximumPageSize: number;
-  private readonly pauseAfterPages: number | undefined;
-  private readonly onClose: ((closeEvent: HistoryEvent) => void) | undefined;
-  private readonly onLivePollError:
+  private _disposed = false;
+  private _historyRequested = false;
+  private _firstEventReported = false;
+  private _liveUpdatesPaused: boolean;
+  private _session: HistoryLoadSession | null = null;
+  private readonly _buffer: GroupedEventBuffer;
+  private readonly _maximumPageSize: number;
+  private readonly _pauseAfterPages: number | undefined;
+  private readonly _onClose: ((closeEvent: HistoryEvent) => void) | undefined;
+  private readonly _onFirstEvent: (() => void) | undefined;
+  private readonly _onLivePollError:
     | ((error: Error | NetworkError) => void)
     | undefined;
 
@@ -86,6 +112,7 @@ export class WorkflowHistoryController {
     pauseAfterPages,
     liveUpdatesPaused = false,
     onClose,
+    onFirstEvent,
     onLivePollError,
   }: WorkflowHistoryControllerOptions) {
     const { namespace, workflowId, runId } = workflowExecutionIdentity;
@@ -97,90 +124,156 @@ export class WorkflowHistoryController {
     this.workflowExecutionIdentity = Object.freeze({
       ...workflowExecutionIdentity,
     });
-    this.buffer = buffer;
+    this._buffer = buffer;
     this.history = new EventBufferView(buffer);
-    this.maximumPageSize = maximumPageSize;
-    this.pauseAfterPages = pauseAfterPages;
-    this.liveUpdatesPaused = liveUpdatesPaused;
-    this.onClose = onClose;
-    this.onLivePollError = onLivePollError;
+    this._maximumPageSize = maximumPageSize;
+    this._pauseAfterPages = pauseAfterPages;
+    this._liveUpdatesPaused = liveUpdatesPaused;
+    this._onClose = onClose;
+    this._onFirstEvent = onFirstEvent;
+    this._onLivePollError = onLivePollError;
   }
 
   get loading(): boolean {
-    return this.started && !this.fetchComplete;
+    return (
+      this.phase.kind === 'loadingClosedRun' ||
+      this.phase.kind === 'loadingOpenRun' ||
+      this.phase.kind === 'loadingPaused'
+    );
+  }
+
+  get error(): Error | NetworkError | null {
+    return this.phase.kind === 'failed' ? this.phase.error : null;
   }
 
   load(workflow: WorkflowExecution): Promise<void> {
-    return this.loadHistory(workflow, { preserveHistory: false });
+    return this._loadHistory(workflow, { preserveHistory: false });
   }
 
   retry(workflow: WorkflowExecution): Promise<void> {
-    return this.loadHistory(workflow, { preserveHistory: true });
+    return this._loadHistory(workflow, { preserveHistory: true });
   }
 
-  private async loadHistory(
+  updateWorkflow(workflow: WorkflowExecution): void {
+    if (this._disposed) {
+      return;
+    }
+    this._verifyWorkflow(workflow);
+    this._buffer.setPendingMetadata(
+      workflow.pendingActivities ?? [],
+      workflow.pendingNexusOperations ?? [],
+    );
+  }
+
+  setLiveUpdatesPaused(paused: boolean): void {
+    if (this._disposed) {
+      return;
+    }
+    this._liveUpdatesPaused = paused;
+    const session = this._session;
+    if (!session) {
+      return;
+    }
+    if (paused && this.phase.kind === 'live') {
+      this.phase = { kind: 'liveUpdatesPaused' };
+    }
+    if (!paused && this.phase.kind === 'liveUpdatesPaused') {
+      this.phase = { kind: 'live' };
+    }
+    this._syncLivePoll(session);
+  }
+
+  resume(): void {
+    if (this._disposed) {
+      return;
+    }
+    this._historyRequested = true;
+    const phase = this.phase;
+    if (phase.kind === 'loadingClosedRun' && phase.pauseHandle) {
+      this.phase = { kind: 'loadingClosedRun', pauseHandle: null };
+      phase.pauseHandle.resume();
+      return;
+    }
+    const session = this._session;
+    if (phase.kind === 'loadingPaused' && session) {
+      this.phase = { kind: 'loadingOpenRun', tailStartId: phase.tailStartId };
+      this._startLivePoll(session);
+    }
+  }
+
+  dispose(): void {
+    if (this._disposed) {
+      return;
+    }
+    this._disposed = true;
+    this._stopSession();
+    this.phase = { kind: 'idle' };
+    this.history.dispose();
+  }
+
+  private async _loadHistory(
     workflow: WorkflowExecution,
     { preserveHistory }: { preserveHistory: boolean },
   ): Promise<void> {
-    if (this.disposed)
+    if (this._disposed) {
       throw new Error('Cannot load a disposed workflow history.');
-    this.verifyWorkflow(workflow);
+    }
+    this._verifyWorkflow(workflow);
     const lastPollToken = preserveHistory
-      ? (this.session?.lastPollToken ?? '')
+      ? (this._session?.lastPollToken ?? '')
       : '';
     const lastPollEventId =
       preserveHistory && lastPollToken
-        ? (this.session?.lastPollEventId ?? 0)
+        ? (this._session?.lastPollEventId ?? 0)
         : 0;
-    this.stopSession();
+    this._stopSession();
 
     this.fetchComplete = false;
-    this.error = null;
-    this.started = true;
     if (!preserveHistory) {
       this.latestEventId = 0;
       this.totalExpectedEvents = 0;
       this.descMinId = 0;
-      this.historyClosed = false;
       this.closeEvent = null;
-      this.buffer.reset(parseInt(workflow.historyEvents ?? '0') || 0);
+      this._buffer.reset(parseInt(workflow.historyEvents ?? '0') || 0);
     }
-    this.buffer.setPendingMetadata(
+    this._buffer.setPendingMetadata(
       workflow.pendingActivities ?? [],
       workflow.pendingNexusOperations ?? [],
     );
-    const isOpen = isWorkflowOpen(workflow);
 
     const session: HistoryLoadSession = {
-      controller: new AbortController(),
-      livePollController: null,
+      fetchAbortController: new AbortController(),
+      livePollAbortController: null,
       livePollTask: null,
-      livePollFailed: false,
       lastPollToken,
       lastPollEventId,
-      workflowWasOpen: isOpen,
-      catchingUp: isOpen,
-      tailStartId: 0,
       pollPages: 0,
-      pollPausedAtPageLimit: false,
       finishCatchUp: () => {},
     };
-    this.session = session;
+    this._session = session;
 
-    if (isOpen) {
-      await this.loadOpenHistory(session);
+    if (isWorkflowOpen(workflow)) {
+      this.phase = { kind: 'loadingOpenRun', tailStartId: 0 };
+      await this._loadOpenHistory(session);
       return;
     }
 
+    this.phase = { kind: 'loadingClosedRun', pauseHandle: null };
+    await this._loadClosedHistory(session);
+  }
+
+  private async _loadClosedHistory(session: HistoryLoadSession): Promise<void> {
+    const { signal } = session.fetchAbortController;
     try {
       await fetchBidirectional({
         ...this.workflowExecutionIdentity,
-        signal: session.controller.signal,
-        maximumPageSize: this.maximumPageSize,
-        pauseAfterPages: this.pauseAfterPages,
+        signal,
+        maximumPageSize: this._maximumPageSize,
+        pauseAfterPages: this._pauseAfterPages,
         onProgress: (progress) => {
-          if (!this.isCurrent(session) || session.controller.signal.aborted)
+          if (!this._isCurrent(session) || signal.aborted) {
             return;
+          }
           this.totalExpectedEvents = Math.max(
             this.totalExpectedEvents,
             progress.totalEstimated,
@@ -193,168 +286,134 @@ export class WorkflowHistoryController {
         },
         onPause: (handle) => {
           if (
-            !this.isCurrent(session) ||
-            session.controller.signal.aborted ||
-            this.historyRequested
+            !this._isCurrent(session) ||
+            signal.aborted ||
+            this._historyRequested
           ) {
             handle.resume();
             return;
           }
-          this.pauseHandle = handle;
+          this.phase = { kind: 'loadingClosedRun', pauseHandle: handle };
         },
         onRawPage: (events) => {
-          if (!this.isCurrent(session) || session.controller.signal.aborted)
+          if (!this._isCurrent(session) || signal.aborted) {
             return;
-          for (const event of events) this.ingestEvent(event, session);
+          }
+          for (const event of events) {
+            this._ingestEvent(event, session);
+          }
         },
       });
-      if (this.isCurrent(session)) {
-        this.pauseHandle = null;
-        this.fetchComplete = true;
+      if (!this._isCurrent(session)) {
+        return;
       }
+      this.phase = { kind: 'complete' };
+      this.fetchComplete = true;
     } catch (error) {
-      if (!this.isCurrent(session)) return;
-      this.error =
-        error instanceof Error || isNetworkError(error)
-          ? error
-          : new Error(getErrorMessage(error));
-      session.controller.abort();
-      const handle = this.pauseHandle;
-      this.pauseHandle = null;
-      handle?.resume();
-    } finally {
-      if (this.isCurrent(session)) this.started = false;
+      if (!this._isCurrent(session)) {
+        return;
+      }
+      const phase = this.phase;
+      this.phase = { kind: 'failed', error: toError(error) };
+      session.fetchAbortController.abort();
+      if (phase.kind === 'loadingClosedRun') {
+        phase.pauseHandle?.resume();
+      }
     }
   }
 
-  private async loadOpenHistory(session: HistoryLoadSession): Promise<void> {
+  private async _loadOpenHistory(session: HistoryLoadSession): Promise<void> {
     const caughtUp = new Promise<void>((resolve) => {
       session.finishCatchUp = resolve;
     });
-    this.startLivePoll(session);
-    void this.loadTail(session);
+    this._startLivePoll(session);
+    void this._loadTail(session);
     await caughtUp;
-    if (this.isCurrent(session)) this.started = false;
   }
 
-  private async loadTail(session: HistoryLoadSession): Promise<void> {
+  private async _loadTail(session: HistoryLoadSession): Promise<void> {
     try {
       const events = await fetchHistoryTail({
         ...this.workflowExecutionIdentity,
-        signal: session.controller.signal,
-        maximumPageSize: this.maximumPageSize,
+        signal: session.fetchAbortController.signal,
+        maximumPageSize: this._maximumPageSize,
       });
-      if (!this.isCurrent(session)) return;
+      if (!this._isCurrent(session)) {
+        return;
+      }
       const eventIds = events.map((event) => parseInt(event.eventId) || 0);
-      for (const event of events) this.ingestEvent(event, session);
+      for (const event of events) {
+        this._ingestEvent(event, session);
+      }
       session.pollPages++;
-      session.tailStartId = eventIds.length ? Math.min(...eventIds) : 1;
+      const tailStartId = eventIds.length ? Math.min(...eventIds) : 1;
       this.totalExpectedEvents = Math.max(
         this.totalExpectedEvents,
         ...eventIds,
       );
       this.descMinId = this.descMinId
-        ? Math.min(this.descMinId, session.tailStartId)
-        : session.tailStartId;
-      this.checkCaughtUp(session);
-      this.syncLivePoll(session);
+        ? Math.min(this.descMinId, tailStartId)
+        : tailStartId;
+      const phase = this.phase;
+      if (phase.kind === 'loadingOpenRun' || phase.kind === 'loadingPaused') {
+        this.phase = { ...phase, tailStartId };
+      }
+      this._finishCatchUpIfCaughtUp(session);
+      this._syncLivePoll(session);
     } catch (error) {
-      if (!this.isCurrent(session)) return;
-      this.error =
-        error instanceof Error || isNetworkError(error)
-          ? error
-          : new Error(getErrorMessage(error));
-      session.controller.abort();
-      session.livePollFailed = true;
-      session.livePollController?.abort();
-      this.endCatchUp(session);
+      if (!this._isCurrent(session)) {
+        return;
+      }
+      this.phase = { kind: 'failed', error: toError(error) };
+      session.fetchAbortController.abort();
+      session.livePollAbortController?.abort();
+      session.finishCatchUp();
     }
   }
 
-  private checkCaughtUp(session: HistoryLoadSession): void {
-    if (!session.catchingUp || !session.tailStartId) return;
-    if (session.lastPollEventId < session.tailStartId - 1) return;
+  private _finishCatchUpIfCaughtUp(session: HistoryLoadSession): void {
+    const phase = this.phase;
+    if (phase.kind !== 'loadingOpenRun' && phase.kind !== 'loadingPaused') {
+      return;
+    }
+    if (!phase.tailStartId) {
+      return;
+    }
+    if (session.lastPollEventId < phase.tailStartId - 1) {
+      return;
+    }
     this.fetchComplete = true;
-    this.endCatchUp(session);
-  }
-
-  private endCatchUp(session: HistoryLoadSession): void {
-    session.catchingUp = false;
-    if (session.pollPausedAtPageLimit) {
-      session.pollPausedAtPageLimit = false;
-      this.pauseHandle = null;
-    }
+    this.phase = this._phaseAfterLoad();
     session.finishCatchUp();
   }
 
-  private syncLivePoll(session: HistoryLoadSession): void {
-    if (!this.canPoll(session)) {
-      session.livePollController?.abort();
-      return;
+  private _phaseAfterLoad(): HistoryPhase {
+    if (this.closeEvent) {
+      return { kind: 'complete' };
     }
-    this.startLivePoll(session);
+    if (this._liveUpdatesPaused) {
+      return { kind: 'liveUpdatesPaused' };
+    }
+    return { kind: 'live' };
   }
 
-  private pauseAtPageLimit(session: HistoryLoadSession): void {
+  private _pauseAtPageLimit(session: HistoryLoadSession): void {
+    const phase = this.phase;
     if (
-      !session.catchingUp ||
-      this.historyRequested ||
-      this.pauseAfterPages === undefined ||
-      session.pollPages < this.pauseAfterPages
+      phase.kind !== 'loadingOpenRun' ||
+      this._historyRequested ||
+      this._pauseAfterPages === undefined ||
+      session.pollPages < this._pauseAfterPages
     ) {
       return;
     }
-    session.pollPausedAtPageLimit = true;
-    this.pauseHandle = {
-      resume: () => {
-        session.pollPausedAtPageLimit = false;
-        this.startLivePoll(session);
-      },
+    this.phase = {
+      kind: 'loadingPaused',
+      tailStartId: phase.tailStartId,
     };
   }
 
-  updateWorkflow(workflow: WorkflowExecution): void {
-    if (this.disposed) return;
-    this.verifyWorkflow(workflow);
-    this.buffer.setPendingMetadata(
-      workflow.pendingActivities ?? [],
-      workflow.pendingNexusOperations ?? [],
-    );
-    const session = this.session;
-    if (!session) return;
-    session.workflowWasOpen ||= isWorkflowOpen(workflow);
-    this.startLivePoll(session);
-  }
-
-  setLiveUpdatesPaused(paused: boolean): void {
-    if (this.disposed) return;
-    this.liveUpdatesPaused = paused;
-    const session = this.session;
-    if (!session) return;
-    if (paused) {
-      if (!session.catchingUp) session.livePollController?.abort();
-      return;
-    }
-    this.startLivePoll(session);
-  }
-
-  resume(): void {
-    if (this.disposed) return;
-    this.historyRequested = true;
-    const handle = this.pauseHandle;
-    this.pauseHandle = null;
-    handle?.resume();
-  }
-
-  dispose(): void {
-    if (this.disposed) return;
-    this.disposed = true;
-    this.started = false;
-    this.stopSession();
-    this.history.dispose();
-  }
-
-  private verifyWorkflow(workflow: WorkflowExecution): void {
+  private _verifyWorkflow(workflow: WorkflowExecution): void {
     if (
       workflow.id !== this.workflowExecutionIdentity.workflowId ||
       workflow.runId !== this.workflowExecutionIdentity.runId
@@ -363,103 +422,141 @@ export class WorkflowHistoryController {
     }
   }
 
-  private isCurrent(session: HistoryLoadSession): boolean {
-    return !this.disposed && this.session === session;
+  private _isCurrent(session: HistoryLoadSession): boolean {
+    return !this._disposed && this._session === session;
   }
 
-  private canPoll(session: HistoryLoadSession): boolean {
-    return (
-      this.isCurrent(session) &&
-      !session.pollPausedAtPageLimit &&
-      !session.livePollFailed &&
-      (session.catchingUp ||
-        (!this.liveUpdatesPaused &&
-          session.workflowWasOpen &&
-          !this.historyClosed))
-    );
+  private _canPoll(session: HistoryLoadSession): boolean {
+    if (!this._isCurrent(session)) {
+      return false;
+    }
+    switch (this.phase.kind) {
+      case 'loadingOpenRun':
+      case 'live':
+        return true;
+      default:
+        return false;
+    }
   }
 
-  private ingestEvent(
+  private _ingestEvent(
     event: HistoryEvent,
     session: HistoryLoadSession,
   ): boolean {
-    if (!this.isCurrent(session)) return false;
-    const isNew = this.buffer.ingestHistoryEvent(event);
+    if (!this._isCurrent(session)) {
+      return false;
+    }
+    const isNew = this._buffer.ingestHistoryEvent(event);
     this.latestEventId = Math.max(
       this.latestEventId,
       parseInt(event.eventId) || 0,
     );
+    if (isNew) {
+      this._reportFirstEvent();
+    }
     if (isWorkflowCloseEvent(event)) {
-      this.historyClosed = true;
-      if (!session.catchingUp) session.livePollController?.abort();
-      if (!this.closeEvent) {
-        this.closeEvent = event;
-        this.onClose?.(event);
-      }
+      this._handleCloseEvent(event, session);
     }
     return isNew;
   }
 
-  private startLivePoll(session: HistoryLoadSession): void {
-    if (!this.canPoll(session) || session.livePollTask) return;
-    const controller = new AbortController();
-    session.livePollController = controller;
+  private _reportFirstEvent(): void {
+    if (this._firstEventReported) {
+      return;
+    }
+    if (this._buffer.getLazyGroups().length === 0) {
+      return;
+    }
+    this._firstEventReported = true;
+    this._onFirstEvent?.();
+  }
+
+  private _handleCloseEvent(
+    event: HistoryEvent,
+    session: HistoryLoadSession,
+  ): void {
+    if (this.phase.kind === 'live' || this.phase.kind === 'liveUpdatesPaused') {
+      this.phase = { kind: 'complete' };
+    }
+    this._syncLivePoll(session);
+    if (this.closeEvent) {
+      return;
+    }
+    this.closeEvent = event;
+    this._onClose?.(event);
+  }
+
+  private _syncLivePoll(session: HistoryLoadSession): void {
+    if (!this._canPoll(session)) {
+      session.livePollAbortController?.abort();
+      return;
+    }
+    this._startLivePoll(session);
+  }
+
+  private _startLivePoll(session: HistoryLoadSession): void {
+    if (!this._canPoll(session) || session.livePollTask) {
+      return;
+    }
+    const abortController = new AbortController();
+    session.livePollAbortController = abortController;
     session.livePollTask = runLivePoll({
       route: routeForApi('events.ascending', this.workflowExecutionIdentity),
       runId: this.workflowExecutionIdentity.runId,
       startToken: session.lastPollToken,
-      maximumPageSize: this.maximumPageSize,
-      signal: controller.signal,
-      shouldRetryError: () => !session.catchingUp,
+      maximumPageSize: this._maximumPageSize,
+      signal: abortController.signal,
+      shouldRetryError: () => this.phase.kind !== 'loadingOpenRun',
       onEvent: (event) => {
-        if (controller.signal.aborted) return false;
-        const isNew = this.ingestEvent(event, session);
+        if (abortController.signal.aborted) {
+          return false;
+        }
+        const isNew = this._ingestEvent(event, session);
         session.lastPollEventId = Math.max(
           session.lastPollEventId,
           parseInt(event.eventId) || 0,
         );
-        this.checkCaughtUp(session);
+        this._finishCatchUpIfCaughtUp(session);
         return isNew;
       },
       onToken: (token) => {
-        if (!this.isCurrent(session) || controller.signal.aborted) return;
+        if (!this._isCurrent(session) || abortController.signal.aborted) {
+          return;
+        }
         session.lastPollToken = token;
         session.pollPages++;
-        this.pauseAtPageLimit(session);
-        this.syncLivePoll(session);
+        this._pauseAtPageLimit(session);
+        this._syncLivePoll(session);
       },
     })
-      .then(() => {
-        if (!this.isCurrent(session) || controller.signal.aborted) return;
-        this.historyClosed = true;
-      })
       .catch((error) => {
-        if (!this.isCurrent(session) || controller.signal.aborted) return;
-        const pollError =
-          error instanceof Error || isNetworkError(error)
-            ? error
-            : new Error(getErrorMessage(error));
-        this.error = pollError;
-        session.livePollFailed = true;
-        controller.abort();
-        this.endCatchUp(session);
-        this.onLivePollError?.(pollError);
+        if (!this._isCurrent(session) || abortController.signal.aborted) {
+          return;
+        }
+        const pollError = toError(error);
+        this.phase = { kind: 'failed', error: pollError };
+        abortController.abort();
+        session.finishCatchUp();
+        this._onLivePollError?.(pollError);
       })
       .finally(() => {
         session.livePollTask = null;
-        session.livePollController = null;
-        if (controller.signal.aborted) this.startLivePoll(session);
+        session.livePollAbortController = null;
+        if (abortController.signal.aborted) {
+          this._startLivePoll(session);
+        }
       });
   }
 
-  private stopSession(): void {
-    const session = this.session;
-    this.session = null;
-    session?.controller.abort();
-    session?.livePollController?.abort();
+  private _stopSession(): void {
+    const session = this._session;
+    this._session = null;
+    session?.fetchAbortController.abort();
+    session?.livePollAbortController?.abort();
     session?.finishCatchUp();
-    const handle = this.pauseHandle;
-    this.pauseHandle = null;
-    handle?.resume();
+    const phase = this.phase;
+    if (phase.kind === 'loadingClosedRun') {
+      phase.pauseHandle?.resume();
+    }
   }
 }

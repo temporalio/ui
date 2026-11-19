@@ -1,6 +1,7 @@
 import type { HistoryEvent } from '$lib/types/events';
 import type { WorkflowExecution } from '$lib/types/workflows';
 import { isNotFound } from '$lib/utilities/handle-error';
+import { toError } from '$lib/utilities/to-error';
 
 import type {
   ChainLoadResult,
@@ -9,11 +10,7 @@ import type {
   FirstRunState,
 } from './types';
 
-import {
-  type ChainContext,
-  readStartedEvent,
-  toChainError,
-} from './chain-context.svelte';
+import { type ChainContext, readStartedEvent } from './chain-context.svelte';
 
 const NO_REDIRECT: ChainLoadResult = { redirectFirstRunId: null };
 
@@ -56,7 +53,7 @@ export class ChainLoader {
       if (this._context.disposed) {
         return NO_REDIRECT;
       }
-      this.resolution = { kind: 'failed', error: toChainError(error) };
+      this.resolution = { kind: 'failed', error: toError(error) };
       return NO_REDIRECT;
     }
     if (this._context.disposed) {
@@ -88,7 +85,7 @@ export class ChainLoader {
     } catch (error) {
       state = isNotFound(error)
         ? { status: 'notFound' }
-        : { status: 'failed', error: toChainError(error) };
+        : { status: 'failed', error: toError(error) };
     }
     if (!this._context.disposed) {
       this.firstRun = state;
