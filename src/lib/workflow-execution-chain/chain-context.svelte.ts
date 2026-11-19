@@ -2,13 +2,10 @@ import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 
 import type { HistoryEvent } from '$lib/types/events';
 import type { WorkflowExecution } from '$lib/types/workflows';
-import { getErrorMessage } from '$lib/utilities/error-message';
-import { isNetworkError } from '$lib/utilities/is-network-error';
 
 import { retryWithBackoff } from './retry-with-backoff';
 import type {
   ChainClient,
-  ChainError,
   ChainEvent,
   ChainRun,
   WorkflowExecutionChainIdentity,
@@ -49,11 +46,6 @@ export type ChainContext = {
   subscribe: (listener: (event: ChainEvent) => void) => () => void;
   dispose: () => void;
 };
-
-export const toChainError = (error: unknown): ChainError =>
-  error instanceof Error || isNetworkError(error)
-    ? error
-    : new Error(getErrorMessage(error));
 
 export const readStartedEvent = (
   event: HistoryEvent,

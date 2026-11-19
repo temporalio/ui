@@ -101,6 +101,7 @@ function createController(
     pauseAfterPages?: number;
     liveUpdatesPaused?: boolean;
     onClose?: (closeEvent: HistoryEvent) => void;
+    onFirstEvent?: () => void;
     onLivePollError?: (error: Error) => void;
   } = {
     pauseAfterPages: 2,
@@ -805,6 +806,141 @@ describe('WorkflowHistoryController', () => {
       expect(polls).toHaveLength(1);
       await expect(controller.load(workflow())).rejects.toThrow('disposed');
       await expect(controller.retry(workflow())).rejects.toThrow('disposed');
+    });
+  });
+
+  describe('phase', () => {
+    it('is idle before a load', () => {
+      const { controller } = createController();
+      expect(controller.phase).toEqual({ kind: 'idle' });
+      expect(controller.loading).toBe(false);
+    });
+
+    it('loads a closed Run and is complete once loaded', async () => {
+      const { controller } = createController();
+      const load = controller.load(workflow());
+      expect(controller.phase).toEqual({
+        kind: 'loadingClosedRun',
+        pauseHandle: null,
+      });
+      request(0).options.onRawPage([makeWorkflowCompleted(10)]);
+      request(0).result.resolve();
+      await load;
+
+      expect(controller.phase).toEqual({ kind: 'complete' });
+    });
+
+    it('is complete when the close event arrives while loading an open Run', async () => {
+      const { controller } = createController();
+      const load = controller.load(workflow('run-1', true));
+      expect(controller.phase).toEqual({
+        kind: 'loadingOpenRun',
+        tailStartId: 0,
+      });
+      tail(0).result.resolve([makeWorkflowCompleted(4), ...tailEvents([3])]);
+      await settle();
+      expect(controller.phase).toEqual({
+        kind: 'loadingOpenRun',
+        tailStartId: 3,
+      });
+
+      pollEvents(0, [1, 2]);
+      await load;
+
+      expect(controller.phase).toEqual({ kind: 'complete' });
+      expect(controller.closeEvent).not.toBeNull();
+    });
+
+    it('pauses loading at the page limit and resumes loading the open Run', async () => {
+      const { controller } = createController();
+      const load = controller.load(workflow('run-1', true));
+      tail(0).result.resolve(tailEvents([50, 51]));
+      await settle();
+      pollEvents(0, [1, 2], 'token-3');
+
+      expect(controller.phase).toEqual({
+        kind: 'loadingPaused',
+        tailStartId: 50,
+      });
+      expect(controller.loading).toBe(true);
+      poll(0).result.resolve();
+      await settle();
+
+      controller.resume();
+      expect(controller.phase).toEqual({
+        kind: 'loadingOpenRun',
+        tailStartId: 50,
+      });
+      pollEvents(1, range(3, 49));
+      await load;
+
+      expect(controller.phase).toEqual({ kind: 'live' });
+    });
+
+    it('moves between live and liveUpdatesPaused', async () => {
+      const { controller } = createController();
+      const load = controller.load(workflow('run-1', true));
+      tail(0).result.resolve(tailEvents([1]));
+      await load;
+      expect(controller.phase).toEqual({ kind: 'live' });
+
+      controller.setLiveUpdatesPaused(true);
+      expect(controller.phase).toEqual({ kind: 'liveUpdatesPaused' });
+      controller.setLiveUpdatesPaused(false);
+      expect(controller.phase).toEqual({ kind: 'live' });
+    });
+
+    it('fails on a poll error while live and keeps fetchComplete', async () => {
+      const { controller } = createController();
+      const load = controller.load(workflow('run-1', true));
+      tail(0).result.resolve(tailEvents([1]));
+      await load;
+
+      const failure = new Error('forbidden');
+      poll(0).result.reject(failure);
+      await settle();
+
+      expect(controller.phase).toEqual({ kind: 'failed', error: failure });
+      expect(controller.error).toBe(failure);
+      expect(controller.fetchComplete).toBe(true);
+      expect(controller.loading).toBe(false);
+    });
+
+    it('retries from failed into loading the open Run', async () => {
+      const { controller } = createController();
+      const load = controller.load(workflow('run-1', true));
+      tail(0).result.reject(new Error('history failed'));
+      await load;
+      expect(controller.phase.kind).toBe('failed');
+
+      const retry = controller.retry(workflow('run-1', true));
+      expect(controller.phase).toEqual({
+        kind: 'loadingOpenRun',
+        tailStartId: 0,
+      });
+      expect(controller.error).toBeNull();
+      tail(1).result.resolve(tailEvents([1]));
+      await retry;
+
+      expect(controller.phase).toEqual({ kind: 'live' });
+    });
+  });
+
+  describe('onFirstEvent', () => {
+    it('is called once, when the first event group appears', async () => {
+      const onFirstEvent = vi.fn();
+      const { controller } = createController('run-1', { onFirstEvent });
+      const load = controller.load(workflow());
+      request(0).options.onRawPage([makeWorkflowStarted(1)]);
+      expect(onFirstEvent).not.toHaveBeenCalled();
+
+      request(0).options.onRawPage([makeEvent(2), makeEvent(3)]);
+      expect(onFirstEvent).toHaveBeenCalledOnce();
+      request(0).options.onRawPage([makeWorkflowCompleted(10)]);
+      request(0).result.resolve();
+      await load;
+
+      expect(onFirstEvent).toHaveBeenCalledOnce();
     });
   });
 });

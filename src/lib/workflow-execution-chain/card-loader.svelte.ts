@@ -2,11 +2,12 @@ import type { WorkflowHistoryController } from '$lib/services/workflow-history-c
 import type { HistoryEvent } from '$lib/types/events';
 import type { WorkflowExecution } from '$lib/types/workflows';
 import { isNotFound } from '$lib/utilities/handle-error';
+import { toError } from '$lib/utilities/to-error';
 
 import { LoadQueue } from './load-queue';
 import type { CardLoad, ChainError, RunLookup } from './types';
 
-import { type ChainContext, toChainError } from './chain-context.svelte';
+import type { ChainContext } from './chain-context.svelte';
 import type { RunCard, RunRecord } from './run-record.svelte';
 
 export const BACKGROUND_CARD_LOAD_CONCURRENCY = 1;
@@ -159,7 +160,7 @@ export class CardLoader {
       }
       record.card.loadState = {
         status: 'error',
-        error: toChainError(error),
+        error: toError(error),
         retryable: !isNotFound(error),
       };
       this._holdBackgroundLoadsUntilForegroundShows();
