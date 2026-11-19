@@ -35,25 +35,8 @@ class FakeController {
   dispose = vi.fn();
   private _finishLoad: ((error?: unknown) => void) | null = null;
 
-  load = vi.fn((): Promise<void> => {
-    this.error = null;
-    if (!this._server.holdLoads) {
-      this.error = this._server.loadErrors.get(this.identity.runId) ?? null;
-      return Promise.resolve();
-    }
-    return new Promise<void>((resolve) => {
-      this._finishLoad = (error) => {
-        this._finishLoad = null;
-        this.error = error ?? null;
-        resolve();
-      };
-    });
-  });
-
-  retry = vi.fn((): Promise<void> => {
-    this.error = null;
-    return Promise.resolve();
-  });
+  load = vi.fn((): Promise<void> => this._loadHistory());
+  retry = vi.fn((): Promise<void> => this._loadHistory());
 
   constructor(
     readonly identity: WorkflowExecutionIdentity,
@@ -81,6 +64,21 @@ class FakeController {
 
   finishLoad(error?: unknown): void {
     this._finishLoad?.(error);
+  }
+
+  private _loadHistory(): Promise<void> {
+    this.error = null;
+    if (!this._server.holdLoads) {
+      this.error = this._server.loadErrors.get(this.identity.runId) ?? null;
+      return Promise.resolve();
+    }
+    return new Promise<void>((resolve) => {
+      this._finishLoad = (error) => {
+        this._finishLoad = null;
+        this.error = error ?? null;
+        resolve();
+      };
+    });
   }
 }
 
@@ -774,7 +772,9 @@ describe('WorkflowExecutionChain', () => {
       server.addChain(runIds(3));
       const chain = track(await loadChain(server));
 
-      expect(server.controllers.get('run-2')!.load).toHaveBeenCalledTimes(4);
+      const controller = server.controllers.get('run-2')!;
+      expect(controller.load).toHaveBeenCalledOnce();
+      expect(controller.retry).toHaveBeenCalledTimes(3);
       expect(chain.cardLoads.get('run-2')).toEqual({
         status: 'error',
         error: networkError(500),
@@ -827,7 +827,8 @@ describe('WorkflowExecutionChain', () => {
       await finishLoad('run-2');
 
       expect(server.controllers.get('run-3')!.loading).toBe(true);
-      expect(server.controllers.get('run-3')!.load).toHaveBeenCalledTimes(5);
+      expect(server.controllers.get('run-3')!.load).toHaveBeenCalledOnce();
+      expect(server.controllers.get('run-3')!.retry).toHaveBeenCalledTimes(4);
       expect(server.controllers.has('run-1')).toBe(false);
 
       await finishLoad('run-3');
@@ -875,7 +876,8 @@ describe('WorkflowExecutionChain', () => {
       chain.retryCard('run-2');
       await finishLoad('run-2');
 
-      expect(controller.retry).not.toHaveBeenCalled();
+      expect(controller.load).toHaveBeenCalledOnce();
+      expect(controller.retry).toHaveBeenCalledOnce();
       expect(chain.cardLoads.get('run-2')).toEqual({ status: 'loaded' });
     });
 

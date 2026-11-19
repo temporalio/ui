@@ -137,9 +137,8 @@ export class CardLoader {
       return;
     }
     const record = this._context.records.recordFor(runId);
+    let historyStarted = record.card.controller !== undefined;
     const controller = this._controllerFor(record);
-    const resumeHistory = record.card.livePollFailed;
-    record.card.livePollFailed = false;
     record.card.loadState = { status: 'loading' };
     try {
       await this._context.retry(async () => {
@@ -147,9 +146,11 @@ export class CardLoader {
         if (!run) {
           throw new Error('Missing Run for this card.');
         }
-        await (resumeHistory
+        const loading = historyStarted
           ? controller.retry(run.workflow)
-          : controller.load(run.workflow));
+          : controller.load(run.workflow);
+        historyStarted = true;
+        await loading;
         if (controller.error) {
           throw controller.error;
         }
@@ -204,7 +205,6 @@ export class CardLoader {
     if (this._context.disposed || card?.loadState?.status !== 'loaded') {
       return;
     }
-    card.livePollFailed = true;
     card.loadState = { status: 'error', error, retryable: !isNotFound(error) };
     this._holdBackgroundLoadsUntilForegroundShows();
   }

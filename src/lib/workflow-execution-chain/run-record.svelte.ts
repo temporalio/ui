@@ -7,7 +7,6 @@ export class RunCard {
   controller = $state.raw<WorkflowHistoryController | undefined>();
   loadState = $state.raw<CardLoad | undefined>();
   firstEventSeen = false;
-  livePollFailed = false;
 }
 
 /** What `LatestRunFollower` remembers about a Run it followed. */
