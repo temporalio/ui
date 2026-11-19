@@ -42,10 +42,6 @@
       });
     },
   });
-
-  export function focusRun(runId: string): void {
-    cardElements[runId]?.focus({ preventScroll: true });
-  }
 </script>
 
 {#if runs.length === 0}

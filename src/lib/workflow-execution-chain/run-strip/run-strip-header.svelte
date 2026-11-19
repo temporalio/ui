@@ -2,23 +2,15 @@
   import EventHistoryLegend from '$lib/components/lines-and-dots/event-history-legend.svelte';
   import { translate } from '$lib/i18n/translate';
   import { Button } from '$lib/io/button';
-  import { IconTarget, IconWarning } from '$lib/io/icon';
+  import { IconWarning } from '$lib/io/icon';
 
   interface Props {
     runCount: number;
     nextRunCheckFailed: boolean;
     onRetryNextRunCheck: () => void;
-    selectedOutOfView: boolean;
-    onScrollToSelected: () => void;
   }
 
-  let {
-    runCount,
-    nextRunCheckFailed,
-    onRetryNextRunCheck,
-    selectedOutOfView,
-    onScrollToSelected,
-  }: Props = $props();
+  let { runCount, nextRunCheckFailed, onRetryNextRunCheck }: Props = $props();
 </script>
 
 <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
@@ -45,15 +37,6 @@
       >
       <Button size="xs" colorScheme="secondary" onclick={onRetryNextRunCheck}
         >{translate('common.retry')}</Button
-      >
-    {/if}
-    {#if selectedOutOfView}
-      <Button
-        size="xs"
-        colorScheme="ghost"
-        LeadingIcon={IconTarget}
-        onclick={onScrollToSelected}
-        >{translate('workflows.scroll-to-selected')}</Button
       >
     {/if}
   </div>

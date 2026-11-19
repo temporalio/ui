@@ -207,7 +207,6 @@ export const Strings = {
   'next-run-load-failed': "Couldn't load the next run",
   'next-run-check-failed': "Couldn't check for a next run",
   'run-status-stale': "Couldn't refresh this run's status",
-  'scroll-to-selected': 'Scroll to selected',
   'view-previous-run': 'View previous run',
   'start-of-chain': 'Start of chain',
   'past-retention': 'Past retention',

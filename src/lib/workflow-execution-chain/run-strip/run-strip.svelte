@@ -36,7 +36,6 @@
     getScrollIndicators,
     preferredScrollBehavior,
     type ScrollMetrics,
-    scrollSegmentIntoView,
   } from './run-strip-scroll.svelte';
 
   interface Props {
@@ -61,7 +60,6 @@
   const messages = announcer.messages;
   const readWallClock = createWallClock();
 
-  let runCards = $state<ReturnType<typeof RunCards>>();
   let scroller = $state<HTMLDivElement>();
   let scrollMetrics = $state<ScrollMetrics>();
   let newerArrivedForRunId = $state<string | null>(null);
@@ -130,12 +128,7 @@
       CAP_WIDTH + CARD_GAP + olderPlaceholderWidth,
     ),
   );
-  const selectedSegment = $derived(
-    segments.find((segment) => segment.id === selectedRunId),
-  );
-  const scrollIndicators = $derived(
-    getScrollIndicators(scrollMetrics, selectedSegment),
-  );
+  const scrollIndicators = $derived(getScrollIndicators(scrollMetrics));
   const nowX = $derived.by(() => {
     const lastSegment = segments[segments.length - 1];
     return followingChain && lastSegment
@@ -199,16 +192,6 @@
     }
   };
 
-  const scrollToSelected = () => {
-    if (!selectedRunId) {
-      return;
-    }
-    runCards?.focusRun(selectedRunId);
-    if (scroller && selectedSegment) {
-      scrollSegmentIntoView(scroller, selectedSegment);
-    }
-  };
-
   const announceChainEvent = (event: ChainEvent) => {
     if (event.type === 'closed') {
       announcer.announce(translate('workflows.chain-closed'));
@@ -242,8 +225,6 @@
     runCount={runs.length}
     nextRunCheckFailed={chain.nextRunCheckFailed}
     onRetryNextRunCheck={() => chain.retryNextRunCheck()}
-    selectedOutOfView={scrollIndicators.selectedOutOfView}
-    onScrollToSelected={scrollToSelected}
   />
 
   <div
@@ -277,7 +258,6 @@
             {onSelect}
           />
           <RunCards
-            bind:this={runCards}
             {chain}
             {cardWidths}
             {now}

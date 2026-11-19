@@ -19,7 +19,6 @@ export type ScrollMetrics = {
 type ScrollIndicators = {
   scrolledFromStart: boolean;
   scrolledFromEnd: boolean;
-  selectedOutOfView: boolean;
 };
 
 type RunStripFollowAttachmentOptions = {
@@ -46,28 +45,18 @@ const readScrollMetrics = ({
 
 export const getScrollIndicators = (
   metrics: ScrollMetrics | undefined,
-  selectedSegment: RunSegment | undefined,
 ): ScrollIndicators => {
   if (!metrics) {
-    return {
-      scrolledFromStart: false,
-      scrolledFromEnd: false,
-      selectedOutOfView: false,
-    };
+    return { scrolledFromStart: false, scrolledFromEnd: false };
   }
   const { scrollLeft, clientWidth, scrollWidth } = metrics;
   return {
     scrolledFromStart: scrollLeft > 1,
     scrolledFromEnd: scrollLeft + clientWidth < scrollWidth - 1,
-    selectedOutOfView: Boolean(
-      selectedSegment &&
-      (selectedSegment.x + selectedSegment.width < scrollLeft + EDGE_INSET ||
-        selectedSegment.x > scrollLeft + clientWidth - EDGE_INSET),
-    ),
   };
 };
 
-export const scrollSegmentIntoView = (
+const scrollSegmentIntoView = (
   scroller: HTMLElement,
   segment: RunSegment,
 ): void => {
