@@ -251,29 +251,13 @@ describe('WorkflowHistoryController request sequence', () => {
       expect(waiters).toHaveLength(0);
     });
 
-    it('pauses the ascending cursor after pauseAfterPages until resumed', async () => {
+    it('loads all of an open Run past pauseAfterPages without resume()', async () => {
       appendEvents(5000);
       const controller = createController({ pauseAfterPages: 2 });
 
-      const load = controller.load(workflow(true));
-      await vi.waitFor(() =>
-        expect(controller.history.events.length).toBeGreaterThanOrEqual(2000),
-      );
-      await flush();
-      const pausedRequests = requests.length;
-      await flush();
-
-      expect(requests).toHaveLength(pausedRequests);
-      expect(ascending().length).toBeLessThanOrEqual(2);
-      expect(controller.fetchComplete).toBe(false);
-      const pausedAscending = ascending().length;
-      const pausedAt = ascending().at(-1)?.eventIds.at(-1) ?? 0;
-
-      controller.resume();
-      await load;
+      await controller.load(workflow(true));
 
       expect(controller.fetchComplete).toBe(true);
-      expect(ascending()[pausedAscending].token).toBe(String(pausedAt + 1));
       expect(controller.history.events).toHaveLength(5000);
     });
 

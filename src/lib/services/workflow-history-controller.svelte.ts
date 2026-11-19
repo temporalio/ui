@@ -37,9 +37,6 @@ export const [getWorkflowHistoryController, setWorkflowHistoryController] =
  * - `loadingOpenRun`: the Run is open. The newest page (starting at
  *   `tailStartId`, 0 until it arrives) is fetched once while a long-poll reads
  *   forward from the first event. Loading ends when the poll reaches that page.
- * - `loadingPaused`: `loadingOpenRun` with the poll stopped at
- *   `pauseAfterPages`, until `resume()` asks for the full history. The newest
- *   page can still arrive and finish loading.
  * - `live`: all history so far is loaded; the long-poll adds new events as
  *   they happen.
  * - `liveUpdatesPaused`: all history so far is loaded, but polling is stopped
@@ -53,7 +50,6 @@ type HistoryPhase =
   | { kind: 'idle' }
   | { kind: 'loadingClosedRun'; pauseHandle: PauseHandle | null }
   | { kind: 'loadingOpenRun'; tailStartId: number }
-  | { kind: 'loadingPaused'; tailStartId: number }
   | { kind: 'live' }
   | { kind: 'liveUpdatesPaused' }
   | { kind: 'complete' }
@@ -65,7 +61,6 @@ type HistoryLoadSession = {
   livePollTask: Promise<void> | null;
   lastPollToken: string;
   lastPollEventId: number;
-  pollPages: number;
   finishCatchUp: () => void;
 };
 
@@ -73,6 +68,10 @@ type WorkflowHistoryControllerOptions = {
   workflowExecutionIdentity: WorkflowExecutionIdentity;
   buffer?: GroupedEventBuffer;
   maximumPageSize?: number;
+  /**
+   * Closed Runs only: pause after this many pages until `resume()`. An open
+   * Run's poll is never paused, because that would also stop new events.
+   */
   pauseAfterPages?: number;
   liveUpdatesPaused?: boolean;
   onClose?: (closeEvent: HistoryEvent) => void;
@@ -137,8 +136,7 @@ export class WorkflowHistoryController {
   get loading(): boolean {
     return (
       this.phase.kind === 'loadingClosedRun' ||
-      this.phase.kind === 'loadingOpenRun' ||
-      this.phase.kind === 'loadingPaused'
+      this.phase.kind === 'loadingOpenRun'
     );
   }
 
@@ -192,12 +190,6 @@ export class WorkflowHistoryController {
     if (phase.kind === 'loadingClosedRun' && phase.pauseHandle) {
       this.phase = { kind: 'loadingClosedRun', pauseHandle: null };
       phase.pauseHandle.resume();
-      return;
-    }
-    const session = this._session;
-    if (phase.kind === 'loadingPaused' && session) {
-      this.phase = { kind: 'loadingOpenRun', tailStartId: phase.tailStartId };
-      this._startLivePoll(session);
     }
   }
 
@@ -247,7 +239,6 @@ export class WorkflowHistoryController {
       livePollTask: null,
       lastPollToken,
       lastPollEventId,
-      pollPages: 0,
       finishCatchUp: () => {},
     };
     this._session = session;
@@ -345,7 +336,6 @@ export class WorkflowHistoryController {
       for (const event of events) {
         this._ingestEvent(event, session);
       }
-      session.pollPages++;
       const tailStartId = eventIds.length ? Math.min(...eventIds) : 1;
       this.totalExpectedEvents = Math.max(
         this.totalExpectedEvents,
@@ -354,9 +344,8 @@ export class WorkflowHistoryController {
       this.descMinId = this.descMinId
         ? Math.min(this.descMinId, tailStartId)
         : tailStartId;
-      const phase = this.phase;
-      if (phase.kind === 'loadingOpenRun' || phase.kind === 'loadingPaused') {
-        this.phase = { ...phase, tailStartId };
+      if (this.phase.kind === 'loadingOpenRun') {
+        this.phase = { kind: 'loadingOpenRun', tailStartId };
       }
       this._finishCatchUpIfCaughtUp(session);
       this._syncLivePoll(session);
@@ -373,7 +362,7 @@ export class WorkflowHistoryController {
 
   private _finishCatchUpIfCaughtUp(session: HistoryLoadSession): void {
     const phase = this.phase;
-    if (phase.kind !== 'loadingOpenRun' && phase.kind !== 'loadingPaused') {
+    if (phase.kind !== 'loadingOpenRun') {
       return;
     }
     if (!phase.tailStartId) {
@@ -395,22 +384,6 @@ export class WorkflowHistoryController {
       return { kind: 'liveUpdatesPaused' };
     }
     return { kind: 'live' };
-  }
-
-  private _pauseAtPageLimit(session: HistoryLoadSession): void {
-    const phase = this.phase;
-    if (
-      phase.kind !== 'loadingOpenRun' ||
-      this._historyRequested ||
-      this._pauseAfterPages === undefined ||
-      session.pollPages < this._pauseAfterPages
-    ) {
-      return;
-    }
-    this.phase = {
-      kind: 'loadingPaused',
-      tailStartId: phase.tailStartId,
-    };
   }
 
   private _verifyWorkflow(workflow: WorkflowExecution): void {
@@ -524,8 +497,6 @@ export class WorkflowHistoryController {
           return;
         }
         session.lastPollToken = token;
-        session.pollPages++;
-        this._pauseAtPageLimit(session);
         this._syncLivePoll(session);
       },
     })

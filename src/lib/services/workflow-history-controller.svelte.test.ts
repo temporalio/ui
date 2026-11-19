@@ -499,31 +499,8 @@ describe('WorkflowHistoryController', () => {
       expect(poll(0).options.signal.aborted).toBe(false);
     });
 
-    it('pauses the poll at pauseAfterPages and resumes it from the saved token', async () => {
+    it('keeps polling an open Run past pauseAfterPages without resume()', async () => {
       const { controller } = createController();
-      const load = controller.load(workflow('run-1', true));
-      tail(0).result.resolve(tailEvents([50, 51]));
-      await settle();
-      pollEvents(0, [1, 2], 'token-3');
-
-      expect(poll(0).options.signal.aborted).toBe(true);
-      poll(0).result.resolve();
-      await settle();
-      controller.updateWorkflow(workflow('run-1', true));
-      controller.setLiveUpdatesPaused(false);
-      expect(polls).toHaveLength(1);
-      expect(controller.loading).toBe(true);
-
-      controller.resume();
-      expect(poll(1).options.startToken).toBe('token-3');
-      pollEvents(1, range(3, 49));
-      await load;
-      expect(controller.fetchComplete).toBe(true);
-    });
-
-    it('does not pause once history was requested', async () => {
-      const { controller } = createController();
-      controller.resume();
       const load = controller.load(workflow('run-1', true));
       tail(0).result.resolve(tailEvents([50, 51]));
       await settle();
@@ -533,22 +510,11 @@ describe('WorkflowHistoryController', () => {
       expect(poll(0).options.signal.aborted).toBe(false);
       pollEvents(0, range(5, 49));
       await load;
-    });
-
-    it('releases the page-limit pause when the tail closes the gap', async () => {
-      const { controller } = createController();
-      const load = controller.load(workflow('run-1', true));
-      pollEvents(0, [1, 2], 'token-3');
-      pollEvents(0, [3, 4], 'token-5');
-      expect(poll(0).options.signal.aborted).toBe(true);
-      poll(0).result.resolve();
-      await settle();
-
-      tail(0).result.resolve(tailEvents([5, 6]));
-      await load;
 
       expect(controller.fetchComplete).toBe(true);
-      expect(poll(1).options.startToken).toBe('token-5');
+      expect(controller.phase).toEqual({ kind: 'live' });
+      expect(poll(0).options.signal.aborted).toBe(false);
+      expect(polls).toHaveLength(1);
     });
 
     it('catches up while live updates are paused, then stops polling', async () => {
@@ -790,11 +756,11 @@ describe('WorkflowHistoryController', () => {
       tail(0).result.resolve(tailEvents([50]));
       await settle();
       pollEvents(0, [1], 'token-2');
-      expect(poll(0).options.signal.aborted).toBe(true);
 
       controller.dispose();
       controller.dispose();
       await load;
+      expect(poll(0).options.signal.aborted).toBe(true);
       expect(disposeHistory).toHaveBeenCalledOnce();
       expect(poll(0).options.onEvent(makeEvent(2))).toBe(false);
       controller.resume();
@@ -849,32 +815,6 @@ describe('WorkflowHistoryController', () => {
 
       expect(controller.phase).toEqual({ kind: 'complete' });
       expect(controller.closeEvent).not.toBeNull();
-    });
-
-    it('pauses loading at the page limit and resumes loading the open Run', async () => {
-      const { controller } = createController();
-      const load = controller.load(workflow('run-1', true));
-      tail(0).result.resolve(tailEvents([50, 51]));
-      await settle();
-      pollEvents(0, [1, 2], 'token-3');
-
-      expect(controller.phase).toEqual({
-        kind: 'loadingPaused',
-        tailStartId: 50,
-      });
-      expect(controller.loading).toBe(true);
-      poll(0).result.resolve();
-      await settle();
-
-      controller.resume();
-      expect(controller.phase).toEqual({
-        kind: 'loadingOpenRun',
-        tailStartId: 50,
-      });
-      pollEvents(1, range(3, 49));
-      await load;
-
-      expect(controller.phase).toEqual({ kind: 'live' });
     });
 
     it('moves between live and liveUpdatesPaused', async () => {
