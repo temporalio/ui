@@ -158,12 +158,24 @@ func authenticate(config *oauth2.Config, options map[string]interface{}, allowed
 		if err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, err)
 		}
-		nonce, err := randNonce(c, allowedOrigins)
+		nonce, err := randString()
 		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, err)
+		}
+		returnURL := c.QueryParam("returnUrl")
+		if err := validateReturnURL(returnURL, allowedOrigins, c.Request().Host); err != nil {
 			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 		}
 		setCallbackCookie(c, "state", state, secure)
 		setCallbackCookie(c, "nonce", nonce, secure)
+		// The return URL travels in its own cookie so the nonce stays short and opaque:
+		// FAPI 2.0 providers reject nonces longer than 64 characters.
+		if returnURL != "" {
+			setCallbackCookie(c, "return_url", returnURL, secure)
+		} else {
+			// Drop a return_url left by an earlier login that never completed or was followed by logout.
+			clearCookie(c, "return_url", secure)
+		}
 
 		opts := []oauth2.AuthCodeOption{
 			oidc.Nonce(nonce),
@@ -215,21 +227,10 @@ func authenticateCb(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc
 		// Set session start time for max session duration enforcement
 		auth.SetSessionStart(c, maxSessionDuration, secure)
 
-		nonceS, err := c.Request().Cookie("nonce")
-		if err != nil {
-			return echo.NewHTTPError(http.StatusBadRequest, "nonce is not provided")
-		}
-		nonce, err := nonceFromString(nonceS.Value)
-		if err != nil {
-			return echo.NewHTTPError(http.StatusBadRequest, "nonce is invalid")
-		}
+		returnURL := returnURLFromRequest(c)
+		clearCookie(c, "return_url", secure)
 
-		returnUrl := nonce.ReturnURL
-		if returnUrl == "" {
-			returnUrl = "/"
-		}
-
-		return c.Redirect(http.StatusSeeOther, returnUrl)
+		return c.Redirect(http.StatusSeeOther, returnURL)
 	}
 }
 
@@ -379,28 +380,21 @@ func randString() (string, error) {
 	return base64.RawURLEncoding.EncodeToString(b), nil
 }
 
-func randNonce(c echo.Context, allowedOrigins []string) (string, error) {
-	v, err := randString()
-	if err != nil {
-		return "", err
+// returnURLFromRequest returns the post-login redirect target stored by authenticate,
+// or "/" if there is none. Logins started before the return URL moved to its own cookie
+// carry it inside a JSON-encoded nonce, so that form is still honored.
+func returnURLFromRequest(c echo.Context) string {
+	if cookie, err := c.Request().Cookie("return_url"); err == nil && cookie.Value != "" {
+		return cookie.Value
 	}
 
-	returnURL := c.QueryParam("returnUrl")
-	if err := validateReturnURL(returnURL, allowedOrigins, c.Request().Host); err != nil {
-		return "", err
+	if cookie, err := c.Request().Cookie("nonce"); err == nil {
+		if n, err := nonceFromString(cookie.Value); err == nil && n.ReturnURL != "" {
+			return n.ReturnURL
+		}
 	}
 
-	n := &Nonce{
-		Nonce:     v,
-		ReturnURL: returnURL,
-	}
-
-	bytes, err := json.Marshal(n)
-	if err != nil {
-		return "", err
-	}
-
-	return base64.RawURLEncoding.EncodeToString(bytes), nil
+	return "/"
 }
 
 func nonceFromString(nonce string) (*Nonce, error) {
