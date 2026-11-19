@@ -24,7 +24,7 @@ test.describe('Workflow execution chain page', () => {
 
     await expect(page.getByTestId('chain-skeleton')).toBeVisible();
     await expect(page.getByTestId('workflow-id-heading')).toHaveText(
-      workflowId,
+      `${workflowId} Click to copy content`,
     );
     await expect(page.getByText('Chain of Executions')).toBeVisible();
     await expect(

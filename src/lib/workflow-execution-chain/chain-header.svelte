@@ -8,6 +8,7 @@
     DetailListValue,
   } from '$lib/components/detail-list';
   import SdkLogo from '$lib/components/lines-and-dots/sdk-logo.svelte';
+  import Copyable from '$lib/holocene/copyable/index.svelte';
   import Skeleton from '$lib/holocene/skeleton/index.svelte';
   import { translate } from '$lib/i18n/translate';
   import { Badge } from '$lib/io/badge';
@@ -111,9 +112,16 @@
     <Badge text={translate('workflows.chain-of-executions')} Icon={IconLink} />
     <h1
       data-testid="workflow-id-heading"
-      class="overflow-hidden text-ellipsis max-sm:text-xl sm:max-md:text-2xl"
+      class="overflow-hidden max-sm:text-xl sm:max-md:text-2xl"
     >
-      {workflowId}
+      <Copyable
+        copyIconTitle={translate('common.copy-icon-title')}
+        copySuccessIconTitle={translate('common.copy-success-icon-title')}
+        content={workflowId}
+        clickAllToCopy
+        container-class="w-full"
+        class="overflow-hidden text-ellipsis text-left"
+      />
     </h1>
   </div>
 
