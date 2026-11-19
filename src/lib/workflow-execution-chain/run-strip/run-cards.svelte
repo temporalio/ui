@@ -13,22 +13,14 @@
   interface Props {
     chain: WorkflowExecutionChain;
     cardWidths: readonly number[];
-    pendingCardWidth: number;
     now: number;
     selectedRunId: string | null;
     live: boolean;
     onSelect: (runId: string) => void;
   }
 
-  let {
-    chain,
-    cardWidths,
-    pendingCardWidth,
-    now,
-    selectedRunId,
-    live,
-    onSelect,
-  }: Props = $props();
+  let { chain, cardWidths, now, selectedRunId, live, onSelect }: Props =
+    $props();
 
   const SKELETON_CARDS = [0, 1, 2, 3];
 
@@ -107,11 +99,7 @@
     {/each}
   </div>
   {#if chain.pendingSuccessorRunId}
-    <RunCardSkeleton
-      width={pendingCardWidth}
-      data-testid="run-card-pending"
-      aria-hidden="true"
-    />
+    <RunCardSkeleton data-testid="run-card-pending" aria-hidden="true" />
   {:else if chain.failedSuccessorRunId}
     <RunCardFailed
       runId={chain.failedSuccessorRunId}

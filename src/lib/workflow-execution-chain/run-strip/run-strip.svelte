@@ -14,12 +14,15 @@
   import type { WorkflowExecutionChain } from '../workflow-execution-chain.svelte';
   import {
     allocateCardWidths,
+    applyFrozenWidths,
     CAP_WIDTH,
     CARD_GAP,
+    freezeWidths,
+    type FrozenWidths,
     layoutSegments,
-    liveCardWidth,
     MIN_CARD_WIDTH,
     type RunSpan,
+    steppedLiveDuration,
     TRAILING_PADDING,
   } from './card-layout';
 
@@ -100,15 +103,22 @@
         TRAILING_PADDING,
     ),
   );
-  const cardWidths = $derived(
+  const allocatedWidths = $derived(
     allocateCardWidths(
-      runSpans.map(({ startMs, endMs }) => endMs - startMs),
+      runSpans.map(({ startMs, endMs, live }) =>
+        live ? steppedLiveDuration(endMs - startMs) : endMs - startMs,
+      ),
       cardsViewportWidth,
-      { latestIsLive },
     ),
   );
-  const pendingCardWidth = $derived(
-    liveCardWidth(runs.length + 1, cardsViewportWidth),
+  let frozenWidths = $state.raw<FrozenWidths | null>(null);
+  const cardWidths = $derived(
+    applyFrozenWidths(
+      runs.map((run) => run.runId),
+      allocatedWidths,
+      frozenWidths,
+      { viewportWidth: cardsViewportWidth, latestRunId: chain.latestRunId },
+    ),
   );
   const olderPlaceholderWidth = $derived(
     chain.failedOlderRunId || chain.walking ? MIN_CARD_WIDTH + CARD_GAP : 0,
@@ -150,6 +160,29 @@
 
   const scrollToOldestEnd = () => {
     scroller?.scrollTo({ left: 0, behavior: preferredScrollBehavior() });
+  };
+
+  const freezeCurrentWidths = () => {
+    frozenWidths = freezeWidths(
+      runs.map((run) => run.runId),
+      cardWidths,
+      cardsViewportWidth,
+    );
+  };
+
+  const freezeWidthsUnlessFollowingEnd = (followingEnd: boolean) => {
+    if (followingEnd) {
+      frozenWidths = null;
+      return;
+    }
+    freezeCurrentWidths();
+  };
+
+  const updateScrollMetrics = (metrics: ScrollMetrics) => {
+    scrollMetrics = metrics;
+    if (frozenWidths && frozenWidths.viewportWidth !== cardsViewportWidth) {
+      freezeCurrentWidths();
+    }
   };
 
   const loadOlderRuns = async (onRunAdded: (runId: string) => void) => {
@@ -223,7 +256,8 @@
         getLayoutKey: () => layoutKey,
         getSelectedRunId: () => selectedRunId,
         isLive: () => live,
-        onMetricsChange: (metrics) => (scrollMetrics = metrics),
+        onMetricsChange: updateScrollMetrics,
+        onFollowingEndChange: freezeWidthsUnlessFollowingEnd,
       })}
       data-testid="run-strip-scroller"
       class="relative overflow-x-auto pb-2.5 [scrollbar-width:thin]"
@@ -246,7 +280,6 @@
             bind:this={runCards}
             {chain}
             {cardWidths}
-            {pendingCardWidth}
             {now}
             {selectedRunId}
             {live}

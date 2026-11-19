@@ -397,7 +397,7 @@ test.describe('Workflow execution chain Run strip', () => {
   test('keeps cards and markers still while the live Run ticks', async ({
     page,
   }) => {
-    await page.clock.install({ time: new Date('2024-01-01T03:00:05.000Z') });
+    await page.clock.install({ time: new Date('2024-01-01T03:00:17.000Z') });
     await mockChain(page, {
       runs: linearChain(4, { open: true }),
       current: () => 'run-04',
@@ -434,6 +434,77 @@ test.describe('Workflow execution chain Run strip', () => {
       nameBefore ?? '',
     );
     expect(await layout()).toEqual(before);
+  });
+
+  test('widens the live Run card each time its duration doubles', async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(isMobile, 'Every card is at the minimum width on a phone');
+    await page.clock.install({ time: new Date('2024-01-01T03:00:17.000Z') });
+    await mockChain(page, {
+      runs: linearChain(4, { open: true }),
+      current: () => 'run-04',
+    });
+    await page.goto(chainUrl('run-01'));
+    await expect(card(page, 'run-04')).toBeVisible();
+
+    const liveWidth = async () =>
+      (await cardActions(page, 'run-04').boundingBox())?.width ?? 0;
+    let before = await liveWidth();
+    await expect
+      .poll(async () => {
+        const settled = await liveWidth();
+        const unchanged = settled === before;
+        before = settled;
+        return unchanged;
+      })
+      .toBe(true);
+
+    await page.clock.runFor(16_000);
+
+    await expect.poll(liveWidth).toBeGreaterThan(before);
+  });
+
+  test('holds scrolled-away cards still while the live Run grows', async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(isMobile, 'Every card is at the minimum width on a phone');
+    await page.clock.install({ time: new Date('2024-01-01T07:00:17.000Z') });
+    await mockChain(page, {
+      runs: linearChain(8, { open: true }),
+      current: () => 'run-08',
+    });
+    await page.goto(chainUrl('run-01'));
+    await expect(strip(page)).toHaveAccessibleName('Runs, 8 loaded');
+    await expect(page.getByTestId('run-card-loading-older')).toHaveCount(0);
+
+    await page
+      .getByTestId('run-strip-scroller')
+      .evaluate((scroller) => scroller.scrollTo({ left: 0 }));
+    const visibleCards = async () => ({
+      'run-01': await cardActions(page, 'run-01').boundingBox(),
+      'run-02': await cardActions(page, 'run-02').boundingBox(),
+      'run-05': await cardActions(page, 'run-05').boundingBox(),
+    });
+    const liveWidth = async () =>
+      (await cardActions(page, 'run-08').boundingBox())?.width ?? 0;
+    let before = await visibleCards();
+    await expect
+      .poll(async () => {
+        const settled = await visibleCards();
+        const unchanged = JSON.stringify(settled) === JSON.stringify(before);
+        before = settled;
+        return unchanged;
+      })
+      .toBe(true);
+    const liveWidthBefore = await liveWidth();
+
+    await page.clock.runFor(16_000);
+
+    await expect.poll(liveWidth).toBeGreaterThan(liveWidthBefore);
+    expect(await visibleCards()).toEqual(before);
   });
 
   const handOffChain = () => {

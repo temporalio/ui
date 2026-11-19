@@ -135,7 +135,7 @@
 </script>
 
 <div
-  class="group/run relative flex shrink-0"
+  class="group/run relative flex shrink-0 transition-[width] duration-300 motion-reduce:transition-none"
   style:width="{width}px"
   data-testid="run-card"
   data-run-id={run.runId}

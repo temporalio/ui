@@ -130,7 +130,7 @@
 <div class="relative h-[34px]" aria-hidden="true" data-testid="run-ruler">
   {#if selectedSegment}
     <span
-      class="absolute left-0 top-0 h-1 rounded-b-full bg-surface-overlay-brand transition-[translate,width] duration-500 motion-reduce:transition-none"
+      class="absolute left-0 top-0 h-1 rounded-b-full bg-surface-overlay-brand transition-[translate,width] duration-300 motion-reduce:transition-none"
       style:translate="{selectedSegment.x}px"
       style:width="{Math.max(2, selectedSegment.width)}px"
       data-testid="run-ruler-band"
@@ -139,7 +139,7 @@
   {#each ticks as tick (`${tick.segmentId}-${tick.kind}-${tick.time}`)}
     <span
       class={twMerge(
-        'absolute left-0 top-0 w-0 border-l border-secondary',
+        'absolute left-0 top-0 w-0 border-l border-secondary transition-[translate] duration-300 motion-reduce:transition-none',
         tick.kind === 'run' && 'h-3.5 border-tertiary',
         tick.kind === 'major' && 'h-2.5',
         tick.kind === 'minor' && 'h-1.5',
@@ -150,7 +150,7 @@
   {#each labels as { tick, text } (`${tick.segmentId}-${tick.kind}-${tick.time}`)}
     <span
       class={twMerge(
-        'absolute left-0 top-4 whitespace-nowrap font-mono text-[11px] tabular-nums leading-none text-tertiary transition-colors',
+        'absolute left-0 top-4 whitespace-nowrap font-mono text-[11px] tabular-nums leading-none text-tertiary transition-[translate,color] duration-300 motion-reduce:transition-none',
         tick.kind === 'run' &&
           'pl-1 font-medium group-hover/strip:text-primary',
         tick.kind === 'major' &&

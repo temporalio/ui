@@ -2,10 +2,12 @@ import { describe, expect, it } from 'vitest';
 
 import {
   allocateCardWidths,
+  applyFrozenWidths,
   CARD_GAP,
+  freezeWidths,
   layoutSegments,
-  liveCardWidth,
   MIN_CARD_WIDTH,
+  steppedLiveDuration,
 } from './card-layout';
 
 const totalWidth = (widths: number[]) =>
@@ -48,32 +50,8 @@ describe('allocateCardWidths', () => {
     expect(widths[0]).toBeLessThanOrEqual(800);
   });
 
-  it('keeps every width fixed while the live Latest Run grows', () => {
-    const before = allocateCardWidths([10, 20, 30, 5], 1000, {
-      latestIsLive: true,
-    });
-    const after = allocateCardWidths([10, 20, 30, 500], 1000, {
-      latestIsLive: true,
-    });
-
-    expect(after).toEqual(before);
-    expect(totalWidth(after) + CARD_GAP * 3).toBeCloseTo(1000);
-  });
-
-  it('gives the live Latest Run an equal share of the newest Runs', () => {
-    const widths = allocateCardWidths([10, 20, 30, 5], 1000, {
-      latestIsLive: true,
-    });
-
-    expect(widths[3]).toBeCloseTo((1000 - CARD_GAP * 3) / 4);
-    expect(widths[3]).toBe(liveCardWidth(4, 1000));
-    expect(widths[2] - MIN_CARD_WIDTH).toBeCloseTo(
-      3 * (widths[0] - MIN_CARD_WIDTH),
-    );
-  });
-
-  it('sizes the live Latest Run of a one-Run chain to the viewport', () => {
-    expect(allocateCardWidths([5], 600, { latestIsLive: true })).toEqual([600]);
+  it('sizes the only Run to the viewport', () => {
+    expect(allocateCardWidths([5], 600)).toEqual([600]);
   });
 
   it('splits the space evenly when every duration is zero', () => {
@@ -109,16 +87,72 @@ describe('layoutSegments', () => {
   });
 });
 
-describe('liveCardWidth', () => {
-  it('matches the slot a successor gets once it is the live Latest Run', () => {
-    const successorWidths = allocateCardWidths([10, 20, 30, 40, 0], 1000, {
-      latestIsLive: true,
-    });
-
-    expect(liveCardWidth(5, 1000)).toBe(successorWidths[4]);
+describe('steppedLiveDuration', () => {
+  it('is zero under a second', () => {
+    expect(steppedLiveDuration(999)).toBe(0);
   });
 
-  it('never goes below the minimum width', () => {
-    expect(liveCardWidth(4, 200)).toBe(MIN_CARD_WIDTH);
+  it('rounds down to the last doubling', () => {
+    expect(steppedLiveDuration(1_000)).toBe(1_000);
+    expect(steppedLiveDuration(7_999)).toBe(4_000);
+    expect(steppedLiveDuration(8_000)).toBe(8_000);
+    expect(steppedLiveDuration(179_000)).toBe(128_000);
+  });
+
+  it('keeps every width fixed until the live Run doubles', () => {
+    const widthsAt = (liveMs: number) =>
+      allocateCardWidths(
+        [10_000, 20_000, 30_000, steppedLiveDuration(liveMs)],
+        1000,
+      );
+
+    expect(widthsAt(9_000)).toEqual(widthsAt(15_999));
+    expect(widthsAt(16_000)[3]).toBeGreaterThan(widthsAt(15_999)[3]);
+  });
+});
+
+describe('applyFrozenWidths', () => {
+  const frozen = freezeWidths(
+    ['run-a', 'run-b', 'run-c'],
+    [200, 300, 400],
+    900,
+  );
+
+  it('passes widths through when nothing is frozen', () => {
+    expect(
+      applyFrozenWidths(['run-a', 'run-b'], [1, 2], null, {
+        viewportWidth: 900,
+        latestRunId: 'run-b',
+      }),
+    ).toEqual([1, 2]);
+  });
+
+  it('keeps frozen widths for every Run but the Latest Run', () => {
+    expect(
+      applyFrozenWidths(['run-a', 'run-b', 'run-c'], [150, 150, 600], frozen, {
+        viewportWidth: 900,
+        latestRunId: 'run-c',
+      }),
+    ).toEqual([200, 300, 600]);
+  });
+
+  it('sizes Runs added since the freeze normally', () => {
+    expect(
+      applyFrozenWidths(
+        ['run-0', 'run-a', 'run-b', 'run-c', 'run-d'],
+        [160, 150, 150, 150, 170],
+        frozen,
+        { viewportWidth: 900, latestRunId: 'run-d' },
+      ),
+    ).toEqual([160, 200, 300, 400, 170]);
+  });
+
+  it('ignores a freeze taken at another viewport width', () => {
+    expect(
+      applyFrozenWidths(['run-a', 'run-b', 'run-c'], [150, 150, 600], frozen, {
+        viewportWidth: 1200,
+        latestRunId: 'run-c',
+      }),
+    ).toEqual([150, 150, 600]);
   });
 });

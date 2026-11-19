@@ -28,10 +28,12 @@ type RunStripFollowAttachmentOptions = {
   getSelectedRunId: () => string | null;
   isLive: () => boolean;
   onMetricsChange: (metrics: ScrollMetrics) => void;
+  onFollowingEndChange: (followingEnd: boolean) => void;
 };
 
 const EDGE_INSET = CAP_WIDTH + CARD_GAP;
 const END_TOLERANCE = 2;
+const WIDTH_TRANSITION_MS = 350;
 
 export const preferredScrollBehavior = (): ScrollBehavior =>
   prefersReducedMotion.current ? 'auto' : 'smooth';
@@ -88,40 +90,84 @@ export const createRunStripFollowAttachment =
   (scroller) => {
     let stuckToEnd = true;
     let wasLive = untrack(options.isLive);
-    let selectionAnchor: { id: string; x: number } | null = null;
+    let visibleAnchor: { id: string; x: number } | null = null;
     let programmaticScrollLeft: number | null = null;
+    let knownScrollLeft = scroller.scrollLeft;
+    let followingEnd: boolean | null = null;
 
     const jumpTo = (left: number) => {
       scroller.scrollLeft = left;
       programmaticScrollLeft = scroller.scrollLeft;
+      knownScrollLeft = scroller.scrollLeft;
     };
 
-    const findSelectedSegment = () => {
-      const selectedRunId = options.getSelectedRunId();
-      return options.getSegments().find(({ id }) => id === selectedRunId);
+    const rememberVisibleAnchor = () => {
+      const segment = options
+        .getSegments()
+        .find(({ x, width }) => x + width > scroller.scrollLeft + EDGE_INSET);
+      visibleAnchor = segment ? { id: segment.id, x: segment.x } : null;
     };
 
-    const rememberSelectionAnchor = () => {
-      const segment = findSelectedSegment();
-      selectionAnchor = segment ? { id: segment.id, x: segment.x } : null;
-    };
-
-    const keepSelectionInPlace = () => {
-      const segment = findSelectedSegment();
-      if (!segment || segment.id !== selectionAnchor?.id) {
+    const keepVisibleCardsInPlace = () => {
+      const anchor = visibleAnchor;
+      const segment = anchor
+        ? options.getSegments().find(({ id }) => id === anchor.id)
+        : undefined;
+      if (!anchor || !segment) {
         return;
       }
-      jumpTo(scroller.scrollLeft + segment.x - selectionAnchor.x);
+      jumpTo(scroller.scrollLeft + segment.x - anchor.x);
+    };
+
+    const reportFollowingEnd = () => {
+      const following = options.isLive() && stuckToEnd;
+      if (following === followingEnd) {
+        return;
+      }
+      followingEnd = following;
+      options.onFollowingEndChange(following);
     };
 
     const reportMetrics = () => {
       options.onMetricsChange(readScrollMetrics(scroller));
     };
 
+    const readStuckToEnd = () =>
+      scroller.scrollLeft + scroller.clientWidth >=
+      scroller.scrollWidth - END_TOLERANCE;
+
+    const noticeUnreportedScroll = () => {
+      if (scroller.scrollLeft === knownScrollLeft) {
+        return;
+      }
+      knownScrollLeft = scroller.scrollLeft;
+      stuckToEnd = readStuckToEnd();
+    };
+
     const keepEndInView = () => {
+      noticeUnreportedScroll();
       if (stuckToEnd) {
         jumpTo(scroller.scrollWidth);
       }
+    };
+
+    let endPinFrame = 0;
+    let endPinUntil = 0;
+
+    const keepEndInViewWhileResizing = () => {
+      endPinUntil = performance.now() + WIDTH_TRANSITION_MS;
+      if (endPinFrame) {
+        return;
+      }
+      const pinEnd = () => {
+        keepEndInView();
+        if (performance.now() >= endPinUntil) {
+          endPinFrame = 0;
+          return;
+        }
+        endPinFrame = requestAnimationFrame(pinEnd);
+      };
+      endPinFrame = requestAnimationFrame(pinEnd);
     };
 
     const scrollToSelection = (live: boolean, selectedRunId: string | null) => {
@@ -143,32 +189,36 @@ export const createRunStripFollowAttachment =
       }
       wasLive = live;
       scrollToSelection(live, selectedRunId);
-      rememberSelectionAnchor();
+      rememberVisibleAnchor();
+      reportFollowingEnd();
       reportMetrics();
     };
 
     const holdScrollPosition = () => {
-      if (options.isLive()) {
+      noticeUnreportedScroll();
+      if (options.isLive() && stuckToEnd) {
         keepEndInView();
+        keepEndInViewWhileResizing();
         return;
       }
-      keepSelectionInPlace();
+      keepVisibleCardsInPlace();
     };
 
     const followLayout = () => {
       holdScrollPosition();
-      rememberSelectionAnchor();
+      rememberVisibleAnchor();
       reportMetrics();
     };
 
     const onScroll = () => {
       const scrolledByUs = scroller.scrollLeft === programmaticScrollLeft;
       programmaticScrollLeft = null;
+      knownScrollLeft = scroller.scrollLeft;
       if (!scrolledByUs) {
-        stuckToEnd =
-          scroller.scrollLeft + scroller.clientWidth >=
-          scroller.scrollWidth - END_TOLERANCE;
+        stuckToEnd = readStuckToEnd();
       }
+      rememberVisibleAnchor();
+      reportFollowingEnd();
       reportMetrics();
     };
 
@@ -188,6 +238,7 @@ export const createRunStripFollowAttachment =
     scroller.addEventListener('scroll', onScroll);
 
     return () => {
+      cancelAnimationFrame(endPinFrame);
       resizeObserver.disconnect();
       scroller.removeEventListener('scroll', onScroll);
     };

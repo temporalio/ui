@@ -26,51 +26,84 @@ const sumOf = (values: readonly number[]): number =>
 const fittedWidthFor = (visibleCount: number, viewportWidth: number): number =>
   viewportWidth - CARD_GAP * (visibleCount - 1);
 
-export const liveCardWidth = (
-  runCount: number,
-  viewportWidth: number,
-): number => {
-  const visibleCount = Math.min(Math.max(runCount, 1), INITIAL_VISIBLE_RUNS);
-  return Math.max(
-    MIN_CARD_WIDTH,
-    fittedWidthFor(visibleCount, viewportWidth) / visibleCount,
+const LIVE_RESIZE_FACTOR = 2;
+
+/**
+ * The live Run's duration, rounded down to a power of `LIVE_RESIZE_FACTOR`
+ * seconds, so its card resizes each time it grows that much rather than on
+ * every tick.
+ */
+export const steppedLiveDuration = (durationMs: number): number => {
+  if (durationMs < 1000) {
+    return 0;
+  }
+  const steps = Math.floor(
+    Math.log(durationMs / 1000) / Math.log(LIVE_RESIZE_FACTOR),
   );
+  return LIVE_RESIZE_FACTOR ** steps * 1000;
 };
 
 export const allocateCardWidths = (
   durations: readonly number[],
   viewportWidth: number,
-  { latestIsLive = false }: { latestIsLive?: boolean } = {},
 ): number[] => {
   if (durations.length === 0) {
     return [];
   }
   const newestDurations = durations.slice(-INITIAL_VISIBLE_RUNS);
   const fittedWidth = fittedWidthFor(newestDurations.length, viewportWidth);
-  const liveWidth = liveCardWidth(durations.length, viewportWidth);
-  const proportionalDurations = latestIsLive
-    ? newestDurations.slice(0, -1)
-    : newestDurations;
-  const proportionalWidth = latestIsLive
-    ? fittedWidth - liveWidth
-    : fittedWidth;
   const spareWidth = Math.max(
     0,
-    proportionalWidth - proportionalDurations.length * MIN_CARD_WIDTH,
+    fittedWidth - newestDurations.length * MIN_CARD_WIDTH,
   );
-  const proportionalTotalDuration = sumOf(proportionalDurations);
+  const totalDuration = sumOf(newestDurations);
   const maxWidth = Math.max(MIN_CARD_WIDTH, fittedWidth);
-  const latestIndex = durations.length - 1;
 
-  return durations.map((duration, index) => {
-    if (latestIsLive && index === latestIndex) {
-      return liveWidth;
-    }
+  return durations.map((duration) => {
     const extraWidth =
-      proportionalTotalDuration > 0
-        ? (spareWidth * Math.max(0, duration)) / proportionalTotalDuration
-        : spareWidth / Math.max(1, proportionalDurations.length);
+      totalDuration > 0
+        ? (spareWidth * Math.max(0, duration)) / totalDuration
+        : spareWidth / newestDurations.length;
     return Math.min(maxWidth, MIN_CARD_WIDTH + extraWidth);
+  });
+};
+
+export type FrozenWidths = {
+  viewportWidth: number;
+  widths: ReadonlyMap<string, number>;
+};
+
+export const freezeWidths = (
+  runIds: readonly string[],
+  widths: readonly number[],
+  viewportWidth: number,
+): FrozenWidths => ({
+  viewportWidth,
+  widths: new Map(runIds.map((runId, index) => [runId, widths[index]])),
+});
+
+/**
+ * Keeps every card but the Latest Run's at its frozen width, so cards the
+ * user has scrolled to hold still while the Latest Run grows or hands off.
+ */
+export const applyFrozenWidths = (
+  runIds: readonly string[],
+  widths: readonly number[],
+  frozen: FrozenWidths | null,
+  {
+    viewportWidth,
+    latestRunId,
+  }: { viewportWidth: number; latestRunId: string | null },
+): number[] => {
+  if (!frozen || frozen.viewportWidth !== viewportWidth) {
+    return [...widths];
+  }
+  return runIds.map((runId, index) => {
+    const frozenWidth = frozen.widths.get(runId);
+    if (runId === latestRunId || frozenWidth === undefined) {
+      return widths[index];
+    }
+    return frozenWidth;
   });
 };
 
