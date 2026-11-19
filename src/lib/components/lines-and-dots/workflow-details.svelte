@@ -5,7 +5,6 @@
   import { translate } from '$lib/i18n/translate';
   import { IconFilter, IconInfo } from '$lib/io/icon';
   import type { EventBufferView } from '$lib/services/grouped-event-buffer.svelte';
-  import { fetchWorkflow } from '$lib/services/workflow-service';
   import { isCloud } from '$lib/stores/advanced-visibility';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type { WorkflowExecution } from '$lib/types/workflows';
@@ -43,8 +42,6 @@
   }
 
   let { workflow, history, next }: Props = $props();
-
-  let latestRunId = $state<string | undefined>(undefined);
 
   const parent = $derived(workflow?.parent);
   const scheduleId = $derived(
@@ -91,19 +88,9 @@
 
   const { sdk, version: sdkVersion } = $derived(history.sdkInfo);
 
-  const fetchLatestRun = async () => {
-    const result = await fetchWorkflow({
-      namespace,
-      workflowId: workflow.id,
-    });
-    latestRunId = result?.workflow?.runId;
-  };
-
-  $effect(() => {
-    if (next && !latestRunId) {
-      fetchLatestRun();
-    }
-  });
+  const latestRunId = $derived(
+    next ? $workflowRun.currentRun?.runId : undefined,
+  );
 </script>
 
 <DetailList aria-label="workflow details" rowCount={5}>
