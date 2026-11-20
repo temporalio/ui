@@ -72,7 +72,7 @@
     "package:patch": "pnpm version patch && svelte-package",
     "package:minor": "pnpm version minor && svelte-package",
     "package:major": "pnpm version major && svelte-package",
-    "prepack": "svelte-package && node scripts/generate-exports.mjs",
+    "prepack": "svelte-package && node scripts/generate-consumer-agents.mjs && node scripts/generate-exports.mjs",
     "catalog": "esno scripts/catalog/catalog-cli.ts",
     "catalog:test-package": "CATALOG_PACKAGE_TEST=1 TZ=UTC vitest run scripts/catalog/catalog-artifacts.test.ts -t 'clean consumer' --pool=forks --maxWorkers=1",
     "stories:dev": "storybook dev -p 6006",
