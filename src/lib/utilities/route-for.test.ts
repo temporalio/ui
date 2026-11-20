@@ -38,6 +38,7 @@ import {
   routeForWorkerDeploymentCreate,
   routeForWorkerDeploymentVersionCreate,
   routeForWorkerDeploymentVersionEdit,
+  routeForWorkflowExecutionChain,
   routeForWorkflowQuery,
   routeForWorkflows,
   routeForWorkflowsWithQuery,
@@ -595,6 +596,30 @@ describe('routeForWorkflow', () => {
     });
     expect(path).toContain('sort=ascending');
     expect(path).not.toContain('sort=descending');
+  });
+});
+
+describe('routeForWorkflowExecutionChain', () => {
+  it('should route to a chain', () => {
+    const path = routeForWorkflowExecutionChain({
+      namespace: 'default',
+      workflow: 'abc',
+      firstRunId: 'first-run',
+    });
+    expect(path).toBe(
+      `${base}/namespaces/default/workflows/abc/chains/first-run`,
+    );
+  });
+
+  it('should encode the workflow ID', () => {
+    const path = routeForWorkflowExecutionChain({
+      namespace: 'default',
+      workflow: 'order/42 #1',
+      firstRunId: 'first-run',
+    });
+    expect(path).toBe(
+      `${base}/namespaces/default/workflows/order%2F42%20%231/chains/first-run`,
+    );
   });
 });
 

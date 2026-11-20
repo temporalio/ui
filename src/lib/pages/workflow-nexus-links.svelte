@@ -17,7 +17,7 @@
     getInboundLinkForEvent,
     getVisibleInboundNexusLinkEvents,
   } from '$lib/runes/inbound-nexus-links.svelte';
-  import { fullEventHistory } from '$lib/stores/events';
+  import { getWorkflowHistoryController } from '$lib/services/workflow-history-controller.svelte.js';
   import { workflowRun } from '$lib/stores/workflow-run';
   import { isSystemNexusScheduledEvent } from '$lib/system-nexus-endpoints';
   import {
@@ -35,18 +35,16 @@
   import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
+  const historyController = getWorkflowHistoryController();
+  const events = $derived(historyController.history.events);
+
   const { namespace, workflow: workflowId, run } = $derived(page.params);
   const { workflow } = $derived($workflowRun);
   const pendingActivities = $derived(workflow?.pendingActivities);
   const pendingNexusOperations = $derived(workflow?.pendingNexusOperations);
 
   const groups = $derived(
-    groupEvents(
-      $fullEventHistory,
-      'ascending',
-      pendingActivities,
-      pendingNexusOperations,
-    ),
+    groupEvents(events, 'ascending', pendingActivities, pendingNexusOperations),
   );
   const nexusGroups = $derived(
     groups.filter(
@@ -56,9 +54,7 @@
         !group.eventList.some((event) => isSystemNexusScheduledEvent(event)),
     ),
   );
-  const inboundLinks = getVisibleInboundNexusLinkEvents(
-    () => $fullEventHistory,
-  );
+  const inboundLinks = getVisibleInboundNexusLinkEvents(() => events);
   const inboundLinkEvents = $derived(inboundLinks.events);
 
   const counts = $derived({

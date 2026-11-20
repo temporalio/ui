@@ -196,6 +196,9 @@ test.describe('Timeline event groups', () => {
     await page.getByTestId('history-tab').click();
     await expect(page.getByTestId('event-summary-table')).toBeVisible();
     await page.getByTestId('timeline-tab').click();
+    await page
+      .getByRole('img', { name: `Workflow ${workflowId}: Running` })
+      .scrollIntoViewIfNeeded();
 
     await expect(toggle(page)).toHaveText('Show Event Groups');
     await expect(groupRow(page, 'satellite:A')).toHaveCount(0);

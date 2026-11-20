@@ -442,6 +442,18 @@ export const routeForWorkflow = ({
   });
 };
 
+export const routeForWorkflowExecutionChain = ({
+  namespace,
+  workflow,
+  firstRunId,
+}: NamespaceParameter & {
+  workflow: string;
+  firstRunId: string;
+}): ResolvedPathname => {
+  const id = encodeURIForSvelte(workflow);
+  return `${routeForWorkflows({ namespace })}/${id}/chains/${firstRunId}`;
+};
+
 export const routeForWorkers = (
   parameters: NamespaceParameter,
 ): ResolvedPathname => {

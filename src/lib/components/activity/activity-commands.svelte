@@ -1,174 +1,119 @@
 <script lang="ts">
-  import type { WorkflowExecution } from '@temporalio/client';
-
   import { page } from '$app/state';
 
-  import Button from '$lib/holocene/button.svelte';
-  import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
-  import {
-    IconPause,
-    IconPencil,
-    IconPlaySolid,
-    IconRetry,
-  } from '$lib/io/icon';
   import { Action } from '$lib/models/activity-actions';
   import {
     pauseActivity,
     resetActivity,
     unpauseActivity,
+    updateActivityOptions,
   } from '$lib/services/workflow-activities-service';
+  import { coreUserStore } from '$lib/stores/core-user';
   import { toaster } from '$lib/stores/toaster';
-  import { triggerRefresh } from '$lib/stores/workflow-run';
+  import type { ActivityOptions } from '$lib/types';
   import type { PendingActivity } from '$lib/types/events';
+  import type {
+    WorkflowExecution,
+    WorkflowExecutionIdentity,
+  } from '$lib/types/workflows';
+  import { activityCommandsEnabled } from '$lib/utilities/activity-commands-enabled';
   import { getIdentity } from '$lib/utilities/core-context';
 
-  import ActivityOptionsUpdateDrawer from './activity-options-update-drawer.svelte';
-  import ActivityPauseConfirmationModal from './activity-pause-confirmation-modal.svelte';
-  import ActivityResetConfirmationModal from './activity-reset-confirmation-modal.svelte';
-  import ActivityUnpauseConfirmationModal from './activity-unpause-confirmation-modal.svelte';
+  import ActivityCommandControls from './activity-command-controls.svelte';
 
   type Props = {
     activity: PendingActivity;
+    workflowExecutionIdentity: WorkflowExecutionIdentity;
+    workflow: Pick<WorkflowExecution, 'isRunning' | 'isPaused'>;
+    onRefresh: (action: Action) => void | Promise<void>;
     class?: string;
   };
 
-  let { activity, class: className = '' }: Props = $props();
-  const { namespace, workflow, run } = $derived(page.params);
-  const execution: WorkflowExecution = $derived({
-    workflowId: workflow,
-    runId: run,
-  });
+  let {
+    activity,
+    workflowExecutionIdentity,
+    workflow,
+    onRefresh,
+    class: className = '',
+  }: Props = $props();
 
   const identity = getIdentity();
+  const coreUser = coreUserStore();
+  const showActivityCommands = $derived(
+    activityCommandsEnabled(
+      page.data.settings,
+      $coreUser,
+      workflowExecutionIdentity.namespace,
+    ) &&
+      (workflow.isRunning || workflow.isPaused),
+  );
 
-  let pauseConfirmationModalOpen = $state(false);
-  let unpauseConfirmationModalOpen = $state(false);
-  let resetConfirmationModalOpen = $state(false);
-  let optionsUpdateDrawerOpen = $state(false);
+  const execution = $derived({
+    workflowId: workflowExecutionIdentity.workflowId,
+    runId: workflowExecutionIdentity.runId,
+  });
 
-  const onPause = async () => {
-    if (activity.paused) {
-      unpauseConfirmationModalOpen = true;
-    } else {
-      pauseConfirmationModalOpen = true;
-    }
-  };
-
-  const onReset = () => {
-    resetConfirmationModalOpen = true;
-  };
-
-  const onUpdate = () => {
-    optionsUpdateDrawerOpen = true;
-  };
-
-  const onConfirmPause = async (reason: string) => {
+  const onPause = async (reason: string) => {
+    const refresh = onRefresh;
     await pauseActivity({
-      namespace,
+      namespace: workflowExecutionIdentity.namespace,
       execution,
       id: activity.activityId,
       reason,
       identity,
     });
-    triggerRefresh(Action.Pause);
+    await refresh(Action.Pause);
   };
 
-  const onConfirmUnpause = async () => {
+  const onUnpause = async () => {
+    const refresh = onRefresh;
     await unpauseActivity({
-      namespace,
+      namespace: workflowExecutionIdentity.namespace,
       execution,
       id: activity.activityId,
       identity,
     });
-    triggerRefresh(Action.Unpause);
+    await refresh(Action.Unpause);
   };
 
-  const onConfirmReset = async (resetHeartbeat: boolean) => {
+  const onReset = async (resetHeartbeat: boolean) => {
+    const refresh = onRefresh;
+    const activityId = activity.activityId;
     await resetActivity({
-      namespace,
+      namespace: workflowExecutionIdentity.namespace,
       execution,
-      id: activity.activityId,
+      id: activityId,
       resetHeartbeat,
       identity,
     });
-    triggerRefresh(Action.Reset);
+    await refresh(Action.Reset);
     toaster.push({
       variant: 'success',
-      message: translate('activities.reset-success', {
-        activityId: activity.activityId,
-      }),
+      message: translate('activities.reset-success', { activityId }),
     });
+  };
+
+  const onUpdateOptions = async (options: ActivityOptions) => {
+    const refresh = onRefresh;
+    await updateActivityOptions({
+      namespace: workflowExecutionIdentity.namespace,
+      execution,
+      id: activity.activityId,
+      activityOptions: options,
+      identity,
+    });
+    await refresh(Action.Update);
   };
 </script>
 
-<div class="flex items-center gap-2 {className}">
-  <Tooltip
-    bottomLeft
-    width={200}
-    text={activity.paused
-      ? translate('activities.resume-tooltip')
-      : translate('activities.pause-tooltip')}
-  >
-    <Button
-      variant="secondary"
-      size="sm"
-      LeadingIcon={activity.paused ? IconPlaySolid : IconPause}
-      onclick={onPause}
-    >
-      {activity.paused
-        ? translate('workflows.unpause')
-        : translate('workflows.pause')}
-    </Button>
-  </Tooltip>
-  <Tooltip bottomLeft width={200} text="Update this Activity Options.">
-    <Button
-      variant="secondary"
-      size="sm"
-      LeadingIcon={IconPencil}
-      onclick={onUpdate}
-    >
-      {translate('common.update')}
-    </Button>
-  </Tooltip>
-  <Tooltip bottom width={200} text="Reset this Activity.">
-    <Button
-      variant="secondary"
-      size="sm"
-      LeadingIcon={IconRetry}
-      onclick={onReset}
-    >
-      {translate('workflows.reset')}
-    </Button>
-  </Tooltip>
-</div>
-
-<ActivityPauseConfirmationModal
-  bind:open={pauseConfirmationModalOpen}
-  activityId={activity.id}
-  onConfirm={onConfirmPause}
-/>
-
-<ActivityUnpauseConfirmationModal
-  bind:open={unpauseConfirmationModalOpen}
-  activityId={activity.id}
-  onConfirm={onConfirmUnpause}
-/>
-
-<ActivityResetConfirmationModal
-  bind:open={resetConfirmationModalOpen}
-  activityId={activity.id}
-  onConfirm={onConfirmReset}
-/>
-
-<!-- Remounts the drawer on every open so the form re-seeds from the current
-  activity; activity-options-form.svelte deliberately untracks its initial
-  values so a background refresh cannot clobber a mid-edit form. -->
-{#key optionsUpdateDrawerOpen}
-  <ActivityOptionsUpdateDrawer
-    bind:open={optionsUpdateDrawerOpen}
-    {namespace}
-    {execution}
+{#if showActivityCommands}
+  <ActivityCommandControls
     {activity}
+    {onPause}
+    {onUnpause}
+    {onReset}
+    {onUpdateOptions}
+    class={className}
   />
-{/key}
+{/if}

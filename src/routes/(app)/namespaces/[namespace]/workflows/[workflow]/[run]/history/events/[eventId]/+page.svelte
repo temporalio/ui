@@ -16,9 +16,4 @@
   )} | ${params.workflow} | Event ${params.eventId}`}
   url={page.url.href}
 />
-<WorkflowHistoryEvent
-  eventId={params.eventId}
-  namespace={params.namespace}
-  workflowId={params.workflow}
-  runId={params.run}
-/>
+<WorkflowHistoryEvent eventId={params.eventId} />

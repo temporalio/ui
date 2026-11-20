@@ -2,8 +2,8 @@
   import { page } from '$app/state';
 
   import { fetchAllChildWorkflows } from '$lib/services/workflow-service';
-  import { fullEventHistory } from '$lib/stores/events';
   import { workflowRun } from '$lib/stores/workflow-run';
+  import type { WorkflowEvents } from '$lib/types/events';
   import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
 
   import ChildWorkflowsTable from './child-workflows-table.svelte';
@@ -12,24 +12,31 @@
   import ParentWorkflowTable from './parent-workflow-table.svelte';
   import SchedulerTable from './scheduler-table.svelte';
 
+  interface Props {
+    events: WorkflowEvents;
+  }
+
+  let { events }: Props = $props();
+
   const namespace = $derived(page.params.namespace);
   const workflowId = $derived(page.params.workflow);
   const runId = $derived(page.params.run);
   const workflow = $derived($workflowRun.workflow);
 
   const workflowRelationships = $derived(
-    getWorkflowRelationships(workflow, $fullEventHistory, page.data.namespace),
+    getWorkflowRelationships(workflow, events, page.data.namespace),
   );
 
   const hasChildren = $derived(workflowRelationships.hasChildren);
-  const first = $derived(workflowRelationships.first);
+  const firstRunId = $derived(workflowRelationships.firstRunId);
+  const isFirstRun = $derived(workflowRelationships.isFirstRun);
   const parent = $derived(workflowRelationships.parent);
   const parentNamespaceName = $derived(
     workflowRelationships.parentNamespaceName,
   );
   const children = $derived(workflowRelationships.children);
-  const next = $derived(workflowRelationships.next);
-  const previous = $derived(workflowRelationships.previous);
+  const nextRunId = $derived(workflowRelationships.nextRunId);
+  const previousRunId = $derived(workflowRelationships.previousRunId);
   const scheduleId = $derived(workflowRelationships.scheduleId);
 </script>
 
@@ -41,11 +48,11 @@
     {#if parent}
       <ParentWorkflowTable {parent} {parentNamespaceName} {namespace} />
     {/if}
-    {#if first || previous || next}
+    {#if (!isFirstRun && firstRunId) || previousRunId || nextRunId}
       <FirstPreviousNextWorkflowTable
-        first={first ?? ''}
-        previous={previous ?? ''}
-        next={next ?? ''}
+        first={isFirstRun ? '' : (firstRunId ?? '')}
+        previous={previousRunId ?? ''}
+        next={nextRunId ?? ''}
         workflow={workflowId}
         {namespace}
       />

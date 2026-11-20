@@ -1,4 +1,5 @@
 import { getGroupId } from '$lib/models/event-groups/get-group-id';
+import type { CurrentRun } from '$lib/stores/workflow-run';
 import { isSystemNexusScheduledEvent } from '$lib/system-nexus-endpoints';
 import type { DescribeNamespaceResponse, EventLink } from '$lib/types';
 import type {
@@ -7,6 +8,7 @@ import type {
   ChildWorkflowExecutionFailedEvent,
   ChildWorkflowExecutionTerminatedEvent,
   ChildWorkflowExecutionTimedOutEvent,
+  HistoryEvent,
   IterableEvent,
   WorkflowEvents,
 } from '$lib/types/events';
@@ -24,7 +26,7 @@ import {
   isWorkflowExecutionStartedEvent,
 } from './is-event-type';
 
-const getNewExecutionId = (events: WorkflowEvents): string | undefined => {
+const findNewExecutionRunId = (events: WorkflowEvents): string | undefined => {
   for (const event of events) {
     if (
       has(event.attributes, 'newExecutionRunId') &&
@@ -33,6 +35,68 @@ const getNewExecutionId = (events: WorkflowEvents): string | undefined => {
       return event.attributes.newExecutionRunId;
     }
   }
+};
+
+export const readSuccessorRunId = (
+  closeEvent: HistoryEvent,
+): string | undefined =>
+  closeEvent.workflowExecutionCompletedEventAttributes?.newExecutionRunId ||
+  closeEvent.workflowExecutionFailedEventAttributes?.newExecutionRunId ||
+  closeEvent.workflowExecutionTimedOutEventAttributes?.newExecutionRunId ||
+  closeEvent.workflowExecutionContinuedAsNewEventAttributes
+    ?.newExecutionRunId ||
+  undefined;
+
+// Unknown counts as the current chain: servers before 1.25 omit firstRunId,
+// and a failed describe-current leaves currentRun null.
+export const belongsToCurrentChain = ({
+  firstRunId,
+  currentRun,
+}: {
+  firstRunId: string | undefined;
+  currentRun: CurrentRun | null;
+}): boolean => {
+  if (!firstRunId || !currentRun?.firstRunId) {
+    return true;
+  }
+  return currentRun.firstRunId === firstRunId;
+};
+
+type LatestRunOfThisChain =
+  | { kind: 'thisRun' }
+  | { kind: 'unknown' }
+  | { kind: 'newerChain' }
+  | { kind: 'run'; runId: string };
+
+// A Run that is open, or closed without a successor, is its chain's Latest
+// Run. Otherwise the Latest Run is the Workflow ID's current Run, unless the
+// Workflow ID has since started a newer chain.
+export const latestRunOfThisChain = ({
+  runId,
+  firstRunId,
+  nextRunId,
+  isOpen,
+  currentRun,
+}: {
+  runId: string;
+  firstRunId: string | undefined;
+  nextRunId: string | undefined;
+  isOpen: boolean;
+  currentRun: CurrentRun | null;
+}): LatestRunOfThisChain => {
+  if (isOpen || !nextRunId) {
+    return { kind: 'thisRun' };
+  }
+  if (!currentRun) {
+    return { kind: 'unknown' };
+  }
+  if (!belongsToCurrentChain({ firstRunId, currentRun })) {
+    return { kind: 'newerChain' };
+  }
+  if (currentRun.runId === runId) {
+    return { kind: 'thisRun' };
+  }
+  return { kind: 'run', runId: currentRun.runId };
 };
 
 export type ChildWorkflowClosedEvent =
@@ -58,11 +122,13 @@ type WorkflowRelationships = {
   hasRelationships: boolean;
   hasChildren: boolean;
   children: ChildWorkflowClosedEvent[];
-  first: string | undefined;
-  previous: string | undefined;
+  firstRunId: string | undefined;
+  isFirstRun: boolean;
+  previousRunId: string | undefined;
   parent: WorkflowIdentifier | undefined;
   parentNamespaceName: string | undefined;
-  next: string | undefined;
+  nextRunId: string | undefined;
+  isMultiRunChain: boolean;
   scheduleId: string | undefined;
   relationshipCount: number;
 };
@@ -79,23 +145,16 @@ export const getWorkflowRelationships = (
   const parent = workflow?.parent;
   const parentNamespaceName = namespace.namespaceInfo?.name ?? undefined;
 
-  const workflowExecutionStartedEvent = fullEventHistory.find(
-    isWorkflowExecutionStartedEvent,
-  );
+  const startedEvent = fullEventHistory.find(isWorkflowExecutionStartedEvent);
 
-  const newExecutionRunId = getNewExecutionId(fullEventHistory);
+  const nextRunId = findNewExecutionRunId(fullEventHistory);
 
-  const firstExecutionRunId =
-    workflowExecutionStartedEvent?.attributes?.firstExecutionRunId;
+  const firstRunId = startedEvent?.attributes?.firstExecutionRunId ?? undefined;
+  const isFirstRun = !!firstRunId && firstRunId === workflow?.runId;
+  const hasEarlierFirstRun = !!firstRunId && !isFirstRun;
 
-  const first =
-    firstExecutionRunId === workflow?.runId
-      ? undefined
-      : (firstExecutionRunId ?? undefined);
-
-  const previous =
-    workflowExecutionStartedEvent?.attributes?.continuedExecutionRunId ??
-    undefined;
+  const previousRunId =
+    startedEvent?.attributes?.continuedExecutionRunId ?? undefined;
 
   let scheduleId = '';
   const temporalScheduledById =
@@ -108,9 +167,9 @@ export const getWorkflowRelationships = (
   const hasRelationships = !!(
     parent ||
     hasChildren ||
-    first ||
-    previous ||
-    newExecutionRunId ||
+    hasEarlierFirstRun ||
+    previousRunId ||
+    nextRunId ||
     scheduleId
   );
 
@@ -118,20 +177,22 @@ export const getWorkflowRelationships = (
     (parent ? 1 : 0) +
     (workflow?.pendingChildren?.length ?? 0) +
     children.length +
-    (first ? 1 : 0) +
-    (previous ? 1 : 0) +
-    (newExecutionRunId ? 1 : 0) +
+    (hasEarlierFirstRun ? 1 : 0) +
+    (previousRunId ? 1 : 0) +
+    (nextRunId ? 1 : 0) +
     (scheduleId ? 1 : 0);
 
   return {
     hasRelationships,
     hasChildren,
     children,
-    first,
-    previous,
+    firstRunId,
+    isFirstRun,
+    previousRunId,
     parent,
     parentNamespaceName,
-    next: newExecutionRunId,
+    nextRunId,
+    isMultiRunChain: hasEarlierFirstRun || !!nextRunId,
     scheduleId,
     relationshipCount,
   };

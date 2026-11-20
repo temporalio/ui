@@ -9,6 +9,7 @@
 
   import Loading from '$lib/holocene/loading.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { getWorkflowHistoryController } from '$lib/services/workflow-history-controller.svelte.js';
   import {
     fetchAllDirectWorkflows,
     fetchAllRootWorkflows,
@@ -19,6 +20,9 @@
 
   import WorkflowFamilyTree from './relationships/workflow-family-tree.svelte';
   import WorkflowRelationshipsOld from './workflow-relationships-old.svelte';
+
+  const historyController = getWorkflowHistoryController();
+  const events = $derived(historyController.history.events);
 
   const MAX_UPPER_LIMIT = 5000;
 
@@ -76,12 +80,12 @@
         <Loading />
       {:then root}
         {#if root}
-          <WorkflowFamilyTree {root} {namespace} />
+          <WorkflowFamilyTree {root} {namespace} {events} />
         {:else}
-          <WorkflowRelationshipsOld />
+          <WorkflowRelationshipsOld {events} />
         {/if}
       {:catch}
-        <WorkflowRelationshipsOld />
+        <WorkflowRelationshipsOld {events} />
       {/await}
     {:else}
       <h4 class="px-8 py-4">{translate('workflows.no-relationships')}</h4>

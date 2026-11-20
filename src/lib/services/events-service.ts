@@ -2,7 +2,6 @@ import { throttle } from 'es-toolkit';
 
 import { toEventHistory } from '$lib/models/event-history';
 import type { EventSortOrder } from '$lib/stores/event-view';
-import { fullEventHistory } from '$lib/stores/events';
 import { triggerRefresh } from '$lib/stores/workflow-run';
 import type { WorkflowAPIRoutePath } from '$lib/types/api';
 import type {
@@ -103,17 +102,12 @@ export const fetchAllEvents = async ({
   signal,
   historySize,
 }: FetchEventsParameters): Promise<CommonHistoryEvent[]> => {
-  const onStart = () => {
-    if (!signal) return;
-    fullEventHistory.set([]);
-  };
-
   const onUpdate = (
-    full: WithoutNextPageToken<GetWorkflowExecutionHistoryResponse>,
+    _full: WithoutNextPageToken<GetWorkflowExecutionHistoryResponse>,
     current: WithoutNextPageToken<GetWorkflowExecutionHistoryResponse>,
   ) => {
     if (!signal) return;
-    fullEventHistory.set([...toEventHistory(full.history?.events)]);
+
     const next = current?.history?.events;
     const hasNewHistory =
       historySize &&
@@ -147,7 +141,7 @@ export const fetchAllEvents = async ({
         })) ?? { history: { events: [] } }
       );
     },
-    { onStart, onUpdate, onComplete },
+    { onUpdate, onComplete },
   );
 
   if (!response?.history) return [];

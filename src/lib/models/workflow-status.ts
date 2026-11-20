@@ -1,4 +1,4 @@
-import type { WorkflowStatus } from '$lib/types/workflows';
+import type { WorkflowExecution, WorkflowStatus } from '$lib/types/workflows';
 
 export type WorkflowFilters = readonly (WorkflowStatus | 'All')[];
 
@@ -17,6 +17,12 @@ export function isWorkflowStatusType(
   value: string,
 ): value is NonNullable<WorkflowStatus> {
   return workflowStatuses.includes(value as WorkflowStatus);
+}
+
+export function isWorkflowOpen(
+  workflow: Pick<WorkflowExecution, 'isRunning' | 'isPaused'>,
+): boolean {
+  return workflow.isRunning || workflow.isPaused;
 }
 
 export const workflowStatusFilters: WorkflowFilters = [

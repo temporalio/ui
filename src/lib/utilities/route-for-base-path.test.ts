@@ -60,6 +60,7 @@ import {
   routeForWorkers,
   routeForWorkersWithQuery,
   routeForWorkflow,
+  routeForWorkflowExecutionChain,
   routeForWorkflowMemo,
   routeForWorkflowQuery,
   routeForWorkflows,
@@ -128,6 +129,15 @@ describe('routeFor functions should resolve the base path exactly once', () => {
     ],
     ['routeForEventHistory', () => routeForEventHistory(workflowParams)],
     ['routeForTimeline', () => routeForTimeline(workflowParams)],
+    [
+      'routeForWorkflowExecutionChain',
+      () =>
+        routeForWorkflowExecutionChain({
+          namespace: 'default',
+          workflow: 'wf-id',
+          firstRunId: 'first-run-id',
+        }),
+    ],
     ['routeForWorkers', () => routeForWorkers(namespaceParams)],
     [
       'routeForWorkerDeployments',
@@ -391,6 +401,15 @@ describe('routeFor functions with prefix should resolve base + prefix correctly'
     ],
     ['routeForEventHistory', () => routeForEventHistory(workflowParams)],
     ['routeForTimeline', () => routeForTimeline(workflowParams)],
+    [
+      'routeForWorkflowExecutionChain',
+      () =>
+        routeForWorkflowExecutionChain({
+          namespace: 'default',
+          workflow: 'wf-id',
+          firstRunId: 'first-run-id',
+        }),
+    ],
     ['routeForWorkers', () => routeForWorkers(workflowParams)],
     [
       'routeForWorkerDeployments',

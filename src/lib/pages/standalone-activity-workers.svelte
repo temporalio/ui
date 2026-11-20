@@ -4,6 +4,7 @@
   import WorkersTable from '$lib/components/workers/workers-table/task-queue-workers-table.svelte';
   import { activityWorkerCount } from '$lib/stores/activities';
   import { parseSearchAttributes } from '$lib/utilities/decode-payload';
+  import { formatSDKName } from '$lib/utilities/get-sdk-version';
   import { activityExecution } from '$lib/utilities/standalone-activity-poller.svelte';
 
   interface Props {
@@ -15,6 +16,10 @@
 
   const searchAttributes = $derived($activityExecution?.info?.searchAttributes);
   const taskQueue = $derived($activityExecution?.info?.taskQueue ?? '');
+  const sdkInfo = $derived({
+    sdk: formatSDKName($activityExecution?.info?.sdkName),
+    version: $activityExecution?.info?.sdkVersion ?? '',
+  });
   const workerHeartbeatsEnabled = $derived(
     !!page.data.namespace.namespaceInfo?.capabilities?.workerHeartbeats,
   );
@@ -28,6 +33,7 @@
   {namespace}
   {taskQueue}
   searchAttributes={decodedSearchAttributes}
+  {sdkInfo}
   useFallback={!workerHeartbeatsEnabled || useFallback}
   onCount={(count) => ($activityWorkerCount = count)}
 />

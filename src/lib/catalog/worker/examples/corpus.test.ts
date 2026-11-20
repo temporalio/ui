@@ -59,6 +59,7 @@ const proofExampleIds = [
   'large-history',
   'workflow-feature-tour',
   'child-fan-out',
+  'execution-chain',
 ] as const;
 
 const activitySummaryExamples = [
@@ -188,6 +189,8 @@ describe('shared workflow corpus', () => {
         'largeHistory',
         'featureTourWorkflow',
         'childFanOut',
+        'executionChain',
+        'executionChainChild',
         'workerCrashWorkflow',
         ...activitySummaryExamples.map(({ workflowType }) => workflowType),
       ].sort(),
@@ -681,6 +684,9 @@ describe('shared workflow corpus', () => {
         'src/lib/catalog/worker/examples/workflow-feature-tour/handler.ts',
         'src/lib/catalog/worker/examples/child-fan-out/example.ts',
         'src/lib/catalog/worker/examples/child-fan-out/workflow.ts',
+        'src/lib/catalog/worker/examples/execution-chain/example.ts',
+        'src/lib/catalog/worker/examples/execution-chain/workflow.ts',
+        'src/lib/catalog/worker/examples/execution-chain/activity.ts',
         'src/lib/catalog/worker/examples/slow-nexus-operation/example.ts',
         'src/lib/catalog/worker/examples/slow-nexus-operation/handler.ts',
         'src/lib/catalog/worker/examples/slow-nexus-operation/service.ts',

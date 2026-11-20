@@ -221,8 +221,13 @@ export const encodeSharedStartOptions = async (
 ): Promise<JsonValue> => {
   if (!isJsonObject(startOptions)) return startOptions;
 
-  const { details, searchAttributes, summary, ...rest } = startOptions;
+  const { details, retryPolicy, searchAttributes, summary, ...rest } =
+    startOptions;
   const encoded: Record<string, JsonValue> = { ...rest };
+
+  if (isJsonObject(retryPolicy) && Object.keys(retryPolicy).length) {
+    encoded.retryPolicy = retryPolicy;
+  }
 
   if (isJsonObject(searchAttributes) && Object.keys(searchAttributes).length) {
     encoded.searchAttributes = {

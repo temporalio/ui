@@ -6,8 +6,8 @@
   import { translate } from '$lib/i18n/translate';
   import { IconTemporalSchedules } from '$lib/io/icon';
   import type { RootNode } from '$lib/services/workflow-service';
-  import { fullEventHistory } from '$lib/stores/events';
   import { workflowRun } from '$lib/stores/workflow-run';
+  import type { WorkflowEvents } from '$lib/types/events';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
   import {
@@ -21,6 +21,7 @@
 
   interface Props {
     root: RootNode;
+    events: WorkflowEvents;
     width: number;
     height: number;
     zoomLevel: number;
@@ -35,6 +36,7 @@
 
   let {
     root,
+    events,
     width,
     height,
     zoomLevel,
@@ -52,15 +54,12 @@
   const namespace = $derived(page.params.namespace);
   const fullWorkflow = $derived($workflowRun.workflow);
   const workflowRelationships = $derived(
-    getWorkflowRelationships(
-      fullWorkflow,
-      $fullEventHistory,
-      page.data.namespace,
-    ),
+    getWorkflowRelationships(fullWorkflow, events, page.data.namespace),
   );
-  const first = $derived(workflowRelationships.first);
-  const next = $derived(workflowRelationships.next);
-  const previous = $derived(workflowRelationships.previous);
+  const firstRunId = $derived(workflowRelationships.firstRunId);
+  const isFirstRun = $derived(workflowRelationships.isFirstRun);
+  const nextRunId = $derived(workflowRelationships.nextRunId);
+  const previousRunId = $derived(workflowRelationships.previousRunId);
 
   const getPositions = (
     width: number,
@@ -170,6 +169,7 @@
   {#if child.children.length && isExpanded(child)}
     <WorkflowFamilyNodeTree
       root={child}
+      {events}
       {width}
       {height}
       {zoomLevel}
@@ -366,7 +366,7 @@
         >
       </a>
     {/if}
-    {#if next}
+    {#if nextRunId}
       <line
         x1={x}
         y1={y}
@@ -381,18 +381,18 @@
         text-anchor="start"
         font-weight="500">Next Execution</text
       >
-      <a href={routeForRelationships({ namespace, workflow, run: next })}>
+      <a href={routeForRelationships({ namespace, workflow, run: nextRunId })}>
         <text
           x={x + 4.25 * radius}
           y={y + radius - 4}
           fill="currentColor"
           text-decoration="underline"
           text-anchor="start"
-          font-weight="500">{next}</text
+          font-weight="500">{nextRunId}</text
         >
       </a>
     {/if}
-    {#if previous}
+    {#if previousRunId}
       <line
         x1={x}
         y1={y}
@@ -406,23 +406,33 @@
         fill="currentColor"
         text-anchor="end"
         font-weight="500"
-        >{previous === first ? 'First' : 'Previous'} Execution</text
+        >{previousRunId === firstRunId ? 'First' : 'Previous'} Execution</text
       >
-      <a href={routeForRelationships({ namespace, workflow, run: previous })}>
+      <a
+        href={routeForRelationships({
+          namespace,
+          workflow,
+          run: previousRunId,
+        })}
+      >
         <text
-          href={routeForRelationships({ namespace, workflow, run: previous })}
+          href={routeForRelationships({
+            namespace,
+            workflow,
+            run: previousRunId,
+          })}
           x={x - 4.25 * radius}
           y={y + radius - 4}
           fill="currentColor"
           text-decoration="underline"
           text-anchor="end"
-          font-weight="500">{previous}</text
+          font-weight="500">{previousRunId}</text
         >
       </a>
     {/if}
-    {#if first && previous !== first}
+    {#if !isFirstRun && firstRunId && previousRunId !== firstRunId}
       <line
-        x1={previous ? x - 4 * radius : x}
+        x1={previousRunId ? x - 4 * radius : x}
         y1={y}
         x2={radius}
         y2={y}
@@ -436,14 +446,14 @@
         text-anchor="start"
         font-weight="500">First Execution</text
       >
-      <a href={routeForRelationships({ namespace, workflow, run: first })}>
+      <a href={routeForRelationships({ namespace, workflow, run: firstRunId })}>
         <text
           x={radius}
           y={y + radius - 4}
           fill="currentColor"
           text-decoration="underline"
           text-anchor="start"
-          font-weight="500">{first}</text
+          font-weight="500">{firstRunId}</text
         >
       </a>
     {/if}

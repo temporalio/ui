@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { tick, untrack } from 'svelte';
+  import { type Snippet, tick, untrack } from 'svelte';
   import { twMerge } from 'tailwind-merge';
 
   import {
@@ -23,12 +23,12 @@
     type LazyGroup,
     materializeGroup,
   } from '$lib/services/grouped-event-buffer';
-  import { eventBuffer } from '$lib/services/grouped-event-buffer.svelte';
-  import { activeGroups } from '$lib/stores/active-events';
-  import { collapseIdleTime } from '$lib/stores/event-view';
-  import { fullEventHistory } from '$lib/stores/events';
-  import { eventStatusFilter } from '$lib/stores/filters';
-  import type { WorkflowExecution } from '$lib/types/workflows';
+  import type { ExecutionHistory } from '$lib/services/grouped-event-buffer.svelte';
+  import type { PendingActivity } from '$lib/types/events';
+  import type {
+    WorkflowExecution,
+    WorkflowExecutionIdentity,
+  } from '$lib/types/workflows';
   import { isWorkflowDelayed } from '$lib/utilities/delayed-workflows';
   import {
     formatDistanceAbbreviated,
@@ -73,14 +73,19 @@
   import WorkflowRow from './workflow-row.svelte';
 
   interface Props {
+    namespace: string;
     workflow: WorkflowExecution;
+    history: ExecutionHistory;
+    collapseIdleTime?: boolean;
+    failedOrPendingOnly?: boolean;
+    activityActions?: Snippet<[PendingActivity]>;
     // Filtering, sorting and segment layout need no EventGroup, so only the
     // pooled rows below materialize one.
     lazyGroups: LazyGroup[];
     latestEventTimeMs?: number;
     scaleGroups?: LazyGroup[];
     selectedEventGroup?: TimelineEventGroup<LazyGroup>;
-    onSelectGroup?: (group: EventGroup) => void;
+    onSelectEventGroup?: (group: TimelineEventGroup) => void;
     onCloseEventGroup?: () => void;
     readOnly?: boolean;
     error?: boolean;
@@ -90,16 +95,22 @@
     totalExpectedEvents?: number;
     descMinId?: number;
     panelHeight?: number;
+    activeGroupId?: string;
     onTimelineInit?: (timeline: Timeline) => void;
   }
 
   let {
+    namespace,
     workflow,
+    history,
+    collapseIdleTime = false,
+    failedOrPendingOnly = false,
+    activityActions,
     lazyGroups,
     latestEventTimeMs,
     scaleGroups,
     selectedEventGroup,
-    onSelectGroup,
+    onSelectEventGroup,
     onCloseEventGroup,
     readOnly = false,
     error = false,
@@ -109,8 +120,20 @@
     totalExpectedEvents = 0,
     descMinId = 0,
     panelHeight = $bindable(0),
+    activeGroupId = $bindable(),
     onTimelineInit,
   }: Props = $props();
+
+  const workflowExecutionIdentity: WorkflowExecutionIdentity = $derived({
+    namespace,
+    workflowId: workflow.id,
+    runId: workflow.runId,
+  });
+
+  const closeGroup = () => {
+    panelHeight = 0;
+    activeGroupId = undefined;
+  };
 
   const DOT_STROKE = 2; // dot border
   // Dot geometry, published as CSS vars on .canvas (consumed by every row's dot).
@@ -165,12 +188,12 @@
   );
 
   const timeline = new Timeline({
-    getFullEventHistory: () => $fullEventHistory,
+    getFullEventHistory: () => history.events,
     getWorkflow: () => workflow,
     getLazyGroups: () => scaleGroups ?? lazyGroups,
     getCurrentTimeMs: () => currentTime,
     getLoading: () => loading,
-    getShouldCollapseByDefault: () => $collapseIdleTime === 'on',
+    getShouldCollapseByDefault: () => collapseIdleTime,
   });
 
   const viewport = new Viewport({ startTimeMs: 0, endTimeMs: 0 });
@@ -199,7 +222,7 @@
   };
 
   const filteredLazyGroups = $derived(
-    $eventStatusFilter
+    failedOrPendingOnly
       ? lazyGroups.filter(
           (group) =>
             isTimelineEventGroup(group) || isFailedOrPendingGroup(group),
@@ -308,7 +331,7 @@
   }
 
   const firstStartTime = $derived.by(() => {
-    const firstEventTime = $fullEventHistory[0]?.eventTime;
+    const firstEventTime = history.events[0]?.eventTime;
 
     if (!firstEventTime) {
       return workflow.executionTime;
@@ -327,10 +350,8 @@
     new Map(filteredLazyGroups.map((g, i) => [g.id, i])),
   );
 
-  // Active group's index in filteredLazyGroups (-1 = none). Derived here so the row
-  // pool doesn't subscribe to $activeGroups directly.
   const activeIdx = $derived(
-    $activeGroups.length > 0 ? (groupIndexMap.get($activeGroups[0]) ?? -1) : -1,
+    activeGroupId ? (groupIndexMap.get(activeGroupId) ?? -1) : -1,
   );
 
   // Materialized here rather than inline in the template: a GroupRecord keeps
@@ -339,12 +360,12 @@
   // built with, missing later pending-metadata changes.
   const activeGroup = $derived(
     activeIdx >= 0 && filteredLazyGroups[activeIdx]
-      ? eventBuffer.materializeGroup(filteredLazyGroups[activeIdx])
+      ? history.materializeGroup(filteredLazyGroups[activeIdx])
       : undefined,
   );
 
-  $effect(() => {
-    if ($activeGroups.length === 0) panelHeight = 0;
+  $effect.pre(() => {
+    if (activeIdx < 0) closeGroup();
   });
 
   // Open detail panel pushes rows below the active one down by panelHeight.
@@ -645,8 +666,13 @@
   });
 
   const selectGroup = async (group: EventGroup) => {
-    onSelectGroup?.(group);
-    if (!isTimelineEventGroup(group)) return;
+    if (!isTimelineEventGroup(group)) {
+      panelHeight = 0;
+      activeGroupId = activeGroupId === group.id ? undefined : group.id;
+      return;
+    }
+    closeGroup();
+    onSelectEventGroup?.(group);
     await tick();
     if (selectedEventGroup?.id === group.id) {
       eventGroupHeaderEl?.querySelector('button')?.focus();
@@ -655,6 +681,7 @@
 
   const closeEventGroup = async () => {
     const groupId = selectedEventGroup?.id;
+    closeGroup();
     onCloseEventGroup?.();
     await tick();
     if (groupId) document.getElementById(groupId)?.focus();
@@ -743,7 +770,7 @@
     {#snippet children({ endTime })}
       <div
         class="pointer-events-none sticky top-[120px]"
-        class:invisible={!!$activeGroups.length}
+        class:invisible={activeIdx >= 0}
       >
         <div class="flex w-full justify-between text-xs">
           <p class="w-60 -translate-x-24 rotate-90">
@@ -841,7 +868,7 @@
                   project={projectX}
                   {readOnly}
                   expanded={slot.lazy.id === selectedEventGroup?.id}
-                  onSelect={onSelectGroup ? selectGroup : undefined}
+                  onSelect={selectGroup}
                 />
               {/if}
             </li>
@@ -932,6 +959,10 @@
             y={panelY}
             group={activeGroup}
             {canvasWidth}
+            {workflowExecutionIdentity}
+            {workflow}
+            {activityActions}
+            onClose={closeGroup}
             {endTime}
             onHeight={(height) => {
               panelHeight = height;

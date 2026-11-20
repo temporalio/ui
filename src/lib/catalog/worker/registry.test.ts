@@ -2,6 +2,7 @@ import { operation, service, serviceHandler } from 'nexus-rpc';
 import { describe, expect, it } from 'vitest';
 
 import { createCatalogRegistry, generateCatalog } from './registry';
+import { catalogSharedStartOptionsSchema } from '../browser/start-options';
 import type { JsonSchema, JsonValue } from '../browser/types';
 
 const createNexusHandler = (name: string) => {
@@ -158,6 +159,7 @@ describe('generateCatalog', () => {
             type: 'object',
             properties: {
               details: { type: 'string' },
+              retryPolicy: catalogSharedStartOptionsSchema.retryPolicy,
               searchAttributes: { type: 'object' },
               summary: { type: 'string' },
               workflowStartDelay: { type: 'string' },
