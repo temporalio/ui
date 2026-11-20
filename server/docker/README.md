@@ -20,10 +20,10 @@ docker run \
     -e TEMPORAL_AUTH_CLIENT_SECRET=xxxxxxxxxxxxxxx \
     -e TEMPORAL_AUTH_CALLBACK_URL=https://xxxx.com:8080/auth/sso/callback \
     -e TEMPORAL_AUTH_SCOPES=openid,email,profile \
-    -e TEMPORAL_TLS_CA=../ca.cert \
-    -e TEMPORAL_TLS_CERT=../cluster.pem \
-    -e TEMPORAL_TLS_KEY=../cluster.key \
-    -e TEMPORAL_TLS_ENABLE_HOST_VERIFICATION=true \
+    -e TEMPORAL_TLS_SERVER_CA_CERT_PATH=../ca.cert \
+    -e TEMPORAL_TLS_CLIENT_CERT_PATH=../cluster.pem \
+    -e TEMPORAL_TLS_CLIENT_KEY_PATH=../cluster.key \
+    -e TEMPORAL_TLS_DISABLE_HOST_VERIFICATION=false \
     -e TEMPORAL_TLS_SERVER_NAME=tls-server \
     temporalio/ui:latest
 ```
