@@ -89,8 +89,8 @@
     page.params?.namespace ?? $lastUsedNamespace,
   );
   let namespaceNames = $derived(
-    isCloud || (!$namespacesLoading && !$namespaces.length)
-      ? [page.params.namespace].filter(Boolean)
+    isCloud
+      ? [page.params.namespace]
       : $namespaces.map(
           (namespace: Namespace) => namespace?.namespaceInfo?.name as string,
         ),
