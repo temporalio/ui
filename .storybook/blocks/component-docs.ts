@@ -93,13 +93,13 @@ export function ComponentDocs(): ReactElement {
         )
       : (excludeParameter ?? []);
   const controlsExclude = [...excludedControls, ...parameterExcludes];
-  const controllableArgTypes: StrictArgTypes = filterArgTypes(
+  const controllableArgTypes = filterArgTypes(
     (preparedMeta.argTypes ?? {}) as StrictArgTypes,
     preparedMeta.parameters.docs?.controls?.include,
     controlsExclude,
   );
   const hasControls = Object.values(controllableArgTypes).some(
-    (argType) => argType.control && !argType.table?.disable,
+    (argType) => argType?.control && !argType.table?.disable,
   );
   const canvas = h(
     'div',
