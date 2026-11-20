@@ -4,7 +4,7 @@ import {
   createEventGroup,
   defineSignal,
   defineUpdate,
-  type EventGroupMarker,
+  type EventGroup,
   proxyActivities,
   setHandler,
   sleep,
@@ -45,12 +45,12 @@ export async function satelliteLaunchEventGroups({
   satellites,
   launchPollTimeoutSeconds,
 }: SatelliteLaunchInput): Promise<string> {
-  const satelliteGroups = new Map<string, EventGroupMarker>();
+  const satelliteGroups = new Map<string, EventGroup>();
   const satelliteGroup = (satelliteId: string) => {
     let group = satelliteGroups.get(satelliteId);
     if (!group) {
-      group = createEventGroup(`Satellite ${satelliteId}`, {
-        id: `satellite:${satelliteId}`,
+      group = createEventGroup(`satellite:${satelliteId}`, {
+        label: `Satellite ${satelliteId}`,
       });
       satelliteGroups.set(satelliteId, group);
     }
@@ -82,10 +82,12 @@ export async function satelliteLaunchEventGroups({
     },
   );
 
-  const preLaunch = createEventGroup('Pre-launch checks', { id: 'pre-launch' });
-  const ascent = createEventGroup('Ascent', { id: 'ascent' });
-  const deployment = createEventGroup('Payload deployment', {
-    id: 'deployment',
+  const preLaunch = createEventGroup('pre-launch', {
+    label: 'Pre-launch checks',
+  });
+  const ascent = createEventGroup('ascent', { label: 'Ascent' });
+  const deployment = createEventGroup('deployment', {
+    label: 'Payload deployment',
   });
 
   const cleared = await preLaunch.withScope(async () => {

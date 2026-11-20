@@ -277,6 +277,20 @@ export const routeForStandaloneNexusOperationMetadata = (
   return `${routeForStandaloneNexusOperationBase(parameters)}/metadata`;
 };
 
+export const routeForStandaloneNexusOperationCallbacks = ({
+  queryParams,
+  ...parameters
+}: NamespaceParameter & {
+  operationId: string;
+  runId: string;
+  queryParams?: Record<string, string>;
+}): ResolvedPathname => {
+  return toURL(
+    `${routeForStandaloneNexusOperationBase(parameters)}/callbacks`,
+    queryParams,
+  );
+};
+
 type StartWorkflowParameters = NamespaceParameter &
   Partial<{
     workflowId: string;

@@ -1,10 +1,11 @@
 import { translate } from '$lib/i18n/translate';
-import type { EventLink } from '$lib/types';
+import type { CallbackLink, EventLink } from '$lib/types';
 import {
   routeForBatchOperation,
   routeForEventHistoryEvent,
   routeForNamespace,
   routeForStandaloneActivityDetails,
+  routeForStandaloneNexusOperationCallbacks,
   routeForStandaloneNexusOperationDetails,
   routeForWorkflow,
 } from '$lib/utilities/route-for';
@@ -16,6 +17,7 @@ export type EventLinkVariant =
   | 'nexusOperation'
   | 'activity'
   | 'batchJob'
+  | 'callback'
   | 'unknown';
 
 export type EventLinkDisplay = {
@@ -91,6 +93,52 @@ const eventDisplay = (
   };
 };
 
+const callbackLinkHref = (callback: CallbackLink): string | undefined => {
+  const namespace = callback.namespace;
+  const businessId = callback.execution?.businessId;
+  const runId = callback.execution?.runId;
+  if (!isPresent(namespace) || !isPresent(businessId) || !isPresent(runId)) {
+    return undefined;
+  }
+
+  const requestIdParam: Record<string, string> = isPresent(callback.requestId)
+    ? { requestId: callback.requestId }
+    : {};
+
+  switch (String(callback.execution?.type)) {
+    case 'EXECUTION_TYPE_NEXUS_OPERATION':
+      return routeForStandaloneNexusOperationCallbacks({
+        namespace,
+        operationId: businessId,
+        runId,
+        ...(isPresent(callback.requestId) && {
+          queryParams: requestIdParam,
+        }),
+      });
+    case 'EXECUTION_TYPE_ACTIVITY':
+      return routeForStandaloneActivityDetails({
+        namespace,
+        activityId: businessId,
+        runId,
+      });
+    case 'EXECUTION_TYPE_WORKFLOW': {
+      const [component, updateId] = callback.componentPath ?? [];
+      const queryParams: Record<string, string> = {
+        ...requestIdParam,
+        ...(component === 'Update' && isPresent(updateId) && { updateId }),
+      };
+      return routeForWorkflow({
+        namespace,
+        workflow: businessId,
+        run: runId,
+        ...(Object.keys(queryParams).length > 0 && { queryParams }),
+      });
+    }
+    default:
+      return undefined;
+  }
+};
+
 const unknownLink = (index?: number): EventLinkView => {
   return {
     variant: 'unknown',
@@ -109,6 +157,8 @@ export const eventLinkTargetTypeLabel = (
     case 'workflowEvent':
     case 'workflow':
       return translate('nexus.target-type-workflow');
+    case 'callback':
+      return translate('nexus.target-type-callback');
     default:
       return undefined;
   }
@@ -302,6 +352,25 @@ export const toEventLinkView = (
       label: translate('common.job-id'),
       value: jobId || translate('common.job-id'),
       href,
+      namespace: namespaceDisplay(namespace),
+    };
+  }
+
+  if (link.callback) {
+    const callback = link.callback;
+    const namespace = callback.namespace;
+    const execution = callback.execution;
+
+    return {
+      variant: 'callback',
+      key: `callback:${namespace ?? ''}:${execution?.type ?? ''}:${execution?.businessId ?? ''}:${execution?.runId ?? ''}:${(callback.requestId || index) ?? ''}`,
+      label: translate('nexus.callback-link'),
+      value:
+        execution?.businessId ||
+        execution?.runId ||
+        namespace ||
+        translate('nexus.nexus-callback'),
+      href: callbackLinkHref(callback),
       namespace: namespaceDisplay(namespace),
     };
   }

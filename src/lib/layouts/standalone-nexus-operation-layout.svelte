@@ -10,10 +10,12 @@
   import Tab from '$lib/holocene/tab/tab.svelte';
   import Tabs from '$lib/holocene/tab/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
+  import BadgeCount from '$lib/io/badge-count/badge-count.svelte';
   import { IconChevronLeft } from '$lib/io/icon';
   import { nexusOperationsSearchParams } from '$lib/stores/nexus-operations';
   import { pathMatches } from '$lib/utilities/path-matches';
   import {
+    routeForStandaloneNexusOperationCallbacks,
     routeForStandaloneNexusOperationDetails,
     routeForStandaloneNexusOperationMetadata,
     routeForStandaloneNexusOperations,
@@ -61,6 +63,14 @@
 
   const detailsRoute = $derived(
     routeForStandaloneNexusOperationDetails(routeParameters),
+  );
+
+  const callbacksRoute = $derived(
+    routeForStandaloneNexusOperationCallbacks(routeParameters),
+  );
+
+  const callbackCount = $derived(
+    $nexusOperationExecution?.completionCallbacks?.length ?? 0,
   );
 
   const searchAttributesRoute = $derived(
@@ -114,6 +124,14 @@
         href={detailsRoute}
         active={pathMatches(page.url.pathname, detailsRoute)}
       />
+      <Tab
+        label={translate('standalone-nexus-operations.layout-callbacks-tab')}
+        id="nexus-operation-callbacks-tab"
+        href={callbacksRoute}
+        active={pathMatches(page.url.pathname, callbacksRoute)}
+      >
+        <BadgeCount value={callbackCount} />
+      </Tab>
       <Tab
         label={translate(
           'standalone-nexus-operations.layout-search-attributes-tab',

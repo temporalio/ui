@@ -6,7 +6,7 @@ import {
   type PayloadCodec,
   ValueError,
 } from '@temporalio/common';
-import encoding from '@temporalio/common/lib/encoding.js';
+import encoding from '@temporalio/common/encoding';
 import temporal from '@temporalio/proto';
 
 import { decrypt, encrypt } from './crypto';

@@ -10,7 +10,6 @@
   import PayloadCodeBlock from '$lib/components/payload/payload-code-block.svelte';
   import ActivityExecutionInputAndOutcome from '$lib/components/standalone-activities/activity-input-and-outcome.svelte';
   import PendingActivityState from '$lib/components/standalone-activities/pending-activity-state.svelte';
-  import WorkflowCallback from '$lib/components/workflow/workflow-callback.svelte';
   import Card from '$lib/holocene/card.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -121,12 +120,6 @@
 {/snippet}
 
 {#if $activityExecution}
-  {#if $activityExecution.callbacks?.length}
-    <WorkflowCallback
-      callback={$activityExecution.callbacks[0]}
-      perspective="caller"
-    />
-  {/if}
   <ActivityExecutionInputAndOutcome
     input={$activityExecution.input}
     outcome={$activityExecution.outcome}
