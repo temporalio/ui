@@ -32,6 +32,11 @@ Object.defineProperty(Element.prototype, 'scrollIntoView', {
   value: () => {},
 });
 
+Object.defineProperty(SVGElement.prototype, 'beginElement', {
+  configurable: true,
+  value: () => {},
+});
+
 Object.defineProperties(HTMLDialogElement.prototype, {
   showModal: {
     configurable: true,
