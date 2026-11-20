@@ -20,7 +20,9 @@
   this={element}
   {...rest}
   class={twMerge(
-    'inline-flex flex-wrap items-center gap-2 rounded border border-primary bg-surface-primary p-px',
+    // w-fit keeps the control at its natural width, even as a flex or grid
+    // child that would otherwise stretch to fill the row.
+    'inline-flex w-fit flex-wrap items-center gap-2 rounded border border-primary bg-surface-primary p-px',
     className,
   )}
 >

@@ -46,9 +46,7 @@
 </script>
 
 {#snippet template(args: ComponentProps<typeof Tag>)}
-  <div class="border border-primary bg-surface-primary p-6 text-primary">
-    <Tag {...args} />
-  </div>
+  <Tag {...args} />
 {/snippet}
 
 <Story tags={['!dev']} name="Playground" />
@@ -67,9 +65,7 @@
 
 <Story name="Color schemes">
   {#snippet template()}
-    <div
-      class="flex flex-wrap items-center gap-4 border border-primary bg-surface-primary p-6"
-    >
+    <div class="flex flex-wrap items-center gap-4">
       {#each colorSchemes as colorScheme (colorScheme)}
         <div class="flex flex-col items-start gap-2">
           <span class="text-xs text-secondary">{colorScheme}</span>

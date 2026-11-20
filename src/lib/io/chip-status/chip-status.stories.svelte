@@ -57,18 +57,14 @@
 </script>
 
 {#snippet template(args: ComponentProps<typeof ChipStatus>)}
-  <div class="border border-primary bg-surface-primary p-6 text-primary">
-    <ChipStatus {...args} />
-  </div>
+  <ChipStatus {...args} />
 {/snippet}
 
 <Story tags={['!dev']} name="Playground" />
 
 <Story name="Statuses">
   {#snippet template()}
-    <div
-      class="flex flex-wrap items-center gap-4 border border-primary bg-surface-primary p-6"
-    >
+    <div class="flex flex-wrap items-center gap-4">
       {#each statuses as status (status)}
         <div class="flex flex-col items-start gap-2">
           <span class="text-xs text-secondary">{status}</span>

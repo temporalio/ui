@@ -72,9 +72,7 @@
 </script>
 
 {#snippet template(args: ComponentProps<typeof BadgeStatus>)}
-  <div class="border border-primary bg-surface-primary p-6 text-primary">
-    <BadgeStatus {...args} />
-  </div>
+  <BadgeStatus {...args} />
 {/snippet}
 
 <Story tags={['!dev']} name="Playground" />
@@ -113,7 +111,7 @@
 
 <Story name="Default truncation">
   {#snippet template()}
-    <div class="w-64 border border-primary bg-surface-primary p-6">
+    <div class="w-64">
       <BadgeStatus
         status="Paused"
         text="A long paused status label that should truncate"
@@ -127,9 +125,7 @@
 
 <Story name="Count formatting">
   {#snippet template()}
-    <div
-      class="flex flex-wrap items-start gap-6 border border-primary bg-surface-primary p-6"
-    >
+    <div class="flex flex-wrap items-start gap-6">
       {#each counts as count (count.label)}
         <div class="flex flex-col items-start gap-2">
           <span class="text-xs text-secondary">{count.label}</span>
@@ -142,9 +138,7 @@
 
 <Story name="Sizes">
   {#snippet template()}
-    <div
-      class="flex flex-wrap items-end gap-4 border border-primary bg-surface-primary p-6"
-    >
+    <div class="flex flex-wrap items-end gap-4">
       {#each sizes as size (size)}
         <div class="flex flex-col items-start gap-2">
           <span class="text-xs text-secondary">{size}</span>
@@ -157,9 +151,7 @@
 
 <Story name="Statuses">
   {#snippet template()}
-    <div
-      class="flex flex-wrap items-center gap-4 border border-primary bg-surface-primary p-6"
-    >
+    <div class="flex flex-wrap items-center gap-4">
       {#each statuses as status (status)}
         <div class="flex flex-col items-start gap-2">
           <span class="text-xs text-secondary">{status}</span>

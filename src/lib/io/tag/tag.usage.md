@@ -4,8 +4,14 @@
 import { Tag } from '$lib/io/tag';
 ```
 
-Use `text` for the tag label and `extension` for an adjoining value. Choose a
-semantic `colorScheme` and pass `Icon={false}` to hide the default tag icon.
+Tags are non-interactive labels that attach metadata to an object, often as a name and value pair, such as a search attribute or a custom label. They help users identify and group items at a glance — use Chip instead when users need to act on the label.
 
-Tags present metadata. Use Chip when clicking the label changes a filter or
-performs another action.
+| Do                                                                                                          | Don't                                                                                                    |
+| ----------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| Use `text` for the name and `extension` for the value, such as "region" and "us-east-1".                    | Don't make tags clickable. Use Chip when clicking the label changes a filter or performs another action. |
+| Keep names consistent across the product, so the same metadata always has the same label.                   | Don't use Tag for statuses. Use Badge Status for workflow states.                                        |
+| Keep the default neutral color unless the color carries a clear meaning.                                    | Don't use color alone to distinguish tags. The text should identify each tag on its own.                 |
+| Show a few tags per item, and move the rest behind an overflow pattern (e.g., +3 more) when there are many. | Don't put long or free-form text in a tag. Show it in a field or description instead.                    |
+
+Choose a semantic `colorScheme` and pass `Icon={false}` to hide the default tag
+icon.

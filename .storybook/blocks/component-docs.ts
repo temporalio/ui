@@ -7,9 +7,9 @@ import {
   Description,
   DocsContext,
   DocsPage,
+  HeaderMdx,
   Heading,
   Markdown,
-  Subheading,
   Title,
   useOf,
 } from '@storybook/addon-docs/blocks';
@@ -25,6 +25,12 @@ import { filterArgTypes } from 'storybook/preview-api';
 import { PageActions } from './page-actions';
 
 const ioStoriesPrefix = './src/lib/io/';
+
+const exampleHeadingId = (name: string): string =>
+  `example-${name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')}`;
 
 function Examples(): ReactElement | null {
   const { componentStories, projectAnnotations, getStoryContext } =
@@ -51,21 +57,27 @@ function Examples(): ReactElement | null {
         Anchor,
         { key: story.id, storyId: story.id },
         h(
-          Subheading,
-          null,
+          'div',
+          { className: 'io-docs-example' },
+          // Subheading only sets an id for plain-text children, so give the
+          // linked title its own id for the page nav.
           h(
-            AnchorMdx,
-            { href: `./?path=/story/${story.id}`, target: '_top' },
-            story.name,
+            HeaderMdx,
+            { as: 'h3', id: exampleHeadingId(story.name) },
+            h(
+              AnchorMdx,
+              { href: `./?path=/story/${story.id}`, target: '_top' },
+              story.name,
+            ),
           ),
+          h(Description, { of: story.moduleExport }),
+          h(Canvas, {
+            of: story.moduleExport,
+            withToolbar: story.parameters.docs?.canvas?.withToolbar ?? false,
+            story: { __forceInitialArgs: true },
+            source: { __forceInitialArgs: true },
+          }),
         ),
-        h(Description, { of: story.moduleExport }),
-        h(Canvas, {
-          of: story.moduleExport,
-          withToolbar: story.parameters.docs?.canvas?.withToolbar ?? false,
-          story: { __forceInitialArgs: true },
-          source: { __forceInitialArgs: true },
-        }),
       ),
     ),
   );
@@ -110,22 +122,31 @@ export function ComponentDocs(): ReactElement {
   return h(
     Fragment,
     null,
+    // Marks IO pages for the docs layout rules in preview.css.
+    h('span', { className: 'io-docs-page', hidden: true }),
     h(PageActions),
     h(Title),
     h(Description),
-    h(Heading, null, 'Playground'),
-    hasControls
-      ? h(
-          'div',
-          { className: 'io-docs-playground' },
-          canvas,
-          h(
-            'section',
-            { className: 'io-docs-adjust-props', 'aria-label': 'Adjust props' },
-            h(Controls, { exclude: controlsExclude }),
-          ),
-        )
-      : canvas,
+    h(
+      'div',
+      { className: 'io-docs-playground-section' },
+      h(Heading, null, 'Playground'),
+      hasControls
+        ? h(
+            'div',
+            { className: 'io-docs-playground' },
+            canvas,
+            h(
+              'section',
+              {
+                className: 'io-docs-adjust-props',
+                'aria-label': 'Adjust props',
+              },
+              h(Controls, { exclude: controlsExclude }),
+            ),
+          )
+        : canvas,
+    ),
     h('div', { className: 'io-docs-examples' }, h(Examples)),
     usage ? h(Markdown, null, usage) : null,
     h(Heading, null, 'API Reference'),

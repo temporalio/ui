@@ -1,0 +1,199 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+import heroImage from '../../../.storybook/assets/io-overview-hero.webp';
+import noiseTexture from '../../../.storybook/assets/io-overview-noise.webp';
+
+<Meta title="IO/Overview" />
+
+{/* Marks IO pages for the docs layout rules in .storybook/preview.css. */}
+
+<div className="io-docs-page" hidden />
+
+<header
+  className="io-overview-hero"
+  style={{
+    '--io-overview-hero-image': `url(${heroImage})`,
+    '--io-overview-hero-noise': `url(${noiseTexture})`,
+  }}
+>
+  <div className="io-overview-hero-content">
+    <h1>io</h1>
+    <div>
+
+      Temporal's design system for product UI: Svelte components, semantic theme
+      tokens, and an icon library. Every component follows the light and dark
+      themes, so screens built with io look right in both.
+
+    </div>
+
+  </div>
+</header>
+
+## Getting started
+
+Import each component from its own entry point. Inside this repository, use
+`$lib/io/{name}`; in other apps, use `@temporalio/ui/io/{name}`.
+
+```ts
+import { Button } from '$lib/io/button';
+import { Badge } from '@temporalio/ui/io/badge';
+```
+
+Configure the theme preset from `@temporalio/ui/theme/preset`, and prefer
+semantic classes such as `text-primary`, `bg-surface-primary`, and
+`border-primary` so your UI follows the selected theme.
+
+Each component page has a live Playground, examples, Do / Don't guidance, and an
+API reference.
+
+## Guides
+
+<div className="io-overview-grid">
+  <div className="io-overview-card">
+
+**[Theme](?path=/docs/io-guides-theme--docs)**
+
+Theme tokens for color, spacing, and interaction states, rendered from the theme
+definitions.
+
+  </div>
+  <div className="io-overview-card">
+
+**[Forms](?path=/docs/io-guides-forms--docs)**
+
+Building forms with SuperForms and schema validation.
+
+  </div>
+  <div className="io-overview-card">
+
+**[Modals and Drawers](?path=/docs/io-guides-modals-and-drawers--docs)**
+
+Confirmations, error handling, and forms in drawers.
+
+  </div>
+  <div className="io-overview-card">
+
+**[Page Layouts and Templates](?path=/docs/io-guides-page-layouts-and-templates--docs)**
+
+The app shell, page headers, and list and detail templates.
+
+  </div>
+</div>
+
+## Components
+
+### Labels and status
+
+<div className="io-overview-grid">
+  <div className="io-overview-card">
+
+**[Badge](?path=/docs/io-components-badge--docs)**
+
+A compact, non-interactive label for metadata, with optional adjoining
+extensions.
+
+  </div>
+  <div className="io-overview-card">
+
+**[Badge Count](?path=/docs/io-components-badge-count--docs)**
+
+A compact count, optionally displayed against a total.
+
+  </div>
+  <div className="io-overview-card">
+
+**[Badge Status](?path=/docs/io-components-badge-status--docs)**
+
+A non-interactive workflow status label with consistent colors and translated
+text.
+
+  </div>
+  <div className="io-overview-card">
+
+**[Tag](?path=/docs/io-components-tag--docs)**
+
+A non-interactive metadata label with a tag icon and optional extension.
+
+  </div>
+</div>
+
+### Actions and navigation
+
+<div className="io-overview-grid">
+  <div className="io-overview-card">
+
+**[Button](?path=/docs/io-components-button--docs)**
+
+Triggers an action, with shared sizes, color schemes, icons, and loading
+feedback.
+
+  </div>
+  <div className="io-overview-card">
+
+**[Chip](?path=/docs/io-components-chip--docs)**
+
+An interactive label for filters or compact actions, with an optional extension.
+
+  </div>
+  <div className="io-overview-card">
+
+**[Chip Status](?path=/docs/io-components-chip-status--docs)**
+
+An interactive workflow status label with optional count and change indicator.
+
+  </div>
+  <div className="io-overview-card">
+
+**[Segmented Control](?path=/docs/io-components-segmented-control--docs)**
+
+A compact group of related actions or navigation destinations.
+
+  </div>
+  <div className="io-overview-card">
+
+**[Text Link](?path=/docs/io-components-text-link--docs)**
+
+An inline navigation link with optional leading and trailing icons.
+
+  </div>
+  <div className="io-overview-card">
+
+**[Breadcrumbs](?path=/docs/io-components-breadcrumbs--docs)**
+
+Shows where a page sits in the hierarchy and links to each level above it.
+
+  </div>
+</div>
+
+### Foundations
+
+<div className="io-overview-grid">
+  <div className="io-overview-card">
+
+**[Icon](?path=/docs/io-components-icon--docs)**
+
+The shared IO icon library, including optical variants for adjusted visual
+sizing.
+
+  </div>
+  <div className="io-overview-card">
+
+**[Roundness Group](?path=/docs/io-components-roundness-group--docs)**
+
+A layout primitive that coordinates the corners and borders of adjoining
+segments.
+
+  </div>
+</div>
+
+## Layouts
+
+<div className="io-overview-grid">
+  <div className="io-overview-card">
+
+**[Page Header](?path=/docs/io-layouts-page-header--docs)**
+
+A responsive page heading with slots for actions, tags, filters, and metadata.
+
+  </div>
+</div>

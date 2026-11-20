@@ -41,9 +41,7 @@
 </script>
 
 {#snippet template(args: ComponentProps<typeof BadgeCount>)}
-  <div class="border border-primary bg-surface-primary p-6 text-primary">
-    <BadgeCount {...args} />
-  </div>
+  <BadgeCount {...args} />
 {/snippet}
 
 <Story tags={['!dev']} name="Playground" />
@@ -54,9 +52,7 @@
 
 <Story name="Sizes">
   {#snippet template()}
-    <div
-      class="flex flex-wrap items-end gap-4 border border-primary bg-surface-primary p-6"
-    >
+    <div class="flex flex-wrap items-end gap-4">
       {#each sizes as size (size)}
         <div class="flex flex-col items-start gap-2">
           <span class="text-xs text-secondary">{size}</span>
@@ -69,9 +65,7 @@
 
 <Story name="Examples">
   {#snippet template()}
-    <div
-      class="flex flex-wrap items-end gap-6 border border-primary bg-surface-primary p-6"
-    >
+    <div class="flex flex-wrap items-end gap-6">
       <div class="flex flex-col items-start gap-2">
         <span class="text-xs text-secondary">Single</span>
         <BadgeCount value={12} />

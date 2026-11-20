@@ -42,9 +42,7 @@
 </script>
 
 {#snippet template(args: ComponentProps<typeof Breadcrumbs>)}
-  <div class="bg-background-primary p-6">
-    <Breadcrumbs {...args} />
-  </div>
+  <Breadcrumbs {...args} />
 {/snippet}
 
 <Story tags={['!dev']} name="Short trail" {template} />
