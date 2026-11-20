@@ -162,7 +162,7 @@
         <td class="truncate" data-testid="callback-operation">
           {handler?.operation ?? ''}
         </td>
-        <td data-testid="callback-target-execution">
+        <td class="py-2" data-testid="callback-target-execution">
           {#if target}
             <div class="flex flex-col">
               {#if target.href}
@@ -171,7 +171,9 @@
                 <span class="truncate">{target.name}</span>
               {/if}
               {#if target.typeLabel}
-                <span class="truncate text-secondary">{target.typeLabel}</span>
+                <span class="truncate text-xs text-secondary"
+                  >{target.typeLabel}</span
+                >
               {/if}
             </div>
           {/if}
