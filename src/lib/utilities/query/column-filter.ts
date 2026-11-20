@@ -16,13 +16,28 @@ export const isAppliedFilter = ({
   isValidFilterValue(value, conditional) &&
   !(isInConditional(conditional) && value === EMPTY_LIST_VALUE);
 
+export const targetsAttribute = (
+  filter: SearchAttributeFilter,
+  attribute: string,
+): boolean => filter.attribute === attribute && !filter.negated;
+
+const EXCLUDING_CONDITIONALS = new Set(['not in', '!=']);
+
+export const targetsStatusAttribute = (
+  filter: SearchAttributeFilter,
+  attribute: string,
+): boolean =>
+  targetsAttribute(filter, attribute) &&
+  !EXCLUDING_CONDITIONALS.has(filter.conditional.toLowerCase());
+
 export const replaceAttributeFilters = (
   filters: SearchAttributeFilter[],
   attribute: string,
   replacements: SearchAttributeFilter[],
+  targets: typeof targetsAttribute = targetsAttribute,
 ): SearchAttributeFilter[] => {
-  const index = filters.findIndex((filter) => filter.attribute === attribute);
-  const others = filters.filter((filter) => filter.attribute !== attribute);
+  const index = filters.findIndex((filter) => targets(filter, attribute));
+  const others = filters.filter((filter) => !targets(filter, attribute));
 
   if (index === -1) return [...others, ...replacements];
 

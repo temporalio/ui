@@ -53,6 +53,7 @@ export const Strings = {
   'filter-by-column': 'Filter by {{column}}',
   'column-has-multiple-filters':
     '{{column}} has {{count}} filters. Applying replaces them with this one.',
+  'read-only-filter': 'Edit the query to change this filter.',
   'remove-all': 'Remove all',
   'replace-all': 'Replace all',
   'execution-status': 'Execution Status',

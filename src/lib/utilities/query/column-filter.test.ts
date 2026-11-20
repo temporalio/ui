@@ -4,6 +4,7 @@ import {
   isAppliedFilter,
   isAtQueryLimit,
   replaceAttributeFilters,
+  targetsStatusAttribute,
 } from './column-filter';
 import { MAX_QUERY_LENGTH } from '../request-from-api';
 import { createFilter } from './to-list-workflow-filters';
@@ -83,6 +84,31 @@ describe('isAppliedFilter', () => {
   });
 });
 
+describe('targetsStatusAttribute', () => {
+  it('targets a status filter that includes statuses', () => {
+    expect(targetsStatusAttribute(status('Running'), 'ExecutionStatus')).toBe(
+      true,
+    );
+  });
+
+  it.each(['NOT IN', 'not in', '!='])(
+    'does not target a status filter with %s',
+    (conditional) => {
+      const filter = createFilter({
+        attribute: 'ExecutionStatus',
+        value: 'Running',
+        conditional,
+      });
+      expect(targetsStatusAttribute(filter, 'ExecutionStatus')).toBe(false);
+    },
+  );
+
+  it('does not target a negated status filter', () => {
+    const filter = createFilter({ ...status('Running'), negated: true });
+    expect(targetsStatusAttribute(filter, 'ExecutionStatus')).toBe(false);
+  });
+});
+
 describe('replaceAttributeFilters', () => {
   it('replaces every filter for the attribute in place of the first one', () => {
     const filters = [
@@ -115,6 +141,42 @@ describe('replaceAttributeFilters', () => {
         [],
       ).map((f) => f.id),
     ).toEqual(['wid']);
+  });
+
+  it('keeps filters the given predicate does not target', () => {
+    const notIn = createFilter({
+      id: 'not-in',
+      attribute: 'ExecutionStatus',
+      value: '("Terminated", "Canceled")',
+      conditional: 'NOT IN',
+    });
+
+    expect(
+      replaceAttributeFilters(
+        [notIn, status('Running'), workflowId],
+        'ExecutionStatus',
+        [status('Failed')],
+        targetsStatusAttribute,
+      ).map((f) => f.id),
+    ).toEqual(['not-in', 'Failed', 'wid']);
+  });
+
+  it('keeps negated filters for the attribute', () => {
+    const notTerminated = createFilter({
+      id: 'not-terminated',
+      attribute: 'ExecutionStatus',
+      value: 'Terminated',
+      conditional: '=',
+      negated: true,
+    });
+
+    expect(
+      replaceAttributeFilters(
+        [notTerminated, status('Running'), workflowId],
+        'ExecutionStatus',
+        [status('Failed')],
+      ).map((f) => f.id),
+    ).toEqual(['not-terminated', 'Failed', 'wid']);
   });
 });
 

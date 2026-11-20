@@ -16,6 +16,8 @@
     isAppliedFilter,
     isAtQueryLimit,
     replaceAttributeFilters,
+    targetsAttribute,
+    targetsStatusAttribute,
   } from '$lib/utilities/query/column-filter';
   import { getDefaultConditional } from '$lib/utilities/query/quick-filter';
   import {
@@ -42,9 +44,13 @@
   const uid = $props.id();
   const controlsId = `column-header-filter-${uid}`;
 
+  const targets = $derived(
+    statusFilter ? targetsStatusAttribute : targetsAttribute,
+  );
+
   const appliedFilters = $derived(
     $filters.filter(
-      (filter) => filter.attribute === attribute && isAppliedFilter(filter),
+      (filter) => targets(filter, attribute) && isAppliedFilter(filter),
     ),
   );
   const filtered = $derived(appliedFilters.length > 0);
@@ -140,7 +146,9 @@
         {statusFilter}
         filters={appliedFilters}
         onUpdate={(updated) =>
-          setFilters(replaceAttributeFilters($filters, attribute, updated))}
+          setFilters(
+            replaceAttributeFilters($filters, attribute, updated, targets),
+          )}
       />
     {:else if initialFilter}
       <FilterEditor

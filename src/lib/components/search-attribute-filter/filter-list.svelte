@@ -9,7 +9,10 @@
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import type { StatusFilter } from '$lib/models/status-filter';
-  import { replaceAttributeFilters } from '$lib/utilities/query/column-filter';
+  import {
+    replaceAttributeFilters,
+    targetsStatusAttribute,
+  } from '$lib/utilities/query/column-filter';
   import { createFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
 
@@ -30,7 +33,7 @@
   const statusAttribute = $derived(statusFilter?.attribute);
 
   const matchesStatusAttribute = (f: SearchAttributeFilter) =>
-    statusAttribute ? f.attribute === statusAttribute : false;
+    statusAttribute ? targetsStatusAttribute(f, statusAttribute) : false;
 
   const { filter, activeQueryIndex, chipOpenIndex } =
     getContext<SearchAttributeFilterContext>(SEARCH_ATTRIBUTE_FILTER_CONTEXT);
@@ -41,11 +44,7 @@
     $filters.findIndex((filter) => matchesStatusAttribute(filter)),
   );
   const visibleFilters = $derived($filters.slice(0, totalFiltersInView));
-  const statusFilters = $derived(
-    statusAttribute
-      ? $filters.filter((filter) => filter.attribute === statusAttribute)
-      : [],
-  );
+  const statusFilters = $derived($filters.filter(matchesStatusAttribute));
   const hasMoreFilters = $derived(totalFiltersInView < $filters.length);
 
   function updateFilter(index: number, updatedFilter: SearchAttributeFilter) {
@@ -61,6 +60,7 @@
       $filters,
       statusAttribute,
       updatedFilters,
+      targetsStatusAttribute,
     );
     updateQueryParamsFromFilter(page.url, $filters);
   }

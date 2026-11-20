@@ -7,6 +7,7 @@ import {
 import { isValidDate } from '../format-date';
 import { isTimestamp, timestampToDate, type ValidTime } from '../format-time';
 import { isInConditional } from '../is';
+import { targetsAttribute, targetsStatusAttribute } from './column-filter';
 import { createFilter } from './to-list-workflow-filters';
 
 export type QuickFilterValue =
@@ -209,6 +210,17 @@ export const createQuickFilter = ({
   });
 };
 
+const targetsQuickFilterAttribute = (
+  filter: SearchAttributeFilter,
+  attribute: string,
+): boolean =>
+  STATUS_ATTRIBUTES.has(attribute)
+    ? targetsStatusAttribute(filter, attribute)
+    : targetsAttribute(filter, attribute);
+
+export const isReadOnlyFilter = (filter: SearchAttributeFilter): boolean =>
+  !targetsQuickFilterAttribute(filter, filter.attribute);
+
 export const isQuickFilterActive = (
   filters: SearchAttributeFilter[],
   quickFilter: Pick<
@@ -218,8 +230,8 @@ export const isQuickFilterActive = (
 ): boolean => {
   if (!quickFilter) return false;
 
-  const filtersForAttribute = filters.filter(
-    (filter) => filter.attribute === quickFilter.attribute,
+  const filtersForAttribute = filters.filter((filter) =>
+    targetsQuickFilterAttribute(filter, quickFilter.attribute),
   );
 
   return (
@@ -235,7 +247,7 @@ export const toggleQuickFilter = (
   quickFilter: SearchAttributeFilter,
 ): SearchAttributeFilter[] => {
   const otherFilters = filters.filter(
-    (filter) => filter.attribute !== quickFilter.attribute,
+    (filter) => !targetsQuickFilterAttribute(filter, quickFilter.attribute),
   );
 
   return isQuickFilterActive(filters, quickFilter)
