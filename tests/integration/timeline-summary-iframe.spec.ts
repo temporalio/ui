@@ -190,3 +190,63 @@ test('keeps a multi-block timeline summary on one line', async ({ page }) => {
     )
     .toBeLessThanOrEqual(24);
 });
+
+test('keeps long Markdown link destinations intact in timeline summaries', async ({
+  page,
+}) => {
+  const href = `https://example.test/${'segment/'.repeat(20)}`;
+  const label = 'Activity logs';
+  const longSummaryEvents = [
+    makeWorkflowStarted(1),
+    {
+      ...activityScheduled,
+      userMetadata: {
+        summary: {
+          metadata: summary.metadata,
+          data: Buffer.from(
+            JSON.stringify(
+              `[${label}](${href}) ${'More details. '.repeat(80)}`,
+            ),
+          ).toString('base64'),
+        },
+      },
+    },
+    makeActivityStarted(3, 2),
+  ];
+
+  await mockWorkflowApis(page, runningWorkflow);
+  await page.route(EVENT_HISTORY_API, (route) =>
+    route.fulfill({ json: historyPage(longSummaryEvents) }),
+  );
+  await page.route(EVENT_HISTORY_API_REVERSE, (route) =>
+    route.fulfill({ json: historyPage([...longSummaryEvents].reverse()) }),
+  );
+
+  await page.goto(timelineUrl, { waitUntil: 'domcontentloaded' });
+  await page
+    .getByRole('img', { name: `Workflow ${workflowId}: Running` })
+    .scrollIntoViewIfNeeded();
+
+  const iframe = page.locator('iframe[title="Summary"]').first();
+  const frame = iframe.contentFrame();
+  const link = frame.getByRole('link', { name: label, exact: true });
+  await expect(link).toBeVisible();
+  await expect(link).toHaveAttribute('href', href);
+
+  const main = frame.locator('main');
+  await expect(main).toHaveCSS('text-overflow', 'ellipsis');
+  await expect
+    .poll(() =>
+      main.evaluate((element) => element.scrollWidth > element.clientWidth),
+    )
+    .toBe(true);
+  await expect
+    .poll(() =>
+      main.evaluate((element) => element.getBoundingClientRect().height),
+    )
+    .toBeLessThanOrEqual(24);
+
+  await page.getByRole('button', { name: /SummarizedActivity/ }).focus();
+  await page.keyboard.press('Tab');
+  await expect(link).toBeFocused();
+});

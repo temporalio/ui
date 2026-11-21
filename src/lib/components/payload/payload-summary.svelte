@@ -9,7 +9,6 @@
     value: Payload | null | undefined;
     fallback?: string;
     prefix?: string;
-    maxSummaryLength?: number;
     class?: string;
     children?: Snippet<[decodedValue: string]>;
   }
@@ -18,7 +17,6 @@
     value,
     fallback = '',
     prefix = '',
-    maxSummaryLength = 120,
     class: className = '',
     children,
   }: Props = $props();
@@ -30,11 +28,7 @@
 
     return decodePayloadAndParseDataToJSON(_value).then((result) => {
       if (typeof result !== 'string' || !result) return fallback;
-      if (!prefix) return result;
-      const prefixed = `${prefix} • ${result}`;
-      return prefixed.length <= maxSummaryLength
-        ? prefixed
-        : prefixed.slice(0, maxSummaryLength) + '...';
+      return prefix ? `${prefix} • ${result}` : result;
     });
   };
 
@@ -43,7 +37,6 @@
     void valueJson;
     void prefix;
     void fallback;
-    void maxSummaryLength;
     return decodeValue(untrack(() => value));
   });
 
