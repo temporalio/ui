@@ -75,6 +75,11 @@
   const timelineWidth = $derived(canvasWidth - 2 * GUTTER);
   const eventGroup = $derived(isTimelineEventGroup(group) ? group : undefined);
   const pendingActivity = $derived(group?.pendingActivity);
+  const activitySummaryPrefix = $derived(
+    !eventGroup && isActivityTaskScheduledEvent(group.initialEvent)
+      ? group.displayName
+      : '',
+  );
 
   // Reactive (not untrack) so a re-pointed pooled row relabels for its new group.
   const accessibleName = $derived(
@@ -236,6 +241,7 @@
       fill={false}
       fitContent
       inline
+      maxTextLength={activitySummaryPrefix ? 120 : undefined}
       minHeight={0}
       overrideTheme="primary"
       title={translate('workflows.summary')}
@@ -387,9 +393,7 @@
       value={eventGroup
         ? eventGroup.eventGroupLabel.label
         : group?.userMetadata?.summary}
-      prefix={!eventGroup && isActivityTaskScheduledEvent(group.initialEvent)
-        ? group?.displayName
-        : ''}
+      prefix={activitySummaryPrefix}
       fallback={decodedLocalActivity
         ? translate('events.category.local-activity')
         : group?.displayName}

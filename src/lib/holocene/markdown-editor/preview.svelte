@@ -37,6 +37,7 @@
      * paint as several lines.
      */
     inline?: boolean;
+    maxTextLength?: number;
     /**
      * Accessible name for the frame. Name what the content is, so a frame in
      * a list of them is distinguishable.
@@ -55,6 +56,7 @@
     previewTheme,
     compact = false,
     inline = false,
+    maxTextLength,
     title = 'output',
   }: Props = $props();
 
@@ -128,8 +130,50 @@
     iframe.style.height = `${height + 2}px`;
   };
 
+  const truncateInlineText = (main: HTMLElement, limit: number) => {
+    const doc = main.ownerDocument;
+    const walker = doc.createTreeWalker(main, NodeFilter.SHOW_TEXT);
+    let length = 0;
+    let previousWasSpace = true;
+    let cutoffNode: Node = main;
+    let cutoffOffset = 0;
+
+    for (let text = walker.nextNode() as Text | null; text; ) {
+      let offset = 0;
+      for (const character of text.data) {
+        offset += character.length;
+        const isSpace = /[ \t\n\f\r]/.test(character);
+        if (previousWasSpace && isSpace) continue;
+        previousWasSpace = isSpace;
+
+        length++;
+        if (length === limit - 1) {
+          cutoffNode = text;
+          cutoffOffset = offset;
+        }
+        if (length <= limit || isSpace) continue;
+
+        const remainder = doc.createRange();
+        remainder.setStart(cutoffNode, cutoffOffset);
+        remainder.setEnd(main, main.childNodes.length);
+        remainder.deleteContents();
+        remainder.setStart(cutoffNode, cutoffOffset);
+        remainder.collapse(true);
+        remainder.insertNode(doc.createTextNode('…'));
+        return;
+      }
+      text = walker.nextNode() as Text | null;
+    }
+  };
+
   const handleLoad = async () => {
-    if (iframe?.contentDocument?.URL !== expectedPreviewUrl) return;
+    const iframeDocument = iframe?.contentDocument;
+    if (!iframeDocument || iframeDocument.URL !== expectedPreviewUrl) return;
+
+    if (inline && maxTextLength && maxTextLength > 0) {
+      const main = iframeDocument.querySelector('main');
+      if (main) truncateInlineText(main, maxTextLength);
+    }
 
     if (fitContent) {
       loading = false;
