@@ -72,6 +72,34 @@ export const timestampFormats: Record<
 export type TimestampFormat = keyof typeof timestampFormats;
 
 const dateTimeFormatters = new Map<string, Intl.DateTimeFormat>();
+const isoFormatters = new Map<string, Intl.DateTimeFormat>();
+
+const formatIsoDate = (date: Date, timeZone: string): string => {
+  let formatter = isoFormatters.get(timeZone);
+  if (!formatter) {
+    formatter = new Intl.DateTimeFormat('en-US-u-ca-iso8601-nu-latn', {
+      timeZone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      fractionalSecondDigits: 3,
+      hourCycle: 'h23',
+      timeZoneName: 'longOffset',
+    });
+    isoFormatters.set(timeZone, formatter);
+  }
+
+  const parts = Object.fromEntries(
+    formatter.formatToParts(date).map(({ type, value }) => [type, value]),
+  );
+  const offset = /^(GMT|UTC)([+-]00:00)?$/.test(parts.timeZoneName)
+    ? 'Z'
+    : parts.timeZoneName.slice(3);
+  return `${parts.year.padStart(4, '0')}-${parts.month}-${parts.day}T${parts.hour}:${parts.minute}:${parts.second}.${parts.fractionalSecond}${offset}`;
+};
 
 const getHour12Option = (hourFormat: HourFormat): boolean | undefined => {
   if (hourFormat === 'system') return undefined;
@@ -81,9 +109,9 @@ const getHour12Option = (hourFormat: HourFormat): boolean | undefined => {
 const getDateTimeFormatter = (
   format: TimestampFormat,
   hourFormat: HourFormat,
-  timeZone?: string,
+  timeZone: string,
 ): Intl.DateTimeFormat => {
-  const cacheKey = `${timeZone ?? BASE_TIME_FORMAT_OPTIONS.LOCAL}|${format}|${hourFormat}`;
+  const cacheKey = `${timeZone}|${format}|${hourFormat}`;
   const cachedFormatter = dateTimeFormatters.get(cacheKey);
   if (cachedFormatter) return cachedFormatter;
 
@@ -91,7 +119,7 @@ const getDateTimeFormatter = (
   const formatter = new Intl.DateTimeFormat(undefined, {
     ...timestampFormats[format],
     ...(hour12 !== undefined && { hour12 }),
-    ...(timeZone && { timeZone }),
+    timeZone,
   });
   dateTimeFormatters.set(cacheKey, formatter);
   return formatter;
@@ -156,16 +184,13 @@ export function formatDate(
       );
     }
 
+    const timeZone = getTimezone(timeFormat);
+
     // Handle ISO format
     if (format === 'iso') {
-      return parsed.toISOString();
+      return formatIsoDate(parsed, timeZone);
     }
 
-    if (timeFormat === BASE_TIME_FORMAT_OPTIONS.LOCAL) {
-      return getDateTimeFormatter(format, hourFormat).format(parsed);
-    }
-
-    const timeZone = getTimezone(timeFormat);
     return getDateTimeFormatter(format, hourFormat, timeZone).format(parsed);
   } catch (e) {
     console.error('Error formatting date:', e);
