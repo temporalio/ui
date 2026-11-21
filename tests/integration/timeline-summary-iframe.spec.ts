@@ -191,62 +191,65 @@ test('keeps a multi-block timeline summary on one line', async ({ page }) => {
     .toBeLessThanOrEqual(24);
 });
 
-test('keeps long Markdown link destinations intact in timeline summaries', async ({
-  page,
-}) => {
-  const href = `https://example.test/${'segment/'.repeat(20)}`;
-  const label = 'Activity logs';
-  const longSummaryEvents = [
-    makeWorkflowStarted(1),
-    {
-      ...activityScheduled,
-      userMetadata: {
-        summary: {
-          metadata: summary.metadata,
-          data: Buffer.from(
-            JSON.stringify(
-              `[${label}](${href}) ${'More details. '.repeat(80)}`,
-            ),
-          ).toString('base64'),
+for (const longLabel of [false, true]) {
+  test(`preserves a long Timeline link destination with a ${longLabel ? 'long' : 'short'} label`, async ({
+    page,
+  }) => {
+    const href = `https://example.test/${'segment/'.repeat(20)}`;
+    const prefix = 'SummarizedActivity • ';
+    const label = longLabel
+      ? 'Activity logs ' + 'x'.repeat(140)
+      : 'Activity logs';
+    const markdown = `[Activity **${label.slice('Activity '.length)}**](${href})`;
+    const visibleLabel = longLabel
+      ? label.slice(0, 119 - prefix.length) + '…'
+      : label;
+    const longSummaryEvents = [
+      makeWorkflowStarted(1),
+      {
+        ...activityScheduled,
+        userMetadata: {
+          summary: {
+            metadata: summary.metadata,
+            data: Buffer.from(JSON.stringify(markdown)).toString('base64'),
+          },
         },
       },
-    },
-    makeActivityStarted(3, 2),
-  ];
+      makeActivityStarted(3, 2),
+    ];
 
-  await mockWorkflowApis(page, runningWorkflow);
-  await page.route(EVENT_HISTORY_API, (route) =>
-    route.fulfill({ json: historyPage(longSummaryEvents) }),
-  );
-  await page.route(EVENT_HISTORY_API_REVERSE, (route) =>
-    route.fulfill({ json: historyPage([...longSummaryEvents].reverse()) }),
-  );
+    await mockWorkflowApis(page, runningWorkflow);
+    await page.route(EVENT_HISTORY_API, (route) =>
+      route.fulfill({ json: historyPage(longSummaryEvents) }),
+    );
+    await page.route(EVENT_HISTORY_API_REVERSE, (route) =>
+      route.fulfill({ json: historyPage([...longSummaryEvents].reverse()) }),
+    );
 
-  await page.goto(timelineUrl, { waitUntil: 'domcontentloaded' });
-  await page
-    .getByRole('img', { name: `Workflow ${workflowId}: Running` })
-    .scrollIntoViewIfNeeded();
+    await page.goto(timelineUrl, { waitUntil: 'domcontentloaded' });
+    await page
+      .getByRole('img', { name: `Workflow ${workflowId}: Running` })
+      .scrollIntoViewIfNeeded();
 
-  const iframe = page.locator('iframe[title="Summary"]').first();
-  const frame = iframe.contentFrame();
-  const link = frame.getByRole('link', { name: label, exact: true });
-  await expect(link).toBeVisible();
-  await expect(link).toHaveAttribute('href', href);
+    const frame = page.frameLocator('iframe[title="Summary"]').first();
+    const link = frame.getByRole('link');
+    await expect(link).toBeVisible();
+    await expect(link).toHaveAttribute('href', href);
+    await expect(link).toHaveAccessibleName(visibleLabel);
 
-  const main = frame.locator('main');
-  await expect(main).toHaveCSS('text-overflow', 'ellipsis');
-  await expect
-    .poll(() =>
-      main.evaluate((element) => element.scrollWidth > element.clientWidth),
-    )
-    .toBe(true);
-  await expect
-    .poll(() =>
-      main.evaluate((element) => element.getBoundingClientRect().height),
-    )
-    .toBeLessThanOrEqual(24);
+    const main = frame.locator('main');
+    await expect(main).toHaveText(prefix + visibleLabel, {
+      useInnerText: true,
+    });
+    await expect(main).toHaveCSS('text-overflow', 'ellipsis');
+    await expect
+      .poll(() =>
+        main.evaluate((element) => element.getBoundingClientRect().height),
+      )
+      .toBeLessThanOrEqual(24);
 
-  await page.getByRole('button', { name: /SummarizedActivity/ }).focus();
-  await page.keyboard.press('Tab');
-  await expect(link).toBeFocused();
-});
+    await page.getByRole('button', { name: /SummarizedActivity/ }).focus();
+    await page.keyboard.press('Tab');
+    await expect(link).toBeFocused();
+  });
+}
