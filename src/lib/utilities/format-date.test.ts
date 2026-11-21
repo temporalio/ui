@@ -15,8 +15,9 @@ const DateTimeFormat = Intl.DateTimeFormat;
 const dateTimeFormatSpy = vi
   .spyOn(global.Intl, 'DateTimeFormat')
   .mockImplementation(function (_, options) {
-    const hour12 = options?.hour12 !== undefined ? options.hour12 : true;
-    const hourCycle = options?.hour12 !== undefined ? undefined : 'h11';
+    const hour12 = options?.hourCycle ? undefined : (options?.hour12 ?? true);
+    const hourCycle =
+      options?.hourCycle ?? (options?.hour12 === undefined ? 'h11' : undefined);
     return new DateTimeFormat('en-US', {
       ...options,
       hour12,
@@ -87,6 +88,66 @@ describe('formatDate', () => {
       'Apr 13, 2022, 4:29:35.63 PM UTC',
     );
   });
+
+  it('uses the current local timezone after the system timezone changes', () => {
+    vi.stubEnv('TZ', 'UTC');
+    const utc = formatDate(date, 'local', { format: 'long', hourFormat: '24' });
+    vi.stubEnv('TZ', 'Europe/Helsinki');
+    const helsinki = formatDate(date, 'local', {
+      format: 'long',
+      hourFormat: '24',
+    });
+    const explicitUtc = formatDate(date, 'UTC', {
+      format: 'long',
+      hourFormat: '24',
+    });
+    vi.unstubAllEnvs();
+
+    expect(utc).toContain('16:29:35');
+    expect(helsinki).toContain('19:29:35');
+    expect(explicitUtc).toContain('16:29:35');
+  });
+
+  it.each([
+    ['0001-01-01T00:00:00.000Z', 'UTC', '0001-01-01T00:00:00.000Z'],
+    ['2026-01-15T12:00:00.123Z', 'UTC', '2026-01-15T12:00:00.123Z'],
+    [
+      '2026-01-15T12:00:00.123Z',
+      'Europe/Helsinki',
+      '2026-01-15T14:00:00.123+02:00',
+    ],
+    [
+      '2026-07-15T12:00:00.123Z',
+      'Europe/Helsinki',
+      '2026-07-15T15:00:00.123+03:00',
+    ],
+    [
+      '2026-03-29T00:59:59.000Z',
+      'Europe/Helsinki',
+      '2026-03-29T02:59:59.000+02:00',
+    ],
+    [
+      '2026-10-25T00:59:59.000Z',
+      'Europe/Helsinki',
+      '2026-10-25T03:59:59.000+03:00',
+    ],
+    [
+      '2026-01-15T23:00:00.123Z',
+      'Asia/Kathmandu',
+      '2026-01-16T04:45:00.123+05:45',
+    ],
+    [
+      '2026-01-15T03:00:00.123Z',
+      'America/New_York',
+      '2026-01-14T22:00:00.123-05:00',
+    ],
+  ])(
+    'formats %s in %s as ISO with the correct offset',
+    (date, zone, expected) => {
+      expect(formatDate(date, zone, { format: 'iso' })).toBe(expected);
+      expect(new Date(expected).toISOString()).toBe(date);
+    },
+  );
 
   it('should format relative local time', () => {
     expect(formatDate(date, 'local', { relative: true })).toContain('ago');
