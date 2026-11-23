@@ -13,4 +13,5 @@ export type SearchAttributeFilter = {
   conditional: string;
   customDate?: boolean;
   negated?: boolean;
+  unsupportedQuery?: boolean;
 };

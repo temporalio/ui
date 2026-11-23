@@ -209,6 +209,10 @@ export const toListWorkflowFilters = (
       }
     });
 
+    if (tokens.some(isNot)) {
+      return filters.map((filter) => ({ ...filter, unsupportedQuery: true }));
+    }
+
     return filters;
   } catch (e) {
     console.error('Error setting filter parameters: ', e);

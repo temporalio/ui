@@ -218,9 +218,6 @@ const targetsQuickFilterAttribute = (
     ? targetsStatusAttribute(filter, attribute)
     : targetsAttribute(filter, attribute);
 
-export const isReadOnlyFilter = (filter: SearchAttributeFilter): boolean =>
-  !targetsQuickFilterAttribute(filter, filter.attribute);
-
 export const isQuickFilterActive = (
   filters: SearchAttributeFilter[],
   quickFilter: Pick<

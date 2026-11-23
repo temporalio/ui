@@ -727,6 +727,32 @@ describe('toListWorkflowFilters', () => {
     expect(result).toMatchObject(expectedFilters);
   });
 
+  it('should flag every filter when NOT applies to a group', () => {
+    const result = toListWorkflowFilters(
+      '`WorkflowId`="x" AND NOT (`WorkflowType`="a" OR `WorkflowType`="b")',
+      attributes,
+    );
+    const expectedFilters = [
+      { attribute: 'WorkflowId', value: 'x', unsupportedQuery: true },
+      { attribute: 'WorkflowType', value: 'a', unsupportedQuery: true },
+      { attribute: 'WorkflowType', value: 'b', unsupportedQuery: true },
+    ];
+    expect(result).toMatchObject(expectedFilters);
+  });
+
+  it.each([
+    notStartsWithQuery,
+    multipleNotStartsWithQuery,
+    prefixNotInQuery,
+    `${isNotEmptyQuery} AND ${keywordListNotInQuery}`,
+    workflowQuery4,
+  ])('should not flag filters parsed from %s', (query) => {
+    const result = toListWorkflowFilters(query, attributes);
+    expect(result.map((filter) => filter.unsupportedQuery)).toEqual(
+      result.map(() => undefined),
+    );
+  });
+
   it('should not negate IS NOT NULL or NOT IN filters', () => {
     const result = toListWorkflowFilters(
       `${isNotEmptyQuery} AND ${keywordListNotInQuery}`,

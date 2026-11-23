@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   isAppliedFilter,
   isAtQueryLimit,
+  isReadOnlyFilter,
   replaceAttributeFilters,
   targetsStatusAttribute,
 } from './column-filter';
@@ -84,6 +85,52 @@ describe('isAppliedFilter', () => {
   });
 });
 
+describe('isReadOnlyFilter', () => {
+  it.each([
+    ['a filter on a text attribute', { attribute: 'WorkflowId' }],
+    ['a status filter', { attribute: 'ExecutionStatus' }],
+    ['a != status filter', { attribute: 'ExecutionStatus', conditional: '!=' }],
+    [
+      'a NOT IN filter on a list attribute',
+      { attribute: 'CustomKeywordListField', conditional: 'not in' },
+    ],
+  ])('is false for %s', (_, overrides) => {
+    expect(
+      isReadOnlyFilter(
+        createFilter({ conditional: '=', value: 'a', ...overrides }),
+        'ExecutionStatus',
+      ),
+    ).toBe(false);
+  });
+
+  it.each([
+    ['a negated filter', { attribute: 'WorkflowId', negated: true }],
+    [
+      'a filter from a query it cannot show',
+      { attribute: 'WorkflowId', unsupportedQuery: true },
+    ],
+    [
+      'a NOT IN status filter',
+      { attribute: 'ExecutionStatus', conditional: 'NOT IN' },
+    ],
+  ])('is true for %s', (_, overrides) => {
+    expect(
+      isReadOnlyFilter(
+        createFilter({ conditional: '=', value: 'a', ...overrides }),
+        'ExecutionStatus',
+      ),
+    ).toBe(true);
+  });
+
+  it('is false for a NOT IN filter on an attribute without a status editor', () => {
+    expect(
+      isReadOnlyFilter(
+        createFilter({ attribute: 'ExecutionStatus', conditional: 'NOT IN' }),
+      ),
+    ).toBe(false);
+  });
+});
+
 describe('targetsStatusAttribute', () => {
   it('targets a status filter that includes statuses', () => {
     expect(targetsStatusAttribute(status('Running'), 'ExecutionStatus')).toBe(
@@ -105,6 +152,14 @@ describe('targetsStatusAttribute', () => {
 
   it('does not target a negated status filter', () => {
     const filter = createFilter({ ...status('Running'), negated: true });
+    expect(targetsStatusAttribute(filter, 'ExecutionStatus')).toBe(false);
+  });
+
+  it('does not target a status filter from a query it cannot show', () => {
+    const filter = createFilter({
+      ...status('Running'),
+      unsupportedQuery: true,
+    });
     expect(targetsStatusAttribute(filter, 'ExecutionStatus')).toBe(false);
   });
 });

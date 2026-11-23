@@ -10,6 +10,7 @@
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import type { StatusFilter } from '$lib/models/status-filter';
   import {
+    isReadOnlyFilter,
     replaceAttributeFilters,
     targetsStatusAttribute,
   } from '$lib/utilities/query/column-filter';
@@ -111,6 +112,7 @@
           openIndex={$chipOpenIndex}
           onUpdate={(updatedFilter) => updateFilter(i, updatedFilter)}
           onRemove={() => removeFilter(i)}
+          readOnly={isReadOnlyFilter(filterItem, statusAttribute)}
         />
       {/if}
     {/each}

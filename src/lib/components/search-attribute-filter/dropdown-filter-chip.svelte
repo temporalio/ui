@@ -9,7 +9,6 @@
   import { IconTrash } from '$lib/io/icon';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { isNullConditional } from '$lib/utilities/is';
-  import { isReadOnlyFilter } from '$lib/utilities/query/quick-filter';
   import {
     isDateTimeFilter,
     isStatusFilter,
@@ -24,6 +23,7 @@
     onRemove: () => void;
     index?: number;
     openIndex?: number | null;
+    readOnly?: boolean;
   };
 
   let {
@@ -32,6 +32,7 @@
     onRemove,
     index = 0,
     openIndex = null,
+    readOnly = false,
   }: Props = $props();
 
   const open = writable(false);
@@ -142,23 +143,32 @@
   >
     <!-- Keyed on open so the editor remounts seeded from the applied filter,
          discarding anything typed and then dismissed. -->
-    {#if isReadOnlyFilter(filter)}
+    {#if readOnly}
       <div class="space-y-4" data-testid="read-only-filter">
-        <h3 class="text-sm font-medium">Filter by {filter.attribute}</h3>
+        <h3 class="text-sm font-medium">
+          {translate('common.filter-by-column', {
+            column: filter.attribute,
+            escapeValue: false,
+          })}
+        </h3>
         <p class="min-w-60 break-all text-sm">{displayText}</p>
         <p class="text-sm text-secondary">
-          {translate('common.read-only-filter')}
+          {filter.unsupportedQuery
+            ? translate('common.unsupported-query-filter')
+            : translate('common.read-only-filter')}
         </p>
-        <div class="flex justify-end">
-          <Button
-            TrailingIcon={IconTrash}
-            variant="secondary"
-            size="xs"
-            data-testid="remove-filter-button"
-            type="button"
-            onclick={onRemove}>{translate('common.remove')}</Button
-          >
-        </div>
+        {#if !filter.unsupportedQuery}
+          <div class="flex justify-end">
+            <Button
+              TrailingIcon={IconTrash}
+              variant="secondary"
+              size="xs"
+              data-testid="remove-filter-button"
+              type="button"
+              onclick={onRemove}>{translate('common.remove')}</Button
+            >
+          </div>
+        {/if}
       </div>
     {:else}
       {#key $open}

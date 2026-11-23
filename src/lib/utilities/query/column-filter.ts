@@ -19,9 +19,18 @@ export const isAppliedFilter = ({
 export const targetsAttribute = (
   filter: SearchAttributeFilter,
   attribute: string,
-): boolean => filter.attribute === attribute && !filter.negated;
+): boolean =>
+  filter.attribute === attribute && !filter.negated && !filter.unsupportedQuery;
 
 const EXCLUDING_CONDITIONALS = new Set(['not in', '!=']);
+
+export const isReadOnlyFilter = (
+  filter: SearchAttributeFilter,
+  statusAttribute?: string,
+): boolean =>
+  Boolean(filter.negated || filter.unsupportedQuery) ||
+  (filter.attribute === statusAttribute &&
+    filter.conditional.toLowerCase() === 'not in');
 
 export const targetsStatusAttribute = (
   filter: SearchAttributeFilter,

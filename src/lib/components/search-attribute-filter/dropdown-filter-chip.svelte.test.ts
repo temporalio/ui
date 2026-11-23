@@ -23,12 +23,15 @@ beforeEach(() => {
 
 let component: ReturnType<typeof mount> | undefined;
 
-const mountChip = (filter: SearchAttributeFilter, onRemove = vi.fn()) => {
+const mountChip = (
+  filter: SearchAttributeFilter,
+  { onRemove = vi.fn(), readOnly = false } = {},
+) => {
   const target = document.createElement('div');
   document.body.appendChild(target);
   component = mount(DropdownFilterChip, {
     target,
-    props: { filter, onUpdate: vi.fn(), onRemove },
+    props: { filter, onUpdate: vi.fn(), onRemove, readOnly },
   });
   flushSync();
   return target;
@@ -123,30 +126,50 @@ describe('DropdownFilterChip', () => {
     expect(byTestId('read-only-filter')).toBeNull();
   });
 
-  it.each([
-    createFilter({
-      attribute: 'WorkflowId',
-      conditional: 'STARTS_WITH',
-      value: 'abc',
-      negated: true,
-    }),
-    createFilter({
-      attribute: 'ExecutionStatus',
-      conditional: 'NOT IN',
-      value: '("Terminated", "Canceled")',
-    }),
-  ])('only offers Remove for $attribute $conditional', (filter) => {
+  it('only offers Remove for a read-only filter', () => {
     const onRemove = vi.fn();
-    const target = mountChip(filter, onRemove);
+    const target = mountChip(
+      createFilter({
+        attribute: 'ExecutionStatus',
+        conditional: 'NOT IN',
+        value: '("Terminated", "Canceled")',
+      }),
+      { onRemove, readOnly: true },
+    );
 
     openChip(target);
 
     expect(byTestId('apply-filter-button')).toBeNull();
-    expect(byTestId('read-only-filter')).not.toBeNull();
+    expect(byTestId('read-only-filter')?.textContent).toContain(
+      'Filter by ExecutionStatus',
+    );
+    expect(byTestId('read-only-filter')?.textContent).toContain(
+      'Edit the query to change this filter.',
+    );
 
     byTestId('remove-filter-button')?.click();
     flushSync();
 
     expect(onRemove).toHaveBeenCalledOnce();
+  });
+
+  it('offers no Remove for a filter from a query it cannot show', () => {
+    const target = mountChip(
+      createFilter({
+        attribute: 'WorkflowType',
+        conditional: '=',
+        value: 'a',
+        unsupportedQuery: true,
+      }),
+      { readOnly: true },
+    );
+
+    openChip(target);
+
+    expect(byTestId('apply-filter-button')).toBeNull();
+    expect(byTestId('remove-filter-button')).toBeNull();
+    expect(byTestId('read-only-filter')?.textContent).toContain(
+      "This query uses NOT in a way the filters can't show. Edit the query to change it.",
+    );
   });
 });
