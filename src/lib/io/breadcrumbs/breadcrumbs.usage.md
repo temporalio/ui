@@ -35,4 +35,4 @@ How the component behaves. Context for reviewers; not checked.
 
 - **BEH-1** Items render as TextLinks inside an ordered list and a navigation landmark. The last item receives `aria-current="page"`; it remains a link.
 - **BEH-2** Separators are decorative trailing icons inside ancestor links. The list wraps when space is constrained.
-- **BEH-3** Item attributes are forwarded to [TextLink](../text-link/text-link.svelte). Wrapper attributes, including `data-testid`, reach the nav. No test ID is assigned internally.
+- **BEH-3** Item attributes are forwarded to TextLink (`text-link.svelte` in `src/lib/io/text-link/`). Wrapper attributes, including `data-testid`, reach the nav. No test ID is assigned internally.
