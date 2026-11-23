@@ -34,16 +34,21 @@ Checked against every PR that uses this component.
 
 ### Input
 
-- **IN-1** A status from an untyped source MUST be validated before it reaches BadgeStatus. The lookup in [`statusConfiguration`](./badge-status.svelte) has no fallback; an unsupported status fails when its configuration is read. Use the appropriate status guard, such as [`isWorkflowStatusType`](../../models/workflow-status.ts), and a Badge fallback for other values.
+- **IN-1** A status from an untyped source MUST be validated before it reaches BadgeStatus. The lookup in `statusConfiguration` (`badge-status.svelte` in `src/lib/io/badge-status/`) has no fallback; an unsupported status fails when its configuration is read. Use the appropriate status guard, such as `isWorkflowStatusType` (`workflow-status.ts` in `src/lib/models/`), and a Badge fallback for other values.
+- **IN-2** Caller-supplied `extensions` MUST satisfy Badge IN-2 in `badge.usage.md` (`src/lib/io/badge/`).
+
+### Accessibility
+
+- **A11Y-1** Caller-supplied `extensions` MUST satisfy Badge A11Y-1 in `badge.usage.md` (`src/lib/io/badge/`).
 
 ## Notes
 
 How the component behaves. Context for reviewers; not checked.
 
-- **BEH-1** BadgeStatus composes [Badge](../badge/badge.usage.md). Badge IN-2 and A11Y-1 document shared extension content and accessibility requirements.
-- **BEH-2** The label combines the count, when present, with `text ?? translate(configuration.translationId)`. Numeric counts use `toLocaleString()`; string counts render verbatim. Zero renders.
+- **BEH-1** BadgeStatus composes Badge (`badge.usage.md` in `src/lib/io/badge/`).
+- **BEH-2** The label combines the count, when present, with `text` or the translated status label. Null or undefined `text` falls back to `translate` using `configuration.translationId`. Numeric counts use `toLocaleString()`; string counts render verbatim. Zero renders.
 - **BEH-3** When implied extensions are enabled, the Paused configuration prepends a warning-colored pause icon before custom extensions. The translated primary label already names the paused state.
-- **DIS-1** Colors come from [BadgeStatus `statusConfiguration`](./badge-status.svelte); [ChipStatus DIS-1](../chip-status/chip-status.usage.md#notes) identifies its separate mapping for comparison.
+- **DIS-1** Colors come from BadgeStatus `statusConfiguration` (`badge-status.svelte` in `src/lib/io/badge-status/`); ChipStatus DIS-1 (`chip-status.usage.md` in `src/lib/io/chip-status/`) identifies its separate mapping for comparison.
 - **DIS-2** Primary and extension truncation are delegated to Badge. An extension can opt into truncation; extensions are not universally exempt.
 - **BEH-4** Native attributes, including `data-testid`, are forwarded to Badge. No test ID is assigned internally.
 
