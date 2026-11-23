@@ -78,6 +78,15 @@ function main() {
       }
     });
 
+  const skipped = barrels
+    .filter(({ source }) => !componentExports(source).length)
+    .map(({ dir }) => dir);
+  if (skipped.length) {
+    console.warn(
+      `Skipped io barrels with no component exports: ${skipped.join(', ')}`,
+    );
+  }
+
   const template = readFileSync(
     join(root, 'src/package/AGENTS.consumer.md'),
     'utf-8',
