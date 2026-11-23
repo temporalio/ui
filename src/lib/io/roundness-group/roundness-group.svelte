@@ -3,7 +3,7 @@
 
   import { twJoin, twMerge } from 'tailwind-merge';
 
-  export type GroupInnerBorderHandling = 'none' | 'collapse' | 'overlap';
+  export type GroupInnerBorderHandling = 'none' | 'collapse';
   export type GroupRoundness = 'none' | 'sm' | 'base' | 'lg' | 'full';
 
   export interface RoundnessGroupProps extends Omit<
@@ -40,11 +40,6 @@
       groupClasses,
       roundnessClasses[roundness],
       innerBorderHandling === 'collapse' && '[&>*:not(:last-child)]:border-r-0',
-      innerBorderHandling === 'overlap' &&
-        twJoin(
-          '[&>*:not(:first-child)]:-ml-px',
-          '[&>*:not(:last-child):not(:focus-visible)]:border-r-transparent',
-        ),
       className,
     );
   }

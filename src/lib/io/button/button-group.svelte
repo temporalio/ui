@@ -26,7 +26,7 @@
 
 <RoundnessGroup
   roundness="base"
-  innerBorderHandling="overlap"
+  innerBorderHandling="collapse"
   class={twMerge(
     'inline-flex',
     '[&>*:not(:first-child)]:border-l-[color:var(--button-divider)]',

@@ -21,7 +21,7 @@
       },
       innerBorderHandling: {
         control: 'select',
-        options: ['none', 'collapse', 'overlap'],
+        options: ['none', 'collapse'],
       },
       children: {
         control: false,

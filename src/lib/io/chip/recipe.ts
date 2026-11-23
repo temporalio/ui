@@ -19,11 +19,10 @@ const overlayClasses = twJoin(
 );
 
 const focusClasses = twJoin(
-  'focus-visible:outline-none',
-  'focus-visible:ring-2',
-  'focus-visible:ring-interactive-primary',
-  'focus-visible:ring-offset-2',
-  'focus-visible:ring-offset-background-primary',
+  'focus-visible:outline',
+  'focus-visible:outline-2',
+  'focus-visible:outline-offset-2',
+  'focus-visible:outline-interactive-primary',
 );
 
 const disabledClasses = twJoin(

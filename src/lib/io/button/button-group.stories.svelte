@@ -27,7 +27,7 @@
       colorScheme: 'tertiary',
       size: 'md',
       roundness: 'base',
-      innerBorderHandling: 'overlap',
+      innerBorderHandling: 'collapse',
     },
     argTypes: {
       colorScheme: { control: 'select', options: colorSchemes },
@@ -38,7 +38,7 @@
       },
       innerBorderHandling: {
         control: 'select',
-        options: ['none', 'collapse', 'overlap'],
+        options: ['none', 'collapse'],
       },
       children: {
         control: false,
