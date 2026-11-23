@@ -27,7 +27,7 @@ export const cardDescriptionRecipe = () => {
 };
 
 export const cardActionsRecipe = () => {
-  return twJoin('flex gap-4 justify-end items-center');
+  return twJoin('flex flex-wrap gap-4 justify-end items-center');
 };
 
 export const cardFooterRecipe = () => {
