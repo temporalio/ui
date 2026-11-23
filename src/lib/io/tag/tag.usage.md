@@ -35,7 +35,7 @@ Checked against every PR that uses this component.
 
 How the component behaves. Context for reviewers; not checked.
 
-- **BEH-1** The default tag icon is used when `Icon` is undefined; false or null suppresses it. The primary icon precedes the label, and an extension icon precedes the extension text.
+- **BEH-1** The primary icon precedes the label, and an extension icon precedes the extension text.
 - **DIS-1** Tag uses [`badgeRecipe`](../badge/recipe.ts) for its wrapper and [`tagSegmentRecipe`](./recipe.ts) for each segment. The neutral segment changes the Badge surface and border tokens.
 - **DIS-2** The caller's `class` is on the outer RoundnessGroup, while color styling is on its inner segments. Text is uppercased by CSS and does not wrap.
 - **BEH-2** Native attributes, including `data-testid`, reach the outer span. No test ID is assigned internally.
