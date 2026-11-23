@@ -107,7 +107,10 @@
         LeadingIcon: IconChevronLeft,
       });
     }
-    if (nextRunId) {
+    if (
+      nextRunId &&
+      !(latestRun.kind === 'run' && nextRunId === latestRun.runId)
+    ) {
       links.push({
         id: 'next',
         label: translate('workflows.next-run'),
