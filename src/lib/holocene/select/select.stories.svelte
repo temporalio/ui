@@ -11,7 +11,7 @@
   import Select from './select.svelte';
 
   const { Story } = defineMeta({
-    title: 'Select',
+    title: 'Holocene/Components/Select',
     component: Select,
     render: template,
     args: {
@@ -19,6 +19,7 @@
       label: 'Select',
       placeholder: 'Select an option',
       labelHidden: false,
+      size: 'md',
       disabled: false,
       onChange: fn(),
     },
@@ -35,6 +36,11 @@
       labelHidden: { name: 'Label Hidden', control: 'boolean' },
       onChange: { table: { disable: true } },
       value: { table: { disable: true } },
+      size: {
+        name: 'Size',
+        control: 'inline-radio',
+        options: ['xs', 'sm', 'md', 'lg'],
+      },
       position: {
         name: 'Position',
         control: 'inline-radio',

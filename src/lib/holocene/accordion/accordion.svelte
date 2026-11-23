@@ -114,12 +114,7 @@
       {/if}
     </div>
 
-    <div
-      id="{id}-content"
-      aria-labelledby="{id}-trigger"
-      class="mt-4 block w-full p-4"
-      class:hidden={!open}
-    >
+    <div id="{id}-content" class="mt-4 block w-full p-4" class:hidden={!open}>
       {@render children?.(open)}
     </div>
   </div>

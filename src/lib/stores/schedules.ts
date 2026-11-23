@@ -2,7 +2,7 @@ import { get, writable } from 'svelte/store';
 
 import { goto } from '$app/navigation';
 
-import type { FormScheduleSchema } from '$lib/components/schedule/schema/form';
+import type { ScheduleFormData } from '$lib/components/schedule/types';
 import { getRequestBody } from '$lib/components/schedule/utilities/get-request-body';
 import { translate } from '$lib/i18n/translate';
 import {
@@ -85,7 +85,7 @@ export function closeConfirmationModal(
 }
 
 export async function submitCreateSchedule(
-  formData: FormScheduleSchema,
+  formData: ScheduleFormData,
   context: Omit<ScheduleContext, 'scheduleId'>,
 ): Promise<void> {
   const { namespace, identity } = context;
@@ -94,7 +94,10 @@ export async function submitCreateSchedule(
   try {
     body = await getRequestBody(formData);
   } catch (error) {
-    const errorMessage = `${translate('data-encoder.encode-error')}: ${getErrorMessage(error)}`;
+    const errorMessage = translate('schedules.create-schedule-error', {
+      error: getErrorMessage(error),
+      escapeValue: false,
+    });
     serverError.set(errorMessage);
     toaster.push({ variant: 'error', message: errorMessage });
     return;
@@ -104,7 +107,7 @@ export async function submitCreateSchedule(
   try {
     await createSchedule({
       identity,
-      scheduleId: formData.name,
+      scheduleId: formData.schedule.name,
       namespace,
       body,
     });
@@ -118,6 +121,7 @@ export async function submitCreateSchedule(
   } catch (error) {
     const errorMessage = translate('schedules.create-schedule-error', {
       error: getErrorMessage(error),
+      escapeValue: false,
     });
     serverError.set(errorMessage);
     toaster.push({ variant: 'error', message: errorMessage });
@@ -125,7 +129,7 @@ export async function submitCreateSchedule(
 }
 
 export async function submitEditSchedule(
-  formData: FormScheduleSchema,
+  formData: ScheduleFormData,
   schedule: DescribeFullSchedule,
   context: ScheduleContext,
 ): Promise<void> {
@@ -135,7 +139,10 @@ export async function submitEditSchedule(
   try {
     body = await getRequestBody(formData, schedule);
   } catch (error) {
-    const errorMessage = `${translate('data-encoder.encode-error')}: ${getErrorMessage(error)}`;
+    const errorMessage = translate('schedules.edit-schedule-error', {
+      error: getErrorMessage(error),
+      escapeValue: false,
+    });
     serverError.set(errorMessage);
     toaster.push({ variant: 'error', message: errorMessage });
     return;
@@ -152,13 +159,14 @@ export async function submitEditSchedule(
 
     loading.set(true);
     setScheduleTimeout('edit', () => {
-      goto(routeForSchedule({ namespace, scheduleId: formData.name }));
+      goto(routeForSchedule({ namespace, scheduleId: formData.schedule.name }));
       serverError.set('');
       loading.set(false);
     });
   } catch (error) {
     const errorMessage = translate('schedules.edit-schedule-error', {
       error: getErrorMessage(error),
+      escapeValue: false,
     });
     serverError.set(errorMessage);
     toaster.push({ variant: 'error', message: errorMessage });
@@ -185,6 +193,7 @@ export async function submitDeleteSchedule(context: ScheduleContext) {
     serverError.set(
       translate('schedules.delete-schedule-error', {
         error: getErrorMessage(error),
+        escapeValue: false,
       }),
     );
   }
@@ -225,6 +234,7 @@ export async function submitPauseSchedule(
           : 'schedules.pause-schedule-error',
         {
           error: getErrorMessage(error),
+          escapeValue: false,
         },
       ),
     );
@@ -265,6 +275,7 @@ export async function submitTriggerImmediatelySchedule(
     serverError.set(
       translate('schedules.trigger-schedule-error', {
         error: getErrorMessage(error),
+        escapeValue: false,
       }),
     );
   }
@@ -312,6 +323,7 @@ export async function submitBackfillSchedule(
     serverError.set(
       translate('schedules.backfill-schedule-error', {
         error: getErrorMessage(error),
+        escapeValue: false,
       }),
     );
   }

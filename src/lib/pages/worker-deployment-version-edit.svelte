@@ -7,10 +7,16 @@
     type ComputeProviderValue,
   } from '$lib/components/workers/serverless-worker-form/compute-providers';
   import EditVersionForm from '$lib/components/workers/serverless-worker-form/edit-version-form.svelte';
-  import type { ComputeProviderOption } from '$lib/components/workers/serverless-worker-form/shared';
   import {
+    computeRegionsFor,
+    scalingGroupSlots,
+    scalingGroupsToRemove,
+    splitHighAvailabilityGroups,
+  } from '$lib/components/workers/serverless-worker-form/multi-region';
+  import {
+    buildComputeConfigForRegions,
     buildComputeConfigFromForm,
-    msToScaleDownStabilization,
+    formValuesFromGroup,
   } from '$lib/components/workers/serverless-worker-form/shared';
   import Alert from '$lib/holocene/alert.svelte';
   import Link from '$lib/holocene/link.svelte';
@@ -18,15 +24,16 @@
   import { translate } from '$lib/i18n/translate';
   import { IconChevronLeft } from '$lib/io/icon';
   import {
-    decodeAgentCoreProviderDetails,
-    decodeGcpCloudRunProviderDetails,
-    decodeLambdaProviderDetails,
-    decodeScalerDetails,
     deleteWorkerDeploymentVersion,
     fetchDeploymentVersion,
     updateWorkerDeploymentVersionComputeConfig,
     validateWorkerDeploymentVersionComputeConfig,
   } from '$lib/services/deployments-service';
+  import {
+    type ComputeProviderConfig,
+    configuredRegions,
+    deployRegionsFor,
+  } from '$lib/utilities/compute-provider-config';
   import { lockProvidersTo } from '$lib/utilities/lock-compute-provider';
   import { routeForWorkerDeployment } from '$lib/utilities/route-for';
 
@@ -34,19 +41,27 @@
     namespace: string;
     deployment: string;
     buildId: string;
-    computeProviders?: readonly ComputeProviderOption[];
-    gcpRegions?: string[];
     templates?: Record<ComputeProviderValue, ComputeProviderTemplates>;
+    /**
+     * The providers this Namespace may use and the regions it lives in. Two
+     * or more regions turn on high availability.
+     */
+    providerConfig?: ComputeProviderConfig;
   }
 
-  let {
-    namespace,
-    deployment,
-    buildId,
-    computeProviders,
-    gcpRegions,
-    templates,
-  }: Props = $props();
+  let { namespace, deployment, buildId, templates, providerConfig }: Props =
+    $props();
+
+  const computeProviders = $derived(providerConfig?.providers);
+  const gcpRegions = $derived(deployRegionsFor(providerConfig, 'cloud-run'));
+  const namespaceRegions = $derived(configuredRegions(providerConfig));
+
+  const primaryRegionId = $derived(
+    namespaceRegions.find(({ role }) => role !== 'replica')?.regionId,
+  );
+  const replicaRegionId = $derived(
+    namespaceRegions.find(({ role }) => role === 'replica')?.regionId,
+  );
 
   let error = $state<string | undefined>();
   let showDeleteModal = $state(false);
@@ -63,17 +78,23 @@
   <SkeletonTable rows={6} />
 {:then versionResponse}
   {@const info = versionResponse.workerDeploymentVersionInfo}
-  {@const providerDetails = decodeLambdaProviderDetails(info.computeConfig)}
-  {@const agentCoreDetails = decodeAgentCoreProviderDetails(info.computeConfig)}
-  {@const gcpDetails = decodeGcpCloudRunProviderDetails(info.computeConfig)}
-  {@const scalerDetails = decodeScalerDetails(info.computeConfig)}
+  <!-- Each role takes the group scoped to its region, then the unscoped one. -->
+  {@const groups = splitHighAvailabilityGroups(info.computeConfig, {
+    primaryRegionId,
+    replicaRegionId,
+  })}
+  {@const slots = primaryRegionId
+    ? scalingGroupSlots(groups, { primaryRegionId, replicaRegionId })
+    : undefined}
+  {@const primaryValues = formValuesFromGroup(groups.primary?.group)}
+  {@const replicaValues = groups.replica
+    ? formValuesFromGroup(groups.replica.group)
+    : undefined}
   <!-- A Version's provider cannot be changed, so the picker shows only the one
-       in use rather than offering alternatives that cannot be applied. -->
-  {@const configuredProvider = agentCoreDetails.agentCoreEndpointArn
-    ? 'agentcore'
-    : gcpDetails.gcpWorkerPool
-      ? 'cloud-run'
-      : 'lambda'}
+       in use rather than offering alternatives that cannot be applied. A
+       Version with compute only in the replica takes the replica's. -->
+  {@const configuredProvider =
+    primaryValues.provider ?? replicaValues?.provider ?? 'lambda'}
   <div class="flex max-w-[45rem] flex-col gap-4">
     <Link href={backHref} LeadingIcon={IconChevronLeft}>
       {translate('workers.back-to-deployment', { deployment })}
@@ -86,41 +107,36 @@
       computeProviders={lockProvidersTo(configuredProvider, computeProviders)}
       {gcpRegions}
       {templates}
-      initialData={{
-        provider: configuredProvider,
-        lambdaArn: providerDetails.lambdaArn ?? '',
-        agentCoreEndpointArn: agentCoreDetails.agentCoreEndpointArn ?? '',
-        iamRoleArn:
-          providerDetails.iamRoleArn ?? agentCoreDetails.iamRoleArn ?? '',
-        roleExternalId:
-          providerDetails.roleExternalId ??
-          agentCoreDetails.roleExternalId ??
-          '',
-        gcpProject: gcpDetails.gcpProject,
-        gcpRegion: gcpDetails.gcpRegion,
-        gcpWorkerPool: gcpDetails.gcpWorkerPool,
-        gcpServiceAccount: gcpDetails.gcpServiceAccount,
-        scaleUpCooloffMs: scalerDetails.scaleUpCooloffMs,
-        scaleUpBacklogThreshold: scalerDetails.scaleUpBacklogThreshold,
-        maxWorkerLifetimeMs: scalerDetails.maxWorkerLifetimeMs,
-        metricsPollIntervalMs: scalerDetails.metricsPollIntervalMs,
-        minReplicas: scalerDetails.minReplicas,
-        maxReplicas: scalerDetails.maxReplicas,
-        initialReplicas: scalerDetails.initialReplicas,
-        utilizationTarget: scalerDetails.utilizationTarget,
-        scaleDownStabilization:
-          scalerDetails.scaleDownStabilizationMs === undefined
-            ? undefined
-            : msToScaleDownStabilization(
-                scalerDetails.scaleDownStabilizationMs,
-              ),
-      }}
+      initialData={{ ...primaryValues, provider: configuredProvider }}
+      initialReplicaData={replicaValues}
+      primaryGroup={slots?.primary}
+      replicaGroup={slots?.replica}
+      initialRunsInPrimary={!!groups.primary || !groups.replica}
+      enabledRegionIds={groups.replica && replicaRegionId
+        ? [replicaRegionId]
+        : []}
+      regions={computeRegionsFor(namespaceRegions, configuredProvider)}
+      {namespace}
+      deploymentName={deployment}
+      {buildId}
       cancelHref={backHref}
-      onSubmit={async (data) => {
+      onSubmit={async (data, regionValues) => {
         error = undefined;
-        const computeConfig = buildComputeConfigFromForm(data);
+        const computeConfig = regionValues
+          ? buildComputeConfigForRegions(regionValues)
+          : buildComputeConfigFromForm(data);
+        const removeScalingGroups = scalingGroupsToRemove(
+          info.computeConfig,
+          computeConfig,
+        );
         await updateWorkerDeploymentVersionComputeConfig(
-          { namespace, deploymentName: deployment, buildId, computeConfig },
+          {
+            namespace,
+            deploymentName: deployment,
+            buildId,
+            computeConfig,
+            removeScalingGroups,
+          },
           (err) => {
             error =
               err.body?.message ||
@@ -132,7 +148,12 @@
 
         let validateError: string | undefined;
         const validation = await validateWorkerDeploymentVersionComputeConfig(
-          { namespace, deploymentName: deployment, buildId, computeConfig },
+          {
+            namespace,
+            deploymentName: deployment,
+            buildId,
+            computeConfig,
+          },
           (err) => {
             if (err.status === 501) return;
             validateError =

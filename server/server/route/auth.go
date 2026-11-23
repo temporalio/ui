@@ -107,6 +107,11 @@ func SetAuthRoutes(e *echo.Echo, cfgProvider *config.ConfigProviderWithRefresh) 
 		RedirectURL:  providerCfg.CallbackURL,
 		Scopes:       providerCfg.Scopes,
 	}
+	if providerCfg.ClientAssertionFile != "" {
+		oauthCfg.ClientSecret = ""
+		oauthCfg.Endpoint.AuthStyle = oauth2.AuthStyleInParams
+		ctx = auth.WithClientAssertionFile(ctx, providerCfg.ClientAssertionFile)
+	}
 
 	secure, err := cookieSecureForCallbackURL(providerCfg.CallbackURL)
 	if err != nil {

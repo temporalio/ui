@@ -23,7 +23,10 @@
     IconExternalLink,
     IconRetry,
   } from '$lib/io/icon';
-  import type { DecodedPayloadState } from '$lib/runes/decoded-payload.svelte';
+  import {
+    createDecodedPayload,
+    type DecodedPayloadState,
+  } from '$lib/runes/decoded-payload.svelte';
   import { downloadExternalPayloadWithCodec } from '$lib/services/data-encoder';
   import type { Payload, Payloads } from '$lib/types';
   import {
@@ -37,8 +40,6 @@
   import { getCodecEndpoint } from '$lib/utilities/get-codec';
   import { isNetworkError } from '$lib/utilities/is-network-error';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
-
-  import PayloadDecoder from './payload-decoder.svelte';
 
   interface Props {
     value: Payload | Payloads | PayloadContainingObject;
@@ -61,6 +62,12 @@
     lazy = false,
     decoded,
   }: Props = $props();
+
+  const sharedDecode = $derived(
+    decoded?.status === 'idle' ? undefined : decoded,
+  );
+  const ownDecoded = createDecodedPayload(() => (sharedDecode ? null : value));
+  const decodedState = $derived(sharedDecode ?? ownDecoded.current);
 
   let downloadError: string | undefined = $state(undefined);
   let downloadLoading: boolean = $state(false);
@@ -239,20 +246,11 @@
      a long unbroken payload (e.g. raw base64) wraps instead of expanding a
      table-auto cell. Covers loading, decoded, and error states. -->
 <div class="w-0 min-w-full">
-  {#if decoded?.status === 'success'}
-    {@render resultsBlock(decoded.results)}
-  {:else if decoded?.status === 'error'}
-    {@render errorBlock(decoded.error, decoded.retry)}
-  {:else if decoded?.status === 'loading'}
-    {@render encodedBlock()}
+  {#if decodedState.status === 'success'}
+    {@render resultsBlock(decodedState.results)}
+  {:else if decodedState.status === 'error'}
+    {@render errorBlock(decodedState.error, decodedState.retry)}
   {:else}
-    <PayloadDecoder {value}>
-      {#snippet loading()}{@render encodedBlock()}{/snippet}
-      {#snippet children(results)}{@render resultsBlock(results)}{/snippet}
-      {#snippet error({ error, retry })}{@render errorBlock(
-          error,
-          retry,
-        )}{/snippet}
-    </PayloadDecoder>
+    {@render encodedBlock()}
   {/if}
 </div>

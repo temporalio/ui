@@ -5,7 +5,7 @@
   import ComputeProviderPicker from './compute-provider-picker.svelte';
 
   const { Story } = defineMeta({
-    title: 'Workers/Compute Provider Picker',
+    title: 'Application/Workers/Compute Provider Picker',
     component: ComputeProviderPicker,
   });
 </script>
@@ -204,6 +204,16 @@
         { value: 'agentcore' },
         { value: 'cloud-run', hidden: true },
       ]}
+    />
+  </div>
+</Story>
+
+<Story name="Selected + Change" asChild>
+  <div class="max-w-[45rem] p-4">
+    <ComputeProviderPicker
+      layout="summary"
+      provider="lambda"
+      providers={[{ value: 'lambda' }, { value: 'agentcore' }]}
     />
   </div>
 </Story>

@@ -70,6 +70,9 @@ test('keeps a timeline summary iframe hidden and zero-sized until it loads', asy
   });
 
   await page.goto(timelineUrl, { waitUntil: 'domcontentloaded' });
+  await page
+    .getByRole('img', { name: `Workflow ${workflowId}: Running` })
+    .scrollIntoViewIfNeeded();
 
   const iframe = page.locator('iframe[title="Summary"]').first();
   await expect(iframe).toBeAttached();
@@ -118,6 +121,9 @@ test('does not add decoded timeline summaries to browser history', async ({
 
   await page.goto('/common-errors');
   await page.goto(timelineUrl, { waitUntil: 'domcontentloaded' });
+  await page
+    .getByRole('img', { name: `Workflow ${workflowId}: Running` })
+    .scrollIntoViewIfNeeded();
 
   const iframe = page.locator('iframe[title="Summary"]').first();
   await expect
@@ -158,6 +164,9 @@ test('keeps a multi-block timeline summary on one line', async ({ page }) => {
   );
 
   await page.goto(timelineUrl, { waitUntil: 'domcontentloaded' });
+  await page
+    .getByRole('img', { name: `Workflow ${workflowId}: Running` })
+    .scrollIntoViewIfNeeded();
 
   const iframe = page.locator('iframe[title="Summary"]').first();
   await expect(iframe).toBeVisible();

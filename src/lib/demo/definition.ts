@@ -75,6 +75,14 @@ const serverSchema = z
          */
         serverModules: z.record(z.string(), z.string()).default({}),
         /**
+         * Go modules pinned to an exact version across the whole workspace,
+         * through a replace in go.work. For a commit whose pseudo-version sorts
+         * below a release the CLI already requires: a floor cannot win there,
+         * because the workspace takes the higher version. Pin only what needs
+         * it, since a pin can also move a module backwards.
+         */
+        pinnedModules: z.record(z.string(), z.string()).default({}),
+        /**
          * Executables the run needs on PATH. Checked before any stage starts,
          * so a missing `docker` or `ngrok` fails immediately with a name
          * rather than midway through a build.
@@ -92,6 +100,15 @@ const serverSchema = z
     namespace: z.string().default('default'),
     dynamicConfig: z.record(z.string(), dynamicConfigValue).default({}),
     searchAttributes: z.record(z.string(), z.string()).default({}),
+    /**
+     * Patches applied to a checkout this tool fetched, before it builds, as
+     * paths from the repository root. For a change only a demo needs, such as
+     * supplying a value the open-source server leaves out. A checkout somebody
+     * pointed at is never patched.
+     */
+    patches: z.array(z.string()).default([]),
+    /** Extra environment for the server process. */
+    env: z.record(z.string(), z.string()).default({}),
   })
   .prefault({});
 
@@ -128,6 +145,8 @@ const uiSchema = z
     apiPort: z.number().int().default(8081),
     webPort: z.number().int().default(3000),
     rebuildUiServer: z.boolean().default(false),
+    /** Extra environment for the UI dev server, such as VITE_ settings. */
+    env: z.record(z.string(), z.string()).default({}),
   })
   .prefault({});
 

@@ -13,6 +13,9 @@ test.describe('Timeline graph node accessible names', () => {
   test.beforeEach(async ({ page }) => {
     await mockWorkflowApis(page);
     await page.goto(timelineUrl);
+    await page
+      .getByRole('img', { name: `Workflow ${workflowId}: Running` })
+      .scrollIntoViewIfNeeded();
   });
 
   test('workflow node announces its id and status', async ({ page }) => {

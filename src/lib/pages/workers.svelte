@@ -8,6 +8,7 @@
   import WorkerHeartbeatsDisabled from '$lib/components/workers/worker-heartbeats-disabled.svelte';
   import WorkersTable from '$lib/components/workers/workers-table/workers-table.svelte';
   import MaximizableTableView from '$lib/holocene/table/paginated-table/maximizable-view.svelte';
+  import { workerStatusFilter } from '$lib/models/status-filter';
   import { createTableSort } from '$lib/runes/table-sort-state.svelte';
   import { fetchPaginatedWorkers } from '$lib/services/worker-service';
   import { workerFilters } from '$lib/stores/filters';
@@ -55,7 +56,7 @@
       options={$workerSearchAttributeOptions}
       searchAttributes={$workerSearchAttributes}
       id="worker"
-      statusAttribute="WorkerStatus"
+      statusFilter={workerStatusFilter}
     />
     {#key [namespace, query, $refresh]}
       <WorkersTable

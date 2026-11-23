@@ -101,7 +101,11 @@
   {:else}
     <Table
       bind:this={table}
-      containerClass={merge('min-h-0 grow rounded-b-none', tableClass)}
+      containerClass={merge(
+        'min-h-0 grow',
+        visibleItems.length && 'rounded-b-none',
+        tableClass,
+      )}
       bordered={false}
       {updating}
       {fixed}

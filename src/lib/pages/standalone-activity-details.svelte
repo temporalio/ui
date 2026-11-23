@@ -14,7 +14,9 @@
   import Card from '$lib/holocene/card.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { Badge } from '$lib/io/badge';
   import { BadgeCount } from '$lib/io/badge-count';
+  import type { ResolvedPrincipal } from '$lib/types/activity-execution';
   import {
     formatAttemptsLeft,
     formatMaximumAttempts,
@@ -42,6 +44,14 @@
   const nextRetryDelay = $derived(
     $activityExecution?.info?.lastFailure?.applicationFailureInfo
       ?.nextRetryDelay,
+  );
+
+  const hasPrincipals = $derived(
+    [
+      $activityExecution?.info?.startedByPrincipal,
+      $activityExecution?.info?.lastWorkerPrincipal,
+      $activityExecution?.info?.closedByPrincipal,
+    ].some((principal) => principal?.nameAtWriteTime),
   );
 
   const hasCodeBlocks = $derived(
@@ -75,6 +85,41 @@
   </DetailListValue>
 {/snippet}
 
+{#snippet principal(
+  label: string,
+  value: ResolvedPrincipal | null | undefined,
+  identity: string | null = null,
+)}
+  <DetailListLabel>{label}</DetailListLabel>
+  {#if value?.nameAtWriteTime}
+    <DetailListValue class="min-w-0">
+      <div
+        class="grid min-w-0 items-center gap-1.5 max-md:grid-cols-[minmax(0,1fr)] max-md:gap-1 md:[grid-template-columns:var(--cols)]"
+        style:--cols={[
+          identity && 'minmax(0,max-content) max-content',
+          value.type && 'max-content',
+          'minmax(0,max-content)',
+        ]
+          .filter(Boolean)
+          .join(' ')}
+      >
+        {#if identity}
+          <span class="truncate" title={identity}>{identity}</span>
+          <span class="text-secondary max-md:hidden" aria-hidden="true">•</span>
+        {/if}
+        {#if value.type}
+          <Badge text={value.type} size="sm" class="justify-self-start" />
+        {/if}
+        <span class="truncate" title={value.nameAtWriteTime}
+          >{value.nameAtWriteTime}</span
+        >
+      </div>
+    </DetailListValue>
+  {:else}
+    <DetailListTextValue text="-" />
+  {/if}
+{/snippet}
+
 {#if $activityExecution}
   {#if $activityExecution.callbacks?.length}
     <WorkflowCallback
@@ -88,8 +133,12 @@
   />
   <Card class="space-y-4">
     <h4>{$activityExecution.info.activityType?.name ?? ''}</h4>
-    <div class={hasCodeBlocks ? 'grid grid-cols-2 gap-4' : ''}>
-      <div class={hasCodeBlocks ? 'space-y-4' : 'grid grid-cols-3 gap-4'}>
+    <div class={hasCodeBlocks ? 'grid grid-cols-1 gap-4 lg:grid-cols-2' : ''}>
+      <div
+        class={hasCodeBlocks
+          ? 'space-y-4'
+          : 'grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3'}
+      >
         {#if !isClosed}
           <div class="space-y-2">
             <h5>
@@ -314,6 +363,33 @@
             />
           </DetailList>
         </div>
+
+        {#if hasPrincipals}
+          <div class="space-y-2">
+            <h5>
+              {translate('standalone-activities.principals')}
+            </h5>
+            <DetailList
+              rowCount={3}
+              aria-label={translate('standalone-activities.principals')}
+            >
+              {@render principal(
+                translate('standalone-activities.started-by'),
+                $activityExecution.info.startedByPrincipal,
+              )}
+              {@render principal(
+                translate('standalone-activities.last-worker'),
+                $activityExecution.info.lastWorkerPrincipal,
+                $activityExecution.info.lastWorkerIdentity,
+              )}
+              {@render principal(
+                translate('standalone-activities.closed-by'),
+                $activityExecution.info.closedByPrincipal,
+              )}
+            </DetailList>
+          </div>
+        {/if}
+
         <div class="space-y-2">
           <h5>
             {translate('standalone-activities.worker')}

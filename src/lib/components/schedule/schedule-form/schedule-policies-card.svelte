@@ -6,7 +6,7 @@
   import Card from '$lib/holocene/card.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { formatDuration } from '$lib/utilities/format-time';
+  import { fromSeconds } from '$lib/utilities/to-duration';
 
   import { getOverlapPolicyContent } from '../constants';
   import type { FormScheduleSchema } from '../schema/form';
@@ -27,29 +27,6 @@
     $form.pauseSchedule
       ? translate('schedules.pause-on-start')
       : translate('schedules.do-not-pause-on-start'),
-  );
-
-  const timeoutsSummary = $derived(
-    [
-      $form.taskTimeout &&
-        translate('schedules.timeout-task', {
-          duration:
-            formatDuration($form.taskTimeout) ||
-            translate('schedules.zero-duration'),
-        }),
-      translate('schedules.timeout-run', {
-        duration:
-          formatDuration($form.runTimeout) ||
-          translate('schedules.zero-duration'),
-      }),
-      translate('schedules.timeout-execution', {
-        duration:
-          formatDuration($form.executionTimeout) ||
-          translate('schedules.zero-duration'),
-      }),
-    ]
-      .filter(Boolean)
-      .join(', ') || translate('schedules.no-timeouts'),
   );
 
   let editPoliciesButton: { focus: () => void };
@@ -100,7 +77,7 @@
         </dt>
         <dd>
           {$form.catchupWindow
-            ? formatDuration($form.catchupWindow)
+            ? fromSeconds($form.catchupWindow)
             : translate('schedules.catchup-window-default')}
         </dd>
       </div>
@@ -114,13 +91,6 @@
             ? translate('common.yes')
             : translate('common.no')}
         </dd>
-      </div>
-
-      <div class="lg:contents">
-        <dt class="text-xs text-secondary lg:text-sm">
-          {translate('schedules.timeouts')}
-        </dt>
-        <dd>{timeoutsSummary}</dd>
       </div>
     </dl>
     <div class="mr-auto mt-2">

@@ -6,7 +6,7 @@
   import Modal from './modal.svelte';
 
   const { Story } = defineMeta({
-    title: 'Modal',
+    title: 'Holocene/Components/Modal',
     component: Modal,
     args: {
       open: true,

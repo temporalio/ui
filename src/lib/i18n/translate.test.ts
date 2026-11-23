@@ -34,6 +34,15 @@ describe('translate', () => {
     });
   });
 
+  test('passes escapeValue through as an interpolation option', () => {
+    translate('common.loading', { foo: 'bar', escapeValue: false });
+
+    expect(i18next.t).toHaveBeenCalledWith('common:loading', {
+      foo: 'bar',
+      interpolation: { escapeValue: false },
+    });
+  });
+
   test('accepts a namespace, key, and count', () => {
     translate('common.loading', { count: 10 });
 

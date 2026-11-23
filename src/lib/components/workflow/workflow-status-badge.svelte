@@ -8,7 +8,11 @@
     BadgeStatus,
     type BadgeStatusExtensions,
   } from '$lib/io/badge-status';
-  import { IconClock, IconExclamationOctagon } from '$lib/io/icon';
+  import {
+    IconClock,
+    IconExclamationOctagon,
+    IconTemporalTimeskippingOn,
+  } from '$lib/io/icon';
   import { isWorkflowStatusType } from '$lib/models/workflow-status';
   import type { WorkflowStatus } from '$lib/types/workflows';
   import { getWorkflowStatusLabel } from '$lib/utilities/get-workflow-status-label';
@@ -20,18 +24,27 @@
     status: WorkflowStatus;
     delayed?: boolean;
     taskFailure?: boolean;
+    timeSkippingEnabled?: boolean;
   }
 
   let {
     status,
     delayed = false,
     taskFailure = false,
+    timeSkippingEnabled = false,
     ...rest
   }: Props = $props();
 
   const delayedText = $derived(translate('workflows.delayed'));
   const taskFailureText = $derived(translate('workflows.task-failure'));
+  const timeSkippingEnabledText = $derived(
+    translate('workflows.time-skipping-enabled'),
+  );
   const extensions = $derived<BadgeStatusExtensions>([
+    timeSkippingEnabled && {
+      colorScheme: 'neutral',
+      TrailIcon: IconTemporalTimeskippingOn,
+    },
     delayed && {
       colorScheme: 'warning',
       TrailIcon: IconClock,
@@ -42,13 +55,20 @@
     },
   ]);
   const modifierLabels = $derived([
+    ...(timeSkippingEnabled ? [timeSkippingEnabledText] : []),
     ...(delayed ? [delayedText] : []),
     ...(taskFailure ? [taskFailureText] : []),
   ]);
   const tooltipText = $derived(modifierLabels.join(', '));
 </script>
 
-<Tooltip topLeft text={tooltipText} hide={!modifierLabels.length}>
+<Tooltip
+  topLeft
+  text={tooltipText}
+  hide={!modifierLabels.length}
+  usePortal
+  portalOffset={{ y: -4 }}
+>
   {#if status && isWorkflowStatusType(status)}
     <BadgeStatus
       {status}

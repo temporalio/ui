@@ -35,6 +35,8 @@
     maxHeight?: string;
     pageSizeOptions?: string[];
     fixed?: boolean;
+    pageParameter?: string;
+    perPageParameter?: string;
     class?: ClassNameValue;
     'aria-label'?: string;
     caption?: Snippet;
@@ -56,6 +58,8 @@
     maxHeight = '',
     pageSizeOptions = options,
     fixed = false,
+    pageParameter = currentPageKey,
+    perPageParameter = perPageKey,
     class: className = '',
     'aria-label': ariaLabel,
     caption,
@@ -69,11 +73,9 @@
 
   const url = $derived(page.url);
   const perPageParam = $derived(
-    url.searchParams.get(perPageKey) ?? pageSizeOptions[0],
+    url.searchParams.get(perPageParameter) ?? pageSizeOptions[0],
   );
-  const currentPageParam = $derived(
-    url.searchParams.get(currentPageKey) || '1',
-  );
+  const currentPageParam = $derived(url.searchParams.get(pageParameter) || '1');
   const itemsPerPage = $derived(perPageFromSearchParameter(perPageParam));
   // pagination() takes a starting index, not a page number, so convert before
   // constructing it. Passing the page straight through made every rebuild start
@@ -93,13 +95,13 @@
   $effect(() => {
     if (parseInt(perPageParam, 10) > parseInt(MAX_PAGE_SIZE, 10)) {
       updateQueryParameters({
-        parameter: perPageKey,
+        parameter: perPageParameter,
         value: MAX_PAGE_SIZE,
         url,
       });
     } else if (!pageSizeOptions.includes(perPageParam)) {
       updateQueryParameters({
-        parameter: perPageKey,
+        parameter: perPageParameter,
         value: defaultItemsPerPage,
         url,
       });
@@ -113,7 +115,7 @@
       parseInt(currentPageParam, 10) > $store.totalPages
     ) {
       updateQueryParameters({
-        parameter: currentPageKey,
+        parameter: pageParameter,
         value: $store.totalPages,
         url,
       });
@@ -121,12 +123,12 @@
       currentPageParam === null ||
       parseInt(currentPageParam, 10) < 0
     ) {
-      updateQueryParameters({ parameter: currentPageKey, value: '1', url });
+      updateQueryParameters({ parameter: pageParameter, value: '1', url });
     }
   });
 
   const handlePageChange = (page: number) => {
-    updateQueryParameters({ parameter: currentPageKey, value: page, url });
+    updateQueryParameters({ parameter: pageParameter, value: page, url });
     paginatedTable?.scrollToTop();
   };
 
@@ -154,7 +156,7 @@
   {#snippet actionsStart()}
     <FilterSelect
       label={perPageLabel}
-      parameter={perPageKey}
+      parameter={perPageParameter}
       value={perPageParam}
       options={pageSizeOptions}
     />

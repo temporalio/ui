@@ -1,0 +1,51 @@
+export const Namespace = 'palette' as const;
+
+// Text for the palette itself. Each tool set owns the text for its own items.
+export const Strings = {
+  label: 'Command palette',
+  'search-placeholder': 'Search…',
+  loading: 'Loading…',
+  'no-matches': 'No matches',
+  empty: 'Nothing here',
+  working: 'Working…',
+  'still-working': 'Still working on the last action',
+  actions: 'Actions',
+  'actions-for': 'Actions for {{item}}',
+  confirm: 'Confirm',
+  cancel: 'Cancel',
+  back: 'Back',
+  open: 'Open',
+  close: 'Close',
+  'dev-tools': 'Dev tools',
+  all: 'All',
+  scope: 'Scope',
+  'scope-label': 'Scope: {{scope}}',
+  'scoped-to': 'Showing {{scope}}',
+  'scope-hint': 'Type a key and a space to scope. Tab cycles scopes.',
+  'on-this-page': 'On this page',
+  recent: 'Recent',
+  'result-count_one': '{{count}} result',
+  'result-count_other': '{{count}} results',
+  dev: 'dev',
+  'shortcut-section': 'Keyboard',
+  shortcut: 'Palette shortcut',
+  'shortcut-subtitle': 'Opens the command palette from any page',
+  'shortcut-off': 'Off',
+  'shortcut-change': 'Change shortcut',
+  'shortcut-turn-off': 'Turn off shortcut',
+  'shortcut-turn-on': 'Turn on shortcut',
+  'shortcut-reset': 'Reset to {{shortcut}}',
+  'shortcut-record-prompt': 'Press the new shortcut',
+  'shortcut-record-hint':
+    'Hold Ctrl or Alt, and Shift if you like, then press a letter or number. Esc cancels.',
+  'shortcut-record-hint-mac':
+    'Hold ⌘, ⌃ or ⌥, and ⇧ if you like, then press a letter or number. Esc cancels.',
+  'shortcut-needs-mod':
+    'Hold Ctrl or Alt, so the shortcut does not block typing',
+  'shortcut-needs-mod-mac':
+    'Hold ⌘, ⌃ or ⌥, so the shortcut does not block typing',
+  'shortcut-needs-key': 'Use a letter or a number',
+  'shortcut-reserved': 'The browser keeps {{shortcut}}. Try other keys.',
+  'shortcut-saved': 'The palette now opens with {{shortcut}}',
+  'shortcut-turned-off': 'The shortcut is off. Open the palette from the menu.',
+} as const;

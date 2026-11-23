@@ -105,8 +105,8 @@ const cloneAcceptedReference = (
 });
 
 const targetFingerprint = (
-  target: Pick<LaunchTarget, 'targetId' | 'namespace' | 'taskQueue'>,
-) => `${target.targetId}:${target.namespace}:${target.taskQueue}`;
+  target: Pick<LaunchTarget, 'workspaceId' | 'namespace' | 'taskQueue'>,
+) => `${target.workspaceId}:${target.namespace}:${target.taskQueue}`;
 
 export const catalogTargetFingerprint = targetFingerprint;
 
@@ -124,7 +124,7 @@ const isAbortError = (error: unknown) =>
 export const findLatestSession = (
   sessions: readonly CatalogSession[],
   exampleId: string,
-  target: Pick<LaunchTarget, 'targetId' | 'namespace' | 'taskQueue'>,
+  target: Pick<LaunchTarget, 'workspaceId' | 'namespace' | 'taskQueue'>,
 ): CatalogSession | undefined => {
   const fingerprint = targetFingerprint(target);
   return sessions.find(
@@ -251,7 +251,7 @@ export const createCatalogSessionStore = (
       kind: descriptor.execution.kind,
       attempt: { ...attempt },
       target: {
-        targetId: descriptor.execution.targetId,
+        workspaceId: descriptor.execution.workspaceId,
         namespace: descriptor.execution.namespace,
         taskQueue: descriptor.execution.taskQueue,
       },

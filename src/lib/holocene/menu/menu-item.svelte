@@ -254,7 +254,7 @@
 
 <style lang="postcss">
   .menu-item {
-    @apply cursor-pointer rounded border border-transparent text-sm text-primary focus-visible:border-interactive-primary focus-visible:bg-surface-primary focus-visible:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary active:bg-interactive-secondary-press;
+    @apply cursor-pointer rounded border border-transparent text-primary focus-visible:border-interactive-primary focus-visible:bg-surface-primary focus-visible:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary active:bg-interactive-secondary-press;
 
     &.active {
       @apply bg-interactive-primary text-white;
@@ -277,10 +277,14 @@
     }
 
     &.destructive {
-      @apply text-danger focus-visible:border-interactive-danger focus-visible:bg-interactive-danger focus-visible:text-primary focus-visible:ring-interactive-danger active:bg-interactive-danger-press active:text-primary;
+      @apply text-static-danger focus-visible:border-interactive-danger focus-visible:bg-interactive-danger focus-visible:text-white focus-visible:ring-interactive-danger active:bg-interactive-danger-press active:text-primary;
+
+      :global(:where([data-theme='dark'])) & {
+        @apply text-danger;
+      }
 
       &.active {
-        @apply bg-interactive-danger text-primary;
+        @apply bg-interactive-danger text-white;
       }
 
       &.hoverable {
@@ -312,8 +316,11 @@
     @apply text-white;
   }
 
-  .menu-item.destructive.hoverable:hover .menu-item-description,
-  .menu-item.destructive:focus-visible .menu-item-description {
+  .menu-item.destructive.hoverable:hover .menu-item-description {
     @apply text-primary;
+  }
+
+  .menu-item.destructive:focus-visible .menu-item-description {
+    @apply text-white;
   }
 </style>

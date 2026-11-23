@@ -40,8 +40,8 @@
   import BatchCancelConfirmationModal from '$lib/components/standalone-activities/batch-cancel-confirmation-modal.svelte';
   import BatchTerminateConfirmationModal from '$lib/components/standalone-activities/batch-terminate-confirmation-modal.svelte';
   import StatusCountFilters from '$lib/components/status-count-filters.svelte';
+  import ConfigurableTableHeadersDrawer from '$lib/components/table/configurable-table-headers-drawer.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
-  import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
   import Button from '$lib/holocene/button.svelte';
   import MaximizableTableView from '$lib/holocene/table/paginated-table/maximizable-view.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -246,6 +246,5 @@
   {availableColumns}
   bind:open={customizationDrawerOpen}
   table={TABLE_TYPE.ACTIVITIES}
-  type={translate('common.columns')}
   title={translate('standalone-activities.activities-table')}
 />

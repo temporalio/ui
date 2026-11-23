@@ -56,7 +56,9 @@
   <div
     class="flex items-start justify-between gap-4 max-xl:w-full max-xl:flex-wrap"
   >
-    <div class="flex items-center gap-4">
+    <div
+      class="flex min-w-0 max-w-full items-center gap-4 max-md:flex-col max-md:items-start max-md:gap-2"
+    >
       <ActivityStatusBadge
         status={toActivityStatus(activityExecutionInfo.status)}
         delayed={isActivityDelayed(activityExecutionInfo)}

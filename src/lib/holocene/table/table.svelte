@@ -35,6 +35,49 @@
   }: Props = $props();
 
   let scrollContainer = $state<HTMLDivElement>();
+  let showLoadingBar = $state(false);
+  let loadingBarVisible = $state(false);
+  let previousUpdating = $state<boolean>();
+  let enterTimeout: ReturnType<typeof setTimeout> | undefined;
+  let exitTimeout: ReturnType<typeof setTimeout> | undefined;
+
+  $effect(() => {
+    if (updating === previousUpdating) return;
+    previousUpdating = updating;
+
+    if (updating) {
+      if (exitTimeout) clearTimeout(exitTimeout);
+      if (showLoadingBar) {
+        loadingBarVisible = true;
+        return;
+      }
+
+      showLoadingBar = true;
+      loadingBarVisible = false;
+      enterTimeout = setTimeout(() => {
+        loadingBarVisible = true;
+      }, 150);
+      return;
+    }
+
+    if (enterTimeout) clearTimeout(enterTimeout);
+    if (!showLoadingBar || !loadingBarVisible) {
+      showLoadingBar = false;
+      return;
+    }
+
+    loadingBarVisible = false;
+    exitTimeout = setTimeout(() => {
+      showLoadingBar = false;
+    }, 350);
+  });
+
+  $effect(() => {
+    return () => {
+      if (enterTimeout) clearTimeout(enterTimeout);
+      if (exitTimeout) clearTimeout(exitTimeout);
+    };
+  });
 
   export function scrollToTop() {
     if (!scrollContainer) return false;
@@ -68,8 +111,16 @@
     {@render caption?.()}
     <thead class="holocene-table-header">
       {@render headers?.()}
-      {#if updating}
-        <tr aria-hidden="true" class="!h-0 bg-transparent">
+      {#if showLoadingBar}
+        <tr
+          aria-hidden="true"
+          class={merge(
+            '!h-0 bg-transparent transition-opacity',
+            loadingBarVisible
+              ? 'opacity-100 duration-[250ms]'
+              : 'opacity-0 duration-[350ms]',
+          )}
+        >
           <th colspan="1000" class="relative !h-0 !border-0 !p-0">
             <ProgressBar subtle class="bottom-0" />
           </th>

@@ -57,6 +57,7 @@
     routeForWorkflowWorkers,
   } from '$lib/utilities/route-for';
   import { isWorkflowTaskFailure } from '$lib/utilities/workflow-task-failures';
+  import { isWorkflowTimeSkippingEnabled } from '$lib/utilities/workflow-time-skipping';
 
   const {
     namespace,
@@ -155,6 +156,7 @@
             status={workflow.status}
             delayed={isWorkflowDelayed(workflow)}
             taskFailure={isWorkflowTaskFailure(workflow)}
+            timeSkippingEnabled={isWorkflowTimeSkippingEnabled(workflow)}
           />
         {/if}
         <div class="xl:hidden">

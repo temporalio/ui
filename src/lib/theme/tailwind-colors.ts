@@ -135,6 +135,7 @@ export const colorTheme = {
   textColor: {
     ...basePaintColors,
     ...contentColors,
+    interactive: interactiveColors,
     action: actionColors,
     extension: extensionColors,
   },

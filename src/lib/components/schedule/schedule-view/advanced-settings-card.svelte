@@ -1,9 +1,11 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   import { timestamp } from '$lib/components/timestamp.svelte';
   import Accordion from '$lib/holocene/accordion/accordion.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { formatDuration } from '$lib/utilities/format-time';
   import { fromScreamingEnum } from '$lib/utilities/screaming-enums';
+  import { fromSeconds } from '$lib/utilities/to-duration';
 
   import { summarizeScheduleSpec } from '../utilities/summarize';
 
@@ -11,8 +13,9 @@
 
   type Props = {
     schedule: DescribeFullSchedule;
+    children?: Snippet;
   };
-  let { schedule }: Props = $props();
+  let { schedule, children }: Props = $props();
 
   const spec = $derived(schedule?.schedule?.spec);
   const state = $derived(schedule?.schedule?.state);
@@ -80,7 +83,7 @@
       </dt>
       <dd>
         {policies?.catchupWindow != null
-          ? formatDuration(policies.catchupWindow.toString())
+          ? fromSeconds(policies.catchupWindow.toString())
           : translate('common.none')}
       </dd>
     </div>
@@ -126,18 +129,7 @@
       </div>
     {/if}
 
-    {#if policies?.keepOriginalWorkflowId != null}
-      <div>
-        <dt class="text-secondary">
-          {translate('schedules.keep-original-workflow-id')}
-        </dt>
-        <dd>
-          {policies?.keepOriginalWorkflowId
-            ? translate('common.true')
-            : translate('common.false')}
-        </dd>
-      </div>
-    {/if}
+    {@render children?.()}
 
     <div class="col-span-full">
       <dt class="text-secondary">

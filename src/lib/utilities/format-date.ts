@@ -1,6 +1,6 @@
 import {
   differenceInHours,
-  formatDistanceToNowStrict,
+  formatDistanceStrict,
   parseISO,
   parseJSON,
 } from 'date-fns';
@@ -12,7 +12,12 @@ import {
   Timezones,
 } from '$lib/utilities/timezone';
 
-import { isTimestamp, timestampToDate, type ValidTime } from './format-time';
+import {
+  isTimestamp,
+  timestampToDate,
+  type ValidTime,
+  validTimeToDate,
+} from './format-time';
 
 export type { ValidTime };
 
@@ -24,6 +29,7 @@ export type FormatDateOptions = {
   relativeLabel?: string;
   flexibleUnits?: boolean;
   hourFormat?: HourFormat;
+  now?: ValidTime;
 };
 
 export const timestampFormats: Record<
@@ -96,14 +102,19 @@ const getDateTimeFormatter = (
  * Handles ValidTime types including strings, numbers, Dates, and Timestamp objects.
  *
  * @param time - The time value to check (can be a string, Date, or Timestamp)
+ * @param now - The reference "now" time, defaults to new Date().
  * @returns true if the time is in the future, false otherwise (including null/undefined)
  */
-export function isFuture(time: ValidTime | undefined | null): boolean {
+export function isFuture(
+  time: ValidTime | undefined | null,
+  now?: ValidTime | undefined | null,
+): boolean {
   if (!time) return false;
 
   try {
+    const nowDate = now ? validTimeToDate(now) : new Date();
     const date = isTimestamp(time) ? timestampToDate(time) : new Date(time);
-    return date > new Date();
+    return date > nowDate;
   } catch {
     return false;
   }
@@ -121,22 +132,22 @@ export function formatDate(
       date = timestampToDate(date);
     }
 
+    const currentDate = validTimeToDate(options.now ?? Date.now());
+
     const {
       relative = false,
-      relativeLabel = isFuture(date) ? 'from now' : 'ago',
+      relativeLabel = isFuture(date, currentDate) ? 'from now' : 'ago',
       flexibleUnits = false,
       format = 'medium',
       hourFormat = 'system',
     } = options;
-
-    const currentDate = Date.now();
 
     const parsed = parseJSON(new Date(date));
 
     // Handle relative time first (takes precedence over format)
     if (timeFormat === BASE_TIME_FORMAT_OPTIONS.LOCAL && relative) {
       return (
-        formatDistanceToNowStrict(parsed, {
+        formatDistanceStrict(parsed, currentDate, {
           ...(!flexibleUnits &&
             Math.abs(differenceInHours(currentDate, parsed)) > 24 && {
               unit: 'day',

@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
+import { activityStatusFilter } from '$lib/models/status-filter';
 import type { ActivityExecutionListInfo } from '$lib/types/activity-execution';
 import { sortTableItems } from '$lib/utilities/table-sort';
 
 import {
+  getActivityColumnFilter,
   getActivityColumnValue,
   getActivitySortColumns,
 } from './column-search-attributes';
@@ -68,5 +70,36 @@ describe('getActivityColumnValue', () => {
 
   it('has no value for a column that is neither mapped nor indexed', () => {
     expect(getActivityColumnValue('Not A Column', activity)).toBeUndefined();
+  });
+});
+
+describe('getActivityColumnFilter', () => {
+  const attributes = {
+    ActivityType: 'Keyword',
+    ExecutionStatus: 'Keyword',
+    CustomIntField: 'Int',
+  } as const;
+
+  it('resolves a column to the search attribute and type it filters on', () => {
+    expect(getActivityColumnFilter('Type', attributes)).toEqual({
+      attribute: 'ActivityType',
+      type: 'Keyword',
+    });
+    expect(getActivityColumnFilter('Status', attributes)).toEqual({
+      attribute: 'ExecutionStatus',
+      type: 'Keyword',
+      statusFilter: activityStatusFilter,
+    });
+  });
+
+  it('resolves a custom search attribute column by its name', () => {
+    expect(getActivityColumnFilter('CustomIntField', attributes)).toEqual({
+      attribute: 'CustomIntField',
+      type: 'Int',
+    });
+  });
+
+  it('offers no filter for a column with no known search attribute type', () => {
+    expect(getActivityColumnFilter('Task Queue', attributes)).toBeUndefined();
   });
 });

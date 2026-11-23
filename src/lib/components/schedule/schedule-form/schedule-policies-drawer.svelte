@@ -19,7 +19,6 @@
 
   import {
     DEFAULT_CATCHUP_WINDOW,
-    DEFAULT_TASK_TIMEOUT,
     durationUnits,
     getOverlapPolicyContent,
   } from '../constants';
@@ -47,9 +46,6 @@
     pauseOnFailure: data.pauseOnFailure,
     pauseSchedule: data.pauseSchedule,
     catchupWindow: data.catchupWindow,
-    taskTimeout: data.taskTimeout,
-    runTimeout: data.runTimeout,
-    executionTimeout: data.executionTimeout,
   });
 
   // svelte-ignore state_referenced_locally
@@ -86,9 +82,6 @@
 
   let resetKeys = $state({
     catchupWindow: 0,
-    taskTimeout: 0,
-    runTimeout: 0,
-    executionTimeout: 0,
   });
 
   // DurationInput seeds its display from `value` only on mount, so after
@@ -247,71 +240,6 @@
         </DurationInput>
       {/key}
     </fieldset>
-
-    <hgroup>
-      <h3 class="text-2xl font-medium">{translate('schedules.timeouts')}</h3>
-      <p class="mt-1 text-secondary">
-        {translate('schedules.timeouts-description')}
-      </p>
-    </hgroup>
-
-    {#key resetKeys.taskTimeout}
-      <DurationInput
-        id="task-timeout-duration"
-        label={translate('schedules.task-timeout')}
-        inputmode="numeric"
-        bind:value={$policies.taskTimeout}
-        initialUnit={getFirstWholeNumberUnit(
-          $policies.taskTimeout,
-          durationUnits,
-          'second(s)',
-        )}
-        units={durationUnits}
-        error={!!$errors.taskTimeout?.[0]}
-        hintText={$errors.taskTimeout?.[0] ?? ''}
-        class="max-w-80"
-        min={0}
-        onblur={snapToDefault('taskTimeout', DEFAULT_TASK_TIMEOUT)}
-      />
-    {/key}
-
-    {#key resetKeys.runTimeout}
-      <DurationInput
-        id="run-timeout-duration"
-        label={translate('schedules.run-timeout')}
-        inputmode="numeric"
-        bind:value={$policies.runTimeout}
-        initialUnit={getFirstWholeNumberUnit(
-          $policies.runTimeout,
-          durationUnits,
-          'second(s)',
-        )}
-        units={durationUnits}
-        error={!!$errors.runTimeout?.[0]}
-        hintText={$errors.runTimeout?.[0] ?? ''}
-        class="max-w-80"
-        min={0}
-      />
-    {/key}
-
-    {#key resetKeys.executionTimeout}
-      <DurationInput
-        id="execution-timeout-duration"
-        label={translate('schedules.execution-timeout')}
-        inputmode="numeric"
-        bind:value={$policies.executionTimeout}
-        initialUnit={getFirstWholeNumberUnit(
-          $policies.executionTimeout,
-          durationUnits,
-          'second(s)',
-        )}
-        units={durationUnits}
-        error={!!$errors.executionTimeout?.[0]}
-        hintText={$errors.executionTimeout?.[0] ?? ''}
-        class="max-w-80"
-        min={0}
-      />
-    {/key}
 
     <div class="ml-auto mt-2 flex gap-4">
       <Button variant="secondary" onclick={onCancel}

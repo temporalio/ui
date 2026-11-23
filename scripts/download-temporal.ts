@@ -3,7 +3,7 @@ import zlib from 'node:zlib';
 import { join } from 'path';
 import { finished } from 'stream/promises';
 
-import mkdirp from 'mkdirp';
+import { mkdirp } from 'mkdirp';
 import fetch from 'node-fetch';
 import rmrf from 'rimraf';
 import tar from 'tar-fs';

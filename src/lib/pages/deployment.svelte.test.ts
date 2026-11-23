@@ -127,6 +127,11 @@ function menuItems(menu: Element | null) {
   );
 }
 
+const headerText = (th: Element | null | undefined) =>
+  th?.textContent?.replace(/\s+/g, ' ').trim();
+
+const REGION_HEADER = 'Region (Primary, Replica)';
+
 describe('deployment connection status visibility', () => {
   let client: Awaited<ReturnType<typeof getDeploymentClientTestRunner>>;
 
@@ -180,38 +185,43 @@ describe('deployment connection status visibility', () => {
 
   afterAll(closeDeploymentClientTestRunner);
 
-  test('renders the connection header and cell by default', async () => {
+  test('renders connection status in the Region column by default', async () => {
     const target = await client.renderDeployment({
       fetchDeployment: deployment,
       fetchDeploymentVersion: { workerDeploymentVersionInfo: {} },
     });
 
-    expect(target.querySelector('th:nth-child(4)')?.textContent).toBe(
-      'Connection',
+    expect(headerText(target.querySelector('th:nth-child(3)'))).toBe(
+      REGION_HEADER,
     );
-    expect(target.textContent).toContain('Connected');
+    const regionCell = target.querySelector('tbody td:nth-child(3)');
+    expect(regionCell?.textContent).toContain('Connected');
+    // A legacy single-group config is keyed "default", which is not a region.
+    expect(regionCell?.textContent).not.toContain('default');
     const details = client.expandDetails(target);
     expect(details).not.toBeNull();
-    expect(details?.getAttribute('colspan')).toBe('6');
+    expect(details?.getAttribute('colspan')).toBe('5');
   });
 
-  test('renders the matching connection header and cell when enabled', async () => {
+  test('renders connection status in the Region column when enabled', async () => {
     const target = await client.renderDeployment({
       fetchDeployment: deployment,
       fetchDeploymentVersion: { workerDeploymentVersionInfo: {} },
       showConnectionStatus: true,
     });
 
-    expect(target.querySelector('th:nth-child(4)')?.textContent).toBe(
-      'Connection',
+    expect(headerText(target.querySelector('th:nth-child(3)'))).toBe(
+      REGION_HEADER,
     );
-    expect(target.textContent).toContain('Connected');
+    expect(
+      target.querySelector('tbody td:nth-child(3)')?.textContent,
+    ).toContain('Connected');
     const details = client.expandDetails(target);
     expect(details).not.toBeNull();
-    expect(details?.getAttribute('colspan')).toBe('6');
+    expect(details?.getAttribute('colspan')).toBe('5');
   });
 
-  test('hides the connection header and cell when the consumer opts out', async () => {
+  test('hides connection status when the consumer opts out', async () => {
     const target = await client.renderDeployment({
       fetchDeployment: deployment,
       fetchDeploymentVersion: { workerDeploymentVersionInfo: {} },
@@ -227,15 +237,20 @@ describe('deployment connection status visibility', () => {
     expect(details?.getAttribute('colspan')).toBe('5');
   });
 
-  test('hides the connection column for a self-hosted deployment', async () => {
+  test('hides connection status for a self-hosted deployment', async () => {
     const target = await client.renderDeployment({
       fetchDeployment: selfHostedDeployment,
       fetchDeploymentVersion: { workerDeploymentVersionInfo: {} },
     });
 
-    expect(
-      Array.from(target.querySelectorAll('th')).map((th) => th.textContent),
-    ).toEqual(['Build ID', 'Lifecycle', 'Compute', 'Deployed At', 'Actions']);
+    expect(Array.from(target.querySelectorAll('th')).map(headerText)).toEqual([
+      'Build ID',
+      'Lifecycle',
+      REGION_HEADER,
+      'Deployed At',
+      'Actions',
+    ]);
+    expect(target.textContent).not.toContain('Connected');
     const details = client.expandDetails(target);
     expect(details).toBeNull();
   });
@@ -246,10 +261,12 @@ describe('deployment connection status visibility', () => {
       fetchDeploymentVersion: { workerDeploymentVersionInfo: {} },
     });
 
-    expect(target.querySelector('th:nth-child(4)')?.textContent).toBe(
-      'Connection',
+    expect(headerText(target.querySelector('th:nth-child(3)'))).toBe(
+      REGION_HEADER,
     );
-    expect(target.textContent).toContain('Pending');
+    expect(
+      target.querySelector('tbody td:nth-child(3)')?.textContent,
+    ).toContain('Pending');
     expect(target.textContent).not.toContain('Connected');
   });
 

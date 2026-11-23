@@ -36,5 +36,6 @@ export type I18nKey<Resources = I18nResources> = WithoutPluralSuffix<
 export type I18nReplace = {
   count?: number;
   ordinal?: boolean;
+  escapeValue?: boolean;
   [index: string]: string | number | boolean | undefined;
 };

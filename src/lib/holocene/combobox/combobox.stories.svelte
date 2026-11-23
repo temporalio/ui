@@ -34,7 +34,7 @@
   };
 
   const { Story } = defineMeta({
-    title: 'Combobox',
+    title: 'Holocene/Components/Combobox',
     component: Combobox,
     args: {
       label: 'Select a Language',

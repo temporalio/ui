@@ -40,7 +40,7 @@
     {#snippet headers()}
       <tr>
         {#each columns as column, i (`${column.label}:${i}`)}
-          <TableHeaderCell {column} />
+          <TableHeaderCell {column} archival />
         {/each}
       </tr>
     {/snippet}

@@ -5,11 +5,15 @@
 
   import CountRefreshButton from '$lib/components/count-refresh-button.svelte';
   import SavedQueryViews from '$lib/components/saved-query-views/saved-views.svelte';
+  import { scheduledActionPresentations } from '$lib/components/schedule/scheduled-action-types/presentation-registry';
+  import { resolveScheduledActionListEntry } from '$lib/components/schedule/scheduled-action-types/resolve-scheduled-action-list-entry';
+  import { getScheduleColumnFilter } from '$lib/components/schedule/schedules-list/column-search-attributes';
   import SchedulesTableRow from '$lib/components/schedule/schedules-list/schedules-table-row.svelte';
+  import ColumnHeaderFilter from '$lib/components/search-attribute-filter/column-header-filter.svelte';
   import FilterBar from '$lib/components/search-attribute-filter/filter-bar.svelte';
+  import ConfigurableTableHeadersDrawer from '$lib/components/table/configurable-table-headers-drawer.svelte';
   import ResetColumnWidthsButton from '$lib/components/table/reset-column-widths-button.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
-  import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
@@ -28,7 +32,6 @@
   import {
     availableScheduleColumns,
     configurableTableColumns,
-    MIN_COLUMN_WIDTH,
     resizeColumn,
     TABLE_TYPE,
   } from '$lib/stores/configurable-table-columns';
@@ -44,7 +47,10 @@
     scheduleSearchAttributeOptions,
     scheduleSearchAttributes,
   } from '$lib/stores/search-attributes';
-  import { columnWidthStyle } from '$lib/utilities/column-width';
+  import {
+    columnWidthStyle,
+    MIN_COLUMN_WIDTH,
+  } from '$lib/utilities/column-width';
   import { parseSearchAttributes } from '$lib/utilities/decode-payload';
   import { isTimestamp, timestampToDate } from '$lib/utilities/format-time';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
@@ -104,7 +110,16 @@
         type: 'string',
       },
       [translate('common.workflow-type')]: {
-        getValue: (schedule) => schedule.info?.workflowType?.name,
+        getValue: (schedule) => {
+          const action = resolveScheduledActionListEntry(schedule);
+          if (action.type === 'unknown') {
+            return undefined;
+          }
+
+          return scheduledActionPresentations[
+            action.type
+          ].schedulesList.getTypeSortValue(action.schedule);
+        },
         type: 'string',
       },
       [translate('schedules.recent-runs')]: {
@@ -237,7 +252,25 @@
       {#snippet headers()}
         <tr class="text-left">
           {#each columns as { label, width }, i (`${label}:${i}`)}
-            <SortableTableHeader column={label} style={columnWidthStyle(width)}>
+            {@const columnFilter = getScheduleColumnFilter(
+              label,
+              $scheduleSearchAttributes,
+            )}
+            {#snippet filter()}
+              {#if columnFilter}
+                <ColumnHeaderFilter
+                  attribute={columnFilter.attribute}
+                  type={columnFilter.type}
+                  {label}
+                  filters={scheduleFilters}
+                />
+              {/if}
+            {/snippet}
+            <SortableTableHeader
+              column={label}
+              leading={columnFilter ? filter : undefined}
+              style={columnWidthStyle(width)}
+            >
               <ColumnResizeHandle
                 {label}
                 {width}
@@ -278,7 +311,7 @@
             <EmptyState title={translate('schedules.empty-state-title')}>
               <p>
                 {translate('schedules.getting-started-docs-link-preface')}
-                <Link newTab href="https://docs.temporal.io/workflows/#schedule"
+                <Link newTab href="https://docs.temporal.io/schedule"
                   >{translate('schedules.getting-started-docs-link')}</Link
                 >
                 {translate('schedules.getting-started-cli-link-preface')}
@@ -319,6 +352,5 @@
   {availableColumns}
   bind:open={customizationDrawerOpen}
   table={TABLE_TYPE.SCHEDULES}
-  type={translate('common.columns')}
   title={translate('common.schedules-table')}
 />

@@ -5,7 +5,7 @@
   import Pill from './pill.svelte';
 
   const { Story } = defineMeta({
-    title: 'Pill Container',
+    title: 'Holocene/Components/Pill Container',
     component: PillContainer,
   });
 </script>

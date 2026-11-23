@@ -11,6 +11,7 @@
         update: 'border-blue-11 bg-indigo-11/80',
         other: 'border-neutral-5 bg-indigo-12/80',
         default: 'border-slate-blue-10 bg-slate-blue-11/80',
+        'event-group': 'border-brand bg-alpha-indigo-30',
       },
     },
   });
@@ -21,6 +22,7 @@
   import Preview from '$lib/holocene/markdown-editor/preview.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
+  import { isTimelineEventGroup } from '$lib/models/event-history/timeline-event-groups';
   import { setActiveGroup } from '$lib/stores/active-events';
   import { resolveSystemNexusEvent } from '$lib/system-nexus-endpoints';
   import {
@@ -38,7 +40,14 @@
   import { dotBox, lineBox } from './primitives';
   import { type DotColors, dotColors, strokeColor } from '../colors';
   import { CategoryIcon, type TimelineIconName } from '../constants';
-  import { GUTTER, RADIUS, ROW_HEIGHT } from './constants';
+  import {
+    EVENT_GROUP_CAP_HEIGHT,
+    EVENT_GROUP_CAP_WIDTH,
+    EVENT_GROUP_LINE_HEIGHT,
+    GUTTER,
+    RADIUS,
+    ROW_HEIGHT,
+  } from './constants';
   import { timelineTextPosition } from './timeline-positioning';
 
   type Props = {
@@ -46,6 +55,8 @@
     canvasWidth: number;
     project: (time: ValidTime | undefined | null) => number;
     readOnly: boolean;
+    expanded?: boolean;
+    onSelect?: (group: EventGroup) => void;
     // Reactive event count so the row recomputes on streamed appends (eventList
     // is mutated in place) and on pooled re-point.
     eventCount?: number;
@@ -56,10 +67,13 @@
     canvasWidth,
     project,
     readOnly = false,
+    expanded = false,
+    onSelect,
     eventCount = 0,
   }: Props = $props();
 
   const timelineWidth = $derived(canvasWidth - 2 * GUTTER);
+  const eventGroup = $derived(isTimelineEventGroup(group) ? group : undefined);
   const pendingActivity = $derived(group?.pendingActivity);
 
   // Reactive (not untrack) so a re-pointed pooled row relabels for its new group.
@@ -111,9 +125,15 @@
   ) => {
     // Loop to `count` (not events.map) to depend on eventCount without allocating.
     const points: number[] = [];
-    const pointCount = Math.min(count, events.length);
-    for (let idx = 0; idx < pointCount; idx++) {
-      points.push(Math.round(project(events[idx].eventTime)));
+    if (eventGroup) {
+      const start = Math.round(project(eventGroup.initialEvent.eventTime));
+      const end = Math.round(project(eventGroup.lastEvent.eventTime));
+      points.push(start, Math.max(end, start + RADIUS * 2));
+    } else {
+      const pointCount = Math.min(count, events.length);
+      for (let idx = 0; idx < pointCount; idx++) {
+        points.push(Math.round(project(events[idx].eventTime)));
+      }
     }
     if (pauseTime) {
       points.push(Math.round(project(pauseTime)));
@@ -133,7 +153,11 @@
 
   const onClick = () => {
     if (readOnly) return;
-    setActiveGroup(group);
+    if (onSelect) {
+      onSelect(group);
+    } else {
+      setActiveGroup(group);
+    }
   };
 
   // Only activity groups carry an ActivityTaskStarted event; guard so other
@@ -154,10 +178,12 @@
   );
 
   const lineColor = $derived(
-    strokeColor({
-      category: effectiveCategory,
-      classification: group.lastEvent.classification,
-    }),
+    eventGroup
+      ? strokeColor({ category: 'event-group' })
+      : strokeColor({
+          category: effectiveCategory,
+          classification: group.lastEvent.classification,
+        }),
   );
   const showRetryGradient = $derived(
     retried && group.lastEvent.classification === 'Completed',
@@ -181,11 +207,16 @@
   // Highlight corner radius, concentric with the dots' rounded corners.
   const highlightRadius = RADIUS * 0.8;
   const spanLeft = $derived(points[0] - HALO);
+  const eventGroupEnd = $derived(
+    group.isPending ? canvasWidth - GUTTER : points[points.length - 1],
+  );
   const spanWidth = $derived(
-    (group.isPending && canvasWidth - points[0] - HALO) ||
-      (points.length >= 2
-        ? points[points.length - 1] - points[0] + RADIUS * 3
-        : RADIUS * 3),
+    eventGroup
+      ? eventGroupEnd - points[0] + HALO * 2
+      : (group.isPending && canvasWidth - points[0] - HALO) ||
+          (points.length >= 2
+            ? points[points.length - 1] - points[0] + RADIUS * 3
+            : RADIUS * 3),
   );
   const spanCy = HALO; // button-local vertical center
   const labelMaxWidth = $derived(
@@ -225,18 +256,21 @@
     animate?: boolean;
     gradient?: boolean;
     dim?: number;
+    thin?: boolean;
   },
 )}
   {@const bounds = lineBox([leftX, spanCy], [rightX, spanCy])}
+  {@const lineHeight = opts.thin ? EVENT_GROUP_LINE_HEIGHT : bounds.height}
   <div
     class="tl-line absolute"
     class:tl-line--gradient={opts.gradient}
     class:tl-line--dashed={opts.dashed}
     class:tl-line--animate={opts.animate}
+    class:tl-line--square={opts.thin}
     style:left="{bounds.left}px"
-    style:top="{bounds.top}px"
+    style:top="{bounds.top + (bounds.height - lineHeight) / 2}px"
     style:width="{bounds.width}px"
-    style:height="{bounds.height}px"
+    style:height="{lineHeight}px"
     style:--tl-line-color={color}
     style:opacity={opts.dim || null}
   ></div>
@@ -267,11 +301,24 @@
   </div>
 {/snippet}
 
+{#snippet cap(pointX: number, color: string)}
+  <div
+    class="absolute"
+    style:left="{pointX - EVENT_GROUP_CAP_WIDTH / 2}px"
+    style:top="{spanCy - EVENT_GROUP_CAP_HEIGHT / 2}px"
+    style:width="{EVENT_GROUP_CAP_WIDTH}px"
+    style:height="{EVENT_GROUP_CAP_HEIGHT}px"
+    style:background-color={color}
+  ></div>
+{/snippet}
+
 <div class="absolute inset-0">
   <button
+    id={eventGroup ? eventGroup.id : undefined}
     type="button"
     class="event"
-    aria-label={accessibleName}
+    aria-label={eventGroup ? undefined : accessibleName}
+    aria-expanded={eventGroup ? expanded : undefined}
     disabled={readOnly}
     style:left="{spanLeft}px"
     style:top="{ROW_HEIGHT / 2 - HALO}px"
@@ -280,49 +327,67 @@
     onclick={onClick}
   >
     <div
-      class="highlight {groupHover({ category: effectiveCategory })}"
+      class="highlight {groupHover({
+        category: eventGroup ? 'event-group' : effectiveCategory,
+      })}"
       style:border-radius="{highlightRadius}px"
     ></div>
-    {#each points as pointX, index (index)}
-      {@const localX = pointX - spanLeft}
-      {@const nextPoint = points[index + 1]}
-      {#if nextPoint}
-        {@render connector(localX, nextPoint - spanLeft, lineColor, {
-          gradient: showRetryGradient,
-          dim: scheduling && index === 0 ? 0.35 : undefined,
-        })}
+    {#if eventGroup}
+      {@const startX = points[0] - spanLeft}
+      {@const endX = eventGroupEnd - spanLeft}
+      {@render connector(startX, endX, lineColor, {
+        thin: true,
+        dashed: group.isPending,
+        animate: group.isPending,
+      })}
+      {@render cap(startX, lineColor)}
+      {#if !group.isPending}
+        {@render cap(endX, lineColor)}
       {/if}
-      {#if !nextPoint && group.isPending && !pauseTime}
-        {@render connector(
-          localX,
-          canvasWidth - GUTTER - spanLeft,
-          pendingLineColor,
-          {
-            dashed: true,
-            animate: true,
-          },
-        )}
+    {:else}
+      {#each points as pointX, index (index)}
+        {@const localX = pointX - spanLeft}
+        {@const nextPoint = points[index + 1]}
+        {#if nextPoint}
+          {@render connector(localX, nextPoint - spanLeft, lineColor, {
+            gradient: showRetryGradient,
+            dim: scheduling && index === 0 ? 0.35 : undefined,
+          })}
+        {/if}
+        {#if !nextPoint && group.isPending && !pauseTime}
+          {@render connector(
+            localX,
+            canvasWidth - GUTTER - spanLeft,
+            pendingLineColor,
+            {
+              dashed: true,
+              animate: true,
+            },
+          )}
+          {@render dot(
+            localX,
+            dotColors(group.lastEvent.classification),
+            'retry',
+          )}
+        {/if}
         {@render dot(
           localX,
-          dotColors(group.lastEvent.classification),
-          'retry',
+          dotColors(group.eventList[index]?.classification),
+          pauseTime && index !== 0
+            ? 'pause'
+            : decodedLocalActivity
+              ? CategoryIcon['local-activity'].name
+              : CategoryIcon[effectiveCategory].name,
         )}
-      {/if}
-      {@render dot(
-        localX,
-        dotColors(group.eventList[index]?.classification),
-        pauseTime && index !== 0
-          ? 'pause'
-          : decodedLocalActivity
-            ? CategoryIcon['local-activity'].name
-            : CategoryIcon[effectiveCategory].name,
-      )}
-    {/each}
+      {/each}
+    {/if}
     <!-- Inside the button so hovering/clicking the label hits the same target;
          positioned button-local (offset by spanLeft), may overflow the box. -->
     <PayloadSummary
-      value={group?.userMetadata?.summary}
-      prefix={isActivityTaskScheduledEvent(group.initialEvent)
+      value={eventGroup
+        ? eventGroup.eventGroupLabel.label
+        : group?.userMetadata?.summary}
+      prefix={!eventGroup && isActivityTaskScheduledEvent(group.initialEvent)
         ? group?.displayName
         : ''}
       fallback={decodedLocalActivity
@@ -358,6 +423,13 @@
               •&nbsp;{@render summary(decodedValue)}
             {:else if retried}
               {retryAttempt} •&nbsp; {@render summary(decodedValue)}
+            {:else if eventGroup}
+              <span class="min-w-0 truncate">{decodedValue}</span>
+              <span class="ml-1 shrink-0 whitespace-nowrap text-secondary">
+                {translate('workflows.event-group-event-count', {
+                  count: eventGroup.eventCount,
+                })}
+              </span>
             {:else if decodedLocalActivity}
               {decodedLocalActivity.value}
             {:else}

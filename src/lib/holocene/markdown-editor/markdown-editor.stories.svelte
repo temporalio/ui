@@ -7,7 +7,7 @@
   import Preview from './preview.svelte';
 
   const { Story } = defineMeta({
-    title: 'Markdown Editor',
+    title: 'Holocene/Components/Markdown Editor',
     component: MarkdownEditor,
     subcomponents: { Editor, Preview },
     argTypes: {

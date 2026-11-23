@@ -1,5 +1,6 @@
 import type { GetClusterInfoResponse, GetSystemInfoResponse } from '$lib/types';
 import type { Settings } from '$lib/types/global';
+import { handleError, isForbidden } from '$lib/utilities/handle-error';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
 
@@ -10,11 +11,16 @@ export const fetchCluster = async (
   if (settings.runtimeEnvironment.isCloud) return {};
 
   const route = routeForApi('cluster');
-  return await requestFromAPI<GetClusterInfoResponse>(route, {
-    request,
-  }).then((clusterInformation) => {
+  try {
+    const clusterInformation = await requestFromAPI<GetClusterInfoResponse>(
+      route,
+      { request, notifyOnError: false },
+    );
     return clusterInformation ?? {};
-  });
+  } catch (error) {
+    if (!isForbidden(error)) handleError(error);
+    return {};
+  }
 };
 
 export const fetchSystemInfo = async (

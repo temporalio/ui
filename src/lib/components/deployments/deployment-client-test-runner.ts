@@ -6,6 +6,7 @@ import {
 } from 'node:util';
 
 import { startIsolatedViteServer } from '$lib/test-utilities/isolated-vite-server';
+import '$lib/test-utilities/jsdom-browser-apis';
 
 type ClientRunner = typeof import('./deployment-client-test-runner-entry');
 

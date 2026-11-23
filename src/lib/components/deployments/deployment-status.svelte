@@ -3,6 +3,7 @@
 
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { Badge, type BadgeColorScheme } from '$lib/io/badge';
   import {
     IconAdd,
     IconArrowTrendingDown,
@@ -17,8 +18,16 @@
   interface Props {
     status: DeploymentStatus;
     label: string;
+    /** `badge` renders the Io Badge used in the Region column. */
+    appearance?: 'outline' | 'badge';
   }
-  let { status, label }: Props = $props();
+  let { status, label, appearance = 'outline' }: Props = $props();
+
+  const badgeScheme: Partial<Record<DeploymentStatus, BadgeColorScheme>> = {
+    Current: 'info',
+    Ramping: 'accent',
+    Draining: 'warning',
+  };
 
   const icon: Partial<Record<DeploymentStatus, IconComponent>> = {
     Current: IconHeartbeat,
@@ -59,11 +68,19 @@
 </script>
 
 <Tooltip text={tooltip[status]} topLeft width={250} usePortal>
-  <p class={deploymentStatus({ status })}>
-    {#if icon[status]}
-      {@const StatusIcon = icon[status]}
-      <StatusIcon />
-    {/if}
-    {label}
-  </p>
+  {#if appearance === 'badge'}
+    <Badge
+      text={label}
+      colorScheme={badgeScheme[status] ?? 'neutral'}
+      Icon={icon[status]}
+    />
+  {:else}
+    <p class={deploymentStatus({ status })}>
+      {#if icon[status]}
+        {@const StatusIcon = icon[status]}
+        <StatusIcon />
+      {/if}
+      {label}
+    </p>
+  {/if}
 </Tooltip>
