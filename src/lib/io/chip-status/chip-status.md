@@ -31,7 +31,7 @@ Checked against every PR that uses this component.
 
 ### Input
 
-- **IN-1** A status from an untyped source MUST be validated before it reaches ChipStatus. The lookup in [`statusConfiguration`](./chip-status.svelte) has no fallback; an unsupported status fails when its configuration is read.
+- **IN-1** A status from an untyped source MUST be validated before it reaches ChipStatus. The lookup in `statusConfiguration` (`chip-status.svelte` in `src/lib/io/chip-status/`) has no fallback; an unsupported status fails when its configuration is read.
 - **IN-2** To hide a change indicator, callers MUST pass `undefined` rather than `0`. Numeric zero is a displayed change, not an absence.
 - **IN-3** Caller `class` MUST NOT override background, border, or text colors to replace the status color mapping.
 
@@ -40,14 +40,18 @@ Checked against every PR that uses this component.
 - **OUT-1** A handler that applies a status filter MUST be idempotent. Clicking an already-applied status MUST NOT add a duplicate filter.
 - **OUT-2** A status filter applied by the chip MUST be removable either through the chip or elsewhere on the page.
 
+### Accessibility
+
+- **A11Y-1** Callers MUST NOT pass an empty `text` with no `count`. An empty string suppresses the fallback status label; without extension content, this leaves the button unnamed.
+
 ## Notes
 
 How the component behaves. Context for reviewers; not checked.
 
 - **BEH-1** The label combines the count, when present, with `text ?? configuration.text`. Numeric counts use `toLocaleString()`; strings render verbatim. The built-in status labels are hardcoded English.
-- **BEH-2** An extension renders when `extension !== undefined`. Numeric changes use `toLocaleString(undefined, { signDisplay: 'always' })`; string changes render verbatim.
-- **DIS-1** Colors come from [ChipStatus `statusConfiguration`](./chip-status.svelte), a separate mapping from [BadgeStatus `statusConfiguration`](../badge-status/badge-status.svelte). Both currently assign the same color scheme to corresponding statuses.
-- **DIS-2** Layout, focus, disabled styling, and extension overlays come from [the Chip recipes](../chip/recipe.ts).
+- **BEH-2** An extension renders when `extension !== undefined`. Numeric changes use locale formatting with `toLocaleString` and `signDisplay: 'always'`; string changes render verbatim.
+- **DIS-1** Colors come from ChipStatus `statusConfiguration` (`chip-status.svelte` in `src/lib/io/chip-status/`), a separate mapping from BadgeStatus `statusConfiguration` (`badge-status.svelte` in `src/lib/io/badge-status/`). Both currently assign the same color scheme to corresponding statuses.
+- **DIS-2** Layout, focus, disabled styling, and extension overlays come from the Chip recipes (`recipe.ts` in `src/lib/io/chip/`).
 - **BEH-3** Native attributes, including `data-testid`, reach the button. No test ID or pressed state is assigned internally.
 
 ## API Reference
