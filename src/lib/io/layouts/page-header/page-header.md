@@ -34,7 +34,7 @@ How the component behaves. Context for reviewers; not checked.
 - **BEH-1** PageHeader owns the header element and page-title `h1`. Other snippets are rendered in layout divs without adding headings or accessible names to their content.
 - **DIS-1** The heading area and actions wrap independently. Filters and metadata occupy their own rows when provided.
 - **BEH-2** Native attributes, including `data-testid`, reach the header. No test ID is assigned internally.
-- **BEH-3** The [Page Layouts guide](../../../guides/page-layouts/page-layouts.mdx#page-header) describes PageHeader composition within list and detail templates.
+- **BEH-3** The Page Layouts guide (`page-layouts.mdx` in `src/lib/guides/page-layouts/`) describes PageHeader composition within list and detail templates.
 
 ## API Reference
 
