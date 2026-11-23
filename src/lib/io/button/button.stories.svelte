@@ -5,11 +5,9 @@
   import { IconAdd, IconChevronDown } from '$lib/io/icon';
 
   import usage from './button.usage.md?raw';
+  import type { ButtonColorScheme, ButtonSize } from './recipe';
 
-  import Button, {
-    type ButtonColorScheme,
-    type ButtonSize,
-  } from './button.svelte';
+  import Button from './button.svelte';
   import ButtonLink from './link.svelte';
 
   const colorSchemes: ButtonColorScheme[] = [
@@ -33,8 +31,16 @@
       isLoading: false,
     },
     argTypes: {
-      colorScheme: { control: 'select', options: colorSchemes },
-      size: { control: 'select', options: sizes },
+      colorScheme: {
+        control: 'select',
+        options: colorSchemes,
+        table: { defaultValue: { summary: '"primary"' } },
+      },
+      size: {
+        control: 'select',
+        options: sizes,
+        table: { defaultValue: { summary: '"md"' } },
+      },
       disabled: {
         control: 'boolean',
         table: {

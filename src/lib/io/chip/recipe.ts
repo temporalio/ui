@@ -1,7 +1,5 @@
 import { twJoin, twMerge } from 'tailwind-merge';
 
-import { roundnessGroupRecipe } from '$lib/io/roundness-group';
-
 export type ChipColorScheme =
   | 'neutral'
   | 'info'
@@ -14,7 +12,6 @@ const overlayClasses = twJoin(
   'before:absolute',
   'before:inset-0',
   'before:z-0',
-  'before:rounded-[var(--group-inner-radius)]',
   'before:bg-transparent',
   "before:content-['']",
   'enabled:hover:before:bg-surface-overlay-primary',
@@ -40,9 +37,9 @@ const wrapperClasses = twJoin(
   'appearance-none',
   'items-stretch',
   'whitespace-nowrap',
-
-  '[--group-border-width:1px]',
-  'border-[length:var(--group-border-width)]',
+  'overflow-hidden',
+  'rounded',
+  'border',
   'p-0',
   'font-sans',
   'uppercase',
@@ -98,7 +95,7 @@ const colorSchemeClasses: Record<
   },
 };
 
-/** Styles the button shell; --group-border-width controls its border and inset segment/overlay radii. */
+/** Styles the button shell; overflow-hidden clips segments and the overlay to its rounded border. */
 export const chipRecipe = ({
   colorScheme,
   className,
@@ -107,7 +104,6 @@ export const chipRecipe = ({
   className?: string;
 }) =>
   twMerge(
-    roundnessGroupRecipe({ roundness: 'base', roundnessTarget: 'wrapper' }),
     wrapperClasses,
     colorSchemeClasses[colorScheme].wrapper,
     className,

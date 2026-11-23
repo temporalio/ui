@@ -12,7 +12,6 @@
     component: RoundnessGroup,
     args: {
       roundness: 'full',
-      roundnessTarget: 'children',
       innerBorderHandling: 'collapse',
     },
     argTypes: {
@@ -20,13 +19,9 @@
         control: 'select',
         options: ['none', 'sm', 'base', 'lg', 'full'],
       },
-      roundnessTarget: {
-        control: 'select',
-        options: ['children', 'wrapper'],
-      },
       innerBorderHandling: {
         control: 'select',
-        options: ['none', 'erase', 'collapse'],
+        options: ['none', 'collapse', 'overlap'],
       },
       children: {
         control: false,

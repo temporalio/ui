@@ -4,8 +4,7 @@ export { default as ButtonLink } from './link.svelte';
 export type { ButtonLinkProps } from './link.svelte';
 export type { TrackingOptions } from './tracking';
 
-export type {
-  ButtonColorScheme,
-  ButtonProps,
-  ButtonSize,
-} from './button.svelte';
+export { buttonRecipe } from './recipe';
+
+export type { ButtonProps } from './button.svelte';
+export type { ButtonColorScheme, ButtonSize } from './recipe';

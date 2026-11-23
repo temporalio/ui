@@ -4,7 +4,7 @@ export {
 } from './roundness-group.svelte';
 
 export type {
+  RoundnessGroupProps,
   GroupInnerBorderHandling,
   GroupRoundness,
-  GroupRoundnessTarget,
 } from './roundness-group.svelte';
