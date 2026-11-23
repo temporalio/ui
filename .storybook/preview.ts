@@ -53,6 +53,7 @@ const preview: Preview = {
             ],
             'Components',
             'Layouts',
+            'For agents',
           ],
           'Holocene',
           ['Components'],
