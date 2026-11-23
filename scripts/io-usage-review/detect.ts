@@ -121,12 +121,24 @@ export function findCandidates(
     );
     if (file.endsWith('.svelte')) {
       for (const match of source.matchAll(
-        new RegExp(`<${escapeRegex(binding)}(?=[\\s/>])`, 'g'),
+        new RegExp(`(?<![\\w$])${escapeRegex(binding)}(?![\\w$])`, 'g'),
       )) {
-        if (match.index >= start && match.index < end) continue;
         if (
-          withoutComments.slice(match.index, match.index + match[0].length) !==
-          match[0]
+          bindings.some(
+            (item) => match.index >= item.start && match.index < item.end,
+          )
+        )
+          continue;
+        const tagStart =
+          match.index -
+          (source.slice(match.index - 2, match.index) === '</' ? 2 : 1);
+        const tagEnd = match.index + binding.length;
+        const directTag =
+          source[tagStart] === '<' && /[\s/>]/.test(source[tagEnd] ?? '');
+        if (
+          !directTag ||
+          withoutComments.slice(tagStart, tagEnd + 1) !==
+            source.slice(tagStart, tagEnd + 1)
         )
           uncertain = true;
       }

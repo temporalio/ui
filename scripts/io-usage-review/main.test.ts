@@ -56,6 +56,70 @@ const oldMeta: Meta = {
   reason: null,
 };
 const oldBody = renderComment({ usages: [usage] }, oldMeta);
+const indirectInputs = [
+  {
+    filename: 'src/indirect-dynamic.svelte',
+    content:
+      '<script>\nimport { Badge } from \'$lib/io/badge\';\n</script>\n<svelte:component\n this={Badge}\n text=""\n/>',
+    patch: '@@ -6 +6 @@\n- text="Active"\n+ text=""',
+  },
+  {
+    filename: 'src/indirect-script-alias.svelte',
+    content:
+      '<script>\nimport { Badge } from \'$lib/io/badge\';\nconst Label = Badge;\n</script>\n<Label text="" />',
+    patch: '@@ -5 +5 @@\n-<Label text="Active" />\n+<Label text="" />',
+  },
+  {
+    filename: 'src/indirect-markup-const.svelte',
+    content:
+      '<script>\nimport { Badge } from \'$lib/io/badge\';\n</script>\n{#if true}\n{@const C = Badge}\n<C text="" />\n{/if}',
+    patch: '@@ -6 +6 @@\n-<C text="Active" />\n+<C text="" />',
+  },
+  {
+    filename: 'src/indirect-renamed-deletion.svelte',
+    content:
+      "<script>\nimport { Badge as Status } from '$lib/io/badge';\n</script>\n<svelte:component\n this={Status}\n/>",
+    patch: '@@ -6 +6,0 @@\n- text="Active"',
+  },
+  {
+    filename: 'src/indirect-alias-deletion.svelte',
+    content:
+      "<script>\nimport { Badge as Status } from '$lib/io/badge';\nconst Label = Status;\n</script>\n<Label />",
+    patch: '@@ -5 +5 @@\n-<Label text="Active" />\n+<Label />',
+  },
+  {
+    filename: 'src/indirect-renamed-const.svelte',
+    content:
+      "<script>\nimport { Badge as Status } from '$lib/io/badge';\n</script>\n{#if true}\n{@const C = Status}\n<C\n/>\n{/if}",
+    patch: '@@ -7 +7,0 @@\n- text="Active"',
+  },
+  {
+    filename: 'src/indirect-container.svelte',
+    content:
+      '<script>\nimport { Badge } from \'$lib/io/badge\';\nconst components = { Badge };\n</script>\n<components.Badge text="" />',
+    patch:
+      '@@ -5 +5 @@\n-<components.Badge text="Active" />\n+<components.Badge text="" />',
+  },
+  {
+    filename: 'src/indirect-factory.svelte',
+    content:
+      '<script>\nimport { Badge } from \'$lib/io/badge\';\nconst Label = decorate(Badge);\n</script>\n<Label text="" />',
+    patch: '@@ -5 +5 @@\n-<Label text="Active" />\n+<Label text="" />',
+  },
+  {
+    filename: 'src/indirect-namespace.svelte',
+    content:
+      '<script>\nimport * as Status from \'$lib/io/badge\';\n</script>\n<Status.Badge\n text=""\n/>',
+    patch: '@@ -5 +5 @@\n- text="Active"\n+ text=""',
+  },
+];
+const mixedIndirectInput = {
+  filename: 'src/x.svelte',
+  content:
+    '<script>\nimport { Badge } from \'$lib/io/badge\';\n</script>\n<Badge text="x" extensions={[{}]} /><svelte:component this={Badge}\n text=""\n/>',
+  patch:
+    '@@ -4,2 +4,2 @@\n-<Badge text="x" /><svelte:component this={Badge}\n+<Badge text="x" extensions={[{}]} /><svelte:component this={Badge}\n- text="Active"\n+ text=""',
+};
 const ambiguousInputs = [
   {
     filename: 'src/x.svelte',
@@ -101,6 +165,7 @@ const ambiguousInputs = [
       '<script>\nimport { Badge } from \'$lib/io/badge\';\n</script>\n<a href="/api/*">\n<Badge\n text=""\n/>\n</a>\n<style>/* Later comment */</style>',
     patch: '@@ -6 +6 @@\n- text="Active"\n+ text=""',
   },
+  ...indirectInputs,
 ];
 
 function packedFixture(markdown: string): Buffer {
@@ -413,6 +478,71 @@ describe('offline orchestration acceptance', () => {
     },
   );
 
+  it.each(['aligned', 'violation'] as const)(
+    'never treats a direct %s verdict as complete coverage for an indirect same-line reference',
+    async (verdict) => {
+      const result = await harness({
+        fixture: mixedIndirectInput,
+        old: oldBody,
+        model: async () => ({
+          stop_reason: 'end_turn',
+          parsed_output: { usages: [{ ...usage, verdict }] },
+        }),
+      });
+      expect(result.result).toBe('published');
+      expect(result.model).toHaveBeenCalledOnce();
+      expect(result.artifacts[0].meta).toMatchObject({
+        reviewStatus: 'partial',
+        headSha: head,
+      });
+      expect(result.artifacts[0].findings).toHaveLength(
+        verdict === 'aligned' ? 0 : 1,
+      );
+      const body = result.writes[0].body.body;
+      expect(body).not.toContain('No IO component usage changed');
+      expect(body).toContain(`originating head ${oldMeta.headSha}`);
+      expect(parseState(body)?.records).toHaveLength(1);
+    },
+  );
+
+  it('still clears complete direct aligned and genuinely unused-import results', async () => {
+    const fixture = {
+      filename: 'src/x.svelte',
+      content:
+        "<script>\nimport { Badge as Label } from '$lib/io/badge';\n</script>\n<Label>\nActive\n</Label>",
+      patch: '@@ -5 +5 @@\n-Old\n+Active',
+    };
+    const direct = await harness({
+      fixture,
+      old: oldBody,
+      model: async () => ({
+        stop_reason: 'end_turn',
+        parsed_output: { usages: [{ ...usage, verdict: 'aligned' }] },
+      }),
+    });
+    expect(direct.result).toBe('published');
+    expect(direct.artifacts[0]).toMatchObject({
+      findings: [],
+      meta: { reviewStatus: 'complete' },
+    });
+    expect(parseState(direct.writes[0].body.body)?.records).toEqual([]);
+    const unused = await harness({
+      old: oldBody,
+      fixture: {
+        filename: 'src/x.svelte',
+        content:
+          "<script>\nimport { Badge } from '$lib/io/badge';\n</script>\n<p>Changed</p>",
+        patch: '@@ -4 +4 @@\n-old\n+<p>Changed</p>',
+      },
+    });
+    expect(unused.model).not.toHaveBeenCalled();
+    expect(unused.artifacts[0]).toMatchObject({
+      findings: [],
+      meta: { reviewStatus: 'complete' },
+    });
+    expect(parseState(unused.writes[0].body.body)?.records).toEqual([]);
+  });
+
   it('reviews visible usages while preserving warnings for a masked multiline usage', async () => {
     const fixture = {
       filename: 'src/x.svelte',
@@ -712,6 +842,21 @@ describe('offline orchestration acceptance', () => {
         ],
         ['skipped', await harness({ labels: [], old: oldBody })],
         ['stale', await harness({ stale: true, old: oldBody })],
+        [
+          'indirect-mixed-partial-nonempty',
+          await harness({ fixture: mixedIndirectInput, old: oldBody }),
+        ],
+        [
+          'indirect-mixed-partial-empty',
+          await harness({
+            fixture: mixedIndirectInput,
+            old: oldBody,
+            model: async () => ({
+              stop_reason: 'end_turn',
+              parsed_output: { usages: [{ ...usage, verdict: 'aligned' }] },
+            }),
+          }),
+        ],
         ...(await Promise.all(
           ambiguousInputs.map(
             async (fixture, index) =>
@@ -728,6 +873,7 @@ describe('offline orchestration acceptance', () => {
           scenarios.map(([name, value]) => ({
             name,
             outcome: value.result,
+            modelCalls: value.model.mock.calls.length,
             artifacts: value.artifacts,
             comments: value.writes,
             summaries: value.summaries,

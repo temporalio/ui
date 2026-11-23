@@ -298,4 +298,139 @@ import type { BadgeProps as Props } from '$lib/io/badge';`,
       uncertain: true,
     });
   });
+
+  describe.each(['Badge', 'StatusLabel', '_Label'])(
+    'file-wide references to %s',
+    (binding) => {
+      it.each([
+        {
+          name: 'dynamic component',
+          script: '',
+          markup: (name: string) =>
+            `<svelte:component\n this={${name}}\n text=""\n/>`,
+        },
+        {
+          name: 'script alias',
+          script: 'const Local = BINDING;',
+          markup: () => '<Local text="" />',
+        },
+        {
+          name: 'markup const',
+          script: '',
+          markup: (name: string) =>
+            `{#if true}\n{@const C = ${name}}\n<C text="" />\n{/if}`,
+        },
+        {
+          name: 'container shorthand',
+          script: 'const components = { BINDING };',
+          markup: (name: string) => `<components.${name} text="" />`,
+        },
+        {
+          name: 'factory call',
+          script: 'const Local = decorate(BINDING);',
+          markup: () => '<Local text="" />',
+        },
+        {
+          name: 'comment mention',
+          script: '// BINDING is described here',
+          markup: () => '<p>Example</p>',
+        },
+        {
+          name: 'string mention',
+          script: "const label = 'BINDING';",
+          markup: () => '<p>Example</p>',
+        },
+      ])(
+        'limits $name even when its reference is unchanged',
+        ({ script, markup }) => {
+          const specifier =
+            binding === 'Badge' ? 'Badge' : `Badge as ${binding}`;
+          const source = `<script>\nimport { ${specifier} } from '$lib/io/badge';\n${script.replaceAll('BINDING', binding)}\n</script>\n${markup(binding)}\n<p>Changed</p>`;
+          const line = source.split('\n').length;
+          const result = findCandidates(
+            source,
+            `@@ -${line} +${line} @@\n-<p>Old</p>\n+<p>Changed</p>`,
+            '$lib/io/',
+            'x.svelte',
+          );
+          expect(result).toEqual({ candidates: [], uncertain: true });
+        },
+      );
+    },
+  );
+
+  it('does not let a direct candidate cover a value reference on the same line', () => {
+    const source =
+      '<script>\nimport { Badge } from \'$lib/io/badge\';\n</script>\n<Badge text="" /><svelte:component this={Badge}\n text=""\n/>';
+    const patch =
+      '@@ -4,2 +4,2 @@\n-<Badge text="Active" /><svelte:component this={Badge}\n+<Badge text="" /><svelte:component this={Badge}\n- text="Active"\n+ text=""';
+    expect(findCandidates(source, patch, '$lib/io/', 'x.svelte')).toEqual({
+      candidates: [{ component: 'badge', line: 4, endLine: 4 }],
+      uncertain: true,
+    });
+  });
+
+  it('limits namespace member references without resolving them', () => {
+    const source =
+      '<script>\nimport * as Status from \'$lib/io/badge\';\n</script>\n<Status.Badge\n text=""\n/>';
+    expect(
+      findCandidates(
+        source,
+        '@@ -5 +5 @@\n- text="Active"\n+ text=""',
+        '$lib/io/',
+        'x.svelte',
+      ),
+    ).toEqual({ candidates: [], uncertain: true });
+  });
+
+  it.each([
+    {
+      source:
+        "<script>\nimport { Badge } from '$lib/io/badge';\n</script>\n<Badge>\nSave\n</Badge>",
+      patch: '@@ -5 +5 @@\n-Old\n+Save',
+      candidates: 1,
+    },
+    {
+      source:
+        '<script>\nimport { Badge as Label } from \'$lib/io/badge\';\n</script>\n<Label\n text="Active"\n/>',
+      patch: '@@ -5 +5 @@\n- text="Old"\n+ text="Active"',
+      candidates: 1,
+    },
+    {
+      source:
+        "<script>\nimport { Badge } from '$lib/io/badge';\n</script>\n<Badge\n/>",
+      patch: '@@ -5 +5,0 @@\n- text="Old"',
+      candidates: 1,
+    },
+    {
+      source:
+        "<script>\nimport { Badge } from '$lib/io/badge';\nconst BadgeStatus = 'Active';\n</script>\n<p>{BadgeStatus}</p>",
+      patch: '@@ -5 +5 @@\n-old\n+<p>{BadgeStatus}</p>',
+      candidates: 0,
+    },
+    {
+      source:
+        "<script>\nimport { Badge } from '$lib/io/badge';\n</script>\n<p>Changed</p>",
+      patch: '@@ -4 +4 @@\n-old\n+<p>Changed</p>',
+      candidates: 0,
+    },
+    {
+      source:
+        '<script>\nimport Badge from \'$lib/holocene/badge.svelte\';\n</script>\n<Badge text="Active" />',
+      patch: '@@ -4 +4 @@\n-old\n+<Badge text="Active" />',
+      candidates: 0,
+    },
+    {
+      source: '<p>No IO</p>',
+      patch: '@@ -1 +1 @@\n-old\n+<p>No IO</p>',
+      candidates: 0,
+    },
+  ])(
+    'keeps supported direct/no-IO coverage complete %#',
+    ({ source, patch, candidates }) => {
+      const result = findCandidates(source, patch, '$lib/io/', 'x.svelte');
+      expect(result.uncertain).toBe(false);
+      expect(result.candidates).toHaveLength(candidates);
+    },
+  );
 });
