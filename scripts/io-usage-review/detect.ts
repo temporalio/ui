@@ -1,0 +1,351 @@
+export type Candidate = { component: string; line: number; endLine: number };
+export type ChangedFile = { path: string; patch: string; status: string };
+
+const escapeRegex = (value: string): string =>
+  value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+function imports(
+  source: string,
+  prefix: string,
+): { component: string; binding: string; start: number; end: number }[] {
+  const result: {
+    component: string;
+    binding: string;
+    start: number;
+    end: number;
+  }[] = [];
+  const text = source.replace(
+    /<!--[^]*?-->|\/\*[^]*?\*\/|\/\/[^\n]*/g,
+    (match) => match.replace(/[^\n]/g, ' '),
+  );
+  const pattern = new RegExp(
+    `\\bimport\\s+(?:type\\s+)?([^;]*?)\\s+from\\s*['"]${escapeRegex(prefix)}([^'"]+)['"]`,
+    'g',
+  );
+  for (const match of text.matchAll(pattern)) {
+    const clause = match[1].replace(/[{}]/g, '');
+    for (const part of clause.split(',')) {
+      const binding =
+        part
+          .trim()
+          .replace(/^type\s+/, '')
+          .split(/\s+as\s+/)
+          .at(-1) ?? '';
+      if (/^[A-Za-z_$][\w$]*$/.test(binding))
+        result.push({
+          component: match[2],
+          binding,
+          start: match.index,
+          end: match.index + match[0].length,
+        });
+    }
+  }
+  return result;
+}
+
+export function findIoImports(source: string, importPrefix: string): string[] {
+  return [
+    ...new Set(imports(source, importPrefix).map(({ component }) => component)),
+  ];
+}
+
+export function inScope(file: string): boolean {
+  return (
+    !file.split('/').some((part) => part === '..' || part === '.') &&
+    !file.startsWith('/') &&
+    /\.(svelte|ts)$/.test(file) &&
+    !file.startsWith('src/lib/io/') &&
+    !/\.(stories\.svelte|test\.ts|spec\.ts)$/.test(file)
+  );
+}
+
+function openingEnd(text: string, start: number): number {
+  let depth = 0;
+  let quote = '';
+  for (let cursor = start; cursor < text.length; cursor++) {
+    const char = text[cursor];
+    if (quote) {
+      if (char === quote && text[cursor - 1] !== '\\') quote = '';
+    } else if (char === '"' || char === "'" || char === '`') quote = char;
+    else if (char === '{') depth++;
+    else if (char === '}') depth--;
+    else if (char === '>' && depth === 0) return cursor;
+  }
+  return text.length;
+}
+
+function patchLines(patch: string): {
+  added: Set<number>;
+  deleted: Set<number>;
+  removed: Map<number, string[]>;
+} {
+  const result = new Set<number>();
+  const deleted = new Set<number>();
+  const removed = new Map<number, string[]>();
+  let line = 0;
+  for (const text of patch.split('\n')) {
+    const hunk = /^@@ -\d+(?:,\d+)? \+(\d+)(?:,\d+)? @@/.exec(text);
+    if (hunk) line = Number(hunk[1]);
+    else if (text.startsWith('+') && line > 0) result.add(line++);
+    else if (text.startsWith('-') && line > 0) {
+      deleted.add(line);
+      removed.set(line, [...(removed.get(line) ?? []), text.slice(1)]);
+    } else if (text.startsWith(' ')) line++;
+  }
+  return { added: result, deleted, removed };
+}
+
+export function changedLines(patch: string): Set<number> {
+  return patchLines(patch).added;
+}
+
+export function findCandidates(
+  source: string,
+  patch: string,
+  prefix: string,
+  file: string,
+): { candidates: Candidate[]; uncertain: boolean } {
+  const { added: changed, deleted, removed } = patchLines(patch);
+  const candidates: Candidate[] = [];
+  const ranges: {
+    component: string;
+    tagStart: number;
+    start: number;
+    end: number;
+    opening: boolean;
+  }[] = [];
+  const bindings = imports(source, prefix);
+  const lineAt = (offset: number): number =>
+    source.slice(0, offset).split('\n').length;
+  const add = (
+    component: string,
+    start: number,
+    end: number,
+    force = false,
+  ): void => {
+    const line = lineAt(start);
+    const endLine = lineAt(end);
+    if (
+      (force ||
+        [...changed].some((value) => value >= line && value <= endLine) ||
+        [...deleted].some((value) => value > line && value <= endLine)) &&
+      !candidates.some(
+        (candidate) =>
+          candidate.line === line && candidate.component === component,
+      )
+    )
+      candidates.push({ component, line, endLine });
+  };
+  let uncertain = source.includes(prefix) && bindings.length === 0;
+  let hasIoReference = false;
+  const withoutComments = source.replace(
+    /<!--[^]*?-->|\/\*[^]*?\*\/|\/\/[^\n]*/g,
+    (match) => match.replace(/[^\n]/g, ' '),
+  );
+  for (const { component, binding, start, end } of bindings) {
+    const importChanged = [...changed, ...deleted].some(
+      (line) => line >= lineAt(start) && line <= lineAt(end),
+    );
+    if (file.endsWith('.svelte')) {
+      for (const match of source.matchAll(
+        new RegExp(`(?<![\\w$])${escapeRegex(binding)}(?![\\w$])`, 'g'),
+      )) {
+        if (
+          bindings.some(
+            (item) => match.index >= item.start && match.index < item.end,
+          )
+        )
+          continue;
+        hasIoReference = true;
+        const tagStart =
+          match.index -
+          (source.slice(match.index - 2, match.index) === '</' ? 2 : 1);
+        const tagEnd = match.index + binding.length;
+        const directTag =
+          source[tagStart] === '<' && /[\s/>]/.test(source[tagEnd] ?? '');
+        if (
+          !directTag ||
+          withoutComments.slice(tagStart, tagEnd + 1) !==
+            source.slice(tagStart, tagEnd + 1)
+        )
+          uncertain = true;
+      }
+      for (const match of withoutComments.matchAll(
+        new RegExp(`\\b${escapeRegex(binding)}\\b`, 'g'),
+      )) {
+        if (match.index >= start && match.index < end) continue;
+        const scriptStart = withoutComments.lastIndexOf('<script', match.index);
+        const scriptEnd = withoutComments.lastIndexOf('</script>', match.index);
+        if (scriptStart > scriptEnd)
+          add(
+            component,
+            match.index,
+            match.index + binding.length,
+            importChanged,
+          );
+      }
+    }
+    const pattern = file.endsWith('.svelte')
+      ? new RegExp(`<${escapeRegex(binding)}(?=[\\s/>])`, 'g')
+      : new RegExp(`\\b${escapeRegex(binding)}\\b`, 'g');
+    for (const match of withoutComments.matchAll(pattern)) {
+      if (match.index >= start && match.index < end) continue;
+      if (!file.endsWith('.svelte')) {
+        add(
+          component,
+          match.index,
+          match.index + match[0].length,
+          importChanged,
+        );
+        continue;
+      }
+      const cursor = openingEnd(source, match.index + match[0].length);
+      ranges.push({
+        component,
+        tagStart: match.index,
+        start: match.index,
+        end: cursor + 1,
+        opening: true,
+      });
+      if (cursor === source.length) uncertain = true;
+      add(component, match.index, cursor, importChanged);
+      if (source[cursor - 1] !== '/') {
+        const close = source.indexOf(`</${binding}>`, cursor + 1);
+        if (close !== -1) {
+          add(component, match.index, close + binding.length + 3);
+          ranges.push({
+            component,
+            tagStart: match.index,
+            start: close,
+            end: close + binding.length + 3,
+            opening: false,
+          });
+          if (!/[<>{}]/.test(source.slice(cursor + 1, close)))
+            ranges.push({
+              component,
+              tagStart: match.index,
+              start: cursor + 1,
+              end: close,
+              opening: false,
+            });
+        } else uncertain = true;
+      }
+    }
+  }
+  if (hasIoReference && file.endsWith('.svelte')) {
+    const script = /<script\b[^>]*>[^]*?<\/script>/g;
+    for (const match of source.matchAll(script)) {
+      const startLine = lineAt(match.index);
+      const endLine = lineAt(match.index + match[0].length);
+      for (const line of changed) {
+        const offset = source
+          .split('\n')
+          .slice(0, line - 1)
+          .join('\n').length;
+        if (
+          line > startLine &&
+          line < endLine &&
+          !bindings.some(
+            (binding) => offset >= binding.start - 1 && offset <= binding.end,
+          )
+        )
+          uncertain = true;
+      }
+    }
+  }
+  const proofs = ranges.filter((range) =>
+    candidates.some(
+      (candidate) =>
+        candidate.component === range.component &&
+        candidate.line === lineAt(range.tagStart),
+    ),
+  );
+  const coveredRanges = [
+    ...proofs,
+    ...bindings.map(({ start, end }) => ({
+      start,
+      end: end + Number(source[end] === ';'),
+    })),
+  ];
+  const literalOrTags = (text: string): boolean => {
+    const chars = text.split('');
+    for (const { start, end } of imports(text, prefix))
+      chars.fill(' ', start, end);
+    for (const { binding } of bindings) {
+      for (const match of text.matchAll(
+        new RegExp(`</?${escapeRegex(binding)}(?=[\\s/>])`, 'g'),
+      )) {
+        const end = openingEnd(text, match.index + match[0].length);
+        if (end < text.length) chars.fill(' ', match.index, end + 1);
+      }
+    }
+    return !/[<>{}]/.test(chars.join(''));
+  };
+  const rawLines = source.split('\n');
+  for (const line of new Set([...changed, ...deleted])) {
+    const covered = (component?: string): boolean =>
+      candidates.some(
+        (candidate) =>
+          line >= candidate.line &&
+          line <= candidate.endLine &&
+          (!component || candidate.component === component),
+      );
+    const text = rawLines[line - 1] ?? '';
+    const offset = rawLines
+      .slice(0, line - 1)
+      .reduce((sum, value) => sum + value.length + 1, 0);
+    const referencesBinding = bindings.some(({ binding, component }) =>
+      [...text.matchAll(new RegExp(`\\b${escapeRegex(binding)}\\b`, 'g'))].some(
+        (match) =>
+          !bindings.some(
+            ({ start, end }) =>
+              offset + match.index >= start && offset + match.index < end,
+          ) &&
+          (!covered(component) ||
+            withoutComments.slice(
+              offset + match.index,
+              offset + match.index + binding.length,
+            ) !== binding),
+      ),
+    );
+    const importLine = bindings.some(
+      ({ start, end }) => line >= lineAt(start) && line <= lineAt(end),
+    );
+    const actualCoverage =
+      coveredRanges.some(
+        (range) => range.start <= offset + text.length && range.end > offset,
+      ) &&
+      text
+        .split('')
+        .every(
+          (char, index) =>
+            /\s/.test(char) ||
+            coveredRanges.some(
+              (range) =>
+                offset + index >= range.start && offset + index < range.end,
+            ),
+        );
+    const removedText = (removed.get(line) ?? []).join('\n');
+    const deletedCoverage =
+      !deleted.has(line) ||
+      literalOrTags(removedText) ||
+      proofs.some(
+        (range) =>
+          range.opening &&
+          line > lineAt(range.start) &&
+          line <= lineAt(range.end - 1) &&
+          !changed.has(lineAt(range.start)) &&
+          !deleted.has(lineAt(range.start)) &&
+          /^\s*[A-Za-z_$:][\w$:.-]*\s*=/.test(removedText) &&
+          !/[<>]|\{[@#:/]/.test(removedText),
+      );
+    const unmatchedChange = file.endsWith('.svelte')
+      ? hasIoReference && (!actualCoverage || !deletedCoverage)
+      : file.endsWith('.ts') &&
+        bindings.length > 0 &&
+        !covered() &&
+        !importLine;
+    if (referencesBinding || unmatchedChange) uncertain = true;
+  }
+  return { candidates, uncertain };
+}
