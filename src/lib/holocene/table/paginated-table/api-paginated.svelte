@@ -27,6 +27,7 @@
   } from '$lib/stores/api-pagination';
   import { options } from '$lib/stores/pagination';
   import { isError } from '$lib/utilities/is';
+  import { isEditableTarget } from '$lib/utilities/is-editable-target';
   import {
     sortTableItems,
     type TableSort,
@@ -232,7 +233,7 @@
   }
 
   async function handleKeydown(event: KeyboardEvent) {
-    if (event.repeat) return;
+    if (event.repeat || isEditableTarget(event)) return;
     const shifted = event.shiftKey;
     switch (event.code) {
       case 'ArrowRight':
