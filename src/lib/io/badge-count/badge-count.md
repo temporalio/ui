@@ -37,7 +37,7 @@ Checked against every PR that uses this component.
 How the component behaves. Context for reviewers; not checked.
 
 - **BEH-1** Zero renders for both `value` and `total`. The fraction separator and total render whenever `total !== undefined`.
-- **DIS-1** Layout and segment colors come from [the Badge recipes](../badge/recipe.ts). The caller's `class` is on the outer RoundnessGroup, while `colorScheme` styles the inner segment.
+- **DIS-1** Layout and segment colors come from the Badge recipes (`recipe.ts` in `src/lib/io/badge/`). The caller's `class` is on the outer RoundnessGroup, while `colorScheme` styles the inner segment.
 - **BEH-2** Native attributes, including `data-testid` and accessible labels, reach the outer span. No test ID is assigned internally.
 
 ## API Reference
