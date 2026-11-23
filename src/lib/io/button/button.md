@@ -50,8 +50,8 @@ How the component behaves. Context for reviewers; not checked.
 
 - **BEH-1** Button always renders a native button; ButtonLink always renders a native anchor. Native event handlers are forwarded without a component-owned `stopPropagation()` or routing wrapper.
 - **BEH-2** `isLoading` sets `aria-busy` and displays a spinner. It replaces the leading icon when one exists; otherwise it occupies the trailing position.
-- **BEH-3** [`getTrackingAttributes`](./tracking.ts) supplies tracking defaults and overrides for both Button and ButtonLink.
-- **DIS-1** [`buttonRecipe`](./button.svelte) merges caller classes after color and size styling and before disabled styling. Labels do not wrap.
+- **BEH-3** `getTrackingAttributes` (`tracking.ts` in `src/lib/io/button/`) supplies tracking defaults and overrides for both Button and ButtonLink.
+- **DIS-1** `buttonRecipe` (`button.svelte` in `src/lib/io/button/`) merges caller classes after color and size styling and before disabled styling. Labels do not wrap.
 - **BEH-4** Native attributes, including `data-testid`, reach the rendered element. Neither component assigns a test ID internally.
 
 ## API Reference
