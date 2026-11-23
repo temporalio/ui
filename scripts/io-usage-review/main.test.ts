@@ -120,6 +120,79 @@ const mixedIndirectInput = {
   patch:
     '@@ -4,2 +4,2 @@\n-<Badge text="x" /><svelte:component this={Badge}\n+<Badge text="x" extensions={[{}]} /><svelte:component this={Badge}\n- text="Active"\n+ text=""',
 };
+const markupContextInputs = [
+  {
+    filename: 'src/M1-const.svelte',
+    content:
+      "<script>\nimport { Badge } from '$lib/io/badge';\n</script>\n{#if true}\n{@const label = ''}\n<Badge text={label} />\n{/if}",
+    patch: "@@ -5 +5 @@\n-{@const label = 'Active'}\n+{@const label = ''}",
+  },
+  {
+    filename: 'src/M1-each.svelte',
+    content:
+      "<script>\nimport { Badge } from '$lib/io/badge';\n</script>\n{#each [''] as label}\n<Badge text={label} />\n{/each}",
+    patch: "@@ -4 +4 @@\n-{#each ['Active'] as label}\n+{#each [''] as label}",
+  },
+  {
+    filename: 'src/M1-snippet.svelte',
+    content:
+      "<script>\nimport { Badge } from '$lib/io/badge';\n</script>\n{#snippet row(label = '')}\n<Badge text={label} />\n{/snippet}\n{@render row()}",
+    patch:
+      "@@ -4 +4 @@\n-{#snippet row(label = 'Active')}\n+{#snippet row(label = '')}",
+  },
+  {
+    filename: 'src/M1-await.svelte',
+    content:
+      "<script>\nimport { Badge } from '$lib/io/badge';\n</script>\n{#await Promise.resolve('')}\n{:then label}\n<Badge text={label} />\n{/await}",
+    patch:
+      "@@ -4 +4 @@\n-{#await Promise.resolve('Active')}\n+{#await Promise.resolve('')}",
+  },
+  {
+    filename: 'src/M1-then-alias.svelte',
+    content:
+      "<script>\nimport { Badge as Status } from '$lib/io/badge';\n</script>\n{#await promise}\n{:then label}\n<Status text={label} />\n{/await}",
+    patch: '@@ -5 +5 @@\n-{:then other}\n+{:then label}',
+  },
+  {
+    filename: 'src/M1-catch.svelte',
+    content:
+      "<script>\nimport { Badge } from '$lib/io/badge';\n</script>\n{#await promise}\n{:catch label}\n<Badge text={label} />\n{/await}",
+    patch: '@@ -5 +5 @@\n-{:catch other}\n+{:catch label}',
+  },
+  {
+    filename: 'src/M1-deletion-alias.svelte',
+    content:
+      "<script>\nimport { Badge as Status } from '$lib/io/badge';\n</script>\n{#each items as label}\n<Status text={label} />\n{/each}",
+    patch: "@@ -5 +5,0 @@\n-{@const label = ''}",
+  },
+  {
+    filename: 'src/unchanged-usage-no-model.svelte',
+    content:
+      '<script>\nimport { Badge } from \'$lib/io/badge\';\n</script>\n<Badge text="Active" />\n<p>New</p>',
+    patch: '@@ -5 +5 @@\n-<p>Old</p>\n+<p>New</p>',
+  },
+];
+const mixedMarkupContextInput = {
+  filename: 'src/x.svelte',
+  content:
+    "<script>\nimport { Badge } from '$lib/io/badge';\n</script>\n<Badge text=\"x\" extensions={[{}]} />\n{#each items as item}\n{@const label = ''}\n<Badge text={label} />\n{/each}",
+  patch:
+    '@@ -4,3 +4,3 @@\n-<Badge text="x" />\n+<Badge text="x" extensions={[{}]} />\n {#each items as item}\n-{@const label = item.name}\n+{@const label = \'\'}',
+};
+const noReferenceInputs = [
+  {
+    filename: 'src/x.svelte',
+    content:
+      "<script>\nimport { Badge } from '$lib/io/badge';\nconst label = 'New';\n</script>\n<p>{label}</p>",
+    patch: "@@ -3 +3 @@\n-const label = 'Old';\n+const label = 'New';",
+  },
+  {
+    filename: 'src/x.svelte',
+    content:
+      "<script>\nimport { Badge } from '$lib/io/badge';\n</script>\n<p>New</p>",
+    patch: '@@ -4 +4 @@\n-<Badge text="Old" />\n+<p>New</p>',
+  },
+];
 const ambiguousInputs = [
   {
     filename: 'src/x.svelte',
@@ -166,6 +239,7 @@ const ambiguousInputs = [
     patch: '@@ -6 +6 @@\n- text="Active"\n+ text=""',
   },
   ...indirectInputs,
+  ...markupContextInputs,
 ];
 
 function packedFixture(markdown: string): Buffer {
@@ -543,6 +617,46 @@ describe('offline orchestration acceptance', () => {
     expect(parseState(unused.writes[0].body.body)?.records).toEqual([]);
   });
 
+  it.each(['aligned', 'violation'] as const)(
+    'keeps a known direct %s result partial when markup context is unmatched',
+    async (verdict) => {
+      const result = await harness({
+        fixture: mixedMarkupContextInput,
+        old: oldBody,
+        model: async () => ({
+          stop_reason: 'end_turn',
+          parsed_output: { usages: [{ ...usage, verdict }] },
+        }),
+      });
+      expect(result.result).toBe('published');
+      expect(result.model).toHaveBeenCalledOnce();
+      expect(result.artifacts[0].meta).toMatchObject({
+        reviewStatus: 'partial',
+        headSha: head,
+      });
+      expect(result.artifacts[0].findings).toHaveLength(
+        verdict === 'aligned' ? 0 : 1,
+      );
+      const body = result.writes[0].body.body;
+      expect(body).not.toContain('No IO component usage changed');
+      expect(body).toContain(`originating head ${oldMeta.headSha}`);
+      expect(parseState(body)?.records).toHaveLength(1);
+    },
+  );
+
+  it('resolves complete no-reference results for unused-import script edits and removed usages', async () => {
+    for (const fixture of noReferenceInputs) {
+      const result = await harness({ fixture, old: oldBody });
+      expect(result.result).toBe('published');
+      expect(result.model).not.toHaveBeenCalled();
+      expect(result.artifacts[0]).toMatchObject({
+        findings: [],
+        meta: { reviewStatus: 'complete', headSha: head },
+      });
+      expect(parseState(result.writes[0].body.body)?.records).toEqual([]);
+    }
+  });
+
   it('reviews visible usages while preserving warnings for a masked multiline usage', async () => {
     const fixture = {
       filename: 'src/x.svelte',
@@ -842,6 +956,29 @@ describe('offline orchestration acceptance', () => {
         ],
         ['skipped', await harness({ labels: [], old: oldBody })],
         ['stale', await harness({ stale: true, old: oldBody })],
+        [
+          'markup-mixed-partial-nonempty',
+          await harness({ fixture: mixedMarkupContextInput, old: oldBody }),
+        ],
+        [
+          'markup-mixed-partial-empty',
+          await harness({
+            fixture: mixedMarkupContextInput,
+            old: oldBody,
+            model: async () => ({
+              stop_reason: 'end_turn',
+              parsed_output: { usages: [{ ...usage, verdict: 'aligned' }] },
+            }),
+          }),
+        ],
+        [
+          'complete-unused-import-script-edit',
+          await harness({ fixture: noReferenceInputs[0], old: oldBody }),
+        ],
+        [
+          'complete-removed-io-reference',
+          await harness({ fixture: noReferenceInputs[1], old: oldBody }),
+        ],
         [
           'indirect-mixed-partial-nonempty',
           await harness({ fixture: mixedIndirectInput, old: oldBody }),

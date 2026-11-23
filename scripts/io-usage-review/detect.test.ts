@@ -433,4 +433,150 @@ import type { BadgeProps as Props } from '$lib/io/badge';`,
       expect(result.candidates).toHaveLength(candidates);
     },
   );
+
+  it.each([
+    {
+      name: 'markup const',
+      markup: "{#if true}\n{@const label = ''}\n<IO text={label} />\n{/if}",
+      line: 5,
+      old: "{@const label = 'Active'}",
+      next: "{@const label = ''}",
+    },
+    {
+      name: 'each source',
+      markup: "{#each [''] as label}\n<IO text={label} />\n{/each}",
+      line: 4,
+      old: "{#each ['Active'] as label}",
+      next: "{#each [''] as label}",
+    },
+    {
+      name: 'snippet default',
+      markup:
+        "{#snippet row(label = '')}\n<IO text={label} />\n{/snippet}\n{@render row()}",
+      line: 4,
+      old: "{#snippet row(label = 'Active')}",
+      next: "{#snippet row(label = '')}",
+    },
+    {
+      name: 'await source',
+      markup:
+        "{#await Promise.resolve('')}\n{:then label}\n<IO text={label} />\n{/await}",
+      line: 4,
+      old: "{#await Promise.resolve('Active')}",
+      next: "{#await Promise.resolve('')}",
+    },
+    {
+      name: 'then binding',
+      markup: '{#await promise}\n{:then label}\n<IO text={label} />\n{/await}',
+      line: 5,
+      old: '{:then other}',
+      next: '{:then label}',
+    },
+    {
+      name: 'catch binding',
+      markup: '{#await promise}\n{:catch label}\n<IO text={label} />\n{/await}',
+      line: 5,
+      old: '{:catch other}',
+      next: '{:catch label}',
+    },
+    {
+      name: 'ordinary condition',
+      markup: '{#if ready}\n<IO text="Active" />\n{/if}',
+      line: 4,
+      old: '{#if loading}',
+      next: '{#if ready}',
+    },
+    {
+      name: 'unrelated markup',
+      markup: '<IO text="Active" />\n<p>New</p>',
+      line: 5,
+      old: '<p>Old</p>',
+      next: '<p>New</p>',
+    },
+    {
+      name: 'comment formatting',
+      markup: '<IO text="Active" />\n<!-- New -->',
+      line: 5,
+      old: '<!-- Old -->',
+      next: '<!-- New -->',
+    },
+    {
+      name: 'blank formatting',
+      markup: '<IO text="Active" />\n',
+      line: 5,
+      old: ' ',
+      next: '',
+    },
+  ])(
+    'limits unmatched $name beside an unchanged IO reference',
+    ({ markup, line, old, next }) => {
+      for (const binding of ['Badge', 'StatusLabel']) {
+        const specifier = binding === 'Badge' ? 'Badge' : `Badge as ${binding}`;
+        const source = `<script>\nimport { ${specifier} } from '$lib/io/badge';\n</script>\n${markup.replaceAll('IO', binding)}`;
+        expect(
+          findCandidates(
+            source,
+            `@@ -${line} +${line} @@\n-${old}\n+${next}`,
+            '$lib/io/',
+            'x.svelte',
+          ),
+        ).toEqual({ candidates: [], uncertain: true });
+      }
+    },
+  );
+
+  it('limits deletion-only context edits even when their anchor is the next unchanged tag', () => {
+    const source =
+      "<script>\nimport { Badge as Status } from '$lib/io/badge';\n</script>\n{#each items as label}\n<Status text={label} />\n{/each}";
+    expect(
+      findCandidates(
+        source,
+        "@@ -5 +5,0 @@\n-{@const label = ''}",
+        '$lib/io/',
+        'x.svelte',
+      ),
+    ).toEqual({ candidates: [], uncertain: true });
+  });
+
+  it('limits mixed unmatched context even with a known changed candidate', () => {
+    const source =
+      '<script>\nimport { Badge } from \'$lib/io/badge\';\n</script>\n<Badge text="" />\n<p>New</p>';
+    expect(
+      findCandidates(
+        source,
+        '@@ -4,2 +4,2 @@\n-<Badge text="Old" />\n+<Badge text="" />\n-<p>Old</p>\n+<p>New</p>',
+        '$lib/io/',
+        'x.svelte',
+      ),
+    ).toEqual({
+      candidates: [{ component: 'badge', line: 4, endLine: 4 }],
+      uncertain: true,
+    });
+  });
+
+  it.each([
+    {
+      source:
+        "<script>\nimport { Badge } from '$lib/io/badge';\nconst label = 'New';\n</script>\n<p>{label}</p>",
+      patch: "@@ -3 +3 @@\n-const label = 'Old';\n+const label = 'New';",
+    },
+    {
+      source:
+        "<script>\nimport { Badge } from '$lib/io/badge';\n</script>\n<p>New</p>",
+      patch: '@@ -4 +4 @@\n-<Badge text="Old" />\n+<p>New</p>',
+    },
+    {
+      source:
+        "<script>\nimport Badge from '$lib/holocene/badge.svelte';\nconst label = 'New';\n</script>\n<Badge text={label} />",
+      patch: "@@ -3 +3 @@\n-const label = 'Old';\n+const label = 'New';",
+    },
+  ])(
+    'does not confuse import presence with active IO references %#',
+    ({ source, patch }) => {
+      expect(findCandidates(source, patch, '$lib/io/', 'x.svelte')).toEqual({
+        candidates: [],
+        uncertain: false,
+      });
+    },
+  );
 });

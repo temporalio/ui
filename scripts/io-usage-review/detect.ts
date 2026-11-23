@@ -111,6 +111,7 @@ export function findCandidates(
       candidates.push({ component, line, endLine });
   };
   let uncertain = source.includes(prefix) && bindings.length === 0;
+  let hasIoReference = false;
   const withoutComments = source.replace(
     /<!--[^]*?-->|\/\*[^]*?\*\/|\/\/[^\n]*/g,
     (match) => match.replace(/[^\n]/g, ' '),
@@ -129,6 +130,7 @@ export function findCandidates(
           )
         )
           continue;
+        hasIoReference = true;
         const tagStart =
           match.index -
           (source.slice(match.index - 2, match.index) === '</' ? 2 : 1);
@@ -193,7 +195,7 @@ export function findCandidates(
       }
     }
   }
-  if (bindings.length && file.endsWith('.svelte')) {
+  if (hasIoReference && file.endsWith('.svelte')) {
     const script = /<script\b[^>]*>[^]*?<\/script>/g;
     for (const match of source.matchAll(script)) {
       const startLine = lineAt(match.index);
@@ -241,14 +243,14 @@ export function findCandidates(
             ) !== binding),
       ),
     );
-    const unmatchedTsChange =
-      file.endsWith('.ts') &&
-      bindings.length > 0 &&
+    const unmatchedChange =
+      ((file.endsWith('.ts') && bindings.length > 0) ||
+        (file.endsWith('.svelte') && hasIoReference)) &&
       !covered() &&
       !bindings.some(
         ({ start, end }) => line >= lineAt(start) && line <= lineAt(end),
       );
-    if (referencesBinding || unmatchedTsChange) uncertain = true;
+    if (referencesBinding || unmatchedChange) uncertain = true;
   }
   return { candidates, uncertain };
 }
