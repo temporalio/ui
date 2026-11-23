@@ -121,19 +121,40 @@ export function renderComment(
 ): string {
   MetaSchema.parse(meta);
   const current = review ? toFindings(review, meta) : [];
-  const retained =
-    meta.reviewStatus === 'complete' ? [] : (previous?.records ?? []);
-  const records = [...retained];
-  for (const finding of current) {
-    if (
-      !records.some(
-        (record) =>
-          record.headSha === meta.headSha &&
-          JSON.stringify(record.finding) === JSON.stringify(finding),
-      )
-    )
-      records.push({ headSha: meta.headSha, finding });
-  }
+  const recordKey = ({
+    headSha,
+    finding,
+  }: CommentState['records'][number]): string =>
+    JSON.stringify([
+      headSha,
+      finding.repo,
+      finding.pr,
+      finding.component,
+      finding.file,
+      finding.line,
+      finding.kind,
+      finding.ruleId,
+      finding.pattern,
+    ]);
+  const currentRecords = current.map((finding) => ({
+    headSha: meta.headSha,
+    finding,
+  }));
+  const currentKeys = new Set(currentRecords.map(recordKey));
+  const priorRecords =
+    meta.reviewStatus === 'complete' && review !== null && current.length === 0
+      ? []
+      : (previous?.records ?? []);
+  const merged = new Map(
+    [...priorRecords, ...currentRecords].map((record) => [
+      recordKey(record),
+      record,
+    ]),
+  );
+  const records = [...merged.values()];
+  const retained = records.filter(
+    (record) => !currentKeys.has(recordKey(record)),
+  );
   const lines = [
     MARKER,
     '## IO usage review',

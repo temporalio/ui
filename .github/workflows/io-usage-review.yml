@@ -35,6 +35,7 @@ permissions:
 
 concurrency:
   group: io-usage-review-${{ github.repository }}
+  queue: max
   cancel-in-progress: false
 
 jobs:

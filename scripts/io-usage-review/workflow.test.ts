@@ -35,6 +35,7 @@ describe('reusable-only workflow release boundary', () => {
           .strict(),
         concurrency: z.object({
           group: z.string(),
+          queue: z.literal('max'),
           'cancel-in-progress': z.literal(false),
         }),
         jobs: z.object({
@@ -48,7 +49,9 @@ describe('reusable-only workflow release boundary', () => {
         }),
       })
       .parse(yaml.load(text));
-    expect(workflow.concurrency.group).toContain('github.repository');
+    expect(workflow.concurrency.group).toBe(
+      'io-usage-review-${{ github.repository }}',
+    );
     for (const step of workflow.jobs.review.steps)
       if (step.uses) expect(step.uses).toMatch(/@[a-f0-9]{40}$/);
     expect(text).not.toContain('pull_request_target');

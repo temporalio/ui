@@ -154,4 +154,92 @@ import type { BadgeProps as Props } from '$lib/io/badge';`,
       ).candidates,
     ).toEqual([]);
   });
+
+  it.each([
+    {
+      name: 'Svelte URL before a changed Badge',
+      file: 'x.svelte',
+      source:
+        '<script>\nimport { Badge } from \'$lib/io/badge\';\n</script>\n<a href="https://docs.temporal.io">Docs</a> <Badge text="" />',
+      patch:
+        '@@ -4 +4 @@\n-old\n+<a href="https://docs.temporal.io">Docs</a> <Badge text="" />',
+    },
+    {
+      name: 'URL before a TS binding',
+      file: 'x.ts',
+      source:
+        "import { Badge } from '$lib/io/badge';\nconst p = { href: 'https://x', icon: Badge };",
+      patch:
+        "@@ -2 +2 @@\n-old\n+const p = { href: 'https://x', icon: Badge };",
+    },
+    {
+      name: 'masked usage after another candidate on the same line',
+      file: 'x.svelte',
+      source:
+        '<script>\nimport { Badge } from \'$lib/io/badge\';\n</script>\n<Badge text="x" /><a href="https://x">Docs</a><Badge text="" />',
+      patch:
+        '@@ -4 +4 @@\n-old\n+<Badge text="x" /><a href="https://x">Docs</a><Badge text="" />',
+    },
+    {
+      name: 'quoted URL before an alias in Svelte script',
+      file: 'x.svelte',
+      source:
+        "<script>\nimport { Badge as B } from '$lib/io/badge';\nconst p = { href: 'https://x', icon: B };\n</script>",
+      patch: "@@ -3 +3 @@\n-old\n+const p = { href: 'https://x', icon: B };",
+    },
+    {
+      name: 'multiline typed props',
+      file: 'x.ts',
+      source:
+        "import type { ButtonProps } from '$lib/io/button';\nconst p: ButtonProps = {\n size: 'md',\n};",
+      patch: "@@ -3 +3 @@\n- size: 'sm',\n+ size: 'md',",
+    },
+    {
+      name: 'deletion-only typed props',
+      file: 'x.ts',
+      source:
+        "import type { ButtonProps as Props } from '$lib/io/button';\nconst p: Props = {\n};",
+      patch: "@@ -2,3 +2,2 @@\n const p: Props = {\n- size: 'sm',\n };",
+    },
+    {
+      name: 'indirect TS initializer',
+      file: 'x.ts',
+      source:
+        "import type { ButtonProps } from '$lib/io/button';\nconst size = 'md';\nconst p: ButtonProps = { size };",
+      patch: "@@ -2 +2 @@\n-const size = 'sm';\n+const size = 'md';",
+    },
+    {
+      name: 'raw ambiguity after comment masking',
+      file: 'x.svelte',
+      source:
+        "<script>\nimport { Badge } from '$lib/io/badge';\n</script>\n<!-- Badge context changed -->",
+      patch: '@@ -4 +4 @@\n-old\n+<!-- Badge context changed -->',
+    },
+  ])(
+    'marks $name uncertain instead of proving clean',
+    ({ file, source, patch }) => {
+      expect(findCandidates(source, patch, '$lib/io/', file).uncertain).toBe(
+        true,
+      );
+    },
+  );
+
+  it('keeps complete coverage for direct TS references and actual no-IO files', () => {
+    expect(
+      findCandidates(
+        "import type { ButtonProps } from '$lib/io/button';\nconst p: ButtonProps = {};",
+        '@@ -2 +2 @@\n-old\n+const p: ButtonProps = {};',
+        '$lib/io/',
+        'x.ts',
+      ).uncertain,
+    ).toBe(false);
+    expect(
+      findCandidates(
+        'const x = 1;',
+        '@@ -1 +1 @@\n-old\n+const x = 1;',
+        '$lib/io/',
+        'x.ts',
+      ),
+    ).toEqual({ candidates: [], uncertain: false });
+  });
 });

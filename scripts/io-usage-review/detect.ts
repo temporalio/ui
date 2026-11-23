@@ -191,20 +191,42 @@ export function findCandidates(
           uncertain = true;
       }
     }
-    for (const line of changed) {
-      const text = withoutComments.split('\n')[line - 1] ?? '';
-      if (
-        bindings.some(
-          ({ binding, start, end }) =>
-            new RegExp(`\\b${escapeRegex(binding)}\\b`).test(text) &&
-            !(line >= lineAt(start) && line <= lineAt(end)),
-        ) &&
-        !candidates.some(
-          (candidate) => line >= candidate.line && line <= candidate.endLine,
-        )
-      )
-        uncertain = true;
-    }
+  }
+  const rawLines = source.split('\n');
+  for (const line of new Set([...changed, ...deleted])) {
+    const covered = (component?: string): boolean =>
+      candidates.some(
+        (candidate) =>
+          line >= candidate.line &&
+          line <= candidate.endLine &&
+          (!component || candidate.component === component),
+      );
+    const text = rawLines[line - 1] ?? '';
+    const offset = rawLines
+      .slice(0, line - 1)
+      .reduce((sum, value) => sum + value.length + 1, 0);
+    const referencesBinding = bindings.some(({ binding, component }) =>
+      [...text.matchAll(new RegExp(`\\b${escapeRegex(binding)}\\b`, 'g'))].some(
+        (match) =>
+          !bindings.some(
+            ({ start, end }) =>
+              offset + match.index >= start && offset + match.index < end,
+          ) &&
+          (!covered(component) ||
+            withoutComments.slice(
+              offset + match.index,
+              offset + match.index + binding.length,
+            ) !== binding),
+      ),
+    );
+    const unmatchedTsChange =
+      file.endsWith('.ts') &&
+      bindings.length > 0 &&
+      !covered() &&
+      !bindings.some(
+        ({ start, end }) => line >= lineAt(start) && line <= lineAt(end),
+      );
+    if (referencesBinding || unmatchedTsChange) uncertain = true;
   }
   return { candidates, uncertain };
 }

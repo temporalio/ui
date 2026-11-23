@@ -56,6 +56,34 @@ const oldMeta: Meta = {
   reason: null,
 };
 const oldBody = renderComment({ usages: [usage] }, oldMeta);
+const ambiguousInputs = [
+  {
+    filename: 'src/x.svelte',
+    content:
+      '<script>\nimport { Badge } from \'$lib/io/badge\';\n</script>\n<a href="https://docs.temporal.io">Docs</a> <Badge text="" />',
+    patch:
+      '@@ -4 +4 @@\n-old\n+<a href="https://docs.temporal.io">Docs</a> <Badge text="" />',
+  },
+  {
+    filename: 'src/x.ts',
+    content:
+      "import { Badge } from '$lib/io/badge';\nconst p = { href: 'https://docs.temporal.io', icon: Badge };",
+    patch:
+      "@@ -2 +2 @@\n-old\n+const p = { href: 'https://docs.temporal.io', icon: Badge };",
+  },
+  {
+    filename: 'src/props.ts',
+    content:
+      "import type { ButtonProps } from '$lib/io/button';\nconst p: ButtonProps = {\n size: 'md',\n};",
+    patch: "@@ -3 +3 @@\n- size: 'sm',\n+ size: 'md',",
+  },
+  {
+    filename: 'src/deleted-props.ts',
+    content:
+      "import type { ButtonProps as Props } from '$lib/io/button';\nconst p: Props = {\n};",
+    patch: "@@ -2,3 +2,2 @@\n const p: Props = {\n- size: 'sm',\n };",
+  },
+];
 
 function packedFixture(markdown: string): Buffer {
   const header = Buffer.alloc(512);
@@ -104,6 +132,7 @@ async function harness(
     artifactError?: boolean;
     pack?: Buffer;
     malformed?: boolean;
+    fixture?: { filename: string; content: string; patch: string };
   } = {},
   changes: Partial<Context> = {},
 ) {
@@ -154,15 +183,23 @@ async function harness(
     if (route.endsWith('/pulls/42/files'))
       return Response.json([
         {
-          filename: 'src/x.svelte',
+          filename: options.fixture?.filename ?? 'src/x.svelte',
           status: 'modified',
           patch: options.noPatch
             ? undefined
             : options.noIo
               ? '@@ -1 +1 @@\n-old\n+const x = 1'
-              : patch,
-          additions: 1,
-          deletions: 1,
+              : (options.fixture?.patch ?? patch),
+          additions: options.fixture
+            ? options.fixture.patch
+                .split('\n')
+                .filter((line) => line.startsWith('+')).length
+            : 1,
+          deletions: options.fixture
+            ? options.fixture.patch
+                .split('\n')
+                .filter((line) => line.startsWith('-')).length
+            : 1,
         },
         ...(options.extraMissing
           ? [
@@ -187,11 +224,16 @@ async function harness(
             ]
           : [],
       );
-    if (route.endsWith('/contents/src/x.svelte')) {
+    if (
+      route.endsWith(`/contents/${options.fixture?.filename ?? 'src/x.svelte'}`)
+    ) {
       expect(url.searchParams.get('ref')).toBe(head);
       const content = options.noIo
         ? 'const x = 1'
-        : source.replace('$lib/io/', current.importPrefix);
+        : (options.fixture?.content ?? source).replace(
+            '$lib/io/',
+            current.importPrefix,
+          );
       return Response.json({
         type: 'file',
         size: Buffer.byteLength(content),
@@ -203,7 +245,11 @@ async function harness(
       expect(url.searchParams.get('ref')).toBe(base);
       if (options.missing) return Response.json({}, { status: 404 });
       const content = await readFile(
-        path.resolve('scripts/io-usage-review/__fixtures__/badge/badge.md'),
+        path.resolve(
+          route.endsWith('/button/button.md')
+            ? 'src/lib/io/button/button.md'
+            : 'scripts/io-usage-review/__fixtures__/badge/badge.md',
+        ),
         'utf8',
       );
       return Response.json({
@@ -305,6 +351,48 @@ describe('offline orchestration acceptance', () => {
       path: '/repos/temporalio/ui/issues/comments/7',
     });
   });
+
+  it('complete nonzero preserves historical warnings and dedupes a repeated head', async () => {
+    const first = await harness({ old: oldBody });
+    expect(first.artifacts[0].meta.reviewStatus).toBe('complete');
+    expect(first.artifacts[0].findings).toHaveLength(1);
+    const state = parseState(first.writes[0].body.body);
+    expect(state?.records.map((record) => record.headSha)).toEqual([
+      oldMeta.headSha,
+      head,
+    ]);
+    expect(first.writes[0].body.body).toContain(
+      `originating head ${oldMeta.headSha}`,
+    );
+    const repeated = await harness({ old: first.writes[0].body.body });
+    expect(parseState(repeated.writes[0].body.body)?.records).toEqual(
+      state?.records,
+    );
+    expect(repeated.writes[0].body.body).not.toContain(
+      `originating head ${head}`,
+    );
+  });
+
+  it.each(ambiguousInputs)(
+    'preserves prior warnings for ambiguous $filename IO changes',
+    async (fixture) => {
+      const result = await harness({ fixture, old: oldBody });
+      expect(result.result).toBe('published');
+      expect(result.artifacts[0]).toMatchObject({
+        findings: [],
+        meta: { reviewStatus: 'partial', headSha: head },
+      });
+      expect(result.model).not.toHaveBeenCalled();
+      expect(result.writes[0].body.body).not.toContain(
+        'No IO component usage changed',
+      );
+      expect(
+        parseState(result.writes[0].body.body)?.records.map(
+          (record) => record.headSha,
+        ),
+      ).toEqual([oldMeta.headSha]);
+    },
+  );
 
   it.each([{ labels: [] }, { fork: true }, { bot: true }])(
     'skips automatically without writes/artifacts %j',
@@ -476,6 +564,15 @@ describe('offline orchestration acceptance', () => {
         ],
         ['skipped', await harness({ labels: [], old: oldBody })],
         ['stale', await harness({ stale: true, old: oldBody })],
+        ...(await Promise.all(
+          ambiguousInputs.map(
+            async (fixture, index) =>
+              [
+                `ambiguous-io-${index + 1}`,
+                await harness({ fixture, old: oldBody }),
+              ] as const,
+          ),
+        )),
       ] as const;
       await writeFile(
         path.join(directory, 'fixture-evidence.json'),
