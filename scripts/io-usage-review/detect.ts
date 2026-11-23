@@ -120,6 +120,16 @@ export function findCandidates(
       (line) => line >= lineAt(start) && line <= lineAt(end),
     );
     if (file.endsWith('.svelte')) {
+      for (const match of source.matchAll(
+        new RegExp(`<${escapeRegex(binding)}(?=[\\s/>])`, 'g'),
+      )) {
+        if (match.index >= start && match.index < end) continue;
+        if (
+          withoutComments.slice(match.index, match.index + match[0].length) !==
+          match[0]
+        )
+          uncertain = true;
+      }
       for (const match of withoutComments.matchAll(
         new RegExp(`\\b${escapeRegex(binding)}\\b`, 'g'),
       )) {

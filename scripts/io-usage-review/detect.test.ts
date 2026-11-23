@@ -242,4 +242,60 @@ import type { BadgeProps as Props } from '$lib/io/badge';`,
       ),
     ).toEqual({ candidates: [], uncertain: false });
   });
+
+  it.each([
+    {
+      name: 'unchanged URL-masked opening with changed prop',
+      source:
+        '<script>\nimport { Badge } from \'$lib/io/badge\';\n</script>\n<a href="https://docs"><Badge\n text=""\n/></a>',
+      patch: '@@ -5 +5 @@\n- text="Active"\n+ text=""',
+    },
+    {
+      name: 'unchanged alias opening with deleted prop',
+      source:
+        '<script>\nimport { Badge as Label } from \'$lib/io/badge\';\n</script>\n<a href="https://docs"><Label\n/></a>',
+      patch: '@@ -5 +5,0 @@\n- text="Active"',
+    },
+    {
+      name: 'markup block delimiter masks a later tag',
+      source:
+        '<script>\nimport { Badge } from \'$lib/io/badge\';\n</script>\n<a href="/api/*">\n<Badge\n text=""\n/>\n</a>\n<style>/* Later comment */</style>',
+      patch: '@@ -6 +6 @@\n- text="Active"\n+ text=""',
+    },
+    {
+      name: 'masked tag elsewhere in a changed file',
+      source:
+        '<script>\nimport { Badge } from \'$lib/io/badge\';\n</script>\n<a href="https://docs"><Badge text="Active" /></a>\n<p>Changed</p>',
+      patch: '@@ -5 +5 @@\n-<p>Old</p>\n+<p>Changed</p>',
+    },
+    {
+      name: 'real comment with a raw IO opening tag',
+      source:
+        '<script>\nimport { Badge } from \'$lib/io/badge\';\n</script>\n<!-- <Badge text="Active" /> -->\n<p>Changed</p>',
+      patch: '@@ -5 +5 @@\n-<p>Old</p>\n+<p>Changed</p>',
+    },
+  ])(
+    'limits coverage for $name without inventing candidates',
+    ({ source, patch }) => {
+      expect(findCandidates(source, patch, '$lib/io/', 'x.svelte')).toEqual({
+        candidates: [],
+        uncertain: true,
+      });
+    },
+  );
+
+  it('retains known candidates when another unchanged opening tag is masked', () => {
+    const source =
+      '<script>\nimport { Badge } from \'$lib/io/badge\';\n</script>\n<Badge text="" />\n<a href="https://docs"><Badge\n text=""\n/></a>';
+    const result = findCandidates(
+      source,
+      '@@ -4,3 +4,3 @@\n-<Badge text="Active" />\n+<Badge text="" />\n <a href="https://docs"><Badge\n- text="Active"\n+ text=""',
+      '$lib/io/',
+      'x.svelte',
+    );
+    expect(result).toEqual({
+      candidates: [{ component: 'badge', line: 4, endLine: 4 }],
+      uncertain: true,
+    });
+  });
 });

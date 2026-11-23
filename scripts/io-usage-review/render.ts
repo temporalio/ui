@@ -121,12 +121,8 @@ export function renderComment(
 ): string {
   MetaSchema.parse(meta);
   const current = review ? toFindings(review, meta) : [];
-  const recordKey = ({
-    headSha,
-    finding,
-  }: CommentState['records'][number]): string =>
+  const findingKey = (finding: Finding): string =>
     JSON.stringify([
-      headSha,
       finding.repo,
       finding.pr,
       finding.component,
@@ -140,20 +136,22 @@ export function renderComment(
     headSha: meta.headSha,
     finding,
   }));
-  const currentKeys = new Set(currentRecords.map(recordKey));
+  const currentKeys = new Set(current.map(findingKey));
   const priorRecords =
     meta.reviewStatus === 'complete' && review !== null && current.length === 0
       ? []
       : (previous?.records ?? []);
-  const merged = new Map(
-    [...priorRecords, ...currentRecords].map((record) => [
-      recordKey(record),
-      record,
-    ]),
-  );
+  const merged = new Map<string, CommentState['records'][number]>();
+  for (const record of [...priorRecords, ...currentRecords]) {
+    const key = findingKey(record.finding);
+    merged.set(key, {
+      headSha: merged.get(key)?.headSha ?? record.headSha,
+      finding: record.finding,
+    });
+  }
   const records = [...merged.values()];
   const retained = records.filter(
-    (record) => !currentKeys.has(recordKey(record)),
+    (record) => !currentKeys.has(findingKey(record.finding)),
   );
   const lines = [
     MARKER,
@@ -185,8 +183,12 @@ export function renderComment(
           : usage.verdict === 'violation'
             ? `breaks ${usage.ruleId}`
             : 'no documented rule covers this';
+      const finding = toFindings({ usages: [usage] }, meta)[0];
+      const origin = finding
+        ? merged.get(findingKey(finding))?.headSha
+        : undefined;
       lines.push(
-        `- ${usage.verdict === 'aligned' ? '✅' : '⚠️'} ${escapeText(displayName(usage.component))} — ${escapeText(verdict)}: ${escapeText(usage.reason)} (line ${usage.line})`,
+        `- ${usage.verdict === 'aligned' ? '✅' : '⚠️'} ${escapeText(displayName(usage.component))} — ${escapeText(verdict)}: ${escapeText(usage.reason)} (line ${usage.line}${origin && origin !== meta.headSha ? `; originating head ${origin}` : ''})`,
       );
     }
   }

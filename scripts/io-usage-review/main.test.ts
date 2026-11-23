@@ -83,6 +83,24 @@ const ambiguousInputs = [
       "import type { ButtonProps as Props } from '$lib/io/button';\nconst p: Props = {\n};",
     patch: "@@ -2,3 +2,2 @@\n const p: Props = {\n- size: 'sm',\n };",
   },
+  {
+    filename: 'src/masked-multiline.svelte',
+    content:
+      '<script>\nimport { Badge } from \'$lib/io/badge\';\n</script>\n<a href="https://docs.temporal.io"><Badge\n text=""\n/></a>',
+    patch: '@@ -5 +5 @@\n- text="Active"\n+ text=""',
+  },
+  {
+    filename: 'src/masked-deletion.svelte',
+    content:
+      '<script>\nimport { Badge as Label } from \'$lib/io/badge\';\n</script>\n<a href="https://docs"><Label\n/></a>',
+    patch: '@@ -5 +5,0 @@\n- text="Active"',
+  },
+  {
+    filename: 'src/masked-block.svelte',
+    content:
+      '<script>\nimport { Badge } from \'$lib/io/badge\';\n</script>\n<a href="/api/*">\n<Badge\n text=""\n/>\n</a>\n<style>/* Later comment */</style>',
+    patch: '@@ -6 +6 @@\n- text="Active"\n+ text=""',
+  },
 ];
 
 function packedFixture(markdown: string): Buffer {
@@ -132,11 +150,13 @@ async function harness(
     artifactError?: boolean;
     pack?: Buffer;
     malformed?: boolean;
+    headSha?: string;
     fixture?: { filename: string; content: string; patch: string };
   } = {},
   changes: Partial<Context> = {},
 ) {
   const current = { ...context, ...changes };
+  const reviewedHead = options.headSha ?? head;
   const writes: {
     method: string;
     path: string;
@@ -174,7 +194,7 @@ async function harness(
           name,
         })),
         head: {
-          sha: options.stale && prReads > 1 ? 'e'.repeat(40) : head,
+          sha: options.stale && prReads > 1 ? 'e'.repeat(40) : reviewedHead,
           repo: { full_name: options.fork ? 'fork/ui' : current.repo },
         },
         base: { sha: base, repo: { full_name: current.repo } },
@@ -227,7 +247,7 @@ async function harness(
     if (
       route.endsWith(`/contents/${options.fixture?.filename ?? 'src/x.svelte'}`)
     ) {
-      expect(url.searchParams.get('ref')).toBe(head);
+      expect(url.searchParams.get('ref')).toBe(reviewedHead);
       const content = options.noIo
         ? 'const x = 1'
         : (options.fixture?.content ?? source).replace(
@@ -359,7 +379,6 @@ describe('offline orchestration acceptance', () => {
     const state = parseState(first.writes[0].body.body);
     expect(state?.records.map((record) => record.headSha)).toEqual([
       oldMeta.headSha,
-      head,
     ]);
     expect(first.writes[0].body.body).toContain(
       `originating head ${oldMeta.headSha}`,
@@ -393,6 +412,134 @@ describe('offline orchestration acceptance', () => {
       ).toEqual([oldMeta.headSha]);
     },
   );
+
+  it('reviews visible usages while preserving warnings for a masked multiline usage', async () => {
+    const fixture = {
+      filename: 'src/x.svelte',
+      content:
+        '<script>\nimport { Badge } from \'$lib/io/badge\';\n</script>\n<Badge text="x" extensions={[{}]} />\n<a href="https://docs"><Badge\n text=""\n/></a>',
+      patch:
+        '@@ -4,3 +4,3 @@\n-<Badge text="x" />\n+<Badge text="x" extensions={[{}]} />\n <a href="https://docs"><Badge\n- text="Active"\n+ text=""',
+    };
+    const result = await harness({ fixture, old: oldBody });
+    expect(result.result).toBe('published');
+    expect(result.model).toHaveBeenCalledOnce();
+    expect(result.artifacts[0]).toMatchObject({
+      meta: { reviewStatus: 'partial' },
+    });
+    expect(result.artifacts[0].findings).toHaveLength(1);
+    expect(
+      parseState(result.writes[0].body.body)?.records.map(
+        (record) => record.headSha,
+      ),
+    ).toEqual([oldMeta.headSha]);
+    expect(result.writes[0].body.body).toContain(
+      `originating head ${oldMeta.headSha}`,
+    );
+  });
+
+  it('recovers duplicate history and keeps current findings publishing over 60 pushes', async () => {
+    const longReason =
+      'Empty badge text provides no visible label and loses essential context for assistive technology users. '
+        .repeat(12)
+        .trim();
+    expect(longReason.length).toBe(1235);
+    const first = parseState(oldBody);
+    if (!first) throw new Error('Missing test history');
+    const records = Array.from({ length: 19 }, (_, index) => ({
+      headSha: index ? index.toString(16).padStart(40, '0') : oldMeta.headSha,
+      finding: { ...first.records[0].finding, reason: longReason },
+    }));
+    let previous = `<!-- io-usage-review-bot -->\n${records.map((record) => `- ${longReason} (originating head ${record.headSha})`).join('\n')}\n<!-- io-usage-state:${Buffer.from(JSON.stringify({ meta: oldMeta, records })).toString('base64')} -->`;
+    expect(previous.length).toBeLessThan(65_000);
+    const initialChars = previous.length;
+    const observations: {
+      push: number;
+      chars: number;
+      records: number;
+      headSha: string;
+    }[] = [];
+    let finalPair: { findings: unknown; meta: Meta } | undefined;
+    for (let push = 1; push <= 60; push++) {
+      const headSha = (push + 100).toString(16).padStart(40, '0');
+      const reason = `${longReason} ${push}`;
+      const result = await harness({
+        headSha,
+        old: previous,
+        model: async () => ({
+          stop_reason: 'end_turn',
+          parsed_output: { usages: [{ ...usage, reason }] },
+        }),
+      });
+      expect(result.result).toBe('published');
+      expect(result.model).toHaveBeenCalledOnce();
+      expect(result.writes).toHaveLength(1);
+      expect(result.artifacts).toHaveLength(1);
+      finalPair = result.artifacts[0];
+      expect(finalPair.meta).toMatchObject({
+        reviewStatus: 'complete',
+        headSha,
+      });
+      expect(finalPair.findings).toEqual([
+        { ...first.records[0].finding, reason },
+      ]);
+      previous = result.writes[0].body.body;
+      expect(previous.length).toBeLessThan(65_000);
+      expect(previous).toContain(`Reviewed head: ${headSha}`);
+      expect(previous).toContain(`originating head ${oldMeta.headSha}`);
+      const state = parseState(previous);
+      expect(state?.records).toEqual([
+        {
+          headSha: oldMeta.headSha,
+          finding: { ...first.records[0].finding, reason },
+        },
+      ]);
+      observations.push({
+        push,
+        chars: previous.length,
+        records: state?.records.length ?? -1,
+        headSha,
+      });
+    }
+    const zero = await harness({
+      headSha: 'e'.repeat(40),
+      noIo: true,
+      old: previous,
+    });
+    expect(zero.result).toBe('published');
+    expect(zero.artifacts[0]).toMatchObject({
+      findings: [],
+      meta: { reviewStatus: 'complete', headSha: 'e'.repeat(40) },
+    });
+    expect(parseState(zero.writes[0].body.body)?.records).toEqual([]);
+    const directory = process.env.IO_REVIEW_EVIDENCE_DIR;
+    if (directory) {
+      await mkdir(directory, { recursive: true });
+      await writeFile(
+        path.join(directory, 'orchestration-stress.json'),
+        JSON.stringify(
+          {
+            pushes: 60,
+            reasonChars: longReason.length,
+            initialRecords: records.length,
+            initialChars,
+            origin: oldMeta.headSha,
+            minChars: Math.min(...observations.map((item) => item.chars)),
+            maxChars: Math.max(...observations.map((item) => item.chars)),
+            observations,
+            finalPair,
+            zeroPair: zero.artifacts[0],
+          },
+          null,
+          2,
+        ),
+      );
+      await writeFile(
+        path.join(directory, 'orchestration-stress-comment.txt'),
+        previous,
+      );
+    }
+  });
 
   it.each([{ labels: [] }, { fork: true }, { bot: true }])(
     'skips automatically without writes/artifacts %j',
@@ -480,14 +627,15 @@ describe('offline orchestration acceptance', () => {
     expect(result.artifacts[0].meta.reviewStatus).toBe('unavailable');
   });
 
-  it('partial nonempty appends findings with new head, preserving prior provenance', async () => {
+  it('partial nonempty updates current findings while preserving original provenance', async () => {
     const result = await harness({ extraMissing: true, old: oldBody });
     expect(result.artifacts[0].meta.reviewStatus).toBe('partial');
     expect(
       parseState(result.writes[0].body.body)?.records.map(
         (record) => record.headSha,
       ),
-    ).toEqual([oldMeta.headSha, head]);
+    ).toEqual([oldMeta.headSha]);
+    expect(result.artifacts[0].findings).toHaveLength(1);
   });
 
   it('artifact staging failure cannot clear previous warnings', async () => {
