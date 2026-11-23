@@ -1,37 +1,39 @@
-name: IO usage review fixture demo (do not merge)
-
-on:
+name: IO usage review real model demo (do not merge)
+'on':
   pull_request:
-    types: [opened, synchronize, reopened]
-    branches: [ardiewen/fe-1628-io-usage-review]
-
+    types:
+      - reopened
+    branches:
+      - ardiewen/fe-1628-io-usage-review
 permissions:
   contents: read
   pull-requests: write
-
 concurrency:
-  group: io-usage-review-DEMO-${{ github.repository }}-${{ github.event.pull_request.number }}
+  group: io-usage-review-DEMO-${{ github.repository }}-4216
   cancel-in-progress: false
-
 jobs:
   demo:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    if: >-
+    if: |-
       github.event_name == 'pull_request' &&
+      github.event.action == 'reopened' &&
+      github.run_attempt == 1 &&
       github.repository == 'temporalio/ui' &&
       github.actor == 'ardiewen' &&
+      github.event.sender.login == 'ardiewen' &&
+      github.event.pull_request.number == 4216 &&
       github.event.pull_request.user.login == 'ardiewen' &&
       github.event.pull_request.head.repo.full_name == 'temporalio/ui' &&
       github.event.pull_request.base.repo.full_name == 'temporalio/ui' &&
       github.event.pull_request.head.ref == 'ardiewen/fe-1628-comment-demo' &&
       github.event.pull_request.base.ref == 'ardiewen/fe-1628-io-usage-review' &&
       github.event.pull_request.base.sha == 'd2dce8f0493d1bce4882dead9cdae763bf63b3b5' &&
-      github.event.pull_request.number != 4212 &&
       github.event.pull_request.draft == true &&
-      github.event.pull_request.state == 'open'
+      github.event.pull_request.state == 'open' &&
+      github.event.pull_request.merged == false
     steps:
-      - name: Checkout pinned production renderer
+      - name: Checkout pinned production review functions
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           repository: temporalio/ui
@@ -42,154 +44,86 @@ jobs:
           sparse-checkout: |
             /scripts/io-usage-review/
             /src/lib/io/badge/badge.md
-
       - name: Set up Node
         uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
         with:
           node-version: 22.23.4
-
-      - name: Prepare isolated fixture renderer
+      - name: Prepare isolated pinned review functions
         shell: bash
         run: |
           set -euo pipefail
           test "$(git -C trusted-review rev-parse HEAD)" = d2dce8f0493d1bce4882dead9cdae763bf63b3b5
-          mkdir "$RUNNER_TEMP/io-usage-demo"
-          for source in render.ts review.ts rules.ts; do
-            cp "trusted-review/scripts/io-usage-review/$source" "$RUNNER_TEMP/io-usage-demo/$source"
-            cmp "trusted-review/scripts/io-usage-review/$source" "$RUNNER_TEMP/io-usage-demo/$source"
-            sha256sum "$RUNNER_TEMP/io-usage-demo/$source"
+          mkdir -p "$RUNNER_TEMP/io-usage-real-demo/output"
+          printf '%s\n' '{"type":"module"}' > "$RUNNER_TEMP/io-usage-real-demo/package.json"
+          for source in main.ts detect.ts render.ts review.ts rules.ts; do
+            cp "trusted-review/scripts/io-usage-review/$source" "$RUNNER_TEMP/io-usage-real-demo/$source"
+            cmp "trusted-review/scripts/io-usage-review/$source" "$RUNNER_TEMP/io-usage-real-demo/$source"
+            sha256sum "$RUNNER_TEMP/io-usage-real-demo/$source"
           done
-          cp trusted-review/src/lib/io/badge/badge.md "$RUNNER_TEMP/io-usage-demo/badge.md"
-          cmp trusted-review/src/lib/io/badge/badge.md "$RUNNER_TEMP/io-usage-demo/badge.md"
-          npm install --prefix "$RUNNER_TEMP/io-usage-demo" --no-save --package-lock=false --ignore-scripts --no-audit --no-fund tsx@4.23.15 zod@4.4.3
-
-      - name: Render explicitly fictional sample data
-        shell: bash
-        run: |
-          set -euo pipefail
-          cat > "$RUNNER_TEMP/io-usage-demo/fixture.mts" <<'FIXTURE'
+          cp trusted-review/src/lib/io/badge/badge.md "$RUNNER_TEMP/io-usage-real-demo/badge.md"
+          cmp trusted-review/src/lib/io/badge/badge.md "$RUNNER_TEMP/io-usage-real-demo/badge.md"
+          sha256sum "$RUNNER_TEMP/io-usage-real-demo/badge.md"
+          npm install --prefix "$RUNNER_TEMP/io-usage-real-demo" --no-save --package-lock=false --ignore-scripts --no-audit --no-fund @anthropic-ai/sdk@1.12.0 zod@4.4.3 tsx@4.23.15
+          cat > "$RUNNER_TEMP/io-usage-real-demo/guard.mjs" <<'GUARD'
           import assert from 'node:assert/strict';
-          import { readFile, writeFile } from 'node:fs/promises';
-          import { MARKER, MetaSchema, parseState, renderComment } from './render.ts';
-          import { ReviewSchema } from './review.ts';
-          import { ruleIdExists } from './rules.ts';
-
-          const pin = 'd2dce8f0493d1bce4882dead9cdae763bf63b3b5';
-          const event = JSON.parse(await readFile(process.env.GITHUB_EVENT_PATH!, 'utf8'));
-          const rules = await readFile(new URL('./badge.md', import.meta.url), 'utf8');
-          assert(ruleIdExists(rules, 'IN-1'));
-          const review = ReviewSchema.parse({
-            usages: [
-              {
-                file: 'fixture-demo/badge-examples.svelte',
-                line: 10,
-                component: 'badge',
-                verdict: 'aligned',
-                ruleId: 'IN-1',
-                pattern: null,
-                reason: 'Fixture: nonempty text Pending satisfies the Badge input rule.',
-              },
-              {
-                file: 'fixture-demo/badge-examples.svelte',
-                line: 20,
-                component: 'badge',
-                verdict: 'violation',
-                ruleId: 'IN-1',
-                pattern: null,
-                reason: 'Fixture: empty text violates the Badge input rule; omit the Badge when no value exists.',
-              },
-              {
-                file: 'fixture-demo/badge-examples.svelte',
-                line: 30,
-                component: 'badge',
-                verdict: 'uncovered',
-                ruleId: null,
-                pattern: 'Relative ordering of metadata badges',
-                reason: 'Fixture: checked Badge rules do not specify the relative ordering of metadata badges.',
-              },
-            ],
-          });
-          const meta = MetaSchema.parse({
-            repo: 'temporalio/ui',
-            pr: event.number,
-            prUrl: `https://github.com/temporalio/ui/pull/${event.number}`,
-            headSha: event.pull_request.head.sha,
-            reviewStatus: 'complete',
-            skippedFiles: [],
-            missingRules: [],
-            reason: null,
-          });
-          const rendered = renderComment(review, meta, null, pin);
-          const prefix = [
-            '<!-- io-usage-review-DEMO-FE-1628 -->',
-            '**Fixture demo — sample data, not an actual review**',
-            '',
-            'All source paths and line numbers below are fictional fixtures. No model ran; coverage describes the fixture scenario, not PR code or CI acceptance. The advisory, findings-artifact and digest text below is part of the sample renderer output; this demo does not publish findings artifacts or log findings.',
-            '',
-          ].join('\n');
-          const body = `${prefix}\n${rendered}`;
-          assert(!body.startsWith(MARKER));
-          assert.equal(parseState(body), null);
-          assert(body.endsWith(rendered));
-          assert(body.includes('✅ Badge — follows IN-1'));
-          assert(body.includes('⚠️ Badge — breaks IN-1'));
-          assert(body.includes('⚠️ Badge — no documented rule covers this'));
-          assert(body.includes(`/blob/${pin}/src/lib/io/badge/badge.md`));
-          assert(body.length < 65_000);
-          await writeFile(new URL('./comment.md', import.meta.url), body);
-          console.log(body);
-          FIXTURE
-          "$RUNNER_TEMP/io-usage-demo/node_modules/.bin/tsx" "$RUNNER_TEMP/io-usage-demo/fixture.mts"
-
-      - name: Upsert only this disposable demo PR comment
-        shell: bash
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          node --input-type=module <<'POST'
-          import assert from 'node:assert/strict';
+          import { createHash } from 'node:crypto';
           import { readFile } from 'node:fs/promises';
+          import { z } from 'zod';
 
-          const pin = 'd2dce8f0493d1bce4882dead9cdae763bf63b3b5';
-          const marker = '<!-- io-usage-review-DEMO-FE-1628 -->';
-          const api = 'https://api.github.com/repos/temporalio/ui';
-          const event = JSON.parse(await readFile(process.env.GITHUB_EVENT_PATH, 'utf8'));
-          const number = event.number;
+          export const pin = 'd2dce8f0493d1bce4882dead9cdae763bf63b3b5';
+          export const marker = '<!-- io-usage-review-DEMO-FE-1628 -->';
+          export const label = '**Real model demo — throwaway PR; production activation remains off**';
+          export const componentPath = 'src/lib/components/io-review-demo.svelte';
+          export const workflowPath = '.github/workflows/io-usage-review-demo.yml';
+          export const commentId = 7112396710;
+          export const prUrl = 'https://github.com/temporalio/ui/pull/4216';
+          export const issueUrl = 'https://api.github.com/repos/temporalio/ui/issues/4216';
+          export const output = `${process.env.RUNNER_TEMP}/io-usage-real-demo/output`;
+          export const digest = (value) => createHash('sha256').update(value).digest('hex');
+          export const sha = z.string().regex(/^[a-f0-9]{40}$/);
+          export const event = JSON.parse(await readFile(process.env.GITHUB_EVENT_PATH, 'utf8'));
           assert.equal(process.env.GITHUB_EVENT_NAME, 'pull_request');
           assert.equal(process.env.GITHUB_REPOSITORY, 'temporalio/ui');
           assert.equal(process.env.GITHUB_ACTOR, 'ardiewen');
+          assert.equal(process.env.GITHUB_RUN_ATTEMPT, '1');
+          assert.match(process.env.GITHUB_RUN_ID, /^\d+$/);
           assert.equal(event.repository.full_name, 'temporalio/ui');
           assert.equal(event.sender.login, 'ardiewen');
-          assert(['opened', 'synchronize', 'reopened'].includes(event.action));
-          assert(Number.isSafeInteger(number) && number > 0 && number !== 4212);
-          const issueUrl = `${api}/issues/${number}`;
-          const prUrl = `https://github.com/temporalio/ui/pull/${number}`;
-          const headSha = event.pull_request.head.sha;
-          assert.match(headSha, /^[a-f0-9]{40}$/);
-          const validatePr = (pr) => {
-            assert.equal(pr.number, number);
-            assert.equal(pr.html_url, prUrl);
-            assert.equal(pr.issue_url, issueUrl);
-            assert.equal(pr.user.login, 'ardiewen');
-            assert.equal(pr.state, 'open');
-            assert.equal(pr.draft, true);
-            assert.equal(pr.merged, false);
-            assert.equal(pr.head.repo.full_name, 'temporalio/ui');
-            assert.equal(pr.base.repo.full_name, 'temporalio/ui');
-            assert.equal(pr.head.ref, 'ardiewen/fe-1628-comment-demo');
-            assert.equal(pr.base.ref, 'ardiewen/fe-1628-io-usage-review');
-            assert.equal(pr.head.sha, headSha);
-            assert.equal(pr.base.sha, pin);
-          };
-          validatePr(event.pull_request);
-          const body = await readFile(`${process.env.RUNNER_TEMP}/io-usage-demo/comment.md`, 'utf8');
-          assert(body.startsWith(`${marker}\n**Fixture demo — sample data, not an actual review**\n`));
-          assert(body.includes('All source paths and line numbers below are fictional fixtures. No model ran;'));
-          assert(body.length < 65_000);
-          const request = async (path, method = 'GET', data) => {
-            const response = await fetch(`${api}${path}`, {
+          assert.equal(event.action, 'reopened');
+          assert.equal(event.number, 4216);
+          export const headSha = sha.parse(event.pull_request.head.sha);
+          const PrSchema = z.object({
+            number: z.literal(4216),
+            html_url: z.literal(prUrl),
+            issue_url: z.literal(issueUrl),
+            state: z.literal('open'),
+            draft: z.literal(true),
+            merged: z.literal(false),
+            user: z.object({ login: z.literal('ardiewen') }),
+            head: z.object({
+              sha: z.literal(headSha),
+              ref: z.literal('ardiewen/fe-1628-comment-demo'),
+              repo: z.object({ full_name: z.literal('temporalio/ui') }),
+            }),
+            base: z.object({
+              sha: z.literal(pin),
+              ref: z.literal('ardiewen/fe-1628-io-usage-review'),
+              repo: z.object({ full_name: z.literal('temporalio/ui') }),
+            }),
+          });
+          PrSchema.parse(event.pull_request);
+          const CommentSchema = z.object({
+            id: z.literal(commentId),
+            issue_url: z.literal(issueUrl),
+            html_url: z.literal(`${prUrl}#issuecomment-${commentId}`),
+            user: z.object({ login: z.literal('github-actions[bot]'), type: z.literal('Bot') }),
+            body: z.string().max(65_000).refine((body) => body.startsWith(`${marker}\n`)),
+          });
+          export const validateComment = (value) => CommentSchema.parse(value);
+          const request = async (path, method, data) => {
+            const response = await fetch(`https://api.github.com/repos/temporalio/ui${path}`, {
               method,
+              redirect: 'error',
               headers: {
                 Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
                 Accept: 'application/vnd.github+json',
@@ -198,41 +132,291 @@ jobs:
               },
               ...(data ? { body: JSON.stringify(data) } : {}),
             });
-            if (!response.ok) throw new Error(`GitHub ${method} ${path}: ${response.status}`);
-            return response.json();
+            if (!response.ok) throw new Error(`GitHub ${method} failed (${response.status})`);
+            const text = await response.text();
+            assert(Buffer.byteLength(text) <= 500_000, 'GitHub response limit');
+            return JSON.parse(text);
           };
-          const validateComment = (comment) => {
-            assert(Number.isSafeInteger(comment.id) && comment.id > 0);
-            assert.equal(comment.issue_url, issueUrl);
-            assert.equal(comment.user.login, 'github-actions[bot]');
-            assert.equal(comment.user.type, 'Bot');
-            assert(comment.body.startsWith(`${marker}\n`));
-            assert.equal(comment.html_url, `${prUrl}#issuecomment-${comment.id}`);
-          };
-          validatePr(await request(`/pulls/${number}`));
-          const matches = [];
-          for (let page = 1; ; page++) {
-            const comments = await request(`/issues/${number}/comments?per_page=100&page=${page}`);
-            assert(Array.isArray(comments));
-            for (const comment of comments) {
-              if (!comment.body?.startsWith(`${marker}\n`)) continue;
-              validateComment(comment);
-              matches.push(comment);
+          export const get = (path) => request(path, 'GET');
+          export const validateLive = async () => PrSchema.parse(await get('/pulls/4216'));
+          export const readTarget = async () => {
+            await validateLive();
+            const matches = [];
+            for (let page = 1; page <= 10; page++) {
+              const comments = z.array(z.object({ body: z.string().nullable() }).passthrough()).max(100)
+                .parse(await get(`/issues/4216/comments?per_page=100&page=${page}`));
+              for (const comment of comments) {
+                if (comment.body?.startsWith(`${marker}\n`)) matches.push(validateComment(comment));
+              }
+              assert(matches.length <= 1, 'Duplicate demo markers');
+              if (comments.length < 100) break;
+              assert(page < 10, 'Comment pagination limit');
             }
-            assert(matches.length <= 1, 'Duplicate demo markers');
-            if (comments.length < 100) break;
+            assert.equal(matches.length, 1, 'Expected original demo comment');
+            const current = validateComment(await get(`/issues/comments/${commentId}`));
+            assert.equal(current.body, matches[0].body, 'Comment changed during read');
+            return current;
+          };
+          export const assertInitialComment = (comment) => {
+            assert(comment.body.startsWith(`${marker}\n**Fixture demo — sample data, not an actual review**\n`),
+              'Real demo already attempted or original fixture label missing');
+          };
+          export const patchComment = (body) => request(`/issues/comments/${commentId}`, 'PATCH', { body });
+          GUARD
+      - name: Review actual PR text with one real model request
+        id: review
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          set -euo pipefail
+          cat > "$RUNNER_TEMP/io-usage-real-demo/review-demo.mts" <<'REVIEW'
+          import assert from 'node:assert/strict';
+          import { createHash } from 'node:crypto';
+          import { appendFile, readFile, writeFile } from 'node:fs/promises';
+          import Anthropic from '@anthropic-ai/sdk';
+          import { z } from 'zod';
+          import { findCandidates, findIoImports, inScope } from './detect.ts';
+          import { createModelCall } from './main.ts';
+          import { MARKER, MetaSchema, parseState, renderComment, toFindings } from './render.ts';
+          import type { Review, ReviewFile } from './review.ts';
+          import { buildPrompt, reviewUsages, validateReview } from './review.ts';
+          import { loadRules, ruleIdExists } from './rules.ts';
+          import {
+            assertInitialComment, componentPath, digest, get, headSha, label, marker,
+            output, pin, prUrl, readTarget, sha, validateLive, workflowPath,
+          } from './guard.mjs';
+
+          const save = async (name: string, value: unknown): Promise<void> => {
+            await writeFile(`${output}/${name}`, JSON.stringify(value, null, 2));
+          };
+          const meta = MetaSchema.parse({
+            repo: 'temporalio/ui', pr: 4216, prUrl, headSha,
+            reviewStatus: 'complete', skippedFiles: [], missingRules: [], reason: null,
+          });
+          const receipt = {
+            kind: 'real-model-demo', pr: 4216, headSha, baseSha: pin, rendererPin: pin,
+            runId: process.env.GITHUB_RUN_ID, runAttempt: 1,
+            configuredModel: 'claude-sonnet-5-5', returnedModel: null as string | null,
+            modelAttempted: false, transportInvocations: 0, transportAttempts: 0,
+            requestId: null as string | null, messageId: null as string | null,
+            usage: null as { input_tokens: number; output_tokens: number; cache_creation_input_tokens?: number; cache_read_input_tokens?: number } | null,
+            stopReason: null as string | null, httpStatus: null as number | null,
+            previousCommentSha256: null as string | null,
+            promptSha256: null as string | null,
+            status: 'unavailable' as string, failure: null as string | null,
+          };
+          let review: Review | null = null;
+          let parsedOutput: unknown = null;
+          let phase = 'input provenance';
+          let safeTarget = false;
+          try {
+            const original = await readTarget();
+            assertInitialComment(original);
+            receipt.previousCommentSha256 = digest(original.body);
+            safeTarget = true;
+            const live = await get('/pulls/4216');
+            z.object({ changed_files: z.literal(2) }).parse(live);
+            const FileSchema = z.object({
+              filename: z.string(), status: z.literal('added'), sha,
+              patch: z.string().optional(),
+              additions: z.number().int().positive(), deletions: z.literal(0),
+            });
+            const files = z.array(FileSchema).length(2)
+              .parse(await get('/pulls/4216/files?per_page=100&page=1'));
+            assert.deepEqual(files.map((file) => file.filename).sort(), [workflowPath, componentPath].sort());
+            const scoped = files.filter((file) => inScope(file.filename));
+            assert.equal(scoped.length, 1);
+            const file = scoped[0];
+            assert.equal(file.filename, componentPath);
+            const patchText = z.string().min(1).max(20_000).parse(file.patch);
+            const content = z.object({
+              type: z.literal('file'), path: z.literal(componentPath),
+              size: z.number().int().positive().max(20_000), sha,
+              encoding: z.literal('base64'), content: z.string().max(30_000),
+            }).parse(await get(`/contents/${componentPath}?ref=${headSha}`));
+            const bytes = Buffer.from(content.content, 'base64');
+            assert.equal(bytes.length, content.size);
+            const source = bytes.toString('utf8');
+            assert(Buffer.from(source, 'utf8').equals(bytes), 'Invalid UTF-8 source');
+            const blobSha = createHash('sha1').update(`blob ${bytes.length}\0`).update(bytes).digest('hex');
+            assert.equal(blobSha, content.sha);
+            assert.equal(blobSha, file.sha);
+            const patch = patchText.split('\n');
+            const hunk = /^@@ -0,0 \+1(?:,(\d+))? @@$/.exec(patch.shift() ?? '');
+            assert(hunk, 'Expected complete added-file patch');
+            const added = patch.filter((line) => line !== '\\ No newline at end of file');
+            assert(added.every((line) => line.startsWith('+')));
+            assert.equal(added.length, Number(hunk[1] ?? 1));
+            assert.equal(added.length, file.additions);
+            assert.equal(added.map((line) => line.slice(1)).join('\n'), source.replace(/\n$/, ''));
+            const found = findCandidates(source, patchText, '$lib/io/', componentPath);
+            assert(found.candidates.length > 0 && found.candidates.length <= 10);
+            const imported = findIoImports(source, '$lib/io/');
+            assert.deepEqual(imported, ['badge']);
+            const rulesText = await readFile(new URL('./badge.md', import.meta.url), 'utf8');
+            const loaded = await loadRules(imported, { kind: 'dir', root: '' }, async (component) => {
+              assert.equal(component, 'badge');
+              return rulesText;
+            });
+            assert.equal(loaded.missing.length, 0);
+            assert(ruleIdExists(rulesText, 'IN-1'));
+            const inputs: ReviewFile[] = [{ path: componentPath, content: source, patch: patchText, candidates: found.candidates }];
+            const prompt = buildPrompt(inputs, loaded.rules);
+            assert(prompt.system.length + prompt.user.length <= 60_000);
+            receipt.promptSha256 = digest(JSON.stringify(prompt));
+            if (found.uncertain) {
+              meta.reviewStatus = 'partial';
+              meta.reason = 'Unsupported or ambiguous IO usage; surrounding layout changes are not fully covered by detection';
+            }
+            await save('inputs.json', {
+              headSha, baseSha: pin, rendererPin: pin,
+              files: inputs, uncertain: found.uncertain,
+              componentBlobSha: blobSha, contentSha256: digest(bytes), patchSha256: digest(patchText),
+              rules: [{ component: 'badge', path: 'src/lib/io/badge/badge.md', sha256: digest(rulesText), ref: pin, markdown: rulesText }],
+              prompt,
+            });
+            phase = 'model request or response validation';
+            assert(process.env.ANTHROPIC_API_KEY, 'Missing API key');
+            await validateLive();
+            const beforeRequest = await readTarget();
+            assertInitialComment(beforeRequest);
+            assert.equal(digest(beforeRequest.body), receipt.previousCommentSha256);
+            await validateLive();
+            const client = new Anthropic({
+              apiKey: process.env.ANTHROPIC_API_KEY,
+              baseURL: 'https://api.anthropic.com',
+              maxRetries: 0,
+              timeout: 180_000,
+              logLevel: 'off',
+              fetch: async (input, init) => {
+                receipt.transportInvocations++;
+                assert.equal(receipt.transportInvocations, 1, 'One model transport invocation only');
+                const url = new URL(typeof input === 'string' ? input : input instanceof URL ? input.href : input.url);
+                assert.equal(url.origin, 'https://api.anthropic.com');
+                assert.equal(url.pathname, '/v1/messages');
+                assert.equal(init?.method, 'POST');
+                assert.equal(typeof init?.body, 'string');
+                const request = z.object({
+                  model: z.literal('claude-sonnet-5-5'), max_tokens: z.literal(16000), stream: z.literal(false),
+                  fallbacks: z.literal('default'), output_config: z.object({ effort: z.literal('medium'), format: z.object({ type: z.literal('json_schema'), schema: z.record(z.string(), z.unknown()) }) }),
+                  system: z.literal(prompt.system), messages: z.tuple([z.object({ role: z.literal('user'), content: z.literal(prompt.user) }).strict()]),
+                }).strict().parse(JSON.parse(init.body as string));
+                await save('request.json', request);
+                receipt.modelAttempted = true;
+                receipt.transportAttempts++;
+                const response = await fetch(input, { ...init, redirect: 'error' });
+                receipt.httpStatus = response.status;
+                const requestId = response.headers.get('request-id');
+                receipt.requestId = requestId && /^[A-Za-z0-9_-]{1,200}$/.test(requestId) ? requestId : null;
+                const responseText = await response.clone().text();
+                assert(Buffer.byteLength(responseText) <= 300_000, 'Provider response limit');
+                if (response.ok) {
+                  const tokens = z.number().int().nonnegative();
+                  const provider = z.object({
+                    id: z.string().max(200), model: z.string().max(200), stop_reason: z.string().max(100).nullable(),
+                    usage: z.object({ input_tokens: tokens, output_tokens: tokens, cache_creation_input_tokens: tokens.optional(), cache_read_input_tokens: tokens.optional() }),
+                  }).parse(JSON.parse(responseText));
+                  receipt.messageId = provider.id;
+                  receipt.returnedModel = provider.model;
+                  receipt.stopReason = provider.stop_reason;
+                  receipt.usage = provider.usage;
+                }
+                return response;
+              },
+            });
+            const call = createModelCall(client);
+            const result = await reviewUsages(async (actualPrompt) => {
+              const response = await call(actualPrompt);
+              parsedOutput = response.parsed_output;
+              return response;
+            }, prompt);
+            assert.equal(receipt.transportAttempts, 1, 'Exactly one model request required');
+            if (!result.ok) {
+              meta.reviewStatus = 'unavailable';
+              meta.reason = result.reason;
+              receipt.failure = result.reason;
+            } else {
+              phase = 'candidate and rule provenance validation';
+              review = validateReview(result.review, inputs, loaded.rules);
+            }
+          } catch {
+            review = null;
+            meta.reviewStatus = 'unavailable';
+            meta.reason = `Real model demo unavailable: ${phase} failed`;
+            receipt.failure = meta.reason;
           }
-          const existing = matches[0];
-          if (existing) validateComment(await request(`/issues/comments/${existing.id}`));
-          validatePr(await request(`/pulls/${number}`));
-          const comment = existing
-            ? await request(`/issues/comments/${existing.id}`, 'PATCH', { body })
-            : await request(`/issues/${number}/comments`, 'POST', { body });
-          validateComment(comment);
+          receipt.status = meta.reviewStatus;
+          const rendered = renderComment(review, meta, null, pin);
+          const body = [
+            marker, label, '',
+            'This is a real-model demo of intentionally throwaway, unmounted layout code on PR #4216. It composes pinned production review functions with a temporary demo entrypoint; production release guards and activation remain unchanged. Verdicts below come from the validated provider response, with normal production rule validation. This is not production CI approval. The rendered advisory text refers to review artifacts; this demo uploads its own receipt and does not activate production digest logging.',
+            '',
+            `Model request dispatched: ${receipt.modelAttempted ? 'yes' : 'no'}; client requests: ${receipt.transportAttempts}; configured model: ${receipt.configuredModel}; returned model: ${receipt.returnedModel ?? 'unavailable'}.`,
+            '', rendered,
+          ].join('\n');
+          assert(!body.startsWith(MARKER));
+          assert.equal(parseState(body), null);
+          assert(body.endsWith(rendered));
+          assert(body.length < 65_000);
+          await save('receipt.json', receipt);
+          await save('model-response.json', { requestId: receipt.requestId, returnedModel: receipt.returnedModel, usage: receipt.usage, stopReason: receipt.stopReason, parsedOutput, validatedReview: review });
+          await save('meta.json', meta);
+          await save('findings.json', review ? toFindings(review, meta) : []);
+          await writeFile(`${output}/comment.md`, body);
+          if (safeTarget && process.env.GITHUB_OUTPUT) await appendFile(process.env.GITHUB_OUTPUT, 'prepared=true\n');
+          console.log(JSON.stringify(receipt));
+          if (meta.reviewStatus === 'unavailable') process.exitCode = 1;
+          REVIEW
+          "$RUNNER_TEMP/io-usage-real-demo/node_modules/.bin/tsx" "$RUNNER_TEMP/io-usage-real-demo/review-demo.mts"
+      - name: Patch only the original bot-owned demo comment
+        if: always() && steps.review.outputs.prepared == 'true'
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          cat > "$RUNNER_TEMP/io-usage-real-demo/post-demo.mts" <<'POST'
+          import assert from 'node:assert/strict';
+          import { readFile } from 'node:fs/promises';
+          import { z } from 'zod';
+          import { MARKER, parseState } from './render.ts';
+          import {
+            assertInitialComment, commentId, digest, get, headSha, label, marker,
+            output, patchComment, pin, readTarget, validateComment, validateLive,
+          } from './guard.mjs';
+
+          const receipt = z.object({
+            kind: z.literal('real-model-demo'), pr: z.literal(4216),
+            headSha: z.literal(headSha), baseSha: z.literal(pin), rendererPin: z.literal(pin),
+            runId: z.literal(process.env.GITHUB_RUN_ID), runAttempt: z.literal(1),
+            transportInvocations: z.number().int().min(0).max(1),
+            transportAttempts: z.number().int().min(0).max(1),
+            previousCommentSha256: z.string().regex(/^[a-f0-9]{64}$/),
+          }).parse(JSON.parse(await readFile(`${output}/receipt.json`, 'utf8')));
+          const body = await readFile(`${output}/comment.md`, 'utf8');
+          assert(body.startsWith(`${marker}\n${label}\n`));
+          assert(body.includes(`Reviewed head: ${headSha}`));
+          assert(!body.startsWith(MARKER));
+          assert.equal(parseState(body), null);
+          assert(body.length < 65_000);
+          const existing = await readTarget();
+          assertInitialComment(existing);
+          assert.equal(digest(existing.body), receipt.previousCommentSha256);
+          await validateLive();
+          const comment = validateComment(await patchComment(body));
           assert.equal(comment.body, body);
-          if (existing) assert.equal(comment.id, existing.id);
-          const readback = await request(`/issues/comments/${comment.id}`);
-          validateComment(readback);
+          const readback = validateComment(await get(`/issues/comments/${commentId}`));
           assert.equal(readback.body, body);
           console.log(readback.html_url);
           POST
+          "$RUNNER_TEMP/io-usage-real-demo/node_modules/.bin/tsx" "$RUNNER_TEMP/io-usage-real-demo/post-demo.mts"
+      - name: Upload safe real-model demo receipt
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: io-usage-real-demo-${{ github.run_id }}
+          path: ${{ runner.temp }}/io-usage-real-demo/output/
+          retention-days: 7
+          if-no-files-found: warn
