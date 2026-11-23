@@ -120,7 +120,12 @@
     copy(e, stringifyWithBigInt(fullJson));
   };
 
-  const decodeWorkflowUserMetadata = async (workflow: WorkflowExecution) => {
+  const decodeWorkflowUserMetadata = async (
+    workflow: WorkflowExecution,
+    ns: string,
+    wfId: string,
+    rId: string,
+  ) => {
     const userMetadata = { summary: '', details: '' };
     try {
       if (workflow?.summary) {
@@ -140,9 +145,15 @@
         }
       }
 
-      $workflowRun = { ...$workflowRun, userMetadata };
+      if (ns === namespace && wfId === workflowId && rId === runId) {
+        $workflowRun = { ...$workflowRun, userMetadata };
+      }
     } catch (e) {
       console.error('Error decoding user metadata', e);
+    } finally {
+      if (ns === namespace && wfId === workflowId && rId === runId) {
+        $workflowRun = { ...$workflowRun, userMetadataLoading: false };
+      }
     }
   };
 
@@ -193,12 +204,16 @@
 
     if (!workflow) return;
 
-    await decodeWorkflowUserMetadata(workflow);
+    // Render the workflow immediately and decode user metadata in the
+    // background, so a slow codec server doesn't block the whole page.
+    // The User Metadata tab shows a loader until decoding finishes.
+    $workflowRun = { ...$workflowRun, workflow, userMetadataLoading: true };
+    void decodeWorkflowUserMetadata(workflow, ns, wfId, rId);
 
     const { taskQueue } = workflow;
     const workers = await getPollers({ queue: taskQueue!, namespace: ns });
 
-    $workflowRun = { ...$workflowRun, workflow, workers, workersLoaded: true };
+    $workflowRun = { ...$workflowRun, workers, workersLoaded: true };
 
     workflowRunController = new AbortController();
 

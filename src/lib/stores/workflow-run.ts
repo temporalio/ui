@@ -29,6 +29,7 @@ export type WorkflowRunWithWorkers = {
     summary: string;
     details: string;
   };
+  userMetadataLoading: boolean;
 };
 
 export const initialWorkflowRun: WorkflowRunWithWorkers = {
@@ -41,6 +42,7 @@ export const initialWorkflowRun: WorkflowRunWithWorkers = {
     summary: '',
     details: '',
   },
+  userMetadataLoading: true,
 };
 
 export const workflowRun = writable<WorkflowRunWithWorkers>(initialWorkflowRun);
