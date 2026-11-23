@@ -579,4 +579,183 @@ import type { BadgeProps as Props } from '$lib/io/badge';`,
       });
     },
   );
+
+  it.each([
+    {
+      name: 'Button const Badge',
+      body: '<Button>\n{@const label = ""}\n<Badge text={label} />\n</Button>',
+      line: 1,
+    },
+    {
+      name: 'Roundness each Button',
+      body: '<RoundnessGroup>\n{#each items as item}\n<Button>{item.label}</Button>\n{/each}\n</RoundnessGroup>',
+      line: 1,
+    },
+    {
+      name: 'same component nested',
+      body: '<Button>\n{#each items as item}\n<Button>{item.label}</Button>\n{/each}\n</Button>',
+      line: 1,
+    },
+    {
+      name: 'multiline const interior',
+      body: '<Button>\n{@const label =\n ""}\n<Badge text={label} />\n</Button>',
+      line: 2,
+    },
+    {
+      name: 'multiline each interior',
+      body: '<RoundnessGroup>\n{#each (\n items\n) as item}\n<Button>{item.label}</Button>\n{/each}\n</RoundnessGroup>',
+      line: 2,
+    },
+    {
+      name: 'same line context outside opening',
+      body: '<Button>{@const label = ""}<Badge text={label} /></Button>',
+      line: 0,
+    },
+    {
+      name: 'expression children',
+      body: '<Button>\n{label}\n</Button>',
+      line: 1,
+    },
+    {
+      name: 'raw masked context',
+      body: '<Button>\n<!-- {@const label = ""} -->\n<Badge text={label} />\n</Button>',
+      line: 1,
+    },
+    {
+      name: 'nested snippet context',
+      body: '<Button>\n{#snippet row(label = "")}\n<Badge text={label} />\n{/snippet}\n</Button>',
+      line: 1,
+    },
+  ])(
+    'does not certify $name through broad children coverage',
+    ({ body, line }) => {
+      for (const renamed of [false, true]) {
+        const markup = renamed
+          ? body
+              .replaceAll('Button', 'Action')
+              .replaceAll('Badge', 'Label')
+              .replaceAll('RoundnessGroup', 'Group')
+          : body;
+        const source = `<script>\nimport { Button${renamed ? ' as Action' : ''} } from '$lib/io/button';\nimport { Badge${renamed ? ' as Label' : ''} } from '$lib/io/badge';\nimport { RoundnessGroup${renamed ? ' as Group' : ''} } from '$lib/io/roundness-group';\n</script>\n${markup}`;
+        const result = findCandidates(
+          source,
+          `@@ -${line + 6} +${line + 6} @@\n-old\n+${markup.split('\n')[line]}`,
+          '$lib/io/',
+          'x.svelte',
+        );
+        expect(result.uncertain).toBe(true);
+        expect(result.candidates.length).toBeGreaterThan(0);
+      }
+    },
+  );
+
+  it.each([
+    {
+      body: '<Button>\n<Badge text={label} />\n</Button>',
+      removed: '{@const label = ""}',
+      line: 1,
+    },
+    {
+      body: '<Button>\nLiteral\n</Button>',
+      removed: '{@const label = ""}',
+      line: 1,
+    },
+    { body: '<Button>\n</Button>', removed: '{label}', line: 1 },
+    {
+      body: '<Button>\n<Badge text={label} />\n</Button>',
+      removed: '{#each items as label}',
+      line: 1,
+    },
+    {
+      body: '<Button>\n<Badge text={label} />\n</Button>',
+      removed: '{@const label =\n ""}',
+      line: 1,
+    },
+  ])(
+    'retains removed context rather than trusting its new anchor %#',
+    ({ body, removed, line }) => {
+      const source = `<script>\nimport { Button } from '$lib/io/button';\nimport { Badge } from '$lib/io/badge';\n</script>\n${body}`;
+      const deleted = removed
+        .split('\n')
+        .map((value) => `-${value}`)
+        .join('\n');
+      expect(
+        findCandidates(
+          source,
+          `@@ -${line + 5},${removed.split('\n').length} +${line + 5},0 @@\n${deleted}`,
+          '$lib/io/',
+          'x.svelte',
+        ).uncertain,
+      ).toBe(true);
+    },
+  );
+
+  it.each([
+    { body: '<Button>\nSave\n</Button>', line: 1, old: 'Start' },
+    { body: '<Button>Save</Button>', line: 0, old: '<Button>Start</Button>' },
+    { body: '<Button>\nSave\n</Button>', line: 2, old: '</Button >' },
+    {
+      body: '<Button disabled={false}>Save</Button>',
+      line: 0,
+      old: '<Button disabled={true}>Save</Button>',
+    },
+    {
+      body: '<Button>\n<Badge\n text="New"\n/>\n</Button>',
+      line: 2,
+      old: ' text="Old"',
+    },
+    {
+      body: '<Button>\n<Badge text={label} />\n</Button>',
+      line: 1,
+      old: '<Badge text={other} />',
+    },
+  ])(
+    'keeps actual opening/prop and literal-child proof complete %#',
+    ({ body, line, old }) => {
+      const source = `<script>\nimport { Button } from '$lib/io/button';\nimport { Badge } from '$lib/io/badge';\n</script>\n${body}`;
+      const result = findCandidates(
+        source,
+        `@@ -${line + 5} +${line + 5} @@\n-${old}\n+${body.split('\n')[line]}`,
+        '$lib/io/',
+        'x.svelte',
+      );
+      expect(result.uncertain).toBe(false);
+      expect(result.candidates.length).toBeGreaterThan(0);
+    },
+  );
+
+  it.each([
+    { body: '<Button>\nSave\n</Button>', removed: 'Old text', line: 1 },
+    { body: '<Button>\n</Button>', removed: 'Old text', line: 1 },
+    {
+      body: '<Button\n disabled={false}\n/>',
+      removed: ' title={label}',
+      line: 2,
+    },
+  ])(
+    'proves literal or interior prop deletion complete %#',
+    ({ body, removed, line }) => {
+      const source = `<script>\nimport { Button } from '$lib/io/button';\n</script>\n${body}`;
+      const result = findCandidates(
+        source,
+        `@@ -${line + 4} +${line + 4},0 @@\n-${removed}`,
+        '$lib/io/',
+        'x.svelte',
+      );
+      expect(result.uncertain).toBe(false);
+      expect(result.candidates).toHaveLength(1);
+    },
+  );
+  it('does not let mixed import and markup lines certify context outside imports', () => {
+    const source =
+      "<script>import { Button } from '$lib/io/button'; import { Badge } from '$lib/io/badge';</script><Button>{@const label = \"\"}<Badge text={label} /></Button>";
+    expect(
+      findCandidates(
+        source,
+        `@@ -1 +1 @@\n-old\n+${source}`,
+        '$lib/io/',
+        'x.svelte',
+      ).uncertain,
+    ).toBe(true);
+  });
 });

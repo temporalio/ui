@@ -193,6 +193,149 @@ const noReferenceInputs = [
     patch: '@@ -4 +4 @@\n-<Badge text="Old" />\n+<p>New</p>',
   },
 ];
+
+const containerInputs = [
+  {
+    name: 'C1-Button-const-Badge',
+    body: '<Button tracking={false}>\n{@const label = ""}\n<Badge text={label} />\n</Button>',
+    line: 1,
+  },
+  {
+    name: 'C1-Roundness-each-Button',
+    body: '<RoundnessGroup>\n{#each items as item}\n<Button tracking={false}>{item.label}</Button>\n{/each}\n</RoundnessGroup>',
+    line: 1,
+  },
+  {
+    name: 'C1-renamed',
+    body: '<Action>\n{@const label = ""}\n<Label text={label} />\n</Action>',
+    line: 1,
+    renamed: true,
+  },
+  {
+    name: 'C1-multiline',
+    body: '<Button>\n{@const label =\n ""}\n<Badge text={label} />\n</Button>',
+    line: 2,
+  },
+  {
+    name: 'C1-same-line',
+    body: '<Button>{@const label = ""}<Badge text={label} /></Button>',
+    line: 0,
+  },
+  {
+    name: 'C1-deletion',
+    body: '<Button>\n<Badge text={label} />\n</Button>',
+    line: 1,
+    removed: '{@const label = ""}',
+  },
+  {
+    name: 'C1-deletion-literal-head',
+    body: '<Button>\nSave\n</Button>',
+    line: 1,
+    removed: '{@const label = ""}',
+  },
+  {
+    name: 'C1-mixed',
+    body: '<Button disabled={false}>\n{@const label = ""}\n<Badge text={label} />\n</Button>',
+    line: 0,
+    extra: true,
+  },
+]
+  .map(({ name, body, line, renamed, removed, extra }) => ({
+    name,
+    fixture: {
+      filename: 'src/x.svelte',
+      content: `<script>\nimport { Button${renamed ? ' as Action' : ''} } from '$lib/io/button';\nimport { Badge${renamed ? ' as Label' : ''} } from '$lib/io/badge';\nimport { RoundnessGroup } from '$lib/io/roundness-group';\n</script>\n${body}`,
+      patch: removed
+        ? `@@ -${line + 6} +${line + 6},0 @@\n-${removed}`
+        : extra
+          ? `@@ -6,2 +6,2 @@\n-<Button disabled={true}>\n+${body.split('\n')[0]}\n-old\n+${body.split('\n')[1]}`
+          : `@@ -${line + 6} +${line + 6} @@\n-old\n+${body.split('\n')[line]}`,
+    },
+  }))
+  .concat([
+    {
+      name: 'C1-Button-container-local-const-Badge-exact',
+      fixture: {
+        filename: 'src/nested-container-const.svelte',
+        content:
+          "<script>\nimport { Button } from '$lib/io/button';\nimport { Badge } from '$lib/io/badge';\n</script>\n<Button tracking={false}>\n{@const label = ''}\n<Badge text={label} />\n</Button>\n",
+        patch: "@@ -6 +6 @@\n-{@const label = 'Active'}\n+{@const label = ''}",
+      },
+    },
+    {
+      name: 'C1-Roundness-container-each-Button-exact',
+      fixture: {
+        filename: 'src/nested-container-each.svelte',
+        content:
+          "<script>\nimport { RoundnessGroup } from '$lib/io/roundness-group';\nimport { Button } from '$lib/io/button';\n</script>\n<RoundnessGroup>\n{#each [{ label: '' }] as item}\n<Button tracking={false}>{item.label}</Button>\n{/each}\n</RoundnessGroup>\n",
+        patch:
+          "@@ -6 +6 @@\n-{#each [{ label: 'Save' }] as item}\n+{#each [{ label: '' }] as item}",
+      },
+    },
+  ]);
+const literalInputs = [
+  {
+    name: 'complete-literal-child',
+    body: '<Button>\nSave\n</Button>',
+    line: 1,
+    old: 'Start',
+  },
+  {
+    name: 'complete-literal-same-line',
+    body: '<Button>Save</Button>',
+    line: 0,
+    old: '<Button>Start</Button>',
+  },
+  {
+    name: 'complete-nested-prop',
+    body: '<RoundnessGroup>\n<Button tracking={false}>Save</Button>\n</RoundnessGroup>',
+    line: 1,
+    old: '<Button tracking={true}>Save</Button>',
+  },
+  {
+    name: 'complete-literal-deletion',
+    body: '<Button>\nSave\n</Button>',
+    line: 1,
+    removed: 'Old text',
+  },
+  {
+    name: 'complete-prop-deletion',
+    body: '<Button\n tracking={false}\n/>',
+    line: 2,
+    removed: ' title={label}',
+  },
+].map(({ name, body, line, old, removed }) => ({
+  name,
+  fixture: {
+    filename: 'src/x.svelte',
+    content: `<script>\nimport { Button } from '$lib/io/button';\nimport { RoundnessGroup } from '$lib/io/roundness-group';\n</script>\n${body}`,
+    patch: removed
+      ? `@@ -${line + 5} +${line + 5},0 @@\n-${removed}`
+      : `@@ -${line + 5} +${line + 5} @@\n-${old}\n+${body.split('\n')[line]}`,
+  },
+}));
+const containerModel =
+  (verdict: 'aligned' | 'violation'): ModelCall =>
+  async (prompt) => ({
+    stop_reason: 'end_turn',
+    parsed_output: {
+      usages: JSON.parse(prompt.user).files.flatMap(
+        (file: {
+          path: string;
+          candidates: { component: string; line: number }[];
+        }) =>
+          file.candidates.map((candidate) => ({
+            file: file.path,
+            component: candidate.component,
+            line: candidate.line,
+            verdict,
+            ruleId: candidate.component === 'badge' ? 'IN-2' : 'USE-1',
+            pattern: null,
+            reason: 'Offline candidate verdict',
+          })),
+      ),
+    },
+  });
 const ambiguousInputs = [
   {
     filename: 'src/x.svelte',
@@ -405,9 +548,11 @@ async function harness(
       if (options.missing) return Response.json({}, { status: 404 });
       const content = await readFile(
         path.resolve(
-          route.endsWith('/button/button.md')
-            ? 'src/lib/io/button/button.md'
-            : 'scripts/io-usage-review/__fixtures__/badge/badge.md',
+          route.endsWith('/roundness-group/roundness-group.md')
+            ? 'src/lib/io/roundness-group/roundness-group.md'
+            : route.endsWith('/button/button.md')
+              ? 'src/lib/io/button/button.md'
+              : 'scripts/io-usage-review/__fixtures__/badge/badge.md',
         ),
         'utf8',
       );
@@ -644,6 +789,66 @@ describe('offline orchestration acceptance', () => {
     },
   );
 
+  it.each(containerInputs)(
+    'preserves history for $name under either known-candidate verdict',
+    async ({ fixture, name }) => {
+      for (const verdict of ['aligned', 'violation'] as const) {
+        const result = await harness({
+          fixture,
+          old: oldBody,
+          model: containerModel(verdict),
+        });
+        expect(result.result).toBe('published');
+        expect(result.model).toHaveBeenCalledOnce();
+        const supplied = JSON.parse(result.model.mock.calls[0][0].user).files[0]
+          .candidates;
+        if (name === 'C1-Button-const-Badge')
+          expect(
+            supplied.map(
+              (candidate: { component: string }) => candidate.component,
+            ),
+          ).toEqual(['button']);
+        if (name === 'C1-Roundness-each-Button')
+          expect(
+            supplied.map(
+              (candidate: { component: string }) => candidate.component,
+            ),
+          ).toEqual(['roundness-group']);
+        expect(result.artifacts[0].meta).toMatchObject({
+          headSha: head,
+          reviewStatus: 'partial',
+        });
+        expect(result.artifacts[0].findings).toHaveLength(
+          verdict === 'aligned' ? 0 : supplied.length,
+        );
+        expect(result.writes).toHaveLength(1);
+        const body = result.writes[0].body.body;
+        expect(body).toContain(`originating head ${oldMeta.headSha}`);
+        expect(body).not.toContain('No IO component usage changed');
+        expect(
+          parseState(body)?.records.some(
+            (record) => record.headSha === oldMeta.headSha,
+          ),
+        ).toBe(true);
+      }
+    },
+  );
+
+  it.each(literalInputs)('resolves history for $name', async ({ fixture }) => {
+    const result = await harness({
+      fixture,
+      old: oldBody,
+      model: containerModel('aligned'),
+    });
+    expect(result.result).toBe('published');
+    expect(result.model).toHaveBeenCalledOnce();
+    expect(result.artifacts[0]).toMatchObject({
+      findings: [],
+      meta: { headSha: head, reviewStatus: 'complete' },
+    });
+    expect(result.writes).toHaveLength(1);
+    expect(parseState(result.writes[0].body.body)?.records).toEqual([]);
+  });
   it('resolves complete no-reference results for unused-import script edits and removed usages', async () => {
     for (const fixture of noReferenceInputs) {
       const result = await harness({ fixture, old: oldBody });
@@ -995,6 +1200,34 @@ describe('offline orchestration acceptance', () => {
           }),
         ],
         ...(await Promise.all(
+          containerInputs.flatMap(({ name, fixture }) =>
+            (['aligned', 'violation'] as const).map(
+              async (verdict) =>
+                [
+                  `${name}-${verdict}`,
+                  await harness({
+                    fixture,
+                    old: oldBody,
+                    model: containerModel(verdict),
+                  }),
+                ] as const,
+            ),
+          ),
+        )),
+        ...(await Promise.all(
+          literalInputs.map(
+            async ({ name, fixture }) =>
+              [
+                name,
+                await harness({
+                  fixture,
+                  old: oldBody,
+                  model: containerModel('aligned'),
+                }),
+              ] as const,
+          ),
+        )),
+        ...(await Promise.all(
           ambiguousInputs.map(
             async (fixture, index) =>
               [
@@ -1011,6 +1244,7 @@ describe('offline orchestration acceptance', () => {
             name,
             outcome: value.result,
             modelCalls: value.model.mock.calls.length,
+            prompts: value.model.mock.calls.map(([prompt]) => prompt),
             artifacts: value.artifacts,
             comments: value.writes,
             summaries: value.summaries,
