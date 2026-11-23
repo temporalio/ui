@@ -48,7 +48,7 @@ How the component behaves. Context for reviewers; not checked.
 
 - **BEH-1** `Icon` follows the primary text. Extension content is ordered `LeadIcon`, `text`, `TrailIcon`.
 - **BEH-2** The singular extension precedes the plural extensions; false, null, and undefined entries are filtered out.
-- **DIS-1** [`badgeRecipe` and `badgeSegmentRecipe`](./recipe.ts) own typography, colors, clipping, and truncation. Colors are applied to inner segments; the caller's `class` is applied to the outer RoundnessGroup.
+- **DIS-1** `badgeRecipe` and `badgeSegmentRecipe` (`recipe.ts` in `src/lib/io/badge/`) own typography, colors, clipping, and truncation. Colors are applied to inner segments; the caller's `class` is applied to the outer RoundnessGroup.
 - **DIS-2** `truncate` enables primary-label truncation inside a constrained width; extension truncation also depends on the extension's `truncate`.
 - **BEH-3** Native attributes, including `data-testid` and accessible labels, reach the outer span. No test ID is assigned internally.
 
