@@ -43,7 +43,7 @@ Checked against every PR that uses this component.
 
 How the component behaves. Context for reviewers; not checked.
 
-- **BEH-1** RoundnessGroup is a span styled by [`roundnessGroupRecipe`](./roundness-group.svelte). It adds no interaction, group role, or accessible name.
+- **BEH-1** RoundnessGroup is a span styled by `roundnessGroupRecipe` (`roundness-group.svelte` in `src/lib/io/roundness-group/`). It adds no interaction, group role, or accessible name.
 - **DIS-1** Child mode resets direct-child radii and rounds the first and last child's outside corners. Wrapper mode also rounds the group and computes inner radii using `--group-border-width`.
 - **DIS-2** Border handling removes right borders between segments in collapse mode and both adjoining borders in erase mode. These rules use physical left and right edges.
 - **BEH-2** Native attributes, including `data-testid`, reach the span. No test ID is assigned internally.
