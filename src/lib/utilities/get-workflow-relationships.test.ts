@@ -6,8 +6,10 @@ import type { WorkflowEvent, WorkflowEvents } from '$lib/types/events';
 
 import { parseRawPayloadToJSON } from './decode-payload';
 import {
+  belongsToCurrentChain,
   getWorkflowNexusLinksFromHistory,
   getWorkflowRelationships,
+  latestRunOfThisChain,
 } from './get-workflow-relationships';
 
 import childEvents from '$fixtures/events.children.json';
@@ -99,7 +101,7 @@ describe('getWorkflowRelationships', () => {
     ).toBe(false);
   });
 
-  it('should return the firstExecutionRunId for first on a workflowExecutionStartedEvent', () => {
+  it('should return the firstExecutionRunId for firstRunId on a workflowExecutionStartedEvent', () => {
     const workflowExecutionStartedEvent = continuedAsNewEvents.find(
       (event) => event?.name === 'WorkflowExecutionStarted',
     );
@@ -111,11 +113,11 @@ describe('getWorkflowRelationships', () => {
         toWorkflowExecution(continuedAsNewWorkflow),
         continuedAsNewEvents,
         namespaces.namespaces[0],
-      ).first,
+      ).firstRunId,
     ).toBe(firstExecutionRunId);
   });
 
-  it('should not return the firstExecutionRunId for first on a workflowExecutionStartedEvent if the id matches the runId', () => {
+  it('isFirstRun should be true only when the firstExecutionRunId matches the runId', () => {
     const workflowExecutionStartedEvent = continuedAsNewEvents.find(
       (event) => event?.name === 'WorkflowExecutionStarted',
     );
@@ -129,22 +131,22 @@ describe('getWorkflowRelationships', () => {
         toWorkflowExecution(continuedAsNewWorkflowCopy),
         continuedAsNewEvents,
         namespaces.namespaces[0],
-      ).first,
-    ).toBe(firstExecutionRunId);
+      ).isFirstRun,
+    ).toBe(false);
 
     continuedAsNewWorkflowCopy.workflowExecutionInfo.execution.runId =
       firstExecutionRunId;
 
-    expect(
-      getWorkflowRelationships(
-        toWorkflowExecution(continuedAsNewWorkflowCopy),
-        continuedAsNewEvents,
-        namespaces.namespaces[0],
-      ).first,
-    ).toBe(undefined);
+    const relationships = getWorkflowRelationships(
+      toWorkflowExecution(continuedAsNewWorkflowCopy),
+      continuedAsNewEvents,
+      namespaces.namespaces[0],
+    );
+    expect(relationships.isFirstRun).toBe(true);
+    expect(relationships.firstRunId).toBe(firstExecutionRunId);
   });
 
-  it('should return the continuedExecutionRunId for previous on a WorkflowExecutionStarted event', () => {
+  it('should return the continuedExecutionRunId for previousRunId on a WorkflowExecutionStarted event', () => {
     const workflowExecutionStartedEvent = continuedAsNewEvents.find(
       (event) => event?.name === 'WorkflowExecutionStarted',
     );
@@ -155,11 +157,11 @@ describe('getWorkflowRelationships', () => {
         toWorkflowExecution(continuedAsNewWorkflow),
         continuedAsNewEvents,
         namespaces.namespaces[0],
-      ).previous,
+      ).previousRunId,
     ).toBe(continuedExecutionRunId);
   });
 
-  it('should return the newExecutionRunId for next on a WorkflowExecutionContinuedAsNew event', () => {
+  it('should return the newExecutionRunId for nextRunId on a WorkflowExecutionContinuedAsNew event', () => {
     const workflowExecutionContinuedAsNewEvent = continuedAsNewEvents.find(
       (event) => event?.name === 'WorkflowExecutionContinuedAsNew',
     );
@@ -171,11 +173,11 @@ describe('getWorkflowRelationships', () => {
         toWorkflowExecution(continuedAsNewWorkflow),
         continuedAsNewEvents,
         namespaces.namespaces[0],
-      ).next,
+      ).nextRunId,
     ).toBe(newExecutionRunId);
   });
 
-  it('should return the newExecutionRunId for next on a WorkflowExecutionCompleted event', () => {
+  it('should return the newExecutionRunId for nextRunId on a WorkflowExecutionCompleted event', () => {
     const workflowExecutionCompletedEvent = completedEvents.find(
       (event) => event?.name === 'WorkflowExecutionCompleted',
     );
@@ -187,11 +189,11 @@ describe('getWorkflowRelationships', () => {
         toWorkflowExecution(completedWorkflow),
         completedEvents,
         namespaces.namespaces[0],
-      ).next,
+      ).nextRunId,
     ).toBe(newExecutionRunId);
   });
 
-  it('should return the newExecutionRunId for next on a WorkflowExecutionTimedOut event', () => {
+  it('should return the newExecutionRunId for nextRunId on a WorkflowExecutionTimedOut event', () => {
     const workflowExecutionCompletedEvent = timedOutEvents.find(
       (event) => event?.name === 'WorkflowExecutionTimedOut',
     );
@@ -203,11 +205,11 @@ describe('getWorkflowRelationships', () => {
         toWorkflowExecution(timedOutWorkflow),
         timedOutEvents,
         namespaces.namespaces[0],
-      ).next,
+      ).nextRunId,
     ).toBe(newExecutionRunId);
   });
 
-  it('should return the newExecutionRunId for next on a WorkflowExecutionFailed event', () => {
+  it('should return the newExecutionRunId for nextRunId on a WorkflowExecutionFailed event', () => {
     const workflowExecutionCompletedEvent = failedEvents.find(
       (event) => event?.name === 'WorkflowExecutionFailed',
     );
@@ -219,7 +221,7 @@ describe('getWorkflowRelationships', () => {
         toWorkflowExecution(failedWorkflow),
         failedEvents,
         namespaces.namespaces[0],
-      ).next,
+      ).nextRunId,
     ).toBe(newExecutionRunId);
   });
 
@@ -245,6 +247,68 @@ describe('getWorkflowRelationships', () => {
         namespaces.namespaces[0],
       ).scheduleId,
     ).toBe('');
+  });
+
+  describe('isMultiRunChain', () => {
+    const firstExecutionRunId = 'dd65e55d-d058-401c-9cb6-77dd4846a98e';
+    const withRunId = (runId: string) => {
+      const workflow = JSON.parse(JSON.stringify(continuedAsNewWorkflow));
+      workflow.workflowExecutionInfo.execution.runId = runId;
+      return toWorkflowExecution(workflow);
+    };
+    const withoutSuccessor = continuedAsNewEvents.filter(
+      (event) => event?.name !== 'WorkflowExecutionContinuedAsNew',
+    );
+
+    it('is true when the Run has a predecessor and a successor', () => {
+      expect(
+        getWorkflowRelationships(
+          toWorkflowExecution(continuedAsNewWorkflow),
+          continuedAsNewEvents,
+          namespaces.namespaces[0],
+        ).isMultiRunChain,
+      ).toBe(true);
+    });
+
+    it('is true when the Run only has a predecessor', () => {
+      expect(
+        getWorkflowRelationships(
+          toWorkflowExecution(continuedAsNewWorkflow),
+          withoutSuccessor,
+          namespaces.namespaces[0],
+        ).isMultiRunChain,
+      ).toBe(true);
+    });
+
+    it('is true when the first Run closes with a successor', () => {
+      expect(
+        getWorkflowRelationships(
+          withRunId(firstExecutionRunId),
+          continuedAsNewEvents,
+          namespaces.namespaces[0],
+        ).isMultiRunChain,
+      ).toBe(true);
+    });
+
+    it('is false for a first Run with no successor', () => {
+      expect(
+        getWorkflowRelationships(
+          withRunId(firstExecutionRunId),
+          withoutSuccessor,
+          namespaces.namespaces[0],
+        ).isMultiRunChain,
+      ).toBe(false);
+    });
+
+    it('is false for a single-Run chain whose close event has an empty newExecutionRunId', () => {
+      expect(
+        getWorkflowRelationships(
+          toWorkflowExecution(completedWorkflow),
+          completedEvents,
+          namespaces.namespaces[0],
+        ).isMultiRunChain,
+      ).toBe(false);
+    });
   });
 });
 
@@ -311,5 +375,104 @@ describe('getWorkflowNexusLinksFromHistory', () => {
       link('scheduled-7'),
       link('completed-8'),
     ]);
+  });
+});
+
+describe('belongsToCurrentChain', () => {
+  const currentRun = {
+    runId: 'run-c',
+    firstRunId: 'run-a',
+    status: 'Running' as const,
+  };
+
+  it('is true when the current Run shares the first Run ID', () => {
+    expect(belongsToCurrentChain({ firstRunId: 'run-a', currentRun })).toBe(
+      true,
+    );
+  });
+
+  it('is false when the Workflow ID was reused', () => {
+    expect(belongsToCurrentChain({ firstRunId: 'run-x', currentRun })).toBe(
+      false,
+    );
+  });
+
+  it('is true while the current Run is unknown', () => {
+    expect(
+      belongsToCurrentChain({ firstRunId: 'run-x', currentRun: null }),
+    ).toBe(true);
+  });
+
+  it('is true when the server omits the first Run ID', () => {
+    expect(
+      belongsToCurrentChain({
+        firstRunId: 'run-x',
+        currentRun: { ...currentRun, firstRunId: undefined },
+      }),
+    ).toBe(true);
+  });
+
+  it('is true when this Run has no first Run ID yet', () => {
+    expect(belongsToCurrentChain({ firstRunId: undefined, currentRun })).toBe(
+      true,
+    );
+  });
+});
+
+describe('latestRunOfThisChain', () => {
+  const currentRun = {
+    runId: 'run-c',
+    firstRunId: 'run-a',
+    status: 'Running' as const,
+  };
+  const midChain = {
+    runId: 'run-b',
+    firstRunId: 'run-a',
+    nextRunId: 'run-c',
+    isOpen: false,
+    currentRun,
+  };
+
+  it('links to the current Run from earlier in the chain', () => {
+    expect(latestRunOfThisChain(midChain)).toEqual({
+      kind: 'run',
+      runId: 'run-c',
+    });
+  });
+
+  it('is this Run while it is open', () => {
+    expect(
+      latestRunOfThisChain({
+        ...midChain,
+        nextRunId: undefined,
+        isOpen: true,
+        currentRun: null,
+      }),
+    ).toEqual({ kind: 'thisRun' });
+  });
+
+  it('is this Run when it closed without a successor', () => {
+    expect(
+      latestRunOfThisChain({
+        ...midChain,
+        nextRunId: undefined,
+        currentRun: { ...currentRun, firstRunId: 'run-x' },
+      }),
+    ).toEqual({ kind: 'thisRun' });
+  });
+
+  it('is unknown until the current Run is described', () => {
+    expect(latestRunOfThisChain({ ...midChain, currentRun: null })).toEqual({
+      kind: 'unknown',
+    });
+  });
+
+  it('reports a newer chain when the Workflow ID was reused', () => {
+    expect(
+      latestRunOfThisChain({
+        ...midChain,
+        currentRun: { ...currentRun, firstRunId: 'run-x' },
+      }),
+    ).toEqual({ kind: 'newerChain' });
   });
 });

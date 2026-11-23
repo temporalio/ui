@@ -4,10 +4,9 @@
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { IconFilter, IconInfo } from '$lib/io/icon';
-  import { eventBuffer } from '$lib/services/grouped-event-buffer.svelte';
-  import { fetchWorkflow } from '$lib/services/workflow-service';
+  import { isWorkflowOpen } from '$lib/models/workflow-status';
+  import type { EventBufferView } from '$lib/services/grouped-event-buffer.svelte';
   import { isCloud } from '$lib/stores/advanced-visibility';
-  import { sdkInfo } from '$lib/stores/events';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { formatBytes } from '$lib/utilities/format-bytes';
@@ -17,6 +16,7 @@
   } from '$lib/utilities/format-time';
   import { getBuildIdFromVersion } from '$lib/utilities/get-deployment-build-id';
   import { getWorkerDeploymentName } from '$lib/utilities/get-worker-deployment-name';
+  import { latestRunOfThisChain } from '$lib/utilities/get-workflow-relationships';
   import {
     routeForSchedule,
     routeForWorkerDeployment,
@@ -39,12 +39,12 @@
 
   interface Props {
     workflow: WorkflowExecution;
+    history: EventBufferView;
+    firstRunId?: string;
     next?: string;
   }
 
-  let { workflow, next }: Props = $props();
-
-  let latestRunId = $state<string | undefined>(undefined);
+  let { workflow, history, firstRunId, next }: Props = $props();
 
   const parent = $derived(workflow?.parent);
   const scheduleId = $derived(
@@ -84,26 +84,25 @@
       : '',
   );
   let totalActions = $derived(
-    eventBuffer.events
+    history.events
       .reduce((acc, event) => (event?.billableActions ?? 0) + acc, 0)
       .toString(),
   );
 
-  const { sdk, version: sdkVersion } = $derived($sdkInfo);
+  const { sdk, version: sdkVersion } = $derived(history.sdkInfo);
 
-  const fetchLatestRun = async () => {
-    const result = await fetchWorkflow({
-      namespace,
-      workflowId: workflow.id,
-    });
-    latestRunId = result?.workflow?.runId;
-  };
-
-  $effect(() => {
-    if (next && !latestRunId) {
-      fetchLatestRun();
-    }
-  });
+  const latestRun = $derived(
+    latestRunOfThisChain({
+      runId: workflow.runId,
+      firstRunId,
+      nextRunId: next,
+      isOpen: isWorkflowOpen(workflow),
+      currentRun: $workflowRun.currentRun,
+    }),
+  );
+  const latestRunId = $derived(
+    latestRun.kind === 'run' ? latestRun.runId : undefined,
+  );
 </script>
 
 <DetailList aria-label="workflow details" rowCount={5}>

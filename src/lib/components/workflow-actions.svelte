@@ -17,9 +17,8 @@
   import Menu from '$lib/holocene/menu/menu.svelte';
   import { translate } from '$lib/i18n/translate';
   import { isCloud } from '$lib/stores/advanced-visibility';
-  import { resetEvents } from '$lib/stores/events';
   import { temporalVersion } from '$lib/stores/versions';
-  import type { WorkflowEvent } from '$lib/types/events';
+  import type { WorkflowEvents } from '$lib/types/events';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { isWorkflowDelayed } from '$lib/utilities/delayed-workflows';
   import { routeForWorkflowStart } from '$lib/utilities/route-for';
@@ -33,13 +32,21 @@
   import { workflowUpdateEnabled } from '$lib/utilities/workflow-update-enabled';
   interface Props {
     workflow: WorkflowExecution;
+    resetEvents: WorkflowEvents;
     namespace: string;
     cancelInProgress: boolean;
     first?: string;
     next?: string;
   }
 
-  let { workflow, namespace, cancelInProgress, first, next }: Props = $props();
+  let {
+    workflow,
+    resetEvents,
+    namespace,
+    cancelInProgress,
+    first,
+    next,
+  }: Props = $props();
 
   const isRunning = $derived(workflow?.isRunning);
   const isPaused = $derived(workflow?.isPaused);
@@ -81,7 +88,7 @@
   let resetEnabled = $derived(
     resetAuthorized &&
       canResetWithPendingChildWorkflows &&
-      $resetEvents.length > 0,
+      resetEvents.length > 0,
   );
 
   let startWorkflowDisabled = $derived(
@@ -103,7 +110,7 @@
   }: {
     resetAuthorized: boolean;
     canResetWithPendingChildWorkflows: boolean;
-    resetEvents: WorkflowEvent[];
+    resetEvents: WorkflowEvents;
   }) => {
     if (!resetAuthorized) {
       return translate('workflows.reset-disabled-unauthorized');
@@ -123,7 +130,7 @@
     getResetDescription({
       resetAuthorized,
       canResetWithPendingChildWorkflows,
-      resetEvents: $resetEvents,
+      resetEvents,
     }),
   );
 
@@ -323,6 +330,7 @@
 
 {#if resetEnabled}
   <ResetConfirmationModal
+    {resetEvents}
     {workflow}
     {namespace}
     bind:open={resetConfirmationModalOpen}

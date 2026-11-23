@@ -20,7 +20,6 @@
     formatEventGroupName,
   } from '$lib/models/event-history/event-group-markers';
   import type { EventGroupOption } from '$lib/services/grouped-event-buffer';
-  import { clearActiveGroups } from '$lib/stores/active-events';
   import {
     parseEventFilterParams,
     updateEventFilterParams,
@@ -101,7 +100,6 @@
   });
 
   const setSelection = (keys: EventGroupKey[]) => {
-    clearActiveGroups();
     updateEventFilterParams(
       page.url,
       { eventGroups: keys.length ? keys : null },

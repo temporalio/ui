@@ -2,13 +2,15 @@ import type { WorkflowExecution } from '$lib/types/workflows';
 
 import { getValidTimeMs } from './format-time';
 
+export const getWorkflowVirtualTime = (
+  workflow: WorkflowExecution | null | undefined,
+): number | undefined =>
+  getValidTimeMs(workflow?.workflowExtendedInfo?.timeSkippingInfo?.currentTime);
+
 export const getWorkflowCurrentTime = (
   workflow: WorkflowExecution | null | undefined,
   fallbackNow: number = Date.now(),
-): number =>
-  getValidTimeMs(
-    workflow?.workflowExtendedInfo?.timeSkippingInfo?.currentTime,
-  ) ?? fallbackNow;
+): number => getWorkflowVirtualTime(workflow) ?? fallbackNow;
 
 export const getWorkflowLatestTime = (
   workflow: WorkflowExecution | null | undefined,
@@ -20,9 +22,7 @@ export const getWorkflowLatestTime = (
     return endTimeMs;
   }
 
-  const virtualTimeMs = getValidTimeMs(
-    workflow?.workflowExtendedInfo?.timeSkippingInfo?.currentTime,
-  );
+  const virtualTimeMs = getWorkflowVirtualTime(workflow);
   if (virtualTimeMs === undefined) {
     return fallbackNow;
   }

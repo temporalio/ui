@@ -80,6 +80,12 @@ export type EventType = import('$lib/utilities/is-event-type').EventType;
 export type EventTypeCategory =
   import('$lib/models/event-history/get-event-categorization').EventTypeCategory;
 
+export type EventTypeFilterChange = {
+  eventTypes: EventTypeCategory[];
+  statusFilter: boolean;
+  allEventTypes: boolean;
+};
+
 export type EventClassification =
   import('$lib/models/event-history/get-event-classification').EventClassification;
 

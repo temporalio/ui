@@ -9,52 +9,54 @@ import { catalogExample as example3 } from './examples/child-fan-out/example.js'
 import * as workflows3 from './examples/child-fan-out/workflow.js';
 import { catalogExample as example4 } from './examples/child-workflows/example.js';
 import * as workflows4 from './examples/child-workflows/workflow.js';
-import { catalogExample as example5 } from './examples/hello/example.js';
-import * as workflows5 from './examples/hello/workflow.js';
-import { catalogExample as example6 } from './examples/high-event-count/example.js';
-import * as workflows6 from './examples/high-event-count/workflow.js';
-import { catalogExample as example7 } from './examples/large-history/example.js';
-import * as workflows7 from './examples/large-history/workflow.js';
-import { catalogExample as example8 } from './examples/local-activity/example.js';
-import * as workflows8 from './examples/local-activity/workflow.js';
-import { catalogExample as example9 } from './examples/long-activity/example.js';
-import * as workflows9 from './examples/long-activity/workflow.js';
-import { catalogExample as example10 } from './examples/nexus-greeting/example.js';
-import * as workflows10 from './examples/nexus-greeting/workflow.js';
-import { catalogExample as example11 } from './examples/parallel-activities/example.js';
-import * as workflows11 from './examples/parallel-activities/workflow.js';
-import { catalogExample as example12 } from './examples/pending-activities/example.js';
-import * as workflows12 from './examples/pending-activities/workflow.js';
-import { catalogExample as example13 } from './examples/pending-nexus/example.js';
-import * as workflows13 from './examples/pending-nexus/workflow.js';
-import { catalogExample as example14 } from './examples/priority-fairness/example.js';
-import * as workflows14 from './examples/priority-fairness/workflow.js';
-import { catalogExample as example15 } from './examples/satellite-launch-event-groups/example.js';
-import * as workflows15 from './examples/satellite-launch-event-groups/workflow.js';
-import { catalogExample as example16 } from './examples/sequential-activities/example.js';
-import * as workflows16 from './examples/sequential-activities/workflow.js';
-import { catalogExample as example17 } from './examples/sequential-markdown-activities/example.js';
-import * as workflows17 from './examples/sequential-markdown-activities/workflow.js';
-import { catalogExample as example18 } from './examples/sequential-multiline-summary-activities/example.js';
-import * as workflows18 from './examples/sequential-multiline-summary-activities/workflow.js';
-import { catalogExample as example19 } from './examples/sequential-no-summary-activities/example.js';
-import * as workflows19 from './examples/sequential-no-summary-activities/workflow.js';
-import { catalogExample as example20 } from './examples/sequential-plain-text-activities/example.js';
-import * as workflows20 from './examples/sequential-plain-text-activities/workflow.js';
-import { catalogExample as example21 } from './examples/signal-collector/example.js';
-import * as workflows21 from './examples/signal-collector/workflow.js';
-import { catalogExample as example22 } from './examples/signal-handlers/example.js';
-import * as workflows22 from './examples/signal-handlers/workflow.js';
-import { catalogExample as example23 } from './examples/slow-nexus-operation/example.js';
-import { catalogExample as example24 } from './examples/standalone-activity/example.js';
-import { catalogExample as example25 } from './examples/timer-driven-repetition/example.js';
-import * as workflows25 from './examples/timer-driven-repetition/workflow.js';
-import { catalogExample as example26 } from './examples/worker-crash/example.js';
-import * as workflows26 from './examples/worker-crash/workflow.js';
-import { catalogExample as example27 } from './examples/workflow-feature-tour/example.js';
-import * as workflows27 from './examples/workflow-feature-tour/workflow.js';
-import { catalogExample as example28 } from './examples/workflow-patching/example.js';
-import * as workflows28 from './examples/workflow-patching/workflow.js';
+import { catalogExample as example5 } from './examples/execution-chain/example.js';
+import * as workflows5 from './examples/execution-chain/workflow.js';
+import { catalogExample as example6 } from './examples/hello/example.js';
+import * as workflows6 from './examples/hello/workflow.js';
+import { catalogExample as example7 } from './examples/high-event-count/example.js';
+import * as workflows7 from './examples/high-event-count/workflow.js';
+import { catalogExample as example8 } from './examples/large-history/example.js';
+import * as workflows8 from './examples/large-history/workflow.js';
+import { catalogExample as example9 } from './examples/local-activity/example.js';
+import * as workflows9 from './examples/local-activity/workflow.js';
+import { catalogExample as example10 } from './examples/long-activity/example.js';
+import * as workflows10 from './examples/long-activity/workflow.js';
+import { catalogExample as example11 } from './examples/nexus-greeting/example.js';
+import * as workflows11 from './examples/nexus-greeting/workflow.js';
+import { catalogExample as example12 } from './examples/parallel-activities/example.js';
+import * as workflows12 from './examples/parallel-activities/workflow.js';
+import { catalogExample as example13 } from './examples/pending-activities/example.js';
+import * as workflows13 from './examples/pending-activities/workflow.js';
+import { catalogExample as example14 } from './examples/pending-nexus/example.js';
+import * as workflows14 from './examples/pending-nexus/workflow.js';
+import { catalogExample as example15 } from './examples/priority-fairness/example.js';
+import * as workflows15 from './examples/priority-fairness/workflow.js';
+import { catalogExample as example16 } from './examples/satellite-launch-event-groups/example.js';
+import * as workflows16 from './examples/satellite-launch-event-groups/workflow.js';
+import { catalogExample as example17 } from './examples/sequential-activities/example.js';
+import * as workflows17 from './examples/sequential-activities/workflow.js';
+import { catalogExample as example18 } from './examples/sequential-markdown-activities/example.js';
+import * as workflows18 from './examples/sequential-markdown-activities/workflow.js';
+import { catalogExample as example19 } from './examples/sequential-multiline-summary-activities/example.js';
+import * as workflows19 from './examples/sequential-multiline-summary-activities/workflow.js';
+import { catalogExample as example20 } from './examples/sequential-no-summary-activities/example.js';
+import * as workflows20 from './examples/sequential-no-summary-activities/workflow.js';
+import { catalogExample as example21 } from './examples/sequential-plain-text-activities/example.js';
+import * as workflows21 from './examples/sequential-plain-text-activities/workflow.js';
+import { catalogExample as example22 } from './examples/signal-collector/example.js';
+import * as workflows22 from './examples/signal-collector/workflow.js';
+import { catalogExample as example23 } from './examples/signal-handlers/example.js';
+import * as workflows23 from './examples/signal-handlers/workflow.js';
+import { catalogExample as example24 } from './examples/slow-nexus-operation/example.js';
+import { catalogExample as example25 } from './examples/standalone-activity/example.js';
+import { catalogExample as example26 } from './examples/timer-driven-repetition/example.js';
+import * as workflows26 from './examples/timer-driven-repetition/workflow.js';
+import { catalogExample as example27 } from './examples/worker-crash/example.js';
+import * as workflows27 from './examples/worker-crash/workflow.js';
+import { catalogExample as example28 } from './examples/workflow-feature-tour/example.js';
+import * as workflows28 from './examples/workflow-feature-tour/workflow.js';
+import { catalogExample as example29 } from './examples/workflow-patching/example.js';
+import * as workflows29 from './examples/workflow-patching/workflow.js';
 import { catalogWorkspace as sourceWorkspace } from './examples/workspace.js';
 import {
   type CatalogRegistrationSource,
@@ -80,6 +82,9 @@ export const catalogRegistrationSource: CatalogRegistrationSource = {
     'src/lib/catalog/worker/examples/child-fan-out/workflow.ts',
     'src/lib/catalog/worker/examples/child-workflows/example.ts',
     'src/lib/catalog/worker/examples/child-workflows/workflow.ts',
+    'src/lib/catalog/worker/examples/execution-chain/activity.ts',
+    'src/lib/catalog/worker/examples/execution-chain/example.ts',
+    'src/lib/catalog/worker/examples/execution-chain/workflow.ts',
     'src/lib/catalog/worker/examples/hello/example.ts',
     'src/lib/catalog/worker/examples/hello/workflow.ts',
     'src/lib/catalog/worker/examples/high-event-count/example.ts',
@@ -205,9 +210,18 @@ export const catalogRegistrationSource: CatalogRegistrationSource = {
           ).href,
         },
         {
-          id: 'hello',
+          id: 'execution-chain',
           example: example5,
           workflows: workflows5,
+          workflowsPath: new URL(
+            './examples/execution-chain/workflow.js',
+            import.meta.url,
+          ).href,
+        },
+        {
+          id: 'hello',
+          example: example6,
+          workflows: workflows6,
           workflowsPath: new URL(
             './examples/hello/workflow.js',
             import.meta.url,
@@ -215,8 +229,8 @@ export const catalogRegistrationSource: CatalogRegistrationSource = {
         },
         {
           id: 'high-event-count',
-          example: example6,
-          workflows: workflows6,
+          example: example7,
+          workflows: workflows7,
           workflowsPath: new URL(
             './examples/high-event-count/workflow.js',
             import.meta.url,
@@ -224,8 +238,8 @@ export const catalogRegistrationSource: CatalogRegistrationSource = {
         },
         {
           id: 'large-history',
-          example: example7,
-          workflows: workflows7,
+          example: example8,
+          workflows: workflows8,
           workflowsPath: new URL(
             './examples/large-history/workflow.js',
             import.meta.url,
@@ -233,8 +247,8 @@ export const catalogRegistrationSource: CatalogRegistrationSource = {
         },
         {
           id: 'local-activity',
-          example: example8,
-          workflows: workflows8,
+          example: example9,
+          workflows: workflows9,
           workflowsPath: new URL(
             './examples/local-activity/workflow.js',
             import.meta.url,
@@ -242,8 +256,8 @@ export const catalogRegistrationSource: CatalogRegistrationSource = {
         },
         {
           id: 'long-activity',
-          example: example9,
-          workflows: workflows9,
+          example: example10,
+          workflows: workflows10,
           workflowsPath: new URL(
             './examples/long-activity/workflow.js',
             import.meta.url,
@@ -251,8 +265,8 @@ export const catalogRegistrationSource: CatalogRegistrationSource = {
         },
         {
           id: 'nexus-greeting',
-          example: example10,
-          workflows: workflows10,
+          example: example11,
+          workflows: workflows11,
           workflowsPath: new URL(
             './examples/nexus-greeting/workflow.js',
             import.meta.url,
@@ -260,8 +274,8 @@ export const catalogRegistrationSource: CatalogRegistrationSource = {
         },
         {
           id: 'parallel-activities',
-          example: example11,
-          workflows: workflows11,
+          example: example12,
+          workflows: workflows12,
           workflowsPath: new URL(
             './examples/parallel-activities/workflow.js',
             import.meta.url,
@@ -269,8 +283,8 @@ export const catalogRegistrationSource: CatalogRegistrationSource = {
         },
         {
           id: 'pending-activities',
-          example: example12,
-          workflows: workflows12,
+          example: example13,
+          workflows: workflows13,
           workflowsPath: new URL(
             './examples/pending-activities/workflow.js',
             import.meta.url,
@@ -278,8 +292,8 @@ export const catalogRegistrationSource: CatalogRegistrationSource = {
         },
         {
           id: 'pending-nexus',
-          example: example13,
-          workflows: workflows13,
+          example: example14,
+          workflows: workflows14,
           workflowsPath: new URL(
             './examples/pending-nexus/workflow.js',
             import.meta.url,
@@ -287,8 +301,8 @@ export const catalogRegistrationSource: CatalogRegistrationSource = {
         },
         {
           id: 'priority-fairness',
-          example: example14,
-          workflows: workflows14,
+          example: example15,
+          workflows: workflows15,
           workflowsPath: new URL(
             './examples/priority-fairness/workflow.js',
             import.meta.url,
@@ -296,8 +310,8 @@ export const catalogRegistrationSource: CatalogRegistrationSource = {
         },
         {
           id: 'satellite-launch-event-groups',
-          example: example15,
-          workflows: workflows15,
+          example: example16,
+          workflows: workflows16,
           workflowsPath: new URL(
             './examples/satellite-launch-event-groups/workflow.js',
             import.meta.url,
@@ -305,8 +319,8 @@ export const catalogRegistrationSource: CatalogRegistrationSource = {
         },
         {
           id: 'sequential-activities',
-          example: example16,
-          workflows: workflows16,
+          example: example17,
+          workflows: workflows17,
           workflowsPath: new URL(
             './examples/sequential-activities/workflow.js',
             import.meta.url,
@@ -314,8 +328,8 @@ export const catalogRegistrationSource: CatalogRegistrationSource = {
         },
         {
           id: 'sequential-markdown-activities',
-          example: example17,
-          workflows: workflows17,
+          example: example18,
+          workflows: workflows18,
           workflowsPath: new URL(
             './examples/sequential-markdown-activities/workflow.js',
             import.meta.url,
@@ -323,8 +337,8 @@ export const catalogRegistrationSource: CatalogRegistrationSource = {
         },
         {
           id: 'sequential-multiline-summary-activities',
-          example: example18,
-          workflows: workflows18,
+          example: example19,
+          workflows: workflows19,
           workflowsPath: new URL(
             './examples/sequential-multiline-summary-activities/workflow.js',
             import.meta.url,
@@ -332,8 +346,8 @@ export const catalogRegistrationSource: CatalogRegistrationSource = {
         },
         {
           id: 'sequential-no-summary-activities',
-          example: example19,
-          workflows: workflows19,
+          example: example20,
+          workflows: workflows20,
           workflowsPath: new URL(
             './examples/sequential-no-summary-activities/workflow.js',
             import.meta.url,
@@ -341,8 +355,8 @@ export const catalogRegistrationSource: CatalogRegistrationSource = {
         },
         {
           id: 'sequential-plain-text-activities',
-          example: example20,
-          workflows: workflows20,
+          example: example21,
+          workflows: workflows21,
           workflowsPath: new URL(
             './examples/sequential-plain-text-activities/workflow.js',
             import.meta.url,
@@ -350,8 +364,8 @@ export const catalogRegistrationSource: CatalogRegistrationSource = {
         },
         {
           id: 'signal-collector',
-          example: example21,
-          workflows: workflows21,
+          example: example22,
+          workflows: workflows22,
           workflowsPath: new URL(
             './examples/signal-collector/workflow.js',
             import.meta.url,
@@ -359,8 +373,8 @@ export const catalogRegistrationSource: CatalogRegistrationSource = {
         },
         {
           id: 'signal-handlers',
-          example: example22,
-          workflows: workflows22,
+          example: example23,
+          workflows: workflows23,
           workflowsPath: new URL(
             './examples/signal-handlers/workflow.js',
             import.meta.url,
@@ -368,16 +382,16 @@ export const catalogRegistrationSource: CatalogRegistrationSource = {
         },
         {
           id: 'slow-nexus-operation',
-          example: example23,
-        },
-        {
-          id: 'standalone-activity',
           example: example24,
         },
         {
-          id: 'timer-driven-repetition',
+          id: 'standalone-activity',
           example: example25,
-          workflows: workflows25,
+        },
+        {
+          id: 'timer-driven-repetition',
+          example: example26,
+          workflows: workflows26,
           workflowsPath: new URL(
             './examples/timer-driven-repetition/workflow.js',
             import.meta.url,
@@ -385,8 +399,8 @@ export const catalogRegistrationSource: CatalogRegistrationSource = {
         },
         {
           id: 'worker-crash',
-          example: example26,
-          workflows: workflows26,
+          example: example27,
+          workflows: workflows27,
           workflowsPath: new URL(
             './examples/worker-crash/workflow.js',
             import.meta.url,
@@ -394,8 +408,8 @@ export const catalogRegistrationSource: CatalogRegistrationSource = {
         },
         {
           id: 'workflow-feature-tour',
-          example: example27,
-          workflows: workflows27,
+          example: example28,
+          workflows: workflows28,
           workflowsPath: new URL(
             './examples/workflow-feature-tour/workflow.js',
             import.meta.url,
@@ -403,8 +417,8 @@ export const catalogRegistrationSource: CatalogRegistrationSource = {
         },
         {
           id: 'workflow-patching',
-          example: example28,
-          workflows: workflows28,
+          example: example29,
+          workflows: workflows29,
           workflowsPath: new URL(
             './examples/workflow-patching/workflow.js',
             import.meta.url,

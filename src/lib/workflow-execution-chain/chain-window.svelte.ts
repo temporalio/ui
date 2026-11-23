@@ -1,0 +1,103 @@
+import { isNotFound } from '$lib/utilities/handle-error';
+
+import type { ChainBoundary, ChainRun } from './types';
+
+import {
+  type ChainContext,
+  readPredecessorRunId,
+} from './chain-context.svelte';
+
+const WALK_SIZE = 10;
+
+/**
+ * The window: the chain's Runs that are loaded and shown in the strip, oldest
+ * to newest. It grows at the old end by walking back through each Run's
+ * predecessor, and at the new end when the Latest Run hands off.
+ */
+export class ChainWindow {
+  private _runIds = $state.raw<string[]>([]);
+  readonly runs = $derived(this._resolveRuns(this._runIds));
+  boundary = $state<ChainBoundary>(null);
+  walking = $state(false);
+
+  constructor(
+    private readonly _context: ChainContext,
+    private readonly _onOlderRunAdded: (runId: string) => void,
+  ) {}
+
+  seed(latestRunId: string): void {
+    this._runIds = [latestRunId];
+  }
+
+  loadInitialRuns(): Promise<void> {
+    return this._walkBack(WALK_SIZE - 1);
+  }
+
+  append(runId: string): void {
+    this._runIds = [...this._runIds, runId];
+  }
+
+  loadOlder(onRunAdded?: (runId: string) => void): Promise<void> {
+    if (
+      this.walking ||
+      this.boundary !== null ||
+      this._context.failures.has('walkBack') ||
+      this._runIds.length === 0
+    ) {
+      return Promise.resolve();
+    }
+    return this._walkBack(WALK_SIZE, onRunAdded);
+  }
+
+  private _resolveRuns(runIds: string[]): ChainRun[] {
+    return runIds.flatMap((runId) => {
+      const run = this._context.records.get(runId)?.run;
+      return run ? [run] : [];
+    });
+  }
+
+  private async _walkBack(
+    hops: number,
+    onRunAdded?: (runId: string) => void,
+  ): Promise<void> {
+    this.walking = true;
+    try {
+      for (let hop = 0; hop < hops; hop++) {
+        const predecessor = readPredecessorRunId(this.runs[0]);
+        if (!predecessor) {
+          this.boundary = 'chainStart';
+          return;
+        }
+        let run: ChainRun;
+        try {
+          run = await this._context.getOrFetchRun(predecessor);
+        } catch (error) {
+          if (this._context.disposed) {
+            return;
+          }
+          if (isNotFound(error)) {
+            this.boundary = 'retention';
+            return;
+          }
+          const remaining = hops - hop;
+          this._context.failures.fail(
+            'walkBack',
+            predecessor,
+            () => void this._walkBack(remaining, onRunAdded),
+          );
+          return;
+        }
+        if (this._context.disposed) {
+          return;
+        }
+        this._runIds = [run.runId, ...this._runIds];
+        this._onOlderRunAdded(run.runId);
+        onRunAdded?.(run.runId);
+      }
+    } finally {
+      if (!this._context.disposed) {
+        this.walking = false;
+      }
+    }
+  }
+}

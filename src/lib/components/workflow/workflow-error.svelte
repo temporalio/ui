@@ -9,7 +9,7 @@
   import { routeForWorkflows } from '$lib/utilities/route-for';
 
   interface Props {
-    error: NetworkError;
+    error: NetworkError | Error;
   }
 
   let { error }: Props = $props();
@@ -17,7 +17,7 @@
   const namespace = $derived(page.params.namespace);
 
   const title = $derived(
-    error.statusCode === 404
+    'statusCode' in error && error.statusCode === 404
       ? translate('workflows.workflow-404-title')
       : translate('workflows.workflow-error-title'),
   );
@@ -37,11 +37,18 @@
   </div>
 </header>
 <div class="text-center align-middle">
-  <h1 class="leading-0 text-[12rem] font-semibold">
-    {error?.statusCode ?? '500'}
-  </h1>
-  <p class="-mt-12 text-lg">{title}</p>
-  <p class="text-2xl font-bold text-danger">
-    {error?.statusText ?? ''}
-  </p>
+  {#if 'statusCode' in error}
+    <h1 class="leading-0 text-[12rem] font-semibold">
+      {error.statusCode}
+    </h1>
+    <p class="-mt-12 text-lg">{title}</p>
+    <p class="text-2xl font-bold text-danger">
+      {error.statusText ?? ''}
+    </p>
+  {:else}
+    <h1 class="text-lg">{title}</h1>
+    <p class="text-2xl font-bold text-danger">
+      {error.message}
+    </p>
+  {/if}
 </div>

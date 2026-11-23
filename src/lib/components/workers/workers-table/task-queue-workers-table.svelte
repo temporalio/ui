@@ -14,6 +14,7 @@
     fetchWorkerCount,
   } from '$lib/services/worker-service';
   import { workerCountEnabled } from '$lib/stores/workers';
+  import type { getSDKandVersion } from '$lib/utilities/get-sdk-version';
 
   import WorkersTable from './workers-table.svelte';
 
@@ -23,6 +24,7 @@
     searchAttributes?: Record<string, string>;
     taskQueue: string;
     onCount?: (count: number) => void;
+    sdkInfo?: ReturnType<typeof getSDKandVersion>;
   }
 
   let {
@@ -31,6 +33,7 @@
     searchAttributes,
     taskQueue,
     onCount,
+    sdkInfo,
   }: Props = $props();
 
   const query = $derived(`TaskQueue="${taskQueue}"`);
@@ -121,7 +124,7 @@
     </ToggleButton>
   </ToggleButtons>
   {#if selected === View.Workers}
-    <WorkersTable {namespace} {onFetch} {total} />
+    <WorkersTable {namespace} {onFetch} {total} {sdkInfo} />
   {:else}
     {@render pollersTable()}
   {/if}

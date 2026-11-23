@@ -3,8 +3,14 @@
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import { IconHeartbeat } from '$lib/io/icon';
-  import { sdkInfo } from '$lib/stores/events';
+  import type { getSDKandVersion } from '$lib/utilities/get-sdk-version';
   import { minimumVersionRequired } from '$lib/utilities/version-check';
+
+  interface Props {
+    sdkInfo?: ReturnType<typeof getSDKandVersion>;
+  }
+
+  let { sdkInfo = { sdk: '', version: '' } }: Props = $props();
 
   const supportedVersions = [
     {
@@ -45,7 +51,7 @@
   ];
   const currentSdk = $derived(
     supportedVersions.find(
-      ({ sdk }) => sdk.toLowerCase() === $sdkInfo.sdk.toLowerCase(),
+      ({ sdk }) => sdk.toLowerCase() === sdkInfo.sdk.toLowerCase(),
     ),
   );
 </script>
@@ -62,7 +68,7 @@
     <h5>{translate('workers.no-worker-heartbeats')}</h5>
     {#if currentSdk}
       {@const { href, sdk, version } = currentSdk}
-      {#if !minimumVersionRequired(version, $sdkInfo.version)}
+      {#if !minimumVersionRequired(version, sdkInfo.version)}
         <p class="flex flex-row gap-1 text-secondary">
           {translate('workers.worker-heartbeats-sdk-link-preface')}
           <Link newTab {href}>

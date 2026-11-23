@@ -2,9 +2,6 @@
   import { omit } from 'es-toolkit';
   import type { Snippet } from 'svelte';
 
-  import { page } from '$app/state';
-
-  import ActivityCommands from '$lib/components/activity/activity-commands.svelte';
   import EventStatusBadge from '$lib/components/event/event-status-badge.svelte';
   import PayloadCodeBlock from '$lib/components/payload/payload-code-block.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
@@ -12,11 +9,8 @@
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
   import { BadgeCount } from '$lib/io/badge-count';
-  import { eventBuffer } from '$lib/services/grouped-event-buffer.svelte';
-  import { coreUserStore } from '$lib/stores/core-user';
-  import { workflowRun } from '$lib/stores/workflow-run';
-  import type { PendingActivity } from '$lib/types/events';
-  import { activityCommandsEnabled } from '$lib/utilities/activity-commands-enabled';
+  import type { PendingActivity, WorkflowEvent } from '$lib/types/events';
+  import type { WorkflowExecution } from '$lib/types/workflows';
   import { getUpdatedActivityOptions } from '$lib/utilities/activity-options-diff';
   import {
     formatAttemptsLeft,
@@ -30,34 +24,25 @@
   let {
     activity,
     totalPending,
+    scheduledEvent,
+    workflow,
+    actions,
   }: {
     activity: PendingActivity;
     totalPending?: number;
+    scheduledEvent?: WorkflowEvent;
+    workflow: WorkflowExecution;
+    actions?: Snippet<[PendingActivity]>;
   } = $props();
   const failed = $derived(
     (activity.attempt ?? 0) > 1 && !!activity.lastFailure,
   );
-  const isRunning = $derived($workflowRun?.workflow?.isRunning);
-  const isPaused = $derived($workflowRun?.workflow?.isPaused);
 
-  const scheduledEvent = $derived(
-    eventBuffer.pendingActivityScheduledEvent(activity.activityId),
-  );
   const updatedOptions = $derived(
     getUpdatedActivityOptions(
       activity.activityOptions,
       scheduledEvent?.activityTaskScheduledEventAttributes,
     ),
-  );
-
-  let coreUser = coreUserStore();
-  let showActivityCommands = $derived(
-    activityCommandsEnabled(
-      page.data.settings,
-      $coreUser,
-      page.params.namespace,
-    ) &&
-      (isRunning || isPaused),
   );
 </script>
 
@@ -69,9 +54,7 @@
       <EventStatusBadge status={activity.paused ? 'Paused' : activity.state} />
       <h4>{activity.activityType}</h4>
     </div>
-    {#if showActivityCommands}
-      <ActivityCommands {activity} class="justify-end" />
-    {/if}
+    {@render actions?.(activity)}
   </div>
   <div class="flex flex-1 flex-col gap-4 xl:flex-row">
     <div class="flex w-full flex-col gap-1 xl:w-1/2">
@@ -94,7 +77,7 @@
       {#if activity.scheduledTime}
         {@const timeDifference = toTimeDifference({
           date: activity.scheduledTime,
-          now: getWorkflowCurrentTime($workflowRun?.workflow),
+          now: getWorkflowCurrentTime(workflow),
           negativeDefault: '',
         })}
         {#if timeDifference}
@@ -114,7 +97,7 @@
             activity.maximumAttempts ?? 0,
             formatDuration(
               getDuration({
-                start: getWorkflowCurrentTime($workflowRun?.workflow),
+                start: getWorkflowCurrentTime(workflow),
                 end: activity.expirationTime,
               }) ?? '',
             ),

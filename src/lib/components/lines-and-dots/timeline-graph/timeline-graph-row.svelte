@@ -23,7 +23,6 @@
   import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { isTimelineEventGroup } from '$lib/models/event-history/timeline-event-groups';
-  import { setActiveGroup } from '$lib/stores/active-events';
   import { resolveSystemNexusEvent } from '$lib/system-nexus-endpoints';
   import {
     decodeLocalActivity,
@@ -153,11 +152,7 @@
 
   const onClick = () => {
     if (readOnly) return;
-    if (onSelect) {
-      onSelect(group);
-    } else {
-      setActiveGroup(group);
-    }
+    onSelect?.(group);
   };
 
   // Only activity groups carry an ActivityTaskStarted event; guard so other

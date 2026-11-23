@@ -71,6 +71,7 @@ export const updateQueryParameters = async ({
 export type QueryParameter = {
   parameter: string;
   value?: string | number | boolean;
+  allowEmpty?: boolean;
 };
 
 type UpdateMultipleQueryParams = {
@@ -94,9 +95,11 @@ export const updateMultipleQueryParameters = async ({
   });
   const newQuery = new URLSearchParams(params);
 
-  parameters.forEach(({ parameter, value }) => {
+  parameters.forEach(({ parameter, value, allowEmpty }) => {
     if (value || value === false) {
       newQuery.set(parameter, String(value));
+    } else if (allowEmpty) {
+      newQuery.set(parameter, '');
     }
   });
 

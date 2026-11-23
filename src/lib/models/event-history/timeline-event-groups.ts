@@ -196,6 +196,56 @@ const attemptNumber = (value: unknown): number => {
   return Number.isFinite(attempt) && attempt > 0 ? attempt : 0;
 };
 
+export type LifecycleEventStatus = {
+  failed: boolean;
+  timedOut: boolean;
+  highestAttempt: number;
+};
+
+export const createLifecycleEventStatus = (): LifecycleEventStatus => ({
+  failed: false,
+  timedOut: false,
+  highestAttempt: 0,
+});
+
+export const addLifecycleEvent = (
+  status: LifecycleEventStatus,
+  event: WorkflowEvent,
+): void => {
+  status.failed ||=
+    event.classification === 'Failed' ||
+    isFailedWorkflowExecutionUpdateCompletedEvent(event) ||
+    Boolean(
+      isLocalActivityMarkerEvent(event) &&
+      event.markerRecordedEventAttributes?.failure,
+    );
+
+  status.timedOut ||= event.classification === 'TimedOut';
+
+  if (isActivityTaskStartedEvent(event)) {
+    status.highestAttempt = Math.max(
+      status.highestAttempt,
+      attemptNumber(event.attributes.attempt),
+    );
+  }
+};
+
+export const lifecycleRetries = (
+  highestAttempt: number,
+  {
+    pendingActivity,
+    pendingNexusOperation,
+  }: Pick<EventGroup, 'pendingActivity' | 'pendingNexusOperation'>,
+): number =>
+  Math.max(
+    0,
+    Math.max(
+      highestAttempt,
+      attemptNumber(pendingActivity?.attempt),
+      attemptNumber(pendingNexusOperation?.attempt),
+    ) - 1,
+  );
+
 export const summarizeLifecycleGroups = (
   groups: readonly EventGroup[],
 ): TimelineEventGroupStatusSummary => {
@@ -209,34 +259,16 @@ export const summarizeLifecycleGroups = (
   };
 
   for (const group of groups) {
-    let failed = false;
-    let timedOut = false;
-    let highestAttempt = Math.max(
-      attemptNumber(group.pendingActivity?.attempt),
-      attemptNumber(group.pendingNexusOperation?.attempt),
-    );
+    const status = createLifecycleEventStatus();
     for (const event of group.eventList) {
-      failed ||=
-        event.classification === 'Failed' ||
-        isFailedWorkflowExecutionUpdateCompletedEvent(event) ||
-        Boolean(
-          isLocalActivityMarkerEvent(event) &&
-          event.markerRecordedEventAttributes?.failure,
-        );
-      timedOut ||= event.classification === 'TimedOut';
-      if (isActivityTaskStartedEvent(event)) {
-        highestAttempt = Math.max(
-          highestAttempt,
-          attemptNumber(event.attributes.attempt),
-        );
-      }
+      addLifecycleEvent(status, event);
     }
-    summary.failed += Number(failed);
-    summary.timedOut += Number(timedOut);
+    summary.failed += Number(status.failed);
+    summary.timedOut += Number(status.timedOut);
     summary.canceled += Number(group.isCanceled);
     summary.terminated += Number(group.isTerminated);
     summary.paused += Number(Boolean(group.pendingActivity?.paused));
-    summary.retries += Math.max(0, highestAttempt - 1);
+    summary.retries += lifecycleRetries(status.highestAttempt, group);
   }
 
   return summary;

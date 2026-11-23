@@ -5,6 +5,7 @@
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import type { WorkflowExecutionIdentity } from '$lib/types/workflows';
   import { isRawPayload, isRawPayloads } from '$lib/utilities/decode-payload';
   import { format } from '$lib/utilities/format-camel-case';
   import type { CombinedAttributes } from '$lib/utilities/format-event-attributes';
@@ -17,6 +18,7 @@
   import EventDetailsLink from './event-details-link.svelte';
 
   interface Props {
+    workflowExecutionIdentity: WorkflowExecutionIdentity;
     key: string;
     value: SummaryAttribute['value'] | number | boolean | null;
     attributes: CombinedAttributes;
@@ -26,6 +28,7 @@
   }
 
   let {
+    workflowExecutionIdentity,
     key,
     value,
     attributes,
@@ -60,6 +63,7 @@
         container-class="truncate"
       >
         <EventDetailsLink
+          {workflowExecutionIdentity}
           {value}
           {attributes}
           type={linkType}

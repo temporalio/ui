@@ -33,6 +33,24 @@ describe('toWorkflowExecution', () => {
       expect(toWorkflowExecution(workflow)).toMatchSnapshot();
     });
   }
+
+  const withInfo = (workflowExecutionInfo: object) =>
+    ({ workflowExecutionInfo }) as unknown as WorkflowExecutionAPIResponse;
+
+  it('should include firstRunId when present', () => {
+    const workflow = toWorkflowExecution(withInfo({ firstRunId: 'first-run' }));
+    expect(workflow.firstRunId).toBe('first-run');
+  });
+
+  it('should leave firstRunId undefined when empty', () => {
+    const workflow = toWorkflowExecution(withInfo({ firstRunId: '' }));
+    expect(workflow.firstRunId).toBeUndefined();
+  });
+
+  it('should leave firstRunId undefined when missing', () => {
+    const workflow = toWorkflowExecution(withInfo({}));
+    expect(workflow.firstRunId).toBeUndefined();
+  });
 });
 
 describe('toWorkflowExecutions', () => {

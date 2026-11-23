@@ -11,16 +11,17 @@
 <script lang="ts">
   import CommonErrorCard from '$lib/components/common-errors/common-error-card.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { fullEventHistory } from '$lib/stores/events';
+  import { getWorkflowHistoryController } from '$lib/services/workflow-history-controller.svelte.js';
   import { workflowRun } from '$lib/stores/workflow-run';
   import { getApplicableCommonErrors } from '$lib/utilities/common-error-detection';
 
+  const historyController = getWorkflowHistoryController();
+  const events = $derived(historyController.history.events);
+
   const { workflow } = $derived($workflowRun);
-  const firstEvent = $derived($fullEventHistory[0]);
+  const firstEvent = $derived(events[0]);
   const errors = $derived(
-    workflow
-      ? getApplicableCommonErrors(workflow, firstEvent, $fullEventHistory)
-      : [],
+    workflow ? getApplicableCommonErrors(workflow, firstEvent, events) : [],
   );
   const commonErrorsDismissed = $derived($dismissedWorkflowCommonErrors);
 
