@@ -3,7 +3,7 @@ import { twJoin } from 'tailwind-merge';
 export const cardRecipe = () => {
   return twJoin(
     'border border-primary rounded-lg',
-    'bg-surface-primary text-primary',
+    'bg-surface-primary text-secondary',
     'flex flex-col',
   );
 };
@@ -19,7 +19,7 @@ export const cardContentRecipe = () => {
 };
 
 export const cardTitleRecipe = () => {
-  return twJoin('flex gap-2 font-medium text-base items-center');
+  return twJoin('flex gap-2 text-primary font-medium text-base items-center');
 };
 
 export const cardDescriptionRecipe = () => {
