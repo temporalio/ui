@@ -10,19 +10,42 @@ An inline navigation link with optional leading and trailing icons.
 import { TextLink } from '$lib/io/text-link';
 ```
 
-Text Links take users to another page or resource, either within a sentence or on their own. They match the surrounding text so they don't interrupt reading — use ButtonLink instead when navigation is a primary action that needs button styling.
-
-| Do                                                                                                   | Don't                                                                                                                           |
-| ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| Write link text that describes the destination, such as "Read the workflow docs".                    | Don't use vague link text such as "click here" or "learn more" on its own. Screen reader users often scan links out of context. |
-| Use a trailing arrow icon for links that open an external site, and set `target` and `rel` to match. | Don't use a Text Link for actions such as Save or Delete. Use Button for actions.                                               |
-| Let links inherit the surrounding typography, so they fit the sentence they sit in.                  | Don't style a Text Link to look like a button. Use ButtonLink when navigation needs button styling.                             |
-| Explain nearby why a link is disabled, so users know what to change.                                 | Don't put several links close together in a sentence. Too many links make the text hard to read and the targets hard to hit.    |
-
 `disabled` removes the destination, prevents click handling, and takes the link
 out of the tab order. Native anchor attributes such as `target` and `rel` pass
 through. Icons scale with the text; use `LeadingIcon` or `TrailingIcon` to
 clarify the link's purpose.
+
+## Selection
+
+Text Links take users to another page or resource, either within a sentence or on their own. They match the surrounding text so they don't interrupt reading — use ButtonLink instead when navigation is a primary action that needs button styling.
+
+| Do                                                                                                             | Don't                                                                                                                                     |
+| -------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| **USE-1** Write link text that describes the destination, such as "Read the workflow docs".                    | **USE-2** Don't use vague link text such as "click here" or "learn more" on its own. Screen reader users often scan links out of context. |
+| **USE-3** Use a trailing arrow icon for links that open an external site, and set `target` and `rel` to match. | **USE-4** Don't use a Text Link for actions such as Save or Delete. Use Button for actions.                                               |
+| **USE-5** Let links inherit the surrounding typography, so they fit the sentence they sit in.                  | **USE-6** Don't style a Text Link to look like a button. Use ButtonLink when navigation needs button styling.                             |
+| **USE-7** Explain nearby why a link is disabled, so users know what to change.                                 | **USE-8** Don't put several links close together in a sentence. Too many links make the text hard to read and the targets hard to hit.    |
+
+## Rules
+
+Checked against every PR that uses this component.
+
+### Output
+
+- **OUT-1** Callers MUST use `disabled` rather than `aria-disabled` alone to suppress navigation and click handling. Setting only the ARIA attribute does not activate TextLink's disabled behavior.
+
+### Accessibility
+
+- **A11Y-1** A TextLink without text children MUST receive an accessible name on the link itself. Its leading and trailing icons are rendered without accessible labels.
+
+## Notes
+
+How the component behaves. Context for reviewers; not checked.
+
+- **BEH-1** TextLink always renders an anchor. When disabled, it omits `href`, sets `aria-disabled`, removes the link from the tab order, and prevents default behavior and propagation before skipping the caller's `onclick`.
+- **BEH-2** While enabled, the caller's `onclick` and `tabindex` are used. Other native anchor attributes pass through.
+- **DIS-1** [`textLinkRecipe`](./recipe.ts) uses inline layout without icons and inline-flex layout with icons. The icons are sized relative to the text.
+- **BEH-3** Native attributes, including `data-testid`, reach the anchor. No test ID is assigned internally.
 
 ## API Reference
 
