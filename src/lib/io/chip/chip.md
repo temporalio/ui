@@ -37,12 +37,16 @@ Checked against every PR that uses this component.
 - **IN-2** Caller `class` MUST NOT override background, border, or text colors to replace `colorScheme`.
 - **IN-3** Callers MUST keep `text` in its natural case rather than uppercasing it in code; casing is presentation.
 
+### Accessibility
+
+- **A11Y-1** Meaning conveyed by `Icon` or `extension.Icon` MUST be expressed in `text` or `extension.text`. The component renders these icons without accessible labels.
+
 ## Notes
 
 How the component behaves. Context for reviewers; not checked.
 
 - **BEH-1** Chip renders a native button. `Icon` precedes `text`; an extension follows with its icon before its text.
-- **DIS-1** [`chipRecipe` and `chipSegmentRecipe`](./recipe.ts) own the shell, focus ring, disabled styles, and extension overlay. Hover and active overlays apply only while enabled.
+- **DIS-1** `chipRecipe` and `chipSegmentRecipe` (`recipe.ts` in `src/lib/io/chip/`) own the shell, focus ring, disabled styles, and extension overlay. Hover and active overlays apply only while enabled.
 - **DIS-2** The label is uppercased by CSS and does not wrap. The current recipe does not apply overflow clipping.
 - **BEH-2** Native attributes, including `data-testid`, reach the button. No test ID or pressed state is assigned internally.
 
