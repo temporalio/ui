@@ -1,0 +1,99 @@
+# Security review notes:
+# - Only trusted release scripts execute; PR files and patches are API-fetched text.
+# - Script checkout matches the reusable workflow commit, never a moving branch.
+# - Event data reaches scripts through environment/JSON, never shell interpolation.
+# - Dependencies use exact versions with lifecycle scripts disabled.
+# - Callers remain deferred until this reviewed release reaches UI integration.
+name: IO usage review (reusable)
+
+on:
+  workflow_call:
+    inputs:
+      pr-number:
+        description: PR number from the original caller event
+        required: true
+        type: string
+      trigger-event:
+        description: Original pull_request or workflow_dispatch event
+        required: true
+        type: string
+      import-prefix:
+        required: false
+        default: '$lib/io/'
+        type: string
+      rules-source:
+        required: false
+        default: dir
+        type: string
+    secrets:
+      ANTHROPIC_API_KEY:
+        required: false
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: io-usage-review-${{ github.repository }}
+  cancel-in-progress: false
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    timeout-minutes: 10
+    if: >-
+      (github.repository == 'temporalio/ui' || github.repository == 'temporalio/cloud-ui') &&
+      (github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch')
+    steps:
+      - name: Checkout matching trusted script release
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: ${{ job.workflow_repository }}
+          ref: ${{ job.workflow_sha }}
+          path: trusted-review
+          persist-credentials: false
+          sparse-checkout: scripts/io-usage-review
+
+      - name: Set up Node
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+        with:
+          node-version: 22.23.4
+
+      - name: Prepare isolated review dependencies
+        working-directory: trusted-review/scripts/io-usage-review
+        run: npm install --prefix . --no-save --package-lock=false --ignore-scripts --no-audit --no-fund @anthropic-ai/sdk@1.12.0 zod@4.4.3 tsx@4.23.15
+
+      - name: Review eligible changed usages
+        id: review
+        working-directory: trusted-review/scripts/io-usage-review
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          PR_NUMBER: ${{ inputs.pr-number }}
+          TRIGGER_EVENT: ${{ inputs.trigger-event }}
+          IMPORT_PREFIX: ${{ inputs.import-prefix }}
+          RULES_SOURCE: ${{ inputs.rules-source }}
+          IO_USAGE_REVIEW_ENABLED: ${{ vars.IO_USAGE_REVIEW_ENABLED }}
+          REVIEW_WORKFLOW_REPOSITORY: ${{ job.workflow_repository }}
+          REVIEW_WORKFLOW_SHA: ${{ job.workflow_sha }}
+          OUTPUT_DIR: ${{ github.workspace }}/review-output
+        run: ./node_modules/.bin/tsx main.ts
+
+      - name: Upload paired findings and coverage metadata
+        if: >-
+          always() &&
+          steps.review.outputs.published == 'true' &&
+          hashFiles('review-output/io-usage-findings.json') != '' &&
+          hashFiles('review-output/io-usage-meta.json') != ''
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: io-usage-findings
+          path: |
+            review-output/io-usage-findings.json
+            review-output/io-usage-meta.json
+          if-no-files-found: ignore
+
+      - name: Summarize preparation or execution failure
+        if: failure()
+        run: echo 'IO usage review unavailable; preparation or execution failed. Previous results remain unresolved.' >> "$GITHUB_STEP_SUMMARY"
