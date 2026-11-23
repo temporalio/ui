@@ -1,0 +1,238 @@
+name: IO usage review fixture demo (do not merge)
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [ardiewen/fe-1628-io-usage-review]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: io-usage-review-DEMO-${{ github.repository }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  demo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.repository == 'temporalio/ui' &&
+      github.actor == 'ardiewen' &&
+      github.event.pull_request.user.login == 'ardiewen' &&
+      github.event.pull_request.head.repo.full_name == 'temporalio/ui' &&
+      github.event.pull_request.base.repo.full_name == 'temporalio/ui' &&
+      github.event.pull_request.head.ref == 'ardiewen/fe-1628-comment-demo' &&
+      github.event.pull_request.base.ref == 'ardiewen/fe-1628-io-usage-review' &&
+      github.event.pull_request.base.sha == 'd2dce8f0493d1bce4882dead9cdae763bf63b3b5' &&
+      github.event.pull_request.number != 4212 &&
+      github.event.pull_request.draft == true &&
+      github.event.pull_request.state == 'open'
+    steps:
+      - name: Checkout pinned production renderer
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: temporalio/ui
+          ref: d2dce8f0493d1bce4882dead9cdae763bf63b3b5
+          path: trusted-review
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /scripts/io-usage-review/
+            /src/lib/io/badge/badge.md
+
+      - name: Set up Node
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+        with:
+          node-version: 22.23.4
+
+      - name: Prepare isolated fixture renderer
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git -C trusted-review rev-parse HEAD)" = d2dce8f0493d1bce4882dead9cdae763bf63b3b5
+          mkdir "$RUNNER_TEMP/io-usage-demo"
+          for source in render.ts review.ts rules.ts; do
+            cp "trusted-review/scripts/io-usage-review/$source" "$RUNNER_TEMP/io-usage-demo/$source"
+            cmp "trusted-review/scripts/io-usage-review/$source" "$RUNNER_TEMP/io-usage-demo/$source"
+            sha256sum "$RUNNER_TEMP/io-usage-demo/$source"
+          done
+          cp trusted-review/src/lib/io/badge/badge.md "$RUNNER_TEMP/io-usage-demo/badge.md"
+          cmp trusted-review/src/lib/io/badge/badge.md "$RUNNER_TEMP/io-usage-demo/badge.md"
+          npm install --prefix "$RUNNER_TEMP/io-usage-demo" --no-save --package-lock=false --ignore-scripts --no-audit --no-fund tsx@4.23.15 zod@4.4.3
+
+      - name: Render explicitly fictional sample data
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > "$RUNNER_TEMP/io-usage-demo/fixture.mts" <<'FIXTURE'
+          import assert from 'node:assert/strict';
+          import { readFile, writeFile } from 'node:fs/promises';
+          import { MARKER, MetaSchema, parseState, renderComment } from './render.ts';
+          import { ReviewSchema } from './review.ts';
+          import { ruleIdExists } from './rules.ts';
+
+          const pin = 'd2dce8f0493d1bce4882dead9cdae763bf63b3b5';
+          const event = JSON.parse(await readFile(process.env.GITHUB_EVENT_PATH!, 'utf8'));
+          const rules = await readFile(new URL('./badge.md', import.meta.url), 'utf8');
+          assert(ruleIdExists(rules, 'IN-1'));
+          const review = ReviewSchema.parse({
+            usages: [
+              {
+                file: 'fixture-demo/badge-examples.svelte',
+                line: 10,
+                component: 'badge',
+                verdict: 'aligned',
+                ruleId: 'IN-1',
+                pattern: null,
+                reason: 'Fixture: nonempty text Pending satisfies the Badge input rule.',
+              },
+              {
+                file: 'fixture-demo/badge-examples.svelte',
+                line: 20,
+                component: 'badge',
+                verdict: 'violation',
+                ruleId: 'IN-1',
+                pattern: null,
+                reason: 'Fixture: empty text violates the Badge input rule; omit the Badge when no value exists.',
+              },
+              {
+                file: 'fixture-demo/badge-examples.svelte',
+                line: 30,
+                component: 'badge',
+                verdict: 'uncovered',
+                ruleId: null,
+                pattern: 'Relative ordering of metadata badges',
+                reason: 'Fixture: checked Badge rules do not specify the relative ordering of metadata badges.',
+              },
+            ],
+          });
+          const meta = MetaSchema.parse({
+            repo: 'temporalio/ui',
+            pr: event.number,
+            prUrl: `https://github.com/temporalio/ui/pull/${event.number}`,
+            headSha: event.pull_request.head.sha,
+            reviewStatus: 'complete',
+            skippedFiles: [],
+            missingRules: [],
+            reason: null,
+          });
+          const rendered = renderComment(review, meta, null, pin);
+          const prefix = [
+            '<!-- io-usage-review-DEMO-FE-1628 -->',
+            '**Fixture demo — sample data, not an actual review**',
+            '',
+            'All source paths and line numbers below are fictional fixtures. No model ran; coverage describes the fixture scenario, not PR code or CI acceptance. The advisory, findings-artifact and digest text below is part of the sample renderer output; this demo does not publish findings artifacts or log findings.',
+            '',
+          ].join('\n');
+          const body = `${prefix}\n${rendered}`;
+          assert(!body.startsWith(MARKER));
+          assert.equal(parseState(body), null);
+          assert(body.endsWith(rendered));
+          assert(body.includes('✅ Badge — follows IN-1'));
+          assert(body.includes('⚠️ Badge — breaks IN-1'));
+          assert(body.includes('⚠️ Badge — no documented rule covers this'));
+          assert(body.includes(`/blob/${pin}/src/lib/io/badge/badge.md`));
+          assert(body.length < 65_000);
+          await writeFile(new URL('./comment.md', import.meta.url), body);
+          console.log(body);
+          FIXTURE
+          "$RUNNER_TEMP/io-usage-demo/node_modules/.bin/tsx" "$RUNNER_TEMP/io-usage-demo/fixture.mts"
+
+      - name: Upsert only this disposable demo PR comment
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'POST'
+          import assert from 'node:assert/strict';
+          import { readFile } from 'node:fs/promises';
+
+          const pin = 'd2dce8f0493d1bce4882dead9cdae763bf63b3b5';
+          const marker = '<!-- io-usage-review-DEMO-FE-1628 -->';
+          const api = 'https://api.github.com/repos/temporalio/ui';
+          const event = JSON.parse(await readFile(process.env.GITHUB_EVENT_PATH, 'utf8'));
+          const number = event.number;
+          assert.equal(process.env.GITHUB_EVENT_NAME, 'pull_request');
+          assert.equal(process.env.GITHUB_REPOSITORY, 'temporalio/ui');
+          assert.equal(process.env.GITHUB_ACTOR, 'ardiewen');
+          assert.equal(event.repository.full_name, 'temporalio/ui');
+          assert.equal(event.sender.login, 'ardiewen');
+          assert(['opened', 'synchronize', 'reopened'].includes(event.action));
+          assert(Number.isSafeInteger(number) && number > 0 && number !== 4212);
+          const issueUrl = `${api}/issues/${number}`;
+          const prUrl = `https://github.com/temporalio/ui/pull/${number}`;
+          const headSha = event.pull_request.head.sha;
+          assert.match(headSha, /^[a-f0-9]{40}$/);
+          const validatePr = (pr) => {
+            assert.equal(pr.number, number);
+            assert.equal(pr.html_url, prUrl);
+            assert.equal(pr.issue_url, issueUrl);
+            assert.equal(pr.user.login, 'ardiewen');
+            assert.equal(pr.state, 'open');
+            assert.equal(pr.draft, true);
+            assert.equal(pr.merged, false);
+            assert.equal(pr.head.repo.full_name, 'temporalio/ui');
+            assert.equal(pr.base.repo.full_name, 'temporalio/ui');
+            assert.equal(pr.head.ref, 'ardiewen/fe-1628-comment-demo');
+            assert.equal(pr.base.ref, 'ardiewen/fe-1628-io-usage-review');
+            assert.equal(pr.head.sha, headSha);
+            assert.equal(pr.base.sha, pin);
+          };
+          validatePr(event.pull_request);
+          const body = await readFile(`${process.env.RUNNER_TEMP}/io-usage-demo/comment.md`, 'utf8');
+          assert(body.startsWith(`${marker}\n**Fixture demo — sample data, not an actual review**\n`));
+          assert(body.includes('All source paths and line numbers below are fictional fixtures. No model ran;'));
+          assert(body.length < 65_000);
+          const request = async (path, method = 'GET', data) => {
+            const response = await fetch(`${api}${path}`, {
+              method,
+              headers: {
+                Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
+                Accept: 'application/vnd.github+json',
+                'X-GitHub-Api-Version': '2022-11-28',
+                ...(data ? { 'Content-Type': 'application/json' } : {}),
+              },
+              ...(data ? { body: JSON.stringify(data) } : {}),
+            });
+            if (!response.ok) throw new Error(`GitHub ${method} ${path}: ${response.status}`);
+            return response.json();
+          };
+          const validateComment = (comment) => {
+            assert(Number.isSafeInteger(comment.id) && comment.id > 0);
+            assert.equal(comment.issue_url, issueUrl);
+            assert.equal(comment.user.login, 'github-actions[bot]');
+            assert.equal(comment.user.type, 'Bot');
+            assert(comment.body.startsWith(`${marker}\n`));
+            assert.equal(comment.html_url, `${prUrl}#issuecomment-${comment.id}`);
+          };
+          validatePr(await request(`/pulls/${number}`));
+          const matches = [];
+          for (let page = 1; ; page++) {
+            const comments = await request(`/issues/${number}/comments?per_page=100&page=${page}`);
+            assert(Array.isArray(comments));
+            for (const comment of comments) {
+              if (!comment.body?.startsWith(`${marker}\n`)) continue;
+              validateComment(comment);
+              matches.push(comment);
+            }
+            assert(matches.length <= 1, 'Duplicate demo markers');
+            if (comments.length < 100) break;
+          }
+          const existing = matches[0];
+          if (existing) validateComment(await request(`/issues/comments/${existing.id}`));
+          validatePr(await request(`/pulls/${number}`));
+          const comment = existing
+            ? await request(`/issues/comments/${existing.id}`, 'PATCH', { body })
+            : await request(`/issues/${number}/comments`, 'POST', { body });
+          validateComment(comment);
+          assert.equal(comment.body, body);
+          if (existing) assert.equal(comment.id, existing.id);
+          const readback = await request(`/issues/comments/${comment.id}`);
+          validateComment(readback);
+          assert.equal(readback.body, body);
+          console.log(readback.html_url);
+          POST
