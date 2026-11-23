@@ -38,5 +38,5 @@ How the component behaves. Context for reviewers; not checked.
 
 - **BEH-1** TextLink always renders an anchor. When disabled, it omits `href`, sets `aria-disabled`, removes the link from the tab order, and prevents default behavior and propagation before skipping the caller's `onclick`.
 - **BEH-2** While enabled, the caller's `onclick` and `tabindex` are used. Other native anchor attributes pass through.
-- **DIS-1** [`textLinkRecipe`](./recipe.ts) uses inline layout without icons and inline-flex layout with icons. The icons are sized relative to the text.
+- **DIS-1** `textLinkRecipe` (`recipe.ts` in `src/lib/io/text-link/`) uses inline layout without icons and inline-flex layout with icons. The icons are sized relative to the text.
 - **BEH-3** Native attributes, including `data-testid`, reach the anchor. No test ID is assigned internally.
