@@ -12,6 +12,7 @@
   import PaginatedTable from '$lib/holocene/table/paginated-table/paginated.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
+  import TableTwoLineCell from '$lib/holocene/table/table-two-line-cell.svelte';
   import { translate } from '$lib/i18n/translate';
   import Badge from '$lib/io/badge/badge.svelte';
   import IconChevronDown from '$lib/io/icon/icons/chevron-down.svelte';
@@ -162,22 +163,18 @@
         <td class="truncate" data-testid="callback-operation">
           {handler?.operation ?? ''}
         </td>
-        <td class="py-2" data-testid="callback-target-execution">
-          {#if target}
-            <div class="flex flex-col">
-              {#if target.href}
-                <Link href={target.href} class="truncate">{target.name}</Link>
-              {:else}
-                <span class="truncate">{target.name}</span>
-              {/if}
-              {#if target.typeLabel}
-                <span class="truncate text-xs text-secondary"
-                  >{target.typeLabel}</span
-                >
-              {/if}
-            </div>
-          {/if}
-        </td>
+        <TableTwoLineCell data-testid="callback-target-execution">
+          {#snippet primary()}
+            {#if target?.href}
+              <Link href={target.href}>{target.name}</Link>
+            {:else}
+              {target?.name ?? ''}
+            {/if}
+          {/snippet}
+          {#snippet secondary()}
+            {target?.typeLabel ?? ''}
+          {/snippet}
+        </TableTwoLineCell>
         <td class="truncate" data-testid="callback-target-event">
           {#if target?.event?.href}
             <Link href={target.event.href} class="truncate"
