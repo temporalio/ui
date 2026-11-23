@@ -15,7 +15,7 @@ export const agentDocsPaths = {
   full: '/llms-full.txt',
   component: (slug: string) => `/io/${slug}.md`,
   overviewPage: '/?path=/docs/io-overview--docs',
-  llmsPage: '/?path=/docs/io-for-agents-llms-txt--docs',
+  forAgentsSection: '/?path=/docs/io-overview--docs#for-agents',
 };
 
 export const generatedBannerPrefix =
@@ -94,9 +94,8 @@ export function buildLlmsIndex(
     [
       `- [Overview](${url(agentDocsPaths.overviewPage)}): Getting started, the guides, and every component.`,
       `- [Full documentation](${url(agentDocsPaths.full)}): Every component's Markdown page in one file.`,
+      `- [For agents](${url(agentDocsPaths.forAgentsSection)}): The files on this site written for AI tools, and how to point an assistant at them.`,
     ].join('\n'),
-    '## For agents',
-    `- [LLMs.txt](${url(agentDocsPaths.llmsPage)}): The files on this site written for AI tools, and how to point an assistant at them.`,
     '## Components',
     componentLines.join('\n'),
   ]

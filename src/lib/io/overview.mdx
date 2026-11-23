@@ -1,4 +1,4 @@
-import { Meta } from '@storybook/addon-docs/blocks';
+import { Markdown, Meta, Source } from '@storybook/addon-docs/blocks';
 
 import heroImage from '../../../.storybook/assets/io-overview-hero.webp';
 import noiseTexture from '../../../.storybook/assets/io-overview-noise.webp';
@@ -8,6 +8,8 @@ import noiseTexture from '../../../.storybook/assets/io-overview-noise.webp';
 {/* Marks IO pages for the docs layout rules in .storybook/preview.css. */}
 
 <div className="io-docs-page" hidden />
+
+export const origin = globalThis.location?.origin ?? '';
 
 <header
   className="io-overview-hero"
@@ -200,13 +202,27 @@ A responsive page heading with slots for actions, tags, filters, and metadata.
 
 ## For agents
 
-<div className="io-overview-grid">
-  <div className="io-overview-card">
+These docs are also published as plain text for AI tools, following the
+[llms.txt](https://llmstxt.org) convention. Every file is generated from the
+same Markdown as the component pages, so it stays current with them.
 
-**[LLMs.txt](?path=/docs/io-for-agents-llms-txt--docs)**
+{/* MDX here has no GFM tables; the Markdown block renders them. */}
 
-Plain-text versions of these docs for AI tools, and how to point an assistant at
-them.
+<Markdown>{`
+| File | Contents |
+| ---- | -------- |
+| <a href="${origin}/llms.txt" target="_blank"><code>/llms.txt</code></a> | An index of the docs and every component, with a link to each component's Markdown page. |
+| <a href="${origin}/llms-full.txt" target="_blank"><code>/llms-full.txt</code></a> | Every component's Markdown page in one file. |
+| \`/io/<slug>.md\` | A component's page: description, usage guidance, Do / Don't rules, and the API reference. Also under Copy page on each component. |
+`}</Markdown>
 
-  </div>
-</div>
+Start an assistant from the index, which links to everything else. In Cursor,
+add the `/llms.txt` link under Docs and reference it with `@Docs`. In Claude
+Code and other assistants, include it in a prompt or your project's
+`AGENTS.md`. For large context windows, attach `/llms-full.txt` instead.
+
+<Source
+  language="text"
+  dark
+  code={`Read ${origin}/llms.txt and follow its usage guidance. Use io components from @temporalio/ui for this change.`}
+/>

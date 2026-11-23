@@ -18,7 +18,7 @@ const button: AgentDocsComponent = {
 };
 
 describe('buildLlmsIndex', () => {
-  test('links the docs, For agents pages, and each component', () => {
+  test('links the docs, the For agents section, and each component', () => {
     const index = buildLlmsIndex('https://example.com', [button]);
 
     expect(index).toMatch(/^# io Design System\n\n> /);
@@ -26,7 +26,7 @@ describe('buildLlmsIndex', () => {
       '- [Full documentation](https://example.com/llms-full.txt)',
     );
     expect(index).toContain(
-      '- [LLMs.txt](https://example.com/?path=/docs/io-for-agents-llms-txt--docs)',
+      '- [For agents](https://example.com/?path=/docs/io-overview--docs#for-agents)',
     );
     expect(index).toContain(
       '- [Button](https://example.com/io/button.md): Triggers an action.',
