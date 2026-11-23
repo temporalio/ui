@@ -5,6 +5,7 @@
 
   import Timestamp from '$lib/components/timestamp.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import Loading from '$lib/holocene/loading.svelte';
   import Markdown from '$lib/holocene/markdown-editor/preview.svelte';
   import { translate } from '$lib/i18n/translate';
   import { IconRetry } from '$lib/io/icon';
@@ -94,11 +95,15 @@
       </div>
     </div>
   </div>
-  {#key currentDetails}
-    <Markdown
-      frameId="user-metadata-current-details"
-      overrideTheme="background"
-      content={currentDetails}
-    />
-  {/key}
+  {#if loading && !currentDetails}
+    <Loading />
+  {:else}
+    {#key currentDetails}
+      <Markdown
+        frameId="user-metadata-current-details"
+        overrideTheme="background"
+        content={currentDetails}
+      />
+    {/key}
+  {/if}
 </div>
