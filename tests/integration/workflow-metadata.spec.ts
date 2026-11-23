@@ -55,4 +55,47 @@ test.describe('Workflow Reset Modal Shown', () => {
       page.getByRole('heading', { name: 'Current Details', exact: true }),
     ).toBeVisible();
   });
+
+  test('Shows loader on Current Details while metadata query is pending', async ({
+    page,
+  }) => {
+    // Sample __temporal_workflow_metadata response, delayed to simulate a
+    // slow query endpoint. data is base64('{"currentDetails":"..."}').
+    await page.route(
+      /\/api\/v1\/namespaces\/default\/workflows\/[^/]+\/query/,
+      async (route) => {
+        await new Promise((r) => setTimeout(r, 1500));
+        await route.fulfill({
+          json: {
+            queryResult: {
+              payloads: [
+                {
+                  metadata: {
+                    encoding: 'anNvbi9wbGFpbg==',
+                    type: 'VGV4dA==',
+                  },
+                  data: 'eyJjdXJyZW50RGV0YWlscyI6Ik1pZ3JhdGluZyBzaGFyZCAxMiBvZiA0OCB0byB0aGUgbmV3IHRhc2sgcXVldWUuIn0=',
+                },
+              ],
+            },
+            queryRejected: null,
+          },
+        });
+      },
+    );
+
+    await page.goto(`${workflowUrl}/user-metadata`);
+
+    // Loader shows while the query is in flight…
+    await expect(page.getByTestId('loading')).toBeVisible();
+
+    // …then resolves to the sampled Current Details content.
+    // (Markdown renders inside an iframe, so pierce it with frameLocator.)
+    await expect(
+      page
+        .frameLocator('#user-metadata-current-details')
+        .getByText('Migrating shard 12 of 48 to the new task queue.'),
+    ).toBeVisible();
+    await expect(page.getByTestId('loading')).toBeHidden();
+  });
 });
