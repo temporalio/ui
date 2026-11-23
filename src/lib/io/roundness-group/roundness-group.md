@@ -10,15 +10,6 @@ A layout primitive that coordinates the corners and borders of adjoining segment
 import { RoundnessGroup } from '$lib/io/roundness-group';
 ```
 
-Roundness Group joins adjoining segments into one shape by rounding only the outer corners and merging the borders between them. It is a building block for other components, such as the segmented labels in Badge, Badge Count, and Tag, rather than something users see on its own.
-
-| Do                                                                                                                | Don't                                                                                                                        |
-| ----------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| Use it when building a component whose segments should read as one shape, such as a label with an attached value. | Don't use it to lay out unrelated items. Segments should belong together, or the shared shape is misleading.                 |
-| Put segments directly inside the group, so it can find the first and last segment.                                | Don't wrap segments in extra elements. The group only shapes its direct children.                                            |
-| Keep colors and border widths on the elements that own each segment's shape.                                      | Don't set rounded corners on the segments yourself. Let `roundness` control the outer corners.                               |
-| Use an existing component, such as Badge or Tag, before building a new segmented one.                             | Don't give the group its own border in wrapper mode without setting `--group-border-width`. The inner corners won't line up. |
-
 `class="inline-flex"` arranges segments side by side. `roundness` controls the
 outer corners.
 
@@ -28,6 +19,34 @@ set that variable when the wrapper owns a border.
 
 `innerBorderHandling="collapse"` removes right borders between segments.
 `erase` removes both adjoining borders, and `none` leaves borders alone.
+
+## Selection
+
+Roundness Group joins adjoining segments into one shape by rounding only the outer corners and merging the borders between them. It is a building block for other components, such as the segmented labels in Badge, Badge Count, and Tag, rather than something users see on its own.
+
+| Do                                                                                                                          | Don't                                                                                                                                  |
+| --------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| **USE-1** Use it when building a component whose segments should read as one shape, such as a label with an attached value. | **USE-2** Don't use it to lay out unrelated items. Segments should belong together, or the shared shape is misleading.                 |
+| **USE-3** Put segments directly inside the group, so it can find the first and last segment.                                | **USE-4** Don't wrap segments in extra elements. The group only shapes its direct children.                                            |
+| **USE-5** Keep colors and border widths on the elements that own each segment's shape.                                      | **USE-6** Don't set rounded corners on the segments yourself. Let `roundness` control the outer corners.                               |
+| **USE-7** Use an existing component, such as Badge or Tag, before building a new segmented one.                             | **USE-8** Don't give the group its own border in wrapper mode without setting `--group-border-width`. The inner corners won't line up. |
+
+## Rules
+
+Checked against every PR that uses this component.
+
+### Input
+
+- **IN-1** Children MUST be valid phrasing content for the rendered `span`. For other container elements, callers SHOULD use the exported `roundnessGroupRecipe` on a suitable element instead.
+
+## Notes
+
+How the component behaves. Context for reviewers; not checked.
+
+- **BEH-1** RoundnessGroup is a span styled by [`roundnessGroupRecipe`](./roundness-group.svelte). It adds no interaction, group role, or accessible name.
+- **DIS-1** Child mode resets direct-child radii and rounds the first and last child's outside corners. Wrapper mode also rounds the group and computes inner radii using `--group-border-width`.
+- **DIS-2** Border handling removes right borders between segments in collapse mode and both adjoining borders in erase mode. These rules use physical left and right edges.
+- **BEH-2** Native attributes, including `data-testid`, reach the span. No test ID is assigned internally.
 
 ## API Reference
 
