@@ -36,7 +36,7 @@ Checked against every PR that uses this component.
 
 How the component behaves. Context for reviewers; not checked.
 
-- **BEH-1** The named glyphs share [IconSvgWrapper](./icon-svg-wrapper.svelte). Its `labelled` expression considers `title`, `aria-label`, and `aria-labelledby`; a labeled SVG has `role="img"`, while an unlabeled one has `aria-hidden="true"`.
+- **BEH-1** The named glyphs share IconSvgWrapper (`icon-svg-wrapper.svelte` in `src/lib/io/icon/`). Its `labelled` expression considers `title`, `aria-label`, and `aria-labelledby`; a labeled SVG has `role="img"`, while an unlabeled one has `aria-hidden="true"`.
 - **BEH-2** A supplied `aria-label` or `aria-labelledby` suppresses the generated SVG title element.
 - **DIS-1** Glyph geometry belongs to each icon component. Optical variants adjust the glyph within the same outer box.
 - **BEH-3** Native SVG attributes, including `data-testid`, reach the SVG. No test ID is assigned internally.
