@@ -440,10 +440,12 @@ type InvokeScalingOptions = {
 };
 
 // Lambda and AgentCore are both invoke-based providers in
-// temporal-auto-scaled-workers, so they pair with the `no-sync` scaler and take
-// the same role/external-id details. They differ only in the provider type and
-// the key naming the resource to invoke: `arn` for Lambda, `endpoint_arn` for
-// AgentCore.
+// temporal-auto-scaled-workers, so they take the same role/external-id details
+// and the same scaler details. They differ in the provider type, the key naming
+// the resource to invoke (`arn` for Lambda, `endpoint_arn` for AgentCore) and
+// the scaler: Lambda pairs with `no-sync`, while AgentCore pairs with
+// `no-sync-session`, which invokes once per no-sync task so each session gets
+// its own worker.
 const buildInvokeComputeConfig = (
   providerType: 'aws-lambda' | 'aws-agentcore',
   resourceKey: 'arn' | 'endpoint_arn',
@@ -484,7 +486,8 @@ const buildInvokeComputeConfig = (
           details: { metadata: { encoding }, data: providerData },
         },
         scaler: {
-          type: 'no-sync',
+          type:
+            providerType === 'aws-agentcore' ? 'no-sync-session' : 'no-sync',
           details: {
             metadata: { encoding },
             data: btoa(JSON.stringify(scalerConfig)),

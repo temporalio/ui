@@ -497,6 +497,7 @@ describe('deployments service', () => {
       const scalingGroup = result.scalingGroups?.['default'];
       expect(scalingGroup).toBeDefined();
       expect(scalingGroup?.provider?.type).toBe('aws-lambda');
+      expect(scalingGroup?.scaler?.type).toBe('no-sync');
 
       const providerData = scalingGroup?.provider?.details?.data;
       expect(providerData).toBeDefined();
@@ -550,14 +551,14 @@ describe('deployments service', () => {
       expect(decoded.role).toBe(iamRoleArn);
     });
 
-    test('pairs with the no-sync scaler, like Lambda', () => {
+    test('pairs with the no-sync-session scaler', () => {
       const result = buildAgentCoreComputeConfig(endpointArn, iamRoleArn, {
         scaleUpCooloffMs: 1000,
         maxWorkerLifetimeMs: 60000,
       });
 
       const scalingGroup = result.scalingGroups?.['default'];
-      expect(scalingGroup?.scaler?.type).toBe('no-sync');
+      expect(scalingGroup?.scaler?.type).toBe('no-sync-session');
 
       const decoded = JSON.parse(
         atob(scalingGroup?.scaler?.details?.data as string),
