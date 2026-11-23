@@ -10,8 +10,7 @@ A non-interactive metadata label with a tag icon and optional extension.
 import { Tag } from '$lib/io/tag';
 ```
 
-Choose a semantic `colorScheme` and pass `Icon={false}` to hide the default tag
-icon.
+Choose a semantic `colorScheme`.
 
 ## Selection
 
@@ -32,17 +31,18 @@ Checked against every PR that uses this component.
 
 - **IN-1** `text` MUST NOT be empty. An empty primary label still renders a segment.
 - **IN-2** Callers MUST keep `text` in its natural case rather than uppercasing it in code; casing is presentation.
+- **IN-3** To omit the primary icon, callers MUST pass `Icon={null}` or `Icon={false}` rather than `undefined`. Reason: `Icon={condition ? X : undefined}` renders `IconTag` when the condition is false.
 
 ### Accessibility
 
-- **A11Y-1** An extension icon's meaning MUST be expressed in `text` or `extension.text`. The component renders its icons without accessible labels.
+- **A11Y-1** Meaning conveyed by `Icon` or `extension.Icon` MUST be expressed in `text` or `extension.text`. The component renders these icons without accessible labels.
 
 ## Notes
 
 How the component behaves. Context for reviewers; not checked.
 
 - **BEH-1** The primary icon precedes the label, and an extension icon precedes the extension text.
-- **DIS-1** Tag uses [`badgeRecipe`](../badge/recipe.ts) for its wrapper and [`tagSegmentRecipe`](./recipe.ts) for each segment. The neutral segment changes the Badge surface and border tokens.
+- **DIS-1** Tag uses `badgeRecipe` (`recipe.ts` in `src/lib/io/badge/`) for its wrapper and `tagSegmentRecipe` (`recipe.ts` in `src/lib/io/tag/`) for each segment. The neutral segment changes the Badge surface and border tokens.
 - **DIS-2** The caller's `class` is on the outer RoundnessGroup, while color styling is on its inner segments. Text is uppercased by CSS and does not wrap.
 - **BEH-2** Native attributes, including `data-testid`, reach the outer span. No test ID is assigned internally.
 
