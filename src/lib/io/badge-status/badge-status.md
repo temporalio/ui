@@ -10,21 +10,42 @@ A non-interactive workflow status label with consistent colors and translated te
 import { BadgeStatus } from '$lib/io/badge-status';
 ```
 
-Communicates the current state/status of an object (e.g., Running, Paused, Complete, Continued as new, Failed, Timed out, Terminated, Cancelled)
-
-| Do                                                                                                              | Don't                                                                                                                   |
-| --------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| Use the built-in `status` values so every status keeps the same label and color across the product.             | Don't override `text` with a different word for the same status. "Failed" should never appear as "Errored" or "Broken". |
-| Add `count` when summarizing many records with the same status, such as "12 Failed" in a workflow list.         | Don't use Badge Status for states that aren't workflow statuses. Use Badge with a semantic color scheme instead.        |
-| Show one status per item. An object is in exactly one state at a time.                                          | Don't make status badges clickable. Use Chip Status when users need to filter by status.                                |
-| Let long labels truncate in tight layouts, and make sure the full status is still available nearby or on hover. | Don't hide the implied pause extension on Paused unless the surrounding UI already shows the item is paused.            |
-
 Set `status` to a workflow status to select its translated label and color.
 `text` overrides the label, and numeric `count` values are locale-formatted.
 
 Paused adds an implied pause extension. Set `showImpliedExtensions={false}` to
 omit implied extensions. Custom `extensions` follow them. Truncation is enabled
 by default; constrain the parent width to see it.
+
+## Selection
+
+Communicates the current state/status of an object (e.g., Running, Paused, Complete, Continued as new, Failed, Timed out, Terminated, Cancelled)
+
+| Do                                                                                                                        | Don't                                                                                                                             |
+| ------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| **USE-1** Use the built-in `status` values so every status keeps the same label and color across the product.             | **USE-2** Don't override `text` with a different word for the same status. "Failed" should never appear as "Errored" or "Broken". |
+| **USE-3** Add `count` when summarizing many records with the same status, such as "12 Failed" in a workflow list.         | **USE-4** Don't use Badge Status for states that aren't workflow statuses. Use Badge with a semantic color scheme instead.        |
+| **USE-5** Show one status per item. An object is in exactly one state at a time.                                          | **USE-6** Don't make status badges clickable. Use Chip Status when users need to filter by status.                                |
+| **USE-7** Let long labels truncate in tight layouts, and make sure the full status is still available nearby or on hover. | **USE-8** Don't hide the implied pause extension on Paused unless the surrounding UI already shows the item is paused.            |
+
+## Rules
+
+Checked against every PR that uses this component.
+
+### Input
+
+- **IN-1** A status from an untyped source MUST be validated before it reaches BadgeStatus. The lookup in [`statusConfiguration`](./badge-status.svelte) has no fallback; an unsupported status fails when its configuration is read. Use the appropriate status guard, such as [`isWorkflowStatusType`](../../models/workflow-status.ts), and a Badge fallback for other values.
+
+## Notes
+
+How the component behaves. Context for reviewers; not checked.
+
+- **BEH-1** BadgeStatus composes [Badge](../badge/badge.usage.md). Badge IN-2 and A11Y-1 document shared extension content and accessibility requirements.
+- **BEH-2** The label combines the count, when present, with `text ?? translate(configuration.translationId)`. Numeric counts use `toLocaleString()`; string counts render verbatim. Zero renders.
+- **BEH-3** When implied extensions are enabled, the Paused configuration prepends a warning-colored pause icon before custom extensions. The translated primary label already names the paused state.
+- **DIS-1** Colors come from [BadgeStatus `statusConfiguration`](./badge-status.svelte); [ChipStatus DIS-1](../chip-status/chip-status.usage.md#notes) identifies its separate mapping for comparison.
+- **DIS-2** Primary and extension truncation are delegated to Badge. An extension can opt into truncation; extensions are not universally exempt.
+- **BEH-4** Native attributes, including `data-testid`, are forwarded to Badge. No test ID is assigned internally.
 
 ## API Reference
 
