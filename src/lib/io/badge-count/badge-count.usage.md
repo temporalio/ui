@@ -4,14 +4,32 @@
 import { BadgeCount } from '$lib/io/badge-count';
 ```
 
-Displays a numeric value, typically representing number of items or sometimes notifications.
-
-| Do                                                                                                                       | Don't                                                                                                                              |
-| ------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
-| Place the count next to a label that says what is being counted, such as "Workers 12". A number on its own is ambiguous. | Don't use a count for non-numeric information. Use Badge or Badge Status for words and states.                                     |
-| Use `total` when progress against a limit matters, such as "3 / 10" completed or used.                                   | Don't make counts interactive. If clicking the count should filter or navigate, put the action on the surrounding control instead. |
-| Show zero when zero is meaningful. An empty queue or no failures is useful information.                                  | Don't use the error color scheme for routine counts. Reserve it for counts that need attention, such as failures.                  |
-| Keep values short. Abbreviate large numbers (e.g., 1.2k) when the exact value isn't needed.                              | Don't stack multiple counts on the same item. If an item has several counts, label each one or move them into a summary.           |
-
 Pass `value` as a number or a preformatted string. Set `total` for a fraction-like
 count. Zero is displayed for both values.
+
+## Selection
+
+Displays a numeric value, typically representing number of items or sometimes notifications.
+
+| Do                                                                                                                                 | Don't                                                                                                                                        |
+| ---------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| **USE-1** Place the count next to a label that says what is being counted, such as "Workers 12". A number on its own is ambiguous. | **USE-2** Don't use a count for non-numeric information. Use Badge or Badge Status for words and states.                                     |
+| **USE-3** Use `total` when progress against a limit matters, such as "3 / 10" completed or used.                                   | **USE-4** Don't make counts interactive. If clicking the count should filter or navigate, put the action on the surrounding control instead. |
+| **USE-5** Show zero when zero is meaningful. An empty queue or no failures is useful information.                                  | **USE-6** Don't use the error color scheme for routine counts. Reserve it for counts that need attention, such as failures.                  |
+| **USE-7** Keep values short. Abbreviate large numbers (e.g., 1.2k) when the exact value isn't needed.                              | **USE-8** Don't stack multiple counts on the same item. If an item has several counts, label each one or move them into a summary.           |
+
+## Rules
+
+Checked against every PR that uses this component.
+
+### Input
+
+- **IN-1** Callers SHOULD pass a locale-formatted string when an exact `value` or `total` can exceed 999. Numeric values render verbatim without locale formatting.
+
+## Notes
+
+How the component behaves. Context for reviewers; not checked.
+
+- **BEH-1** Zero renders for both `value` and `total`. The fraction separator and total render whenever `total !== undefined`.
+- **DIS-1** Layout and segment colors come from [the Badge recipes](../badge/recipe.ts). The caller's `class` is on the outer RoundnessGroup, while `colorScheme` styles the inner segment.
+- **BEH-2** Native attributes, including `data-testid` and accessible labels, reach the outer span. No test ID is assigned internally.
