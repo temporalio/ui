@@ -51,20 +51,12 @@ body.sb-show-main,
   max-width: 800px;
 }
 
-/* Keep docs prose near 66 characters per line, never over 75. */
-.sbdocs.sbdocs-content:has(.io-docs-page)
-  :is(p, li, blockquote):not(table *, .docs-story *) {
-  max-width: 52ch;
-}
-
-/* Two-column docs tables, such as Do / Don't, split evenly and keep each
-   cell to the same 52ch text width (plus 13px padding and a border). */
+/* Two-column docs tables, such as Do / Don't, split evenly. */
 .sbdocs.sbdocs-content:has(.io-docs-page)
   table:not(.sb-anchor, .sb-unstyled, .sb-unstyled table):has(
     tr > :nth-child(2):last-child
   ) {
   width: 100%;
-  max-width: calc(2 * (52ch + 27px));
   table-layout: fixed;
 }
 
@@ -241,7 +233,6 @@ body.sb-show-main,
 }
 
 .sbdocs.sbdocs-content .io-overview-hero p {
-  max-width: none;
   margin: 0;
   color: inherit;
   font-family: inherit;
