@@ -83,9 +83,11 @@ The flow:
 ```
 
 The modal clears `error` whenever it closes, and Escape, the backdrop, the close
-icon, and Cancel all close it the same way. While `loading` is true, none of
-them can close it, so a request can't finish after users think they cancelled.
-Use `onCancelModal` to reset any fields you own.
+icon, and Cancel all close it the same way. While `loading` is true, the modal
+hides its close icon and disables both buttons, but Escape and a click on the
+backdrop still close it. A request can therefore finish after the modal has
+closed, so don't rely on the modal being open when it does. Use `onCancelModal`
+to reset any fields you own.
 
 ## Form in a drawer
 

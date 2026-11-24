@@ -26,11 +26,8 @@ import { PageActions } from './page-actions';
 
 export const ioStoriesPrefix = './src/lib/io/';
 
-const exampleHeadingId = (name: string): string =>
-  `example-${name
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '')}`;
+const exampleHeadingId = (storyId: string): string =>
+  `example-${storyId.split('--').at(-1) ?? storyId}`;
 
 function Examples(): ReactElement | null {
   const { componentStories, projectAnnotations, getStoryContext } =
@@ -63,7 +60,7 @@ function Examples(): ReactElement | null {
           // linked title its own id for the page nav.
           h(
             HeaderMdx,
-            { as: 'h3', id: exampleHeadingId(story.name) },
+            { as: 'h3', id: exampleHeadingId(story.id) },
             h(
               AnchorMdx,
               { href: `./?path=/story/${story.id}`, target: '_top' },

@@ -56,4 +56,25 @@ describe('pageSummary', () => {
       ),
     ).toEqual({ name: 'Button', description: 'Triggers an action.' });
   });
+
+  test('reads a final paragraph with a single trailing newline', () => {
+    expect(pageSummary('# Tag\n\nA metadata label.\n')).toEqual({
+      name: 'Tag',
+      description: 'A metadata label.',
+    });
+  });
+
+  test('returns no description when the page starts with a heading or table', () => {
+    expect(pageSummary('# Button\n\n## Usage\n\nText.\n')).toEqual({
+      name: 'Button',
+      description: '',
+    });
+    expect(pageSummary('# Slots\n\n| a | b |\n| - | - |\n').description).toBe(
+      '',
+    );
+  });
+
+  test('handles a page that is only a title', () => {
+    expect(pageSummary('# Empty')).toEqual({ name: 'Empty', description: '' });
+  });
 });

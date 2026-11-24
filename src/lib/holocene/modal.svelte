@@ -83,14 +83,8 @@
     modalElement?.close();
   };
 
-  // While a request is running the close icon is hidden and Cancel is
-  // disabled, so the backdrop and Escape can't dismiss the modal either.
   const handleClick = (event: MouseEvent) => {
-    if (event.target === modalElement && !loading) closeModal();
-  };
-
-  const handleCancel = (event: Event) => {
-    if (loading) event.preventDefault();
+    if (event.target === modalElement) closeModal();
   };
 
   $effect(() => {
@@ -105,7 +99,6 @@
 <dialog
   {id}
   onclose={handleClose}
-  oncancel={handleCancel}
   bind:this={modalElement}
   class={merge(
     'body',

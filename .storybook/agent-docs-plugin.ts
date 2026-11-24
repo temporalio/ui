@@ -1,3 +1,5 @@
+import { join } from 'node:path';
+
 import type { Plugin } from 'vite';
 
 import {
@@ -7,6 +9,9 @@ import {
   loadPages,
   servedPageMarkdown,
 } from './agent-docs';
+
+const isDocsSource = (path: string) =>
+  path.endsWith('.md') || path.endsWith('.stories.svelte');
 
 const isAgentDocsPath = (pathname: string) =>
   pathname === agentDocsPaths.index ||
@@ -29,11 +34,20 @@ export function agentDocsPlugin(root: string): Plugin {
   return {
     name: 'io-agent-docs',
     configureServer(server) {
+      const ioDirectory = join(root, 'src', 'lib', 'io');
+      let files: Map<string, string> | undefined;
+      server.watcher.on('all', (_event, path) => {
+        if (path.startsWith(ioDirectory) && isDocsSource(path)) {
+          files = undefined;
+        }
+      });
+
       server.middlewares.use((request, response, next) => {
         const pathname = new URL(request.url ?? '/', 'http://localhost')
           .pathname;
         if (!isAgentDocsPath(pathname)) return next();
-        const body = agentDocsFiles(root).get(pathname);
+        files ??= agentDocsFiles(root);
+        const body = files.get(pathname);
         if (body === undefined) return next();
         response.setHeader('Content-Type', 'text/plain; charset=utf-8');
         response.end(body);

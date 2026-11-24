@@ -21,11 +21,23 @@ export const generatedBannerPrefix =
 export const stripGeneratedBanner = (markdown: string): string =>
   markdown.replace(/^<!--[\s\S]*?-->\s*/, '');
 
+const notProse = /^(#|\||```|<!--|>|- |\d+\. )/;
+
 export function pageSummary(markdown: string): {
   name?: string;
   description: string;
 } {
-  const [, name, paragraph = ''] =
-    stripGeneratedBanner(markdown).match(/^# (.+)\n+([^#][\s\S]*?)\n\n/) ?? [];
-  return { name, description: paragraph.replace(/\s+/g, ' ').trim() };
+  const body = stripGeneratedBanner(markdown);
+  const title = body.match(/^# (.+)(?:\n|$)/);
+  const rest = title ? body.slice(title[0].length) : body;
+  const [firstBlock = ''] = rest
+    .split(/\n\s*\n/)
+    .map((block) => block.trim())
+    .filter(Boolean);
+  return {
+    name: title?.[1].trim(),
+    description: notProse.test(firstBlock)
+      ? ''
+      : firstBlock.replace(/\s+/g, ' '),
+  };
 }

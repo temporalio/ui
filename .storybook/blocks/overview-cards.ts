@@ -20,11 +20,15 @@ const modules = import.meta.glob<StoriesModule>(
   { eager: true },
 );
 
-const pages = import.meta.glob<string>('../../src/lib/io/**/*.md', {
-  eager: true,
-  query: '?raw',
-  import: 'default',
-});
+const pages = import.meta.glob<string>(
+  [
+    '../../src/lib/io/**/*.md',
+    '!**/*.usage.md',
+    '!**/AGENTS.md',
+    '!**/README.md',
+  ],
+  { eager: true, query: '?raw', import: 'default' },
+);
 
 const entries: OverviewEntry[] = Object.entries(modules).flatMap(
   ([path, { default: meta }]) => {
