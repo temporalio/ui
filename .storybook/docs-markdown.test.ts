@@ -15,16 +15,17 @@ Intro.
 The flow.
 `;
 
+const shape = (markdown: string) =>
+  splitGuide(markdown).map((part) =>
+    part.type === 'story' ? `story:${part.story}` : part.markdown.trim(),
+  );
+
 describe('splitGuide', () => {
   test('splits Markdown around story markers', () => {
-    expect(splitGuide(guide)).toEqual([
-      {
-        type: 'markdown',
-        markdown:
-          '# Modals\n\nConfirmations and errors.\n\n## Confirmation modal\n\nIntro.\n\n',
-      },
-      { type: 'story', story: 'ConfirmationModal' },
-      { type: 'markdown', markdown: '\n\nThe flow.\n' },
+    expect(shape(guide)).toEqual([
+      '# Modals\n\nConfirmations and errors.\n\n## Confirmation modal\n\nIntro.',
+      'story:ConfirmationModal',
+      'The flow.',
     ]);
   });
 
@@ -33,11 +34,42 @@ describe('splitGuide', () => {
       { type: 'markdown', markdown: '# Theme\n\nTokens.\n' },
     ]);
   });
+
+  test('leaves markers inside fenced code blocks alone', () => {
+    const markdown =
+      'Mark an example like this:\n\n```md\n<!-- story: Example -->\n```\n\n~~~\n<!-- story: Other -->\n~~~\n';
+    expect(shape(markdown)).toEqual([markdown.trim()]);
+  });
+
+  test('reads markers with Windows line endings', () => {
+    expect(
+      shape('Intro.\r\n\r\n<!-- story: Example -->\r\n\r\nMore.\r\n'),
+    ).toEqual(['Intro.', 'story:Example', 'More.']);
+  });
+
+  test('reads a marker on the last line without a trailing newline', () => {
+    expect(shape('Intro.\n\n<!-- story: Example -->')).toEqual([
+      'Intro.',
+      'story:Example',
+    ]);
+  });
 });
 
 describe('stripStoryMarkers', () => {
-  test('removes marker lines and the blank line after them', () => {
+  test('removes marker lines and keeps one blank line between paragraphs', () => {
     expect(stripStoryMarkers(guide)).toContain('Intro.\n\nThe flow.\n');
+  });
+
+  test('removes a marker on the last line', () => {
+    expect(stripStoryMarkers('Intro.\n\n<!-- story: Example -->')).toBe(
+      'Intro.\n',
+    );
+  });
+
+  test('keeps markers shown inside code blocks', () => {
+    expect(stripStoryMarkers('```md\n<!-- story: Example -->\n```\n')).toBe(
+      '```md\n<!-- story: Example -->\n```\n',
+    );
   });
 });
 
