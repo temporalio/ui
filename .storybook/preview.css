@@ -221,15 +221,6 @@ body.sb-show-main,
   font-family: ui-sans-serif, system-ui, sans-serif;
 }
 
-.io-overview-hero::after {
-  position: absolute;
-  inset: 0;
-  background: var(--io-overview-hero-noise) top left / 31.97cqw;
-  content: '';
-  mix-blend-mode: difference;
-  pointer-events: none;
-}
-
 .io-overview-hero-content {
   position: relative;
   z-index: 1;

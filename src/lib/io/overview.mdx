@@ -1,7 +1,6 @@
 import { Markdown, Meta, Source } from '@storybook/addon-docs/blocks';
 
 import heroImage from '../../../.storybook/assets/io-overview-hero.webp';
-import noiseTexture from '../../../.storybook/assets/io-overview-noise.webp';
 
 <Meta title="Overview" />
 
@@ -15,7 +14,6 @@ export const origin = globalThis.location?.origin ?? '';
   className="io-overview-hero"
   style={{
     '--io-overview-hero-image': `url(${heroImage})`,
-    '--io-overview-hero-noise': `url(${noiseTexture})`,
   }}
 >
   <div className="io-overview-hero-content">
