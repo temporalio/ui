@@ -1,291 +1,200 @@
-# SuperForms Usage Guide
+# Forms
 
-This guide demonstrates how to use SuperForms directly in this codebase, both with our minimal wrapper and with raw SuperForms.
+Forms use [SuperForms](https://superforms.rocks/) in SPA mode with a Zod
+schema. Call `superForm` directly. There is no wrapper.
 
-## Installation
-
-SuperForms is already installed in this project. The main dependencies are:
-
-- `sveltekit-superforms` - The core library
-- `zod` - For schema validation
-
-## Option 1: Using the Minimal Wrapper
-
-We provide a simple `createSPAForm` wrapper that sets up SuperForms with SPA defaults.
-
-```typescript
-import { createSPAForm } from '$lib/utilities/form/create-spa-form';
-import { z } from 'zod';
-
-// Define your schema
-const userSchema = z.object({
-  username: z.string().min(3, 'Username must be at least 3 characters'),
-  email: z.string().email('Please enter a valid email'),
-});
-
-// Create the form
-const { form, errors, constraints, enhance } = createSPAForm({
-  schema: userSchema,
-  defaultValues: {
-    username: '',
-    email: '',
-  },
-  options: {
-    onUpdate: async ({ form }) => {
-      // Handle form submission
-      console.log('Form submitted:', form);
-      // Make API call here
-    },
-    onError: async ({ result }) => {
-      console.error('Form error:', result);
-    },
-    resetForm: true,
-  },
-});
+```ts
+import { superForm } from 'sveltekit-superforms';
+import { zodClient } from 'sveltekit-superforms/adapters';
+import { z } from 'zod/v3';
 ```
 
-```svelte
-<!-- In your Svelte component -->
-<script lang="ts">
-  import { createSPAForm } from '$lib/utilities/form/create-spa-form';
-  import { z } from 'zod';
-  import Input from '$lib/holocene/input/input.svelte';
-  import Button from '$lib/holocene/button.svelte';
+Import Zod from `zod/v3`. The `zodClient` adapter expects a Zod 3 schema.
 
-  const userSchema = z.object({
-    username: z.string().min(3),
-    email: z.string().email(),
+## Basic form
+
+Define a schema, pass the starting values and options to `superForm`, and add
+`use:enhance` to the form. Show each field's first error with the Holocene
+`Input` props `error` and `hintText`.
+
+```svelte
+<script lang="ts">
+  import { superForm } from 'sveltekit-superforms';
+  import { zodClient } from 'sveltekit-superforms/adapters';
+  import { z } from 'zod/v3';
+
+  import Input from '$lib/holocene/input/input.svelte';
+  import { Button } from '$lib/io/button';
+
+  const schema = z.object({
+    username: z.string().min(3, 'Username must be at least 3 characters'),
+    email: z.string().email('Enter a valid email'),
   });
 
-  const { form, errors, constraints, enhance } = createSPAForm({
-    schema: userSchema,
-    defaultValues: { username: '', email: '' },
-    options: {
+  const { form, errors, constraints, enhance, submitting } = superForm(
+    { username: '', email: '' },
+    {
+      SPA: true,
+      validators: zodClient(schema),
       onUpdate: async ({ form }) => {
-        await fetch('/api/users', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(form),
-        });
+        if (!form.valid) return;
+        await saveUser(form.data);
       },
     },
-  });
+  );
 </script>
 
-<form use:enhance>
+<form use:enhance class="flex flex-col gap-4">
   <Input
-    bind:value={$form.username}
-    name="username"
+    id="username"
     label="Username"
-    error={$errors.username?.[0]}
+    bind:value={$form.username}
+    error={!!$errors.username}
+    hintText={$errors.username?.[0]}
     {...$constraints.username}
   />
-
   <Input
-    bind:value={$form.email}
-    name="email"
+    id="email"
     type="email"
     label="Email"
-    error={$errors.email?.[0]}
+    bind:value={$form.email}
+    error={!!$errors.email}
+    hintText={$errors.email?.[0]}
     {...$constraints.email}
   />
-
-  <Button type="submit">Submit</Button>
+  <Button type="submit" isLoading={$submitting}>Save</Button>
 </form>
 ```
 
-## Option 2: Raw SuperForms Usage
+## Options
 
-For more control, you can use SuperForms directly:
+| Option             | Use                                                                                    |
+| ------------------ | -------------------------------------------------------------------------------------- |
+| `SPA: true`        | Always. Forms submit in the browser, not to a SvelteKit form action.                   |
+| `validators`       | Always. Pass `zodClient(schema)`.                                                      |
+| `onUpdate`         | Runs on submit. Check `form.valid` before you send anything.                           |
+| `dataType: 'json'` | When the data has nested objects, arrays, or numbers you don't want posted as strings. |
+| `resetForm: false` | When the form stays on screen after saving and should keep the saved values.           |
+| `onError`          | When you need to react to an error thrown in `onUpdate`, such as logging it.           |
 
-```typescript
-import { superForm } from 'sveltekit-superforms';
-import { zodClient } from 'sveltekit-superforms/adapters';
-import { z } from 'zod';
+## Patterns
 
-const schema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  age: z.number().min(18, 'Must be 18 or older'),
-});
+### Loading state
 
-const { form, errors, constraints, enhance, submitting } = superForm(
-  {},
+`$submitting` is true while `onUpdate` runs. Pass it to the IO `Button` prop
+`isLoading`, which shows a spinner and blocks repeat submits.
+
+```svelte
+<Button type="submit" isLoading={$submitting}>Save</Button>
+```
+
+### Success message
+
+Set `form.message` in `onUpdate`, and show `$message`.
+
+```svelte
+<script lang="ts">
+  const { form, enhance, message } = superForm(
+    { name: '' },
+    {
+      SPA: true,
+      validators: zodClient(schema),
+      resetForm: false,
+      onUpdate: async ({ form }) => {
+        if (!form.valid) return;
+        await saveName(form.data);
+        form.message = 'Saved';
+      },
+    },
+  );
+</script>
+
+{#if $message}
+  <p class="text-success">{$message}</p>
+{/if}
+```
+
+### Errors from the API
+
+When the API rejects a value, attach the error to its field with `setError`,
+so it shows next to the input like a validation error.
+
+```ts
+import { setError, superForm } from 'sveltekit-superforms';
+
+const { form, errors, enhance } = superForm(
+  { namespace: '' },
   {
     SPA: true,
     validators: zodClient(schema),
-    dataType: 'json',
-    resetForm: false,
-
     onUpdate: async ({ form }) => {
       if (!form.valid) return;
-
-      // Custom submission logic
-      const response = await fetch('/api/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form.data),
-      });
-
-      if (!response.ok) {
-        throw new Error('Submission failed');
+      try {
+        await createNamespace(form.data);
+      } catch {
+        setError(form, 'namespace', 'This namespace already exists');
       }
-
-      // Handle success
-      console.log('Success!');
-    },
-
-    onError: async ({ result }) => {
-      console.error('Form error:', result);
     },
   },
 );
 ```
 
-## Common Patterns
+### Rules across fields
 
-### 1. Basic Form with Validation
+Use `refine` on the schema, and set `path` to the field that should show the
+error.
 
-```svelte
-<script lang="ts">
-  import { createSPAForm } from '$lib/utilities/form/create-spa-form';
-  import { z } from 'zod';
-
-  const schema = z.object({
-    email: z.string().email('Invalid email'),
+```ts
+const schema = z
+  .object({
     password: z.string().min(8, 'Password must be at least 8 characters'),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ['confirmPassword'],
   });
-
-  const { form, errors, enhance } = createSPAForm({
-    schema,
-    defaultValues: { email: '', password: '' },
-    options: {
-      onUpdate: async ({ form }) => {
-        // Login logic
-        await loginUser(form);
-      },
-    },
-  });
-</script>
-
-<form use:enhance>
-  <input bind:value={$form.email} name="email" type="email" />
-  {#if $errors.email}
-    <span class="error">{$errors.email[0]}</span>
-  {/if}
-
-  <input bind:value={$form.password} name="password" type="password" />
-  {#if $errors.password}
-    <span class="error">{$errors.password[0]}</span>
-  {/if}
-
-  <button type="submit">Login</button>
-</form>
 ```
 
-### 2. Form with Loading State
+### Nested data
+
+Set `dataType: 'json'` for nested objects and arrays. Bind each field by its
+path.
 
 ```svelte
 <script lang="ts">
-  import { createSPAForm } from '$lib/utilities/form/create-spa-form';
+  const schema = z.object({
+    user: z.object({
+      name: z.string().min(1, 'Name is required'),
+    }),
+    tags: z.array(z.string()),
+  });
 
-  const { form, enhance, submitting } = createSPAForm({
-    defaultValues: { name: '' },
-    options: {
+  const { form, errors, enhance } = superForm(
+    { user: { name: '' }, tags: [] },
+    {
+      SPA: true,
+      dataType: 'json',
+      validators: zodClient(schema),
       onUpdate: async ({ form }) => {
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 2000));
+        if (!form.valid) return;
+        await save(form.data);
       },
     },
-  });
+  );
 </script>
 
-<form use:enhance>
-  <input bind:value={$form.name} name="name" />
-  <button type="submit" disabled={$submitting}>
-    {$submitting ? 'Submitting...' : 'Submit'}
-  </button>
-</form>
+<Input
+  id="name"
+  label="Name"
+  bind:value={$form.user.name}
+  error={!!$errors.user?.name}
+  hintText={$errors.user?.name?.[0]}
+/>
 ```
-
-### 3. Form with Custom Error Handling
-
-```svelte
-<script lang="ts">
-  import { createSPAForm } from '$lib/utilities/form/create-spa-form';
-
-  const { form, enhance, message } = createSPAForm({
-    defaultValues: { data: '' },
-    options: {
-      onUpdate: async ({ form }) => {
-        const response = await fetch('/api/save', {
-          method: 'POST',
-          body: JSON.stringify(form),
-        });
-
-        if (!response.ok) {
-          throw new Error('Save failed');
-        }
-
-        return 'Data saved successfully!';
-      },
-      onError: async ({ result }) => {
-        console.error('Save error:', result);
-      },
-    },
-  });
-</script>
-
-<form use:enhance>
-  <input bind:value={$form.data} name="data" />
-  <button type="submit">Save</button>
-
-  {#if $message}
-    <div class="success">{$message}</div>
-  {/if}
-</form>
-```
-
-### 4. Complex Form with Nested Data
-
-```typescript
-const complexSchema = z.object({
-  user: z.object({
-    name: z.string().min(1),
-    email: z.string().email(),
-  }),
-  preferences: z.object({
-    theme: z.enum(['light', 'dark']),
-    notifications: z.boolean(),
-  }),
-  tags: z.array(z.string()),
-});
-
-const { form, errors, enhance } = createSPAForm({
-  schema: complexSchema,
-  defaultValues: {
-    user: { name: '', email: '' },
-    preferences: { theme: 'light', notifications: true },
-    tags: [],
-  },
-  options: {
-    onUpdate: async ({ form }) => {
-      // Handle complex form submission
-    },
-  },
-});
-```
-
-## Best Practices
-
-1. **Always use `use:enhance`** on your form elements
-2. **Bind form values** with `bind:value={$form.fieldName}`
-3. **Handle errors** by checking `$errors.fieldName`
-4. **Use constraints** for HTML validation: `{...$constraints.fieldName}`
-5. **Check submitting state** for loading indicators: `$submitting`
-6. **Validate on client** but always validate on server for security
 
 ## Resources
 
-- [SuperForms Documentation](https://superforms.rocks/)
-- [Zod Documentation](https://zod.dev/)
-- [SvelteKit Forms](https://kit.svelte.dev/docs/form-actions)
+- [SuperForms documentation](https://superforms.rocks/)
+- [SuperForms in SPA mode](https://superforms.rocks/concepts/spa)
+- [Zod documentation](https://zod.dev/)
