@@ -1,4 +1,10 @@
-import { Canvas, Markdown } from '@storybook/addon-docs/blocks';
+import {
+  AnchorMdx,
+  Canvas,
+  CodeOrSourceMdx,
+  HeadersMdx,
+  Markdown,
+} from '@storybook/addon-docs/blocks';
 import { Fragment, createElement as h, type ReactElement } from 'react';
 import { components } from 'storybook/internal/components';
 
@@ -6,6 +12,9 @@ import { splitGuide } from '../docs-markdown';
 
 const markdownOptions = {
   overrides: {
+    a: AnchorMdx,
+    code: CodeOrSourceMdx,
+    ...HeadersMdx,
     ol: components.ol,
     ul: components.ul,
     li: components.li,
