@@ -4,15 +4,6 @@
 import { IconAdd } from '$lib/io/icon';
 ```
 
-Icons are small symbols that represent an action, object, or idea at a glance. They support nearby text and help users scan the interface, and they are usually decorative — when an icon is the only way to convey meaning, give it an accessible label.
-
-| Do                                                                                                                   | Don't                                                                                                        |
-| -------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| Pair icons with text whenever the meaning isn't universally clear.                                                   | Don't use the same icon for different meanings, or different icons for the same meaning, across the product. |
-| Give an icon a `title`, `aria-label`, or `aria-labelledby` when it communicates information on its own.              | Don't label an icon inside an icon-only button. Label the button instead, so the label describes the action. |
-| Let icons inherit the surrounding text color so they match the content they support.                                 | Don't recolor icons to convey status on their own. Pair color with text or use a status component.           |
-| Size icons to the text they sit beside, and use optical variants when an icon looks too heavy or light at that size. | Don't use icons purely as decoration where they add clutter without helping users scan.                      |
-
 Import named icons from `$lib/io/icon`. Icons inherit the current text color
 unless the glyph defines its own colors. Use `width` and `height` to size the SVG.
 
@@ -21,3 +12,31 @@ adjusting the glyph within it.
 
 The Contact Sheet story in the sidebar is generated from the icon barrel, so
 newly exported icons appear automatically.
+
+## Selection
+
+Icons are small symbols that represent an action, object, or idea at a glance. They support nearby text and help users scan the interface, and they are usually decorative — when an icon is the only way to convey meaning, give it an accessible label.
+
+| Do                                                                                                                             | Don't                                                                                                                  |
+| ------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
+| **USE-1** Pair icons with text whenever the meaning isn't universally clear.                                                   | **USE-2** Don't use the same icon for different meanings, or different icons for the same meaning, across the product. |
+| **USE-3** Give an icon a `title`, `aria-label`, or `aria-labelledby` when it communicates information on its own.              | **USE-4** Don't label an icon inside an icon-only button. Label the button instead, so the label describes the action. |
+| **USE-5** Let icons inherit the surrounding text color so they match the content they support.                                 | **USE-6** Don't recolor icons to convey status on their own. Pair color with text or use a status component.           |
+| **USE-7** Size icons to the text they sit beside, and use optical variants when an icon looks too heavy or light at that size. | **USE-8** Don't use icons purely as decoration where they add clutter without helping users scan.                      |
+
+## Rules
+
+Checked against every PR that uses this component.
+
+### Accessibility
+
+- **A11Y-1** Every ID supplied through `aria-labelledby` MUST identify an existing labeling element in the rendered document.
+
+## Notes
+
+How the component behaves. Context for reviewers; not checked.
+
+- **BEH-1** The named glyphs share IconSvgWrapper (`icon-svg-wrapper.svelte` in `src/lib/io/icon/`). Its `labelled` expression considers `title`, `aria-label`, and `aria-labelledby`; a labeled SVG has `role="img"`, while an unlabeled one has `aria-hidden="true"`.
+- **BEH-2** A supplied `aria-label` or `aria-labelledby` suppresses the generated SVG title element.
+- **DIS-1** Glyph geometry belongs to each icon component. Optical variants adjust the glyph within the same outer box.
+- **BEH-3** Native SVG attributes, including `data-testid`, reach the SVG. No test ID is assigned internally.

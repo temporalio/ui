@@ -10,17 +10,41 @@ A non-interactive metadata label with a tag icon and optional extension.
 import { Tag } from '$lib/io/tag';
 ```
 
+Choose a semantic `colorScheme`.
+
+## Selection
+
 Tags are non-interactive labels that attach metadata to an object, often as a name and value pair, such as a search attribute or a custom label. They help users identify and group items at a glance — use Chip instead when users need to act on the label.
 
-| Do                                                                                                          | Don't                                                                                                    |
-| ----------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| Use `text` for the name and `extension` for the value, such as "region" and "us-east-1".                    | Don't make tags clickable. Use Chip when clicking the label changes a filter or performs another action. |
-| Keep names consistent across the product, so the same metadata always has the same label.                   | Don't use Tag for statuses. Use Badge Status for workflow states.                                        |
-| Keep the default neutral color unless the color carries a clear meaning.                                    | Don't use color alone to distinguish tags. The text should identify each tag on its own.                 |
-| Show a few tags per item, and move the rest behind an overflow pattern (e.g., +3 more) when there are many. | Don't put long or free-form text in a tag. Show it in a field or description instead.                    |
+| Do                                                                                                                    | Don't                                                                                                              |
+| --------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| **USE-1** Use `text` for the name and `extension` for the value, such as "region" and "us-east-1".                    | **USE-2** Don't make tags clickable. Use Chip when clicking the label changes a filter or performs another action. |
+| **USE-3** Keep names consistent across the product, so the same metadata always has the same label.                   | **USE-4** Don't use Tag for statuses. Use Badge Status for workflow states.                                        |
+| **USE-5** Keep the default neutral color unless the color carries a clear meaning.                                    | **USE-6** Don't use color alone to distinguish tags. The text should identify each tag on its own.                 |
+| **USE-7** Show a few tags per item, and move the rest behind an overflow pattern (e.g., +3 more) when there are many. | **USE-8** Don't put long or free-form text in a tag. Show it in a field or description instead.                    |
 
-Choose a semantic `colorScheme` and pass `Icon={false}` to hide the default tag
-icon.
+## Rules
+
+Checked against every PR that uses this component.
+
+### Input
+
+- **IN-1** `text` MUST NOT be empty. An empty primary label still renders a segment.
+- **IN-2** Callers MUST keep `text` in its natural case rather than uppercasing it in code; casing is presentation.
+- **IN-3** To omit the primary icon, callers MUST pass `Icon={null}` or `Icon={false}` rather than `undefined`. Reason: `Icon={condition ? X : undefined}` renders `IconTag` when the condition is false.
+
+### Accessibility
+
+- **A11Y-1** Meaning conveyed by `Icon` or `extension.Icon` MUST be expressed in `text` or `extension.text`. The component renders these icons without accessible labels.
+
+## Notes
+
+How the component behaves. Context for reviewers; not checked.
+
+- **BEH-1** The primary icon precedes the label, and an extension icon precedes the extension text.
+- **DIS-1** Tag uses `badgeRecipe` (`recipe.ts` in `src/lib/io/badge/`) for its wrapper and `tagSegmentRecipe` (`recipe.ts` in `src/lib/io/tag/`) for each segment. The neutral segment changes the Badge surface and border tokens.
+- **DIS-2** The caller's `class` is on the outer RoundnessGroup, while color styling is on its inner segments. Text is uppercased by CSS and does not wrap.
+- **BEH-2** Native attributes, including `data-testid`, reach the outer span. No test ID is assigned internally.
 
 ## API Reference
 

@@ -10,20 +10,49 @@ Triggers an action, with shared sizes, color schemes, icons, and loading feedbac
 import { Button, ButtonLink } from '$lib/io/button';
 ```
 
-Buttons trigger actions. They are the primary means by which users interact with a product.
-
-| Do                                                                                                                                                            | Don't                                                                                                                 |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| Start labels with a verb that says what will happen, such as "Start workflow" or "Save changes".                                                              | Don't use more than one primary button in the same area. A single primary action keeps the next step clear.           |
-| Match the color scheme to the action's importance: primary for the main action, secondary or tertiary for supporting actions, ghost for low-emphasis actions. | Don't use danger for anything other than destructive actions, such as terminating a workflow or deleting a namespace. |
-| Show a loading state with `isLoading` while the action runs, so users know it was received.                                                                   | Don't use a Button to navigate to another page. Use ButtonLink, or TextLink when the link sits within text.           |
-| Give icon-only buttons an accessible label that describes the action.                                                                                         | Don't disable a button without explaining why nearby. Users should know what to change to enable it.                  |
-| Choose a `size` that fits the surrounding layout, such as `sm` or `xs` in dense tables and toolbars.                                                          | Don't mix button sizes within the same group of actions.                                                              |
-| Set `type="submit"` explicitly on the button that submits a form.                                                                                             | Don't rely on the default button type to submit forms.                                                                |
-
 `Button` and `ButtonLink` are both exported from `$lib/io/button`. The
 `tracking` prop accepts overrides for name, intent, and text, or `false` to opt
 out of the default tracking attributes.
+
+## Selection
+
+Buttons trigger actions. They are the primary means by which users interact with a product.
+
+| Do                                                                                                                                                                      | Don't                                                                                                                           |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| **USE-1** Start labels with a verb that says what will happen, such as "Start workflow" or "Save changes".                                                              | **USE-2** Don't use more than one primary button in the same area. A single primary action keeps the next step clear.           |
+| **USE-3** Match the color scheme to the action's importance: primary for the main action, secondary or tertiary for supporting actions, ghost for low-emphasis actions. | **USE-4** Don't use danger for anything other than destructive actions, such as terminating a workflow or deleting a namespace. |
+| **USE-5** Show a loading state with `isLoading` while the action runs, so users know it was received.                                                                   | **USE-6** Don't use a Button to navigate to another page. Use ButtonLink, or TextLink when the link sits within text.           |
+| **USE-7** Give icon-only buttons an accessible label that describes the action.                                                                                         | **USE-8** Don't disable a button without explaining why nearby. Users should know what to change to enable it.                  |
+| **USE-9** Choose a `size` that fits the surrounding layout, such as `sm` or `xs` in dense tables and toolbars.                                                          | **USE-10** Don't mix button sizes within the same group of actions.                                                             |
+| **USE-11** Set `type="submit"` explicitly on the button that submits a form.                                                                                            | **USE-12** Don't rely on the default button type to submit forms.                                                               |
+
+## Rules
+
+Checked against every PR that uses this component.
+
+### Input
+
+- **IN-1** Callers MUST set `tracking={false}` when the rendered label contains customer data. Otherwise the default `data-track-text="*textContent*"` requests analytics collection of the label.
+- **IN-2** Caller `class` MUST NOT override background, border, or text colors to replace `colorScheme`.
+
+### Output
+
+- **OUT-1** While an asynchronous action is running, callers MUST also disable the Button or make its handler idempotent. `isLoading` supplies feedback and `aria-busy`, but does not disable clicks.
+
+### Accessibility
+
+- **A11Y-1** When a Button toggles state, callers MUST expose that state programmatically, for example with `aria-pressed`. Button does not assign a toggle state.
+
+## Notes
+
+How the component behaves. Context for reviewers; not checked.
+
+- **BEH-1** Button always renders a native button; ButtonLink always renders a native anchor. Native event handlers are forwarded without a component-owned `stopPropagation()` or routing wrapper.
+- **BEH-2** `isLoading` sets `aria-busy` and displays a spinner. It replaces the leading icon when one exists; otherwise it occupies the trailing position.
+- **BEH-3** `getTrackingAttributes` (`tracking.ts` in `src/lib/io/button/`) supplies tracking defaults and overrides for both Button and ButtonLink.
+- **DIS-1** `buttonRecipe` (`button.svelte` in `src/lib/io/button/`) merges caller classes after color and size styling and before disabled styling. Labels do not wrap.
+- **BEH-4** Native attributes, including `data-testid`, reach the rendered element. Neither component assigns a test ID internally.
 
 ## API Reference
 

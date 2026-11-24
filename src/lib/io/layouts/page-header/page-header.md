@@ -18,6 +18,24 @@ compose the header using other IO components.
 The heading is rendered as an `h1`. The layout wraps as space becomes constrained;
 keep action labels concise and use snippets for structured content.
 
+## Rules
+
+Checked against every PR that uses this component.
+
+### Accessibility
+
+- **A11Y-1** The `heading` snippet MUST provide nonempty title content.
+- **A11Y-2** The `heading` snippet MUST NOT contain another heading element. PageHeader already wraps the snippet in an `h1`.
+
+## Notes
+
+How the component behaves. Context for reviewers; not checked.
+
+- **BEH-1** PageHeader owns the header element and page-title `h1`. Other snippets are rendered in layout divs without adding headings or accessible names to their content.
+- **DIS-1** The heading area and actions wrap independently. Filters and metadata occupy their own rows when provided.
+- **BEH-2** Native attributes, including `data-testid`, reach the header. No test ID is assigned internally.
+- **BEH-3** The Page Layouts guide (`page-layouts.mdx` in `src/lib/guides/page-layouts/`) describes PageHeader composition within list and detail templates.
+
 ## API Reference
 
 | Name           | Description | Type          | Default | Required |
