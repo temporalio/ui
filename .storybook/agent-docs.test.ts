@@ -12,25 +12,19 @@ const button: AgentDocsComponent = {
   slug: 'button',
   name: 'Button',
   description: 'Triggers an action.',
-  importPath: '$lib/io/button',
-  packageEntryPoint: '@temporalio/ui/io/button',
   markdown: '# Button\n\nTriggers an action.\n',
 };
 
 describe('buildLlmsIndex', () => {
-  test('links the docs, the For agents section, and each component', () => {
-    const index = buildLlmsIndex('https://example.com', [button]);
+  test('links the docs, the For agents section, and each component relative to llms.txt', () => {
+    const index = buildLlmsIndex([button]);
 
     expect(index).toMatch(/^# io Design System\n\n> /);
+    expect(index).toContain('- [Full documentation](llms-full.txt)');
     expect(index).toContain(
-      '- [Full documentation](https://example.com/llms-full.txt)',
+      '- [For agents](./?path=/docs/overview--docs#for-agents)',
     );
-    expect(index).toContain(
-      '- [For agents](https://example.com/?path=/docs/overview--docs#for-agents)',
-    );
-    expect(index).toContain(
-      '- [Button](https://example.com/io/button.md): Triggers an action.',
-    );
+    expect(index).toContain('- [Button](io/button.md): Triggers an action.');
   });
 });
 
@@ -49,18 +43,14 @@ describe('loadComponents', () => {
   test('reads generated component pages without their banner', () => {
     const page = components.find(({ slug }) => slug === 'button');
 
-    expect(page).toMatchObject({
-      name: 'Button',
-      importPath: '$lib/io/button',
-      packageEntryPoint: '@temporalio/ui/io/button',
-    });
+    expect(page?.name).toBe('Button');
     expect(page?.markdown).toMatch(/^# Button\n/);
   });
 
   test('uses the folder name as the slug for nested components', () => {
-    expect(components.find(({ slug }) => slug === 'page-header')).toMatchObject(
-      { importPath: '$lib/io/layouts/page-header' },
-    );
+    expect(
+      components.find(({ slug }) => slug === 'page-header')?.markdown,
+    ).toMatch(/^# Page Header\n/);
   });
 
   test('skips usage files and hand-written Markdown', () => {

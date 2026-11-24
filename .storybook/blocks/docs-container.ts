@@ -42,8 +42,6 @@ const toThemeName = (globals?: Globals): ThemeName => {
   return theme in themes ? theme : defaultThemeName;
 };
 
-// Docs pages are not re-rendered when globals change, so follow the theme
-// toolbar over the channel instead.
 const isIoPage = (context: DocsContainerProps['context']): boolean => {
   try {
     const fileName: unknown = context.resolveOf('meta', ['meta']).preparedMeta
@@ -65,6 +63,8 @@ export function ThemedDocsContainer(
     ),
   );
 
+  // Docs pages are not re-rendered when globals change, so follow the theme
+  // toolbar over the channel instead.
   useEffect(() => {
     const onGlobalsUpdated = ({ globals }: { globals: Globals }) =>
       setThemeName(toThemeName(globals));

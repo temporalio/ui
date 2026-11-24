@@ -7,10 +7,15 @@ import {
   loadComponents,
 } from './agent-docs';
 
-function agentDocsFiles(root: string, origin: string): Map<string, string> {
+const isAgentDocsPath = (pathname: string) =>
+  pathname === agentDocsPaths.index ||
+  pathname === agentDocsPaths.full ||
+  /^\/io\/[^/]+\.md$/.test(pathname);
+
+function agentDocsFiles(root: string): Map<string, string> {
   const components = loadComponents(root);
   return new Map([
-    [agentDocsPaths.index, buildLlmsIndex(origin, components)],
+    [agentDocsPaths.index, buildLlmsIndex(components)],
     [agentDocsPaths.full, buildLlmsFull(components)],
     ...components.map(
       (component) =>
@@ -26,15 +31,15 @@ export function agentDocsPlugin(root: string): Plugin {
       server.middlewares.use((request, response, next) => {
         const pathname = new URL(request.url ?? '/', 'http://localhost')
           .pathname;
-        const origin = `http://${request.headers.host ?? 'localhost'}`;
-        const body = agentDocsFiles(root, origin).get(pathname);
+        if (!isAgentDocsPath(pathname)) return next();
+        const body = agentDocsFiles(root).get(pathname);
         if (body === undefined) return next();
         response.setHeader('Content-Type', 'text/plain; charset=utf-8');
         response.end(body);
       });
     },
     generateBundle() {
-      for (const [path, source] of agentDocsFiles(root, '')) {
+      for (const [path, source] of agentDocsFiles(root)) {
         this.emitFile({ type: 'asset', fileName: path.slice(1), source });
       }
     },

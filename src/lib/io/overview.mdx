@@ -9,7 +9,8 @@ import heroImage from '../../../.storybook/assets/io-overview-hero.webp';
 
 <div className="io-docs-page" hidden />
 
-export const origin = globalThis.location?.origin ?? '';
+export const docsUrl = (path) =>
+  globalThis.location ? new URL(path, globalThis.location.href).href : path;
 
 <header
   className="io-overview-hero"
@@ -73,8 +74,8 @@ same Markdown as the component pages, so it stays current with them.
 <Markdown>{`
 | File | Contents |
 | ---- | -------- |
-| <a href="${origin}/llms.txt" target="_blank"><code>/llms.txt</code></a> | An index of the docs and every component, with a link to each component's Markdown page. |
-| <a href="${origin}/llms-full.txt" target="_blank"><code>/llms-full.txt</code></a> | Every component's Markdown page in one file. |
+| <a href="${docsUrl('llms.txt')}" target="_blank"><code>/llms.txt</code></a> | An index of the docs and every component, with a link to each component's Markdown page. |
+| <a href="${docsUrl('llms-full.txt')}" target="_blank"><code>/llms-full.txt</code></a> | Every component's Markdown page in one file. |
 | \`/io/<slug>.md\` | A component's page: description, usage guidance, Do / Don't rules, and the API reference. Also under Copy page on each component. |
 `}</Markdown>
 
@@ -86,5 +87,5 @@ Code and other assistants, include it in a prompt or your project's
 <Source
   language="text"
   dark
-  code={`Read ${origin}/llms.txt and follow its usage guidance. Use io components from @temporalio/ui for this change.`}
+  code={`Read ${docsUrl('llms.txt')} and follow its usage guidance. Use io components from @temporalio/ui for this change.`}
 />
