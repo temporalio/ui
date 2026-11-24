@@ -1,9 +1,10 @@
 <script lang="ts">
   import type { HTMLAnchorAttributes } from 'svelte/elements';
 
+  import { buttonRecipe } from './recipe';
   import { getTrackingAttributes } from './tracking';
 
-  import { type ButtonProps, buttonRecipe } from './button.svelte';
+  import type { ButtonProps } from './button.svelte';
 
   export interface ButtonLinkProps
     extends

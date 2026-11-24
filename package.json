@@ -325,6 +325,10 @@
       "types": "./dist/io/button/index.d.ts",
       "import": "./dist/io/button/index.js"
     },
+    "./io/button-group": {
+      "types": "./dist/io/button-group/index.d.ts",
+      "import": "./dist/io/button-group/index.js"
+    },
     "./io/chip": {
       "types": "./dist/io/chip/index.d.ts",
       "import": "./dist/io/chip/index.js"
