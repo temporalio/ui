@@ -35,7 +35,7 @@ const wrapperClasses = twJoin(
   'focus-visible:outline',
   'focus-visible:outline-2',
   'focus-visible:outline-offset-2',
-  'focus-visible:outline-interactive-primary-press',
+  'focus-visible:outline-interactive-primary',
 );
 
 const colorSchemeClasses: Record<ButtonColorScheme, string> = {

@@ -14,7 +14,7 @@ const textLinkBaseClasses = twJoin(
 const focusVisibleClasses = twJoin(
   'focus-visible:bg-surface-primary focus-visible:text-primary',
   'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2',
-  'focus-visible:outline-interactive-primary-press',
+  'focus-visible:outline-interactive-primary',
 );
 
 const hasIconsClasses = twJoin('inline-flex');
