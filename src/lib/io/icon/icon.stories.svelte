@@ -16,14 +16,17 @@
   type IconArgs = ComponentProps<typeof IconSvgWrapper> & { icon?: string };
   type IconTemplate = Snippet<[IconArgs, StoryContext<IconArgs>]>;
 
+  const sourceAttribute = (name: string, value: unknown): string =>
+    typeof value === 'string' && !/["{}]/.test(value)
+      ? `${name}="${value}"`
+      : `${name}={${JSON.stringify(value)}}`;
+
   // Show the picked icon as usage code instead of the Playground template.
   const iconSource = (_code: string, { args }: { args: IconArgs }) => {
     const { icon = 'IconAdd', ...props } = args;
     const attributes = Object.entries(props)
       .filter(([, value]) => value !== undefined && value !== '')
-      .map(([name, value]) =>
-        typeof value === 'string' ? `${name}="${value}"` : `${name}={${value}}`,
-      );
+      .map(([name, value]) => sourceAttribute(name, value));
     return `<${icon} ${attributes.join(' ')} />`;
   };
 
