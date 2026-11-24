@@ -7,7 +7,7 @@
   import Breadcrumbs from './breadcrumbs.svelte';
 
   const { Story } = defineMeta({
-    title: 'IO/Components/Breadcrumbs',
+    title: 'Components/Breadcrumbs',
     tags: ['autodocs'],
     component: Breadcrumbs,
     args: {

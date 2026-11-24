@@ -26,7 +26,7 @@ describe('buildLlmsIndex', () => {
       '- [Full documentation](https://example.com/llms-full.txt)',
     );
     expect(index).toContain(
-      '- [For agents](https://example.com/?path=/docs/io-overview--docs#for-agents)',
+      '- [For agents](https://example.com/?path=/docs/overview--docs#for-agents)',
     );
     expect(index).toContain(
       '- [Button](https://example.com/io/button.md): Triggers an action.',

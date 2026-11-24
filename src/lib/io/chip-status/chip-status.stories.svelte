@@ -19,7 +19,7 @@
   ];
 
   const { Story } = defineMeta({
-    title: 'IO/Components/Chip Status',
+    title: 'Components/Chip Status',
     tags: ['autodocs'],
     component: ChipStatus,
     args: {

@@ -23,7 +23,7 @@
   const states = ['default', 'hover', 'active', 'disabled'];
 
   const { Story } = defineMeta({
-    title: 'IO/Components/Button',
+    title: 'Components/Button',
     tags: ['autodocs'],
     component: Button,
     args: {

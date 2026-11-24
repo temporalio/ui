@@ -4,6 +4,7 @@ import {
 } from '@storybook/addon-docs/blocks';
 import {
   createElement as h,
+  type PropsWithChildren,
   type ReactElement,
   useEffect,
   useState,
@@ -12,6 +13,7 @@ import { GLOBALS_UPDATED } from 'storybook/internal/core-events';
 import type { Globals } from 'storybook/internal/types';
 import { create, type ThemeVars } from 'storybook/theming';
 
+import { ioStoriesPrefix } from './component-docs';
 import {
   defaultThemeName,
   type ThemeName,
@@ -42,7 +44,19 @@ const toThemeName = (globals?: Globals): ThemeName => {
 
 // Docs pages are not re-rendered when globals change, so follow the theme
 // toolbar over the channel instead.
-export function ThemedDocsContainer(props: DocsContainerProps): ReactElement {
+const isIoPage = (context: DocsContainerProps['context']): boolean => {
+  try {
+    const fileName: unknown = context.resolveOf('meta', ['meta']).preparedMeta
+      .parameters.fileName;
+    return typeof fileName === 'string' && fileName.startsWith(ioStoriesPrefix);
+  } catch {
+    return false;
+  }
+};
+
+export function ThemedDocsContainer(
+  props: PropsWithChildren<DocsContainerProps>,
+): ReactElement {
   const { context } = props;
   const [themeName, setThemeName] = useState(() =>
     toThemeName(
@@ -64,5 +78,10 @@ export function ThemedDocsContainer(props: DocsContainerProps): ReactElement {
     document.documentElement.setAttribute('data-theme', themeName);
   }, [themeName]);
 
-  return h(DocsContainer, { ...props, theme: docsThemes[themeName] });
+  return h(
+    DocsContainer,
+    { ...props, theme: docsThemes[themeName] },
+    isIoPage(context) && h('span', { className: 'io-docs-page', hidden: true }),
+    props.children,
+  );
 }

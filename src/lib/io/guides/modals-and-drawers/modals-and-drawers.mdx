@@ -4,10 +4,6 @@ import * as Stories from './modals-and-drawers.stories.svelte';
 
 <Meta of={Stories} />
 
-{/* Marks IO pages for the docs layout rules in .storybook/preview.css. */}
-
-<div className="io-docs-page" hidden />
-
 # Modals and Drawers
 
 Modals and drawers show content on top of the page. They are built from the
@@ -112,7 +108,7 @@ The flow:
    opens, so cancelled edits and old errors don't carry over.
 2. **Validate on submit** with SuperForms and a Zod schema. Show each field's
    error with the input's `error` and `hintText` props. See the
-   [Forms guide](?path=/docs/io-guides-forms--docs) for more.
+   [Forms guide](?path=/docs/guides-forms--docs) for more.
 3. **Save and close** only when the form is valid. Otherwise the drawer stays
    open with the errors showing.
 4. **Cancel** closes the drawer without saving.

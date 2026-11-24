@@ -5,7 +5,7 @@
   import DrawerFormExample from './drawer-form-example.svelte';
 
   const { Story } = defineMeta({
-    title: 'IO/Guides/Modals and Drawers',
+    title: 'Guides/Modals and Drawers',
     component: ConfirmationModalExample,
   });
 </script>

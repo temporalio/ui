@@ -24,7 +24,7 @@
   ];
 
   const { Story } = defineMeta({
-    title: 'IO/Components/Badge',
+    title: 'Components/Badge',
     tags: ['autodocs'],
     component: Badge,
     args: {

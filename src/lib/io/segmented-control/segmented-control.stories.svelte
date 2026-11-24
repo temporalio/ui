@@ -13,7 +13,7 @@
   const states = ['default', 'hover', 'focus', 'disabled'];
 
   const { Story } = defineMeta({
-    title: 'IO/Components/Segmented Control',
+    title: 'Components/Segmented Control',
     tags: ['autodocs'],
     component: Segment,
     args: {

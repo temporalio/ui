@@ -41,19 +41,16 @@ const preview: Preview = {
       storySort: {
         method: 'alphabetical',
         order: [
-          'IO',
+          'Overview',
+          'Guides',
           [
-            'Overview',
-            'Guides',
-            [
-              'Forms',
-              'Modals and Drawers',
-              'Page Layouts and Templates',
-              'Theme',
-            ],
-            'Components',
-            'Layouts',
+            'Forms',
+            'Modals and Drawers',
+            'Page Layouts and Templates',
+            'Theme',
           ],
+          'Components',
+          'Layouts',
           'Holocene',
           ['Components'],
           'Application',

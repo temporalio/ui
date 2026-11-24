@@ -28,7 +28,7 @@
   };
 
   const { Story } = defineMeta<IconTemplate, typeof IconSvgWrapper>({
-    title: 'IO/Components/Icon',
+    title: 'Components/Icon',
     tags: ['autodocs'],
     component: IconSvgWrapper,
     parameters: {

@@ -14,8 +14,8 @@ export const agentDocsPaths = {
   index: '/llms.txt',
   full: '/llms-full.txt',
   component: (slug: string) => `/io/${slug}.md`,
-  overviewPage: '/?path=/docs/io-overview--docs',
-  forAgentsSection: '/?path=/docs/io-overview--docs#for-agents',
+  overviewPage: '/?path=/docs/overview--docs',
+  forAgentsSection: '/?path=/docs/overview--docs#for-agents',
 };
 
 export const generatedBannerPrefix =

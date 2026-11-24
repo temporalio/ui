@@ -9,7 +9,7 @@
   import TextLink from './text-link.svelte';
 
   const { Story } = defineMeta({
-    title: 'IO/Components/Text Link',
+    title: 'Components/Text Link',
     tags: ['autodocs'],
     component: TextLink,
     args: {

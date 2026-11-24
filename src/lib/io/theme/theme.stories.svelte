@@ -25,7 +25,7 @@
   }
 
   const { Story } = defineMeta({
-    title: 'IO/Guides/Theme',
+    title: 'Guides/Theme',
     parameters: {
       layout: 'fullscreen',
     },
@@ -42,7 +42,7 @@
     ioThemeToCssVariables,
     themes,
     toCssVariables,
-  } from './themes';
+  } from '$lib/theme/io/themes';
 
   const colorGroupNames = [
     'background',

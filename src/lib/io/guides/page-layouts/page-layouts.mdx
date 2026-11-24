@@ -4,10 +4,6 @@ import * as Stories from './page-layouts.stories.svelte';
 
 <Meta of={Stories} />
 
-{/* Marks IO pages for the docs layout rules in .storybook/preview.css. */}
-
-<div className="io-docs-page" hidden />
-
 # Page Layouts and Templates
 
 Every page sits inside the same app shell, and most pages follow one of two
@@ -40,7 +36,7 @@ Each route stays thin and hands off to a page component:
 
 ## Page header
 
-Use the IO [Page Header](?path=/docs/io-layouts-page-header--docs) at the top
+Use the IO [Page Header](?path=/docs/layouts-page-header--docs) at the top
 of every page. It renders the page's `h1` and arranges the rest in slots:
 
 {/* MDX here has no GFM tables; the Markdown block renders them. */}
@@ -96,7 +92,7 @@ From top to bottom:
 2. **Page Header** with the record's status in `leading`, its ID or name as the
    title, tags and metadata, and the actions users can take on it. Use
    `colorScheme="danger"` for destructive actions, and confirm them with a
-   [modal](?path=/docs/io-guides-modals-and-drawers--docs).
+   [modal](?path=/docs/guides-modals-and-drawers--docs).
 3. **Tabs** for each section. When each tab has its own route, give `Tab` an
    `href` and set `active` from the current path, and keep the header and tabs
    in the shared layout.

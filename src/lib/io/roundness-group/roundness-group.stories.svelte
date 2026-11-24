@@ -7,7 +7,7 @@
   import RoundnessGroup from './roundness-group.svelte';
 
   const { Story } = defineMeta({
-    title: 'IO/Components/Roundness Group',
+    title: 'Components/Roundness Group',
     tags: ['autodocs'],
     component: RoundnessGroup,
     args: {

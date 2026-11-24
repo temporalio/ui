@@ -5,7 +5,7 @@
   import ListPageExample from './list-page-example.svelte';
 
   const { Story } = defineMeta({
-    title: 'IO/Guides/Page Layouts and Templates',
+    title: 'Guides/Page Layouts and Templates',
     component: ListPageExample,
   });
 </script>

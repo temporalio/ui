@@ -17,7 +17,7 @@
   ];
 
   const { Story } = defineMeta({
-    title: 'IO/Components/Tag',
+    title: 'Components/Tag',
     tags: ['autodocs'],
     component: Tag,
     args: {

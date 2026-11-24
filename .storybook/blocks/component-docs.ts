@@ -24,7 +24,7 @@ import { filterArgTypes } from 'storybook/preview-api';
 
 import { PageActions } from './page-actions';
 
-const ioStoriesPrefix = './src/lib/io/';
+export const ioStoriesPrefix = './src/lib/io/';
 
 const exampleHeadingId = (name: string): string =>
   `example-${name
@@ -122,8 +122,6 @@ export function ComponentDocs(): ReactElement {
   return h(
     Fragment,
     null,
-    // Marks IO pages for the docs layout rules in preview.css.
-    h('span', { className: 'io-docs-page', hidden: true }),
     h(PageActions),
     h(Title),
     h(Description),
