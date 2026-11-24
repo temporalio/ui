@@ -1,7 +1,19 @@
+<script lang="ts" module>
+  import { twJoin, twMerge } from 'tailwind-merge';
+
+  const segmentedControlClasses = twJoin(
+    'inline-flex flex-wrap items-center gap-2',
+    'rounded border border-primary bg-surface-primary p-px',
+  );
+
+  export const segmentedControlRecipe = ({
+    className,
+  }: { className?: string } = {}) =>
+    twMerge(segmentedControlClasses, className);
+</script>
+
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
-
-  import { twMerge } from 'tailwind-merge';
 
   interface Props extends Omit<HTMLAttributes<HTMLElement>, 'class'> {
     element?: 'div' | 'nav';
@@ -19,10 +31,7 @@
 <svelte:element
   this={element}
   {...rest}
-  class={twMerge(
-    'inline-flex flex-wrap items-center gap-2 rounded border border-primary bg-surface-primary p-px',
-    className,
-  )}
+  class={segmentedControlRecipe({ className })}
 >
   {@render children?.()}
 </svelte:element>

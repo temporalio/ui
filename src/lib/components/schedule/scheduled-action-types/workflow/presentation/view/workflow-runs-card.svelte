@@ -1,12 +1,9 @@
 <script lang="ts">
   import Panel from '$lib/components/panel.svelte';
   import Link from '$lib/holocene/link.svelte';
-  import TabButtonList from '$lib/holocene/tabs-primitive/tab-button-list.svelte';
-  import TabPanels from '$lib/holocene/tabs-primitive/tab-panels.svelte';
-  import Tabs from '$lib/holocene/tabs-primitive/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
-  import Segment from '$lib/io/segmented-control/segment.svelte';
-  import SegmentedControl from '$lib/io/segmented-control/segmented-control.svelte';
+  import { Segment, segmentedControlRecipe } from '$lib/io/segmented-control';
+  import { TabBar, TabPanel, Tabs } from '$lib/io/tabs/primitive';
   import { toUpcomingScheduleRuns } from '$lib/services/schedule-service';
   import { workflowCount } from '$lib/stores/workflows';
   import { routeForWorkflowsWithQuery } from '$lib/utilities/route-for';
@@ -66,44 +63,37 @@
   </header>
 
   <Tabs {tabs} selectedTab={view} onSelectedTabChange={handleViewClick}>
-    <SegmentedControl class="mr-auto">
-      <TabButtonList
-        aria-label={translate('schedules.workflow-runs')}
-        class="contents"
-      >
-        {#snippet tabButtonSnippet(getTabButtonProps, { isSelected, tab })}
-          <Segment {...getTabButtonProps()} selected={isSelected}>
-            {tab === 'recent'
-              ? translate('schedules.recent-runs-count', {
-                  count: recentRunCount,
-                })
-              : translate('schedules.upcoming-runs-count', {
-                  count: upcomingRunCount,
-                })}
-          </Segment>
-        {/snippet}
-      </TabButtonList>
-    </SegmentedControl>
-
-    <TabPanels>
-      {#snippet tabPanelSnippet(getTabPanelProps, { tab })}
-        <div {...getTabPanelProps()}>
-          {#if tab === 'recent'}
-            <WorkflowRunsRecent
-              {schedule}
-              {namespace}
-              {openBackfillConfirmationModal}
-              {openTriggerConfirmationModal}
-            />
-          {:else}
-            <WorkflowRunsUpcoming
-              {schedule}
-              {openBackfillConfirmationModal}
-              {openTriggerConfirmationModal}
-            />
-          {/if}
-        </div>
+    <TabBar
+      aria-label={translate('schedules.workflow-runs')}
+      class={segmentedControlRecipe({ className: 'mr-auto' })}
+    >
+      {#snippet tabSnippet({ tab, isSelected, getAttributes })}
+        <Segment {...getAttributes()} selected={isSelected}>
+          {tab === 'recent'
+            ? translate('schedules.recent-runs-count', {
+                count: recentRunCount,
+              })
+            : translate('schedules.upcoming-runs-count', {
+                count: upcomingRunCount,
+              })}
+        </Segment>
       {/snippet}
-    </TabPanels>
+    </TabBar>
+
+    <TabPanel tab="recent">
+      <WorkflowRunsRecent
+        {schedule}
+        {namespace}
+        {openBackfillConfirmationModal}
+        {openTriggerConfirmationModal}
+      />
+    </TabPanel>
+    <TabPanel tab="upcoming">
+      <WorkflowRunsUpcoming
+        {schedule}
+        {openBackfillConfirmationModal}
+        {openTriggerConfirmationModal}
+      />
+    </TabPanel>
   </Tabs>
 </Panel>
