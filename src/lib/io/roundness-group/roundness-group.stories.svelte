@@ -35,6 +35,7 @@
     },
     parameters: {
       docs: {
+        group: 'Foundations',
         description: {
           component:
             'A layout primitive that coordinates the corners and borders of adjoining segments.',

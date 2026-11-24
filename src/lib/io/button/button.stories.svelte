@@ -67,6 +67,7 @@
     },
     parameters: {
       docs: {
+        group: 'Actions and navigation',
         description: {
           component:
             'Triggers an action, with shared sizes, color schemes, icons, and loading feedback.',

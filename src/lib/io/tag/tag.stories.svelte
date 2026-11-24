@@ -33,6 +33,7 @@
     },
     parameters: {
       docs: {
+        group: 'Labels and status',
         description: {
           component:
             'A non-interactive metadata label with a tag icon and optional extension.',

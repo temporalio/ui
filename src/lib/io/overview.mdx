@@ -1,5 +1,6 @@
 import { Markdown, Meta, Source } from '@storybook/addon-docs/blocks';
 
+import { OverviewCards } from '../../../.storybook/blocks/overview-cards';
 import heroImage from '../../../.storybook/assets/io-overview-hero.webp';
 
 <Meta title="Overview" />
@@ -48,155 +49,18 @@ API reference.
 
 ## Guides
 
-<div className="io-overview-grid">
-  <div className="io-overview-card">
-
-**[Theme](?path=/docs/guides-theme--docs)**
-
-Theme tokens for color, spacing, and interaction states, rendered from the theme
-definitions.
-
-  </div>
-  <div className="io-overview-card">
-
-**[Forms](?path=/docs/guides-forms--docs)**
-
-Building forms with SuperForms and schema validation.
-
-  </div>
-  <div className="io-overview-card">
-
-**[Modals and Drawers](?path=/docs/guides-modals-and-drawers--docs)**
-
-Confirmations, error handling, and forms in drawers.
-
-  </div>
-  <div className="io-overview-card">
-
-**[Page Layouts and Templates](?path=/docs/guides-page-layouts-and-templates--docs)**
-
-The app shell, page headers, and list and detail templates.
-
-  </div>
-</div>
+<OverviewCards section="Guides" />
 
 ## Components
 
-### Labels and status
-
-<div className="io-overview-grid">
-  <div className="io-overview-card">
-
-**[Badge](?path=/docs/components-badge--docs)**
-
-A compact, non-interactive label for metadata, with optional adjoining
-extensions.
-
-  </div>
-  <div className="io-overview-card">
-
-**[Badge Count](?path=/docs/components-badge-count--docs)**
-
-A compact count, optionally displayed against a total.
-
-  </div>
-  <div className="io-overview-card">
-
-**[Badge Status](?path=/docs/components-badge-status--docs)**
-
-A non-interactive workflow status label with consistent colors and translated
-text.
-
-  </div>
-  <div className="io-overview-card">
-
-**[Tag](?path=/docs/components-tag--docs)**
-
-A non-interactive metadata label with a tag icon and optional extension.
-
-  </div>
-</div>
-
-### Actions and navigation
-
-<div className="io-overview-grid">
-  <div className="io-overview-card">
-
-**[Button](?path=/docs/components-button--docs)**
-
-Triggers an action, with shared sizes, color schemes, icons, and loading
-feedback.
-
-  </div>
-  <div className="io-overview-card">
-
-**[Chip](?path=/docs/components-chip--docs)**
-
-An interactive label for filters or compact actions, with an optional extension.
-
-  </div>
-  <div className="io-overview-card">
-
-**[Chip Status](?path=/docs/components-chip-status--docs)**
-
-An interactive workflow status label with optional count and change indicator.
-
-  </div>
-  <div className="io-overview-card">
-
-**[Segmented Control](?path=/docs/components-segmented-control--docs)**
-
-A compact group of related actions or navigation destinations.
-
-  </div>
-  <div className="io-overview-card">
-
-**[Text Link](?path=/docs/components-text-link--docs)**
-
-An inline navigation link with optional leading and trailing icons.
-
-  </div>
-  <div className="io-overview-card">
-
-**[Breadcrumbs](?path=/docs/components-breadcrumbs--docs)**
-
-Shows where a page sits in the hierarchy and links to each level above it.
-
-  </div>
-</div>
-
-### Foundations
-
-<div className="io-overview-grid">
-  <div className="io-overview-card">
-
-**[Icon](?path=/docs/components-icon--docs)**
-
-The shared IO icon library, including optical variants for adjusted visual
-sizing.
-
-  </div>
-  <div className="io-overview-card">
-
-**[Roundness Group](?path=/docs/components-roundness-group--docs)**
-
-A layout primitive that coordinates the corners and borders of adjoining
-segments.
-
-  </div>
-</div>
+<OverviewCards
+  section="Components"
+  order={['Labels and status', 'Actions and navigation', 'Foundations']}
+/>
 
 ## Layouts
 
-<div className="io-overview-grid">
-  <div className="io-overview-card">
-
-**[Page Header](?path=/docs/layouts-page-header--docs)**
-
-A responsive page heading with slots for actions, tags, filters, and metadata.
-
-  </div>
-</div>
+<OverviewCards section="Layouts" />
 
 ## For agents
 

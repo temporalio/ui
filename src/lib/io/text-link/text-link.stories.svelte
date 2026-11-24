@@ -48,6 +48,7 @@
     },
     parameters: {
       docs: {
+        group: 'Actions and navigation',
         description: {
           component:
             'An inline navigation link with optional leading and trailing icons.',

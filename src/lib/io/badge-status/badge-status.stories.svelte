@@ -59,6 +59,7 @@
     },
     parameters: {
       docs: {
+        group: 'Labels and status',
         description: {
           component:
             'A non-interactive workflow status label with consistent colors and translated text.',

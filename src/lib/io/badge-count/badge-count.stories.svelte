@@ -29,6 +29,7 @@
     },
     parameters: {
       docs: {
+        group: 'Labels and status',
         description: {
           component: 'A compact count, optionally displayed against a total.',
         },

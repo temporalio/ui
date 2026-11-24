@@ -44,6 +44,7 @@
     },
     parameters: {
       docs: {
+        group: 'Labels and status',
         description: {
           component:
             'A compact, non-interactive label for metadata, with optional adjoining extensions.',

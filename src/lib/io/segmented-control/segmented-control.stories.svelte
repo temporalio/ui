@@ -47,6 +47,7 @@
     },
     parameters: {
       docs: {
+        group: 'Actions and navigation',
         description: {
           component:
             'A compact group of related actions or navigation destinations.',

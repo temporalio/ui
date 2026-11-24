@@ -43,6 +43,7 @@
     },
     parameters: {
       docs: {
+        group: 'Actions and navigation',
         description: {
           component:
             'An interactive label for filters or compact actions, with an optional extension.',

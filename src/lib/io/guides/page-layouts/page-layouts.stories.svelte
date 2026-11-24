@@ -7,6 +7,14 @@
   const { Story } = defineMeta({
     title: 'Guides/Page Layouts and Templates',
     component: ListPageExample,
+    parameters: {
+      docs: {
+        description: {
+          component:
+            'The app shell, page headers, and list and detail templates.',
+        },
+      },
+    },
   });
 </script>
 

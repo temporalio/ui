@@ -33,6 +33,7 @@
     component: IconSvgWrapper,
     parameters: {
       docs: {
+        group: 'Foundations',
         description: {
           component:
             'The shared IO icon library, including optical variants for adjusted visual sizing.',

@@ -13,8 +13,11 @@ Breadcrumbs display the current page, allows for navigation to different levels 
 | Place breadcrumbs at the top of the page, above the page title.                                                                                    | Don't replace primary navigation with breadcrumbs. They are a secondary aid for moving up the hierarchy.                |
 | Keep labels short. Use the object's name or ID rather than a full description.                                                                     | Don't add actions, menus, or icons to crumbs. Each crumb should be a plain link.                                        |
 
-Pass `items` in hierarchy order, each with a `label` and `href`. The final item
-receives `aria-current="page"`; separators are decorative. The navigation has a
-translated accessible label, which can be overridden with `aria-label`.
+Pass `items` in hierarchy order, each with a `label` and `href`. Each item also
+accepts native link attributes and a `class` override. The final item receives
+`aria-current="page"`. Separators appear only between items, are decorative, and
+sit inside the ancestor links. The navigation has a translated accessible label;
+override it with `aria-label` to tell apart several navigation landmarks on one
+page.
 
 The trail wraps when space is constrained.
