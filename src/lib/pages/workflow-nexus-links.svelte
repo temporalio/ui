@@ -6,12 +6,9 @@
   import PaginatedTable from '$lib/holocene/table/paginated-table/paginated.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
-  import TabButtonList from '$lib/holocene/tabs-primitive/tab-button-list.svelte';
-  import TabPanels from '$lib/holocene/tabs-primitive/tab-panels.svelte';
-  import Tabs from '$lib/holocene/tabs-primitive/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
-  import Segment from '$lib/io/segmented-control/segment.svelte';
-  import SegmentedControl from '$lib/io/segmented-control/segmented-control.svelte';
+  import { Segment, segmentedControlRecipe } from '$lib/io/segmented-control';
+  import { TabBar, TabPanel, Tabs } from '$lib/io/tabs/primitive';
   import { groupEvents } from '$lib/models/event-groups';
   import {
     getInboundLinkForEvent,
@@ -255,37 +252,24 @@
       selectedTab={selectedView}
       onSelectedTabChange={handleViewChange}
     >
-      <SegmentedControl class="mr-auto">
-        <TabButtonList
-          aria-label={translate('workflows.nexus-links-tab')}
-          class="contents"
-        >
-          {#snippet tabButtonSnippet(getTabButtonProps, { isSelected, tab })}
-            {@const view = tab as NexusLinksView}
-            <Segment
-              {...getTabButtonProps()}
-              selected={isSelected}
-              count={counts[view]}
-              data-testid={`nexus-links-${view}-segment`}
-            >
-              {viewLabels[view]}
-            </Segment>
-          {/snippet}
-        </TabButtonList>
-      </SegmentedControl>
-      <TabPanels>
-        {#snippet tabPanelSnippet(getTabPanelProps, { isSelected, tab })}
-          <div {...getTabPanelProps()}>
-            {#if isSelected}
-              {#if tab === 'inbound'}
-                {@render inboundTable()}
-              {:else}
-                {@render outboundTable()}
-              {/if}
-            {/if}
-          </div>
+      <TabBar
+        aria-label={translate('workflows.nexus-links-tab')}
+        class={segmentedControlRecipe({ className: 'mr-auto' })}
+      >
+        {#snippet tabSnippet({ tab, isSelected, getAttributes })}
+          {@const view = tab as NexusLinksView}
+          <Segment
+            {...getAttributes()}
+            selected={isSelected}
+            count={counts[view]}
+            data-testid={`nexus-links-${view}-segment`}
+          >
+            {viewLabels[view]}
+          </Segment>
         {/snippet}
-      </TabPanels>
+      </TabBar>
+      <TabPanel tab="inbound">{@render inboundTable()}</TabPanel>
+      <TabPanel tab="outbound">{@render outboundTable()}</TabPanel>
     </Tabs>
   {/if}
 </section>
