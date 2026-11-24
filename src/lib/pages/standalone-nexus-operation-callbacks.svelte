@@ -1,0 +1,48 @@
+<script lang="ts">
+  import { page } from '$app/state';
+
+  import NexusOperationCallbacksFilter from '$lib/components/standalone-nexus-operations/nexus-operation-callbacks-filter.svelte';
+  import NexusOperationCallbacksTable from '$lib/components/standalone-nexus-operations/nexus-operation-callbacks-table.svelte';
+  import { translate } from '$lib/i18n/translate';
+  import {
+    appliedCallbackFilterCount,
+    callbackFilterUpdate,
+    EMPTY_CALLBACK_FILTERS,
+    filterCallbacks,
+    parseCallbackFilters,
+  } from '$lib/utilities/nexus-operation-callback-filters';
+  import { nexusOperationExecution } from '$lib/utilities/standalone-nexus-operation-poller.svelte';
+  import { updateMultipleQueryParameters } from '$lib/utilities/update-query-parameters';
+
+  let { namespace }: { namespace: string } = $props();
+
+  const callbacks = $derived(
+    $nexusOperationExecution?.completionCallbacks ?? [],
+  );
+  const filters = $derived(parseCallbackFilters(page.url));
+  const filteredCallbacks = $derived(filterCallbacks(callbacks, filters));
+
+  const clearFilters = () => {
+    updateMultipleQueryParameters({
+      ...callbackFilterUpdate(EMPTY_CALLBACK_FILTERS),
+      url: page.url,
+    });
+  };
+</script>
+
+<section class="flex flex-col gap-4">
+  <header class="flex flex-col gap-1">
+    <h2>{translate('nexus.callbacks')}</h2>
+    <p class="text-sm text-secondary">{translate('nexus.callbacks-intro')}</p>
+  </header>
+  <div class="flex flex-col">
+    <NexusOperationCallbacksFilter />
+    <NexusOperationCallbacksTable
+      class="rounded-t-none"
+      callbacks={filteredCallbacks}
+      filtered={appliedCallbackFilterCount(filters) > 0}
+      onClearFilters={clearFilters}
+      {namespace}
+    />
+  </div>
+</section>

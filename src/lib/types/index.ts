@@ -132,6 +132,8 @@ export type StartNexusOperationExecutionRequest =
   temporal.api.workflowservice.v1.IStartNexusOperationExecutionRequest;
 export type StartNexusOperationExecutionResponse =
   temporal.api.workflowservice.v1.IStartNexusOperationExecutionResponse;
+export type NexusOperationCallbackInfo =
+  temporal.api.nexusoperation.v1.ICallbackInfo;
 export type DescribeNexusOperationResponse =
   temporal.api.workflowservice.v1.IDescribeNexusOperationExecutionResponse;
 // api.history
@@ -366,6 +368,7 @@ export type BatchTerminateOperation =
 // api.nexus
 export type Endpoint = temporal.api.nexus.v1.IEndpoint;
 export type EndpointSpec = temporal.api.nexus.v1.IEndpointSpec;
+export type CallbackLink = temporal.api.common.v1.Link.ICallback;
 export type EventLink = temporal.api.common.v1.ILink;
 
 // api.failure

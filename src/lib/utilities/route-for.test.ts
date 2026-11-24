@@ -34,6 +34,7 @@ import {
   routeForSchedule,
   routeForScheduleCreate,
   routeForSchedules,
+  routeForStandaloneNexusOperationCallbacks,
   routeForTaskQueue,
   routeForWorkerDeploymentCreate,
   routeForWorkerDeploymentVersionCreate,
@@ -64,6 +65,29 @@ describe('routeFor', () => {
     });
     expect(path).toBe(
       `${base}/namespaces/default/workflows?query=ExecutionStatus%3D%22Running%22`,
+    );
+  });
+
+  it('should route to a standalone Nexus operation "callbacks" tab', () => {
+    const path = routeForStandaloneNexusOperationCallbacks({
+      namespace: 'default',
+      operationId: 'operation/1',
+      runId: 'run-1',
+    });
+    expect(path).toBe(
+      `${base}/namespaces/default/nexus-operations/operation%2F1/run-1/callbacks`,
+    );
+  });
+
+  it('should route to a standalone Nexus operation "callbacks" tab with query params', () => {
+    const path = routeForStandaloneNexusOperationCallbacks({
+      namespace: 'default',
+      operationId: 'operation-1',
+      runId: 'run-1',
+      queryParams: { requestId: 'req-1' },
+    });
+    expect(path).toBe(
+      `${base}/namespaces/default/nexus-operations/operation-1/run-1/callbacks?requestId=req-1`,
     );
   });
 

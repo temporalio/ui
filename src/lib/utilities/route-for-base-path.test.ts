@@ -40,6 +40,7 @@ import {
   routeForStandaloneActivityMetadata,
   routeForStandaloneActivitySearchAttributes,
   routeForStandaloneActivityWorkers,
+  routeForStandaloneNexusOperationCallbacks,
   routeForStandaloneNexusOperationDetails,
   routeForStandaloneNexusOperationMetadata,
   routeForStandaloneNexusOperations,
@@ -232,6 +233,10 @@ describe('routeFor functions should resolve the base path exactly once', () => {
     [
       'routeForStandaloneNexusOperationMetadata',
       () => routeForStandaloneNexusOperationMetadata(nexusOperationParams),
+    ],
+    [
+      'routeForStandaloneNexusOperationCallbacks',
+      () => routeForStandaloneNexusOperationCallbacks(nexusOperationParams),
     ],
     [
       'routeForWorkflowStart',
@@ -495,6 +500,10 @@ describe('routeFor functions with prefix should resolve base + prefix correctly'
     [
       'routeForStandaloneNexusOperationMetadata',
       () => routeForStandaloneNexusOperationMetadata(nexusOperationParams),
+    ],
+    [
+      'routeForStandaloneNexusOperationCallbacks',
+      () => routeForStandaloneNexusOperationCallbacks(nexusOperationParams),
     ],
     [
       'routeForWorkflowStart',

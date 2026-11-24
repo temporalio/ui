@@ -2,10 +2,12 @@ import { temporal } from '@temporalio/proto';
 
 import type {
   DescribeNexusOperationResponse,
+  NexusOperationCallbackInfo,
   NexusOperationIdConflictPolicy,
   NexusOperationIdReusePolicy,
   StartNexusOperationExecutionRequest,
 } from '.';
+import type { Callback } from './nexus';
 import type {
   DecodedWorkflowSearchAttributes,
   WorkflowSearchAttributes,
@@ -97,11 +99,19 @@ export type NexusOperationExecutionListInfoAPIResponse = Omit<
 
 export interface NexusOperationExecution extends Omit<
   DescribeNexusOperationResponse,
-  'info' | 'longPollToken'
+  'info' | 'longPollToken' | 'completionCallbacks'
 > {
   info: NexusOperationExecutionInfo;
   longPollToken?: string;
+  completionCallbacks?: Callback[];
 }
+
+export type NexusOperationExecutionAPIResponse = Omit<
+  NexusOperationExecution,
+  'completionCallbacks'
+> & {
+  completionCallbacks?: NexusOperationCallbackInfo[] | null;
+};
 
 export interface StartNexusOperationRequest extends Omit<
   StartNexusOperationExecutionRequest,
