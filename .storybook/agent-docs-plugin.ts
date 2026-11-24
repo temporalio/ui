@@ -4,7 +4,8 @@ import {
   agentDocsPaths,
   buildLlmsFull,
   buildLlmsIndex,
-  loadComponents,
+  loadPages,
+  servedPageMarkdown,
 } from './agent-docs';
 
 const isAgentDocsPath = (pathname: string) =>
@@ -13,13 +14,13 @@ const isAgentDocsPath = (pathname: string) =>
   /^\/io\/[^/]+\.md$/.test(pathname);
 
 function agentDocsFiles(root: string): Map<string, string> {
-  const components = loadComponents(root);
+  const pages = loadPages(root);
   return new Map([
-    [agentDocsPaths.index, buildLlmsIndex(components)],
-    [agentDocsPaths.full, buildLlmsFull(components)],
-    ...components.map(
-      (component) =>
-        [agentDocsPaths.component(component.slug), component.markdown] as const,
+    [agentDocsPaths.index, buildLlmsIndex(pages)],
+    [agentDocsPaths.full, buildLlmsFull(pages)],
+    ...pages.map(
+      (page) =>
+        [agentDocsPaths.page(page.slug), servedPageMarkdown(page)] as const,
     ),
   ]);
 }

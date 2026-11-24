@@ -7,13 +7,6 @@
   const { Story } = defineMeta({
     title: 'Guides/Modals and Drawers',
     component: ConfirmationModalExample,
-    parameters: {
-      docs: {
-        description: {
-          component: 'Confirmations, error handling, and forms in drawers.',
-        },
-      },
-    },
   });
 </script>
 

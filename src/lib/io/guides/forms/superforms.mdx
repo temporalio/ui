@@ -1,11 +1,12 @@
-import { Meta, Markdown, Primary } from '@storybook/addon-docs/blocks';
+import { Meta, Primary } from '@storybook/addon-docs/blocks';
 
-import SuperForms from './superforms.stories.svelte';
-import usage from './superforms-usage.md?raw';
+import { GuidePage } from '../../../../../.storybook/blocks/guide-page';
+import guide from './superforms.md?raw';
+import * as Stories from './superforms.stories.svelte';
 
-<Meta of={SuperForms} />
+<Meta of={Stories} />
 
-<Markdown>{usage}</Markdown>
+<GuidePage markdown={guide} />
 
 ## Example
 

@@ -1,5 +1,7 @@
 # Forms
 
+Building forms with SuperForms and schema validation.
+
 Forms use [SuperForms](https://superforms.rocks/) in SPA mode with a Zod
 schema. Call `superForm` directly. There is no wrapper.
 

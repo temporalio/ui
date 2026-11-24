@@ -2,6 +2,7 @@ import { AnchorMdx, HeaderMdx } from '@storybook/addon-docs/blocks';
 import { Fragment, createElement as h, type ReactElement } from 'react';
 
 import { type OverviewEntry, overviewGroups } from './overview-groups';
+import { pageSummary } from '../docs-markdown';
 
 type StoriesModule = {
   default?: {
@@ -12,22 +13,33 @@ type StoriesModule = {
   };
 };
 
+const storiesSuffix = '.stories.svelte';
+
 const modules = import.meta.glob<StoriesModule>(
   '../../src/lib/io/**/*.stories.svelte',
   { eager: true },
 );
 
-const entries: OverviewEntry[] = Object.values(modules).flatMap(
-  ({ default: meta }) =>
-    meta?.title
-      ? [
-          {
-            title: meta.title,
-            description: meta.parameters?.docs?.description?.component,
-            group: meta.parameters?.docs?.group,
-          },
-        ]
-      : [],
+const pages = import.meta.glob<string>('../../src/lib/io/**/*.md', {
+  eager: true,
+  query: '?raw',
+  import: 'default',
+});
+
+const entries: OverviewEntry[] = Object.entries(modules).flatMap(
+  ([path, { default: meta }]) => {
+    if (!meta?.title) return [];
+    const page = pages[`${path.slice(0, -storiesSuffix.length)}.md`];
+    return [
+      {
+        title: meta.title,
+        description:
+          meta.parameters?.docs?.description?.component ??
+          (page ? pageSummary(page).description : undefined),
+        group: meta.parameters?.docs?.group,
+      },
+    ];
+  },
 );
 
 type OverviewCardsProps = {

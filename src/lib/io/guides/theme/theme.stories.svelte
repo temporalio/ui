@@ -28,12 +28,6 @@
     title: 'Guides/Theme',
     parameters: {
       layout: 'fullscreen',
-      docs: {
-        description: {
-          component:
-            'Theme tokens for color, spacing, and interaction states, rendered from the theme definitions.',
-        },
-      },
     },
   });
 </script>

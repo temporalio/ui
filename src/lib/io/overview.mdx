@@ -67,16 +67,16 @@ API reference.
 
 These docs are also published as plain text for AI tools, following the
 [llms.txt](https://llmstxt.org) convention. Every file is generated from the
-same Markdown as the component pages, so it stays current with them.
+same Markdown as the guide and component pages, so it stays current with them.
 
 {/* MDX here has no GFM tables; the Markdown block renders them. */}
 
 <Markdown>{`
 | File | Contents |
 | ---- | -------- |
-| <a href="${docsUrl('llms.txt')}" target="_blank"><code>/llms.txt</code></a> | An index of the docs and every component, with a link to each component's Markdown page. |
-| <a href="${docsUrl('llms-full.txt')}" target="_blank"><code>/llms-full.txt</code></a> | Every component's Markdown page in one file. |
-| \`/io/<slug>.md\` | A component's page: description, usage guidance, Do / Don't rules, and the API reference. Also under Copy page on each component. |
+| <a href="${docsUrl('llms.txt')}" target="_blank"><code>/llms.txt</code></a> | An index of the docs, with a link to every guide and component's Markdown page. |
+| <a href="${docsUrl('llms-full.txt')}" target="_blank"><code>/llms-full.txt</code></a> | Every guide and component page in one file. |
+| \`/io/<slug>.md\` | One page. A guide's page is the guide itself. A component's page has its description, usage guidance, Do / Don't rules, and the API reference, and is also under Copy page on the component. |
 `}</Markdown>
 
 Start an assistant from the index, which links to everything else. In Cursor,

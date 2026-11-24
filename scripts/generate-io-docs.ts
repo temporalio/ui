@@ -24,11 +24,9 @@ import type { StrictArgTypes } from 'storybook/internal/types';
 import { filterArgTypes } from 'storybook/preview-api';
 
 import { getProjectRoot } from './get-project-root';
-import {
-  generatedBannerPrefix,
-  generatedMarkdownFiles,
-} from '../.storybook/agent-docs';
+import { generatedMarkdownFiles } from '../.storybook/agent-docs';
 import { pageMarkdown } from '../.storybook/blocks/page-markdown';
+import { generatedBannerPrefix } from '../.storybook/docs-markdown';
 
 type IndexEntry = {
   id: string;

@@ -6,13 +6,6 @@
   const { Story } = defineMeta({
     title: 'Guides/Forms',
     component: SuperFormsExample,
-    parameters: {
-      docs: {
-        description: {
-          component: 'Building forms with SuperForms and schema validation.',
-        },
-      },
-    },
   });
 </script>
 
