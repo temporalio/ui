@@ -28,6 +28,8 @@
   import { onDestroy } from 'svelte';
 
   import Button from '$lib/holocene/button.svelte';
+  import Link from '$lib/holocene/link.svelte';
+  import TableTwoLineCell from '$lib/holocene/table/table-two-line-cell.svelte';
 
   let updating = $state(false);
   let runId = $state(0);
@@ -129,6 +131,36 @@
 <Story name="Primary" args={{}} {template} />
 
 <Story name="Primary, Updating" args={{ updating: true }} {template} />
+
+<Story name="Two-Line Cells" asChild>
+  <Table class="w-full">
+    {#snippet headers()}
+      <tr>
+        <th>Status</th>
+        <th>Target Execution</th>
+        <th>Task Queue</th>
+      </tr>
+    {/snippet}
+    {#each [{ id: 'first-workflow-id' }, { id: '' }, { id: 'third-workflow-id' }] as row, index (index)}
+      <tr>
+        <td>Succeeded</td>
+        <TableTwoLineCell>
+          {#snippet primary()}
+            {#if row.id}
+              <Link href="#">{row.id}</Link>
+            {/if}
+          {/snippet}
+          {#snippet secondary()}
+            {#if row.id}
+              Workflow Execution
+            {/if}
+          {/snippet}
+        </TableTwoLineCell>
+        <td>task-queue-{index + 1}</td>
+      </tr>
+    {/each}
+  </Table>
+</Story>
 
 <Story name="Updating Timing Harness" asChild>
   <div class="space-y-4 p-4">
