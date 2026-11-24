@@ -36,7 +36,7 @@
 
   const syncFiltersToUrl = (filters: CatalogFilters) => {
     const url = catalogFiltersUrl(page.url, filters);
-    if (url.search === page.url.search) return;
+    if (url.search === window.location.search) return;
     replaceState(url, page.state);
   };
 </script>
