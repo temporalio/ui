@@ -4,11 +4,11 @@
 
   import { IconAdd, IconChevronDown } from '$lib/io/icon';
 
-  import type { ButtonColorScheme, ButtonSize } from './recipe';
+  import type { ButtonColorScheme, ButtonSize } from '../button';
 
+  import ButtonGroupButton from './button-group-button.svelte';
+  import ButtonGroupLink from './button-group-link.svelte';
   import ButtonGroup from './button-group.svelte';
-  import Button from './button.svelte';
-  import ButtonLink from './link.svelte';
 
   const colorSchemes: ButtonColorScheme[] = [
     'primary',
@@ -50,7 +50,7 @@
       docs: {
         description: {
           component:
-            'Joins adjacent buttons and shares a color scheme and size with them. A button’s own props take precedence.',
+            'Joins adjacent buttons. `ButtonGroupButton` and `ButtonGroupLink` always use the group’s size and take its color scheme unless they set their own; plain `Button`s inside the group, such as those in a menu, are unaffected.',
         },
       },
       layout: 'padded',
@@ -61,9 +61,9 @@
 {#snippet template(args: ComponentProps<typeof ButtonGroup>)}
   <div class="bg-background-primary p-6 text-primary">
     <ButtonGroup {...args}>
-      <Button>First</Button>
-      <Button>Second</Button>
-      <Button>Third</Button>
+      <ButtonGroupButton>First</ButtonGroupButton>
+      <ButtonGroupButton>Second</ButtonGroupButton>
+      <ButtonGroupButton>Third</ButtonGroupButton>
     </ButtonGroup>
   </div>
 {/snippet}
@@ -96,9 +96,9 @@
               {#each colorSchemes as colorScheme (colorScheme)}
                 <td>
                   <ButtonGroup {...args} {size} {colorScheme}>
-                    <Button>One</Button>
-                    <Button>Two</Button>
-                    <Button>Three</Button>
+                    <ButtonGroupButton>One</ButtonGroupButton>
+                    <ButtonGroupButton>Two</ButtonGroupButton>
+                    <ButtonGroupButton>Three</ButtonGroupButton>
                   </ButtonGroup>
                 </td>
               {/each}
@@ -114,9 +114,11 @@
   {#snippet template(args)}
     <div class="bg-background-primary p-6 text-primary">
       <ButtonGroup {...args}>
-        <Button LeadingIcon={IconAdd}>Create</Button>
-        <Button TrailingIcon={IconChevronDown} aria-label="More create options"
-        ></Button>
+        <ButtonGroupButton LeadingIcon={IconAdd}>Create</ButtonGroupButton>
+        <ButtonGroupButton
+          TrailingIcon={IconChevronDown}
+          aria-label="More create options"
+        ></ButtonGroupButton>
       </ButtonGroup>
     </div>
   {/snippet}
@@ -126,9 +128,10 @@
   {#snippet template(args)}
     <div class="bg-background-primary p-6 text-primary">
       <ButtonGroup {...args}>
-        <Button>Inherited</Button>
-        <Button colorScheme="primary">Own color scheme</Button>
-        <Button size="sm">Own size</Button>
+        <ButtonGroupButton>Inherited</ButtonGroupButton>
+        <ButtonGroupButton colorScheme="primary"
+          >Own color scheme</ButtonGroupButton
+        >
       </ButtonGroup>
     </div>
   {/snippet}
@@ -138,9 +141,11 @@
   {#snippet template(args)}
     <div class="bg-background-primary p-6 text-primary">
       <ButtonGroup {...args}>
-        <ButtonLink href="https://docs.temporal.io">Docs</ButtonLink>
-        <ButtonLink href="https://temporal.io/blog">Blog</ButtonLink>
-        <ButtonLink href="https://community.temporal.io">Community</ButtonLink>
+        <ButtonGroupLink href="https://docs.temporal.io">Docs</ButtonGroupLink>
+        <ButtonGroupLink href="https://temporal.io/blog">Blog</ButtonGroupLink>
+        <ButtonGroupLink href="https://community.temporal.io"
+          >Community</ButtonGroupLink
+        >
       </ButtonGroup>
     </div>
   {/snippet}

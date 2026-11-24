@@ -8,5 +8,4 @@
 - Reuse base components when their structure fits; otherwise reuse recipes. Do not complicate a base API just to eliminate a little markup.
 - Reuse types and theme tokens. Preserve native attributes, accessibility, and existing public behavior.
 - Show keyboard focus with a CSS outline (`focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-{color}`), not a Tailwind `ring`. Outlines survive forced-colors mode and their offset gap is transparent, so they don't paint over neighboring elements.
-- Use `RoundnessGroup` for grouped corners and borders. Put colors on the element that owns the shape.
 - Keep stories focused on meaningful variants and component-specific behavior. Verify visual changes in the browser and follow repository validation rules.

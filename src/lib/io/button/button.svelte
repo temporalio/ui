@@ -19,13 +19,13 @@
 </script>
 
 <script lang="ts">
-  import { getButtonContext } from './context';
   import { buttonRecipe } from './recipe';
   import { getTrackingAttributes } from './tracking';
+
   let {
     class: className,
-    colorScheme,
-    size,
+    colorScheme = 'primary',
+    size = 'md',
     type = 'button',
     children,
     isLoading,
@@ -35,15 +35,7 @@
     ...rest
   }: ButtonProps = $props();
 
-  const buttonContext = getButtonContext();
-
-  const resolvedColorScheme = $derived(
-    colorScheme ?? buttonContext.colorScheme ?? 'primary',
-  );
-
-  const resolvedSize = $derived(size ?? buttonContext.size ?? 'md');
-
-  const iconSize = $derived(resolvedSize === 'md' ? 16 : 12);
+  const iconSize = $derived(size === 'md' ? 16 : 12);
 </script>
 
 {#snippet loadingIcon()}
@@ -70,14 +62,10 @@
 
 <button
   aria-busy={isLoading}
-  {...getTrackingAttributes(tracking, resolvedColorScheme)}
+  {...getTrackingAttributes(tracking, colorScheme)}
   {...rest}
   {type}
-  class={buttonRecipe({
-    colorScheme: resolvedColorScheme,
-    size: resolvedSize,
-    className,
-  })}
+  class={buttonRecipe({ colorScheme, size, className })}
 >
   {@render leadingIcon()}
   {#if children}

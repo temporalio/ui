@@ -1,7 +1,6 @@
 <script lang="ts">
   import type { HTMLAnchorAttributes } from 'svelte/elements';
 
-  import { getButtonContext } from './context';
   import { buttonRecipe } from './recipe';
   import { getTrackingAttributes } from './tracking';
 
@@ -23,8 +22,8 @@
   let {
     href,
     class: className,
-    colorScheme,
-    size,
+    colorScheme = 'primary',
+    size = 'md',
     children,
     tracking,
     LeadingIcon,
@@ -32,26 +31,14 @@
     ...rest
   }: ButtonLinkProps = $props();
 
-  const buttonContext = getButtonContext();
-
-  const resolvedColorScheme = $derived(
-    colorScheme ?? buttonContext.colorScheme ?? 'primary',
-  );
-
-  const resolvedSize = $derived(size ?? buttonContext.size ?? 'md');
-
-  const iconSize = $derived(resolvedSize === 'md' ? 16 : 12);
+  const iconSize = $derived(size === 'md' ? 16 : 12);
 </script>
 
 <a
-  {...getTrackingAttributes(tracking, resolvedColorScheme)}
+  {...getTrackingAttributes(tracking, colorScheme)}
   {...rest}
   {href}
-  class={buttonRecipe({
-    colorScheme: resolvedColorScheme,
-    size: resolvedSize,
-    className,
-  })}
+  class={buttonRecipe({ colorScheme, size, className })}
 >
   {#if LeadingIcon}
     <LeadingIcon width={iconSize} height={iconSize} />

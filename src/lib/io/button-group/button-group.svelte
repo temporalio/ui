@@ -2,19 +2,21 @@
   import { twMerge } from 'tailwind-merge';
 
   import { RoundnessGroup, type RoundnessGroupProps } from '../roundness-group';
-  import { type ButtonContext, setButtonContext } from './context';
+  import { type ButtonGroupContext, setButtonGroupContext } from './context';
 
   interface ButtonGroupProps
-    extends Partial<RoundnessGroupProps>, ButtonContext {}
+    extends Partial<RoundnessGroupProps>, ButtonGroupContext {}
 
   const {
     colorScheme,
     size,
+    roundness = 'base',
+    innerBorderHandling = 'collapse',
     class: className,
     ...roundnessGroupProps
   }: ButtonGroupProps = $props();
 
-  setButtonContext({
+  setButtonGroupContext({
     get colorScheme() {
       return colorScheme;
     },
@@ -25,12 +27,13 @@
 </script>
 
 <RoundnessGroup
-  roundness="base"
-  innerBorderHandling="collapse"
+  role="group"
+  {...roundnessGroupProps}
+  {roundness}
+  {innerBorderHandling}
   class={twMerge(
     'inline-flex',
     '[&>*:not(:first-child)]:border-l-[color:var(--button-divider)]',
     className,
   )}
-  {...roundnessGroupProps}
 />
