@@ -4,6 +4,10 @@
   import type { Payload } from '$lib/types';
   import { decodePayloadAndParseDataToJSON } from '$lib/utilities/decode-payload';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
+  import {
+    markdownVisibleLength,
+    truncateMarkdown,
+  } from '$lib/utilities/truncate-markdown';
 
   interface Props {
     value: Payload | null | undefined;
@@ -32,9 +36,9 @@
       if (typeof result !== 'string' || !result) return fallback;
       if (!prefix) return result;
       const prefixed = `${prefix} • ${result}`;
-      return prefixed.length <= maxSummaryLength
+      return markdownVisibleLength(prefixed) <= maxSummaryLength
         ? prefixed
-        : prefixed.slice(0, maxSummaryLength) + '...';
+        : truncateMarkdown(prefixed, maxSummaryLength);
     });
   };
 
