@@ -126,6 +126,11 @@
     ...defaultConditionOptions,
   ]);
 
+  const equalityConditionalOptions = [
+    { value: '=', label: translate('common.equal-to') },
+    { value: '!=', label: translate('common.not-equal-to') },
+  ];
+
   const dateConditionalOptions = $derived([
     { value: '<=', label: translate('common.before') },
     { value: 'BETWEEN', label: translate('common.between') },
@@ -541,21 +546,14 @@
         </ToggleButtons>
       </div>
     {:else}
-      <div class="space-y-2">
+      <div class="space-y-3">
+        {@render conditionalButtons(equalityConditionalOptions)}
         <Input
           id={`${idPrefix}-generic`}
           label="Value"
           placeholder="Enter value..."
           bind:value={localFilter.value}
         />
-        <Select
-          id={`${idPrefix}-cond`}
-          label="Condition"
-          bind:value={localFilter.conditional}
-        >
-          <Option value="=">{translate('common.equal-to')}</Option>
-          <Option value="!=">{translate('common.not-equal-to')}</Option>
-        </Select>
       </div>
     {/if}
 

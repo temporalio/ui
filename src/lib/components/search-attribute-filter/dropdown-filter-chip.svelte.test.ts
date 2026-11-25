@@ -25,13 +25,13 @@ let component: ReturnType<typeof mount> | undefined;
 
 const mountChip = (
   filter: SearchAttributeFilter,
-  { onRemove = vi.fn(), readOnly = false } = {},
+  { onRemove = vi.fn(), onUpdate = vi.fn(), readOnly = false } = {},
 ) => {
   const target = document.createElement('div');
   document.body.appendChild(target);
   component = mount(DropdownFilterChip, {
     target,
-    props: { filter, onUpdate: vi.fn(), onRemove, readOnly },
+    props: { filter, onUpdate, onRemove, readOnly },
   });
   flushSync();
   return target;
@@ -124,6 +124,38 @@ describe('DropdownFilterChip', () => {
 
     expect(byTestId('apply-filter-button')).not.toBeNull();
     expect(byTestId('read-only-filter')).toBeNull();
+  });
+
+  it('offers Equal to and Not equal to as toggle buttons for a status filter', () => {
+    const onUpdate = vi.fn();
+    const target = mountChip(
+      createFilter({
+        attribute: 'ExecutionStatus',
+        conditional: '!=',
+        value: 'Running',
+      }),
+      { onUpdate },
+    );
+
+    openChip(target);
+
+    const toggle = (label: string) =>
+      [...document.querySelectorAll<HTMLButtonElement>('button')].find(
+        (button) => button.textContent?.trim() === label,
+      );
+
+    expect(document.querySelector('[id$="-cond"]')).toBeNull();
+    expect(toggle('Not equal to')?.getAttribute('aria-pressed')).toBe('true');
+    expect(toggle('Equal to')?.getAttribute('aria-pressed')).toBe('false');
+
+    toggle('Equal to')?.click();
+    flushSync();
+    byTestId('apply-filter-button')?.click();
+    flushSync();
+
+    expect(onUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({ conditional: '=', value: 'Running' }),
+    );
   });
 
   it('only offers Remove for a read-only filter', () => {
