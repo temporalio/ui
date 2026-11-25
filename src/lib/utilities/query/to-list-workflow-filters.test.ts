@@ -740,12 +740,34 @@ describe('toListWorkflowFilters', () => {
     expect(result).toMatchObject(expectedFilters);
   });
 
+  it('should parse "not" as a value without flagging the filters', () => {
+    const result = toListWorkflowFilters(
+      '`WorkflowId`="not" AND `WorkflowType`="NOT"',
+      attributes,
+    );
+    const expectedFilters = [
+      { attribute: 'WorkflowId', value: 'not', conditional: '=' },
+      { attribute: 'WorkflowType', value: 'NOT', conditional: '=' },
+    ];
+    expect(result).toMatchObject(expectedFilters);
+    expect(result.map((filter) => filter.unsupportedQuery)).toEqual([
+      undefined,
+      undefined,
+    ]);
+    expect(result.map((filter) => filter.negated)).toEqual([
+      undefined,
+      undefined,
+    ]);
+  });
+
   it.each([
     notStartsWithQuery,
     multipleNotStartsWithQuery,
     prefixNotInQuery,
     `${isNotEmptyQuery} AND ${keywordListNotInQuery}`,
     workflowQuery4,
+    '`WorkflowId` != "not"',
+    '`WorkflowId` STARTS_WITH "Not"',
   ])('should not flag filters parsed from %s', (query) => {
     const result = toListWorkflowFilters(query, attributes);
     expect(result.map((filter) => filter.unsupportedQuery)).toEqual(

@@ -60,10 +60,15 @@ const isNot = is('not');
 const extractNegations = (
   tokens: Tokens,
   attributes: SearchAttributes,
-): { tokens: Tokens; negatedIndexes: Set<number> } => {
+): {
+  tokens: Tokens;
+  negatedIndexes: Set<number>;
+  hasUnsupportedNegation: boolean;
+} => {
   const remainingTokens: Tokens = [];
   const negatedIndexes = new Set<number>();
   let negateNextToken = false;
+  let hasUnsupportedNegation = false;
 
   tokens.forEach((token, index) => {
     const previousToken = tokens[index - 1];
@@ -84,10 +89,14 @@ const extractNegations = (
       negateNextToken = false;
     }
 
+    if (isNot(token) && !isConditional(previousToken)) {
+      hasUnsupportedNegation = true;
+    }
+
     remainingTokens.push(token);
   });
 
-  return { tokens: remainingTokens, negatedIndexes };
+  return { tokens: remainingTokens, negatedIndexes, hasUnsupportedNegation };
 };
 
 const defaultFilter: SearchAttributeFilter = {
@@ -121,7 +130,7 @@ export const toListWorkflowFilters = (
   query: string,
   attributes: SearchAttributes = DefaultAttributes,
 ): SearchAttributeFilter[] => {
-  const { tokens, negatedIndexes } = extractNegations(
+  const { tokens, negatedIndexes, hasUnsupportedNegation } = extractNegations(
     tokenize(query),
     attributes,
   );
@@ -209,7 +218,7 @@ export const toListWorkflowFilters = (
       }
     });
 
-    if (tokens.some(isNot)) {
+    if (hasUnsupportedNegation) {
       return filters.map((filter) => ({ ...filter, unsupportedQuery: true }));
     }
 
