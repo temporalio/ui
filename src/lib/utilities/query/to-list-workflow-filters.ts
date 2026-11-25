@@ -7,6 +7,7 @@ import {
   SEARCH_ATTRIBUTE_TYPE,
   type SearchAttributes,
 } from '$lib/types/workflows';
+import { hasUnsupportedQuery } from '$lib/utilities/query/column-filter';
 import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
 
 import { tokenize } from './tokenize';
@@ -57,6 +58,12 @@ const isDatetimeStatement = is(SEARCH_ATTRIBUTE_TYPE.DATETIME);
 const isBoolStatement = is(SEARCH_ATTRIBUTE_TYPE.BOOL);
 const isNot = is('not');
 
+const startsStatement = (previousToken: string | undefined): boolean =>
+  previousToken === undefined ||
+  previousToken === '(' ||
+  isJoin(previousToken) ||
+  isNot(previousToken);
+
 const extractNegations = (
   tokens: Tokens,
   attributes: SearchAttributes,
@@ -94,7 +101,10 @@ const extractNegations = (
       negateNextToken = false;
     }
 
-    if (isNot(token) && !isConditional(previousToken)) {
+    if (
+      isNot(token) &&
+      (startsStatement(previousToken) || attributes[previousToken])
+    ) {
       hasUnsupportedNegation = true;
     }
 
@@ -102,6 +112,26 @@ const extractNegations = (
   });
 
   return { tokens: remainingTokens, negatedIndexes, hasUnsupportedNegation };
+};
+
+const changesMeaningWhenCombined = (
+  filters: SearchAttributeFilter[],
+): boolean => {
+  const combined = combineFilters(filters.map((filter) => ({ ...filter })));
+  const operatorChanged = combined.some(
+    (filter, index) => filter.operator !== filters[index].operator,
+  );
+  if (operatorChanged) return true;
+
+  const parenthesisChanged = combined.some(
+    (filter, index) => filter.parenthesis !== filters[index].parenthesis,
+  );
+  const operators = new Set(
+    filters.map((filter) => filter.operator.toUpperCase()),
+  );
+  const mixesAndWithOr = operators.has('AND') && operators.has('OR');
+
+  return parenthesisChanged && mixesAndWithOr;
 };
 
 const defaultFilter: SearchAttributeFilter = {
@@ -223,7 +253,7 @@ export const toListWorkflowFilters = (
       }
     });
 
-    if (hasUnsupportedNegation) {
+    if (hasUnsupportedNegation || changesMeaningWhenCombined(filters)) {
       return filters.map((filter) => ({ ...filter, unsupportedQuery: true }));
     }
 
@@ -306,6 +336,8 @@ export const combineFilters = (filters: SearchAttributeFilter[]) => {
 
 export const updateQueryParamsFromFilter = debounce(
   (url: URL, filters: SearchAttributeFilter[], isDropdownFilter = false) => {
+    if (hasUnsupportedQuery(filters)) return;
+
     const allFilters = isDropdownFilter
       ? combineDropdownFilters(filters)
       : combineFilters(filters);

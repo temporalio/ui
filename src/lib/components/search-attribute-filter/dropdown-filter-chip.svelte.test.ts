@@ -201,7 +201,7 @@ describe('DropdownFilterChip', () => {
     expect(byTestId('apply-filter-button')).toBeNull();
     expect(byTestId('remove-filter-button')).toBeNull();
     expect(byTestId('read-only-filter')?.textContent).toContain(
-      "This query uses NOT in a way the filters can't show. Edit the query to change it.",
+      "The filters can't show this query. Edit the query to change it.",
     );
   });
 });

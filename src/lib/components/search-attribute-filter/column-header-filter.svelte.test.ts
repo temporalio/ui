@@ -155,8 +155,8 @@ describe('ColumnHeaderFilter', () => {
     expect(button.disabled).toBe(true);
   });
 
-  it('is disabled when the column has an IN filter on a keyword attribute', () => {
-    const { button } = mountFilter({
+  it('shows an IN filter on a keyword attribute as read-only with Remove', () => {
+    const { store, button, open } = mountFilter({
       filters: [
         createFilter({
           ...workflowType(),
@@ -166,10 +166,21 @@ describe('ColumnHeaderFilter', () => {
       ],
     });
 
-    expect(button.disabled).toBe(true);
+    expect(button.disabled).toBe(false);
+    expect(button.dataset.filtered).toBe('true');
+
+    open();
+
+    expect(byTestId('column-header-filter-read-only')).not.toBeNull();
+    expect(byTestId('apply-filter-button')).toBeNull();
+
+    byTestId('remove-filter-button')?.click();
+    flushSync();
+
+    expect(get(store)).toEqual([]);
   });
 
-  it('leaves a NOT IN status filter out of the status editor', () => {
+  it('shows a NOT IN status filter as read-only instead of in the status editor', () => {
     const notIn = createFilter({
       id: 'not-in',
       attribute: 'ExecutionStatus',
@@ -177,13 +188,17 @@ describe('ColumnHeaderFilter', () => {
       value: '("Terminated", "Canceled")',
       conditional: 'NOT IN',
     });
-    const { button } = mountFilter({
+    const { button, open } = mountFilter({
       attribute: 'ExecutionStatus',
       filters: [notIn],
       statusFilter: workflowStatusFilter,
     });
 
-    expect(button.dataset.filtered).toBe('false');
+    expect(button.dataset.filtered).toBe('true');
+
+    open();
+
+    expect(byTestId('column-header-filter-read-only')).not.toBeNull();
   });
 
   it('removes the column filter and closes the menu', () => {

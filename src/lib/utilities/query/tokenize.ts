@@ -125,7 +125,10 @@ export const tokenize = (string: string): Tokens => {
     if (isQuote(character)) {
       addBufferToTokens();
 
-      const isPotentialStartOfValue = isConditional(string[cursor - 1]);
+      const isPotentialStartOfValue =
+        isConditional(string[cursor - 1]) ||
+        (isSpace(string[cursor - 1]) &&
+          isConditional(tokens[tokens.length - 1]));
       const hasClosingQuote = string.slice(cursor + 1).includes(character);
       if (isPotentialStartOfValue && hasClosingQuote) {
         const isClosingQuote = (value: unknown) => value === character;

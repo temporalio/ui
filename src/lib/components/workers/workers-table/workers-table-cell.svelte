@@ -10,6 +10,7 @@
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { workerFilters } from '$lib/stores/filters';
   import { workerSearchAttributes } from '$lib/stores/search-attributes';
+  import { hasUnsupportedQuery } from '$lib/utilities/query/column-filter';
   import {
     createQuickFilter,
     getQuickFilterConditional,
@@ -110,12 +111,15 @@
   };
 
   const hasContent = $derived(hasMultipleFilters || quickFilterValue !== null);
+  const unsupportedQuery = $derived(hasUnsupportedQuery($workerFilters));
 </script>
 
 <TableCellWithFilterOrCopyButtons
   class="h-8"
   copyValue={value ?? undefined}
-  onFilter={hasContent && filterable ? onRowFilterClick : undefined}
+  onFilter={hasContent && filterable && !unsupportedQuery
+    ? onRowFilterClick
+    : undefined}
   {isFiltered}
   filterIconTitle={translate('common.filter-workflows')}
 >

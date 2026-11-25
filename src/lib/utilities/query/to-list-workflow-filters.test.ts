@@ -753,6 +753,48 @@ describe('toListWorkflowFilters', () => {
     expect(result).toMatchObject(expectedFilters);
   });
 
+  it('should flag a NOT between an attribute and BETWEEN', () => {
+    const result = toListWorkflowFilters(
+      '`StartTime` NOT BETWEEN "2024-01-01T00:00:00Z" AND "2024-02-01T00:00:00Z" AND `WorkflowType`="x"',
+      attributes,
+    );
+
+    expect(result.length).toBeGreaterThan(0);
+    expect(result.every((filter) => filter.unsupportedQuery)).toBe(true);
+  });
+
+  it('should parse a value containing "not" without flagging the filters', () => {
+    const result = toListWorkflowFilters(
+      '`WorkflowId` = "do not touch"',
+      attributes,
+    );
+
+    expect(result).toMatchObject([
+      { attribute: 'WorkflowId', conditional: '=', value: 'do not touch' },
+    ]);
+    expect(result[0].unsupportedQuery).toBeUndefined();
+  });
+
+  it.each([
+    '`WorkflowType`="a" OR `WorkflowId`="b"',
+    '`WorkflowId`="a" OR `WorkflowId`="b" AND `WorkflowType`="c"',
+    '`WorkflowType`="c" AND `WorkflowId`="a" OR `WorkflowId`="b"',
+  ])('should flag filters the UI would rebuild differently: %s', (query) => {
+    const result = toListWorkflowFilters(query, attributes);
+
+    expect(result.every((filter) => filter.unsupportedQuery)).toBe(true);
+  });
+
+  it.each([
+    '`ExecutionStatus`="Running" OR `ExecutionStatus`="Completed"',
+    '(`ExecutionStatus`="Running" OR `ExecutionStatus`="Completed") AND `WorkflowType`="c"',
+    '`WorkflowType`="c" AND (`ExecutionStatus`="Running" OR `ExecutionStatus`="Completed")',
+  ])('should not flag OR groups the UI rebuilds the same way: %s', (query) => {
+    const result = toListWorkflowFilters(query, attributes);
+
+    expect(result.some((filter) => filter.unsupportedQuery)).toBe(false);
+  });
+
   it('should parse "not" as a value without flagging the filters', () => {
     const result = toListWorkflowFilters(
       '`WorkflowId`="not" AND `WorkflowType`="NOT"',

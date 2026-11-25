@@ -23,8 +23,6 @@ export const targetsAttribute = (
 ): boolean =>
   filter.attribute === attribute && !filter.negated && !filter.unsupportedQuery;
 
-const EXCLUDING_CONDITIONALS = new Set(['not in', '!=']);
-
 export const isListFilterOnSingleValueAttribute = ({
   type,
   conditional,
@@ -40,7 +38,8 @@ export const targetsStatusAttribute = (
   attribute: string,
 ): boolean =>
   targetsAttribute(filter, attribute) &&
-  !EXCLUDING_CONDITIONALS.has(filter.conditional.toLowerCase());
+  filter.conditional !== '!=' &&
+  !isInConditional(filter.conditional);
 
 export const hasUnsupportedQuery = (
   filters: SearchAttributeFilter[],

@@ -8,7 +8,8 @@
   import Alert from '$lib/holocene/alert.svelte';
   import { Menu, MenuButton, MenuContainer } from '$lib/holocene/menu';
   import { translate } from '$lib/i18n/translate';
-  import { IconFilterLines } from '$lib/io/icon';
+  import { Button } from '$lib/io/button';
+  import { IconFilterLines, IconTrash } from '$lib/io/icon';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import type { StatusFilter } from '$lib/models/status-filter';
   import type { SearchAttributeType } from '$lib/types/workflows';
@@ -55,13 +56,22 @@
       (filter) => targets(filter, attribute) && isAppliedFilter(filter),
     ),
   );
-  const filtered = $derived(appliedFilters.length > 0);
+  const listFilters = $derived(
+    $filters.filter(
+      (filter) =>
+        filter.attribute === attribute &&
+        !filter.negated &&
+        !filter.unsupportedQuery &&
+        isListFilterOnSingleValueAttribute(filter),
+    ),
+  );
+  const hasUneditableListFilter = $derived(listFilters.length > 0);
+  const filtered = $derived(
+    appliedFilters.length > 0 || hasUneditableListFilter,
+  );
 
   const atQueryLimit = $derived(isAtQueryLimit(page.url));
   const unsupportedQuery = $derived(hasUnsupportedQuery($filters));
-  const hasUneditableListFilter = $derived(
-    !statusFilter && appliedFilters.some(isListFilterOnSingleValueAttribute),
-  );
 
   const createInitialFilter = (): SearchAttributeFilter =>
     appliedFilters[0] ??
@@ -72,7 +82,9 @@
     });
 
   const initialFilter = $derived(
-    $open && !statusFilter ? untrack(createInitialFilter) : undefined,
+    $open && !statusFilter && !hasUneditableListFilter
+      ? untrack(createInitialFilter)
+      : undefined,
   );
 
   const hasMultipleFilters = $derived(appliedFilters.length > 1);
@@ -93,6 +105,11 @@
     } else if (canRemove) {
       setFilters(replaceAttributeFilters($filters, attribute, []));
     }
+    $open = false;
+  };
+
+  const removeListFilters = () => {
+    setFilters($filters.filter((filter) => !listFilters.includes(filter)));
     $open = false;
   };
 
@@ -118,9 +135,7 @@
     variant="ghost"
     size="xs"
     active={filtered || $open}
-    disabled={unsupportedQuery ||
-      hasUneditableListFilter ||
-      (!filtered && atQueryLimit)}
+    disabled={unsupportedQuery || (!filtered && atQueryLimit)}
     label={translate('common.filter-by-column', {
       column: label,
       escapeValue: false,
@@ -149,7 +164,37 @@
         : 'w-min min-w-0 max-w-[calc(100dvw-1rem)]',
     ]}
   >
-    {#if statusFilter}
+    {#if hasUneditableListFilter}
+      <div class="space-y-4" data-testid="column-header-filter-read-only">
+        <h3 class="text-sm font-medium">
+          {translate('common.filter-by-column', {
+            column: label,
+            escapeValue: false,
+          })}
+        </h3>
+        {#each listFilters as filter (filter.id)}
+          <p class="min-w-60 break-all text-sm">
+            {filter.attribute}
+            {filter.conditional}
+            {filter.value}
+          </p>
+        {/each}
+        <p class="text-sm text-secondary">
+          {translate('common.read-only-filter')}
+        </p>
+        <div class="flex justify-end">
+          <Button
+            TrailingIcon={IconTrash}
+            colorScheme="secondary"
+            size="xs"
+            data-testid="remove-filter-button"
+            onclick={removeListFilters}
+          >
+            {translate('common.remove')}
+          </Button>
+        </div>
+      </div>
+    {:else if statusFilter}
       <StatusFilterEditor
         {statusFilter}
         filters={appliedFilters}

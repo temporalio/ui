@@ -162,6 +162,18 @@ describe('targetsStatusAttribute', () => {
     },
   );
 
+  it.each(['IN', 'in', 'NOT IN'])(
+    'does not target a status filter with an %s list',
+    (conditional) => {
+      const filter = createFilter({
+        attribute: 'ExecutionStatus',
+        value: '("Running", "Failed")',
+        conditional,
+      });
+      expect(targetsStatusAttribute(filter, 'ExecutionStatus')).toBe(false);
+    },
+  );
+
   it('does not target a negated status filter', () => {
     const filter = createFilter({ ...status('Running'), negated: true });
     expect(targetsStatusAttribute(filter, 'ExecutionStatus')).toBe(false);

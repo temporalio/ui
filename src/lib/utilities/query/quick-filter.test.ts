@@ -8,6 +8,7 @@ import {
 
 import { toListWorkflowQueryFromFilters } from './filter-workflow-query';
 import {
+  addStatusCountFilter,
   createQuickFilter,
   formatQuickFilterValue,
   getDefaultConditional,
@@ -20,6 +21,7 @@ import {
   toQuickFilterValue,
 } from './quick-filter';
 import {
+  combineFilters,
   createFilter,
   toListWorkflowFilters,
 } from './to-list-workflow-filters';
@@ -582,5 +584,52 @@ describe('ExecutionDuration', () => {
       value: '5m10s',
       conditional: '>=',
     });
+  });
+});
+
+describe('addStatusCountFilter', () => {
+  const parse = (query: string) => toListWorkflowFilters(query);
+  const toQuery = (filters: SearchAttributeFilter[] | null) =>
+    filters && toListWorkflowQueryFromFilters(combineFilters(filters));
+
+  it('adds the status when nothing filters on it', () => {
+    expect(
+      toQuery(addStatusCountFilter(parse('`WorkflowId`="a"'), 'Running')),
+    ).toBe('`WorkflowId`="a" AND `ExecutionStatus`="Running"');
+  });
+
+  it('does nothing when the status is already selected', () => {
+    expect(
+      addStatusCountFilter(parse('`ExecutionStatus`="Running"'), 'Running'),
+    ).toBeNull();
+  });
+
+  it.each([
+    ['`ExecutionStatus`!="Running" AND `WorkflowId`="a"'],
+    ['NOT `ExecutionStatus`="Running" AND `WorkflowId`="a"'],
+  ])('replaces a filter that excludes the status: %s', (query) => {
+    expect(toQuery(addStatusCountFilter(parse(query), 'Running'))).toBe(
+      '`ExecutionStatus`="Running" AND `WorkflowId`="a"',
+    );
+  });
+
+  it('does nothing when a NOT IN list excludes the status', () => {
+    expect(
+      addStatusCountFilter(
+        parse('`ExecutionStatus` NOT IN ("Running", "Failed")'),
+        'Running',
+      ),
+    ).toBeNull();
+  });
+
+  it('does nothing when the query has a NOT the filters cannot show', () => {
+    expect(
+      addStatusCountFilter(
+        parse(
+          '`WorkflowId`="x" AND NOT (`WorkflowType`="a" OR `WorkflowType`="b")',
+        ),
+        'Running',
+      ),
+    ).toBeNull();
   });
 });

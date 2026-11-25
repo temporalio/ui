@@ -16,14 +16,12 @@
     workflowCount,
     refresh as workflowRefresh,
   } from '$lib/stores/workflows';
-  import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
   import { getStatusAndCountOfGroup } from '$lib/utilities/get-group-status-and-count';
   import { getWorkflowStatusLabel } from '$lib/utilities/get-workflow-status-label';
+  import { hasUnsupportedQuery } from '$lib/utilities/query/column-filter';
   import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
-  import {
-    combineFilters,
-    createFilter,
-  } from '$lib/utilities/query/to-list-workflow-filters';
+  import { addStatusCountFilter } from '$lib/utilities/query/quick-filter';
+  import { combineFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
   import {
@@ -69,20 +67,12 @@
     refreshTime = new Date(statusCounts.refreshTime);
   });
 
-  const onStatusClick = (status: Status) => {
-    const statusExists = $filters.some(
-      (filter) =>
-        filter.attribute === 'ExecutionStatus' && filter.value === status,
-    );
+  const unsupportedQuery = $derived(hasUnsupportedQuery($filters));
 
-    if (!statusExists && status) {
-      const filter = createFilter({
-        attribute: 'ExecutionStatus',
-        type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
-        value: status,
-        conditional: '=',
-      });
-      $filters = [...$filters, filter];
+  const onStatusClick = (status: Status) => {
+    const next = addStatusCountFilter($filters, status);
+    if (next) {
+      $filters = next;
       const searchQuery = toListWorkflowQueryFromFilters(
         combineFilters($filters),
       );
@@ -112,6 +102,7 @@
           {count}
           extension={difference || undefined}
           onclick={() => onStatusClick(status)}
+          disabled={unsupportedQuery}
           data-testid={`${testId}-${status}`}
         />
       {/if}

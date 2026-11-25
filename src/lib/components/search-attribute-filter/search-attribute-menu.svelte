@@ -19,6 +19,10 @@
   import type { StatusFilter } from '$lib/models/status-filter';
   import type { SearchAttributeOption } from '$lib/stores/search-attributes';
   import type { SearchAttributeType } from '$lib/types/workflows';
+  import {
+    hasUnsupportedQuery,
+    targetsStatusAttribute,
+  } from '$lib/utilities/query/column-filter';
   import { getDefaultConditional } from '$lib/utilities/query/quick-filter';
   import {
     createFilter,
@@ -93,7 +97,9 @@
     LeadingIcon={IconFilter}
     variant="tertiary"
     data-testid="add-filter-button"
-    disabled={$activeQueryIndex !== null || query.length >= MAX_QUERY_LENGTH}
+    disabled={$activeQueryIndex !== null ||
+      query.length >= MAX_QUERY_LENGTH ||
+      hasUnsupportedQuery($filters)}
     onclick={(isOpen) => {
       searchAttributeValue = '';
       if (isOpen) focusSearch();
@@ -124,7 +130,7 @@
           handleNewQuery(value, type);
         }}
         disabled={value === statusAttribute &&
-          !!$filters.find((f) => f.attribute === statusAttribute)}
+          $filters.some((f) => targetsStatusAttribute(f, statusAttribute))}
       >
         <div>
           <p class="break-all leading-3">{label}</p>

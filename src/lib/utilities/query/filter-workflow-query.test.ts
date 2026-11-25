@@ -479,4 +479,28 @@ describe('toListWorkflowQueryFromFilters', () => {
     const query = toListWorkflowQueryFromFilters(filters);
     expect(query).toBe('`ExecutionStatus`IN("Terminated", "Canceled")');
   });
+
+  it.each([
+    [{ conditional: '=', value: 'a' }, '`Custom Space`="a"'],
+    [{ conditional: '=', value: 'a', negated: true }, 'NOT `Custom Space`="a"'],
+    [
+      { conditional: 'STARTS_WITH', value: 'a', negated: true },
+      '`Custom Space` NOT STARTS_WITH "a"',
+    ],
+    [{ conditional: 'IS', value: null }, '`Custom Space` IS null'],
+  ])(
+    'should wrap an attribute with spaces in one pair of backticks',
+    (overrides, expected) => {
+      const filters = [
+        {
+          attribute: 'Custom Space',
+          type: 'Keyword',
+          operator: '',
+          parenthesis: '',
+          ...overrides,
+        },
+      ];
+      expect(toListWorkflowQueryFromFilters(filters)).toBe(expected);
+    },
+  );
 });

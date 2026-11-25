@@ -68,13 +68,10 @@ const formatValue = ({
   return `"${value}"`;
 };
 
-const getQueryKey = (attribute: string | number) => {
-  const key = filterKeys[attribute] ?? attribute;
-  if (typeof key === 'string' && /\s/g.test(key)) {
-    return '`' + key + '`';
-  }
-  return key;
-};
+const getQueryKey = (attribute: string | number) =>
+  String(filterKeys[attribute] ?? attribute);
+
+const getBareQueryKey = (key: string) => (/\s/.test(key) ? `\`${key}\`` : key);
 
 const toFilterQueryStatement = (
   attribute: keyof SearchAttributes,
@@ -86,12 +83,13 @@ const toFilterQueryStatement = (
   negated: boolean,
 ): string => {
   const queryKey = getQueryKey(attribute);
+  const bareQueryKey = getBareQueryKey(queryKey);
 
   if (value === 'All') return '';
 
   // Custom Dates...
   if (customDate) {
-    return `${queryKey} ${value}`;
+    return `${bareQueryKey} ${value}`;
   }
 
   if (isNullConditional(conditional)) {
@@ -108,9 +106,9 @@ const toFilterQueryStatement = (
 
   if (isDuration(value) || isDurationString(value)) {
     if (archived || get(supportsAdvancedVisibility)) {
-      return `${queryKey} ${conditional} "${toDate(value)}"`;
+      return `${bareQueryKey} ${conditional} "${toDate(value)}"`;
     }
-    return `${queryKey} BETWEEN "${toDate(value)}" AND "${tomorrow()}"`;
+    return `${bareQueryKey} BETWEEN "${toDate(value)}" AND "${tomorrow()}"`;
   }
 
   if (isStartsWith(conditional)) {

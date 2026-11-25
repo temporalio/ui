@@ -124,12 +124,25 @@ describe('tokenize', () => {
   });
 
   it('should tokenize with "`" not used in custom attributes with spaces', () => {
-    expect(tokenize('one = "one `"')).toEqual(['one', '=', 'one', '`']);
-    expect(tokenize('one = "one `1`"')).toEqual(['one', '=', 'one', '`1`']);
+    expect(tokenize('one = "one `"')).toEqual(['one', '=', 'one `']);
+    expect(tokenize('one = "one `1`"')).toEqual(['one', '=', 'one `1`']);
     expect(tokenize('one = "`one"')).toEqual(['one', '=', '`one']);
     expect(tokenize('one = 1 `')).toEqual(['one', '=', '1', '`']);
     expect(tokenize('`one = 1')).toEqual(['`one', '=', '1']);
     expect(tokenize('one = `1')).toEqual(['one', '=', '`1']);
+  });
+
+  it('should keep a quoted value with spaces whole when a space follows the conditional', () => {
+    expect(tokenize('`WorkflowId` = "do not touch"')).toEqual([
+      'WorkflowId',
+      '=',
+      'do not touch',
+    ]);
+    expect(tokenize('`WorkflowId` STARTS_WITH "a b"')).toEqual([
+      'WorkflowId',
+      'STARTS_WITH',
+      'a b',
+    ]);
   });
 
   it('should tokenize the valueWithSpacesQuery', () => {

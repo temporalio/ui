@@ -12,6 +12,7 @@ import {
   targetsAttribute,
   targetsStatusAttribute,
 } from './column-filter';
+import { formatListFilterValue } from './search-attribute-filter';
 import { createFilter } from './to-list-workflow-filters';
 
 export type QuickFilterValue =
@@ -256,4 +257,58 @@ export const toggleQuickFilter = (
   return isQuickFilterActive(filters, quickFilter)
     ? otherFilters
     : [...otherFilters, quickFilter];
+};
+
+const EXECUTION_STATUS = 'ExecutionStatus';
+
+const excludesStatus = (filter: SearchAttributeFilter, status: string) =>
+  filter.attribute === EXECUTION_STATUS &&
+  filter.value === status &&
+  (Boolean(filter.negated) || filter.conditional === '!=');
+
+const excludesStatusInList = (filter: SearchAttributeFilter, status: string) =>
+  filter.attribute === EXECUTION_STATUS &&
+  filter.conditional.toLowerCase() === 'not in' &&
+  formatListFilterValue(filter.value).includes(status);
+
+export const addStatusCountFilter = (
+  filters: SearchAttributeFilter[],
+  status: string | null,
+): SearchAttributeFilter[] | null => {
+  if (!status || hasUnsupportedQuery(filters)) return null;
+
+  const alreadySelected = filters.some(
+    (filter) =>
+      targetsStatusAttribute(filter, EXECUTION_STATUS) &&
+      filter.value === status,
+  );
+  const excludedInList = filters.some((filter) =>
+    excludesStatusInList(filter, status),
+  );
+  if (alreadySelected || excludedInList) return null;
+
+  const statusFilter = createFilter({
+    attribute: EXECUTION_STATUS,
+    type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+    value: status,
+    conditional: '=',
+  });
+  const excludedIndex = filters.findIndex((filter) =>
+    excludesStatus(filter, status),
+  );
+  if (excludedIndex === -1) return [...filters, statusFilter];
+
+  const excluded = filters[excludedIndex];
+  return filters.flatMap((filter, index) => {
+    if (index === excludedIndex) {
+      return [
+        {
+          ...statusFilter,
+          operator: excluded.operator,
+          parenthesis: excluded.parenthesis,
+        },
+      ];
+    }
+    return excludesStatus(filter, status) ? [] : [filter];
+  });
 };
