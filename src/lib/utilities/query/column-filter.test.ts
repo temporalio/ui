@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
+import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
 import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
 
 import {
+  excludesValue,
   isAppliedFilter,
   isAtQueryLimit,
   isReadOnlyFilter,
@@ -276,6 +278,24 @@ describe('replaceAttributeFilters', () => {
     ).toBe(filters);
   });
 
+  it('drops a filter that excludes a value it now includes', () => {
+    const notRunning = createFilter({
+      id: 'not-running',
+      attribute: 'ExecutionStatus',
+      value: 'Running',
+      conditional: '!=',
+    });
+
+    expect(
+      replaceAttributeFilters(
+        [notRunning, workflowId],
+        'ExecutionStatus',
+        [status('Running')],
+        targetsStatusAttribute,
+      ).map((f) => f.id),
+    ).toEqual(['wid', 'Running']);
+  });
+
   it('keeps negated filters for the attribute', () => {
     const notTerminated = createFilter({
       id: 'not-terminated',
@@ -312,5 +332,71 @@ describe('isAtQueryLimit', () => {
 
   it('is true at the limit', () => {
     expect(isAtQueryLimit(urlWithQuery(MAX_QUERY_LENGTH))).toBe(true);
+  });
+});
+
+describe('excludesValue', () => {
+  const check = (overrides: Partial<SearchAttributeFilter>) =>
+    excludesValue(
+      createFilter({ attribute: 'ExecutionStatus', ...overrides }),
+      'ExecutionStatus',
+      'Running',
+    );
+
+  it.each([
+    ['NOT = the value', { conditional: '=', value: 'Running', negated: true }],
+    ['!= the value', { conditional: '!=', value: 'Running' }],
+    [
+      'NOT IN a list with the value',
+      { conditional: 'NOT IN', value: '("Running")' },
+    ],
+    [
+      'NOT … IN a list with the value',
+      { conditional: 'IN', value: '("Running")', negated: true },
+    ],
+    ['IN a list without the value', { conditional: 'IN', value: '("Failed")' }],
+    [
+      'NOT … NOT IN a list without the value',
+      { conditional: 'not in', value: '("Failed")', negated: true },
+    ],
+  ])('is true for %s', (_, overrides) => {
+    expect(check(overrides)).toBe(true);
+  });
+
+  it.each([
+    ['= the value', { conditional: '=', value: 'Running' }],
+    [
+      'NOT = another value',
+      { conditional: '=', value: 'Failed', negated: true },
+    ],
+    [
+      'NOT … != the value',
+      { conditional: '!=', value: 'Running', negated: true },
+    ],
+    ['IN a list with the value', { conditional: 'IN', value: '("Running")' }],
+    [
+      'NOT … NOT IN a list with the value',
+      { conditional: 'NOT IN', value: '("Running")', negated: true },
+    ],
+    [
+      'a filter from a query it cannot show',
+      { conditional: '!=', value: 'Running', unsupportedQuery: true },
+    ],
+  ])('is false for %s', (_, overrides) => {
+    expect(check(overrides)).toBe(false);
+  });
+
+  it('is false for a filter on another attribute', () => {
+    expect(
+      excludesValue(
+        createFilter({
+          attribute: 'WorkflowType',
+          conditional: '!=',
+          value: 'Running',
+        }),
+        'ExecutionStatus',
+        'Running',
+      ),
+    ).toBe(false);
   });
 });

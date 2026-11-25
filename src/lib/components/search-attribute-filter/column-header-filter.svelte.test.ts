@@ -136,14 +136,15 @@ describe('ColumnHeaderFilter', () => {
     expect(byTestId('remove-filter-button')).toBeNull();
   });
 
-  it('leaves a negated filter on the column untouched', () => {
+  it('shows a column with only a negated filter as filtered, with a notice', () => {
     const negated = createFilter({ ...workflowType(), negated: true });
     const { button, open } = mountFilter({ filters: [negated] });
 
-    expect(button.dataset.filtered).toBe('false');
+    expect(button.dataset.filtered).toBe('true');
 
     open();
 
+    expect(byTestId('column-header-filter-hidden')).not.toBeNull();
     expect(byTestId('remove-filter-button')).toBeNull();
   });
 

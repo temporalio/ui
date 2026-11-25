@@ -9,10 +9,10 @@ import { isTimestamp, timestampToDate, type ValidTime } from '../format-time';
 import { isInConditional } from '../is';
 import {
   hasUnsupportedQuery,
+  removeExclusions,
   targetsAttribute,
   targetsStatusAttribute,
 } from './column-filter';
-import { formatListFilterValue } from './search-attribute-filter';
 import { createFilter } from './to-list-workflow-filters';
 
 export type QuickFilterValue =
@@ -250,26 +250,25 @@ export const toggleQuickFilter = (
 ): SearchAttributeFilter[] => {
   if (hasUnsupportedQuery(filters)) return filters;
 
-  const otherFilters = filters.filter(
-    (filter) => !targetsQuickFilterAttribute(filter, quickFilter.attribute),
-  );
+  const withoutTargets = (list: SearchAttributeFilter[]) =>
+    list.filter(
+      (filter) => !targetsQuickFilterAttribute(filter, quickFilter.attribute),
+    );
 
-  return isQuickFilterActive(filters, quickFilter)
-    ? otherFilters
-    : [...otherFilters, quickFilter];
+  if (isQuickFilterActive(filters, quickFilter)) return withoutTargets(filters);
+  if (quickFilter.conditional !== '=') {
+    return [...withoutTargets(filters), quickFilter];
+  }
+
+  const kept = removeExclusions(
+    filters,
+    quickFilter.attribute,
+    quickFilter.value,
+  );
+  return kept ? [...withoutTargets(kept), quickFilter] : filters;
 };
 
 const EXECUTION_STATUS = 'ExecutionStatus';
-
-const excludesStatus = (filter: SearchAttributeFilter, status: string) =>
-  filter.attribute === EXECUTION_STATUS &&
-  filter.value === status &&
-  (Boolean(filter.negated) || filter.conditional === '!=');
-
-const excludesStatusInList = (filter: SearchAttributeFilter, status: string) =>
-  filter.attribute === EXECUTION_STATUS &&
-  filter.conditional.toLowerCase() === 'not in' &&
-  formatListFilterValue(filter.value).includes(status);
 
 export const addStatusCountFilter = (
   filters: SearchAttributeFilter[],
@@ -282,33 +281,18 @@ export const addStatusCountFilter = (
       targetsStatusAttribute(filter, EXECUTION_STATUS) &&
       filter.value === status,
   );
-  const excludedInList = filters.some((filter) =>
-    excludesStatusInList(filter, status),
-  );
-  if (alreadySelected || excludedInList) return null;
+  if (alreadySelected) return null;
 
-  const statusFilter = createFilter({
-    attribute: EXECUTION_STATUS,
-    type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
-    value: status,
-    conditional: '=',
-  });
-  const excludedIndex = filters.findIndex((filter) =>
-    excludesStatus(filter, status),
-  );
-  if (excludedIndex === -1) return [...filters, statusFilter];
+  const kept = removeExclusions(filters, EXECUTION_STATUS, status);
+  if (!kept) return null;
 
-  const excluded = filters[excludedIndex];
-  return filters.flatMap((filter, index) => {
-    if (index === excludedIndex) {
-      return [
-        {
-          ...statusFilter,
-          operator: excluded.operator,
-          parenthesis: excluded.parenthesis,
-        },
-      ];
-    }
-    return excludesStatus(filter, status) ? [] : [filter];
-  });
+  return [
+    ...kept,
+    createFilter({
+      attribute: EXECUTION_STATUS,
+      type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+      value: status,
+      conditional: '=',
+    }),
+  ];
 };

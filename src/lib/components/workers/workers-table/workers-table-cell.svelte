@@ -10,7 +10,10 @@
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { workerFilters } from '$lib/stores/filters';
   import { workerSearchAttributes } from '$lib/stores/search-attributes';
-  import { hasUnsupportedQuery } from '$lib/utilities/query/column-filter';
+  import {
+    hasUnsupportedQuery,
+    removeExclusions,
+  } from '$lib/utilities/query/column-filter';
   import {
     createQuickFilter,
     getQuickFilterConditional,
@@ -57,6 +60,8 @@
   );
 
   const matchesFilter = (a: SearchAttributeFilter, b: SearchAttributeFilter) =>
+    !a.negated &&
+    !a.unsupportedQuery &&
     a.attribute === b.attribute &&
     a.value === b.value &&
     a.conditional === b.conditional;
@@ -100,12 +105,18 @@
       (f) => !$workerFilters.some((wf) => matchesFilter(wf, f)),
     );
 
-    $workerFilters = [
-      ...$workerFilters.filter(
+    const kept = toAdd.reduce<SearchAttributeFilter[] | null>(
+      (current, f) =>
+        current && f.conditional === '=' && f.value
+          ? removeExclusions(current, f.attribute, f.value)
+          : current,
+      $workerFilters.filter(
         (wf) => !toRemove.some((f) => matchesFilter(wf, f)),
       ),
-      ...toAdd,
-    ];
+    );
+    if (!kept) return;
+
+    $workerFilters = [...kept, ...toAdd];
 
     updateQueryParamsFromFilter(page.url, $workerFilters);
   };

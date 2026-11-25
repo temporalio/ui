@@ -66,8 +66,20 @@
     ),
   );
   const hasUneditableListFilter = $derived(listFilters.length > 0);
+  const hiddenFilters = $derived(
+    $filters.filter(
+      (filter) =>
+        filter.attribute === attribute &&
+        !filter.unsupportedQuery &&
+        !targets(filter, attribute) &&
+        !listFilters.includes(filter) &&
+        isAppliedFilter(filter),
+    ),
+  );
   const filtered = $derived(
-    appliedFilters.length > 0 || hasUneditableListFilter,
+    appliedFilters.length > 0 ||
+      hasUneditableListFilter ||
+      hiddenFilters.length > 0,
   );
 
   const atQueryLimit = $derived(isAtQueryLimit(page.url));
@@ -119,14 +131,24 @@
   };
 </script>
 
-{#snippet multipleFiltersNotice()}
-  <Alert intent="warning" data-testid="column-header-filter-multiple">
-    {translate('common.column-has-multiple-filters', {
-      column: label,
-      count: appliedFilters.length,
-      escapeValue: false,
-    })}
-  </Alert>
+{#snippet notices()}
+  {#if hasMultipleFilters}
+    <Alert intent="warning" data-testid="column-header-filter-multiple">
+      {translate('common.column-has-multiple-filters', {
+        column: label,
+        count: appliedFilters.length,
+        escapeValue: false,
+      })}
+    </Alert>
+  {/if}
+  {#if hiddenFilters.length}
+    <Alert intent="info" data-testid="column-header-filter-hidden">
+      {translate('common.column-has-read-only-filters', {
+        column: label,
+        escapeValue: false,
+      })}
+    </Alert>
+  {/if}
 {/snippet}
 
 <MenuContainer {open} class="shrink-0">
@@ -195,6 +217,9 @@
         </div>
       </div>
     {:else if statusFilter}
+      {#if hiddenFilters.length}
+        <div class="mb-3">{@render notices()}</div>
+      {/if}
       <StatusFilterEditor
         {statusFilter}
         filters={appliedFilters}
@@ -211,7 +236,9 @@
         applyOnEnter
         onApply={applyFilter}
         onRemove={canRemove ? removeFilter : undefined}
-        notice={hasMultipleFilters ? multipleFiltersNotice : undefined}
+        notice={hasMultipleFilters || hiddenFilters.length
+          ? notices
+          : undefined}
         applyLabel={hasMultipleFilters
           ? translate('common.replace-all')
           : undefined}

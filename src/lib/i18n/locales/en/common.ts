@@ -54,6 +54,8 @@ export const Strings = {
   'column-has-multiple-filters':
     '{{column}} has {{count}} filters. Applying replaces them with this one.',
   'read-only-filter': 'Edit the query to change this filter.',
+  'column-has-read-only-filters':
+    '{{column}} also has filters you can only change by editing the query.',
   'unsupported-query-filter':
     "The filters can't show this query. Edit the query to change it.",
   'remove-all': 'Remove all',
