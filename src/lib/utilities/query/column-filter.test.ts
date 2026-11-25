@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
+import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
+
 import {
   isAppliedFilter,
   isAtQueryLimit,
@@ -91,14 +93,25 @@ describe('isReadOnlyFilter', () => {
     ['a status filter', { attribute: 'ExecutionStatus' }],
     ['a != status filter', { attribute: 'ExecutionStatus', conditional: '!=' }],
     [
+      'an IN filter on a list attribute',
+      {
+        attribute: 'CustomKeywordListField',
+        type: SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST,
+        conditional: 'in',
+      },
+    ],
+    [
       'a NOT IN filter on a list attribute',
-      { attribute: 'CustomKeywordListField', conditional: 'not in' },
+      {
+        attribute: 'CustomKeywordListField',
+        type: SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST,
+        conditional: 'not in',
+      },
     ],
   ])('is false for %s', (_, overrides) => {
     expect(
       isReadOnlyFilter(
         createFilter({ conditional: '=', value: 'a', ...overrides }),
-        'ExecutionStatus',
       ),
     ).toBe(false);
   });
@@ -113,21 +126,20 @@ describe('isReadOnlyFilter', () => {
       'a NOT IN status filter',
       { attribute: 'ExecutionStatus', conditional: 'NOT IN' },
     ],
+    [
+      'an IN filter on a keyword attribute',
+      { attribute: 'WorkflowType', conditional: 'IN' },
+    ],
+    [
+      'a NOT IN filter on a keyword attribute',
+      { attribute: 'WorkflowType', conditional: 'not in' },
+    ],
   ])('is true for %s', (_, overrides) => {
     expect(
       isReadOnlyFilter(
         createFilter({ conditional: '=', value: 'a', ...overrides }),
-        'ExecutionStatus',
       ),
     ).toBe(true);
-  });
-
-  it('is false for a NOT IN filter on an attribute without a status editor', () => {
-    expect(
-      isReadOnlyFilter(
-        createFilter({ attribute: 'ExecutionStatus', conditional: 'NOT IN' }),
-      ),
-    ).toBe(false);
   });
 });
 
@@ -214,6 +226,42 @@ describe('replaceAttributeFilters', () => {
         targetsStatusAttribute,
       ).map((f) => f.id),
     ).toEqual(['not-in', 'Failed', 'wid']);
+  });
+
+  it('keeps the OR that joined the replaced filters to the next filter', () => {
+    const notFailed = createFilter({
+      id: 'not-failed',
+      attribute: 'ExecutionStatus',
+      value: 'Failed',
+      conditional: '!=',
+    });
+    const running = { ...status('Running'), operator: 'OR' };
+    const completed = status('Completed');
+
+    const result = replaceAttributeFilters(
+      [running, notFailed],
+      'ExecutionStatus',
+      [{ ...status('Running'), operator: 'OR' }, completed],
+      targetsStatusAttribute,
+    );
+
+    expect(result.map((f) => [f.id, f.operator])).toEqual([
+      ['Running', 'OR'],
+      ['Completed', 'OR'],
+      ['not-failed', ''],
+    ]);
+    expect(completed.operator).toBe('');
+  });
+
+  it('leaves the filters unchanged when the query has an unsupported NOT', () => {
+    const filters = [
+      { ...workflowId, unsupportedQuery: true },
+      { ...status('Running'), unsupportedQuery: true },
+    ];
+
+    expect(
+      replaceAttributeFilters(filters, 'WorkflowType', [workflowType]),
+    ).toBe(filters);
   });
 
   it('keeps negated filters for the attribute', () => {

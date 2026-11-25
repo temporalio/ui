@@ -7,7 +7,11 @@ import {
 import { isValidDate } from '../format-date';
 import { isTimestamp, timestampToDate, type ValidTime } from '../format-time';
 import { isInConditional } from '../is';
-import { targetsAttribute, targetsStatusAttribute } from './column-filter';
+import {
+  hasUnsupportedQuery,
+  targetsAttribute,
+  targetsStatusAttribute,
+} from './column-filter';
 import { createFilter } from './to-list-workflow-filters';
 
 export type QuickFilterValue =
@@ -243,6 +247,8 @@ export const toggleQuickFilter = (
   filters: SearchAttributeFilter[],
   quickFilter: SearchAttributeFilter,
 ): SearchAttributeFilter[] => {
+  if (hasUnsupportedQuery(filters)) return filters;
+
   const otherFilters = filters.filter(
     (filter) => !targetsQuickFilterAttribute(filter, quickFilter.attribute),
   );

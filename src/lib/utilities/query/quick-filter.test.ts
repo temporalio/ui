@@ -378,6 +378,14 @@ describe('toggleQuickFilter', () => {
     expect(toggleQuickFilter([notIn], running)).toEqual([notIn, running]);
   });
 
+  it('leaves the filters unchanged when the query has an unsupported NOT', () => {
+    const filters = toListWorkflowFilters(
+      '`WorkflowId`="x" AND NOT (`WorkflowType`="a" OR `WorkflowType`="b")',
+    );
+
+    expect(toggleQuickFilter(filters, keywordFilter)).toBe(filters);
+  });
+
   it('keeps a negated filter on the same attribute', () => {
     const negated = createFilter({ ...keywordFilter, negated: true });
 

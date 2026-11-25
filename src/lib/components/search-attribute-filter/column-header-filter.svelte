@@ -13,8 +13,10 @@
   import type { StatusFilter } from '$lib/models/status-filter';
   import type { SearchAttributeType } from '$lib/types/workflows';
   import {
+    hasUnsupportedQuery,
     isAppliedFilter,
     isAtQueryLimit,
+    isListFilterOnSingleValueAttribute,
     replaceAttributeFilters,
     targetsAttribute,
     targetsStatusAttribute,
@@ -56,6 +58,10 @@
   const filtered = $derived(appliedFilters.length > 0);
 
   const atQueryLimit = $derived(isAtQueryLimit(page.url));
+  const unsupportedQuery = $derived(hasUnsupportedQuery($filters));
+  const hasUneditableListFilter = $derived(
+    !statusFilter && appliedFilters.some(isListFilterOnSingleValueAttribute),
+  );
 
   const createInitialFilter = (): SearchAttributeFilter =>
     appliedFilters[0] ??
@@ -112,7 +118,9 @@
     variant="ghost"
     size="xs"
     active={filtered || $open}
-    disabled={!filtered && atQueryLimit}
+    disabled={unsupportedQuery ||
+      hasUneditableListFilter ||
+      (!filtered && atQueryLimit)}
     label={translate('common.filter-by-column', {
       column: label,
       escapeValue: false,

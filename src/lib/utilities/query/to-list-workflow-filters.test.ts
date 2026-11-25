@@ -658,6 +658,19 @@ describe('toListWorkflowFilters', () => {
     expect(result).toMatchObject(expectedFilters);
   });
 
+  it('should cancel out a NOT before the attribute and a NOT before the conditional', () => {
+    const result = toListWorkflowFilters(
+      'NOT `WorkflowId` NOT STARTS_WITH "x"',
+      attributes,
+    );
+
+    expect(result).toMatchObject([
+      { attribute: 'WorkflowId', conditional: 'STARTS_WITH', value: 'x' },
+    ]);
+    expect(result[0].negated).toBeUndefined();
+    expect(result[0].unsupportedQuery).toBeUndefined();
+  });
+
   it('should parse multiple NOT STARTS_WITH filters joined by AND', () => {
     const result = toListWorkflowFilters(
       multipleNotStartsWithQuery,

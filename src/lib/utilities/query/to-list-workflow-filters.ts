@@ -80,7 +80,12 @@ const extractNegations = (
     }
 
     if (isNot(token) && attributes[previousToken] && isConditional(nextToken)) {
-      negatedIndexes.add(remainingTokens.length - 1);
+      const attributeIndex = remainingTokens.length - 1;
+      if (negatedIndexes.has(attributeIndex)) {
+        negatedIndexes.delete(attributeIndex);
+      } else {
+        negatedIndexes.add(attributeIndex);
+      }
       return;
     }
 

@@ -1,4 +1,5 @@
 import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
+import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
 
 import { isInConditional } from '../is';
 import { MAX_QUERY_LENGTH } from '../request-from-api';
@@ -24,13 +25,15 @@ export const targetsAttribute = (
 
 const EXCLUDING_CONDITIONALS = new Set(['not in', '!=']);
 
-export const isReadOnlyFilter = (
-  filter: SearchAttributeFilter,
-  statusAttribute?: string,
-): boolean =>
+export const isListFilterOnSingleValueAttribute = ({
+  type,
+  conditional,
+}: SearchAttributeFilter): boolean =>
+  isInConditional(conditional) && type !== SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST;
+
+export const isReadOnlyFilter = (filter: SearchAttributeFilter): boolean =>
   Boolean(filter.negated || filter.unsupportedQuery) ||
-  (filter.attribute === statusAttribute &&
-    filter.conditional.toLowerCase() === 'not in');
+  isListFilterOnSingleValueAttribute(filter);
 
 export const targetsStatusAttribute = (
   filter: SearchAttributeFilter,
@@ -39,16 +42,41 @@ export const targetsStatusAttribute = (
   targetsAttribute(filter, attribute) &&
   !EXCLUDING_CONDITIONALS.has(filter.conditional.toLowerCase());
 
+export const hasUnsupportedQuery = (
+  filters: SearchAttributeFilter[],
+): boolean => filters.some((filter) => filter.unsupportedQuery);
+
+const withJoinOperator = (
+  replacements: SearchAttributeFilter[],
+  operator: string | undefined,
+): SearchAttributeFilter[] => {
+  if (!operator || !replacements.length) return replacements;
+
+  const last = replacements[replacements.length - 1];
+  return [...replacements.slice(0, -1), { ...last, operator }];
+};
+
 export const replaceAttributeFilters = (
   filters: SearchAttributeFilter[],
   attribute: string,
   replacements: SearchAttributeFilter[],
   targets: typeof targetsAttribute = targetsAttribute,
 ): SearchAttributeFilter[] => {
+  if (hasUnsupportedQuery(filters)) return filters;
+
   const index = filters.findIndex((filter) => targets(filter, attribute));
   const others = filters.filter((filter) => !targets(filter, attribute));
 
   if (index === -1) return [...others, ...replacements];
 
-  return [...others.slice(0, index), ...replacements, ...others.slice(index)];
+  const nextKept = others[index];
+  const joinOperator = nextKept
+    ? filters[filters.indexOf(nextKept) - 1]?.operator
+    : undefined;
+
+  return [
+    ...others.slice(0, index),
+    ...withJoinOperator(replacements, joinOperator),
+    ...others.slice(index),
+  ];
 };

@@ -147,6 +147,28 @@ describe('ColumnHeaderFilter', () => {
     expect(byTestId('remove-filter-button')).toBeNull();
   });
 
+  it('is disabled while the query has a NOT it cannot show', () => {
+    const { button } = mountFilter({
+      filters: [{ ...workflowType(), unsupportedQuery: true }],
+    });
+
+    expect(button.disabled).toBe(true);
+  });
+
+  it('is disabled when the column has an IN filter on a keyword attribute', () => {
+    const { button } = mountFilter({
+      filters: [
+        createFilter({
+          ...workflowType(),
+          value: '("a", "b")',
+          conditional: 'NOT IN',
+        }),
+      ],
+    });
+
+    expect(button.disabled).toBe(true);
+  });
+
   it('leaves a NOT IN status filter out of the status editor', () => {
     const notIn = createFilter({
       id: 'not-in',

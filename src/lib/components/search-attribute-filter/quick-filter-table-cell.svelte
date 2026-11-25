@@ -17,6 +17,7 @@
     type SearchAttributeType,
   } from '$lib/types/workflows';
   import {
+    hasUnsupportedQuery,
     isAtQueryLimit,
     replaceAttributeFilters,
   } from '$lib/utilities/query/column-filter';
@@ -87,6 +88,7 @@
   const menuId = $derived(`quick-filter-${quickFilterCellId}-${attribute}`);
 
   const atQueryLimit = $derived(isAtQueryLimit(page.url));
+  const unsupportedQuery = $derived(hasUnsupportedQuery($filters));
 
   const replaceFilter = (filter: SearchAttributeFilter) => {
     // Replace rather than append, so a multi-status group collapses and
@@ -143,7 +145,7 @@
 
 <TableCellWithFilterOrCopyButtons
   {...cellProps}
-  onFilter={filterValue === null ? undefined : onFilter}
+  onFilter={filterValue === null || unsupportedQuery ? undefined : onFilter}
   {isFiltered}
   menuId={hasPopup ? menuId : undefined}
   menuOpen={$open}

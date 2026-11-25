@@ -112,7 +112,7 @@
           openIndex={$chipOpenIndex}
           onUpdate={(updatedFilter) => updateFilter(i, updatedFilter)}
           onRemove={() => removeFilter(i)}
-          readOnly={isReadOnlyFilter(filterItem, statusAttribute)}
+          readOnly={isReadOnlyFilter(filterItem)}
         />
       {/if}
     {/each}
