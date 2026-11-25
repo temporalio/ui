@@ -10,6 +10,8 @@ import { isInConditional } from '../is';
 import {
   hasUnsupportedQuery,
   removeExclusions,
+  replaceAttributeFilters,
+  STATUS_ATTRIBUTES,
   targetsAttribute,
   targetsStatusAttribute,
 } from './column-filter';
@@ -76,11 +78,7 @@ export const getQuickFilterConditional = ({
 // Status filters render as a multi-select chip rather than the operator form —
 // isTextFilter even refuses them — so a status cell applies `=` in one click and
 // every other cell asks which operator it meant.
-const STATUS_ATTRIBUTE_NAMES = ['ExecutionStatus', 'WorkerStatus'] as const;
-
-export type StatusAttribute = (typeof STATUS_ATTRIBUTE_NAMES)[number];
-
-export const STATUS_ATTRIBUTES = new Set<string>(STATUS_ATTRIBUTE_NAMES);
+export { STATUS_ATTRIBUTES, type StatusAttribute } from './column-filter';
 
 export const requiresOperatorChoice = ({
   attribute,
@@ -286,13 +284,21 @@ export const addStatusCountFilter = (
   const kept = removeExclusions(filters, EXECUTION_STATUS, status);
   if (!kept) return null;
 
-  return [
-    ...kept,
-    createFilter({
-      attribute: EXECUTION_STATUS,
-      type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
-      value: status,
-      conditional: '=',
-    }),
-  ];
+  const added = createFilter({
+    attribute: EXECUTION_STATUS,
+    type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+    value: status,
+    conditional: '=',
+  });
+  const selected = kept.filter((filter) =>
+    targetsStatusAttribute(filter, EXECUTION_STATUS),
+  );
+  if (!selected.length) return [...kept, added];
+
+  return replaceAttributeFilters(
+    kept,
+    EXECUTION_STATUS,
+    [...selected.map((filter) => ({ ...filter, operator: 'OR' })), added],
+    targetsStatusAttribute,
+  );
 };

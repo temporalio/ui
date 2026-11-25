@@ -17,6 +17,7 @@
     hasUnsupportedQuery,
     isAppliedFilter,
     isAtQueryLimit,
+    isExcludedByQuery,
     isListFilterOnSingleValueAttribute,
     replaceAttributeFilters,
     targetsAttribute,
@@ -76,14 +77,16 @@
         isAppliedFilter(filter),
     ),
   );
+  const unsupportedQuery = $derived(hasUnsupportedQuery($filters));
   const filtered = $derived(
     appliedFilters.length > 0 ||
       hasUneditableListFilter ||
-      hiddenFilters.length > 0,
+      hiddenFilters.length > 0 ||
+      (unsupportedQuery &&
+        $filters.some((filter) => filter.attribute === attribute)),
   );
 
   const atQueryLimit = $derived(isAtQueryLimit(page.url));
-  const unsupportedQuery = $derived(hasUnsupportedQuery($filters));
 
   const createInitialFilter = (): SearchAttributeFilter =>
     appliedFilters[0] ??
@@ -131,6 +134,17 @@
   };
 </script>
 
+{#snippet hiddenFiltersNotice()}
+  {#if hiddenFilters.length}
+    <Alert intent="info" data-testid="column-header-filter-hidden">
+      {translate('common.column-has-read-only-filters', {
+        column: label,
+        escapeValue: false,
+      })}
+    </Alert>
+  {/if}
+{/snippet}
+
 {#snippet notices()}
   {#if hasMultipleFilters}
     <Alert intent="warning" data-testid="column-header-filter-multiple">
@@ -141,14 +155,7 @@
       })}
     </Alert>
   {/if}
-  {#if hiddenFilters.length}
-    <Alert intent="info" data-testid="column-header-filter-hidden">
-      {translate('common.column-has-read-only-filters', {
-        column: label,
-        escapeValue: false,
-      })}
-    </Alert>
-  {/if}
+  {@render hiddenFiltersNotice()}
 {/snippet}
 
 <MenuContainer {open} class="shrink-0">
@@ -162,6 +169,9 @@
       column: label,
       escapeValue: false,
     })}
+    title={unsupportedQuery
+      ? translate('common.unsupported-query-filter')
+      : undefined}
     data-testid="column-header-filter-{attribute}"
     data-filtered={filtered}
   >
@@ -208,7 +218,7 @@
           <Button
             TrailingIcon={IconTrash}
             colorScheme="secondary"
-            size="xs"
+            size="sm"
             data-testid="remove-filter-button"
             onclick={removeListFilters}
           >
@@ -218,11 +228,12 @@
       </div>
     {:else if statusFilter}
       {#if hiddenFilters.length}
-        <div class="mb-3">{@render notices()}</div>
+        <div class="mb-3">{@render hiddenFiltersNotice()}</div>
       {/if}
       <StatusFilterEditor
         {statusFilter}
         filters={appliedFilters}
+        allFilters={$filters}
         onUpdate={(updated) =>
           setFilters(
             replaceAttributeFilters($filters, attribute, updated, targets),
@@ -234,6 +245,10 @@
         idPrefix={controlsId}
         {conditionals}
         applyOnEnter
+        getApplyBlockedReason={(filter) =>
+          isExcludedByQuery($filters, filter, targets)
+            ? translate('common.value-excluded-by-query')
+            : null}
         onApply={applyFilter}
         onRemove={canRemove ? removeFilter : undefined}
         notice={hasMultipleFilters || hiddenFilters.length

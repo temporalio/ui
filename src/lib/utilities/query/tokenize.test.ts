@@ -240,6 +240,21 @@ describe('tokenize', () => {
     ]);
   });
 
+  it('should split NOT from a parenthesis that follows it', () => {
+    expect(tokenize('`WorkflowId`="a" AND NOT(`WorkflowType`="b")')).toEqual([
+      'WorkflowId',
+      '=',
+      'a',
+      'AND',
+      'NOT',
+      '(',
+      'WorkflowType',
+      '=',
+      'b',
+      ')',
+    ]);
+  });
+
   it('should not tokenize "not in" at the start of an attribute name', () => {
     expect(tokenize('NOT InvoiceId = 1')).toEqual([
       'NOT',

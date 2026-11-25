@@ -6,6 +6,7 @@
   import { page } from '$app/state';
 
   import Skeleton from '$lib/holocene/skeleton/index.svelte';
+  import { translate } from '$lib/i18n/translate';
   import { ChipStatus } from '$lib/io/chip-status';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { fetchWorkflowCountByExecutionStatus } from '$lib/services/workflow-counts';
@@ -18,7 +19,10 @@
   } from '$lib/stores/workflows';
   import { getStatusAndCountOfGroup } from '$lib/utilities/get-group-status-and-count';
   import { getWorkflowStatusLabel } from '$lib/utilities/get-workflow-status-label';
-  import { hasUnsupportedQuery } from '$lib/utilities/query/column-filter';
+  import {
+    canAddValue,
+    hasUnsupportedQuery,
+  } from '$lib/utilities/query/column-filter';
   import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
   import { addStatusCountFilter } from '$lib/utilities/query/quick-filter';
   import { combineFilters } from '$lib/utilities/query/to-list-workflow-filters';
@@ -68,6 +72,10 @@
   });
 
   const unsupportedQuery = $derived(hasUnsupportedQuery($filters));
+  const isExcludedByQuery = (status: Status) =>
+    Boolean(status) &&
+    !unsupportedQuery &&
+    !canAddValue($filters, 'ExecutionStatus', status ?? '');
 
   const onStatusClick = (status: Status) => {
     const next = addStatusCountFilter($filters, status);
@@ -102,7 +110,10 @@
           {count}
           extension={difference || undefined}
           onclick={() => onStatusClick(status)}
-          disabled={unsupportedQuery}
+          disabled={unsupportedQuery || isExcludedByQuery(status)}
+          title={isExcludedByQuery(status)
+            ? translate('common.value-excluded-by-query')
+            : undefined}
           data-testid={`${testId}-${status}`}
         />
       {/if}

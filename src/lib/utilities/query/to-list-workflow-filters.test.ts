@@ -776,6 +776,9 @@ describe('toListWorkflowFilters', () => {
   });
 
   it.each([
+    '(`WorkflowType`="a" OR NOT `WorkflowType`="b" OR `WorkflowType`="c") AND `WorkflowId`="1"',
+    '(`ExecutionStatus`="Running" OR `ExecutionStatus`!="Failed")',
+    '`WorkflowId`="a" AND NOT(`WorkflowType`="b")',
     '`WorkflowType`="a" OR `WorkflowId`="b"',
     '`WorkflowId`="a" OR `WorkflowId`="b" AND `WorkflowType`="c"',
     '`WorkflowType`="c" AND `WorkflowId`="a" OR `WorkflowId`="b"',
@@ -789,10 +792,21 @@ describe('toListWorkflowFilters', () => {
     '`ExecutionStatus`="Running" OR `ExecutionStatus`="Completed"',
     '(`ExecutionStatus`="Running" OR `ExecutionStatus`="Completed") AND `WorkflowType`="c"',
     '`WorkflowType`="c" AND (`ExecutionStatus`="Running" OR `ExecutionStatus`="Completed")',
+    '(`ExecutionStatus`="Running" or `ExecutionStatus`="Completed") and `WorkflowType`="c"',
+    '(`WorkflowType`="c") AND (`ExecutionStatus`="Running" OR `ExecutionStatus`="Completed")',
   ])('should not flag OR groups the UI rebuilds the same way: %s', (query) => {
     const result = toListWorkflowFilters(query, attributes);
 
     expect(result.some((filter) => filter.unsupportedQuery)).toBe(false);
+  });
+
+  it('should drop parentheses around a single filter', () => {
+    const result = toListWorkflowFilters(
+      '(`WorkflowType`="c") AND (`ExecutionStatus`="Running" OR `ExecutionStatus`="Completed")',
+      attributes,
+    );
+
+    expect(result.map((filter) => filter.parenthesis)).toEqual(['', '(', ')']);
   });
 
   it('should parse "not" as a value without flagging the filters', () => {

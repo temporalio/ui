@@ -18,6 +18,7 @@
     copyIconTitle?: FilterOrCopyButtonsProps['copyIconTitle'];
     copySuccessIconTitle?: FilterOrCopyButtonsProps['copySuccessIconTitle'];
     filterIconTitle?: FilterOrCopyButtonsProps['filterIconTitle'];
+    filterDisabledTitle?: FilterOrCopyButtonsProps['filterDisabledTitle'];
     menuId?: FilterOrCopyButtonsProps['menuId'];
     menuOpen?: boolean;
   }
@@ -30,6 +31,7 @@
     copyIconTitle = translate('common.copy-icon-title'),
     copySuccessIconTitle = translate('common.copy-success-icon-title'),
     filterIconTitle = translate('common.filter-items'),
+    filterDisabledTitle,
     menuId,
     menuOpen = false,
     ...cellProps
@@ -78,6 +80,7 @@
     {copyIconTitle}
     {copySuccessIconTitle}
     {filterIconTitle}
+    {filterDisabledTitle}
     {copyable}
     {filterable}
     content={copyValue ?? ''}

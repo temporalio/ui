@@ -7,7 +7,10 @@ import {
   SEARCH_ATTRIBUTE_TYPE,
   type SearchAttributes,
 } from '$lib/types/workflows';
-import { hasUnsupportedQuery } from '$lib/utilities/query/column-filter';
+import {
+  hasMixedOrGroup,
+  hasUnsupportedQuery,
+} from '$lib/utilities/query/column-filter';
 import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
 
 import { tokenize } from './tokenize';
@@ -171,6 +174,7 @@ export const toListWorkflowFilters = (
   );
   const filters: SearchAttributeFilter[] = [];
   let filter = createFilter();
+  let parenthesisDepth = 0;
 
   if (!query) {
     return [];
@@ -238,13 +242,16 @@ export const toListWorkflowFilters = (
       }
 
       if (isParenthesis(token)) {
-        filter.parenthesis = token;
+        parenthesisDepth += token === '(' ? 1 : -1;
+        filter.parenthesis =
+          parenthesisDepth > 0 ? '(' : parenthesisDepth < 0 ? ')' : '';
       }
 
       if (isJoin(token) && !isBetween(getTwoBehind(tokens, index))) {
         filter.operator = token;
         filters.push(filter);
         filter = createFilter();
+        parenthesisDepth = 0;
       }
 
       if (index === tokens.length - 1) {
@@ -253,7 +260,11 @@ export const toListWorkflowFilters = (
       }
     });
 
-    if (hasUnsupportedNegation || changesMeaningWhenCombined(filters)) {
+    if (
+      hasUnsupportedNegation ||
+      changesMeaningWhenCombined(filters) ||
+      hasMixedOrGroup(filters)
+    ) {
       return filters.map((filter) => ({ ...filter, unsupportedQuery: true }));
     }
 
@@ -305,6 +316,9 @@ export const combineDropdownFilters = (filters: SearchAttributeFilter[]) => {
   ];
 };
 
+const isOrOperator = (operator: string | undefined) =>
+  operator?.toUpperCase() === 'OR';
+
 export const combineFilters = (filters: SearchAttributeFilter[]) => {
   filters.forEach((filter, index) => {
     const previousFilter = filters[index - 1];
@@ -317,15 +331,15 @@ export const combineFilters = (filters: SearchAttributeFilter[]) => {
       filter.operator = '';
     }
 
-    if (
-      filter.operator === 'OR' &&
-      nextFilter?.attribute !== filter.attribute
-    ) {
+    const isOr = isOrOperator(filter.operator);
+    const followsOr = isOrOperator(previousFilter?.operator);
+
+    if (isOr && nextFilter?.attribute !== filter.attribute) {
       filter.parenthesis = '';
       filter.operator = '';
-    } else if (filter.operator === 'OR' && previousFilter?.operator !== 'OR') {
+    } else if (isOr && !followsOr) {
       filter.parenthesis = '(';
-    } else if (previousFilter?.operator === 'OR' && filter.operator !== 'OR') {
+    } else if (followsOr && !isOr) {
       filter.parenthesis = ')';
     } else {
       filter.parenthesis = '';

@@ -5,7 +5,6 @@
   import { zonedTimeToUtc } from 'date-fns-tz';
   import type { Snippet } from 'svelte';
 
-  import Button from '$lib/holocene/button.svelte';
   import DatePicker from '$lib/holocene/date-picker.svelte';
   import ChipInput from '$lib/holocene/input/chip-input.svelte';
   import Input from '$lib/holocene/input/input.svelte';
@@ -16,6 +15,7 @@
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { Button } from '$lib/io/button';
   import { IconClock, IconTrash } from '$lib/io/icon';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { prefixSearchEnabled } from '$lib/stores/capability-enablement';
@@ -67,6 +67,7 @@
     // standard visibility.
     conditionals?: string[];
     notice?: Snippet;
+    getApplyBlockedReason?: (filter: SearchAttributeFilter) => string | null;
     applyLabel?: string;
     removeLabel?: string;
   };
@@ -80,6 +81,7 @@
     applyOnEnter = false,
     conditionals,
     notice,
+    getApplyBlockedReason,
     applyLabel = translate('common.apply'),
     removeLabel = translate('common.remove'),
   }: Props = $props();
@@ -172,8 +174,13 @@
     ...defaultConditionOptions,
   ]);
 
+  const applyBlockedReason = $derived(
+    getApplyBlockedReason?.(localFilter) ?? null,
+  );
+
   function applyChanges(e: SubmitEvent) {
     e.preventDefault();
+    if (applyBlockedReason) return;
 
     if (isInConditional(localFilter.conditional)) {
       localFilter.value = `(${chips.map((item) => `"${item}"`).join(', ')})`;
@@ -559,21 +566,34 @@
 
     {@render notice?.()}
 
+    {#if applyBlockedReason}
+      <p
+        id="{idPrefix}-apply-blocked"
+        class="text-sm text-secondary"
+        data-testid="filter-apply-blocked"
+      >
+        {applyBlockedReason}
+      </p>
+    {/if}
+
     <div class="flex justify-end gap-2">
       {#if onRemove}
         <Button
           TrailingIcon={IconTrash}
-          variant="secondary"
-          size="xs"
+          colorScheme="secondary"
+          size="sm"
           data-testid="remove-filter-button"
-          type="button"
           onclick={onRemove}>{removeLabel}</Button
         >
       {/if}
       <Button
-        variant="primary"
-        size="xs"
+        colorScheme="primary"
+        size="sm"
         data-testid="apply-filter-button"
+        disabled={Boolean(applyBlockedReason)}
+        aria-describedby={applyBlockedReason
+          ? `${idPrefix}-apply-blocked`
+          : undefined}
         type="submit">{applyLabel}</Button
       >
     </div>

@@ -10,6 +10,7 @@
   interface Props {
     statusFilter: StatusFilter;
     filters: SearchAttributeFilter[];
+    allFilters?: SearchAttributeFilter[];
     onUpdate: (updatedFilter: SearchAttributeFilter[]) => void;
     index?: number;
     openIndex?: number | null;
@@ -18,6 +19,7 @@
   let {
     statusFilter,
     filters,
+    allFilters = filters,
     onUpdate,
     index = 0,
     openIndex = null,
@@ -55,6 +57,6 @@
   </MenuButton>
 
   <Menu id={controlsId} usePortal class="max-h-fit w-80 max-w-fit p-4" keepOpen>
-    <StatusFilterEditor {statusFilter} {filters} {onUpdate} />
+    <StatusFilterEditor {statusFilter} {filters} {allFilters} {onUpdate} />
   </Menu>
 </MenuContainer>

@@ -73,6 +73,7 @@ export const tokenize = (string: string): Tokens => {
         getTokenWithSpaces(isEndParenthesis, true);
         continue;
       } else {
+        addBufferToTokens();
         buffer += character;
         addBufferToTokens();
         cursor++;

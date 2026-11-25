@@ -101,6 +101,7 @@
         <StatusFilterChip
           {statusFilter}
           filters={statusFilters}
+          allFilters={$filters}
           index={i}
           openIndex={$chipOpenIndex}
           onUpdate={updateStatusFilters}

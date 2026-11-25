@@ -24,13 +24,16 @@ let component: ReturnType<typeof mount> | undefined;
 const mountEditor = ({
   statusFilter = workflowStatusFilter,
   filters = [],
+  allFilters,
 }: {
   statusFilter?: StatusFilter;
   filters?: SearchAttributeFilter[];
+  allFilters?: SearchAttributeFilter[];
 } = {}) => {
   const props = $state({
     statusFilter,
     filters,
+    allFilters,
     onUpdate: vi.fn((next: SearchAttributeFilter[]) => {
       props.filters = next;
     }),
@@ -227,5 +230,29 @@ describe('StatusFilterEditor', () => {
     select(target, 'Failed');
 
     expect(running).toEqual(before);
+  });
+
+  it('disables a status the rest of the query excludes and says why', () => {
+    const notIn = createFilter({
+      attribute: 'ExecutionStatus',
+      type: 'Keyword',
+      value: '("Running", "Failed")',
+      conditional: 'NOT IN',
+    });
+    const { target, onUpdate } = mountEditor({ allFilters: [notIn] });
+
+    const running = target.querySelector<HTMLElement>(
+      '[data-testid="status-dropdown-filter-chip-Running"]',
+    );
+    expect(running?.getAttribute('aria-disabled')).toBe('true');
+    expect(running?.textContent).toContain(
+      'Part of the query excludes this value.',
+    );
+    expect(checkbox(target, 'Running')?.disabled).toBe(true);
+    expect(checkbox(target, 'Completed')?.disabled).toBe(false);
+
+    select(target, 'Running');
+
+    expect(onUpdate).not.toHaveBeenCalled();
   });
 });

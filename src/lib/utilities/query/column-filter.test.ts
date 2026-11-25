@@ -4,10 +4,13 @@ import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters
 import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
 
 import {
+  canAddValue,
   excludesValue,
+  hasMixedOrGroup,
   isAppliedFilter,
   isAtQueryLimit,
   isReadOnlyFilter,
+  parseListValues,
   replaceAttributeFilters,
   targetsStatusAttribute,
 } from './column-filter';
@@ -188,6 +191,34 @@ describe('targetsStatusAttribute', () => {
     });
     expect(targetsStatusAttribute(filter, 'ExecutionStatus')).toBe(false);
   });
+
+  it('targets a status filter with ==', () => {
+    const filter = createFilter({ ...status('Running'), conditional: '==' });
+    expect(targetsStatusAttribute(filter, 'ExecutionStatus')).toBe(true);
+  });
+
+  it.each(['!==', 'STARTS_WITH', 'is null', '>'])(
+    'does not target a status filter with %s',
+    (conditional) => {
+      const filter = createFilter({ ...status('Running'), conditional });
+      expect(targetsStatusAttribute(filter, 'ExecutionStatus')).toBe(false);
+    },
+  );
+});
+
+describe('parseListValues', () => {
+  it.each([
+    ['("a", "b")', ['a', 'b']],
+    ["('a','b')", ['a', 'b']],
+    ['(1, 2)', ['1', '2']],
+    ['("a,b", "c")', ['a,b', 'c']],
+    ['("a b")', ['a b']],
+    ['("")', ['']],
+    ['()', []],
+    [null, []],
+  ])('reads %s', (value, expected) => {
+    expect(parseListValues(value)).toEqual(expected);
+  });
 });
 
 describe('replaceAttributeFilters', () => {
@@ -296,6 +327,60 @@ describe('replaceAttributeFilters', () => {
     ).toEqual(['wid', 'Running']);
   });
 
+  it('leaves the filters unchanged when a kept OR group excludes the value', () => {
+    const notA = createFilter({
+      id: 'not-a',
+      attribute: 'WorkflowType',
+      value: 'a',
+      conditional: '=',
+      operator: 'OR',
+      negated: true,
+    });
+    const notInA = createFilter({
+      id: 'not-in-a',
+      attribute: 'WorkflowType',
+      value: '("a")',
+      conditional: 'NOT IN',
+    });
+    const filters = [notA, notInA];
+    const a = createFilter({
+      id: 'a',
+      attribute: 'WorkflowType',
+      value: 'a',
+      conditional: '=',
+    });
+
+    expect(replaceAttributeFilters(filters, 'WorkflowType', [a])).toBe(filters);
+  });
+
+  it('replaces an OR group it targets even when the group excludes the value', () => {
+    const notA = createFilter({
+      id: 'not-a',
+      attribute: 'WorkflowType',
+      value: 'a',
+      conditional: '!=',
+      operator: 'OR',
+    });
+    const b = createFilter({
+      id: 'b',
+      attribute: 'WorkflowType',
+      value: 'b',
+      conditional: '=',
+    });
+    const a = createFilter({
+      id: 'a',
+      attribute: 'WorkflowType',
+      value: 'a',
+      conditional: '=',
+    });
+
+    expect(
+      replaceAttributeFilters([notA, b, workflowId], 'WorkflowType', [a]).map(
+        (f) => f.id,
+      ),
+    ).toEqual(['a', 'wid']);
+  });
+
   it('keeps negated filters for the attribute', () => {
     const notTerminated = createFilter({
       id: 'not-terminated',
@@ -359,6 +444,23 @@ describe('excludesValue', () => {
       'NOT … NOT IN a list without the value',
       { conditional: 'not in', value: '("Failed")', negated: true },
     ],
+    [
+      '== the value negated',
+      { conditional: '==', value: 'Running', negated: true },
+    ],
+    ['!== the value', { conditional: '!==', value: 'Running' }],
+    [
+      'NOT … != another value',
+      { conditional: '!=', value: 'Failed', negated: true },
+    ],
+    [
+      'NOT … STARTS_WITH a prefix of the value',
+      { conditional: 'STARTS_WITH', value: 'Run', negated: true },
+    ],
+    [
+      'STARTS_WITH another prefix',
+      { conditional: 'STARTS_WITH', value: 'Fail' },
+    ],
   ])('is true for %s', (_, overrides) => {
     expect(check(overrides)).toBe(true);
   });
@@ -374,6 +476,19 @@ describe('excludesValue', () => {
       { conditional: '!=', value: 'Running', negated: true },
     ],
     ['IN a list with the value', { conditional: 'IN', value: '("Running")' }],
+    ['== the value', { conditional: '==', value: 'Running' }],
+    [
+      'IN a list that quotes the value with single quotes',
+      { conditional: 'IN', value: "('Failed', 'Running')" },
+    ],
+    [
+      'STARTS_WITH a prefix of the value',
+      { conditional: 'STARTS_WITH', value: 'Run' },
+    ],
+    [
+      'NOT … STARTS_WITH another prefix',
+      { conditional: 'STARTS_WITH', value: 'Fail', negated: true },
+    ],
     [
       'NOT … NOT IN a list with the value',
       { conditional: 'NOT IN', value: '("Running")', negated: true },
@@ -398,5 +513,141 @@ describe('excludesValue', () => {
         'Running',
       ),
     ).toBe(false);
+  });
+
+  it('reads unquoted numbers in an IN list', () => {
+    const filter = createFilter({
+      attribute: 'CustomInt',
+      type: SEARCH_ATTRIBUTE_TYPE.INT,
+      conditional: 'IN',
+      value: '(1, 2)',
+    });
+    expect(excludesValue(filter, 'CustomInt', '1')).toBe(false);
+    expect(excludesValue(filter, 'CustomInt', '3')).toBe(true);
+  });
+
+  it('keeps commas inside a quoted IN list value', () => {
+    const filter = createFilter({
+      attribute: 'WorkflowType',
+      conditional: 'IN',
+      value: '("a,b", "c")',
+    });
+    expect(excludesValue(filter, 'WorkflowType', 'a,b')).toBe(false);
+    expect(excludesValue(filter, 'WorkflowType', 'a')).toBe(true);
+  });
+});
+
+describe('canAddValue', () => {
+  const statusFilter = (overrides: Partial<SearchAttributeFilter>) =>
+    createFilter({
+      attribute: 'ExecutionStatus',
+      type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+      conditional: '=',
+      value: 'Running',
+      ...overrides,
+    });
+
+  it('is true when nothing excludes the value', () => {
+    expect(canAddValue([workflowId], 'ExecutionStatus', 'Running')).toBe(true);
+  });
+
+  it('is true when a simple exclusion can be dropped', () => {
+    expect(
+      canAddValue(
+        [statusFilter({ conditional: '!=' }), workflowId],
+        'ExecutionStatus',
+        'Running',
+      ),
+    ).toBe(true);
+  });
+
+  it('is false when a list excludes the value', () => {
+    expect(
+      canAddValue(
+        [statusFilter({ conditional: 'NOT IN', value: '("Running")' })],
+        'ExecutionStatus',
+        'Running',
+      ),
+    ).toBe(false);
+  });
+
+  it('is true when another filter in the OR group lets the value through', () => {
+    expect(
+      canAddValue(
+        [
+          statusFilter({ negated: true, operator: 'OR' }),
+          statusFilter({ value: 'Failed', negated: true }),
+        ],
+        'ExecutionStatus',
+        'Running',
+      ),
+    ).toBe(true);
+  });
+
+  it('is false when the exclusion is in an OR group', () => {
+    expect(
+      canAddValue(
+        [
+          statusFilter({ value: 'Failed', operator: 'OR', parenthesis: '(' }),
+          statusFilter({ conditional: '!=', parenthesis: ')' }),
+        ],
+        'ExecutionStatus',
+        'Running',
+      ),
+    ).toBe(false);
+  });
+});
+
+describe('hasMixedOrGroup', () => {
+  const type = (overrides: Partial<SearchAttributeFilter>) =>
+    createFilter({
+      attribute: 'WorkflowType',
+      conditional: '=',
+      value: 'a',
+      ...overrides,
+    });
+
+  it('is false for an OR group the editor can change', () => {
+    expect(
+      hasMixedOrGroup([type({ operator: 'OR' }), type({ value: 'b' })]),
+    ).toBe(false);
+  });
+
+  it('is false for a read-only filter joined with AND', () => {
+    expect(
+      hasMixedOrGroup([
+        type({ operator: 'AND' }),
+        type({ value: 'b', negated: true }),
+      ]),
+    ).toBe(false);
+  });
+
+  it('is true when a negated filter shares an OR group with editable ones', () => {
+    expect(
+      hasMixedOrGroup([
+        type({ operator: 'OR' }),
+        type({ value: 'b', negated: true, operator: 'or' }),
+        type({ value: 'c', operator: 'AND' }),
+        createFilter({ attribute: 'WorkflowId', conditional: '=', value: '1' }),
+      ]),
+    ).toBe(true);
+  });
+
+  it('is true when a status != shares an OR group with a selected status', () => {
+    expect(
+      hasMixedOrGroup([
+        createFilter({
+          attribute: 'ExecutionStatus',
+          conditional: '=',
+          value: 'Running',
+          operator: 'OR',
+        }),
+        createFilter({
+          attribute: 'ExecutionStatus',
+          conditional: '!=',
+          value: 'Failed',
+        }),
+      ]),
+    ).toBe(true);
   });
 });

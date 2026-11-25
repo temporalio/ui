@@ -11,14 +11,17 @@
     type MenuContext,
   } from '$lib/holocene/menu/menu-container.svelte';
   import TableCellWithFilterOrCopyButtons from '$lib/holocene/table/table-cell-with-filter-or-copy-buttons.svelte';
+  import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import {
     SEARCH_ATTRIBUTE_TYPE,
     type SearchAttributeType,
   } from '$lib/types/workflows';
   import {
+    canAddValue,
     hasUnsupportedQuery,
     isAtQueryLimit,
+    isExcludedByQuery,
     replaceAttributeFilters,
   } from '$lib/utilities/query/column-filter';
   import {
@@ -89,6 +92,13 @@
 
   const atQueryLimit = $derived(isAtQueryLimit(page.url));
   const unsupportedQuery = $derived(hasUnsupportedQuery($filters));
+  const excludedByQuery = $derived(
+    !isFiltered &&
+      !hasPopup &&
+      filterValue !== null &&
+      conditional === '=' &&
+      !canAddValue($filters, attribute, filterValue),
+  );
 
   const replaceFilter = (filter: SearchAttributeFilter) => {
     // Replace rather than append, so a multi-status group collapses and
@@ -147,6 +157,9 @@
   {...cellProps}
   onFilter={filterValue === null || unsupportedQuery ? undefined : onFilter}
   {isFiltered}
+  filterDisabledTitle={excludedByQuery
+    ? translate('common.value-excluded-by-query')
+    : undefined}
   menuId={hasPopup ? menuId : undefined}
   menuOpen={$open}
 >
@@ -167,6 +180,10 @@
           idPrefix={menuId}
           defaultTimeMode="absolute"
           applyOnEnter
+          getApplyBlockedReason={(filter) =>
+            isExcludedByQuery($filters, filter)
+              ? translate('common.value-excluded-by-query')
+              : null}
           onApply={(filter) => {
             if (!isFiltered && atQueryLimit) return;
             replaceFilter(filter);

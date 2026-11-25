@@ -341,6 +341,24 @@ describe('isQuickFilterActive', () => {
 });
 
 describe('toggleQuickFilter', () => {
+  it('replaces a NOT STARTS_WITH that excludes the value', () => {
+    const filters = toListWorkflowFilters(
+      '`WorkflowType` NOT STARTS_WITH "foo"',
+    );
+    const quickFilter = createFilter({
+      attribute: 'WorkflowType',
+      type: 'Keyword',
+      value: 'foobar',
+      conditional: '=',
+    });
+
+    expect(
+      toListWorkflowQueryFromFilters(
+        combineFilters(toggleQuickFilter(filters, quickFilter)),
+      ),
+    ).toBe('`WorkflowType`="foobar"');
+  });
+
   const keywordFilter = createQuickFilter({
     attribute: 'CustomKeywordField',
     type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
@@ -642,6 +660,19 @@ describe('addStatusCountFilter', () => {
     expect(
       toQuery(addStatusCountFilter(parse('`WorkflowId`="a"'), 'Running')),
     ).toBe('`WorkflowId`="a" AND `ExecutionStatus`="Running"');
+  });
+
+  it('adds the status to the statuses already selected', () => {
+    expect(
+      toQuery(
+        addStatusCountFilter(
+          parse('`ExecutionStatus`="Failed" AND `WorkflowId`="a"'),
+          'Running',
+        ),
+      ),
+    ).toBe(
+      '(`ExecutionStatus`="Failed" OR `ExecutionStatus`="Running") AND `WorkflowId`="a"',
+    );
   });
 
   it('does nothing when the status is already selected', () => {

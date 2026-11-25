@@ -2,10 +2,10 @@
   import { writable } from 'svelte/store';
 
   import { timestamp } from '$lib/components/timestamp.svelte';
-  import Button from '$lib/holocene/button.svelte';
   import { Menu, MenuButton, MenuContainer } from '$lib/holocene/menu';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { Button } from '$lib/io/button';
   import { IconTrash } from '$lib/io/icon';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { isNullConditional } from '$lib/utilities/is';
@@ -161,10 +161,9 @@
           <div class="flex justify-end">
             <Button
               TrailingIcon={IconTrash}
-              variant="secondary"
-              size="xs"
+              colorScheme="secondary"
+              size="sm"
               data-testid="remove-filter-button"
-              type="button"
               onclick={onRemove}>{translate('common.remove')}</Button
             >
           </div>
