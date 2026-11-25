@@ -56,10 +56,7 @@ const formatValue = ({
   if (type === SEARCH_ATTRIBUTE_TYPE.BOOL) {
     return value.toLowerCase() === 'true' ? true : false;
   }
-  if (
-    type === SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST &&
-    isInConditional(conditional)
-  ) {
+  if (isInConditional(conditional)) {
     return value;
   }
   if (
@@ -71,13 +68,10 @@ const formatValue = ({
   return `"${value}"`;
 };
 
-const getQueryKey = (attribute: string | number) => {
-  const key = filterKeys[attribute] ?? attribute;
-  if (typeof key === 'string' && /\s/g.test(key)) {
-    return '`' + key + '`';
-  }
-  return key;
-};
+const getQueryKey = (attribute: string | number) =>
+  String(filterKeys[attribute] ?? attribute);
+
+const getBareQueryKey = (key: string) => (/\s/.test(key) ? `\`${key}\`` : key);
 
 const toFilterQueryStatement = (
   attribute: keyof SearchAttributes,
@@ -86,14 +80,16 @@ const toFilterQueryStatement = (
   conditional = '=',
   archived: boolean,
   customDate: boolean,
+  negated: boolean,
 ): string => {
   const queryKey = getQueryKey(attribute);
+  const bareQueryKey = getBareQueryKey(queryKey);
 
   if (value === 'All') return '';
 
   // Custom Dates...
   if (customDate) {
-    return `${queryKey} ${value}`;
+    return `${bareQueryKey} ${value}`;
   }
 
   if (isNullConditional(conditional)) {
@@ -110,17 +106,19 @@ const toFilterQueryStatement = (
 
   if (isDuration(value) || isDurationString(value)) {
     if (archived || get(supportsAdvancedVisibility)) {
-      return `${queryKey} ${conditional} "${toDate(value)}"`;
+      return `${bareQueryKey} ${conditional} "${toDate(value)}"`;
     }
-    return `${queryKey} BETWEEN "${toDate(value)}" AND "${tomorrow()}"`;
+    return `${bareQueryKey} BETWEEN "${toDate(value)}" AND "${tomorrow()}"`;
   }
 
   if (isStartsWith(conditional)) {
-    return `\`${queryKey}\` ${conditional} ${formatValue({
-      value,
-      type,
-      conditional,
-    })}`;
+    return `\`${queryKey}\` ${negated ? 'NOT ' : ''}${conditional} ${formatValue(
+      {
+        value,
+        type,
+        conditional,
+      },
+    )}`;
   }
 
   return `\`${queryKey}\`${conditional}${formatValue({
@@ -144,6 +142,7 @@ const toQueryStatementsFromFilters = (
         operator,
         parenthesis,
         customDate,
+        negated,
       }) => {
         if (isValidFilterValue(value, conditional)) {
           let statement = toFilterQueryStatement(
@@ -153,7 +152,11 @@ const toQueryStatementsFromFilters = (
             conditional,
             archived,
             customDate ?? false,
+            negated ?? false,
           );
+          if (negated && statement && !isStartsWith(conditional)) {
+            statement = `NOT ${statement}`;
+          }
           if (parenthesis === '(') {
             statement = `(${statement}`;
           } else if (parenthesis === ')') {

@@ -5,6 +5,8 @@
   import { Menu, MenuButton, MenuContainer } from '$lib/holocene/menu';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { Button } from '$lib/io/button';
+  import { IconTrash } from '$lib/io/icon';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { isNullConditional } from '$lib/utilities/is';
   import {
@@ -21,6 +23,7 @@
     onRemove: () => void;
     index?: number;
     openIndex?: number | null;
+    readOnly?: boolean;
   };
 
   let {
@@ -29,6 +32,7 @@
     onRemove,
     index = 0,
     openIndex = null,
+    readOnly = false,
   }: Props = $props();
 
   const open = writable(false);
@@ -42,6 +46,11 @@
   );
 
   function getDisplayKeyWithConditional(filter: SearchAttributeFilter): string {
+    const displayKey = getDisplayKey(filter);
+    return filter.negated ? `NOT ${displayKey}` : displayKey;
+  }
+
+  function getDisplayKey(filter: SearchAttributeFilter): string {
     const { attribute, conditional } = filter;
 
     if (isDateTimeFilter(filter)) {
@@ -134,16 +143,44 @@
   >
     <!-- Keyed on open so the editor remounts seeded from the applied filter,
          discarding anything typed and then dismissed. -->
-    {#key $open}
-      <FilterEditor
-        {filter}
-        idPrefix={controlsId}
-        onApply={(updated) => {
-          onUpdate(updated);
-          $open = false;
-        }}
-        {onRemove}
-      />
-    {/key}
+    {#if readOnly}
+      <div class="space-y-4" data-testid="read-only-filter">
+        <h3 class="text-sm font-medium">
+          {translate('common.filter-by-column', {
+            column: filter.attribute,
+            escapeValue: false,
+          })}
+        </h3>
+        <p class="min-w-60 break-all text-sm">{displayText}</p>
+        <p class="text-sm text-secondary">
+          {filter.unsupportedQuery
+            ? translate('common.unsupported-query-filter')
+            : translate('common.read-only-filter')}
+        </p>
+        {#if !filter.unsupportedQuery}
+          <div class="flex justify-end">
+            <Button
+              TrailingIcon={IconTrash}
+              colorScheme="secondary"
+              size="sm"
+              data-testid="remove-filter-button"
+              onclick={onRemove}>{translate('common.remove')}</Button
+            >
+          </div>
+        {/if}
+      </div>
+    {:else}
+      {#key $open}
+        <FilterEditor
+          {filter}
+          idPrefix={controlsId}
+          onApply={(updated) => {
+            onUpdate(updated);
+            $open = false;
+          }}
+          {onRemove}
+        />
+      {/key}
+    {/if}
   </Menu>
 </MenuContainer>

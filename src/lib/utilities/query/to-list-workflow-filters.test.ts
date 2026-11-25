@@ -36,6 +36,11 @@ const isNotEmptyQuery = '`StartTime` IS NOT NULL';
 const keywordListQuery = '`CustomKeywordListField`in("Hello", "World")';
 const keywordListNotInQuery =
   '`CustomKeywordListField`not in("Hello", "World")';
+const notStartsWithQuery = '`WorkflowId` NOT STARTS_WITH "abc"';
+const multipleNotStartsWithQuery =
+  '`WorkflowType`="Deploy" AND `WorkflowId` NOT STARTS_WITH "first_" AND `WorkflowId` NOT STARTS_WITH "second_"';
+const prefixNotInQuery =
+  '`WorkflowId`="temporal.canary.cron" AND NOT `ExecutionStatus` IN ("Terminated", "Canceled")';
 
 const attributes = {
   CloseTime: 'Datetime',
@@ -635,6 +640,228 @@ describe('toListWorkflowFilters', () => {
       attributes,
     );
     expect(spy).toHaveBeenCalled();
+  });
+
+  it('should parse a query with NOT STARTS_WITH as a negated filter', () => {
+    const result = toListWorkflowFilters(notStartsWithQuery, attributes);
+    const expectedFilters = [
+      {
+        attribute: 'WorkflowId',
+        type: 'Keyword',
+        conditional: 'STARTS_WITH',
+        operator: '',
+        parenthesis: '',
+        value: 'abc',
+        negated: true,
+      },
+    ];
+    expect(result).toMatchObject(expectedFilters);
+  });
+
+  it('should cancel out a NOT before the attribute and a NOT before the conditional', () => {
+    const result = toListWorkflowFilters(
+      'NOT `WorkflowId` NOT STARTS_WITH "x"',
+      attributes,
+    );
+
+    expect(result).toMatchObject([
+      { attribute: 'WorkflowId', conditional: 'STARTS_WITH', value: 'x' },
+    ]);
+    expect(result[0].negated).toBeUndefined();
+    expect(result[0].unsupportedQuery).toBeUndefined();
+  });
+
+  it('should parse multiple NOT STARTS_WITH filters joined by AND', () => {
+    const result = toListWorkflowFilters(
+      multipleNotStartsWithQuery,
+      attributes,
+    );
+    const expectedFilters = [
+      {
+        attribute: 'WorkflowType',
+        conditional: '=',
+        operator: 'AND',
+        value: 'Deploy',
+      },
+      {
+        attribute: 'WorkflowId',
+        conditional: 'STARTS_WITH',
+        operator: 'AND',
+        value: 'first_',
+        negated: true,
+      },
+      {
+        attribute: 'WorkflowId',
+        conditional: 'STARTS_WITH',
+        operator: '',
+        value: 'second_',
+        negated: true,
+      },
+    ];
+    expect(result).toMatchObject(expectedFilters);
+    expect(result[0].negated).toBeUndefined();
+  });
+
+  it('should parse a NOT before a backticked attribute as a negated filter', () => {
+    const result = toListWorkflowFilters(prefixNotInQuery, attributes);
+    const expectedFilters = [
+      {
+        attribute: 'WorkflowId',
+        conditional: '=',
+        operator: 'AND',
+        value: 'temporal.canary.cron',
+      },
+      {
+        attribute: 'ExecutionStatus',
+        type: 'Keyword',
+        conditional: 'IN',
+        operator: '',
+        value: '("Terminated", "Canceled")',
+        negated: true,
+      },
+    ];
+    expect(result).toMatchObject(expectedFilters);
+    expect(result[0].negated).toBeUndefined();
+  });
+
+  it('should parse a NOT before an attribute without backticks', () => {
+    const result = toListWorkflowFilters(
+      'not WorkflowType = "World"',
+      attributes,
+    );
+    const expectedFilters = [
+      {
+        attribute: 'WorkflowType',
+        conditional: '=',
+        value: 'World',
+        negated: true,
+      },
+    ];
+    expect(result).toMatchObject(expectedFilters);
+  });
+
+  it('should flag every filter when NOT applies to a group', () => {
+    const result = toListWorkflowFilters(
+      '`WorkflowId`="x" AND NOT (`WorkflowType`="a" OR `WorkflowType`="b")',
+      attributes,
+    );
+    const expectedFilters = [
+      { attribute: 'WorkflowId', value: 'x', unsupportedQuery: true },
+      { attribute: 'WorkflowType', value: 'a', unsupportedQuery: true },
+      { attribute: 'WorkflowType', value: 'b', unsupportedQuery: true },
+    ];
+    expect(result).toMatchObject(expectedFilters);
+  });
+
+  it('should flag a NOT between an attribute and BETWEEN', () => {
+    const result = toListWorkflowFilters(
+      '`StartTime` NOT BETWEEN "2024-01-01T00:00:00Z" AND "2024-02-01T00:00:00Z" AND `WorkflowType`="x"',
+      attributes,
+    );
+
+    expect(result.length).toBeGreaterThan(0);
+    expect(result.every((filter) => filter.unsupportedQuery)).toBe(true);
+  });
+
+  it('should parse a value containing "not" without flagging the filters', () => {
+    const result = toListWorkflowFilters(
+      '`WorkflowId` = "do not touch"',
+      attributes,
+    );
+
+    expect(result).toMatchObject([
+      { attribute: 'WorkflowId', conditional: '=', value: 'do not touch' },
+    ]);
+    expect(result[0].unsupportedQuery).toBeUndefined();
+  });
+
+  it.each([
+    '(`WorkflowType`="a" OR NOT `WorkflowType`="b" OR `WorkflowType`="c") AND `WorkflowId`="1"',
+    '(`ExecutionStatus`="Running" OR `ExecutionStatus`!="Failed")',
+    '`WorkflowId`="a" AND NOT(`WorkflowType`="b")',
+    '`WorkflowType`="a" OR `WorkflowId`="b"',
+    '`WorkflowId`="a" OR `WorkflowId`="b" AND `WorkflowType`="c"',
+    '`WorkflowType`="c" AND `WorkflowId`="a" OR `WorkflowId`="b"',
+  ])('should flag filters the UI would rebuild differently: %s', (query) => {
+    const result = toListWorkflowFilters(query, attributes);
+
+    expect(result.every((filter) => filter.unsupportedQuery)).toBe(true);
+  });
+
+  it.each([
+    '`ExecutionStatus`="Running" OR `ExecutionStatus`="Completed"',
+    '(`ExecutionStatus`="Running" OR `ExecutionStatus`="Completed") AND `WorkflowType`="c"',
+    '`WorkflowType`="c" AND (`ExecutionStatus`="Running" OR `ExecutionStatus`="Completed")',
+    '(`ExecutionStatus`="Running" or `ExecutionStatus`="Completed") and `WorkflowType`="c"',
+    '(`WorkflowType`="c") AND (`ExecutionStatus`="Running" OR `ExecutionStatus`="Completed")',
+  ])('should not flag OR groups the UI rebuilds the same way: %s', (query) => {
+    const result = toListWorkflowFilters(query, attributes);
+
+    expect(result.some((filter) => filter.unsupportedQuery)).toBe(false);
+  });
+
+  it('should drop parentheses around a single filter', () => {
+    const result = toListWorkflowFilters(
+      '(`WorkflowType`="c") AND (`ExecutionStatus`="Running" OR `ExecutionStatus`="Completed")',
+      attributes,
+    );
+
+    expect(result.map((filter) => filter.parenthesis)).toEqual(['', '(', ')']);
+  });
+
+  it('should parse "not" as a value without flagging the filters', () => {
+    const result = toListWorkflowFilters(
+      '`WorkflowId`="not" AND `WorkflowType`="NOT"',
+      attributes,
+    );
+    const expectedFilters = [
+      { attribute: 'WorkflowId', value: 'not', conditional: '=' },
+      { attribute: 'WorkflowType', value: 'NOT', conditional: '=' },
+    ];
+    expect(result).toMatchObject(expectedFilters);
+    expect(result.map((filter) => filter.unsupportedQuery)).toEqual([
+      undefined,
+      undefined,
+    ]);
+    expect(result.map((filter) => filter.negated)).toEqual([
+      undefined,
+      undefined,
+    ]);
+  });
+
+  it.each([
+    notStartsWithQuery,
+    multipleNotStartsWithQuery,
+    prefixNotInQuery,
+    `${isNotEmptyQuery} AND ${keywordListNotInQuery}`,
+    workflowQuery4,
+    '`WorkflowId` != "not"',
+    '`WorkflowId` STARTS_WITH "Not"',
+  ])('should not flag filters parsed from %s', (query) => {
+    const result = toListWorkflowFilters(query, attributes);
+    expect(result.map((filter) => filter.unsupportedQuery)).toEqual(
+      result.map(() => undefined),
+    );
+  });
+
+  it('should not negate IS NOT NULL or NOT IN filters', () => {
+    const result = toListWorkflowFilters(
+      `${isNotEmptyQuery} AND ${keywordListNotInQuery}`,
+      attributes,
+    );
+    const expectedFilters = [
+      { attribute: 'StartTime', conditional: 'IS NOT', value: null },
+      {
+        attribute: 'CustomKeywordListField',
+        conditional: 'not in',
+        value: '("Hello", "World")',
+      },
+    ];
+    expect(result).toMatchObject(expectedFilters);
+    expect(result.map((filter) => filter.negated)).toEqual([
+      undefined,
+      undefined,
+    ]);
   });
 });
 

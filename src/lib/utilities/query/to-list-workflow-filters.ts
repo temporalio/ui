@@ -7,6 +7,10 @@ import {
   SEARCH_ATTRIBUTE_TYPE,
   type SearchAttributes,
 } from '$lib/types/workflows';
+import {
+  hasMixedOrGroup,
+  hasUnsupportedQuery,
+} from '$lib/utilities/query/column-filter';
 import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
 
 import { tokenize } from './tokenize';
@@ -55,6 +59,83 @@ export const getLargestDurationUnit = (
 
 const isDatetimeStatement = is(SEARCH_ATTRIBUTE_TYPE.DATETIME);
 const isBoolStatement = is(SEARCH_ATTRIBUTE_TYPE.BOOL);
+const isNot = is('not');
+
+const startsStatement = (previousToken: string | undefined): boolean =>
+  previousToken === undefined ||
+  previousToken === '(' ||
+  isJoin(previousToken) ||
+  isNot(previousToken);
+
+const extractNegations = (
+  tokens: Tokens,
+  attributes: SearchAttributes,
+): {
+  tokens: Tokens;
+  negatedIndexes: Set<number>;
+  hasUnsupportedNegation: boolean;
+} => {
+  const remainingTokens: Tokens = [];
+  const negatedIndexes = new Set<number>();
+  let negateNextToken = false;
+  let hasUnsupportedNegation = false;
+
+  tokens.forEach((token, index) => {
+    const previousToken = tokens[index - 1];
+    const nextToken = getOneAhead(tokens, index);
+
+    if (isNot(token) && attributes[nextToken]) {
+      negateNextToken = true;
+      return;
+    }
+
+    if (isNot(token) && attributes[previousToken] && isConditional(nextToken)) {
+      const attributeIndex = remainingTokens.length - 1;
+      if (negatedIndexes.has(attributeIndex)) {
+        negatedIndexes.delete(attributeIndex);
+      } else {
+        negatedIndexes.add(attributeIndex);
+      }
+      return;
+    }
+
+    if (negateNextToken) {
+      negatedIndexes.add(remainingTokens.length);
+      negateNextToken = false;
+    }
+
+    if (
+      isNot(token) &&
+      (startsStatement(previousToken) || attributes[previousToken])
+    ) {
+      hasUnsupportedNegation = true;
+    }
+
+    remainingTokens.push(token);
+  });
+
+  return { tokens: remainingTokens, negatedIndexes, hasUnsupportedNegation };
+};
+
+const changesMeaningWhenCombined = (
+  filters: SearchAttributeFilter[],
+): boolean => {
+  const combined = combineFilters(filters.map((filter) => ({ ...filter })));
+  const operatorChanged = combined.some(
+    (filter, index) => filter.operator !== filters[index].operator,
+  );
+  if (operatorChanged) return true;
+
+  const parenthesisChanged = combined.some(
+    (filter, index) => filter.parenthesis !== filters[index].parenthesis,
+  );
+  const operators = new Set(
+    filters.map((filter) => filter.operator.toUpperCase()),
+  );
+  const mixesAndWithOr = operators.has('AND') && operators.has('OR');
+
+  return parenthesisChanged && mixesAndWithOr;
+};
 
 const defaultFilter: SearchAttributeFilter = {
   id: '',
@@ -87,9 +168,13 @@ export const toListWorkflowFilters = (
   query: string,
   attributes: SearchAttributes = DefaultAttributes,
 ): SearchAttributeFilter[] => {
-  const tokens = tokenize(query);
+  const { tokens, negatedIndexes, hasUnsupportedNegation } = extractNegations(
+    tokenize(query),
+    attributes,
+  );
   const filters: SearchAttributeFilter[] = [];
   let filter = createFilter();
+  let parenthesisDepth = 0;
 
   if (!query) {
     return [];
@@ -103,6 +188,10 @@ export const toListWorkflowFilters = (
       if (attributes[token]) {
         filter.attribute = token;
         filter.type = attributes[token];
+
+        if (negatedIndexes.has(index)) {
+          filter.negated = true;
+        }
 
         if (isNullConditional(nextToken)) {
           const combinedTokens = `${nextToken} ${tokenTwoAhead}`;
@@ -153,13 +242,16 @@ export const toListWorkflowFilters = (
       }
 
       if (isParenthesis(token)) {
-        filter.parenthesis = token;
+        parenthesisDepth += token === '(' ? 1 : -1;
+        filter.parenthesis =
+          parenthesisDepth > 0 ? '(' : parenthesisDepth < 0 ? ')' : '';
       }
 
       if (isJoin(token) && !isBetween(getTwoBehind(tokens, index))) {
         filter.operator = token;
         filters.push(filter);
         filter = createFilter();
+        parenthesisDepth = 0;
       }
 
       if (index === tokens.length - 1) {
@@ -167,6 +259,14 @@ export const toListWorkflowFilters = (
         filter = createFilter();
       }
     });
+
+    if (
+      hasUnsupportedNegation ||
+      changesMeaningWhenCombined(filters) ||
+      hasMixedOrGroup(filters)
+    ) {
+      return filters.map((filter) => ({ ...filter, unsupportedQuery: true }));
+    }
 
     return filters;
   } catch (e) {
@@ -216,6 +316,9 @@ export const combineDropdownFilters = (filters: SearchAttributeFilter[]) => {
   ];
 };
 
+const isOrOperator = (operator: string | undefined) =>
+  operator?.toUpperCase() === 'OR';
+
 export const combineFilters = (filters: SearchAttributeFilter[]) => {
   filters.forEach((filter, index) => {
     const previousFilter = filters[index - 1];
@@ -228,15 +331,15 @@ export const combineFilters = (filters: SearchAttributeFilter[]) => {
       filter.operator = '';
     }
 
-    if (
-      filter.operator === 'OR' &&
-      nextFilter?.attribute !== filter.attribute
-    ) {
+    const isOr = isOrOperator(filter.operator);
+    const followsOr = isOrOperator(previousFilter?.operator);
+
+    if (isOr && nextFilter?.attribute !== filter.attribute) {
       filter.parenthesis = '';
       filter.operator = '';
-    } else if (filter.operator === 'OR' && previousFilter?.operator !== 'OR') {
+    } else if (isOr && !followsOr) {
       filter.parenthesis = '(';
-    } else if (previousFilter?.operator === 'OR' && filter.operator !== 'OR') {
+    } else if (followsOr && !isOr) {
       filter.parenthesis = ')';
     } else {
       filter.parenthesis = '';
@@ -247,6 +350,8 @@ export const combineFilters = (filters: SearchAttributeFilter[]) => {
 
 export const updateQueryParamsFromFilter = debounce(
   (url: URL, filters: SearchAttributeFilter[], isDropdownFilter = false) => {
+    if (hasUnsupportedQuery(filters)) return;
+
     const allFilters = isDropdownFilter
       ? combineDropdownFilters(filters)
       : combineFilters(filters);

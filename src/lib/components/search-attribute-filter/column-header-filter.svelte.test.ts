@@ -136,6 +136,121 @@ describe('ColumnHeaderFilter', () => {
     expect(byTestId('remove-filter-button')).toBeNull();
   });
 
+  it('shows a column with only a negated filter as filtered, with a notice', () => {
+    const negated = createFilter({ ...workflowType(), negated: true });
+    const { button, open } = mountFilter({ filters: [negated] });
+
+    expect(button.dataset.filtered).toBe('true');
+
+    open();
+
+    expect(byTestId('column-header-filter-hidden')).not.toBeNull();
+    expect(byTestId('remove-filter-button')).toBeNull();
+  });
+
+  it('is disabled while the query has a NOT it cannot show', () => {
+    const { button } = mountFilter({
+      filters: [{ ...workflowType(), unsupportedQuery: true }],
+    });
+
+    expect(button.disabled).toBe(true);
+    expect(button.dataset.filtered).toBe('true');
+    expect(button.title).toBe(
+      "The filters can't show this query. Edit the query to change it.",
+    );
+  });
+
+  it('does not show as filtered when the unsupported query is on another column', () => {
+    const { button } = mountFilter({
+      filters: [
+        createFilter({
+          attribute: 'WorkflowId',
+          value: 'b',
+          conditional: '=',
+          unsupportedQuery: true,
+        }),
+      ],
+    });
+
+    expect(button.disabled).toBe(true);
+    expect(button.dataset.filtered).toBe('false');
+  });
+
+  it('shows an IN filter on a keyword attribute as read-only with Remove', () => {
+    const { store, button, open } = mountFilter({
+      filters: [
+        createFilter({
+          ...workflowType(),
+          value: '("a", "b")',
+          conditional: 'NOT IN',
+        }),
+      ],
+    });
+
+    expect(button.disabled).toBe(false);
+    expect(button.dataset.filtered).toBe('true');
+
+    open();
+
+    expect(byTestId('column-header-filter-read-only')).not.toBeNull();
+    expect(byTestId('apply-filter-button')).toBeNull();
+
+    byTestId('remove-filter-button')?.click();
+    flushSync();
+
+    expect(get(store)).toEqual([]);
+  });
+
+  it('shows only the read-only notice above the status editor', () => {
+    const status = (value: string, operator = '') =>
+      createFilter({
+        id: value,
+        attribute: 'ExecutionStatus',
+        type: 'Keyword',
+        value,
+        conditional: '=',
+        operator,
+      });
+    const notFailed = createFilter({
+      id: 'not-failed',
+      attribute: 'ExecutionStatus',
+      type: 'Keyword',
+      value: 'Failed',
+      conditional: '!=',
+    });
+    const { open } = mountFilter({
+      attribute: 'ExecutionStatus',
+      filters: [status('Running', 'OR'), status('Completed', 'AND'), notFailed],
+      statusFilter: workflowStatusFilter,
+    });
+
+    open();
+
+    expect(byTestId('column-header-filter-hidden')).not.toBeNull();
+    expect(byTestId('column-header-filter-multiple')).toBeNull();
+  });
+
+  it('shows a NOT IN status filter as read-only instead of in the status editor', () => {
+    const notIn = createFilter({
+      id: 'not-in',
+      attribute: 'ExecutionStatus',
+      type: 'Keyword',
+      value: '("Terminated", "Canceled")',
+      conditional: 'NOT IN',
+    });
+    const { button, open } = mountFilter({
+      attribute: 'ExecutionStatus',
+      filters: [notIn],
+      statusFilter: workflowStatusFilter,
+    });
+
+    expect(button.dataset.filtered).toBe('true');
+
+    open();
+
+    expect(byTestId('column-header-filter-read-only')).not.toBeNull();
+  });
+
   it('removes the column filter and closes the menu', () => {
     const other = createFilter({
       id: 'wid',
@@ -275,6 +390,37 @@ describe('ColumnHeaderFilter', () => {
 
       expect(get(store).map((filter) => filter.id)).toEqual(['type-a', 'wid']);
     });
+  });
+
+  it('blocks Apply and says why when the rest of the query excludes the value', () => {
+    const notInA = createFilter({
+      id: 'not-in-a',
+      attribute: 'WorkflowType',
+      type: 'Keyword',
+      value: '("a")',
+      conditional: 'IN',
+      negated: true,
+    });
+    const { store, open } = mountFilter({ filters: [notInA] });
+
+    open();
+    const input =
+      document.querySelector<HTMLInputElement>('input[id$="-text"]');
+    if (!input) throw new Error('value input not rendered');
+    input.value = 'a';
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    flushSync();
+
+    const apply = byTestId('apply-filter-button') as HTMLButtonElement;
+    expect(byTestId('filter-apply-blocked')?.textContent).toContain(
+      'Part of the query excludes this value.',
+    );
+    expect(apply.disabled).toBe(true);
+
+    apply.click();
+    flushSync();
+
+    expect(get(store)).toEqual([notInA]);
   });
 
   it('does not add a filter when applied without a value', () => {

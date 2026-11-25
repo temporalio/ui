@@ -124,12 +124,25 @@ describe('tokenize', () => {
   });
 
   it('should tokenize with "`" not used in custom attributes with spaces', () => {
-    expect(tokenize('one = "one `"')).toEqual(['one', '=', 'one', '`']);
-    expect(tokenize('one = "one `1`"')).toEqual(['one', '=', 'one', '`1`']);
+    expect(tokenize('one = "one `"')).toEqual(['one', '=', 'one `']);
+    expect(tokenize('one = "one `1`"')).toEqual(['one', '=', 'one `1`']);
     expect(tokenize('one = "`one"')).toEqual(['one', '=', '`one']);
     expect(tokenize('one = 1 `')).toEqual(['one', '=', '1', '`']);
     expect(tokenize('`one = 1')).toEqual(['`one', '=', '1']);
     expect(tokenize('one = `1')).toEqual(['one', '=', '`1']);
+  });
+
+  it('should keep a quoted value with spaces whole when a space follows the conditional', () => {
+    expect(tokenize('`WorkflowId` = "do not touch"')).toEqual([
+      'WorkflowId',
+      '=',
+      'do not touch',
+    ]);
+    expect(tokenize('`WorkflowId` STARTS_WITH "a b"')).toEqual([
+      'WorkflowId',
+      'STARTS_WITH',
+      'a b',
+    ]);
   });
 
   it('should tokenize the valueWithSpacesQuery', () => {
@@ -198,5 +211,56 @@ describe('tokenize', () => {
     const query = '`WorkflowType` STARTS_WITH "Joiner"';
 
     expect(tokenize(query)).toEqual(['WorkflowType', 'STARTS_WITH', 'Joiner']);
+  });
+
+  it('should tokenize a NOT STARTS_WITH query', () => {
+    const query = '`WorkflowId` NOT STARTS_WITH "abc"';
+
+    expect(tokenize(query)).toEqual([
+      'WorkflowId',
+      'NOT',
+      'STARTS_WITH',
+      'abc',
+    ]);
+  });
+
+  it('should tokenize a backticked attribute after a NOT', () => {
+    const query =
+      '`WorkflowId`="abc" AND NOT `ExecutionStatus` IN ("Terminated", "Canceled")';
+
+    expect(tokenize(query)).toEqual([
+      'WorkflowId',
+      '=',
+      'abc',
+      'AND',
+      'NOT',
+      'ExecutionStatus',
+      'IN',
+      '("Terminated", "Canceled")',
+    ]);
+  });
+
+  it('should split NOT from a parenthesis that follows it', () => {
+    expect(tokenize('`WorkflowId`="a" AND NOT(`WorkflowType`="b")')).toEqual([
+      'WorkflowId',
+      '=',
+      'a',
+      'AND',
+      'NOT',
+      '(',
+      'WorkflowType',
+      '=',
+      'b',
+      ')',
+    ]);
+  });
+
+  it('should not tokenize "not in" at the start of an attribute name', () => {
+    expect(tokenize('NOT InvoiceId = 1')).toEqual([
+      'NOT',
+      'InvoiceId',
+      '=',
+      '1',
+    ]);
   });
 });

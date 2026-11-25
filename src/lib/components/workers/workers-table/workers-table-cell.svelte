@@ -11,6 +11,11 @@
   import { workerFilters } from '$lib/stores/filters';
   import { workerSearchAttributes } from '$lib/stores/search-attributes';
   import {
+    canAddValue,
+    hasUnsupportedQuery,
+    removeExclusions,
+  } from '$lib/utilities/query/column-filter';
+  import {
     createQuickFilter,
     getQuickFilterConditional,
     isQuickFilterActive,
@@ -56,12 +61,18 @@
   );
 
   const matchesFilter = (a: SearchAttributeFilter, b: SearchAttributeFilter) =>
+    !a.negated &&
+    !a.unsupportedQuery &&
     a.attribute === b.attribute &&
     a.value === b.value &&
     a.conditional === b.conditional;
 
   const filterList = $derived(filters ?? []);
   const hasMultipleFilters = $derived(filterList.length > 0);
+
+  const quickFilterConditional = $derived(
+    getQuickFilterConditional({ attribute: attribute ?? '', type }),
+  );
 
   const isFiltered = $derived(
     hasMultipleFilters
@@ -71,11 +82,36 @@
       : isQuickFilterActive($workerFilters, {
           attribute: attribute ?? '',
           value: quickFilterValue ?? '',
-          conditional: getQuickFilterConditional({
-            attribute: attribute ?? '',
-            type,
-          }),
+          conditional: quickFilterConditional,
         }),
+  );
+
+  const filtersAfterToggle = $derived.by(() => {
+    const toRemove = filterList.filter((f) =>
+      $workerFilters.some((wf) => matchesFilter(wf, f)),
+    );
+    const toAdd = filterList.filter(
+      (f) => !$workerFilters.some((wf) => matchesFilter(wf, f)),
+    );
+    const kept = toAdd.reduce<SearchAttributeFilter[] | null>(
+      (current, f) =>
+        current && f.conditional === '=' && f.value
+          ? removeExclusions(current, f.attribute, f.value)
+          : current,
+      $workerFilters.filter(
+        (wf) => !toRemove.some((f) => matchesFilter(wf, f)),
+      ),
+    );
+    return kept ? [...kept, ...toAdd] : null;
+  });
+
+  const excludedByQuery = $derived(
+    hasMultipleFilters
+      ? filtersAfterToggle === null
+      : !isFiltered &&
+          quickFilterValue !== null &&
+          quickFilterConditional === '=' &&
+          !canAddValue($workerFilters, attribute ?? '', quickFilterValue),
   );
 
   const onRowFilterClick = () => {
@@ -92,32 +128,28 @@
       return;
     }
 
-    const toRemove = filterList.filter((f) =>
-      $workerFilters.some((wf) => matchesFilter(wf, f)),
-    );
-    const toAdd = filterList.filter(
-      (f) => !$workerFilters.some((wf) => matchesFilter(wf, f)),
-    );
+    if (!filtersAfterToggle) return;
 
-    $workerFilters = [
-      ...$workerFilters.filter(
-        (wf) => !toRemove.some((f) => matchesFilter(wf, f)),
-      ),
-      ...toAdd,
-    ];
+    $workerFilters = filtersAfterToggle;
 
     updateQueryParamsFromFilter(page.url, $workerFilters);
   };
 
   const hasContent = $derived(hasMultipleFilters || quickFilterValue !== null);
+  const unsupportedQuery = $derived(hasUnsupportedQuery($workerFilters));
 </script>
 
 <TableCellWithFilterOrCopyButtons
   class="h-8"
   copyValue={value ?? undefined}
-  onFilter={hasContent && filterable ? onRowFilterClick : undefined}
+  onFilter={hasContent && filterable && !unsupportedQuery
+    ? onRowFilterClick
+    : undefined}
   {isFiltered}
   filterIconTitle={translate('common.filter-workflows')}
+  filterDisabledTitle={excludedByQuery
+    ? translate('common.value-excluded-by-query')
+    : undefined}
 >
   {#if attribute === 'BuildId' || attribute === 'WorkerInstanceKey'}
     {#if href}

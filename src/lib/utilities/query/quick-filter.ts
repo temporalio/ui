@@ -7,6 +7,14 @@ import {
 import { isValidDate } from '../format-date';
 import { isTimestamp, timestampToDate, type ValidTime } from '../format-time';
 import { isInConditional } from '../is';
+import {
+  hasUnsupportedQuery,
+  removeExclusions,
+  replaceAttributeFilters,
+  STATUS_ATTRIBUTES,
+  targetsAttribute,
+  targetsStatusAttribute,
+} from './column-filter';
 import { createFilter } from './to-list-workflow-filters';
 
 export type QuickFilterValue =
@@ -70,11 +78,7 @@ export const getQuickFilterConditional = ({
 // Status filters render as a multi-select chip rather than the operator form —
 // isTextFilter even refuses them — so a status cell applies `=` in one click and
 // every other cell asks which operator it meant.
-const STATUS_ATTRIBUTE_NAMES = ['ExecutionStatus', 'WorkerStatus'] as const;
-
-export type StatusAttribute = (typeof STATUS_ATTRIBUTE_NAMES)[number];
-
-export const STATUS_ATTRIBUTES = new Set<string>(STATUS_ATTRIBUTE_NAMES);
+export { STATUS_ATTRIBUTES, type StatusAttribute } from './column-filter';
 
 export const requiresOperatorChoice = ({
   attribute,
@@ -209,6 +213,14 @@ export const createQuickFilter = ({
   });
 };
 
+const targetsQuickFilterAttribute = (
+  filter: SearchAttributeFilter,
+  attribute: string,
+): boolean =>
+  STATUS_ATTRIBUTES.has(attribute)
+    ? targetsStatusAttribute(filter, attribute)
+    : targetsAttribute(filter, attribute);
+
 export const isQuickFilterActive = (
   filters: SearchAttributeFilter[],
   quickFilter: Pick<
@@ -218,8 +230,8 @@ export const isQuickFilterActive = (
 ): boolean => {
   if (!quickFilter) return false;
 
-  const filtersForAttribute = filters.filter(
-    (filter) => filter.attribute === quickFilter.attribute,
+  const filtersForAttribute = filters.filter((filter) =>
+    targetsQuickFilterAttribute(filter, quickFilter.attribute),
   );
 
   return (
@@ -234,11 +246,59 @@ export const toggleQuickFilter = (
   filters: SearchAttributeFilter[],
   quickFilter: SearchAttributeFilter,
 ): SearchAttributeFilter[] => {
-  const otherFilters = filters.filter(
-    (filter) => filter.attribute !== quickFilter.attribute,
-  );
+  if (hasUnsupportedQuery(filters)) return filters;
 
-  return isQuickFilterActive(filters, quickFilter)
-    ? otherFilters
-    : [...otherFilters, quickFilter];
+  const withoutTargets = (list: SearchAttributeFilter[]) =>
+    list.filter(
+      (filter) => !targetsQuickFilterAttribute(filter, quickFilter.attribute),
+    );
+
+  if (isQuickFilterActive(filters, quickFilter)) return withoutTargets(filters);
+  if (quickFilter.conditional !== '=') {
+    return [...withoutTargets(filters), quickFilter];
+  }
+
+  const kept = removeExclusions(
+    filters,
+    quickFilter.attribute,
+    quickFilter.value,
+  );
+  return kept ? [...withoutTargets(kept), quickFilter] : filters;
+};
+
+const EXECUTION_STATUS = 'ExecutionStatus';
+
+export const addStatusCountFilter = (
+  filters: SearchAttributeFilter[],
+  status: string | null,
+): SearchAttributeFilter[] | null => {
+  if (!status || hasUnsupportedQuery(filters)) return null;
+
+  const alreadySelected = filters.some(
+    (filter) =>
+      targetsStatusAttribute(filter, EXECUTION_STATUS) &&
+      filter.value === status,
+  );
+  if (alreadySelected) return null;
+
+  const kept = removeExclusions(filters, EXECUTION_STATUS, status);
+  if (!kept) return null;
+
+  const added = createFilter({
+    attribute: EXECUTION_STATUS,
+    type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+    value: status,
+    conditional: '=',
+  });
+  const selected = kept.filter((filter) =>
+    targetsStatusAttribute(filter, EXECUTION_STATUS),
+  );
+  if (!selected.length) return [...kept, added];
+
+  return replaceAttributeFilters(
+    kept,
+    EXECUTION_STATUS,
+    [...selected.map((filter) => ({ ...filter, operator: 'OR' })), added],
+    targetsStatusAttribute,
+  );
 };

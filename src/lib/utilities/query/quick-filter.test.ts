@@ -8,6 +8,7 @@ import {
 
 import { toListWorkflowQueryFromFilters } from './filter-workflow-query';
 import {
+  addStatusCountFilter,
   createQuickFilter,
   formatQuickFilterValue,
   getDefaultConditional,
@@ -20,6 +21,7 @@ import {
   toQuickFilterValue,
 } from './quick-filter';
 import {
+  combineFilters,
   createFilter,
   toListWorkflowFilters,
 } from './to-list-workflow-filters';
@@ -276,6 +278,20 @@ describe('isQuickFilterActive', () => {
     expect(isQuickFilterActive([], quickFilter)).toBe(false);
   });
 
+  it('is inactive when the matching filter is negated', () => {
+    const negated = createFilter({ ...quickFilter, negated: true });
+    expect(isQuickFilterActive([negated], quickFilter)).toBe(false);
+  });
+
+  it('ignores a negated filter on the same attribute', () => {
+    const negated = createFilter({
+      ...quickFilter,
+      value: 'other-value',
+      negated: true,
+    });
+    expect(isQuickFilterActive([negated, quickFilter], quickFilter)).toBe(true);
+  });
+
   it('is inactive for a different value on the same attribute', () => {
     const other = createFilter({ ...quickFilter, value: 'other-value' });
     expect(isQuickFilterActive([other], quickFilter)).toBe(false);
@@ -325,6 +341,24 @@ describe('isQuickFilterActive', () => {
 });
 
 describe('toggleQuickFilter', () => {
+  it('replaces a NOT STARTS_WITH that excludes the value', () => {
+    const filters = toListWorkflowFilters(
+      '`WorkflowType` NOT STARTS_WITH "foo"',
+    );
+    const quickFilter = createFilter({
+      attribute: 'WorkflowType',
+      type: 'Keyword',
+      value: 'foobar',
+      conditional: '=',
+    });
+
+    expect(
+      toListWorkflowQueryFromFilters(
+        combineFilters(toggleQuickFilter(filters, quickFilter)),
+      ),
+    ).toBe('`WorkflowType`="foobar"');
+  });
+
   const keywordFilter = createQuickFilter({
     attribute: 'CustomKeywordField',
     type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
@@ -343,6 +377,87 @@ describe('toggleQuickFilter', () => {
     const existing = createFilter({ ...keywordFilter, value: 'other-value' });
     expect(toggleQuickFilter([existing], keywordFilter)).toEqual([
       keywordFilter,
+    ]);
+  });
+
+  it('keeps a NOT IN status filter when toggling a status', () => {
+    const notIn = createFilter({
+      attribute: 'ExecutionStatus',
+      type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+      value: '("Terminated", "Canceled")',
+      conditional: 'NOT IN',
+    });
+    const running = createQuickFilter({
+      attribute: 'ExecutionStatus',
+      type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+      value: 'Running',
+    });
+    if (!running) throw new Error('expected a quick filter');
+
+    expect(isQuickFilterActive([notIn, running], running)).toBe(true);
+    expect(toggleQuickFilter([notIn], running)).toEqual([notIn, running]);
+  });
+
+  it('leaves the filters unchanged when the query has an unsupported NOT', () => {
+    const filters = toListWorkflowFilters(
+      '`WorkflowId`="x" AND NOT (`WorkflowType`="a" OR `WorkflowType`="b")',
+    );
+
+    expect(toggleQuickFilter(filters, keywordFilter)).toBe(filters);
+  });
+
+  it('replaces a negated filter that excludes the value', () => {
+    const negated = createFilter({ ...keywordFilter, negated: true });
+
+    expect(toggleQuickFilter([negated], keywordFilter)).toEqual([
+      keywordFilter,
+    ]);
+  });
+
+  it('keeps a negated filter on a different value', () => {
+    const negated = createFilter({
+      ...keywordFilter,
+      value: 'other-value',
+      negated: true,
+    });
+
+    expect(toggleQuickFilter([negated], keywordFilter)).toEqual([
+      negated,
+      keywordFilter,
+    ]);
+  });
+
+  it('does nothing when the value is excluded inside an OR group', () => {
+    const filters = toListWorkflowFilters(
+      '`ExecutionStatus`="Failed" OR NOT `ExecutionStatus`="Running"',
+    );
+    const running = createQuickFilter({
+      attribute: 'ExecutionStatus',
+      type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+      value: 'Running',
+    });
+    if (!running) throw new Error('expected a quick filter');
+
+    expect(toggleQuickFilter(filters, running)).toBe(filters);
+  });
+
+  it('leaves an IN filter on a keyword attribute alone', () => {
+    const inList = createFilter({
+      attribute: 'WorkflowType',
+      type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+      value: '("a", "b")',
+      conditional: 'IN',
+    });
+    const quickFilter = createQuickFilter({
+      attribute: 'WorkflowType',
+      type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+      value: 'a',
+    });
+    if (!quickFilter) throw new Error('expected a quick filter');
+
+    expect(toggleQuickFilter([inList], quickFilter)).toEqual([
+      inList,
+      quickFilter,
     ]);
   });
 
@@ -533,5 +648,78 @@ describe('ExecutionDuration', () => {
       value: '5m10s',
       conditional: '>=',
     });
+  });
+});
+
+describe('addStatusCountFilter', () => {
+  const parse = (query: string) => toListWorkflowFilters(query);
+  const toQuery = (filters: SearchAttributeFilter[] | null) =>
+    filters && toListWorkflowQueryFromFilters(combineFilters(filters));
+
+  it('adds the status when nothing filters on it', () => {
+    expect(
+      toQuery(addStatusCountFilter(parse('`WorkflowId`="a"'), 'Running')),
+    ).toBe('`WorkflowId`="a" AND `ExecutionStatus`="Running"');
+  });
+
+  it('adds the status to the statuses already selected', () => {
+    expect(
+      toQuery(
+        addStatusCountFilter(
+          parse('`ExecutionStatus`="Failed" AND `WorkflowId`="a"'),
+          'Running',
+        ),
+      ),
+    ).toBe(
+      '(`ExecutionStatus`="Failed" OR `ExecutionStatus`="Running") AND `WorkflowId`="a"',
+    );
+  });
+
+  it('does nothing when the status is already selected', () => {
+    expect(
+      addStatusCountFilter(parse('`ExecutionStatus`="Running"'), 'Running'),
+    ).toBeNull();
+  });
+
+  it.each([
+    ['`ExecutionStatus`!="Running" AND `WorkflowId`="a"'],
+    ['NOT `ExecutionStatus`="Running" AND `WorkflowId`="a"'],
+  ])('replaces a filter that excludes the status: %s', (query) => {
+    expect(toQuery(addStatusCountFilter(parse(query), 'Running'))).toBe(
+      '`WorkflowId`="a" AND `ExecutionStatus`="Running"',
+    );
+  });
+
+  it.each([
+    '`ExecutionStatus` NOT IN ("Running", "Failed")',
+    'NOT `ExecutionStatus` IN ("Running")',
+    '`ExecutionStatus` IN ("Failed", "Completed")',
+    '`ExecutionStatus`="Failed" OR NOT `ExecutionStatus`="Running"',
+  ])('does nothing when it cannot safely drop the exclusion: %s', (query) => {
+    expect(addStatusCountFilter(parse(query), 'Running')).toBeNull();
+  });
+
+  it('adds the status when a double negation already includes it', () => {
+    expect(
+      toQuery(
+        addStatusCountFilter(
+          parse('NOT `ExecutionStatus` NOT IN ("Running")'),
+          'Running',
+        ),
+      ),
+    ).toBe(
+      'NOT `ExecutionStatus`NOT IN("Running") AND `ExecutionStatus`="Running"',
+    );
+  });
+
+  it('does nothing when the query has a NOT the filters cannot show', () => {
+    expect(
+      addStatusCountFilter(
+        parse(
+          '`WorkflowId`="x" AND NOT (`WorkflowType`="a" OR `WorkflowType`="b")',
+        ),
+        'Running',
+      ),
+    ).toBeNull();
   });
 });

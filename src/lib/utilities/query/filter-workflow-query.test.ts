@@ -1,7 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { toListWorkflowQueryFromFilters } from './filter-workflow-query';
-import { combineFilters } from './to-list-workflow-filters';
+import {
+  combineFilters,
+  toListWorkflowFilters,
+} from './to-list-workflow-filters';
 import { isVersionNewer } from '../version-check';
 
 describe('toListWorkflowQueryFromFilters', () => {
@@ -404,4 +407,100 @@ describe('toListWorkflowQueryFromFilters', () => {
       '`CustomKeywordListField`not in("Hello", "World") AND `WorkflowType`="ExampleWorkflow"',
     );
   });
+
+  it('should convert a negated STARTS_WITH filter with an infix NOT', () => {
+    const filters = [
+      {
+        attribute: 'WorkflowId',
+        type: 'Keyword',
+        conditional: 'STARTS_WITH',
+        operator: '',
+        parenthesis: '',
+        value: 'abc',
+        negated: true,
+      },
+    ];
+    const query = toListWorkflowQueryFromFilters(filters);
+    expect(query).toBe('`WorkflowId` NOT STARTS_WITH "abc"');
+  });
+
+  it('should convert a negated filter with a prefix NOT', () => {
+    const filters = [
+      {
+        attribute: 'WorkflowType',
+        type: 'Keyword',
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+        value: 'World',
+        negated: true,
+      },
+    ];
+    const query = toListWorkflowQueryFromFilters(filters);
+    expect(query).toBe('NOT `WorkflowType`="World"');
+  });
+
+  it.each([
+    [
+      '`WorkflowType`="Deploy" AND `WorkflowId` NOT STARTS_WITH "first_" AND `WorkflowId` NOT STARTS_WITH "second_"',
+      '`WorkflowType`="Deploy" AND `WorkflowId` NOT STARTS_WITH "first_" AND `WorkflowId` NOT STARTS_WITH "second_"',
+    ],
+    [
+      '`WorkflowId`="temporal.canary.cron" AND NOT `ExecutionStatus` IN ("Terminated", "Canceled")',
+      '`WorkflowId`="temporal.canary.cron" AND NOT `ExecutionStatus`IN("Terminated", "Canceled")',
+    ],
+    [
+      'NOT `WorkflowType`="World" AND `WorkflowId`="abc"',
+      'NOT `WorkflowType`="World" AND `WorkflowId`="abc"',
+    ],
+    [
+      '`WorkflowId`="temporal.canary.cron" AND `ExecutionStatus` NOT IN ("Terminated", "Canceled")',
+      '`WorkflowId`="temporal.canary.cron" AND `ExecutionStatus`NOT IN("Terminated", "Canceled")',
+    ],
+  ])(
+    'should keep NOT when rebuilding %s from its filters',
+    (query, expected) => {
+      const filters = combineFilters(toListWorkflowFilters(query));
+      expect(toListWorkflowQueryFromFilters(filters)).toBe(expected);
+    },
+  );
+
+  it('should not quote an IN list for a Keyword attribute', () => {
+    const filters = [
+      {
+        attribute: 'ExecutionStatus',
+        type: 'Keyword',
+        conditional: 'IN',
+        operator: '',
+        parenthesis: '',
+        value: '("Terminated", "Canceled")',
+      },
+    ];
+    const query = toListWorkflowQueryFromFilters(filters);
+    expect(query).toBe('`ExecutionStatus`IN("Terminated", "Canceled")');
+  });
+
+  it.each([
+    [{ conditional: '=', value: 'a' }, '`Custom Space`="a"'],
+    [{ conditional: '=', value: 'a', negated: true }, 'NOT `Custom Space`="a"'],
+    [
+      { conditional: 'STARTS_WITH', value: 'a', negated: true },
+      '`Custom Space` NOT STARTS_WITH "a"',
+    ],
+    [{ conditional: 'IS', value: null }, '`Custom Space` IS null'],
+  ])(
+    'should wrap an attribute with spaces in one pair of backticks',
+    (overrides, expected) => {
+      const filters = [
+        {
+          attribute: 'Custom Space',
+          type: 'Keyword',
+          operator: '',
+          parenthesis: '',
+          ...overrides,
+        },
+      ];
+      expect(toListWorkflowQueryFromFilters(filters)).toBe(expected);
+    },
+  );
 });

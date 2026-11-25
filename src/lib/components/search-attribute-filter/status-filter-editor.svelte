@@ -9,15 +9,22 @@
   import type { StatusFilter } from '$lib/models/status-filter';
   import { isWorkerStatusType } from '$lib/models/worker-status';
   import { isWorkflowStatusType } from '$lib/models/workflow-status';
+  import { canAddValue } from '$lib/utilities/query/column-filter';
   import { createFilter } from '$lib/utilities/query/to-list-workflow-filters.js';
 
   interface Props {
     statusFilter: StatusFilter;
     filters: SearchAttributeFilter[];
+    allFilters?: SearchAttributeFilter[];
     onUpdate: (updatedFilter: SearchAttributeFilter[]) => void;
   }
 
-  let { statusFilter, filters, onUpdate }: Props = $props();
+  let {
+    statusFilter,
+    filters,
+    allFilters = filters,
+    onUpdate,
+  }: Props = $props();
 
   const attribute = $derived(statusFilter.attribute);
   const options = $derived(['All', ...statusFilter.statuses]);
@@ -80,15 +87,25 @@
       filters.some((filter) => filter.value === status) ||
       (status === 'All' &&
         (filters.length === 0 || (filters.length === 1 && !filters[0].value)))}
+    {@const excluded =
+      !checked &&
+      status !== 'All' &&
+      !!status &&
+      !canAddValue(allFilters, attribute, status)}
     <MenuItem
       data-testid={`status-dropdown-filter-chip-${status}`}
-      onclick={() => handleStatusSelect(status)}
+      onclick={excluded ? undefined : () => handleStatusSelect(status)}
+      disabled={excluded}
+      description={excluded
+        ? translate('common.value-excluded-by-query')
+        : undefined}
       class="m-0 gap-0 p-2"
     >
       {#snippet leading()}
         <Checkbox
           onChange={() => handleStatusSelect(status)}
           {checked}
+          disabled={excluded}
           label={status ?? undefined}
           labelHidden
         />

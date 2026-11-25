@@ -11,6 +11,7 @@
     content: string;
     onFilter?: () => void;
     filtered?: boolean;
+    filterDisabledTitle?: string;
     copyIconTitle: string;
     copySuccessIconTitle: string;
     filterIconTitle: string;
@@ -28,6 +29,7 @@
     content,
     onFilter = () => {},
     filtered = false,
+    filterDisabledTitle,
     copyIconTitle,
     copySuccessIconTitle,
     filterIconTitle,
@@ -48,10 +50,13 @@
         onclick={(e) => {
           e.preventDefault();
           e.stopPropagation();
+          if (filterDisabledTitle) return;
           onFilter();
         }}
         class="copy-or-filter-button"
         class:filtered
+        class:filter-disabled={Boolean(filterDisabledTitle)}
+        aria-disabled={filterDisabledTitle ? 'true' : undefined}
         data-testid="quick-filter-button"
         data-menu-anchor={menuId}
         aria-haspopup={menuId ? 'true' : undefined}
@@ -59,7 +64,10 @@
         aria-expanded={menuId ? menuOpen : undefined}
       >
         {#key filtered}
-          <IconFilter title={filterIconTitle} class="m-0.5" />
+          <IconFilter
+            title={filterDisabledTitle ?? filterIconTitle}
+            class="m-0.5"
+          />
         {/key}
       </button>
     {/if}
@@ -90,6 +98,10 @@
 
   .copy-or-filter-button {
     @apply h-6 w-6 rounded-full bg-surface-primary p-0.5 text-primary hover:bg-interactive-tertiary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background-primary active:bg-interactive-tertiary-press;
+  }
+
+  .filter-disabled {
+    @apply cursor-not-allowed opacity-50 hover:bg-surface-primary active:bg-surface-primary;
   }
 
   .filtered {
