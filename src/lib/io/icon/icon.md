@@ -10,13 +10,20 @@ The shared IO icon library, including optical variants for adjusted visual sizin
 import { IconAdd } from '$lib/io/icon';
 ```
 
+Icons are small symbols that represent an action, object, or idea at a glance. They support nearby text and help users scan the interface, and they are usually decorative — when an icon is the only way to convey meaning, give it an accessible label.
+
+| Do                                                                                                                   | Don't                                                                                                        |
+| -------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| Pair icons with text whenever the meaning isn't universally clear.                                                   | Don't use the same icon for different meanings, or different icons for the same meaning, across the product. |
+| Give an icon a `title`, `aria-label`, or `aria-labelledby` when it communicates information on its own.              | Don't label an icon inside an icon-only button. Label the button instead, so the label describes the action. |
+| Let icons inherit the surrounding text color so they match the content they support.                                 | Don't recolor icons to convey status on their own. Pair color with text or use a status component.           |
+| Size icons to the text they sit beside, and use optical variants when an icon looks too heavy or light at that size. | Don't use icons purely as decoration where they add clutter without helping users scan.                      |
+
 Import named icons from `$lib/io/icon`. Icons inherit the current text color
 unless the glyph defines its own colors. Use `width` and `height` to size the SVG.
 
-Icons are decorative by default. Supply `title`, `aria-label`, or
-`aria-labelledby` when an icon communicates information on its own. For an
-icon-only button, label the button instead. Optical variants keep the outer
-box size while adjusting the glyph within it.
+Icons are decorative by default. Optical variants keep the outer box size while
+adjusting the glyph within it.
 
 The Contact Sheet story in the sidebar is generated from the icon barrel, so
 newly exported icons appear automatically.

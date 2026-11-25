@@ -24,7 +24,7 @@
   ];
 
   const { Story } = defineMeta({
-    title: 'IO/Components/Badge',
+    title: 'Components/Badge',
     tags: ['autodocs'],
     component: Badge,
     args: {
@@ -44,6 +44,7 @@
     },
     parameters: {
       docs: {
+        group: 'Labels and status',
         description: {
           component:
             'A compact, non-interactive label for metadata, with optional adjoining extensions.',
@@ -57,9 +58,7 @@
 </script>
 
 {#snippet template(args: ComponentProps<typeof Badge>)}
-  <div class="border border-primary bg-surface-primary p-6 text-primary">
-    <Badge {...args} />
-  </div>
+  <Badge {...args} />
 {/snippet}
 
 <Story tags={['!dev']} name="Playground" />
@@ -96,7 +95,7 @@
 
 <Story name="Primary truncation">
   {#snippet template()}
-    <div class="w-64 border border-primary bg-surface-primary p-6">
+    <div class="w-64">
       <Badge
         text="A long badge label that should truncate"
         truncate
@@ -112,7 +111,7 @@
 
 <Story name="Extension truncation">
   {#snippet template()}
-    <div class="w-64 border border-primary bg-surface-primary p-6">
+    <div class="w-64">
       <Badge
         text="A long badge label that should truncate"
         truncate
@@ -132,9 +131,7 @@
 
 <Story name="Sizes">
   {#snippet template()}
-    <div
-      class="flex flex-wrap items-end gap-4 border border-primary bg-surface-primary p-6"
-    >
+    <div class="flex flex-wrap items-end gap-4">
       {#each sizes as size (size)}
         <div class="flex flex-col items-start gap-2">
           <span class="text-xs text-secondary">{size}</span>
@@ -151,9 +148,7 @@
 
 <Story name="Color schemes">
   {#snippet template()}
-    <div
-      class="flex flex-wrap items-center gap-4 border border-primary bg-surface-primary p-6"
-    >
+    <div class="flex flex-wrap items-center gap-4">
       {#each colorSchemes as colorScheme (colorScheme)}
         <div class="flex flex-col items-start gap-2">
           <span class="text-xs text-secondary">{colorScheme}</span>

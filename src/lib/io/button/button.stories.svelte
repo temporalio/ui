@@ -23,7 +23,7 @@
   const states = ['default', 'hover', 'active', 'disabled'];
 
   const { Story } = defineMeta({
-    title: 'IO/Components/Button',
+    title: 'Components/Button',
     tags: ['autodocs'],
     component: Button,
     args: {
@@ -67,6 +67,7 @@
     },
     parameters: {
       docs: {
+        group: 'Actions and navigation',
         description: {
           component:
             'Triggers an action, with shared sizes, color schemes, icons, and loading feedback.',
@@ -99,9 +100,7 @@
 </script>
 
 {#snippet template(args: ComponentProps<typeof Button>)}
-  <div class="bg-background-primary p-6 text-primary">
-    <Button {...args}>Button</Button>
-  </div>
+  <Button {...args}>Button</Button>
 {/snippet}
 
 <Story tags={['!dev']} name="Playground" {template} />
@@ -121,9 +120,7 @@
   }}
 >
   {#snippet template(args)}
-    <div
-      class="flex flex-wrap items-center gap-4 bg-background-primary p-6 text-primary"
-    >
+    <div class="flex flex-wrap items-center gap-4 text-primary">
       <ButtonLink
         href="https://docs.temporal.io"
         colorScheme={args.colorScheme}
@@ -148,7 +145,7 @@
 
 <Story name="Color schemes and sizes">
   {#snippet template()}
-    <div class="overflow-x-auto bg-background-primary p-6 text-primary">
+    <div class="overflow-x-auto text-primary">
       <table class="border-separate border-spacing-4">
         <caption class="text-left text-sm text-secondary">
           All color schemes and sizes.
@@ -182,7 +179,7 @@
 
 <Story name="Icons">
   {#snippet template()}
-    <div class="flex flex-col gap-6 bg-background-primary p-6 text-primary">
+    <div class="flex flex-col gap-6 text-primary">
       {#each sizes as size (size)}
         <div class="flex flex-wrap items-center gap-4">
           <span class="w-6 text-xs text-secondary">{size}</span>
@@ -200,7 +197,7 @@
 
 <Story name="Icon only">
   {#snippet template(args)}
-    <div class="overflow-x-auto bg-background-primary p-6 text-primary">
+    <div class="overflow-x-auto text-primary">
       <table class="border-separate border-spacing-4">
         <caption class="text-left text-sm text-secondary">
           Leading and trailing icon-only buttons across all sizes and color
@@ -259,7 +256,7 @@
 />
 
 {#snippet loadingTemplate(args: ComponentProps<typeof Button>)}
-  <div class="bg-background-primary p-6 text-primary">
+  <div class="text-primary">
     <Button
       {...args}
       isLoading={args.isLoading || isLoading}
@@ -296,7 +293,7 @@
 
 <Story name="States">
   {#snippet template(args)}
-    <div class="overflow-x-auto bg-background-primary p-6 text-primary">
+    <div class="overflow-x-auto text-primary">
       <table class="border-separate border-spacing-4">
         <caption class="text-left text-sm text-secondary">
           Default, hover, active, and disabled states.

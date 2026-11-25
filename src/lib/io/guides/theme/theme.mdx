@@ -1,0 +1,11 @@
+import { Meta, Stories } from '@storybook/addon-docs/blocks';
+
+import { GuidePage } from '../../../../../.storybook/blocks/guide-page';
+import guide from './theme.md?raw';
+import * as ThemeStories from './theme.stories.svelte';
+
+<Meta of={ThemeStories} />
+
+<GuidePage markdown={guide} />
+
+<Stories title="Token reference" />

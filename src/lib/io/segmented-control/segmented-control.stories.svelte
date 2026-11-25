@@ -13,7 +13,7 @@
   const states = ['default', 'hover', 'focus', 'disabled'];
 
   const { Story } = defineMeta({
-    title: 'IO/Components/Segmented Control',
+    title: 'Components/Segmented Control',
     tags: ['autodocs'],
     component: Segment,
     args: {
@@ -47,6 +47,7 @@
     },
     parameters: {
       docs: {
+        group: 'Actions and navigation',
         description: {
           component:
             'A compact group of related actions or navigation destinations.',
@@ -64,7 +65,7 @@
 </script>
 
 {#snippet template(args: ComponentProps<typeof Segment>)}
-  <div class="bg-background-primary p-6 text-primary">
+  <div class="text-primary">
     <SegmentedControl>
       <Segment {...args}>Segment</Segment>
     </SegmentedControl>
@@ -75,7 +76,7 @@
 
 <Story name="Default">
   {#snippet template()}
-    <div class="bg-background-primary p-6 text-primary">
+    <div class="text-primary">
       <SegmentedControl aria-label="Segments">
         {#each ['first', 'second', 'third'] as segment (segment)}
           <Segment
@@ -91,7 +92,7 @@
 
 <Story name="States">
   {#snippet template()}
-    <div class="overflow-x-auto bg-background-primary p-6 text-primary">
+    <div class="overflow-x-auto text-primary">
       <table class="border-separate border-spacing-4">
         <thead>
           <tr>
@@ -131,7 +132,7 @@
 
 <Story name="Variants">
   {#snippet template()}
-    <div class="bg-background-primary p-6 text-primary">
+    <div class="text-primary">
       <SegmentedControl>
         <Segment selected>Text only</Segment>
         <Segment count={12}>With count</Segment>
@@ -145,7 +146,7 @@
 
 <Story name="Navigation">
   {#snippet template()}
-    <div class="bg-background-primary p-6 text-primary">
+    <div class="text-primary">
       <SegmentedControl element="nav" aria-label="Workflow pages">
         {#each [{ page: 'history', count: 12 }, { page: 'workers', count: 2 }, { page: 'relationships', count: 0 }] as { page, count } (page)}
           <SegmentLink

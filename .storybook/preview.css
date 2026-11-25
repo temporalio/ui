@@ -12,12 +12,52 @@ body.sb-show-main,
   border-bottom: 0;
 }
 
+/* The controls always sit directly under the canvas. */
 .io-docs-playground {
   --io-docs-controls-header-height: 36px;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(260px, 320px);
-  align-items: start;
-  gap: 24px;
+}
+
+/* Storybook's page nav uses fixed light colors, so follow the Io theme.
+   The rail selectors match the specificity of Storybook's nested lists. */
+.sbdocs.sbdocs-toc--custom .toc-wrapper .toc-list,
+.sbdocs.sbdocs-toc--custom .toc-wrapper .toc-list .toc-list {
+  border-left-color: var(--color-border-primary);
+}
+
+.sbdocs-toc--custom .toc-list-item.is-active-li::before {
+  border-left-color: var(--color-content-secondary);
+}
+
+/* IO docs pages render a hidden .io-docs-page marker; the rules below only
+   apply there, so Holocene and Application docs keep Storybook's defaults. */
+
+/* Soften Storybook's docs table striping to 10% of its default fill. */
+[data-theme='light']
+  .sbdocs.sbdocs-content:has(.io-docs-page)
+  table:not(.sb-anchor, .sb-unstyled, .sb-unstyled table)
+  tr:nth-of-type(2n) {
+  background-color: rgb(246 249 252 / 10%);
+}
+
+[data-theme='dark']
+  .sbdocs.sbdocs-content:has(.io-docs-page)
+  table:not(.sb-anchor, .sb-unstyled, .sb-unstyled table)
+  tr:nth-of-type(2n) {
+  background-color: rgb(69 76 84 / 10%);
+}
+
+/* Narrower than Storybook's default 1000px docs column. */
+.sbdocs.sbdocs-content:has(.io-docs-page) {
+  max-width: 800px;
+}
+
+/* Two-column docs tables, such as Do / Don't, split evenly. */
+.sbdocs.sbdocs-content:has(.io-docs-page)
+  table:not(.sb-anchor, .sb-unstyled, .sb-unstyled table):has(
+    tr > :nth-child(2):last-child
+  ) {
+  width: 100%;
+  table-layout: fixed;
 }
 
 .io-docs-canvas,
@@ -30,12 +70,62 @@ body.sb-show-main,
   box-sizing: border-box;
 }
 
-.io-docs-examples .sbdocs-preview-actions {
-  margin-bottom: 16px;
+:is(.io-docs-canvas, .io-docs-examples) .docs-story {
+  background-color: var(--color-surface-primary);
+}
+
+/* Center vertically here and horizontally on the story root, so stories that
+   fill the width (such as grids) are not shrunk to their content. */
+:is(.io-docs-canvas, .io-docs-examples) .docs-story > div:first-child {
+  display: flex;
+  min-height: 86px;
+  flex-direction: column;
+  justify-content: center;
+}
+
+:is(.io-docs-canvas, .io-docs-examples) .docs-story .sb-story > * {
+  display: flex;
+  justify-content: safe center;
+}
+
+/* Show code buttons on the heading row for the Playground and each example.
+   The extra class outranks Storybook's margin reset on docs divs. */
+.sbdocs :is(.io-docs-playground-section, .io-docs-example) {
+  position: relative;
+  margin-bottom: 40px;
+}
+
+:is(.io-docs-playground-section, .io-docs-example) .sbdocs-preview {
+  margin-bottom: 0;
+}
+
+:is(.io-docs-playground-section, .io-docs-example) .sbdocs-preview-actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: auto;
+  margin: 0;
+}
+
+/* Center the 40px buttons bar on the 30px example heading, and keep long
+   titles clear of it. */
+.io-docs-example .sbdocs-preview-actions {
+  top: -5px;
+}
+
+.io-docs-example > h3 {
+  padding-right: 220px;
 }
 
 .io-docs-api-reference {
   overflow-x: auto;
+}
+
+/* Storybook gives this table width: 100% plus a 1px side margin, which
+   overflows the scroll wrapper by 2px. Keep the margin, shrink the width; the
+   extra class outranks Storybook's doubled-class table style. */
+.sbdocs .io-docs-api-reference .docblock-argstable {
+  width: calc(100% - 2px);
 }
 
 .io-docs-page-actions {
@@ -85,16 +175,67 @@ body.sb-show-main,
   height: var(--io-docs-controls-header-height);
 }
 
-.io-docs-playground .io-docs-canvas {
-  margin-top: var(--io-docs-controls-header-height);
+/* IO overview landing page cards. */
+.io-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+  margin: 12px 0 32px;
 }
 
-@media (max-width: 1100px) {
-  .io-docs-playground {
-    grid-template-columns: minmax(0, 1fr);
-  }
+.sbdocs .io-overview-card {
+  padding: 16px;
+  border: 1px solid var(--color-border-primary);
+  border-radius: 8px;
+  background-color: var(--color-surface-primary);
+}
 
-  .io-docs-playground .io-docs-canvas {
-    margin-top: 0;
-  }
+.sbdocs .io-overview-card > p {
+  margin: 0;
+}
+
+.sbdocs .io-overview-card > p + p {
+  margin-top: 6px;
+  color: var(--color-content-secondary);
+}
+
+/* IO overview hero, sized from the 800 × 450 Figma frame. Text and spacing
+   scale with the banner width (cqw); the banner grows if text needs room. */
+.sbdocs .io-overview-hero {
+  position: relative;
+  container-type: inline-size;
+  display: flex;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  margin: 0 0 40px;
+  background: #000 var(--io-overview-hero-image) center / cover no-repeat;
+  color: #fff;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}
+
+.io-overview-hero-content {
+  position: relative;
+  z-index: 1;
+  /* 260px of text plus 40px padding on each side, in the 540px frame. */
+  width: max(62.96cqw, min(340px, 100%));
+  padding: 7.41cqw;
+}
+
+.sbdocs .io-overview-hero h1 {
+  margin: 0 0 1.48cqw;
+  padding: 0;
+  border: 0;
+  color: inherit;
+  font-family: inherit;
+  font-size: max(5.56cqw, 24px);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.sbdocs.sbdocs-content .io-overview-hero p {
+  margin: 0;
+  color: inherit;
+  font-family: inherit;
+  font-size: max(2.22cqw, 13px);
+  line-height: 1.2;
 }

@@ -142,7 +142,7 @@
 
 <div class="space-y-8">
   <section>
-    <h2 class="mb-4 text-xl font-semibold">Basic Form with Wrapper</h2>
+    <h2 class="mb-4 text-xl font-semibold">Basic Form</h2>
     <form use:basicEnhance class="max-w-md space-y-4">
       <Input
         id="username"
@@ -163,7 +163,7 @@
         {...$basicConstraints.email}
       />
 
-      <Button type="submit">Submit with Wrapper</Button>
+      <Button type="submit">Submit</Button>
     </form>
   </section>
 

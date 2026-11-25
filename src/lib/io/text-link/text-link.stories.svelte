@@ -9,7 +9,7 @@
   import TextLink from './text-link.svelte';
 
   const { Story } = defineMeta({
-    title: 'IO/Components/Text Link',
+    title: 'Components/Text Link',
     tags: ['autodocs'],
     component: TextLink,
     args: {
@@ -48,6 +48,7 @@
     },
     parameters: {
       docs: {
+        group: 'Actions and navigation',
         description: {
           component:
             'An inline navigation link with optional leading and trailing icons.',
@@ -60,9 +61,7 @@
 </script>
 
 {#snippet template(args: ComponentProps<typeof TextLink>)}
-  <div
-    class="bg-background-primary p-6 text-xs font-normal leading-4 text-primary"
-  >
+  <div class="text-xs font-normal leading-4 text-primary">
     <TextLink {...args}>Documentation</TextLink>
   </div>
 {/snippet}
@@ -88,9 +87,7 @@
 
 <Story name="Inline text">
   {#snippet template(args)}
-    <div
-      class="max-w-sm bg-background-primary p-6 text-xs leading-4 text-primary"
-    >
+    <div class="max-w-sm text-xs leading-4 text-primary">
       Read the <TextLink {...args}>Temporal documentation</TextLink> for more information
       about workflows and activities.
     </div>
@@ -99,7 +96,7 @@
 
 <Story name="Inherited typography">
   {#snippet template(args)}
-    <div class="space-y-4 bg-background-primary p-6 text-primary">
+    <div class="space-y-4 text-primary">
       {#each ['text-xs leading-4', 'text-base leading-6', 'text-xl font-semibold leading-8'] as typography (typography)}
         <p class={typography}>
           Read the <TextLink {...args}>documentation</TextLink> or

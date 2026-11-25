@@ -38,7 +38,7 @@
   ];
 
   const { Story } = defineMeta({
-    title: 'IO/Layouts/Page Header',
+    title: 'Layouts/Page Header',
     tags: ['autodocs'],
     component: PageHeader,
     args: { heading },

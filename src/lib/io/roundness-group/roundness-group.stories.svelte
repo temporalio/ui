@@ -7,7 +7,7 @@
   import RoundnessGroup from './roundness-group.svelte';
 
   const { Story } = defineMeta({
-    title: 'IO/Components/Roundness Group',
+    title: 'Components/Roundness Group',
     tags: ['autodocs'],
     component: RoundnessGroup,
     args: {
@@ -35,6 +35,7 @@
     },
     parameters: {
       docs: {
+        group: 'Foundations',
         description: {
           component:
             'A layout primitive that coordinates the corners and borders of adjoining segments.',

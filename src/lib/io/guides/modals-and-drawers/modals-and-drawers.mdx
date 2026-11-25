@@ -1,0 +1,9 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+import { GuidePage } from '../../../../../.storybook/blocks/guide-page';
+import guide from './modals-and-drawers.md?raw';
+import * as Stories from './modals-and-drawers.stories.svelte';
+
+<Meta of={Stories} />
+
+<GuidePage markdown={guide} stories={Stories} />

@@ -1,0 +1,13 @@
+import { Meta, Primary } from '@storybook/addon-docs/blocks';
+
+import { GuidePage } from '../../../../../.storybook/blocks/guide-page';
+import guide from './superforms.md?raw';
+import * as Stories from './superforms.stories.svelte';
+
+<Meta of={Stories} />
+
+<GuidePage markdown={guide} />
+
+## Example
+
+<Primary />
