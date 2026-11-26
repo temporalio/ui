@@ -42,7 +42,7 @@ The citations in this document point at the spike branch, at the commit above.
 - **Other changes:**
   - `apps/ui/package.json:44`: `BUILD_PATH=../../server/ui/assets/local`.
   - `apps/ui/package.json:112`: `"@temporalio/io": "workspace:*"`.
-  - 71 imports inside Io changed from `$lib/io/…` to relative paths.
+  - 71 imports inside Io changed from `$lib/io/…` to relative paths. This is the number in the spike notes. The diff of the move commit (`git show 519087433`) changes 44 import lines in Io, all in `.svelte` and `.ts` files. These are the same 44 imports that `main` has (migration-plan.md, step 0.4). The diff does not show what the other 27 count, so the migration plan uses 44.
   - 14 re-export files keep `$lib/io/<name>` working in the app, for example `apps/ui/src/lib/io/badge-status/index.ts:1`.
   - 8 app files imported `$lib/io/….svelte` directly. They now import `@temporalio/io/….svelte`.
 

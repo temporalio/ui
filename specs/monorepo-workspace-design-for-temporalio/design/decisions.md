@@ -61,7 +61,7 @@ Decision records 1 (the app moves to `apps/ui`) and 2 (the catalog split) are in
 
 - **Question:** how does CI run only what a PR changed?
 - **Options:**
-  1. **One `ci.yml` with `dorny/paths-filter`, job-level `if:`, one `ci-gate` required check and a nightly full run. pnpm `--filter "...[origin/main]"` selects packages. No task runner now (recommended).**
+  1. **One `ci.yml` with `dorny/paths-filter`, job-level `if:`, one `ci-gate` required check and a nightly full run. pnpm `--filter "...[$BASE]"` selects packages, where `BASE` is the PR base branch or the merge-group base commit. The two jobs that use it check out the full history (`fetch-depth: 0`). No task runner now (recommended).**
   2. **Turborepo now,** with `turbo run --affected` and a remote cache.
   3. **Nx.**
 - **Recommendation:** option 1.

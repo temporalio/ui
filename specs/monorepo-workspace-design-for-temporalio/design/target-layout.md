@@ -99,13 +99,13 @@ overrides:
 
 ### Root: `temporal-ui-workspace` (private)
 
-| Field                                  | Value                                                                                                                                                                    |
-| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `private`                              | `true`                                                                                                                                                                   |
-| `packageManager`                       | `pnpm@12.23.0`                                                                                                                                                           |
-| `scripts`                              | `lint`, `lint:ci`, `check`, `test` and `build` as `pnpm -r <task>` over all packages. `build:server` as `pnpm --filter @temporalio/ui build:server`. `prepare` for husky |
-| `devDependencies`                      | Only repo-wide tools: `husky`, `lint-staged`, `prettier`, `eslint`, `knip`, `@temporalio/ui-config: workspace:*`                                                         |
-| `exports`, `files`, `peerDependencies` | None (the root is never published)                                                                                                                                       |
+| Field                                  | Value                                                                                                                                                                                                                                                                        |
+| -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `private`                              | `true`                                                                                                                                                                                                                                                                       |
+| `packageManager`                       | `pnpm@12.23.0`                                                                                                                                                                                                                                                               |
+| `scripts`                              | `lint`, `lint:ci`, `check`, `test` and `build` as `pnpm -r <task>` over all packages. `build:server` as `pnpm --filter @temporalio/ui build:server`. `catalog` as `pnpm --filter @temporalio/ui-catalog catalog --app-root apps/ui` (decision record 2). `prepare` for husky |
+| `devDependencies`                      | Only repo-wide tools: `husky`, `lint-staged`, `prettier`, `eslint`, `knip`, `@temporalio/ui-config: workspace:*`                                                                                                                                                             |
+| `exports`, `files`, `peerDependencies` | None (the root is never published)                                                                                                                                                                                                                                           |
 
 The root wrappers run every package. CI selects the changed packages itself (ci-and-release.md). The `ui-server` sync and `server-test` call the root `build:server`.
 
@@ -256,9 +256,26 @@ In this variant, Io, config, catalog and dev tools move to `packages/*`, and the
   The Svelte components of `browser/`, `catalog-kinds`, `catalog-features` and all of `host/` stay in `apps/ui/src/lib/catalog`. They import `@temporalio/ui-catalog/...`.
 
 - **How the 2.x paths stay.** The `package` script of `apps/ui` compiles `packages/catalog/src` with `svelte-package` into a temporary folder, and copies the output into `apps/ui/dist/catalog/`. It then rewrites each `@temporalio/ui-catalog/<path>` import in `dist` to a relative path. Then `generate-exports.mjs` runs as today, so each `./catalog/*` key stays. `@temporalio/ui` keeps the runtime dependencies of the catalog in `dependencies`, as today (`package.json:108,111-112,134`).
-- **Why this keeps the catalog private.** The package `@temporalio/ui-catalog` is never packed or published, and `@temporalio/ui` lists it only in `devDependencies`. `@temporalio/ui` ships the compiled catalog modules that it ships today, and nothing more. The dependency graph has no cycle: the app, the dev tools and nothing else depend on the catalog, and the catalog depends on no workspace package except the config.
-- **Checks.** The `package` job fails if a packed file names `@temporalio/ui-catalog` (boundaries.md, rule B6). Step 1.4 also runs the clean-consumer test and compares the export keys before and after (migration-plan.md).
+- **The CLI also reads and writes app files by path.** The split line above counts imports only. The CLI has a second coupling: it resolves file paths against `getProjectRoot()`, the nearest folder above the script that has a `package.json` (`scripts/get-project-root.ts:5-16`).
+  - It writes the generated catalog to `src/lib/catalog/browser/catalog.generated.json` and `catalog.generated.ts` (`scripts/catalog/project-artifacts.ts:18-19`, `scripts/catalog/ui-authoring.ts:80-81,159-164`).
+  - Its boundary check reads 13 browser and host files and the app `package.json` (`scripts/catalog/project-artifacts.ts:27-42`).
+  - It writes the worker files `shared-registrations.ts` and `workflows.ts`, and the examples (`scripts/catalog/ui-authoring.ts:78-79,155,167,176`).
+  - It reads and writes `catalog.local/` (`scripts/catalog/project-artifacts.ts:20-22`).
+
+  After step 1.4, `getProjectRoot()` finds `packages/catalog/package.json`. Each app path then resolves in the wrong folder, and `pnpm catalog` breaks.
+
+- **Where the files live after the split.**
+  - The generated files stay in the app, at `apps/ui/src/lib/catalog/browser/catalog.generated.json` and `.ts`. Their only importer is `catalog.ts` (`src/lib/catalog/browser/catalog.ts:1`), a UI module that stays in the app.
+  - The worker files and the examples move with `worker/` to `packages/catalog/src/worker/`.
+  - `catalog.local/` stays at the app root, `apps/ui/catalog.local/`. The Vite plugin reads it from the Vite root (`plugins/vite-plugin-catalog-local.ts:11`). The root-anchored `.gitignore` entry gets the new path (spike-results.md, C).
+- **How the CLI finds the app root.** The CLI gets two roots in place of one `rootDirectory`:
+  - The catalog root is the folder of its own `package.json`. The CLI gets its own copy of `getProjectRoot()`, because `scripts/get-project-root.ts` stays at the repo root, and a relative import across a package root breaks rule B7. Worker paths, `routing.ts` and `types.ts` resolve against the catalog root.
+  - The app root comes from an explicit `--app-root` option, a path from the workspace root. The root `catalog` script passes `--app-root apps/ui`. Without the option, the CLI finds the workspace root (the folder with `pnpm-workspace.yaml`) and uses `apps/ui` below it. The generated files, the other 11 files of the boundary check, the app `package.json` and `catalog.local/` resolve against the app root.
+- **The edge to the app is a path, not an import.** The CLI writes files in `apps/ui`, but no catalog module imports app code, and `packages/catalog/package.json` does not list `@temporalio/ui`. So the package graph stays as the next point says. pnpm does not see the path edge, but a catalog change that changes the generated files also changes files in `apps/ui`, so the `app` filter of CI turns on.
+- **Why this keeps the catalog private.** The package `@temporalio/ui-catalog` is never packed or published, and `@temporalio/ui` lists it only in `devDependencies`. `@temporalio/ui` ships the compiled catalog modules that it ships today, and nothing more. The dependency graph has no cycle: the app, the dev tools and nothing else depend on the catalog, and the catalog depends on no workspace package except the config. The path edge of the CLI to `apps/ui` is not a package dependency (see above).
+- **Checks.** The `package` job fails if an import specifier in a packed `dist` file names `@temporalio/ui-catalog`, or if a runtime dependency field of the packed `package.json` names it (boundaries.md, rule B6). Step 1.4 also runs the clean-consumer test and compares the export keys before and after (migration-plan.md).
 - **Cost:**
   - The Stage 1 catalog PR must sort each file of `browser/` by its imports. The migration plan gives this PR its own step.
   - A copy step in the `apps/ui` package script, which the spike did not test (risks-and-open-questions.md, K9).
+  - Two roots and an `--app-root` option in the CLI (risks-and-open-questions.md, K9).
   - In 3.0, the team can drop the copy. That needs a decision about how `cloud-ui` gets the catalog (Stage 3).

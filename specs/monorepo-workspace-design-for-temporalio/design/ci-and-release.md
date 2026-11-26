@@ -67,17 +67,17 @@ nightly.yml (schedule + workflow_dispatch): every job with every filter set to t
 
 ### Which jobs run
 
-| Job                          | Runs when                                             | Command                                                                                                                                   |
-| ---------------------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| `lint`                       | always (it is fast and covers all packages)           | `pnpm lint:ci` (prettier, eslint with the boundary rules, stylelint, knip)                                                                |
-| `check-types`                | any of `io`, `catalog`, `dev_tools`, `app`, `config`  | `pnpm -r $SELECT check` (see `SELECT` below)                                                                                              |
-| `unit-tests`                 | any of `io`, `catalog`, `dev_tools`, `app`            | `pnpm -r $SELECT test -- --run`                                                                                                           |
-| `package`                    | `io` or `app`                                         | `pnpm --filter "./packages/io" --filter "./apps/ui" pack`, then a search of the packed files for private package names (boundary rule B6) |
-| `integration-tests`          | `app` or `dev_tools`                                  | `pnpm --filter @temporalio/ui test:integration`                                                                                           |
-| `e2e-tests`                  | `app` or `dev_tools`                                  | `pnpm --filter @temporalio/ui test:e2e`                                                                                                   |
-| `server-test` (today `test`) | `server` or `app` (the Go build embeds the app build) | `pnpm build:server`, then `make build` and `make test` in `server/`                                                                       |
-| `chromatic-io`               | `io`                                                  | Chromatic in `packages/io`                                                                                                                |
-| `chromatic-app`              | every PR. `skip: true` when neither `app` nor `io`    | Chromatic in `apps/ui`. It posts the required `UI Tests` status.                                                                          |
+| Job                          | Runs when                                                              | Command                                                                                                                                                                           |
+| ---------------------------- | ---------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `lint`                       | always (it is fast and covers all packages)                            | `pnpm lint:ci` (prettier, eslint with the boundary rules, stylelint, knip)                                                                                                        |
+| `check-types`                | any of `io`, `catalog`, `dev_tools`, `app`, `config`                   | `pnpm -r $SELECT check` (see `SELECT` below)                                                                                                                                      |
+| `unit-tests`                 | any of `io`, `catalog`, `dev_tools`, `app`                             | `pnpm -r $SELECT test -- --run`                                                                                                                                                   |
+| `package`                    | `io` or `app`                                                          | `pnpm --filter "./packages/io" --filter "./apps/ui" pack`, then the import scan of the packed `dist` files and the manifest check of the packed `package.json` (boundary rule B6) |
+| `integration-tests`          | `app` or `dev_tools`                                                   | `pnpm --filter @temporalio/ui test:integration`                                                                                                                                   |
+| `e2e-tests`                  | `app`, `dev_tools` or `server` (the job builds and runs the Go server) | `pnpm build:server`, `make build` in `server/`, then `pnpm --filter @temporalio/ui test:e2e` against that server                                                                  |
+| `server-test` (today `test`) | `server` or `app` (the Go build embeds the app build)                  | `pnpm build:server`, then `make build` and `make test` in `server/`                                                                                                               |
+| `chromatic-io`               | `io`                                                                   | Chromatic in `packages/io`                                                                                                                                                        |
+| `chromatic-app`              | every PR. `skip: true` when neither `app` nor `io`                     | Chromatic in `apps/ui`. It posts the required `UI Tests` status.                                                                                                                  |
 
 In these cases, `SELECT` is empty, and the command runs every package:
 
@@ -85,7 +85,14 @@ In these cases, `SELECT` is empty, and the command runs every package:
 - the event is `push` (to `main`)
 - the `root` or the `ci` filter is `true` (for example, a catalog version bump that changes only `pnpm-workspace.yaml` and `pnpm-lock.yaml`)
 
-In all other cases, `SELECT` is `--filter "...[origin/main]"` (pnpm 12.7 and later use the merge base). It selects the changed packages and the packages that depend on them. A change in `packages/io` then also checks and tests `apps/ui`. Without this rule, the diff on `main` is empty, the filter selects no package, and pnpm exits with 0 and tests nothing.
+In all other cases, `SELECT` is `--filter "...[$BASE]"` (pnpm 12.7 and later use the merge base). It selects the changed packages and the packages that depend on them. A change in `packages/io` then also checks and tests `apps/ui`. Without this rule, the diff on `main` is empty, the filter selects no package, and pnpm exits with 0 and tests nothing.
+
+`BASE` and the checkout:
+
+- For `pull_request`, `BASE` is `origin/<base branch>` from `github.base_ref`. For `merge_group`, `BASE` is `github.event.merge_group.base_sha`, the commit that the queue merges into. The job passes the value through `env:`, not by interpolation in `run:`.
+- `check-types` and `unit-tests` check out with `fetch-depth: 0`. Today each job checks out with no `fetch-depth` (`.github/workflows/lint-and-test.yml:25,33,41`). That clone has a depth of 1 and no `origin/main` ref, so pnpm cannot find the merge base. A full clone has the base branch and the merge base.
+- A step before the command runs `git rev-parse --verify "$BASE^{commit}"`. If the ref is missing, the job fails. It does not continue with an empty selection.
+- Only these two jobs need the full history. The other jobs keep the clone with a depth of 1.
 
 ### Example: a PR that changes only `packages/io` (R3.S1)
 
@@ -107,7 +114,7 @@ The filters give `io = true` and `app = true` (the app depends on Io). All other
 
 No job skips for a change only in `packages/io`. Io is the base of the app, so the app tests and the Go build must run. Savings come from other changes:
 
-- `server/` only: `check-types`, `unit-tests`, `package`, `integration-tests` and `e2e-tests` skip, and `chromatic-app` passes with `skip`.
+- `server/` only: `check-types`, `unit-tests`, `package` and `integration-tests` skip, and `chromatic-app` passes with `skip`. `e2e-tests` runs, because it is the only browser test of the Go server (`.github/workflows/playwright.yml:46-60`).
 - `packages/dev-tools` only: `package`, `server-test` and the Chromatic builds skip.
 - `specs/**` or `docs/**` only: `changes`, `lint`, `ci-gate` and a skipped `chromatic-app` run.
 
@@ -269,4 +276,4 @@ The other option is to keep `@temporalio/io` inside the `@temporalio/ui` tarball
 
 ## Compatibility with Turborepo
 
-`ci.yml` runs pnpm filters, not a task runner. Turborepo can replace the `--filter "...[origin/main]"` calls later with `turbo run <task> --affected`, which reads `GITHUB_BASE_REF`. The `changes` job and `ci-gate` stay. A remote cache would save time mostly in `check-types` and `unit-tests`. Independent data shows modest gains from the cache, with a median of 20 to 18 minutes at Sentry, and larger gains from affected-only runs. This design gets the affected-only runs without Turborepo.
+`ci.yml` runs pnpm filters, not a task runner. Turborepo can replace the `--filter "...[$BASE]"` calls later with `turbo run <task> --affected`, which reads `GITHUB_BASE_REF`. The `changes` job and `ci-gate` stay. A remote cache would save time mostly in `check-types` and `unit-tests`. Independent data shows modest gains from the cache, with a median of 20 to 18 minutes at Sentry, and larger gains from affected-only runs. This design gets the affected-only runs without Turborepo.
