@@ -1,0 +1,53 @@
+{
+  "name": "@temporalio/io",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Io design system components for Temporal UIs",
+  "license": "MIT",
+  "files": [
+    "dist/**/*",
+    "!dist/**/*.test.*",
+    "!dist/**/*.spec.*",
+    "!dist/**/*.stories.*"
+  ],
+  "scripts": {
+    "package": "svelte-package --input src --output dist",
+    "generate-exports": "node ../../apps/ui/scripts/generate-exports.mjs .",
+    "stories:build": "storybook build",
+    "check": "svelte-check --tsconfig ./tsconfig.json"
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    "./types": {
+      "types": "./src/types.ts",
+      "default": "./src/types.ts"
+    },
+    "./*.svelte": {
+      "types": "./src/*.svelte",
+      "svelte": "./src/*.svelte",
+      "default": "./src/*.svelte"
+    },
+    "./*": {
+      "types": "./src/*/index.ts",
+      "svelte": "./src/*/index.ts",
+      "default": "./src/*/index.ts"
+    }
+  },
+  "dependencies": {
+    "tailwind-merge": "^2.6.1"
+  },
+  "peerDependencies": {
+    "@sveltejs/kit": "catalog:",
+    "svelte": "catalog:"
+  },
+  "devDependencies": {
+    "@sveltejs/kit": "catalog:",
+    "@sveltejs/package": "^2.3.10",
+    "@sveltejs/vite-plugin-svelte": "7.3.1",
+    "svelte": "catalog:",
+    "svelte-check": "^4.1.5",
+    "typescript": "6.0.3",
+    "vite": "8.3.4"
+  }
+}

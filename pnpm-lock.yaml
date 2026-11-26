@@ -239,6 +239,24 @@ overrides:
 importers:
 
   .:
+    devDependencies:
+      husky:
+        specifier: ^8.0.3
+        version: 8.0.3
+      lint-staged:
+        specifier: ^16.2.7
+        version: 16.4.0
+      prettier:
+        specifier: 3.8.1
+        version: 3.8.1
+      prettier-plugin-svelte:
+        specifier: ^3.3.3
+        version: 3.5.2(prettier@3.8.1)(svelte@5.56.3(@typescript-eslint/types@8.62.0))
+      prettier-plugin-tailwindcss:
+        specifier: ^0.7.2
+        version: 0.7.4(prettier-plugin-svelte@3.5.2(prettier@3.8.1)(svelte@5.56.3(@typescript-eslint/types@8.62.0)))(prettier@3.8.1)
+
+  apps/ui:
     dependencies:
       '@codemirror/autocomplete':
         specifier: ^6.18.7
@@ -288,6 +306,9 @@ importers:
       '@temporalio/activity':
         specifier: 1.24.0
         version: 1.24.0
+      '@temporalio/io':
+        specifier: workspace:*
+        version: link:../../packages/io
       '@temporalio/workflow':
         specifier: 1.24.0
         version: 1.24.0
@@ -520,9 +541,6 @@ importers:
       helmet:
         specifier: ^8.1.0
         version: 8.2.0
-      husky:
-        specifier: ^8.0.3
-        version: 8.0.3
       js-yaml:
         specifier: '>=4.3.2 <5'
         version: 4.3.2
@@ -532,9 +550,6 @@ importers:
       knip:
         specifier: ^6.7.0
         version: 6.23.0
-      lint-staged:
-        specifier: ^16.2.7
-        version: 16.4.0
       mkdirp:
         specifier: ^2.1.3
         version: 2.1.6
@@ -643,6 +658,34 @@ importers:
       zx:
         specifier: ^8.8.5
         version: 8.8.5
+
+  packages/io:
+    dependencies:
+      tailwind-merge:
+        specifier: ^2.6.1
+        version: 2.6.1
+    devDependencies:
+      '@sveltejs/kit':
+        specifier: 'catalog:'
+        version: 2.70.2(@sveltejs/vite-plugin-svelte@7.3.1(svelte@5.56.3(@typescript-eslint/types@8.62.0))(vite@8.3.4(@types/node@22.18.0)(esbuild@0.28.2)(jiti@1.21.7)(terser@5.46.1)(yaml@2.8.3)))(svelte@5.56.3(@typescript-eslint/types@8.62.0))(typescript@6.0.3)(vite@8.3.4(@types/node@22.18.0)(esbuild@0.28.2)(jiti@1.21.7)(terser@5.46.1)(yaml@2.8.3))
+      '@sveltejs/package':
+        specifier: ^2.3.10
+        version: 2.5.8(svelte@5.56.3(@typescript-eslint/types@8.62.0))(typescript@6.0.3)
+      '@sveltejs/vite-plugin-svelte':
+        specifier: 7.3.1
+        version: 7.3.1(svelte@5.56.3(@typescript-eslint/types@8.62.0))(vite@8.3.4(@types/node@22.18.0)(esbuild@0.28.2)(jiti@1.21.7)(terser@5.46.1)(yaml@2.8.3))
+      svelte:
+        specifier: 'catalog:'
+        version: 5.56.3(@typescript-eslint/types@8.62.0)
+      svelte-check:
+        specifier: ^4.1.5
+        version: 4.7.1(picomatch@4.0.4)(svelte@5.56.3(@typescript-eslint/types@8.62.0))(typescript@6.0.3)
+      typescript:
+        specifier: 6.0.3
+        version: 6.0.3
+      vite:
+        specifier: 8.3.4
+        version: 8.3.4(@types/node@22.18.0)(esbuild@0.28.2)(jiti@1.21.7)(terser@5.46.1)(yaml@2.8.3)
 
 packages:
 

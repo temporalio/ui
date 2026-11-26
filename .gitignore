@@ -60,3 +60,12 @@ go.work.sum
 # Feature demo runner output and machine-local paths (scripts/feature-demo.ts)
 /.feature-demo/
 /.env.feature-demo.local
+
+# spike: workspace packages (root-anchored entries above no longer match apps/ui, packages/io)
+.svelte-kit/
+/apps/*/bin
+/apps/*/build
+/apps/*/dist
+/packages/*/dist
+storybook-static/
+/apps/*/.catalog-tmp/
