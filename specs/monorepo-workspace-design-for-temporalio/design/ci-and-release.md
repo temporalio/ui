@@ -6,15 +6,15 @@ This document gives the CI workflow graph after the split, the gate job, the rel
 
 ## CI today
 
-| Workflow                   | Jobs                                                                                                               | Required check on `main`         |
-| -------------------------- | ------------------------------------------------------------------------------------------------------------------ | -------------------------------- |
-| `lint-and-test.yml`        | `lint`, `check-types`, `unit-tests` (`.github/workflows/lint-and-test.yml:22,30,38`)                               | `unit-tests`                     |
-| `playwright.yml`           | `integration-tests`, `e2e-tests`, each with `timeout-minutes: 60` (`.github/workflows/playwright.yml:18-19,37-38`) | `integration-tests`, `e2e-tests` |
-| `test.yml` ("Server Test") | `test`: `pnpm build:server`, then `make build` and `make test` in `server/` (`.github/workflows/test.yml:13-36`)   | `test`                           |
-| `chromatic.yml`            | `chromatic` on `pull_request_target` (`.github/workflows/chromatic.yml:6,15`)                                      | none                             |
+| Workflow                   | Jobs                                                                                                               | Required check on `main`                     |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------ | -------------------------------------------- |
+| `lint-and-test.yml`        | `lint`, `check-types`, `unit-tests` (`.github/workflows/lint-and-test.yml:22,30,38`)                               | `unit-tests`                                 |
+| `playwright.yml`           | `integration-tests`, `e2e-tests`, each with `timeout-minutes: 60` (`.github/workflows/playwright.yml:18-19,37-38`) | `integration-tests`, `e2e-tests`             |
+| `test.yml` ("Server Test") | `test`: `pnpm build:server`, then `make build` and `make test` in `server/` (`.github/workflows/test.yml:13-36`)   | `test`                                       |
+| `chromatic.yml`            | `chromatic` on `pull_request_target` (`.github/workflows/chromatic.yml:6,15`)                                      | `UI Tests` (the status that Chromatic posts) |
 
 - Source: the `main` ruleset (`gh api repos/temporalio/ui/rules/branches/main`) requires `unit-tests`, `integration-tests`, `e2e-tests`, `test` and `UI Tests`.
-- Branch protection also requires `UI Tests`. No workflow in this repo has a job with that name, so the check comes from outside (see risks-and-open-questions.md).
+- Branch protection also requires `UI Tests`. No job in this repo has that name. It is the commit status that Chromatic posts for the app Storybook project. On `051de464a`, the `UI Tests` status links to a `chromatic.com` build and says "370 tests unchanged" (GitHub statuses API). The `chromatic` job starts the build (`.github/workflows/chromatic.yml:25-33`).
 - `lint` and `check-types` are not required today.
 - No test workflow has `paths:`, so every PR runs every job. The PR triggers also run on `codefreeze-*` branches (`.github/workflows/test.yml:6-7`).
 
@@ -38,45 +38,54 @@ pull_request / push to main / merge_group
                               │ ci-gate │  the only required check
                               └─────────┘
 
-chromatic.yml (pull_request_target): changes → chromatic-io (if io) ; chromatic-app (if app or io)
+chromatic.yml (pull_request_target): changes → chromatic-io (if io) ; chromatic-app (always, with skip when neither app nor io)
 nightly.yml (schedule + workflow_dispatch): every job with every filter set to true
 ```
 
 - One workflow, `ci.yml`, replaces `lint-and-test.yml`, `playwright.yml` and `test.yml`. All gated jobs and the gate job are in one workflow, so `needs:` can join them. The job names stay the same.
 - **No workflow-level `paths:`.** A workflow that `paths:` skips leaves its required checks "Pending", and the PR cannot merge. A job that `if:` skips reports "Success". So each gate is a job-level `if:` on an output of the `changes` job.
 - **Do not interpolate the `*_files` outputs of `paths-filter` into `run:`.** File names come from the PR, and interpolation is a script injection path. The jobs read only the boolean outputs.
-- `chromatic.yml` stays a separate workflow, because it runs on `pull_request_target` with `statuses: write` (`.github/workflows/chromatic.yml:6-12`). It has its own small `changes` job. Chromatic is not a required check today, and it does not become one.
+- `chromatic.yml` stays a separate workflow, because it runs on `pull_request_target` with `statuses: write` (`.github/workflows/chromatic.yml:6-12`). It has its own small `changes` job.
+- **`UI Tests` stays a second required check** (decision record 9 in decisions.md). `ci-gate` cannot need it: it is a status from the Chromatic service, from a separate workflow. So `chromatic-app` runs on every PR. When the filters do not need a visual test, it passes `skip: true` to `chromaui/action`. Chromatic then marks the commit as passing, and `UI Tests` never stays "Pending". The workflow already uses this input for Dependabot branches (`.github/workflows/chromatic.yml:33`).
 
 ### The filters
 
-| Output      | Paths                                                                                     | Also true when                                          |
-| ----------- | ----------------------------------------------------------------------------------------- | ------------------------------------------------------- |
-| `root`      | `package.json`, `pnpm-lock.yaml`, `pnpm-workspace.yaml`, `.npmrc`, `.github/actions/**`   | —                                                       |
-| `ci`        | `.github/workflows/ci.yml`                                                                | —                                                       |
-| `config`    | `packages/config/**`, `eslint.config.js`, `.prettierrc`, `.stylelintrc`, `knip.config.ts` | —                                                       |
-| `io`        | `packages/io/**`                                                                          | `root`, `ci`                                            |
-| `catalog`   | `packages/catalog/**`                                                                     | `root`, `ci`                                            |
-| `dev_tools` | `packages/dev-tools/**`                                                                   | `root`, `ci`                                            |
-| `app`       | `apps/ui/**`                                                                              | `root`, `ci`, `io`, `catalog` (the app depends on them) |
-| `server`    | `server/**`                                                                               | `root`, `ci`                                            |
+| Output      | Paths                                                                                                 | Also true when                                          |
+| ----------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| `root`      | `package.json`, `pnpm-lock.yaml`, `pnpm-workspace.yaml`, `.npmrc`, `.github/actions/**`, `scripts/**` | —                                                       |
+| `ci`        | `.github/workflows/ci.yml`                                                                            | —                                                       |
+| `config`    | `packages/config/**`, `eslint.config.js`, `.prettierrc`, `.stylelintrc`, `knip.config.ts`             | —                                                       |
+| `io`        | `packages/io/**`                                                                                      | `root`, `ci`                                            |
+| `catalog`   | `packages/catalog/**`                                                                                 | `root`, `ci`                                            |
+| `dev_tools` | `packages/dev-tools/**`                                                                               | `root`, `ci`                                            |
+| `app`       | `apps/ui/**`                                                                                          | `root`, `ci`, `io`, `catalog` (the app depends on them) |
+| `server`    | `server/**`                                                                                           | `root`, `ci`                                            |
 
-`root` and `ci` turn on every filter. A change to the lockfile or to the CI itself then runs everything, so a dependency bump never skips a test.
+`root` and `ci` turn on every filter, and the job commands then run every package (below). A change to the lockfile or to the CI itself then runs everything, so a dependency bump never skips a test.
+
+**The filters change with each move.** Stage 0.1 starts with filters for today's layout. There, `app` is every path except `server/**`, `docs/**`, `specs/**`, `examples/**`, `agent-plugins/**` and the Markdown files at the root. A negative filter cannot miss an app input such as `tests/**`, `static/**`, `plugins/**`, `utilities/**`, `temporal/**` or a root config file. Each Stage 1 PR that moves files changes the filters in the same PR (migration-plan.md). Between two steps, no app PR skips a test.
 
 ### Which jobs run
 
-| Job                          | Runs when                                             | Command                                                                                   |
-| ---------------------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| `lint`                       | always (it is fast and covers all packages)           | `pnpm lint:ci` (prettier, eslint with the boundary rules, stylelint, knip)                |
-| `check-types`                | any of `io`, `catalog`, `dev_tools`, `app`, `config`  | `pnpm -r --filter "...[origin/main]" check` (pnpm 12.7 and later use the merge base)      |
-| `unit-tests`                 | any of `io`, `catalog`, `dev_tools`, `app`            | `pnpm -r --filter "...[origin/main]" test -- --run`                                       |
-| `package`                    | `io` or `app`                                         | `pnpm -r --filter "./packages/io" --filter "./apps/ui" pack --dry-run` (boundary rule B6) |
-| `integration-tests`          | `app` or `dev_tools`                                  | `pnpm --filter @temporalio/ui test:integration`                                           |
-| `e2e-tests`                  | `app` or `dev_tools`                                  | `pnpm --filter @temporalio/ui test:e2e`                                                   |
-| `server-test` (today `test`) | `server` or `app` (the Go build embeds the app build) | `pnpm build:server`, then `make build` and `make test` in `server/`                       |
-| `chromatic-io`               | `io`                                                  | Chromatic in `packages/io`                                                                |
-| `chromatic-app`              | `app` or `io`                                         | Chromatic in `apps/ui`                                                                    |
+| Job                          | Runs when                                             | Command                                                                                                                                   |
+| ---------------------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `lint`                       | always (it is fast and covers all packages)           | `pnpm lint:ci` (prettier, eslint with the boundary rules, stylelint, knip)                                                                |
+| `check-types`                | any of `io`, `catalog`, `dev_tools`, `app`, `config`  | `pnpm -r $SELECT check` (see `SELECT` below)                                                                                              |
+| `unit-tests`                 | any of `io`, `catalog`, `dev_tools`, `app`            | `pnpm -r $SELECT test -- --run`                                                                                                           |
+| `package`                    | `io` or `app`                                         | `pnpm --filter "./packages/io" --filter "./apps/ui" pack`, then a search of the packed files for private package names (boundary rule B6) |
+| `integration-tests`          | `app` or `dev_tools`                                  | `pnpm --filter @temporalio/ui test:integration`                                                                                           |
+| `e2e-tests`                  | `app` or `dev_tools`                                  | `pnpm --filter @temporalio/ui test:e2e`                                                                                                   |
+| `server-test` (today `test`) | `server` or `app` (the Go build embeds the app build) | `pnpm build:server`, then `make build` and `make test` in `server/`                                                                       |
+| `chromatic-io`               | `io`                                                  | Chromatic in `packages/io`                                                                                                                |
+| `chromatic-app`              | every PR. `skip: true` when neither `app` nor `io`    | Chromatic in `apps/ui`. It posts the required `UI Tests` status.                                                                          |
 
-`...[origin/main]` selects the changed packages and the packages that depend on them. A change in `packages/io` then also checks and tests `apps/ui`.
+In these cases, `SELECT` is empty, and the command runs every package:
+
+- the `full` input is `true` (the nightly run)
+- the event is `push` (to `main`)
+- the `root` or the `ci` filter is `true` (for example, a catalog version bump that changes only `pnpm-workspace.yaml` and `pnpm-lock.yaml`)
+
+In all other cases, `SELECT` is `--filter "...[origin/main]"` (pnpm 12.7 and later use the merge base). It selects the changed packages and the packages that depend on them. A change in `packages/io` then also checks and tests `apps/ui`. Without this rule, the diff on `main` is empty, the filter selects no package, and pnpm exits with 0 and tests nothing.
 
 ### Example: a PR that changes only `packages/io` (R3.S1)
 
@@ -91,12 +100,16 @@ The filters give `io = true` and `app = true` (the app depends on Io). All other
 | `package`           | runs                                                                                                                                                              |
 | `integration-tests` | runs (the app changed through Io)                                                                                                                                 |
 | `e2e-tests`         | runs                                                                                                                                                              |
-| `server-test`       | **skips** (`if:` is false, and GitHub reports Success)                                                                                                            |
+| `server-test`       | runs (`app` is true, and the Go build embeds the app build)                                                                                                       |
 | `chromatic-io`      | runs                                                                                                                                                              |
-| `chromatic-app`     | runs (Holocene stories render Io components)                                                                                                                      |
+| `chromatic-app`     | runs, with no skip (Holocene stories render Io components)                                                                                                        |
 | `ci-gate`           | runs, with `if: always()`. It fails if any job in `needs` has the result `failure` or `cancelled`. It passes when each job has the result `success` or `skipped`. |
 
-A change only in `packages/io` saves only the Go job. Io is the base of the app, so the app tests must run. Large savings come from changes to `server/` only (it skips all browser tests), to `packages/dev-tools` only, and to docs only. A PR that changes only `specs/**` or `docs/**` runs `changes`, `lint` and `ci-gate`.
+No job skips for a change only in `packages/io`. Io is the base of the app, so the app tests and the Go build must run. Savings come from other changes:
+
+- `server/` only: `check-types`, `unit-tests`, `package`, `integration-tests` and `e2e-tests` skip, and `chromatic-app` passes with `skip`.
+- `packages/dev-tools` only: `package`, `server-test` and the Chromatic builds skip.
+- `specs/**` or `docs/**` only: `changes`, `lint`, `ci-gate` and a skipped `chromatic-app` run.
 
 ### The gate job
 
@@ -123,12 +136,12 @@ ci-gate:
 
 - The `main` ruleset then requires `ci-gate`, in place of `unit-tests`, `integration-tests`, `e2e-tests` and `test`.
 - The ruleset change goes in the same PR window as the new workflow (see migration-plan.md, Stage 0).
-- `UI Tests` stays required until its owner is known.
+- `UI Tests` (Chromatic) stays required. This is a deviation from "one required check" (decision record 9).
 - `ci-gate` reports a result in all cases. `if: always()` makes it run when a dependency failed or skipped.
 
 ### Nightly full run
 
-`nightly.yml` runs at 06:00 UTC on `main` (`schedule`) and on `workflow_dispatch`. It calls `ci.yml` as a reusable workflow with the input `full: true`. The input sets every filter output to `true`. A failure posts to the team's CI channel. The nightly run catches a missed dependency between packages that the filters did not see.
+`nightly.yml` runs at 06:00 UTC on `main` (`schedule`) and on `workflow_dispatch`. It calls `ci.yml` as a reusable workflow with the input `full: true`. The input sets every filter output to `true`, and it makes `SELECT` empty, so each command runs every package. A failure posts to the team's CI channel. The nightly run catches a missed dependency between packages that the filters did not see.
 
 ## Release
 
@@ -139,6 +152,7 @@ ci-gate:
 - `UIVersion` in `server/server/version/version.go:31` stays the source of truth.
 - `version-bump.yml` (manual dispatch) uses `.github/actions/update-version-files`. Today the action writes the root `package.json` (`.github/actions/update-version-files/action.yml:50-54`). After the split, it writes `apps/ui/package.json` and `packages/io/package.json`. The private packages keep `0.0.0`.
 - `scripts/validate-versions.sh` and `.github/actions/validate-version-sync` check both published files against `UIVersion` (config-strategy.md, site 16).
+- `.github/actions/validate-published-release` reads the version from the root `package.json` today (`.github/actions/validate-published-release/action.yml:38`). The private root has no version, so `jq` gives `null` and every release stops at its first step. The action reads `apps/ui/package.json` from step 1.2, and both published files from step 1.3 (migration-plan.md).
 - No Changesets. A fixed group needs no per-package bump files, and `version-bump.yml` already computes the bump from commits. The team adds Changesets or pnpm `versioning` only if it wants per-package changelogs or snapshot publishing (Stage 3).
 
 ### Publish flow
@@ -146,26 +160,31 @@ ci-gate:
 ```text
 version-bump.yml (dispatch) → version PR → merge → release-draft.yml (push to main)
    → a person publishes the GitHub release → release-published.yml:
-       1. validate-published-release (today)
-       2. build-and-package: @temporalio/io, then @temporalio/ui → release assets
-          (temporal-ui-package.tar.gz keeps its name; temporal-io-package.tar.gz is new)
-       3. publish-npm (new): pnpm --filter @temporalio/io publish, then pnpm --filter @temporalio/ui publish
-       4. dispatch sync-from-ui-release to ui-server (today, unchanged)
+       job create_release (today, one job, release-published.yml:14-59):
+         1. validate-published-release (reads apps/ui/package.json, see above)
+         2. build-and-package → release asset temporal-ui-package.tar.gz (name unchanged)
+         3. dispatch sync-from-ui-release to ui-server (unchanged)
+       job publish-npm (new, needs: create_release):
+         4. pnpm pack @temporalio/io, then @temporalio/ui → two npm tarballs
+         5. attest both tarballs, and attach them to the release
+         6. npm publish of the @temporalio/io tarball, then of the @temporalio/ui tarball
 ```
 
-- Step 3 is new. Today no workflow publishes to npm, and npm has `@temporalio/ui` 2.38.0 while the repo has 2.58.1 (claims ledger, row 14).
-- The first release after the split publishes both packages at the same version. `@temporalio/io` is published first, because `@temporalio/ui` depends on it.
-- pnpm writes the real version in place of `workspace:*` when it packs.
+- `publish-npm` is a separate job. The `ui-server` dispatch is in `create_release` and does not wait for npm. An npm failure (an expired trusted-publisher entry, or the first-publish case below) does not stop the `ui-server` release.
+- `publish-npm` is new. Today no workflow publishes to npm, and npm has `@temporalio/ui` 2.38.0 while the repo has 2.58.1 (claims ledger, row 14).
+- The first release after step 1.3 publishes both packages at the same version. `@temporalio/io` is published first, because `@temporalio/ui` depends on it.
+- `pnpm pack` writes the real version in place of `workspace:*`. `npm publish` then publishes that exact tarball.
+- Step 5 uses `actions/attest-build-provenance` on the two `.tgz` files. The job summary also prints the `sha512` of each file. The fallback below uses this.
 
 ### npm trusted publishing
 
-| Item            | Value                                                                                                                                                                            |
-| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Job permissions | `id-token: write` and `contents: read` on the `publish-npm` job only                                                                                                             |
-| Registration    | One trusted-publisher entry per package on npmjs.com: repo `temporalio/ui`, workflow file `release-published.yml` (the exact file name). A rename of the file breaks publishing. |
-| Tools           | npm CLI 11.5.1 or later, Node 22.14 or later (the repo has `^22.23.4`), a GitHub-hosted runner                                                                                   |
-| Provenance      | npm makes it automatically under trusted publishing for a public source repo                                                                                                     |
-| Tokens          | None. npm revoked classic tokens on 2025-12-09.                                                                                                                                  |
+| Item            | Value                                                                                                                                                                                                                          |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Job permissions | `id-token: write`, `attestations: write` and `contents: write` (to attach the tarballs) on the `publish-npm` job only. The workflow-level permissions (`.github/workflows/release-published.yml:7-11`) do not give `id-token`. |
+| Registration    | One trusted-publisher entry per package on npmjs.com: repo `temporalio/ui`, workflow file `release-published.yml` (the exact file name). A rename of the file breaks publishing.                                               |
+| Tools           | npm CLI 11.5.1 or later, Node 22.14 or later (the repo has `^22.23.4`), a GitHub-hosted runner                                                                                                                                 |
+| Provenance      | npm makes it automatically under trusted publishing for a public source repo                                                                                                                                                   |
+| Tokens          | None. npm revoked classic tokens on 2025-12-09.                                                                                                                                                                                |
 
 #### The first publish of `@temporalio/io` (R3.S3)
 
@@ -179,11 +198,13 @@ version-bump.yml (dispatch) → version PR → merge → release-draft.yml (push
 
 **Fallback:**
 
-1. An org owner publishes the same version of `@temporalio/io` one time by hand, from the release tag, with `npm publish --access public` and 2FA. The owner uses the tarball that the release attached (step 2 of the publish flow), so the published code is exactly the CI-built code.
-2. The owner adds the trusted-publisher entry.
-3. The next release publishes through OIDC.
+1. An org owner downloads the `@temporalio/io` `.tgz` that `publish-npm` attached to the release (step 5 of the publish flow). It is an `npm pack` tarball, not the `dist` archive that `build-and-package` makes (`.github/actions/build-and-package/action.yml:24-25`).
+2. The owner runs `gh attestation verify <file> --repo temporalio/ui`, and compares the `sha512` with the job summary. A release asset can change after the upload, so the owner does not skip this check.
+3. The owner publishes that file one time by hand: `npm publish <file> --access public`, with 2FA.
+4. The owner adds the trusted-publisher entry.
+5. The next release publishes through OIDC.
 
-The manual publish has no provenance. The risks document lists this case until someone confirms the OIDC behavior.
+The manual publish has no npm provenance. The GitHub attestation shows that CI built the file. The risks document lists this case until someone confirms the OIDC behavior.
 
 `@temporalio/ui` already exists on npm. It needs only its trusted-publisher entry. It is not known if the entry exists today (see risks-and-open-questions.md).
 
@@ -220,11 +241,29 @@ How it works today:
 
 What stays the same: the event, the payload (`ui_commit_sha`, `mode`) and the trigger. The trigger paths change only to the new folders (config-strategy.md, site 15).
 
-What changes in `cloud-ui` (`generate-ui-pr.yml`, about 10 lines, in the same week as the move PR):
+What changes in `cloud-ui`, with step 1.2 (`generate-ui-pr.yml`, about 10 lines, in the same week as the move PR):
 
 1. Set `source-path: source/apps/ui` for the build and pack step, or set the build command to `pnpm --filter @temporalio/ui... package`.
-2. Pack `@temporalio/io` too: `pnpm --filter @temporalio/io pack`.
-3. Install both tarballs, and add a `pnpm.overrides` entry `"@temporalio/io": "file:./packs/temporalio-io-<sha>.tgz"`, so the `@temporalio/ui` tarball resolves its Io dependency.
+2. Pack every public workspace package: a loop over the `package.json` files of `apps/*` and `packages/*` whose `private` is not `true`. From step 1.3, this also packs `@temporalio/io`, so step 1.3 needs no change to this workflow.
+3. Install the tarballs, and add a `pnpm.overrides` entry `"@temporalio/io": "file:./packs/temporalio-io-<sha>.tgz"` when that tarball exists, so the `@temporalio/ui` tarball resolves its Io dependency.
+
+What changes in `cloud-ui` with step 1.3 (`tailwind.config.ts` and `package.json`, about 5 lines):
+
+4. Add `@temporalio/io` as a direct dependency, from the same tarball. Under pnpm, only a direct dependency gets a folder at `node_modules/@temporalio/io`.
+5. Add `./node_modules/@temporalio/io/dist/**/*.{html,js,svelte,ts}` to the Tailwind `content`. Today `cloud-ui` scans only `./node_modules/@temporalio/ui/dist/**` (`tailwind.config.ts` lines 7-12 at `cloud-ui` commit 2e61fe9e1). After step 1.3, the Io recipes, for example `badge/recipe.ts`, are only in `@temporalio/io`. Without this glob, Io components render without their classes, and no build fails. Spike check 3 showed this loss in the app. The local-UI branch of the same config (`CLOUD_UI_LOCAL_UI_TAILWIND_CONTENT`) also needs the `packages/io/src` path.
+
+#### `cloud-ui` imports that must keep working
+
+`cloud-ui` imports these `@temporalio/ui` paths (a search of `cloud-ui` at commit 2e61fe9e1). Each one stays in the 2.x export map of `@temporalio/ui`. The step 1.3 and 1.4 exit criteria import each path from the packed tarball.
+
+| Path                                                                                                                                                    | References                  | After the split                                                                                    |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------- | -------------------------------------------------------------------------------------------------- |
+| `io/icon`, `io/badge`, `io/badge-count`, `io/tag`, `io/chip`                                                                                            | 334 (269 of them `io/icon`) | A folder re-export to `@temporalio/io` (target-layout.md, `packages/io`)                           |
+| `io/badge/badge.svelte`, `io/icon/icon-svg-wrapper.svelte`, `io/segmented-control/segmented-control.svelte`, `io/segmented-control/segment-link.svelte` | 7                           | A file re-export with the same key                                                                 |
+| `theme/io/themes`                                                                                                                                       | 10                          | A re-export of the Io theme file                                                                   |
+| `theme/preset`                                                                                                                                          | 1 (`tailwind.config.ts`)    | A re-export that keeps the old `content` glob (config-strategy.md, site 6)                         |
+| `catalog/worker/*`, `catalog/authoring`, `catalog/browser/*`, `catalog/host/ui-services`                                                                | 52 in 26 files              | The compiled copy of the catalog modules, and the catalog UI (target-layout.md, decision record 2) |
+| `holocene/*`, `components/*`, `utilities/*`, `stores/*`, `services/*`, `pages/*`, `i18n/*`                                                              | many                        | No change: the app files stay in `apps/ui`                                                         |
 
 The other option is to keep `@temporalio/io` inside the `@temporalio/ui` tarball in 2.x (`bundleDependencies`). Then `cloud-ui` needs only change 1, but a consumer can get two copies of Io. The meeting summary has this choice as a vote. The recommendation is the change to `cloud-ui`, because the `cloud-ui` pack flow is then the same as the npm publish flow.
 
