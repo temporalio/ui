@@ -91,7 +91,7 @@ In all other cases, `SELECT` is `--filter "...[$BASE]"` (pnpm 12.7 and later use
 
 - For `pull_request`, `BASE` is `origin/<base branch>` from `github.base_ref`. For `merge_group`, `BASE` is `github.event.merge_group.base_sha`, the commit that the queue merges into. The job passes the value through `env:`, not by interpolation in `run:`.
 - `check-types` and `unit-tests` check out with `fetch-depth: 0`. Today each job checks out with no `fetch-depth` (`.github/workflows/lint-and-test.yml:25,33,41`). That clone has a depth of 1 and no `origin/main` ref, so pnpm cannot find the merge base. A full clone has the base branch and the merge base.
-- A step before the command runs `git rev-parse --verify "$BASE^{commit}"`. If the ref is missing, the job fails. It does not continue with an empty selection.
+- A step before the command runs `git rev-parse --verify "$BASE^{commit}"`, but only when `SELECT` uses `BASE`. In the three cases above, `SELECT` is `-r`, the job sets no `BASE`, and the step does not run. If `SELECT` uses `BASE` and the ref is missing, the job fails. It does not continue with an empty selection.
 - Only these two jobs need the full history. The other jobs keep the clone with a depth of 1.
 
 ### Example: a PR that changes only `packages/io` (R3.S1)
