@@ -35,6 +35,7 @@
   } from '../detail-list';
   import DetailListTimestampValue from '../detail-list/detail-list-timestamp-value.svelte';
 
+  import FairnessKey from './fairness-key.svelte';
   import SdkLogo from './sdk-logo.svelte';
 
   interface Props {
@@ -173,7 +174,7 @@
       {/if}
       {#if fairnessKey}
         <DetailListLabel>{translate('workflows.fairness')}</DetailListLabel>
-        <DetailListTextValue text={fairnessKey} />
+        <DetailListValue><FairnessKey {fairnessKey} /></DetailListValue>
       {/if}
     {/if}
   </DetailListColumn>
