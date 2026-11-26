@@ -77,3 +77,25 @@ This document lists what the design could not settle. Each item has an owner (a 
 ## Spike failures that the design could not settle
 
 [spike-results.md](spike-results.md) gives the full results. This section lists each failed or partial check that changes the plan or stays open.
+
+### S1. `svelte-check --tsgo` does not type Io files that the app imports
+
+- **Owner:** the Frontend Engineering team.
+- **Fact:** in the spike, `pnpm check` (`svelte-check --tsgo`) in `apps/ui` gave 27 errors, all for `.svelte` exports read from `packages/io/src`. Plain `svelte-check` gave 0 errors (spike-results.md, check 1).
+- **Answers and their effect:**
+  1. **The app reads Io types from the `svelte-package` output** (a `types` condition that points at `dist`). Then `--tsgo` reads `.d.ts` files only. The cost: `packages/io` must build before `apps/ui` runs `check`.
+  2. **The app runs `svelte-check` without `--tsgo`** until the tsgo support improves. The cost: a slower type check.
+  3. **A fix in `svelte-check`** for `--tsgo` outside the tsconfig folder. The team files an issue and waits.
+- **Effect on the design:** step 1.3 cannot merge until one answer passes `pnpm check`. Answer 1 is the most likely. The layout does not change.
+
+### S2. The Io Chromatic project is not tested
+
+- **Owner:** an owner of the Chromatic account.
+- **Fact:** a Chromatic dry run also needs a project token. The spike had none. The proposed config is in spike-results.md, check 2.
+- **Effect:** step 1.3 creates the Io project and accepts the first baseline. If the team does not want a second project, the app Storybook can keep the Io stories through a `refs` entry, and risk K8 goes away.
+
+### S3. `pnpm peers check` fails on an unrelated peer today
+
+- **Owner:** the Frontend Engineering team.
+- **Fact:** `@typescript-eslint/utils@7.18.0` wants `eslint ^8.56.0`, and the repo has `eslint 9.39.4` (spike-results.md, check 4).
+- **Effect:** the mitigation for K1 needs this fixed first. Remove or upgrade the package that pulls in `@typescript-eslint/utils@7`. This can go in Stage 0.2.

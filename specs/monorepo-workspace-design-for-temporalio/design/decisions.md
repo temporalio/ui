@@ -21,7 +21,7 @@ Decision records 1 (the app moves to `apps/ui`) and 2 (the catalog split) are in
 - **Question:** does Io become its own published package?
 - **Options:**
   1. **Publish `@temporalio/io`. `@temporalio/ui` keeps `./io/*` as re-exports for all of 2.x (recommended).** A removal of the re-exports is a 3.0 change with a one-line codemod (`@temporalio/ui/io/` to `@temporalio/io/`).
-  2. **A private `packages/io`.** Only `@temporalio/ui` is published, and Io is inside it. The workspace boundary still holds in the repo.
+  2. **A private `packages/io`.** Only `@temporalio/ui` is published, and Io is inside it. The workspace boundary still holds in the repo. The spike showed that the `@temporalio/ui/io/*` re-exports then need `bundleDependencies`, because they import `@temporalio/io` (spike-results.md, check 1).
   3. **No Io package.** Io stays in `src/lib/io`, and an eslint zone enforces its boundary.
 - **Recommendation:** option 1.
   - Io is the only part that is cleanly carvable today: 3 app imports, all of i18n (claims ledger, row 7).

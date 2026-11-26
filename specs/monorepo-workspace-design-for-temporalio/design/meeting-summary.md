@@ -32,24 +32,27 @@ temporalio/ui/
 ## Where the design disagrees with the brief
 
 1. **The `cloud-ui` side must change** (vote 4). The dispatch stays the same. `cloud-ui` builds `@temporalio/ui` with `pnpm package` and `pnpm pack` at the ui repo root, and that no longer works after the move.
-2. **The coupling is larger than the audit counted** ([claims ledger](README.md#claims-ledger)):
-   - Holocene has 53 app imports in 39 files, not about 20. Holocene stays in the app, so the design does not change.
-   - The tool folders have 70 relative imports into `src/`, not about 7. Most go to `src/lib/demo`, which no app code uses, so `src/lib/demo` moves into the dev-tools package.
+2. **The coupling is larger than the audit counted:** 53 Holocene imports, not about 20, and 70 relative tool imports into `src/`, not about 7 ([claims ledger](README.md#claims-ledger)). The layout does not change.
 3. **Io takes the theme.** The Tailwind preset and plugin import no app code, and Io needs them. `@temporalio/ui/theme/preset` stays as a re-export.
 4. **A change only in Io saves little CI.** The app depends on Io, so its tests still run. The savings come from changes to `server/`, to dev tools and to docs only.
 
 ## Spike results
 
-_The spike results are added here when the spike is complete ([spike-results.md](spike-results.md))._
+The spike moved the app and Io into packages on a disposable branch ([spike-results.md](spike-results.md)).
+
+- **Pass:** pnpm 12 with the catalog, the Io Tailwind classes, one Svelte runtime, and `pnpm build:server`.
+- **Partial:** `svelte-check --tsgo` gives 27 errors for Io files that the app imports. Step 1.3 must fix this first.
+- **Partial:** the Io Storybook builds. Chromatic needs a project token.
+- **For vote 2:** the `@temporalio/ui/io/*` re-exports work only if `@temporalio/io` is published.
 
 ## Effort
 
-| Stage | Scope                                                                                                                                        | Estimate                |
-| ----- | -------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------- |
-| 0     | Path-gated CI and the gate job, pnpm 12, Dependabot for Go, Io without i18n imports, one alias map, trusted publishing for `@temporalio/ui`  | 1.5 to 2 engineer-weeks |
-| 1     | 7 PRs: workspace skeleton, the app move (with the `cloud-ui` change), Io, catalog, dev tools, boundaries, the first release of both packages | 3 to 4 engineer-weeks   |
-| 2     | Go module from `ui`, retirement of the `ui-server` mirror                                                                                    | Separate decision       |
-| 3     | `cloud-ui` extension seams, snapshot publishing                                                                                              | Separate decision       |
+| Stage | Scope                                                                                                                                        | Estimate                  |
+| ----- | -------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
+| 0     | Path-gated CI and the gate job, pnpm 12, Dependabot for Go, Io without i18n imports, one alias map, trusted publishing for `@temporalio/ui`  | 1.5 to 2 engineer-weeks   |
+| 1     | 7 PRs: workspace skeleton, the app move (with the `cloud-ui` change), Io, catalog, dev tools, boundaries, the first release of both packages | 3.5 to 4.5 engineer-weeks |
+| 2     | Go module from `ui`, retirement of the `ui-server` mirror                                                                                    | Separate decision         |
+| 3     | `cloud-ui` extension seams, snapshot publishing                                                                                              | Separate decision         |
 
 ## Questions the meeting cannot settle
 
