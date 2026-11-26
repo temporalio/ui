@@ -9,6 +9,7 @@ This folder holds the design for the change of `temporalio/ui` from one package 
 | Document | What it settles |
 |---|---|
 | [meeting-summary.md](meeting-summary.md) | One page for the go/no-go meeting: the layout, the decided items, the five votes and the effort |
+| [decisions.md](decisions.md) | Decision records 3 to 7: the five open votes, each with its options and the recommendation |
 | [target-layout.md](target-layout.md) | The directory tree, the packages, `pnpm-workspace.yaml` and the tool owners |
 | [config-strategy.md](config-strategy.md) | How each single-package config site changes |
 | [boundaries.md](boundaries.md) | The dependency rules between packages and how CI enforces them |
