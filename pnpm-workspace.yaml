@@ -9,6 +9,12 @@ catalogMode: strict
 catalog:
   svelte: 5.56.3
   '@sveltejs/kit': 2.70.2
+  '@storybook/addon-docs': ^10.6.1
+  '@storybook/addon-svelte-csf': ^5.1.2
+  '@storybook/sveltekit': ^10.6.1
+  storybook: ^10.6.1
+  autoprefixer: ^10.5.2
+  tailwindcss: ^3.4.19
 
 allowBuilds:
   '@swc/core': true

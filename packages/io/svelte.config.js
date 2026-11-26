@@ -10,6 +10,8 @@ export default {
   kit: {
     files: {
       lib: 'src',
+      appTemplate: '.storybook/app.html',
+      routes: '.storybook/routes',
     },
   },
 };

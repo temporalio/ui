@@ -1,0 +1,10 @@
+{
+  "buildScriptName": "stories:build",
+  "storybookBaseDir": "packages/io",
+  "onlyChanged": true,
+  "externals": ["../../apps/ui/src/app.css", "../../apps/ui/src/lib/theme/**"],
+  "exitOnceUploaded": true,
+  "exitZeroOnChanges": true,
+  "autoAcceptChanges": "main",
+  "skip": "dependabot/**"
+}

@@ -42,11 +42,17 @@
     "svelte": "catalog:"
   },
   "devDependencies": {
+    "@storybook/addon-docs": "catalog:",
+    "@storybook/addon-svelte-csf": "catalog:",
+    "@storybook/sveltekit": "catalog:",
     "@sveltejs/kit": "catalog:",
     "@sveltejs/package": "^2.3.10",
     "@sveltejs/vite-plugin-svelte": "7.3.1",
+    "autoprefixer": "catalog:",
+    "storybook": "catalog:",
     "svelte": "catalog:",
     "svelte-check": "^4.1.5",
+    "tailwindcss": "catalog:",
     "typescript": "6.0.3",
     "vite": "8.3.4"
   }
