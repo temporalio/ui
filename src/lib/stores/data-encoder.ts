@@ -50,9 +50,10 @@ export const dataEncoder = derived(
     const settingsIncludeCredentials = Boolean(
       $page?.data?.settings?.codec?.includeCredentials,
     );
-    const endpoint = $overrideRemoteCodecConfiguration
-      ? $codecEndpoint
-      : settingsEndpoint || $codecEndpoint;
+    const endpoint =
+      ($overrideRemoteCodecConfiguration && $codecEndpoint) ||
+      settingsEndpoint ||
+      '';
     const hasNotRequested = endpoint
       ? $lastDataEncoderStatus === 'notRequested'
       : $lastDataConverterStatus === 'notRequested';

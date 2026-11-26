@@ -32,8 +32,9 @@ describe('dataEncoder', () => {
     });
   });
 
-  it('should set codecEndpoint', () => {
+  it('should set codecEndpoint when the override is on', () => {
     codecEndpoint.set('https://localhost:8383');
+    overrideRemoteCodecConfiguration.set(true);
     expect(get(dataEncoder)).toEqual({
       endpoint: 'https://localhost:8383',
       hasError: false,
@@ -46,5 +47,10 @@ describe('dataEncoder', () => {
       customErrorLink: '',
       customErrorMessage: '',
     });
+  });
+
+  it('should ignore a saved codecEndpoint when the override is off', () => {
+    codecEndpoint.set('https://localhost:8383');
+    expect(get(dataEncoder).endpoint).toBe('');
   });
 });
