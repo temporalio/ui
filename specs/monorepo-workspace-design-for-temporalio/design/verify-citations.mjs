@@ -11,28 +11,62 @@ const repoRoot = execFileSync('git', ['rev-parse', '--show-toplevel'], {
 }).trim();
 
 const commitPattern = /^Verified at commit: `([0-9a-f]{7,40})`/m;
-const citationPattern =
-  /`((?:\.github|\.storybook|\.husky|[A-Za-z0-9_-]+)(?:\/[A-Za-z0-9_.()[\]+-]+)*\.[A-Za-z0-9]{1,5}):(\d+)(?:-(\d+))?((?:,\d+)*)`/g;
+
+const tokenPattern = /`([^`\s:]+):(\d+(?:-\d+)?(?:,\d+(?:-\d+)?)*)`/g;
+
+const hostPattern =
+  /^(?:localhost|(?:\d{1,3}\.){3}\d{1,3}|[a-z0-9-]+(?:\.[a-z0-9-]+)*\.(?:com|org|net|io|dev|cloud))$/i;
 
 const lineCounts = new Map();
+const treeFiles = new Map();
+
+function git(args) {
+  return execFileSync('git', args, {
+    cwd: repoRoot,
+    encoding: 'utf8',
+    maxBuffer: 64 * 1024 * 1024,
+    stdio: ['ignore', 'pipe', 'ignore'],
+  });
+}
+
+function filesAt(commit) {
+  if (!treeFiles.has(commit)) {
+    treeFiles.set(
+      commit,
+      git(['ls-tree', '-r', '--name-only', commit]).split('\n').filter(Boolean),
+    );
+  }
+  return treeFiles.get(commit);
+}
+
+function resolvePath(commit, target) {
+  const files = filesAt(commit);
+  if (files.includes(target)) return { file: target };
+  const matches = files.filter((file) => file.endsWith(`/${target}`));
+  if (matches.length === 1) return { file: matches[0] };
+  if (matches.length === 0) return { error: 'does not exist' };
+  return {
+    error: `is ambiguous (${matches.length} files match: ${matches
+      .slice(0, 3)
+      .join(', ')}${matches.length > 3 ? ', ...' : ''})`,
+  };
+}
 
 function countLines(commit, file) {
   const key = `${commit}:${file}`;
   if (lineCounts.has(key)) return lineCounts.get(key);
-  let count = null;
-  try {
-    const text = execFileSync('git', ['show', key], {
-      cwd: repoRoot,
-      encoding: 'utf8',
-      maxBuffer: 64 * 1024 * 1024,
-      stdio: ['ignore', 'pipe', 'ignore'],
-    });
-    count = text.split('\n').length - (text.endsWith('\n') ? 1 : 0);
-  } catch {
-    count = null;
-  }
+  const text = git(['show', key]);
+  const count = text.split('\n').length - (text.endsWith('\n') ? 1 : 0);
   lineCounts.set(key, count);
   return count;
+}
+
+function parseLines(spec) {
+  const ranges = spec.split(',').map((part) => {
+    const [start, end] = part.split('-').map(Number);
+    return { start, end: end ?? start };
+  });
+  return ranges;
 }
 
 const documents = readdirSync(designDir)
@@ -40,6 +74,7 @@ const documents = readdirSync(designDir)
   .sort();
 
 let checked = 0;
+let skipped = 0;
 const failures = [];
 
 for (const name of documents) {
@@ -50,28 +85,33 @@ for (const name of documents) {
     continue;
   }
   const commit = commitMatch[1];
-  for (const match of text.matchAll(citationPattern)) {
-    const [, file, start, end, extra] = match;
-    const lines = [Number(start)];
-    if (end) lines.push(Number(end));
-    if (extra) lines.push(...extra.split(',').filter(Boolean).map(Number));
-    const total = countLines(commit, file);
-    checked += 1;
-    if (total === null) {
-      failures.push(`${name}: ${file} does not exist at ${commit}`);
+  for (const match of text.matchAll(tokenPattern)) {
+    const [token, target, spec] = match;
+    if (hostPattern.test(target)) {
+      skipped += 1;
       continue;
     }
-    const highest = Math.max(...lines);
-    if (highest > total) {
-      failures.push(
-        `${name}: ${file}:${highest} is past the end (${total} lines) at ${commit}`,
-      );
+    checked += 1;
+    const resolved = resolvePath(commit, target);
+    if (resolved.error) {
+      failures.push(`${name}: ${token} ${resolved.error} at ${commit}`);
+      continue;
+    }
+    const total = countLines(commit, resolved.file);
+    for (const { start, end } of parseLines(spec)) {
+      if (start < 1 || end < start) {
+        failures.push(`${name}: ${token} has a bad line range`);
+      } else if (end > total) {
+        failures.push(
+          `${name}: ${token} line ${end} is past the end of ${resolved.file} (${total} lines) at ${commit}`,
+        );
+      }
     }
   }
 }
 
 for (const failure of failures) console.error(`FAIL ${failure}`);
 console.log(
-  `${documents.length} documents, ${checked} citations checked, ${failures.length} failures`,
+  `${documents.length} documents, ${checked} citations checked, ${skipped} host:port tokens skipped, ${failures.length} failures`,
 );
 process.exit(failures.length === 0 ? 0 : 1);
