@@ -28,9 +28,11 @@
 <script lang="ts">
   import { twMerge } from 'tailwind-merge';
 
-  import { translate } from '$lib/i18n/translate';
   import { IconSlashForward } from '../icon';
+  import { getIoTranslate } from '../i18n';
   import { TextLink } from '../text-link';
+
+  const translate = getIoTranslate();
 
   let {
     'aria-label': ariaLabel = translate('common.breadcrumbs'),

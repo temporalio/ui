@@ -13,7 +13,7 @@
   ],
   "scripts": {
     "package": "svelte-package --input src --output dist",
-    "generate-exports": "node ../../apps/ui/scripts/generate-exports.mjs .",
+    "generate-exports": "node ../../apps/ui/scripts/generate-exports.mjs . --publish-config",
     "stories:build": "storybook build",
     "check": "svelte-check --tsconfig ./tsconfig.json"
   },

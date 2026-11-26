@@ -1,5 +1,6 @@
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 function* walk(dir) {
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
@@ -9,8 +10,14 @@ function* walk(dir) {
   }
 }
 
-const distPath = new URL('../dist', import.meta.url).pathname;
-const pkgUrl = new URL('../package.json', import.meta.url);
+const args = process.argv.slice(2);
+const usePublishConfig = args.includes('--publish-config');
+const rootArg = args.find((arg) => !arg.startsWith('--'));
+const pkgRoot = rootArg
+  ? resolve(process.cwd(), rootArg)
+  : fileURLToPath(new URL('..', import.meta.url));
+const distPath = join(pkgRoot, 'dist');
+const pkgUrl = join(pkgRoot, 'package.json');
 const pkg = JSON.parse(readFileSync(pkgUrl));
 const pkgName = pkg.name;
 
@@ -79,7 +86,11 @@ for (const rel of allFiles) {
   if (rewritten !== code) writeFileSync(file, rewritten);
 }
 
-pkg.exports = exports;
+if (usePublishConfig) {
+  pkg.publishConfig = { ...pkg.publishConfig, exports };
+} else {
+  pkg.exports = exports;
+}
 writeFileSync(pkgUrl, JSON.stringify(pkg, null, 2) + '\n');
 
 console.log(`Generated ${Object.keys(exports).length} explicit export entries`);

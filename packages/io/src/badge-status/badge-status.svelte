@@ -1,5 +1,4 @@
 <script lang="ts" module>
-  import type { I18nKey } from '$lib/i18n';
   import {
     Badge,
     type BadgeColorScheme,
@@ -8,6 +7,7 @@
     type BadgeSize,
   } from '../badge';
   import { type IconComponent, IconPause } from '../icon';
+  import type { IoTranslationKey } from '../i18n';
   import type { ConditionalValue } from '../types';
 
   export type BadgeStatusValue =
@@ -31,7 +31,7 @@
   const statusConfiguration: Record<
     BadgeStatusValue,
     {
-      translationId: I18nKey;
+      translationId: IoTranslationKey;
       colorScheme: BadgeStatusColorScheme;
       impliedExtensions: BadgeStatusExtensions;
     }
@@ -88,7 +88,7 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
 
-  import { translate } from '$lib/i18n/translate';
+  import { getIoTranslate } from '../i18n';
 
   interface Props extends Omit<
     HTMLAttributes<HTMLSpanElement>,
@@ -120,6 +120,8 @@
     class: className,
     ...rest
   }: Props = $props();
+
+  const translate = getIoTranslate();
 
   const configuration = $derived(statusConfiguration[status]);
   const label = $derived.by(() => {
