@@ -8,16 +8,16 @@ The citations in this document point at the spike branch, at the commit above.
 
 ## Result for each check
 
-| #   | Check                                                    | Result                                                 | Commit      | Effect on the design                                                                     |
-| --- | -------------------------------------------------------- | ------------------------------------------------------ | ----------- | ---------------------------------------------------------------------------------------- |
-| A   | The banner                                               | Pass                                                   | `be544facc` | None                                                                                     |
-| B   | pnpm 12.23.0, the workspace and the catalog              | Pass, after four changes                               | `07b2721e6` | Stage 0.2 gets the four changes (below)                                                  |
-| C   | The move to `apps/ui` and `packages/io`                  | Pass, after three changes                              | `519087433` | Steps 1.1 and 1.2 get the three changes (below)                                          |
-| 1   | Io extraction                                            | **Partial.** It works, but `svelte-check --tsgo` fails | `184e63fdf` | A new open item (risks-and-open-questions.md, S1). Step 1.3 gets more work               |
-| 2   | Io Storybook and Chromatic                               | **Partial.** The build passes. Chromatic needs a token | `4c8c32872` | Confirms that Io takes the theme. Chromatic stays open (risks-and-open-questions.md, S2) |
-| 3   | Tailwind 3 sees the Io classes                           | Pass                                                   | `5ae44fd9a` | None                                                                                     |
-| 4   | One Svelte runtime across packages                       | Pass                                                   | `ccd8f4f69` | `pnpm peers check` needs one unrelated fix before CI can use it                          |
-| 5   | `pnpm build:server` from the root writes the server tree | Pass                                                   | `519087433` | None                                                                                     |
+| #   | Check                                                    | Result                                                       | Commit      | Effect on the design                                                                              |
+| --- | -------------------------------------------------------- | ------------------------------------------------------------ | ----------- | ------------------------------------------------------------------------------------------------- |
+| A   | The banner                                               | Pass                                                         | `be544facc` | None                                                                                              |
+| B   | pnpm 12.23.0, the workspace and the catalog              | Pass, after four changes                                     | `07b2721e6` | Stage 0.2 gets the four changes (below)                                                           |
+| C   | The move to `apps/ui` and `packages/io`                  | Pass, after three changes                                    | `519087433` | Steps 1.1 and 1.2 get the three changes (below)                                                   |
+| 1   | Io extraction                                            | **Partial.** It works, but `svelte-check --tsgo` fails       | `184e63fdf` | A new open item (risks-and-open-questions.md, S1). Step 1.3 gets more work                        |
+| 2   | Io Storybook and Chromatic                               | **Partial.** The build passes. Chromatic needs a token       | `4c8c32872` | Confirms that Io takes the theme. Chromatic stays open (risks-and-open-questions.md, S2)          |
+| 3   | Tailwind 3 sees the Io classes                           | Pass                                                         | `5ae44fd9a` | None                                                                                              |
+| 4   | One Svelte runtime across packages                       | **Partial.** One runtime is proved. `pnpm peers check` fails | `ccd8f4f69` | `pnpm peers check` needs one unrelated fix before CI can use it (risks-and-open-questions.md, S3) |
+| 5   | `pnpm build:server` from the root writes the server tree | Pass                                                         | `519087433` | None                                                                                              |
 
 ## B. pnpm 12.23.0
 
@@ -67,7 +67,7 @@ The citations in this document point at the spike branch, at the commit above.
   - The `--tsgo` mode does not type `.svelte` files outside the folder of its tsconfig. The spike did not find a fix. This is open item S1.
 - **The full app test suite:** `Test Files 5 failed | 325 passed`, `Tests 19 failed | 4424 passed`.
   - 3 files failed because of paths that the move changed: `catalog-artifacts.test.ts`, `local-migration.test.ts` (`ENOENT … apps/ui/.gitignore`) and `generate-markdown-css.test.ts` (`ENOENT … apps/ui/server/server/route/markdown.gen.css`). Step 1.2 fixes these paths.
-  - 2 files (`catalog-list.test.ts`, `multi-region-wiring.svelte.test.ts`) failed in the full run and passed alone. The spike did not find the cause.
+  - 2 files (`catalog-list.test.ts`, `multi-region-wiring.svelte.test.ts`) failed in the full run and passed alone. The spike did not find the cause. This is open item S4 (risks-and-open-questions.md).
   - The 3 Io `*.test.ts` files no longer ran, because the app Vitest `include` looks only in `apps/ui`. Io needs its own Vitest config.
 
 ## Check 2. Io Storybook: build pass, Chromatic partial
@@ -88,7 +88,7 @@ The citations in this document point at the spike branch, at the commit above.
 - **After** `apps/ui/tailwind.config.ts:9` added `../../packages/io/src/**/*.{html,js,svelte,ts}`: each count was 1.
 - The path is relative to the folder where the build runs (`apps/ui`).
 
-## Check 4. One Svelte runtime: pass
+## Check 4. One Svelte runtime: partial
 
 - **`pnpm ls -r svelte`:** both packages have `svelte@5.56.3`. Both links point to the same folder, `.pnpm/svelte@5.56.3_@typescript-eslint+types@8.62.0`.
   - The folder name has a peer suffix. If the two packages ever resolve a different peer, pnpm makes two Svelte copies. `pnpm peers check` and the catalog prevent this (risks-and-open-questions.md, K1).
