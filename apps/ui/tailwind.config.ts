@@ -4,7 +4,10 @@ import temporal, { textStyles } from './src/lib/theme/plugin';
 import { fontSize } from './src/lib/theme/preset';
 
 const config = {
-  content: ['./src/**/*.{html,js,svelte,ts}'],
+  content: [
+    './src/**/*.{html,js,svelte,ts}',
+    '../../packages/io/src/**/*.{html,js,svelte,ts}',
+  ],
   darkMode: ['selector', '[data-theme="dark"]'],
   theme: {
     fontFamily: {
