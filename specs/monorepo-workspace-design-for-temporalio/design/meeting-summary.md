@@ -14,6 +14,13 @@ temporalio/ui/
 └── server/             Go server, unchanged
 ```
 
+## Expected first question
+
+**Why is `server/` not in `apps/`, and Holocene not in `packages/`?** Both are good end states, but not in Stage 1 ([decision record 1](target-layout.md#decision-record-1-the-app-moves-to-appsui), "Later layout").
+
+- **`apps/server` in Stage 2.** A move now breaks the `ui-server` sync and about 20 workflow paths. In Stage 2, the folder sets the new module path.
+- **`packages/holocene` after decoupling.** Holocene imports the app about 100 times.
+
 ## Already decided (not votes)
 
 - **Layout:** the app moves to `apps/ui` ([decision record 1](target-layout.md#decision-record-1-the-app-moves-to-appsui)).

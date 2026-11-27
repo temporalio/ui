@@ -227,6 +227,19 @@ In this variant, Io, config, catalog and dev tools move to `packages/*`, and the
   - One large rename PR.
   - Open PRs at the time of the move need a rebase. Git rename detection handles most of these.
   - Each config site of the app changes (see config-strategy.md).
+- **Later layout:** two more moves are good end states, but not in Stage 1. The Stage 1 layout can grow into both.
+  - **`server/` to `apps/server`, in Stage 2.**
+    - The folder does not set the module path today. `server/go.mod:1` declares `github.com/temporalio/ui-server/v2`.
+    - A move in Stage 1 breaks the `ui-server` sync, which copies `server/`. The brief does not allow a change to the sync.
+    - About 20 workflow lines use `server/go.mod` or `server/go.sum`, for example `.github/workflows/test.yml:26`.
+    - `.github/workflows/version-bump.yml:105` reads `server/go.mod` at the last tag. The first release after the move must read both paths.
+    - `server/` has no `package.json`, so the `apps/*` glob must exclude it, or the server gets a small `package.json`.
+    - In Stage 2, the folder sets the module path and the tag prefix (migration-plan.md, "What Stage 2 and Stage 3 defer"). Stage 2 decides the folder and the module path together, so the sync and the tags change one time.
+  - **Holocene to `packages/holocene`, after a separate decoupling project.**
+    - A package cannot import the app. That makes a cycle and breaks rule B1 (boundaries.md).
+    - Holocene imports the app about 100 times: 36 `$lib/utilities`, 17 `$lib/i18n`, 11 `$lib/stores`, 10 `$lib/types`, 6 `$lib/components` and 15 `$app/*` (README.md, claims ledger, rows 9 and 10).
+    - Io had 3 app imports, and those 3 needed a new context in the spike (spike-results.md, check 1).
+    - The decoupling project removes these imports with the same method. Then Holocene can move.
 
 ## Decision record 2: the catalog is a private package, and its UI stays in the app
 
