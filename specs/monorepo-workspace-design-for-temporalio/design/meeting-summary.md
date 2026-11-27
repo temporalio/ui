@@ -21,6 +21,26 @@ temporalio/ui/
 - **`apps/server` in Stage 2.** A move now breaks the `ui-server` sync and about 20 workflow paths. In Stage 2, the folder sets the new module path.
 - **`packages/holocene` after decoupling.** Holocene imports the app about 100 times.
 
+## Pros and cons
+
+Stage 0 has a clear net gain. Each Stage 0 item helps without the split. The table compares Stage 1 with Stage 0 alone.
+
+| Pros of Stage 1                                                          | Cons of Stage 1                                                                              |
+| ------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------- |
+| The package manager stops Io from importing the app. A lint rule cannot. | 17 to 21 engineer-days, after 9 to 12 for Stage 0                                            |
+| `@temporalio/io` is a small package with no SvelteKit dependency         | A release freeze of about 7 to 8 working days, from step 1.3 to 1.7                          |
+| Each package owns its dependencies, and the catalog sets one version     | `cloud-ui` must change in the same window                                                    |
+| The catalog and the dev tools leave the published app                    | Open items: `svelte-check --tsgo` (S1), the Io Chromatic project (S2), the catalog copy step |
+| The base for `apps/server`, `packages/holocene` and snapshot publishing  | Holocene, the largest coupling, stays in the app. A change only in Io saves no CI job        |
+|                                                                          | A second published package, with its own first publish                                       |
+
+**Opinion of the author:** the pros of Stage 1 are larger than the cons only if one of these is true:
+
+1. A consumer other than the app needs `@temporalio/io`.
+2. The team plans the Holocene decoupling next.
+
+If neither is true, an eslint zone for Io gives most of the boundary value for less work (decision record 4, option 3). The Stage 1 gate asks these two questions.
+
 ## Already decided (not votes)
 
 - **Layout:** the app moves to `apps/ui` ([decision record 1](target-layout.md#decision-record-1-the-app-moves-to-appsui)).
