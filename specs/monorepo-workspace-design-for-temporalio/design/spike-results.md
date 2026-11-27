@@ -57,7 +57,7 @@ The citations in this document point at the spike branch, at the commit above.
 - **The app imports Io from the workspace:** pass. `vitest run src/lib/components/app-palette/ src/lib/holocene` gave `Test Files 18 passed, Tests 229 passed`. The stack traces resolve to `packages/io/src`.
   - Before a fix, 56 tests failed with `ReferenceError: IconSvgWrapper is not defined`. `svelte-preprocess` reads the nearest tsconfig, and without `verbatimModuleSyntax` it removes imports that only the markup uses. The fix is `packages/io/tsconfig.json:9`.
 - **`generate-exports.mjs`:** it needed a package-root argument and a `--publish-config` flag, which writes to `publishConfig.exports`. The result was 294 export entries. 13 of them are `*.stories.svelte` files, because the script does not skip stories.
-- **The published `@temporalio/ui/io/*` paths:** `svelte-package` in `apps/ui` writes `dist/io/badge-status/index.js` as `export * from '@temporalio/io/badge-status';`. **So the re-exports work only if `@temporalio/io` is also published.** This is evidence for decision record 4: a private Io package needs `bundleDependencies` to keep the 2.x import paths.
+- **The published `@temporalio/ui/io/*` paths:** `svelte-package` in `apps/ui` writes `dist/io/badge-status/index.js` as `export * from '@temporalio/io/badge-status';`. **So the re-exports work only if the consumer also installs `@temporalio/io`,** from npm or from a packed tarball. This is evidence for decision record 4: a private Io package needs `bundleDependencies` to keep the 2.x import paths.
 
 ### What failed
 

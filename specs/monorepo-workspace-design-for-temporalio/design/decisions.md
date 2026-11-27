@@ -2,7 +2,7 @@
 
 Verified at commit: `051de464a`
 
-Decision records 1 (the app moves to `apps/ui`) and 2 (the catalog split) are in [target-layout.md](target-layout.md). This file has the records for the five open decisions of the meeting (3 to 7), and the records for the places where the design departs from the brief or the spec (8 to 10).
+Decision records 1 (the app moves to `apps/ui`) and 2 (the catalog split) are in [target-layout.md](target-layout.md). This file has the records for the five open decisions of the meeting (3 to 7), and the records for the places where the design departs from the brief or the spec (8 to 11).
 
 ## Decision record 3: go or no-go
 
@@ -17,20 +17,19 @@ Decision records 1 (the app moves to `apps/ui`) and 2 (the catalog split) are in
   - Io is planned to replace Holocene. Io then grows, and each Holocene component must move into Io without its app imports. The package boundary of Stage 1 enforces that. A later split costs more, because Io is larger then. The Stage 1 gate checks that S1 (the `--tsgo` type check) has a fix.
 - **Evidence:** spike-results.md, and the Stage 0 table in migration-plan.md.
 
-## Decision record 4: publish Io as `@temporalio/io`
+## Decision record 4: Io becomes the package `@temporalio/io`
 
-- **Question:** does Io become its own published package?
+- **Question:** does Io become its own workspace package, and is it public or private?
 - **Options:**
-  1. **Publish `@temporalio/io`. `@temporalio/ui` keeps `./io/*` as re-exports for all of 2.x (recommended).** A removal of the re-exports is a 3.0 change with a one-line codemod (`@temporalio/ui/io/` to `@temporalio/io/`).
-  2. **A private `packages/io`.** Only `@temporalio/ui` is published, and Io is inside it. The workspace boundary still holds in the repo. The spike showed that the `@temporalio/ui/io/*` re-exports then need `bundleDependencies`, because they import `@temporalio/io` (spike-results.md, check 1).
+  1. **A public `@temporalio/io` that the repo does not publish to npm now. `@temporalio/ui` keeps `./io/*` as re-exports for all of 2.x (recommended).** `cloud-ui` installs the packed tarball (decision record 6). A removal of the re-exports is a 3.0 change with a one-line codemod (`@temporalio/ui/io/` to `@temporalio/io/`).
+  2. **A private `packages/io`.** Io ships inside `@temporalio/ui`. The workspace boundary still holds in the repo. The spike showed that the `@temporalio/ui/io/*` re-exports then need `bundleDependencies`, because they import `@temporalio/io` (spike-results.md, check 1).
   3. **No Io package.** Io stays in `src/lib/io`, and an eslint zone enforces its boundary.
 - **Recommendation:** option 1.
   - Io is the only part that is cleanly carvable today: 3 app imports, all of i18n (claims ledger, row 7).
-  - A consumer who needs only the design system then installs a small package that does not depend on SvelteKit.
+  - Io is planned to replace Holocene. The package boundary keeps app imports and undeclared dependencies out of each component that moves into Io.
+  - "Public" means only that pnpm can pack the package. No workflow publishes it (decision record 11). An npm publish later needs no change to the package shape.
   - The re-exports keep every 2.x import path working. A removal of an `exports` path is a semver-major change.
-- **Cost:**
-  - A second package to publish, with its own first-publish risk (risks-and-open-questions.md, Q5).
-  - The `cloud-ui` pack flow must handle two tarballs (decision record 6).
+- **Cost:** the `cloud-ui` pack flow must handle two tarballs (decision record 6).
 - **Evidence:** target-layout.md (the `packages/io` shape), and spike check 1.
 
 ## Decision record 5: one fixed version
@@ -54,7 +53,7 @@ Decision records 1 (the app moves to `apps/ui`) and 2 (the catalog split) are in
   1. **`cloud-ui` packs every public workspace package and overrides `@temporalio/io` with its tarball (recommended).** About 10 lines in `generate-ui-pr.yml` in `cloud-ui`, in the same window as the move PR, and about 5 lines (the Io dependency and the Tailwind glob) with step 1.3.
   2. **`@temporalio/ui` bundles `@temporalio/io`** (`bundleDependencies`). `cloud-ui` changes only its build path.
   3. **Keep the app at the root** (decision record 1, option 2). Then `pnpm package` at the root still builds `@temporalio/ui`, but the Io dependency problem stays.
-- **Recommendation:** option 1. The `cloud-ui` flow then matches the npm publish flow. Option 2 can give npm consumers two copies of Io.
+- **Recommendation:** option 1. Each package stays its own tarball, the same shape that an npm publish would use later. Option 2 can give a consumer two copies of Io.
 - **This is a disagreement with the brief.** The brief said that the `cloud-ui` dispatch keeps working unchanged. The dispatch does, but the workflow that receives it does not.
 - **Evidence:** ci-and-release.md, "`cloud-ui` dispatch", and risks-and-open-questions.md, Q1.
 
@@ -82,7 +81,7 @@ Decision records 1 (the app moves to `apps/ui`) and 2 (the catalog split) are in
 - **Options:**
   1. **Io takes `src/lib/theme` and the base CSS layers. `@temporalio/ui` re-exports each theme path for all of 2.x (recommended).**
   2. **The theme stays in `apps/ui`.** Io then needs the theme from `@temporalio/ui`, so the published Io package depends on the app. That breaks rule B1 and makes a cycle.
-  3. **A third published package for the theme.** It adds a package, a trusted publisher and a first publish for 13 files.
+  3. **A third package for the theme.** It adds a package, a third tarball for `cloud-ui` and a third version file for 13 files.
 - **Recommendation:** option 1. The published surface keeps every 2.x path. The preset in `@temporalio/io` drops its `content` glob (config-strategy.md, site 6).
 - **Cost:** `cloud-ui` adds the Io `content` glob (ci-and-release.md, `cloud-ui` change 5).
 
@@ -113,6 +112,22 @@ Decision records 1 (the app moves to `apps/ui`) and 2 (the catalog split) are in
   3. **One Storybook in `packages/io` only.** Not possible: the app stories import app code.
 - **Recommendation:** option 1. If the team does not want a second Chromatic project, option 2 is the fallback (risks-and-open-questions.md, S2).
 - **Cost:** a second Chromatic project (risks-and-open-questions.md, K8).
+
+## Decision record 11: no npm publish in Stage 0 and Stage 1
+
+- **Item of the spec:** R3 asks for npm trusted publishing in the release flow, and R3.S3 asks for the first-publish steps of `@temporalio/io`.
+- **Evidence:**
+  - No workflow publishes to npm. npm has `@temporalio/ui` 2.38.0 from 2025-05-27, and the repo has 2.58.1 (README.md, claims ledger, row 14).
+  - `cloud-ui` does not install from npm. It packs `@temporalio/ui` from a SHA (ci-and-release.md, "`cloud-ui` dispatch").
+  - `ui-server` takes the `dist` archive of the release, not an npm package (ci-and-release.md, "`ui-server` sync").
+- **Options:**
+  1. **No npm publish now. Both packages stay public, so `pnpm pack` works. npm publishing moves to Stage 3, next to snapshot publishing (recommended).**
+  2. **Trusted publishing in Stage 0 and the first publish of `@temporalio/io` in Stage 1**, as the spec asks.
+- **Recommendation:** option 1. Nobody needs npm today.
+  - Stage 0 loses step 0.6 (about 2 days).
+  - Stage 1 needs no release freeze. The freeze existed only because a release between step 1.3 and step 1.7 would publish an `@temporalio/ui` that depends on an `@temporalio/io` that npm does not have.
+  - The two npm questions (risks-and-open-questions.md, Q5 and Q6) and the first-publish risk (K6) wait for Stage 3.
+- **What stays:** ci-and-release.md keeps the trusted-publishing setup and the first-publish steps (R3.S3) under "Later: npm publishing (Stage 3)", for the day the team decides to publish.
 
 ## Disagreements that change no design choice
 

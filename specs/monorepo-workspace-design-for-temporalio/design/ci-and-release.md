@@ -2,7 +2,7 @@
 
 Verified at commit: `051de464a`
 
-This document gives the CI workflow graph after the split, the gate job, the release flow with one fixed version, npm trusted publishing, and the effect on the two downstream consumers: `ui-server` and `cloud-ui`. Facts from other repos cite the file, the lines and the commit on GitHub, because the citation checker reads only this repo.
+This document gives the CI workflow graph after the split, the gate job, the release flow with one fixed version, the deferred npm publishing (Stage 3), and the effect on the two downstream consumers: `ui-server` and `cloud-ui`. Facts from other repos cite the file, the lines and the commit on GitHub, because the citation checker reads only this repo.
 
 ## CI today
 
@@ -171,15 +171,24 @@ version-bump.yml (dispatch) → version PR → merge → release-draft.yml (push
          1. validate-published-release (reads apps/ui/package.json, see above)
          2. build-and-package → release asset temporal-ui-package.tar.gz (name unchanged)
          3. dispatch sync-from-ui-release to ui-server (unchanged)
-       job publish-npm (new, needs: create_release):
+```
+
+- The release flow does not change, except the path in step 1. No step publishes to npm (decisions.md, decision record 11).
+- Today no workflow publishes to npm, and npm has `@temporalio/ui` 2.38.0 while the repo has 2.58.1 (claims ledger, row 14).
+
+## Later: npm publishing (Stage 3)
+
+This section is for the day the team decides to publish. Stage 0 and Stage 1 do not use it. It adds one job after `create_release`:
+
+```text
+       job publish-npm (needs: create_release):
          4. pnpm pack @temporalio/io, then @temporalio/ui → two npm tarballs
          5. attest both tarballs, and attach them to the release
          6. npm publish of the @temporalio/io tarball, then of the @temporalio/ui tarball
 ```
 
 - `publish-npm` is a separate job. The `ui-server` dispatch is in `create_release` and does not wait for npm. An npm failure (an expired trusted-publisher entry, or the first-publish case below) does not stop the `ui-server` release.
-- `publish-npm` is new. Today no workflow publishes to npm, and npm has `@temporalio/ui` 2.38.0 while the repo has 2.58.1 (claims ledger, row 14).
-- The first release after step 1.3 publishes both packages at the same version. `@temporalio/io` is published first, because `@temporalio/ui` depends on it.
+- `@temporalio/io` is published first, because `@temporalio/ui` depends on it at the same version.
 - `pnpm pack` writes the real version in place of `workspace:*`. `npm publish` then publishes that exact tarball.
 - Step 5 uses `actions/attest-build-provenance` on the two `.tgz` files. The job summary also prints the `sha512` of each file. The fallback below uses this.
 

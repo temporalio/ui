@@ -6,13 +6,15 @@ Verified at commit: `051de464a`
 
 ```text
 temporalio/ui/
-├── apps/ui/            @temporalio/ui      published   app, Holocene, catalog UI, Playwright
-├── packages/io/        @temporalio/io      published   Io components, theme, Tailwind preset, Io Storybook
+├── apps/ui/            @temporalio/ui      public      app, Holocene, catalog UI, Playwright
+├── packages/io/        @temporalio/io      public      Io components, theme, Tailwind preset, Io Storybook
 ├── packages/catalog/   @temporalio/ui-catalog    private   catalog worker, authoring, CLI
 ├── packages/config/    @temporalio/ui-config     private   tsconfig, eslint, prettier, stylelint bases
 ├── packages/dev-tools/ @temporalio/ui-dev-tools  private   utilities, Vite plugins, demo, e2e workers
 └── server/             Go server, unchanged
 ```
+
+"Public" means that pnpm can pack the package for `cloud-ui`. Nothing publishes to npm in Stage 0 or Stage 1 ([DR 11](decisions.md#decision-record-11-no-npm-publish-in-stage-0-and-stage-1)).
 
 ## Expected first question
 
@@ -27,14 +29,13 @@ Stage 0 has a clear net gain. Each Stage 0 item helps without the split. The tab
 
 | Pros of Stage 1                                                                            | Cons of Stage 1                                                                              |
 | ------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------- |
-| The package manager stops Io from importing the app. A lint rule cannot.                   | 17 to 21 engineer-days, after 9 to 12 for Stage 0                                            |
-| `@temporalio/io` is a small package with no SvelteKit dependency                           | A release freeze of about 7 to 8 working days, from step 1.3 to 1.7                          |
+| The package manager stops Io from importing the app. A lint rule cannot.                   | 17 to 21 engineer-days, after 7 to 10 for Stage 0                                            |
+| `@temporalio/io` is a small package with no SvelteKit dependency                           | One large rename PR. Open PRs need a rebase                                                  |
 | Each package owns its dependencies, and the catalog sets one version                       | `cloud-ui` must change in the same window                                                    |
-| The catalog and the dev tools leave the published app                                      | Open items: `svelte-check --tsgo` (S1), the Io Chromatic project (S2), the catalog copy step |
+| The catalog and the dev tools leave the packed app                                         | Open items: `svelte-check --tsgo` (S1), the Io Chromatic project (S2), the catalog copy step |
 | Io grows as it replaces Holocene. The boundary keeps app imports out of each new component | A change only in Io saves no CI job                                                          |
 | A move now costs the least: Io has 13 components and 44 import lines today                 |                                                                                              |
 | The base for `apps/server` and snapshot publishing                                         |                                                                                              |
-|                                                                                            | A second published package, with its own first publish                                       |
 
 **Opinion of the author:** the pros of Stage 1 are larger than the cons. Io is planned to replace Holocene, so Io grows, and each Holocene component must move into Io without its app imports. A package boundary enforces that, and it also stops dependencies that Io does not declare. An eslint zone (decision record 4, option 3) checks only imports. A later split costs more, because Io is larger then. The largest risk is S1: the `--tsgo` type check fails across packages, so step 1.3 must solve it first.
 
@@ -45,13 +46,13 @@ Stage 0 has a clear net gain. Each Stage 0 item helps without the split. The tab
 
 ## Five decisions to vote on
 
-| #   | Decision                       | Options                                            | Recommendation                                                                              | Record                                                              |
-| --- | ------------------------------ | -------------------------------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| 1   | Go or no-go                    | Two gates / all now / no-go                        | **Go in two gates:** Stage 0 after the freeze, Stage 1 when Stage 0 meets its exit criteria | [DR 3](decisions.md#decision-record-3-go-or-no-go)                  |
-| 2   | Publish Io as `@temporalio/io` | Published / private package / no package           | **Published,** with `@temporalio/ui/io/*` re-exports for all of 2.x                         | [DR 4](decisions.md#decision-record-4-publish-io-as-temporalioio)   |
-| 3   | Versions                       | One fixed version / independent / mixed            | **One fixed version,** 2.x continues, `UIVersion` stays the source of truth                 | [DR 5](decisions.md#decision-record-5-one-fixed-version)            |
-| 4   | How `cloud-ui` gets Io in 2.x  | Pack both tarballs / bundle Io / app at the root   | **Pack both tarballs:** about 15 lines change in `cloud-ui`                                 | [DR 6](decisions.md#decision-record-6-how-cloud-ui-gets-io-in-2x)   |
-| 5   | CI shape                       | Path filters and one gate job / Turborepo now / Nx | **Path filters and one gate job,** no task runner now, compatible with Turborepo later      | [DR 7](decisions.md#decision-record-7-ci-shape-and-the-task-runner) |
+| #   | Decision                           | Options                                            | Recommendation                                                                                     | Record                                                                     |
+| --- | ---------------------------------- | -------------------------------------------------- | -------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| 1   | Go or no-go                        | Two gates / all now / no-go                        | **Go in two gates:** Stage 0 after the freeze, Stage 1 when Stage 0 meets its exit criteria        | [DR 3](decisions.md#decision-record-3-go-or-no-go)                         |
+| 2   | Io as the package `@temporalio/io` | Public, not on npm / private package / no package  | **Public package, not published to npm now,** with `@temporalio/ui/io/*` re-exports for all of 2.x | [DR 4](decisions.md#decision-record-4-io-becomes-the-package-temporalioio) |
+| 3   | Versions                           | One fixed version / independent / mixed            | **One fixed version,** 2.x continues, `UIVersion` stays the source of truth                        | [DR 5](decisions.md#decision-record-5-one-fixed-version)                   |
+| 4   | How `cloud-ui` gets Io in 2.x      | Pack both tarballs / bundle Io / app at the root   | **Pack both tarballs:** about 15 lines change in `cloud-ui`                                        | [DR 6](decisions.md#decision-record-6-how-cloud-ui-gets-io-in-2x)          |
+| 5   | CI shape                           | Path filters and one gate job / Turborepo now / Nx | **Path filters and one gate job,** no task runner now, compatible with Turborepo later             | [DR 7](decisions.md#decision-record-7-ci-shape-and-the-task-runner)        |
 
 ## Where the design disagrees with the brief or the spec
 
@@ -59,6 +60,7 @@ Stage 0 has a clear net gain. Each Stage 0 item helps without the split. The tab
 2. **Io takes the theme** ([DR 8](decisions.md#decision-record-8-io-takes-the-theme)). The preset imports no app code, and Io needs it. Every `@temporalio/ui/theme/*` path stays as a re-export.
 3. **`UI Tests` stays a second required check** ([DR 9](decisions.md#decision-record-9-ui-tests-stays-a-second-required-check)). It is the Chromatic status, which `ci-gate` cannot wait for.
 4. **Two Storybooks and two Chromatic projects** ([DR 10](decisions.md#decision-record-10-two-storybooks-and-two-chromatic-projects)).
+5. **No npm publish in Stage 0 and Stage 1** ([DR 11](decisions.md#decision-record-11-no-npm-publish-in-stage-0-and-stage-1)). Nobody installs from npm today: the last npm version is 2.38.0, from 2025-05-27. npm publishing moves to Stage 3.
 
 Two facts change no design choice: the coupling is larger than the audit counted ([claims ledger](README.md#claims-ledger)), and a change only in Io saves no CI job.
 
@@ -70,17 +72,17 @@ The spike moved the app and Io into packages on a disposable branch ([spike-resu
 - **Partial:** one Svelte runtime is proved, but `pnpm peers check` fails on an unrelated eslint peer.
 - **Partial:** `svelte-check --tsgo` gives 27 errors for Io files that the app imports. Step 1.3 must fix this first.
 - **Partial:** the Io Storybook builds. Chromatic needs a project token.
-- **For vote 2:** the `@temporalio/ui/io/*` re-exports work only if `@temporalio/io` is published.
+- **For vote 2:** the `@temporalio/ui/io/*` re-exports work only if the consumer also installs `@temporalio/io`. The `cloud-ui` pack flow does that.
 
 ## Effort
 
-| Stage | Scope                                                                                                                                        | Estimate                                                                              |
-| ----- | -------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| 0     | Path-gated CI and the gate job, pnpm 12, Dependabot for Go, Io without i18n imports, one alias map, trusted publishing for `@temporalio/ui`  | 9 to 12 engineer-days (1.8 to 2.4 weeks)                                              |
-| 1     | 7 PRs: workspace skeleton, the app move (with the `cloud-ui` change), Io, catalog, dev tools, boundaries, the first release of both packages | 17 to 21 engineer-days (3.4 to 4.2 weeks), with a release freeze from step 1.3 to 1.7 |
-| 2     | Go module from `ui`, retirement of the `ui-server` mirror                                                                                    | Separate decision                                                                     |
-| 3     | `cloud-ui` extension seams, snapshot publishing                                                                                              | Separate decision                                                                     |
+| Stage | Scope                                                                                                                                       | Estimate                                                          |
+| ----- | ------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| 0     | Path-gated CI and the gate job, pnpm 12, Dependabot for Go, Io without i18n imports, one alias map                                          | 7 to 10 engineer-days (1.4 to 2 weeks)                            |
+| 1     | 7 PRs: workspace skeleton, the app move (with the `cloud-ui` change), Io, catalog, dev tools, boundaries, the first release after the split | 17 to 21 engineer-days (3.4 to 4.2 weeks), with no release freeze |
+| 2     | Go module from `ui`, retirement of the `ui-server` mirror                                                                                   | Separate decision                                                 |
+| 3     | `cloud-ui` extension seams, npm publishing, snapshot publishing                                                                             | Separate decision                                                 |
 
 ## Questions the meeting cannot settle
 
-The status name of the second Chromatic project is not known. Two npm questions need an org owner: OIDC for a new package, and the current publisher of `@temporalio/ui`. One question needs the `ui-server` maintainers: does their sync install pnpm 12? See [risks-and-open-questions.md](risks-and-open-questions.md).
+The status name of the second Chromatic project is not known. One question needs the `ui-server` maintainers: does their sync install pnpm 12? See [risks-and-open-questions.md](risks-and-open-questions.md).
