@@ -23,7 +23,6 @@
 package route
 
 import (
-	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
 	"errors"
@@ -119,10 +118,32 @@ func SetAuthRoutes(e *echo.Echo, cfgProvider *config.ConfigProviderWithRefresh) 
 
 	api := e.Group("/auth")
 	api.GET("/sso", authenticate(&oauthCfg, providerCfg.Options, serverCfg.CORS.AllowOrigins, secure, serverCfg.Auth.PKCEEnabled))
-	api.GET("/sso/callback", authenticateCb(ctx, &oauthCfg, provider, maxSessionDuration, refreshTokenDuration, secure, serverCfg.Auth.PKCEEnabled))
-	api.GET("/sso_callback", authenticateCb(ctx, &oauthCfg, provider, maxSessionDuration, refreshTokenDuration, secure, serverCfg.Auth.PKCEEnabled)) // compatibility with UI v1
+	api.GET("/sso/callback", authenticateCb(ctx, &oauthCfg, provider, maxSessionDuration, refreshTokenDuration, secure))
+	api.GET("/sso_callback", authenticateCb(ctx, &oauthCfg, provider, maxSessionDuration, refreshTokenDuration, secure)) // compatibility with UI v1
 	api.GET("/refresh", refreshTokens(ctx, &oauthCfg, provider, maxSessionDuration, refreshTokenDuration, secure))
 	api.GET("/logout", logout(secure))
+
+	if serverCfg.Auth.PKCEEnabled {
+		warnIfProviderLacksS256(provider, providerCfg.ProviderURL)
+	}
+}
+
+func warnIfProviderLacksS256(provider *oidc.Provider, providerURL string) {
+	var discovery struct {
+		CodeChallengeMethodsSupported []string `json:"code_challenge_methods_supported"`
+	}
+	if err := provider.Claims(&discovery); err != nil {
+		log.Printf("auth_pkce_warning unable to read code_challenge_methods_supported from %s: %s", providerURL, err)
+		return
+	}
+
+	for _, method := range discovery.CodeChallengeMethodsSupported {
+		if method == "S256" {
+			return
+		}
+	}
+
+	log.Printf("auth_pkce_warning provider %s does not advertise code_challenge_methods_supported S256; PKCE may be silently ignored", providerURL)
 }
 
 // cookieSecureForCallbackURL reports whether the auth cookies may carry the Secure
@@ -163,18 +184,6 @@ func authenticate(config *oauth2.Config, options map[string]interface{}, allowed
 
 		opts := []oauth2.AuthCodeOption{oidc.Nonce(nonce)}
 
-		if pkceEnabled {
-			codeVerifier, err := randCodeVerifier()
-			if err != nil {
-				return echo.NewHTTPError(http.StatusInternalServerError, err)
-			}
-			setCallbackCookie(c, "code_verifier", codeVerifier, secure)
-			opts = append(opts,
-				oauth2.SetAuthURLParam("code_challenge_method", "S256"),
-				oauth2.SetAuthURLParam("code_challenge", sha256CodeChallenge(codeVerifier)),
-			)
-		}
-
 		for k, v := range options {
 			var value string
 			if vStr, ok := v.(string); ok {
@@ -191,24 +200,23 @@ func authenticate(config *oauth2.Config, options map[string]interface{}, allowed
 			opts = append(opts, oauth2.SetAuthURLParam(k, value))
 		}
 
+		if pkceEnabled {
+			codeVerifier := oauth2.GenerateVerifier()
+			setPKCECookie(c, codeVerifier, secure)
+			opts = append(opts, oauth2.S256ChallengeOption(codeVerifier))
+		}
+
 		url := config.AuthCodeURL(state, opts...)
 
 		return c.Redirect(http.StatusFound, url)
 	}
 }
 
-func authenticateCb(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc.Provider, maxSessionDuration time.Duration, refreshTokenDuration time.Duration, secure bool, pkceEnabled bool) func(echo.Context) error {
+func authenticateCb(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc.Provider, maxSessionDuration time.Duration, refreshTokenDuration time.Duration, secure bool) func(echo.Context) error {
 	return func(c echo.Context) error {
-		// Always clear the code_verifier cookie once the callback handler is
-		// entered. PKCE verifiers are single-use by design (RFC 7636 §4.6):
-		// clearing on every entry ensures the verifier cannot be replayed
-		// even if a later step (SetUser, SetSessionStart, id_token verify)
-		// fails after a successful token exchange.
-		if pkceEnabled {
-			defer clearCookie(c, "code_verifier", secure)
-		}
+		clearCookie(c, "code_verifier", secure)
 
-		user, err := auth.ExchangeCode(ctx, c.Request(), oauthCfg, provider, pkceEnabled)
+		user, err := auth.ExchangeCode(ctx, c.Request(), oauthCfg, provider)
 		if err != nil {
 			return err
 		}
@@ -378,20 +386,22 @@ func setCallbackCookie(c echo.Context, name, value string, secure bool) {
 	}
 	c.SetCookie(cookiePreV280)
 
-	// SameSite=Lax is required so that cookies set during /auth/sso are
-	// sent back on the top-level redirect to /auth/sso/callback. Strict would
-	// drop them on cross-site navigations; None would weaken CSRF defenses
-	// for the OAuth flow itself.
-	//
-	// MaxAge is kept short (5 minutes) to shrink the window in which a
-	// stolen code_verifier could be replayed alongside an intercepted
-	// authorization code. RFC 6749 leaves the exact value to the client;
-	// 5 minutes comfortably covers the typical user interaction with the
-	// IdP login form while limiting exposure if the cookie leaks.
 	cookie := &http.Cookie{
 		Name:     name,
 		Value:    value,
-		MaxAge:   int(pkceCallbackCookieTTL.Seconds()),
+		MaxAge:   int(time.Hour.Seconds()),
+		Secure:   secure,
+		Path:     "/",
+		HttpOnly: true,
+	}
+	c.SetCookie(cookie)
+}
+
+func setPKCECookie(c echo.Context, value string, secure bool) {
+	cookie := &http.Cookie{
+		Name:     "code_verifier",
+		Value:    value,
+		MaxAge:   int(time.Hour.Seconds()),
 		Secure:   secure,
 		Path:     "/",
 		HttpOnly: true,
@@ -446,33 +456,6 @@ func nonceFromString(nonce string) (*Nonce, error) {
 	}
 
 	return &n, nil
-}
-
-// pkceVerifierBytes is the entropy size used when generating a PKCE code
-// verifier. RFC 7636 allows 43-128 base64url characters; 64 random bytes
-// yield 86 characters, well within the range and comfortably above the
-// minimum to leave headroom for future IdPs that may reject near-minimum
-// verifiers.
-const pkceVerifierBytes = 64
-
-// pkceCallbackCookieTTL bounds how long state, nonce, and code_verifier
-// cookies survive in the browser. OAuth2 / OIDC round-trips normally
-// complete in under a minute; 5 minutes is a generous upper bound that
-// still dramatically reduces the replay window if any of these cookies
-// leak compared to the previous 1 hour TTL.
-const pkceCallbackCookieTTL = 5 * time.Minute
-
-func randCodeVerifier() (string, error) {
-	b := securecookie.GenerateRandomKey(pkceVerifierBytes)
-	if b == nil {
-		return "", errors.New("unable to generate PKCE code verifier")
-	}
-	return base64.RawURLEncoding.EncodeToString(b), nil
-}
-
-func sha256CodeChallenge(verifier string) string {
-	h := sha256.Sum256([]byte(verifier))
-	return base64.RawURLEncoding.EncodeToString(h[:])
 }
 
 type Nonce struct {

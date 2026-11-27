@@ -201,22 +201,6 @@ func signJWT(header, payload interface{}, key *ecdsa.PrivateKey) (string, error)
 	return msg + "." + sigB64, nil
 }
 
-func TestExchangeCode_MissingCodeVerifier(t *testing.T) {
-	harness := newOIDCTestHarness(t)
-	defer harness.Close()
-
-	provider, err := harness.Provider(context.Background())
-	require.NoError(t, err)
-
-	req := httptest.NewRequest(http.MethodGet, "/auth/sso/callback?code=test-code&state=test-state", nil)
-	req.AddCookie(&http.Cookie{Name: "state", Value: "test-state"})
-
-	cfg := harness.OAuth2Config()
-	_, err = auth.ExchangeCode(context.Background(), req, cfg, provider, true)
-	require.Error(t, err)
-	assert.Contains(t, err.Error(), "Code verifier is not set")
-}
-
 func TestExchangeCode_WithPKCE(t *testing.T) {
 	harness := newOIDCTestHarness(t)
 	defer harness.Close()
@@ -233,7 +217,7 @@ func TestExchangeCode_WithPKCE(t *testing.T) {
 	req.AddCookie(&http.Cookie{Name: "nonce", Value: tokenNonce})
 
 	cfg := harness.OAuth2Config()
-	user, err := auth.ExchangeCode(context.Background(), req, cfg, provider, true)
+	user, err := auth.ExchangeCode(context.Background(), req, cfg, provider)
 	require.NoError(t, err)
 	require.NotNil(t, user)
 	require.NotNil(t, user.OAuth2Token)
@@ -266,7 +250,7 @@ func TestExchangeCode_WithoutPKCE(t *testing.T) {
 	req.AddCookie(&http.Cookie{Name: "nonce", Value: tokenNonce})
 
 	cfg := harness.OAuth2Config()
-	user, err := auth.ExchangeCode(context.Background(), req, cfg, provider, false)
+	user, err := auth.ExchangeCode(context.Background(), req, cfg, provider)
 	require.NoError(t, err)
 	require.NotNil(t, user)
 	require.NotNil(t, user.OAuth2Token)
@@ -278,7 +262,7 @@ func TestExchangeCode_WithoutPKCE(t *testing.T) {
 
 	require.NotNil(t, harness.lastTokenParams)
 	assert.Empty(t, harness.lastTokenParams.Get("code_verifier"),
-		"code_verifier must NOT be sent to token endpoint when PKCE disabled")
+		"code_verifier must NOT be sent to token endpoint without a code_verifier cookie")
 }
 
 func TestExchangeCode_StateMismatch(t *testing.T) {
@@ -294,7 +278,7 @@ func TestExchangeCode_StateMismatch(t *testing.T) {
 	req.AddCookie(&http.Cookie{Name: "nonce", Value: "test-nonce"})
 
 	cfg := harness.OAuth2Config()
-	_, err = auth.ExchangeCode(context.Background(), req, cfg, provider, true)
+	_, err = auth.ExchangeCode(context.Background(), req, cfg, provider)
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "State cookie did not match")
 }
@@ -312,66 +296,9 @@ func TestExchangeCode_NonceMismatch(t *testing.T) {
 	req.AddCookie(&http.Cookie{Name: "nonce", Value: "expected-nonce"})
 
 	cfg := harness.OAuth2Config()
-	_, err = auth.ExchangeCode(context.Background(), req, cfg, provider, true)
+	_, err = auth.ExchangeCode(context.Background(), req, cfg, provider)
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "Nonce did not match")
-}
-
-func TestExchangeCode_RejectsTooShortVerifier(t *testing.T) {
-	harness := newOIDCTestHarness(t)
-	defer harness.Close()
-
-	provider, err := harness.Provider(context.Background())
-	require.NoError(t, err)
-
-	req := httptest.NewRequest(http.MethodGet, "/auth/sso/callback?code=test-code&state=test-state", nil)
-	req.AddCookie(&http.Cookie{Name: "state", Value: "test-state"})
-	// 42 chars is below the RFC 7636 minimum of 43.
-	req.AddCookie(&http.Cookie{Name: "code_verifier", Value: strings.Repeat("a", 42)})
-	req.AddCookie(&http.Cookie{Name: "nonce", Value: "n"})
-
-	cfg := harness.OAuth2Config()
-	_, err = auth.ExchangeCode(context.Background(), req, cfg, provider, true)
-	require.Error(t, err)
-	assert.Contains(t, err.Error(), "RFC 7636")
-}
-
-func TestExchangeCode_RejectsTooLongVerifier(t *testing.T) {
-	harness := newOIDCTestHarness(t)
-	defer harness.Close()
-
-	provider, err := harness.Provider(context.Background())
-	require.NoError(t, err)
-
-	req := httptest.NewRequest(http.MethodGet, "/auth/sso/callback?code=test-code&state=test-state", nil)
-	req.AddCookie(&http.Cookie{Name: "state", Value: "test-state"})
-	// 129 chars is above the RFC 7636 maximum of 128.
-	req.AddCookie(&http.Cookie{Name: "code_verifier", Value: strings.Repeat("a", 129)})
-	req.AddCookie(&http.Cookie{Name: "nonce", Value: "n"})
-
-	cfg := harness.OAuth2Config()
-	_, err = auth.ExchangeCode(context.Background(), req, cfg, provider, true)
-	require.Error(t, err)
-	assert.Contains(t, err.Error(), "RFC 7636")
-}
-
-func TestExchangeCode_RejectsMalformedVerifier(t *testing.T) {
-	harness := newOIDCTestHarness(t)
-	defer harness.Close()
-
-	provider, err := harness.Provider(context.Background())
-	require.NoError(t, err)
-
-	req := httptest.NewRequest(http.MethodGet, "/auth/sso/callback?code=test-code&state=test-state", nil)
-	req.AddCookie(&http.Cookie{Name: "state", Value: "test-state"})
-	// 43 chars but contains '!' which is not in the unreserved set.
-	req.AddCookie(&http.Cookie{Name: "code_verifier", Value: "!" + strings.Repeat("a", 42)})
-	req.AddCookie(&http.Cookie{Name: "nonce", Value: "n"})
-
-	cfg := harness.OAuth2Config()
-	_, err = auth.ExchangeCode(context.Background(), req, cfg, provider, true)
-	require.Error(t, err)
-	assert.Contains(t, err.Error(), "base64url")
 }
 
 func TestExchangeCode_AcceptsBoundaryLengthVerifiers(t *testing.T) {
@@ -395,7 +322,7 @@ func TestExchangeCode_AcceptsBoundaryLengthVerifiers(t *testing.T) {
 			req.AddCookie(&http.Cookie{Name: "nonce", Value: tokenNonce})
 
 			cfg := harness.OAuth2Config()
-			_, err = auth.ExchangeCode(context.Background(), req, cfg, provider, true)
+			_, err = auth.ExchangeCode(context.Background(), req, cfg, provider)
 			require.NoError(t, err, "len=%d must be accepted", n)
 		})
 	}
@@ -438,7 +365,7 @@ func TestExchangeCodeSurfacesProviderError(t *testing.T) {
 		"error_description": {"Invalid scopes: openid offline_access"},
 	}
 
-	user, err := auth.ExchangeCode(context.Background(), newCallbackRequest("expected-state", query), newOAuthConfig(t), nil, false)
+	user, err := auth.ExchangeCode(context.Background(), newCallbackRequest("expected-state", query), newOAuthConfig(t), nil)
 
 	assert.Nil(t, user)
 	httpErr := requireHTTPError(t, err)
@@ -452,7 +379,7 @@ func TestExchangeCodeSurfacesProviderErrorWithoutDescription(t *testing.T) {
 		"error": {"access_denied"},
 	}
 
-	_, err := auth.ExchangeCode(context.Background(), newCallbackRequest("expected-state", query), newOAuthConfig(t), nil, false)
+	_, err := auth.ExchangeCode(context.Background(), newCallbackRequest("expected-state", query), newOAuthConfig(t), nil)
 
 	httpErr := requireHTTPError(t, err)
 	assert.Equal(t, http.StatusUnauthorized, httpErr.Code)
@@ -465,7 +392,7 @@ func TestExchangeCodeChecksStateBeforeProviderError(t *testing.T) {
 		"error": {"access_denied"},
 	}
 
-	_, err := auth.ExchangeCode(context.Background(), newCallbackRequest("expected-state", query), newOAuthConfig(t), nil, false)
+	_, err := auth.ExchangeCode(context.Background(), newCallbackRequest("expected-state", query), newOAuthConfig(t), nil)
 
 	httpErr := requireHTTPError(t, err)
 	assert.Equal(t, http.StatusBadRequest, httpErr.Code)
@@ -477,7 +404,7 @@ func TestExchangeCodeRejectsMissingCode(t *testing.T) {
 		"state": {"expected-state"},
 	}
 
-	_, err := auth.ExchangeCode(context.Background(), newCallbackRequest("expected-state", query), newOAuthConfig(t), nil, false)
+	_, err := auth.ExchangeCode(context.Background(), newCallbackRequest("expected-state", query), newOAuthConfig(t), nil)
 
 	httpErr := requireHTTPError(t, err)
 	assert.Equal(t, http.StatusBadRequest, httpErr.Code)

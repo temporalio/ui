@@ -35,13 +35,13 @@ auth:
 
 #### Auth Settings
 
-| Field                | Type     | Description                                                                                                                       |
-| -------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| `enabled`            | boolean  | Enable or disable authentication                                                                                                  |
-| `redirectToProvider` | boolean  | Skip the Temporal UI login page and redirect unauthenticated users directly to the configured OIDC provider                       |
-| `maxSessionDuration` | duration | Maximum session duration before forced re-login (e.g., `8h`, `24h`, `168h`). Omit, or set to `0s`, for unlimited session duration |
-| `pkceEnabled`        | boolean  | Enable PKCE (Proof Key for Code Exchange) for the OAuth2 authorization code flow. Default: `false`                                |
-| `providers`          | array    | List of auth providers (currently only the first is used)                                                                         |
+| Field                | Type     | Description                                                                                                                                      |
+| -------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `enabled`            | boolean  | Enable or disable authentication                                                                                                                 |
+| `redirectToProvider` | boolean  | Skip the Temporal UI login page and redirect unauthenticated users directly to the configured OIDC provider                                      |
+| `maxSessionDuration` | duration | Maximum session duration before forced re-login (e.g., `8h`, `24h`, `168h`). Omit, or set to `0s`, for unlimited session duration                |
+| `pkceEnabled`        | boolean  | Enable PKCE (Proof Key for Code Exchange) for the OAuth2 authorization code flow. Set at `auth.pkceEnabled`, not on a provider. Default: `false` |
+| `providers`          | array    | List of auth providers (currently only the first is used)                                                                                        |
 
 #### Provider Settings
 
@@ -79,6 +79,7 @@ Docker deployment can be configured without supplying a custom config file.
 | `TEMPORAL_AUTH_SCOPES`                 | `auth.providers[0].scopes` (comma separated) | unset             |
 | `TEMPORAL_AUTH_USE_ID_TOKEN_AS_BEARER` | `auth.providers[0].useIdTokenAsBearer`       | `false`           |
 | `TEMPORAL_AUTH_REFRESH_TOKEN_DURATION` | `auth.providers[0].refreshTokenDuration`     | unset             |
+| `TEMPORAL_AUTH_PKCE_ENABLED`           | `auth.pkceEnabled`                           | `false`           |
 
 ## PKCE Support
 
@@ -94,21 +95,17 @@ auth:
     # ... provider config
 ```
 
-PKCE can also be enabled via environment variable:
-
-| Environment Variable         | Default | Description                  |
-| ---------------------------- | ------- | ---------------------------- |
-| `TEMPORAL_AUTH_PKCE_ENABLED` | `false` | Set to `true` to enable PKCE |
+`pkceEnabled` is an `auth` level setting, not a per-provider one. It can also be set with the `TEMPORAL_AUTH_PKCE_ENABLED` environment variable (see [Docker Environment Variables](#docker-environment-variables)).
 
 ### How It Works
 
 When PKCE is enabled:
 
-1. The UI server generates a cryptographically random `code_verifier` (64 bytes, encoded as 86 base64url characters — comfortably within the RFC 7636 range of 43–128) and stores it in a secure, HttpOnly, `SameSite=Lax` cookie scoped to `/` with a 5-minute TTL
-2. A `code_challenge` (SHA-256 hash of the verifier) is included in the authorization request as `code_challenge_method=S256`. Only S256 is supported; identity providers that only support the deprecated `plain` method are incompatible
-3. Upon receiving the authorization code in the callback, the server validates the verifier against RFC 7636 length and alphabet constraints, then sends it to the token endpoint
+1. The UI server generates a cryptographically random `code_verifier` (32 random bytes, encoded as 43 base64url characters) and stores it in a secure, HttpOnly, `SameSite=Lax` cookie scoped to `/` with the same one-hour TTL as the `state` and `nonce` cookies
+2. A `code_challenge` (the base64url SHA-256 hash of the verifier, always 43 characters) is sent in the authorization request with `code_challenge_method=S256`. Only S256 is supported; identity providers that only support the deprecated `plain` method are incompatible
+3. On the callback the server reads the verifier from the cookie and sends it to the token endpoint in the `code_verifier` parameter
 4. The identity provider verifies that the challenge matches the verifier, ensuring the party exchanging the code is the same one that initiated the request
-5. The verifier cookie is cleared as soon as the callback handler is entered (via `defer`), preventing replay across retries. The `state`, `nonce`, and `code_verifier` cookies all share the same 5-minute TTL
+5. The verifier cookie is cleared before the token exchange, so the browser never receives it again and it cannot be replayed across retries
 
 ### When to Enable
 
@@ -122,25 +119,23 @@ Enabling PKCE is recommended:
 ### Identity Provider Requirements
 
 - Must support PKCE with `S256` challenge method. Major IdPs (Okta, Auth0, Azure AD, Google, Keycloak, Authentik, AWS Cognito, GitHub) all support S256
-- Must accept authorization requests of at least 86 base64url characters in `code_challenge`. All compliant IdPs do
 - Cookie-based: ensure your IdP redirects back to the UI using a top-level navigation so the `SameSite=Lax` cookies are sent. Embedded iframes will not receive the cookies
+
+At startup the server reads `code_challenge_methods_supported` from the provider's discovery document and logs an `auth_pkce_warning` when `S256` is missing. Many providers ignore unknown authorization parameters, so without this PKCE would be silently ineffective.
 
 ### Rolling Out PKCE on an Existing Deployment
 
-Enabling PKCE is a one-way upgrade that should be transparent to end users. However, note that:
+PKCE is off by default, so enabling it is a configuration change rather than a migration. Note that:
 
-- A user who is mid-authentication (started SSO before PKCE was enabled) when the upgrade happens will not have a verifier cookie and will receive a `400 Code verifier is not set` error. They simply need to start SSO again
-- There is no migration window required: each user authentication is independent and self-contained
+- A user who is in the middle of a login when the flag is toggled may fail the token exchange and needs to start SSO again
+- Each user authentication is independent and self-contained
 
 ### Troubleshooting
 
-| Symptom                                                           | Likely cause                                                                                                                                                                         |
-| ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `400 Code verifier is not set in request` after enabling PKCE     | Browser dropped the `code_verifier` cookie. Check `SameSite` settings on your reverse proxy / CDN, and that the callback URL uses the same site as the SSO URL                       |
-| `400 Code verifier length is outside the RFC 7636 range (43-128)` | A reverse proxy is rewriting the cookie. Verify no middleware is truncating or encoding cookie values                                                                                |
-| `400 Code verifier is not valid base64url`                        | Cookie was corrupted in transit. Check that no component is URL-encoding the cookie value a second time                                                                              |
-| IdP returns `invalid_grant` on the token endpoint                 | The verifier does not match the challenge from the authorization request. Verify the callback reaches the same server instance that issued the redirect (no session affinity issues) |
-| `redirect_uri_mismatch` when PKCE is enabled                      | Some IdPs (notably Azure AD in certain configurations) validate the redirect URI more strictly when PKCE is in use. Verify the `callbackUrl` exactly matches the configured value    |
+| Symptom                                                                                      | Likely cause                                                                                                                                                                         |
+| -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Startup log `auth_pkce_warning ... does not advertise code_challenge_methods_supported S256` | The provider's discovery document does not list `S256`. Check whether the provider supports PKCE; the flag may have no effect                                                        |
+| IdP returns `invalid_grant` on the token endpoint                                            | The verifier does not match the challenge from the authorization request. Verify the callback reaches the same server instance that issued the redirect (no session affinity issues) |
 
 ## Session Duration Management
 
