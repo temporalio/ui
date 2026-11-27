@@ -1,0 +1,6 @@
+# Spec Studio run state. Git tracks the spec documents only.
+*/state.json
+*/activity.jsonl
+*/reviews/
+*/loop/
+*/.lock
