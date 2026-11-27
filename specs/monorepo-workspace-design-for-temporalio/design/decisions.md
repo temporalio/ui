@@ -14,7 +14,7 @@ Decision records 1 (the app moves to `apps/ui`) and 2 (the catalog split) are in
 - **Recommendation:** option 1.
   - Each Stage 0 PR is useful without Stage 1. A later no-go then wastes nothing.
   - Stage 0.1 and 0.2 remove the two largest risks before any file moves: a "Pending" required check, and a pnpm 12 failure in the `ui-server` sync.
-  - The Stage 1 gate asks two questions. Does a consumer other than the app need `@temporalio/io`? Does the team plan the Holocene decoupling next? If both answers are no, decision record 4, option 3 (an eslint zone for Io) gives most of the boundary value for less work.
+  - Io is planned to replace Holocene. Io then grows, and each Holocene component must move into Io without its app imports. The package boundary of Stage 1 enforces that. A later split costs more, because Io is larger then. The Stage 1 gate checks that S1 (the `--tsgo` type check) has a fix.
 - **Evidence:** spike-results.md, and the Stage 0 table in migration-plan.md.
 
 ## Decision record 4: publish Io as `@temporalio/io`

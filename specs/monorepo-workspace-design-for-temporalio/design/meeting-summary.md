@@ -16,30 +16,27 @@ temporalio/ui/
 
 ## Expected first question
 
-**Why is `server/` not in `apps/`, and Holocene not in `packages/`?** Both are good end states, but not in Stage 1 ([decision record 1](target-layout.md#decision-record-1-the-app-moves-to-appsui), "Later layout").
+**Why is `server/` not in `apps/`, and Holocene not in `packages/`?** The server moves later. Holocene does not move, because Io replaces it ([decision record 1](target-layout.md#decision-record-1-the-app-moves-to-appsui), "Later layout").
 
 - **`apps/server` in Stage 2.** A move now breaks the `ui-server` sync and about 20 workflow paths. In Stage 2, the folder sets the new module path.
-- **`packages/holocene` after decoupling.** Holocene imports the app about 100 times.
+- **No `packages/holocene`.** Holocene imports the app about 100 times. Each Holocene component that Io replaces moves into Io without its app imports, and the package boundary enforces that.
 
 ## Pros and cons
 
 Stage 0 has a clear net gain. Each Stage 0 item helps without the split. The table compares Stage 1 with Stage 0 alone.
 
-| Pros of Stage 1                                                          | Cons of Stage 1                                                                              |
-| ------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------- |
-| The package manager stops Io from importing the app. A lint rule cannot. | 17 to 21 engineer-days, after 9 to 12 for Stage 0                                            |
-| `@temporalio/io` is a small package with no SvelteKit dependency         | A release freeze of about 7 to 8 working days, from step 1.3 to 1.7                          |
-| Each package owns its dependencies, and the catalog sets one version     | `cloud-ui` must change in the same window                                                    |
-| The catalog and the dev tools leave the published app                    | Open items: `svelte-check --tsgo` (S1), the Io Chromatic project (S2), the catalog copy step |
-| The base for `apps/server`, `packages/holocene` and snapshot publishing  | Holocene, the largest coupling, stays in the app. A change only in Io saves no CI job        |
-|                                                                          | A second published package, with its own first publish                                       |
+| Pros of Stage 1                                                                            | Cons of Stage 1                                                                              |
+| ------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------- |
+| The package manager stops Io from importing the app. A lint rule cannot.                   | 17 to 21 engineer-days, after 9 to 12 for Stage 0                                            |
+| `@temporalio/io` is a small package with no SvelteKit dependency                           | A release freeze of about 7 to 8 working days, from step 1.3 to 1.7                          |
+| Each package owns its dependencies, and the catalog sets one version                       | `cloud-ui` must change in the same window                                                    |
+| The catalog and the dev tools leave the published app                                      | Open items: `svelte-check --tsgo` (S1), the Io Chromatic project (S2), the catalog copy step |
+| Io grows as it replaces Holocene. The boundary keeps app imports out of each new component | A change only in Io saves no CI job                                                          |
+| A move now costs the least: Io has 13 components and 44 import lines today                 |                                                                                              |
+| The base for `apps/server` and snapshot publishing                                         |                                                                                              |
+|                                                                                            | A second published package, with its own first publish                                       |
 
-**Opinion of the author:** the pros of Stage 1 are larger than the cons only if one of these is true:
-
-1. A consumer other than the app needs `@temporalio/io`.
-2. The team plans the Holocene decoupling next.
-
-If neither is true, an eslint zone for Io gives most of the boundary value for less work (decision record 4, option 3). The Stage 1 gate asks these two questions.
+**Opinion of the author:** the pros of Stage 1 are larger than the cons. Io is planned to replace Holocene, so Io grows, and each Holocene component must move into Io without its app imports. A package boundary enforces that, and it also stops dependencies that Io does not declare. An eslint zone (decision record 4, option 3) checks only imports. A later split costs more, because Io is larger then. The largest risk is S1: the `--tsgo` type check fails across packages, so step 1.3 must solve it first.
 
 ## Already decided (not votes)
 
