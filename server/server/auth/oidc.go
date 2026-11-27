@@ -80,7 +80,12 @@ func ExchangeCode(ctx context.Context, r *http.Request, config *oauth2.Config, p
 		return nil, echo.NewHTTPError(http.StatusBadRequest, "Authorization code is missing from the SSO callback")
 	}
 
-	oauth2Token, err := config.Exchange(ctx, code)
+	var exchangeOpts []oauth2.AuthCodeOption
+	if codeVerifier, verr := r.Cookie("code_verifier"); verr == nil && codeVerifier.Value != "" {
+		exchangeOpts = append(exchangeOpts, oauth2.VerifierOption(codeVerifier.Value))
+	}
+
+	oauth2Token, err := config.Exchange(ctx, code, exchangeOpts...)
 	if err != nil {
 		return nil, echo.NewHTTPError(http.StatusInternalServerError, "Unable to exchange token: "+err.Error())
 	}

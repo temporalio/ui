@@ -122,11 +122,33 @@ func SetAuthRoutes(e *echo.Echo, cfgProvider *config.ConfigProviderWithRefresh) 
 	refreshTokenDuration := providerCfg.RefreshTokenDuration
 
 	api := e.Group("/auth")
-	api.GET("/sso", authenticate(&oauthCfg, providerCfg.Options, serverCfg.CORS.AllowOrigins, secure))
+	api.GET("/sso", authenticate(&oauthCfg, providerCfg.Options, serverCfg.CORS.AllowOrigins, secure, serverCfg.Auth.PKCEEnabled))
 	api.GET("/sso/callback", authenticateCb(ctx, &oauthCfg, provider, maxSessionDuration, refreshTokenDuration, secure))
 	api.GET("/sso_callback", authenticateCb(ctx, &oauthCfg, provider, maxSessionDuration, refreshTokenDuration, secure)) // compatibility with UI v1
 	api.GET("/refresh", refreshTokens(ctx, &oauthCfg, provider, maxSessionDuration, refreshTokenDuration, secure))
 	api.GET("/logout", logout(secure))
+
+	if serverCfg.Auth.PKCEEnabled {
+		warnIfProviderLacksS256(provider, providerCfg.ProviderURL)
+	}
+}
+
+func warnIfProviderLacksS256(provider *oidc.Provider, providerURL string) {
+	var discovery struct {
+		CodeChallengeMethodsSupported []string `json:"code_challenge_methods_supported"`
+	}
+	if err := provider.Claims(&discovery); err != nil {
+		log.Printf("auth_pkce_warning unable to read code_challenge_methods_supported from %s: %s", providerURL, err)
+		return
+	}
+
+	for _, method := range discovery.CodeChallengeMethodsSupported {
+		if method == "S256" {
+			return
+		}
+	}
+
+	log.Printf("auth_pkce_warning provider %s does not advertise code_challenge_methods_supported S256; PKCE may be silently ignored", providerURL)
 }
 
 // cookieSecureForCallbackURL reports whether the auth cookies may carry the Secure
@@ -152,7 +174,7 @@ func cookieSecureForCallbackURL(callbackURL string) (bool, error) {
 	}
 }
 
-func authenticate(config *oauth2.Config, options map[string]interface{}, allowedOrigins []string, secure bool) func(echo.Context) error {
+func authenticate(config *oauth2.Config, options map[string]interface{}, allowedOrigins []string, secure bool, pkceEnabled bool) func(echo.Context) error {
 	return func(c echo.Context) error {
 		state, err := randString()
 		if err != nil {
@@ -165,9 +187,8 @@ func authenticate(config *oauth2.Config, options map[string]interface{}, allowed
 		setCallbackCookie(c, "state", state, secure)
 		setCallbackCookie(c, "nonce", nonce, secure)
 
-		opts := []oauth2.AuthCodeOption{
-			oidc.Nonce(nonce),
-		}
+		opts := []oauth2.AuthCodeOption{oidc.Nonce(nonce)}
+
 		for k, v := range options {
 			var value string
 			if vStr, ok := v.(string); ok {
@@ -184,6 +205,12 @@ func authenticate(config *oauth2.Config, options map[string]interface{}, allowed
 			opts = append(opts, oauth2.SetAuthURLParam(k, value))
 		}
 
+		if pkceEnabled {
+			codeVerifier := oauth2.GenerateVerifier()
+			setPKCECookie(c, codeVerifier, secure)
+			opts = append(opts, oauth2.S256ChallengeOption(codeVerifier))
+		}
+
 		url := config.AuthCodeURL(state, opts...)
 
 		return c.Redirect(http.StatusFound, url)
@@ -192,6 +219,8 @@ func authenticate(config *oauth2.Config, options map[string]interface{}, allowed
 
 func authenticateCb(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc.Provider, maxSessionDuration time.Duration, refreshTokenDuration time.Duration, secure bool) func(echo.Context) error {
 	return func(c echo.Context) error {
+		clearCookie(c, "code_verifier", secure)
+
 		user, err := auth.ExchangeCode(ctx, c.Request(), oauthCfg, provider)
 		if err != nil {
 			return err
@@ -312,6 +341,9 @@ func logout(secure bool) func(echo.Context) error {
 	return func(c echo.Context) error {
 		log.Printf("[Auth] User logout initiated from %s", c.RealIP())
 
+		// Clear PKCE code verifier
+		clearCookie(c, "code_verifier", secure)
+
 		// Clear refresh token cookie
 		clearCookie(c, "refresh", secure)
 		log.Printf("[Auth] Cleared refresh token cookie")
@@ -366,6 +398,19 @@ func setCallbackCookie(c echo.Context, name, value string, secure bool) {
 		Secure:   secure,
 		Path:     "/",
 		HttpOnly: true,
+	}
+	c.SetCookie(cookie)
+}
+
+func setPKCECookie(c echo.Context, value string, secure bool) {
+	cookie := &http.Cookie{
+		Name:     "code_verifier",
+		Value:    value,
+		MaxAge:   int(time.Hour.Seconds()),
+		Secure:   secure,
+		Path:     "/",
+		HttpOnly: true,
+		SameSite: http.SameSiteLaxMode,
 	}
 	c.SetCookie(cookie)
 }

@@ -24,6 +24,7 @@ disableWriteActions: false
 auth:
   enabled: true
   redirectToProvider: false
+  pkceEnabled: true
   # Below the 60s user cookie lifetime, so that the clamp is visible at login.
   maxSessionDuration: 45s
   providers:
